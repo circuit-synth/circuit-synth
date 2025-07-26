@@ -106,7 +106,7 @@ class CanonicalCircuit:
             # This is a circuit_synth.core.circuit.Circuit - process flat
             logger.debug("Processing circuit_synth.core.circuit.Circuit object")
             # Process components in the order they appear in the circuit
-            for idx, component in enumerate(circuit._components.values()):
+            for idx, component in enumerate(circuit.components):
                 # Determine component type in symbol:value format
                 # Extract just the symbol name from the full library:symbol format
                 symbol = component.symbol.split(':')[-1] if ':' in component.symbol else component.symbol
@@ -115,7 +115,7 @@ class CanonicalCircuit:
                 component_type = f"{symbol}:{value}"
                 
                 # Process each pin connection
-                for pin in component._pins.values():
+                for pin in component:
                     if pin.net:
                         conn = CanonicalConnection(
                             component_index=idx,

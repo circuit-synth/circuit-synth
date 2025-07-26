@@ -789,37 +789,33 @@ class SchematicGenerator(IKiCadIntegration):
                     existing_components = schematic.get_components() if hasattr(schematic, 'get_components') else []
                     logger.info(f"Found {len(existing_components)} components in existing schematic")
                     
-                    # Create canonical circuit from existing schematic
-                    existing_canonical = CanonicalCircuit()
-                    for comp in existing_components:
-                        existing_canonical.add_component(
-                            comp['reference'],
-                            comp['lib_id'],
-                            comp.get('value', ''),
-                            comp.get('footprint', '')
-                        )
-                    
                     # Create canonical circuit from new circuit definition
-                    new_canonical = CanonicalCircuit()
-                    for comp in circ.components:
-                        new_canonical.add_component(
-                            comp.reference,
-                            comp.lib_id,
-                            comp.value,
-                            comp.footprint
-                        )
+                    new_canonical = CanonicalCircuit.from_circuit(circ)
                     
-                    # Match components
-                    matcher = CircuitMatcher()
-                    matches = matcher.match_circuits(existing_canonical, new_canonical)
-                    logger.info(f"Matched {len(matches)} components between existing and new circuits")
+                    # For existing schematic, we need to create it with proper connections
+                    # Since the old add_component API is deprecated, we'll create with empty connections
+                    # and skip matching for now until schematic reader provides full connectivity
+                    existing_canonical = CanonicalCircuit([])
+                    
+                    # For now, skip canonical matching since existing schematic doesn't have full connectivity
+                    # Instead, do simple reference-based matching for components with same references
+                    matches = {}
+                    for comp in existing_components:
+                        ref = comp['reference']
+                        # Check if a component with same reference exists in new circuit
+                        for new_comp in circ.components:
+                            if new_comp.reference == ref:
+                                matches[ref] = ref
+                                break
+                    
+                    logger.info(f"Matched {len(matches)} components by reference between existing and new circuits")
                     
                     # Extract positions for matched components
                     for existing_ref, new_ref in matches.items():
                         for comp in existing_components:
                             if comp['reference'] == existing_ref:
                                 existing_positions[new_ref] = (comp['x'], comp['y'])
-                                logger.debug(f"Preserving position for {new_ref} (was {existing_ref}): ({comp['x']}, {comp['y']})")
+                                logger.debug(f"Preserving position for {new_ref}: ({comp['x']}, {comp['y']})")
                                 break
                     
                     logger.info(f"Preserving positions for {len(existing_positions)} matched components")

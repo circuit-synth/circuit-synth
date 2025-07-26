@@ -312,4 +312,10 @@ def root():
 
 if __name__ == '__main__':
     circuit = root()
+    
+    # Generate netlists
+    circuit.generate_kicad_netlist("example_kicad_project.net")
+    circuit.generate_json_netlist("example_kicad_project.json")
+    
+    # Generate KiCad project
     circuit.generate_kicad_project("example_kicad_project")

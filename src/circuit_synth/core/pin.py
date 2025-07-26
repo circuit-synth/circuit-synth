@@ -1,7 +1,7 @@
 # src/circuit_synth/core/pin.py
 
 from enum import Enum
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from .net import Net
 from ._logger import context_logger
@@ -99,7 +99,7 @@ class Pin:
       but stored for schematic export.
     """
 
-    def __init__(self, name: str, num: str, func: str | PinType, unit: int = 1, **kwargs):
+    def __init__(self, name: str, num: str, func: Union[str, PinType], unit: int = 1, **kwargs):
         self.name = name
         self.num = num       # e.g. "1", "2", ...
         # Convert string pin type to enum if needed
