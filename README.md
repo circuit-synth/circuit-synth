@@ -95,10 +95,62 @@ Unlike other circuit design tools that generate KiCad files as output only, circ
 - **Type Safety**: Full type hints support for better IDE integration
 - **Extensible Architecture**: Clean interfaces for custom implementations
 
-## Installation
+## Quick Start
+
+Try circuit-synth immediately without installation:
 
 ```bash
-pip install circuit-synth
+# Clone the repository
+git clone https://github.com/circuit-synth/circuit-synth.git
+cd circuit-synth
+
+# Run the example (automatically installs dependencies with uv)
+uv run python examples/example_kicad_project.py
+```
+
+This will generate a complete KiCad project in the `example_kicad_project/` directory.
+
+## Installation
+
+### Using uv (Recommended)
+
+```bash
+# Install uv if you don't have it
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install circuit-synth for development
+uv pip install -e ".[dev]"
+```
+
+### Using pip (in virtual environment)
+
+Since this package isn't published to PyPI yet, install from source:
+
+```bash
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Clone and install
+git clone https://github.com/circuit-synth/circuit-synth.git
+cd circuit-synth
+pip install -e ".[dev]"
+```
+
+### Development Setup
+
+For development work:
+
+```bash
+# Clone the repository
+git clone https://github.com/circuit-synth/circuit-synth.git
+cd circuit-synth
+
+# Install with development dependencies using uv
+uv sync
+
+# Or with pip
+pip install -e ".[dev]"
 ```
 
 
