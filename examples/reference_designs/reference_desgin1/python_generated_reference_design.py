@@ -48,7 +48,7 @@ if __name__ == '__main__':
     
     # Generate KiCad project directly (no intermediate files needed)
     c.generate_kicad_project(
-        path="python_generated_reference_design",
-        force_create=True
+        "python_generated_reference_design",
+        force_regenerate=True
     )
 
