@@ -90,7 +90,9 @@ class ComponentManager:
             value=value or "",
             footprint=footprint,
             properties=properties,
-            pins=symbol_def.pins.copy() if symbol_def.pins else []
+            pins=symbol_def.pins.copy() if symbol_def.pins else [],
+            in_bom=True,  # Ensure component is included in BOM
+            on_board=True  # Ensure component is included on board
         )
         
         # Determine position (now with component for dynamic sizing)
@@ -107,9 +109,15 @@ class ComponentManager:
         # Update component position
         component.position = Point(position[0], position[1])
         
-        # Add instance using centralized utility
-        project_name = getattr(self.schematic, 'project_name', 'circuit')
-        add_symbol_instance(component, project_name, "/")
+        # Add instance using centralized utility with proper hierarchy
+        from .instance_utils import add_symbol_instance, get_project_hierarchy_path
+        schematic_path = getattr(self.schematic, 'file_path', '')
+        if schematic_path:
+            project_name, hierarchical_path = get_project_hierarchy_path(schematic_path)
+        else:
+            project_name = getattr(self.schematic, 'project_name', 'circuit')
+            hierarchical_path = "/"
+        add_symbol_instance(component, project_name, hierarchical_path)
         
         # Add to schematic
         self.schematic.components.append(component)
@@ -145,6 +153,7 @@ class ComponentManager:
         value: Optional[str] = None,
         position: Optional[Tuple[float, float]] = None,
         rotation: Optional[float] = None,
+        footprint: Optional[str] = None,
         **properties
     ) -> bool:
         """
@@ -155,6 +164,7 @@ class ComponentManager:
             value: New value (if provided)
             position: New position (if provided)
             rotation: New rotation in degrees (if provided)
+            footprint: New footprint (if provided)
             **properties: Additional properties to update
             
         Returns:
@@ -170,6 +180,10 @@ class ComponentManager:
         if value is not None:
             component.value = value
         
+        # Update footprint
+        if footprint is not None:
+            component.footprint = footprint
+        
         # Update position
         if position is not None:
             position = self._snap_to_grid(position)
@@ -179,10 +193,27 @@ class ComponentManager:
         if rotation is not None:
             component.rotation = rotation
         
+        # Ensure component is properly included in BOM and board
+        # This fixes the "?" symbol issue caused by in_bom=no or on_board=no
+        component.in_bom = True
+        component.on_board = True
+        
+        # Ensure component has proper instance information for reference display
+        if not component.instances or len(component.instances) == 0:
+            from .instance_utils import add_symbol_instance, get_project_hierarchy_path
+            schematic_path = getattr(self.schematic, 'file_path', '')
+            if schematic_path:
+                project_name, hierarchical_path = get_project_hierarchy_path(schematic_path)
+            else:
+                project_name = getattr(self.schematic, 'project_name', 'circuit')
+                hierarchical_path = "/"
+            add_symbol_instance(component, project_name, hierarchical_path)
+            logger.debug(f"Added instance information to component {component.reference}")
+        
         # Update additional properties
         component.properties.update(properties)
         
-        logger.debug(f"Updated component {reference}")
+        logger.debug(f"Updated component {reference} - ensuring in_bom=True, on_board=True")
         return True
     
     def find_component(self, reference: str) -> Optional[SchematicSymbol]:

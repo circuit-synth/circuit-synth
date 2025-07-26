@@ -20,8 +20,13 @@ def resistor_divider():
     out = Net('out')
     GND = Net('GND')
     
+    r1 = Component(
+        symbol="Device:R", ref="R", value="4.7k",
+        footprint="Resistor_SMD:R_0603_1608Metric"
+    )
+
     r2 = Component(
-        symbol="Device:R", ref="R2", value="1k",
+        symbol="Device:R", ref="R", value="1k",
         footprint="Resistor_SMD:R_0603_1608Metric"
     )
 
@@ -29,6 +34,8 @@ def resistor_divider():
         symbol="Device:C", ref="C", value="100nF",
         footprint="Capacitor_SMD:C_0603_1608Metric"
     )
+    r1["1"] += _5v
+    r1["2"] += out
     r2["1"] += out
     r2["2"] += GND
     c1["1"] += out
@@ -42,6 +49,6 @@ if __name__ == '__main__':
     # Generate KiCad project directly (no intermediate files needed)
     c.generate_kicad_project(
         "python_generated_reference_design",
-        force_regenerate=False  # Changed to preserve user edits
+        force_regenerate=False
     )
 

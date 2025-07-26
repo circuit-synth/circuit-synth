@@ -74,6 +74,9 @@ class APISynchronizer:
         self.parser = SExpressionParser()
         self.schematic = self._load_schematic()
         
+        # Store the file path in the schematic for instance hierarchy detection
+        self.schematic.file_path = str(self.schematic_path)
+        
         # Initialize API components
         self.component_manager = ComponentManager(self.schematic)
         self.search_engine = SearchEngine(self.schematic)
@@ -155,12 +158,31 @@ class APISynchronizer:
         try:
             # Extract components from circuit
             circuit_components = self._extract_circuit_components(circuit)
+            logger.info(f"=== CIRCUIT COMPONENTS EXTRACTED ===")
+            for comp_id, comp_data in circuit_components.items():
+                logger.info(f"  Circuit Component: {comp_id}")
+                logger.info(f"    Reference: {comp_data.get('reference')}")
+                logger.info(f"    Value: {comp_data.get('value')}")
+                logger.info(f"    Symbol: {comp_data.get('symbol')}")
 
             kicad_components = {c.reference: c for c in self.schematic.components}
+            logger.info(f"=== KICAD COMPONENTS FOUND ===")
+            for ref, comp in kicad_components.items():
+                logger.info(f"  KiCad Component: {ref}")
+                logger.info(f"    Value: {getattr(comp, 'value', 'N/A')}")
+                logger.info(f"    Symbol: {getattr(comp, 'lib_id', 'N/A')}")
+                logger.info(f"    Position: ({getattr(comp, 'at_x', 'N/A')}, {getattr(comp, 'at_y', 'N/A')})")
 
             # Match components using strategies
             matches = self._match_components(circuit_components, kicad_components)
             report.matched = matches
+            
+            logger.info(f"=== MATCHING RESULTS ===")
+            logger.info(f"  Total circuit components: {len(circuit_components)}")
+            logger.info(f"  Total KiCad components: {len(kicad_components)}")
+            logger.info(f"  Total matches found: {len(matches)}")
+            for circuit_id, kicad_ref in matches.items():
+                logger.info(f"    MATCHED: {circuit_id} -> {kicad_ref}")
 
             # Process matches
             self._process_matches(circuit_components, kicad_components, matches, report)
@@ -209,13 +231,29 @@ class APISynchronizer:
         all_components = get_all_components(circuit)
         
         for comp in all_components:
-            comp_id = comp.id if hasattr(comp, 'id') else comp.ref
+            # Debug: Check component type and attributes
+            logger.debug(f"Processing component: {type(comp).__name__}, attributes: {dir(comp)}")
+            
+            # Handle different component types
+            if hasattr(comp, 'reference'):  # KiCad SchematicSymbol
+                comp_id = comp.reference
+                comp_ref = comp.reference
+                comp_value = getattr(comp, 'value', '')
+                comp_symbol = getattr(comp, 'lib_id', None)
+                comp_footprint = getattr(comp, 'footprint', None)
+            else:  # Circuit Synth Component
+                comp_id = comp.id if hasattr(comp, 'id') else comp.ref
+                comp_ref = comp.ref
+                comp_value = comp.value
+                comp_symbol = getattr(comp, 'symbol', None)
+                comp_footprint = getattr(comp, 'footprint', None)
+            
             result[comp_id] = {
                 'id': comp_id,
-                'reference': comp.ref,
-                'value': comp.value,
-                'symbol': getattr(comp, 'symbol', None),  # Add symbol field
-                'footprint': getattr(comp, 'footprint', None),
+                'reference': comp_ref,
+                'value': comp_value,
+                'symbol': comp_symbol,  # Add symbol field
+                'footprint': comp_footprint,
                 'pins': self._extract_pin_info(comp),
                 'original': comp
             }
@@ -236,14 +274,33 @@ class APISynchronizer:
         """Match components using multiple strategies."""
         all_matches = {}
         
-        for strategy in self.strategies:
+        logger.info(f"=== COMPONENT MATCHING STRATEGIES ===")
+        for i, strategy in enumerate(self.strategies):
+            strategy_name = strategy.__class__.__name__
+            logger.info(f"  Strategy {i+1}: {strategy_name}")
+            
             matches = strategy.match_components(circuit_components, kicad_components)
+            logger.info(f"    Found {len(matches)} matches:")
+            for circuit_id, kicad_ref in matches.items():
+                logger.info(f"      {circuit_id} -> {kicad_ref}")
             
             # Add new matches that don't conflict
+            new_matches_added = 0
             for circuit_id, kicad_ref in matches.items():
                 if circuit_id not in all_matches and kicad_ref not in all_matches.values():
                     all_matches[circuit_id] = kicad_ref
+                    new_matches_added += 1
+                    logger.info(f"      ADDED: {circuit_id} -> {kicad_ref}")
+                else:
+                    if circuit_id in all_matches:
+                        logger.info(f"      SKIPPED (circuit_id conflict): {circuit_id} already matched to {all_matches[circuit_id]}")
+                    if kicad_ref in all_matches.values():
+                        existing_circuit_id = [k for k, v in all_matches.items() if v == kicad_ref][0]
+                        logger.info(f"      SKIPPED (kicad_ref conflict): {kicad_ref} already matched to {existing_circuit_id}")
+                        
+            logger.info(f"    New matches added from this strategy: {new_matches_added}")
         
+        logger.info(f"  Final matches after all strategies: {len(all_matches)}")
         return all_matches
     
     def _process_matches(self, circuit_components: Dict, kicad_components: Dict,
@@ -269,26 +326,48 @@ class APISynchronizer:
             return True
         if circuit_comp.get('footprint') and circuit_comp['footprint'] != kicad_comp.footprint:
             return True
+        # Always ensure components have proper BOM and board inclusion flags
+        # This fixes the "?" symbol issue caused by in_bom=no or on_board=no
+        if not kicad_comp.in_bom or not kicad_comp.on_board:
+            logger.debug(f"Component {kicad_comp.reference} needs update for BOM/board flags: in_bom={kicad_comp.in_bom}, on_board={kicad_comp.on_board}")
+            return True
         return False
     
     def _process_unmatched(self, circuit_components: Dict, kicad_components: Dict,
                           matches: Dict[str, str], report: SyncReport):
         """Process unmatched components."""
+        logger.info(f"=== PROCESSING UNMATCHED COMPONENTS ===")
+        
         # Find circuit components to add
         matched_circuit_ids = set(matches.keys())
+        unmatched_circuit_components = []
         for circuit_id, comp_data in circuit_components.items():
             if circuit_id not in matched_circuit_ids:
-                self._add_component(comp_data, report)
+                unmatched_circuit_components.append((circuit_id, comp_data))
+                
+        logger.info(f"  Circuit components to ADD: {len(unmatched_circuit_components)}")
+        for circuit_id, comp_data in unmatched_circuit_components:
+            logger.info(f"    ADDING: {circuit_id} (ref={comp_data.get('reference')}, value={comp_data.get('value')})")
+            self._add_component(comp_data, report)
         
         # Find KiCad components to preserve/remove
         matched_kicad_refs = set(matches.values())
+        unmatched_kicad_components = []
         for kicad_ref in kicad_components:
             if kicad_ref not in matched_kicad_refs:
-                if self.preserve_user_components:
-                    report.preserved.append(kicad_ref)
-                else:
-                    self.component_manager.remove_component(kicad_ref)
-                    report.removed.append(kicad_ref)
+                unmatched_kicad_components.append(kicad_ref)
+                
+        logger.info(f"  KiCad components to PRESERVE/REMOVE: {len(unmatched_kicad_components)}")
+        for kicad_ref in unmatched_kicad_components:
+            kicad_comp = kicad_components[kicad_ref]
+            logger.info(f"    UNMATCHED KiCad: {kicad_ref} (value={getattr(kicad_comp, 'value', 'N/A')})")
+            if self.preserve_user_components:
+                logger.info(f"      -> PRESERVING (preserve_user_components=True)")
+                report.preserved.append(kicad_ref)
+            else:
+                logger.info(f"      -> REMOVING (preserve_user_components=False)")
+                self.component_manager.remove_component(kicad_ref)
+                report.removed.append(kicad_ref)
     
     def _add_component(self, comp_data: Dict, report: SyncReport):
         """Add a new component to the schematic."""
