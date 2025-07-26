@@ -314,26 +314,37 @@ def root():
 if __name__ == '__main__':
     c = root()
     
-    # Generate text netlist
-    netlist_text = c.generate_text_netlist()
-    print("=== TEXT NETLIST ===")
-    print(netlist_text)
+    # Print the circuit structure
+    print(c)
     
-    # Generate JSON netlist
-    print("\n=== GENERATING JSON NETLIST ===")
+    # Generate netlists
+    print("\n=== Generating netlists ===")
     c.generate_json_netlist("circuit_synth_example_kicad_project.json")
-    print("JSON netlist saved to: circuit_synth_example_kicad_project.json")
-    
-    # Generate KiCad netlist
-    print("\n=== GENERATING KICAD NETLIST ===")
     c.generate_kicad_netlist("circuit_synth_example_kicad_project.net")
-    print("KiCad netlist saved to: circuit_synth_example_kicad_project.net")
     
-    print("\n=== CIRCUIT GENERATION COMPLETE ===")
-    print("This example demonstrates the core circuit synthesis features:")
-    print("- @circuit decorator for hierarchical design")
-    print("- Component creation and connection")
-    print("- Net management")
-    print("- Netlist generation in multiple formats")
-    print("\nNote: KiCad schematic generation requires additional modules")
-    print("that are not included in the open source package.")
+    # Create output directory for KiCad project
+    output_dir = "kicad_output"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Generate KiCad project with schematic
+    logger.info(f"Generating KiCad project in {output_dir}")
+    
+    # Import is already available from "from circuit_synth import *" at the top
+    gen = create_unified_kicad_integration(output_dir, "example_kicad_project")
+    
+    # Generate the project with specified placement algorithm
+    gen.generate_project(
+        "circuit_synth_example_kicad_project.json",
+        schematic_placement="connection_aware",  # Default placement algorithm
+        generate_pcb=True,
+        force_regenerate=True,
+        draw_bounding_boxes=True  # Enable bounding box visualization
+    )
+    
+    print("\n=== KiCad project generated successfully! ===")
+    print(f"Output directory: {output_dir}/example_kicad_project/")
+    print("Files generated:")
+    print("  - example_kicad_project.kicad_pro (project file)")
+    print("  - example_kicad_project.kicad_sch (root schematic)")
+    print("  - example_kicad_project.kicad_pcb (PCB file)")
+    print("  - Hierarchical schematics for each subcircuit")
