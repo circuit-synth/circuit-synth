@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 360a336c-3323-47e9-8e4d-90f9e32ce398)
+	(uuid f0f6732a-058c-4d8a-87d4-a7455e29a25e)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -1132,7 +1132,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid f2bed5f6-5530-4090-818e-bbf649535c39)
+		(uuid 19cf7211-0f23-4bcf-9eaf-af6784668b33)
 		(property
 			"Reference"
 			"P1"
@@ -1166,7 +1166,7 @@
 			(project
 				"example_kicad_project"
 				(path
-					"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/c885e2ec-a963-4311-ba21-2c795dda6da0"
+					"/c2317114-faf4-4a41-a39a-94797d166521/3f0e2cd7-e41a-4894-bbff-43c5a5cdb969/46921933-f888-4707-8e3c-e812a22e9a37"
 					(reference P1)
 					(unit 1)
 				)
@@ -1179,7 +1179,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid f366a3d3-20ee-4e42-980a-94a80ba8b0b8)
+		(uuid ca2429e2-7faa-4ada-9923-0d006735073c)
 		(property
 			"Reference"
 			"R13"
@@ -1223,7 +1223,7 @@
 			(project
 				"example_kicad_project"
 				(path
-					"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/c885e2ec-a963-4311-ba21-2c795dda6da0"
+					"/c2317114-faf4-4a41-a39a-94797d166521/3f0e2cd7-e41a-4894-bbff-43c5a5cdb969/46921933-f888-4707-8e3c-e812a22e9a37"
 					(reference R13)
 					(unit 1)
 				)
@@ -1236,7 +1236,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 8982103d-af59-4a9b-855f-41b22b0cac17)
+		(uuid ff925d89-363e-472e-a262-19355aa44e1a)
 		(property
 			"Reference"
 			"C9"
@@ -1280,7 +1280,7 @@
 			(project
 				"example_kicad_project"
 				(path
-					"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/c885e2ec-a963-4311-ba21-2c795dda6da0"
+					"/c2317114-faf4-4a41-a39a-94797d166521/3f0e2cd7-e41a-4894-bbff-43c5a5cdb969/46921933-f888-4707-8e3c-e812a22e9a37"
 					(reference C9)
 					(unit 1)
 				)
@@ -1293,7 +1293,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid eed514d0-1480-4ba8-b068-86cd7ed7d774)
+		(uuid dcdfb0af-7e29-492a-a7d2-ef049faec3e0)
 		(property
 			"Reference"
 			"R14"
@@ -1337,7 +1337,7 @@
 			(project
 				"example_kicad_project"
 				(path
-					"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/c885e2ec-a963-4311-ba21-2c795dda6da0"
+					"/c2317114-faf4-4a41-a39a-94797d166521/3f0e2cd7-e41a-4894-bbff-43c5a5cdb969/46921933-f888-4707-8e3c-e812a22e9a37"
 					(reference R14)
 					(unit 1)
 				)
@@ -1350,7 +1350,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid b03b7961-36c2-4c67-a11b-857b72215a11)
+		(uuid 6ec0349b-fdba-4d50-bf5c-161c3a5b7478)
 		(property
 			"Reference"
 			"D3"
@@ -1384,7 +1384,7 @@
 			(project
 				"example_kicad_project"
 				(path
-					"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/c885e2ec-a963-4311-ba21-2c795dda6da0"
+					"/c2317114-faf4-4a41-a39a-94797d166521/3f0e2cd7-e41a-4894-bbff-43c5a5cdb969/46921933-f888-4707-8e3c-e812a22e9a37"
 					(reference D3)
 					(unit 1)
 				)
@@ -1397,7 +1397,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 7e4112a7-bcc0-4052-b8d9-178f8ffc52d2)
+		(uuid af3e56ef-712d-454f-8917-9b35d1cd0e8f)
 		(property
 			"Reference"
 			"R15"
@@ -1441,7 +1441,7 @@
 			(project
 				"example_kicad_project"
 				(path
-					"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/c885e2ec-a963-4311-ba21-2c795dda6da0"
+					"/c2317114-faf4-4a41-a39a-94797d166521/3f0e2cd7-e41a-4894-bbff-43c5a5cdb969/46921933-f888-4707-8e3c-e812a22e9a37"
 					(reference R15)
 					(unit 1)
 				)
@@ -1454,7 +1454,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 1c82aa3b-7a8a-45b3-8536-dc88b5f3d75f)
+		(uuid f6838532-2cfd-4069-90a7-28a62de7552f)
 		(property
 			"Reference"
 			"D4"
@@ -1488,7 +1488,7 @@
 			(project
 				"example_kicad_project"
 				(path
-					"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/c885e2ec-a963-4311-ba21-2c795dda6da0"
+					"/c2317114-faf4-4a41-a39a-94797d166521/3f0e2cd7-e41a-4894-bbff-43c5a5cdb969/46921933-f888-4707-8e3c-e812a22e9a37"
 					(reference D4)
 					(unit 1)
 				)
@@ -1505,7 +1505,7 @@
 			)
 			(justify right)
 		)
-		(uuid 38380f4b-877e-46b0-861e-ce452071a1b2)
+		(uuid c27bcb87-1570-4a8a-b31e-54f446688be7)
 	)
 	(hierarchical_label
 		GND
@@ -1517,7 +1517,7 @@
 			)
 			(justify right)
 		)
-		(uuid 6044a654-4e3f-4e2a-aeab-7444a0a86ef5)
+		(uuid 51f11b28-9164-4a9f-8f7e-10c4689202ef)
 	)
 	(hierarchical_label
 		GND
@@ -1529,7 +1529,7 @@
 			)
 			(justify right)
 		)
-		(uuid 38dcf687-1cf0-4e47-81a6-2fa070531027)
+		(uuid d9826a88-f01a-4dce-beb9-3752139895f8)
 	)
 	(hierarchical_label
 		GND
@@ -1541,7 +1541,7 @@
 			)
 			(justify left)
 		)
-		(uuid 3ca31a0c-5528-45f4-ba5a-e0eedac4da74)
+		(uuid 6d9d3849-1cfe-427b-bdaf-5d88f76cf052)
 	)
 	(hierarchical_label
 		GND
@@ -1553,7 +1553,7 @@
 			)
 			(justify left)
 		)
-		(uuid eacf12c4-b800-4a07-8ede-790135418ee2)
+		(uuid f9b81d9b-c726-4083-ac8a-9492fd8a73a7)
 	)
 	(hierarchical_label
 		5V
@@ -1565,7 +1565,7 @@
 			)
 			(justify left)
 		)
-		(uuid d5382741-7b70-4f80-a112-f563c10c3703)
+		(uuid 5ffc74a3-7f42-4d28-b6b7-479b9b5363c5)
 	)
 	(hierarchical_label
 		5V
@@ -1577,7 +1577,7 @@
 			)
 			(justify left)
 		)
-		(uuid d72d5a0f-cf7c-4249-8b71-09e7e49f4c88)
+		(uuid ace80d9c-7334-4db2-84a8-df68a3858669)
 	)
 	(hierarchical_label
 		N$7
@@ -1589,7 +1589,7 @@
 			)
 			(justify left)
 		)
-		(uuid c71d5aed-268a-4929-a87f-f2b18268ba57)
+		(uuid 5f406887-7cbc-4fda-9513-901ac7439ef8)
 	)
 	(hierarchical_label
 		N$7
@@ -1601,7 +1601,7 @@
 			)
 			(justify left)
 		)
-		(uuid a816d1e4-f9f8-431d-80b8-960beb87cd7c)
+		(uuid 2378f6d4-2a93-41a2-be7a-5e2af0960b0f)
 	)
 	(hierarchical_label
 		USB_DM_CONN
@@ -1613,7 +1613,7 @@
 			)
 			(justify left)
 		)
-		(uuid 3bf8b80f-5a88-4e5b-a824-adc828bc1b1a)
+		(uuid cbe58bb4-04ac-419f-9189-7c834de02578)
 	)
 	(hierarchical_label
 		USB_DM_CONN
@@ -1625,7 +1625,7 @@
 			)
 			(justify left)
 		)
-		(uuid b8f93305-b664-43bd-9c6d-efbf49f87496)
+		(uuid 54332974-1e3b-4eae-b583-8cb5492a3595)
 	)
 	(hierarchical_label
 		USB_DP_CONN
@@ -1637,7 +1637,7 @@
 			)
 			(justify left)
 		)
-		(uuid 52f0a0f5-4681-4b06-891c-dc3078264c2f)
+		(uuid f3eebc73-21e2-4aa5-a575-a7e967e95fd0)
 	)
 	(hierarchical_label
 		USB_DP_CONN
@@ -1649,7 +1649,7 @@
 			)
 			(justify left)
 		)
-		(uuid 22d47821-05e9-49cb-bb24-7161ba9d63ed)
+		(uuid 0ad3696c-5a41-476e-8a0d-e065fbf50ab9)
 	)
 	(hierarchical_label
 		USB_DM
@@ -1661,7 +1661,7 @@
 			)
 			(justify right)
 		)
-		(uuid 76ea9d0f-9315-41e7-9d9d-0545203b3d8d)
+		(uuid 14003a7c-6544-4f7f-9ae6-226f7a71ade5)
 	)
 	(hierarchical_label
 		USB_DM
@@ -1673,7 +1673,7 @@
 			)
 			(justify right)
 		)
-		(uuid 1e4465fb-ae5d-47d8-af8d-3646fafa8a2f)
+		(uuid df947c06-e6e6-4662-b695-ad10dcb5dc5f)
 	)
 	(hierarchical_label
 		USB_DP
@@ -1685,7 +1685,7 @@
 			)
 			(justify right)
 		)
-		(uuid 157948a8-6bdf-4042-a69e-05c282c868ac)
+		(uuid efafee3f-1edc-48b6-8364-538ee84658b1)
 	)
 	(hierarchical_label
 		USB_DP
@@ -1697,7 +1697,7 @@
 			)
 			(justify right)
 		)
-		(uuid 8c733318-5ce9-4f1e-b8c8-31b3b10561d4)
+		(uuid cb1abf50-ea62-4bed-b027-f0c7d50e5374)
 	)
 	(rectangle
 		(start 41.021 33.481)
@@ -1709,7 +1709,7 @@
 		(fill
 			(type none)
 		)
-		(uuid fecbfff1-99c8-4c2d-83eb-1a9c1ccf26cf)
+		(uuid 15133805-4f7f-406f-94ca-bff69955098b)
 	)
 	(rectangle
 		(start 55.96 113.491)
@@ -1721,7 +1721,7 @@
 		(fill
 			(type none)
 		)
-		(uuid e1c6d702-cc8b-43f9-84dd-e9ea4e70bc3e)
+		(uuid f16d39fa-09f5-491f-9538-76b225f88905)
 	)
 	(rectangle
 		(start 96.6 98.251)
@@ -1733,7 +1733,7 @@
 		(fill
 			(type none)
 		)
-		(uuid 0ce61004-3139-458f-bc37-b738fd07fdac)
+		(uuid 265ff5ca-b59e-4c56-8da4-33a34d5ba009)
 	)
 	(rectangle
 		(start 91.52 52.531000000000006)
@@ -1745,7 +1745,7 @@
 		(fill
 			(type none)
 		)
-		(uuid 88fa25ba-352f-48cc-bdb5-47a6fb0d9d77)
+		(uuid 763acca3-e3a6-42dc-a68e-c8b38b751afa)
 	)
 	(rectangle
 		(start 141.351 56.34100000000001)
@@ -1757,7 +1757,7 @@
 		(fill
 			(type none)
 		)
-		(uuid 8f98bc40-711a-42bb-92da-681ec59c13ce)
+		(uuid f377a864-cab3-4b0c-a18a-08bf1e145e53)
 	)
 	(rectangle
 		(start 111.84 52.531000000000006)
@@ -1769,7 +1769,7 @@
 		(fill
 			(type none)
 		)
-		(uuid 1d768183-a386-40a7-a78e-8d7d9b2746d9)
+		(uuid c4b01b34-69aa-4ece-88fb-557cc178509b)
 	)
 	(rectangle
 		(start 148.971 91.901)
@@ -1781,11 +1781,11 @@
 		(fill
 			(type none)
 		)
-		(uuid df2eb152-bcc2-4669-a721-a625078d8eb8)
+		(uuid 9ef90061-01f3-49d5-a3aa-247d910a3bb2)
 	)
 	(sheet_instances
 		(path
-			"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/c885e2ec-a963-4311-ba21-2c795dda6da0"
+			"/c2317114-faf4-4a41-a39a-94797d166521/3f0e2cd7-e41a-4894-bbff-43c5a5cdb969/46921933-f888-4707-8e3c-e812a22e9a37"
 			(page "1")
 		)
 	)

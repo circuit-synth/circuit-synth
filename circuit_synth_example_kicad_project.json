@@ -1,7 +1,7 @@
 {
   "name": "root",
   "description": "\n    Top-level circuit with individual nets instead of buses\n    ",
-  "tstamps": "/root-4611139120/",
+  "tstamps": "/root-4927415856/",
   "source_file": "root.kicad_sch",
   "components": {},
   "nets": {},
@@ -9,7 +9,7 @@
     {
       "name": "regulator",
       "description": "\n    A simple 3.3v regulator designed for 1A max current.\n    Includes 10uF input and output capacitors.\n    ",
-      "tstamps": "/regulator-4611139744/",
+      "tstamps": "/regulator-4927416432/",
       "source_file": "regulator.kicad_sch",
       "components": {
         "U2": {
@@ -210,7 +210,7 @@
     {
       "name": "Comms_processor",
       "description": "\n    Main processor (ESP32-S3) with individual nets for USB, SPI, and interrupts\n    ",
-      "tstamps": "/comms_processor-4309869696/",
+      "tstamps": "/comms_processor-4347908496/",
       "source_file": "Comms_processor.kicad_sch",
       "components": {
         "U1": {
@@ -1279,7 +1279,7 @@
         {
           "name": "Debug_Header",
           "description": "\n    Debug header connections using individual nets\n    ",
-          "tstamps": "/debug_header-4668823488/",
+          "tstamps": "/debug_header-4935817152/",
           "source_file": "Debug_Header.kicad_sch",
           "components": {
             "J1": {
@@ -1433,7 +1433,7 @@
         {
           "name": "HW_version",
           "description": "\n    A simple resistor divider to set the HW version.\n    Uses two 10K resistors from 3.3V -> HW_VER -> GND.\n    ",
-          "tstamps": "/hw_version-4693143776/",
+          "tstamps": "/hw_version-4960137440/",
           "source_file": "HW_version.kicad_sch",
           "components": {
             "R11": {
@@ -1617,7 +1617,7 @@
     {
       "name": "USB_Port",
       "description": "\n    USB-C port with in-line 22\u03a9 resistors, ESD diodes,\n    CC resistor to GND, and ESD diode on 5V rail.\n    Uses individual nets for D+/D-.\n    ",
-      "tstamps": "/usb_port-4693144496/",
+      "tstamps": "/usb_port-4960138160/",
       "source_file": "USB_Port.kicad_sch",
       "components": {
         "P1": {
@@ -2172,7 +2172,7 @@
     {
       "name": "IMU_Circuit",
       "description": "\n    LSM6DSL IMU circuit using SPI interface and interrupt pins.\n    ",
-      "tstamps": "/imu_circuit-4856406352/",
+      "tstamps": "/imu_circuit-5114339664/",
       "source_file": "IMU_Circuit.kicad_sch",
       "components": {
         "U3": {

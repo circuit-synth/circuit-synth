@@ -1,6 +1,6 @@
 (kicad_sch (version 20211123) (generator eeschema)
 
-  (uuid a749f405-c7ad-4be2-acf7-eb735b082507)
+  (uuid c2317114-faf4-4a41-a39a-94797d166521)
 
   (paper "A4")
 
@@ -10,7 +10,7 @@
   (sheet (at 25.4 25.4) (size 50.8 25.4)
     (stroke (width 0.1524) (type solid) (color 0 0 0 0))
     (fill (color 0 0 0 0.0000))
-    (uuid c1cf464d-b050-4e72-b2de-2f1b9b2f4d40)
+    (uuid 3f0e2cd7-e41a-4894-bbff-43c5a5cdb969)
     (property "Sheet name" "root" (id 0) (at 25.4 24.6884 0)
       (effects (font (size 1.27 1.27)) (justify left bottom))
     )
@@ -21,7 +21,7 @@
 
   (sheet_instances
     (path "/" (page "1"))
-    (path "/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40" (page "2"))
+    (path "/3f0e2cd7-e41a-4894-bbff-43c5a5cdb969" (page "2"))
   )
 
   (symbol_instances

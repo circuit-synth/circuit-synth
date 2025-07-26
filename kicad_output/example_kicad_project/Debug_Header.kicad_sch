@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 9732e9a4-83b2-43c7-b73e-1ddea9a7105f)
+	(uuid 0554bdd9-b448-4a12-a1ec-1788d40334c8)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -317,7 +317,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 7c1ef8c1-8f25-4313-9ce7-54d443ba1ab6)
+		(uuid 06f128f0-8a31-432c-a2bf-fbc277cd9a80)
 		(property
 			"Reference"
 			"J1"
@@ -351,7 +351,7 @@
 			(project
 				"example_kicad_project"
 				(path
-					"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/611cea57-d378-48ba-be35-41a223a9066e/d940330f-414d-4a32-b612-e5c95961dadc"
+					"/c2317114-faf4-4a41-a39a-94797d166521/3f0e2cd7-e41a-4894-bbff-43c5a5cdb969/ac67e813-745a-40b2-9f70-bdbc75a00e2d/cb2b3ed0-87c1-460f-a8c0-416e11c5e8ef"
 					(reference J1)
 					(unit 1)
 				)
@@ -368,7 +368,7 @@
 			)
 			(justify right)
 		)
-		(uuid 017f7f33-cb72-4468-a0ab-205c648a14a3)
+		(uuid 5227790c-df03-48a4-a359-4b134b08ba2a)
 	)
 	(hierarchical_label
 		N$2
@@ -380,7 +380,7 @@
 			)
 			(justify right)
 		)
-		(uuid 4e7d70b6-9366-4d46-9d62-dca9d9b24933)
+		(uuid a3504b54-45d0-4e3f-8bf0-2bbb4a325844)
 	)
 	(hierarchical_label
 		N$3
@@ -392,7 +392,7 @@
 			)
 			(justify right)
 		)
-		(uuid 4ff343dd-d7bc-43bc-9f9d-8de9ab986f53)
+		(uuid e9f40ead-9bc7-4327-bd7b-fd1dc1d31c11)
 	)
 	(hierarchical_label
 		3V3
@@ -404,7 +404,7 @@
 			)
 			(justify left)
 		)
-		(uuid 0d332c32-0370-4fb7-9fd1-c2ba3af174bc)
+		(uuid a026a469-94fc-44ae-af63-4c4111f9f551)
 	)
 	(hierarchical_label
 		GND
@@ -416,7 +416,7 @@
 			)
 			(justify left)
 		)
-		(uuid 39606616-f5ce-4835-ad26-623b57db34cf)
+		(uuid 013b2084-6824-4b13-85e7-cc767d79ee3b)
 	)
 	(hierarchical_label
 		N$4
@@ -428,7 +428,7 @@
 			)
 			(justify left)
 		)
-		(uuid daa540eb-aa20-45b9-a603-5f48c5f636a1)
+		(uuid 40227fe7-4a23-48b0-ac20-d58a533e4605)
 	)
 	(rectangle
 		(start 34.671 33.480999999999995)
@@ -440,11 +440,11 @@
 		(fill
 			(type none)
 		)
-		(uuid 1d49d649-d0d9-42eb-afa8-e46e270cb427)
+		(uuid 76e17ea6-5881-49fe-aa17-eab928dc4dd5)
 	)
 	(sheet_instances
 		(path
-			"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/611cea57-d378-48ba-be35-41a223a9066e/d940330f-414d-4a32-b612-e5c95961dadc"
+			"/c2317114-faf4-4a41-a39a-94797d166521/3f0e2cd7-e41a-4894-bbff-43c5a5cdb969/ac67e813-745a-40b2-9f70-bdbc75a00e2d/cb2b3ed0-87c1-460f-a8c0-416e11c5e8ef"
 			(page "1")
 		)
 	)
