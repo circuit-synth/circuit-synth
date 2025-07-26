@@ -1,8 +1,8 @@
 (kicad_sch
 	(version 20250114)
-	(generator "circuit_synth")
+	(generator "eeschema")
 	(generator_version 9.0)
-	(uuid 2b5db3a5-2db6-41cd-8ca2-ff5d8aed297d)
+	(uuid bf422d3c-ed0d-44bd-9289-e11a2540ea7d)
 	(paper A4)
 	(lib_symbols
 		(symbol "Device:R"
@@ -269,66 +269,22 @@
 			(embedded_fonts no)
 		)
 	)
-	(symbol
-		(lib_id Device:R)
-		(at 25.4 25.4 0)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid 9f017ba7-854e-4976-a673-fa1ef04b91de)
-		(property
-			"Reference"
-			"R1"
-			(at 25.4 20.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property
-			"Value"
-			"4.7k"
-			(at 25.4 30.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property
-			"Footprint"
-			"Resistor_SMD:R_0603_1608Metric"
-			(at 25.4 35.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project
-				"python_generated_reference_design"
-				(path
-					"/548f32ab-3b72-47b6-b7c9-f49e04bff365/2b5db3a5-2db6-41cd-8ca2-ff5d8aed297d"
-					(reference R1)
-					(unit 1)
-				)
-			)
-		)
+	(title_block
+		(title resistor_divider)
+		(date 2025-07-26)
+		(company Circuit-Synth)
 	)
 	(symbol
 		(lib_id Device:R)
-		(at 50.8 25.4 0)
-		(in_bom yes)
-		(on_board yes)
+		(at 60.96 90.17 0)
+		(in_bom no)
+		(on_board no)
 		(dnp no)
-		(uuid 43a1b3da-5c0b-4b2f-8c4d-31b522b8626c)
+		(uuid 39a44672-40d2-4623-9859-2afae299f9d1)
 		(property
 			"Reference"
 			"R2"
-			(at 50.8 20.4 0)
+			(at 60.96 85.17 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -338,7 +294,7 @@
 		(property
 			"Value"
 			"1k"
-			(at 50.8 30.4 0)
+			(at 60.96 95.17 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -348,7 +304,7 @@
 		(property
 			"Footprint"
 			"Resistor_SMD:R_0603_1608Metric"
-			(at 50.8 35.4 0)
+			(at 60.96 100.17 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -356,28 +312,19 @@
 				(hide yes)
 			)
 		)
-		(instances
-			(project
-				"python_generated_reference_design"
-				(path
-					"/548f32ab-3b72-47b6-b7c9-f49e04bff365/2b5db3a5-2db6-41cd-8ca2-ff5d8aed297d"
-					(reference R2)
-					(unit 1)
-				)
-			)
-		)
+		(instances)
 	)
 	(symbol
 		(lib_id Device:C)
-		(at 76.2 25.4 0)
-		(in_bom yes)
-		(on_board yes)
+		(at 76.2 85.09 0)
+		(in_bom no)
+		(on_board no)
 		(dnp no)
-		(uuid f9ae8875-55c4-4043-be17-eeffac7cc7f2)
+		(uuid 4887b2df-8b1c-4df8-8b61-3b4fd408dc28)
 		(property
 			"Reference"
 			"C1"
-			(at 76.2 20.4 0)
+			(at 76.2 80.09 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -387,7 +334,7 @@
 		(property
 			"Value"
 			"100nF"
-			(at 76.2 30.4 0)
+			(at 76.2 90.09 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -397,7 +344,7 @@
 		(property
 			"Footprint"
 			"Capacitor_SMD:C_0603_1608Metric"
-			(at 76.2 35.4 0)
+			(at 76.2 95.09 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -405,88 +352,121 @@
 				(hide yes)
 			)
 		)
-		(instances
-			(project
-				"python_generated_reference_design"
-				(path
-					"/548f32ab-3b72-47b6-b7c9-f49e04bff365/2b5db3a5-2db6-41cd-8ca2-ff5d8aed297d"
-					(reference C1)
-					(unit 1)
+		(instances)
+	)
+	(symbol
+		(lib_id Device:R)
+		(at 60.96 68.58 0)
+		(in_bom no)
+		(on_board no)
+		(dnp no)
+		(uuid a865e6f0-32dd-4f58-8003-0c76cafd826b)
+		(property
+			"Reference"
+			"R1"
+			(at 60.96 63.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
 				)
 			)
 		)
+		(property
+			"Value"
+			"4.7k"
+			(at 60.96 73.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Resistor_SMD:R_0603_1608Metric"
+			(at 60.96 78.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances)
+	)
+	(wire
+		(pts
+			(xy 60.96 81.28)
+			(xy 60.96 72.39)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid 08a00610-d79c-479d-905a-eb7e130dcafa)
+	)
+	(wire
+		(pts
+			(xy 76.2 81.28)
+			(xy 60.96 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid 4872689d-b3d4-4c24-8042-c67e0596246e)
+	)
+	(wire
+		(pts
+			(xy 60.96 81.28)
+			(xy 60.96 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid 6c6d517f-1487-4f2a-a63f-81b20e6f390c)
 	)
 	(hierarchical_label
 		5V
 		(shape input)
-		(at 25.4 21.59 90)
+		(at 60.96 64.77 90)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid 0a5e1c09-2e96-4849-8d48-97923717ee03)
-	)
-	(hierarchical_label
-		out
-		(shape input)
-		(at 76.2 21.59 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 44b601ac-fd5c-46ce-8cce-0ffa67d0b4ce)
-	)
-	(hierarchical_label
-		out
-		(shape input)
-		(at 25.4 29.209999999999997 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 8124caf4-1808-4ceb-bbb1-cf02337c8f9f)
-	)
-	(hierarchical_label
-		out
-		(shape input)
-		(at 50.8 21.59 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid bfab82ee-dcf5-4c73-8685-3027f1b30c1c)
+		(uuid 0e08ecda-1ed7-4cd0-96ba-51a98f03cdd5)
 	)
 	(hierarchical_label
 		GND
 		(shape input)
-		(at 76.2 29.209999999999997 270)
+		(at 60.96 93.98 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right)
 		)
-		(uuid 58488424-8184-48ec-8e86-16f256d32120)
+		(uuid 4770f8f6-801d-4ecf-bd06-e5b357f16f9e)
 	)
 	(hierarchical_label
 		GND
 		(shape input)
-		(at 50.8 29.209999999999997 270)
+		(at 76.2 88.9 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right)
 		)
-		(uuid d82b6018-8aba-41ff-9ba8-48fbac97bbd3)
+		(uuid 8d6baa88-cb7b-49f8-a9c3-b344579ca314)
+	)
+	(junction
+		(at 60.96 81.28)
+		(diameter 0)
+		(uuid ed630dd3-1ded-4493-a1b8-080e9e5e0bb4)
 	)
 	(sheet_instances
 		(path
