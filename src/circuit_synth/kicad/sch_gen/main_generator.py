@@ -26,7 +26,29 @@ from .circuit_loader import load_circuit_hierarchy, assign_subcircuit_instance_l
 from .schematic_writer import SchematicWriter, write_schematic_file
 from .collision_manager import CollisionManager, SHEET_MARGIN
 from .connection_aware_collision_manager import ConnectionAwareCollisionManager
-from .llm_placement_agent import LLMPlacementManager
+# Try to import LLM placement agent, fallback to basic placement if not available
+try:
+    from .llm_placement_agent import LLMPlacementManager
+    LLM_PLACEMENT_AVAILABLE = True
+except ImportError:
+    # Create a basic fallback placement manager
+    class LLMPlacementManager:
+        def __init__(self, *args, **kwargs):
+            logging.warning("LLM placement not available, using basic placement")
+            
+        def place_components(self, components, nets, existing_placements=None):
+            """Fallback to basic grid placement"""
+            placements = {}
+            x, y = 50, 50  # Starting position
+            for comp in components:
+                placements[comp.ref] = {'x': x, 'y': y}
+                x += 100  # Simple grid layout
+                if x > 400:  # Wrap to next row
+                    x = 50
+                    y += 100
+            return placements
+    
+    LLM_PLACEMENT_AVAILABLE = False
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
 from .symbol_geometry import SymbolBoundingBoxCalculator
