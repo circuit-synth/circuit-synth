@@ -16,7 +16,7 @@ Circuit Synth is an open-source Python library designed specifically for KiCad t
 ```python
 from circuit_synth import *
 
-@circuit(name="simple_esp32s3")
+@circuit(name="esp32s3_simple")
 def esp32s3_simple():
     """Simple ESP32-S3 circuit with decoupling capacitor and debug header"""
     

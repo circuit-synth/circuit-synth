@@ -73,18 +73,15 @@ python-to-kicad = "circuit_synth.scripts.python_to_kicad_sync:main"
 preload-symbols = "circuit_synth.scripts.preload_symbols:main"
 preparse-symbols = "circuit_synth.scripts.preparse_kicad_symbols:main"
 
-# PCB tracking (requires additional modules not in open source)
-# pcb-tracker = "circuit_synth.scripts.pcb_tracker_basic:cli"
-
 # Import/Export tools
 netlist-import = "circuit_synth.kicad.netlist_importer:main"
 json-to-python = "circuit_synth.codegen.json_to_python_project:main"
 
 [project.urls]
-Homepage = "https://github.com/circuitsynth/circuit-synth"
-Documentation = "https://circuitsynth.readthedocs.io"
-Repository = "https://github.com/circuitsynth/circuit-synth"
-Issues = "https://github.com/circuitsynth/circuit-synth/issues"
+Homepage = "https://github.com/circuit-synth/circuit-synth"
+Documentation = "https://circuit-synth.readthedocs.io"
+Repository = "https://github.com/circuit-synth/circuit-synth"
+Issues = "https://github.com/circuit-synth/circuit-synth/issues"
 
 [tool.setuptools]
 packages = ["circuit_synth"]
