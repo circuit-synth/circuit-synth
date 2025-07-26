@@ -1,10 +1,15 @@
 # circuit-synth
 
-Pythonic circuit design for production-ready KiCad projects
+Pythonic circuit design for professional KiCad projects
 
 ## Overview
 
-Circuit Synth is an open-source Python library that provides a high-level, programmatic interface for designing electronic circuits and generating KiCad projects. It allows you to define circuits using Python code, automatically handle component placement, and generate production-ready KiCad schematics and PCB layouts.
+Circuit Synth is an open-source Python library that provides a high-level, programmatic interface for designing electronic circuits and generating KiCad projects. It allows you to define circuits using Python code, automatically handle component placement, and generate professional-quality KiCad schematics and PCB layouts.
+
+**Current Status**: Circuit-synth is ready for professional use with the following capabilities:
+- Places components functionally (not yet optimized for intelligent board layout)
+- Places schematic parts (without intelligent placement algorithms)
+- Generates working KiCad projects suitable for professional development
 
 ## Features
 
@@ -24,48 +29,61 @@ pip install circuit-synth
 ## Quick Start
 
 ```python
-from circuit_synth import Circuit, Component, Net, circuit
+from circuit_synth import *
+import os
+
+# Define components
+LED_0603 = Component(
+    symbol="Device:LED", ref="D", value="LED",
+    footprint="LED_SMD:LED_0603_1608Metric"
+)
+
+R_330 = Component(
+    symbol="Device:R", ref="R", value="330",
+    footprint="Resistor_SMD:R_0603_1608Metric"
+)
 
 # Define a simple LED circuit
 @circuit
 def led_circuit():
+    # Create power nets
+    _3v3 = Net('3V3')
+    GND = Net('GND')
+    led_net = Net('LED_NET')
+    
     # Create components
-    led = Component("LED", "D1")
-    resistor = Component("R", "R1", value="330")
-    power = Component("VCC", "U1")
-    ground = Component("GND", "U2")
+    led = LED_0603()
+    led.ref = "D1"
     
-    # Create nets to connect components
-    vcc_net = Net("VCC")
-    led_net = Net("LED_NET")
-    gnd_net = Net("GND")
+    resistor = R_330()
+    resistor.ref = "R1"
     
-    # Connect components
-    power.connect("OUT", vcc_net)
-    resistor.connect("1", vcc_net)
-    resistor.connect("2", led_net)
-    led.connect("A", led_net)
-    led.connect("K", gnd_net)
-    ground.connect("IN", gnd_net)
-    
-    # Create and return circuit
-    circuit = Circuit("LED Circuit")
-    circuit.add_components(led, resistor, power, ground)
-    circuit.add_nets(vcc_net, led_net, gnd_net)
-    
-    return circuit
+    # Connect components using pin access
+    resistor[1] += _3v3      # Resistor to power
+    resistor[2] += led_net   # Resistor to LED
+    led[1] += led_net        # LED anode
+    led[2] += GND            # LED cathode
 
 # Generate KiCad files
-from circuit_synth import create_unified_kicad_integration
-
-kicad = create_unified_kicad_integration()
-circuit = led_circuit()
-kicad.generate_schematic(circuit, "output/led_circuit")
+if __name__ == '__main__':
+    c = led_circuit()
+    
+    # Create output directory
+    output_dir = "kicad_output"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Generate KiCad project
+    gen = create_unified_kicad_integration(output_dir, "led_circuit")
+    gen.generate_project(
+        circuit=c,
+        generate_pcb=True,
+        force_regenerate=True
+    )
 ```
 
 ## Documentation
 
-Full documentation is available at [https://circuitsynth.readthedocs.io](https://circuitsynth.readthedocs.io)
+Full documentation is available at [https://circuit-synth.readthedocs.io](https://circuit-synth.readthedocs.io)
 
 ## Contributing
 
@@ -77,6 +95,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-- Documentation: [https://circuitsynth.readthedocs.io](https://circuitsynth.readthedocs.io)
-- Issues: [GitHub Issues](https://github.com/circuitsynth/circuit-synth/issues)
-- Discussions: [GitHub Discussions](https://github.com/circuitsynth/circuit-synth/discussions)
+- Documentation: [https://circuit-synth.readthedocs.io](https://circuit-synth.readthedocs.io)
+- Issues: [GitHub Issues](https://github.com/circuit-synth/circuit-synth/issues)
+- Discussions: [GitHub Discussions](https://github.com/circuit-synth/circuit-synth/discussions)
