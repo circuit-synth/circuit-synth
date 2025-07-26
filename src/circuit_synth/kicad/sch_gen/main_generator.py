@@ -850,7 +850,7 @@ class SchematicGenerator(IKiCadIntegration):
                     # Read existing schematic
                     reader = SchematicReader()
                     schematic = reader.read_file(str(existing_sch_path))
-                    existing_components = schematic.get_components() if hasattr(schematic, 'get_components') else []
+                    existing_components = schematic.components
                     logger.info(f"Found {len(existing_components)} components in existing schematic")
                     
                     # Create canonical circuit from new circuit definition
@@ -865,7 +865,7 @@ class SchematicGenerator(IKiCadIntegration):
                     # Instead, do simple reference-based matching for components with same references
                     matches = {}
                     for comp in existing_components:
-                        ref = comp['reference']
+                        ref = comp.reference  # SchematicSymbol has reference attribute
                         # Check if a component with same reference exists in new circuit
                         for new_comp in circ.components:
                             if new_comp.reference == ref:
@@ -877,9 +877,12 @@ class SchematicGenerator(IKiCadIntegration):
                     # Extract positions for matched components
                     for existing_ref, new_ref in matches.items():
                         for comp in existing_components:
-                            if comp['reference'] == existing_ref:
-                                existing_positions[new_ref] = (comp['x'], comp['y'])
-                                logger.debug(f"Preserving position for {new_ref}: ({comp['x']}, {comp['y']})")
+                            if comp.reference == existing_ref:
+                                # SchematicSymbol position is a tuple (x, y, rotation)
+                                if comp.position:
+                                    x, y = comp.position[0], comp.position[1]  # Extract x, y from position tuple
+                                    existing_positions[new_ref] = (x, y)
+                                    logger.debug(f"Preserving position for {new_ref}: ({x}, {y})")
                                 break
                     
                     logger.info(f"Preserving positions for {len(existing_positions)} matched components")
