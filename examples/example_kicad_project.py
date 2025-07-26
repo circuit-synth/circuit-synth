@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import logging
-import os
 from circuit_synth import *
 
 # Configure logging to reduce noise - only show warnings and errors
@@ -312,50 +311,5 @@ def root():
 
 
 if __name__ == '__main__':
-    c = root()
-    netlist_text = c.generate_text_netlist()
-    print(netlist_text)
-    c.generate_json_netlist("circuit_synth_example_kicad_project.json")
-    c.generate_kicad_netlist("circuit_synth_example_kicad_project.net")
-    
-    # Create output directory for KiCad project
-    output_dir = "kicad_output"
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Generate KiCad project with schematic
-    logger.info(f"Generating KiCad project in {output_dir}")
-    logger.info(f"Using JSON file: circuit_synth_example_kicad_project.json")
-    
-    # Enable debug logging for PCB generation
-    pcb_logger = logging.getLogger('circuit_synth_core.kicad.pcb_gen')
-    pcb_logger.setLevel(logging.DEBUG)
-    
-    # Enable debug logging for placement algorithm
-    placement_logger = logging.getLogger('circuit_synth_core.kicad_api.pcb.placement')
-    placement_logger.setLevel(logging.DEBUG)
-    
-    # Check command line argument for placement algorithm
-    import sys
-    placement_algo = "connection_aware"  # Default
-    if len(sys.argv) > 1:
-        if sys.argv[1] in ["sequential", "connection_aware", "llm"]:
-            placement_algo = sys.argv[1]
-            logger.info(f"Using {placement_algo} placement algorithm from command line")
-        else:
-            logger.warning(f"Unknown placement algorithm: {sys.argv[1]}")
-            logger.info("Valid options: sequential, connection_aware, llm")
-    
-    gen = create_unified_kicad_integration(output_dir, "example_kicad_project")
-    # Note: component_spacing and group_spacing are now set to larger defaults in PCBGenerator
-    # Generate the project with specified placement algorithm
-    gen.generate_project(
-        "circuit_synth_example_kicad_project.json",
-        schematic_placement=placement_algo,  # Use specified placement algorithm
-        generate_pcb=True,
-        force_regenerate=True,
-        draw_bounding_boxes=True  # Enable bounding box visualization
-    )
-    logger.info(f"KiCad project generated successfully in {output_dir}")
-    
-    # Note: Auto-routing is now disabled by default in generate_pcb()
-    # To enable auto-routing, pass auto_route=True to the PCB generator
+    circuit = root()
+    circuit.generate_kicad_project("example_kicad_project")

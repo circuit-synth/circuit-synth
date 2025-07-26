@@ -4,17 +4,75 @@ Pythonic circuit design for professional KiCad projects
 
 ## Overview
 
-Circuit Synth is an open-source Python library that provides a high-level, programmatic interface for designing electronic circuits and generating KiCad projects. It allows you to define circuits using Python code, automatically handle component placement, and generate professional-quality KiCad schematics and PCB layouts.
+Circuit Synth is an open-source Python library designed specifically for KiCad that provides bidirectional import/export between KiCad projects and Python code. The library enables transparent, programmatic circuit design for professional development workflows.
 
 **Current Status**: Circuit-synth is ready for professional use with the following capabilities:
 - Places components functionally (not yet optimized for intelligent board layout)
 - Places schematic parts (without intelligent placement algorithms)
 - Generates working KiCad projects suitable for professional development
 
+## Example
+
+```python
+from circuit_synth import *
+
+@circuit(name="simple_esp32s3")
+def esp32s3_simple():
+    """Simple ESP32-S3 circuit with decoupling capacitor and debug header"""
+    
+    # Create power nets
+    _3V3 = Net('3V3')
+    GND = Net('GND')
+    
+    # ESP32-S3 module
+    esp32s3 = Component(
+        symbol="RF_Module:ESP32-S3-MINI-1",
+        ref="U",
+        footprint="RF_Module:ESP32-S2-MINI-1"
+    )
+    
+    # Decoupling capacitor
+    cap_power = Component(
+        symbol="Device:C",
+        ref="C", 
+        value="10uF",
+        footprint="Capacitor_SMD:C_0603_1608Metric"
+    )
+    
+    # Debug header
+    debug_header = Component(
+        symbol="Connector_Generic:Conn_02x03_Odd_Even",
+        ref="J",
+        footprint="Connector_IDC:IDC-Header_2x03_P2.54mm_Vertical"
+    )
+    
+    # Power connections
+    esp32s3["3V3"] += _3V3  # Power pin
+    esp32s3["GND"] += GND   # Ground pin
+    
+    # Decoupling capacitor connections
+    cap_power[1] += _3V3
+    cap_power[2] += GND
+    
+    # Debug header connections
+    debug_header[1] += esp32s3['EN']
+    debug_header[2] += _3V3
+    debug_header[3] += esp32s3['TXD0']
+    debug_header[4] += GND
+    debug_header[5] += esp32s3['RXD0']
+    debug_header[6] += esp32s3['IO0']
+
+if __name__ == '__main__':
+    circuit = esp32s3_simple()
+    circuit.generate_kicad_project("esp32s3_simple")
+```
+
 ## Features
 
+- **Bidirectional KiCad Integration**: Import existing KiCad projects to Python and export Python circuits to KiCad
+- **Professional Transparency**: Designed for use in professional development with clear, readable code generation
+- **KiCad-Specific**: Purpose-built for KiCad workflows and conventions
 - **Pythonic Circuit Design**: Define circuits using intuitive Python classes and decorators
-- **KiCad Integration**: Generate KiCad schematics and PCB layouts automatically
 - **Component Management**: Built-in component library with easy extensibility
 - **Smart Placement**: Automatic component placement algorithms
 - **Type Safety**: Full type hints support for better IDE integration
@@ -26,60 +84,6 @@ Circuit Synth is an open-source Python library that provides a high-level, progr
 pip install circuit-synth
 ```
 
-## Quick Start
-
-```python
-from circuit_synth import *
-import os
-
-# Define components
-LED_0603 = Component(
-    symbol="Device:LED", ref="D", value="LED",
-    footprint="LED_SMD:LED_0603_1608Metric"
-)
-
-R_330 = Component(
-    symbol="Device:R", ref="R", value="330",
-    footprint="Resistor_SMD:R_0603_1608Metric"
-)
-
-# Define a simple LED circuit
-@circuit
-def led_circuit():
-    # Create power nets
-    _3v3 = Net('3V3')
-    GND = Net('GND')
-    led_net = Net('LED_NET')
-    
-    # Create components
-    led = LED_0603()
-    led.ref = "D1"
-    
-    resistor = R_330()
-    resistor.ref = "R1"
-    
-    # Connect components using pin access
-    resistor[1] += _3v3      # Resistor to power
-    resistor[2] += led_net   # Resistor to LED
-    led[1] += led_net        # LED anode
-    led[2] += GND            # LED cathode
-
-# Generate KiCad files
-if __name__ == '__main__':
-    c = led_circuit()
-    
-    # Create output directory
-    output_dir = "kicad_output"
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Generate KiCad project
-    gen = create_unified_kicad_integration(output_dir, "led_circuit")
-    gen.generate_project(
-        circuit=c,
-        generate_pcb=True,
-        force_regenerate=True
-    )
-```
 
 ## Documentation
 

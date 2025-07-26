@@ -241,13 +241,99 @@ class Circuit:
         exporter = NetlistExporter(self)
         return exporter.generate_kicad_netlist(filename)
 
-    def generate_kicad_project(self, path: str, project_name: Optional[str] = None,
-                             force_create: bool = False, preserve_user_components: bool = True) -> None:
+    def generate_kicad_project(self, project_name: str, 
+                             generate_pcb: bool = True,
+                             force_regenerate: bool = True,
+                             placement_algorithm: str = "connection_aware") -> None:
         """
-        Generate or update a KiCad project (schematic files) from this circuit.
+        Generate a complete KiCad project (schematic + PCB) from this circuit.
+        
+        This method provides a simplified API that handles all the boilerplate setup
+        required for KiCad project generation, creating the project directory and
+        generating KiCad files directly without intermediate JSON files.
+        
+        Args:
+            project_name: Name of the KiCad project and directory to create
+            generate_pcb: Whether to generate PCB in addition to schematic (default: True)
+            force_regenerate: Force regeneration of existing files (default: True)
+            placement_algorithm: Component placement algorithm to use (default: "connection_aware")
+        
+        Example:
+            >>> circuit = esp32s3_simple()
+            >>> circuit.generate_kicad_project("esp32s3_simple")
         """
-        exporter = NetlistExporter(self)
-        return exporter.generate_kicad_project(path, project_name, force_create, preserve_user_components)
+        try:
+            # Import KiCad schematic generator directly
+            from ..kicad.sch_gen.main_generator import SchematicGenerator
+            
+            # Finalize references before generation
+            self.finalize_references()
+            
+            # Create output directory with the project name
+            output_path = Path(project_name).resolve()
+            output_path.mkdir(parents=True, exist_ok=True)
+            
+            context_logger.info(
+                "Starting KiCad project generation",
+                component="CIRCUIT",
+                project_name=project_name,
+                output_dir=str(output_path),
+                generate_pcb=generate_pcb,
+                placement_algorithm=placement_algorithm
+            )
+            
+            # Create a temporary JSON file for the circuit (will be cleaned up)
+            import tempfile
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as temp_file:
+                temp_json_path = temp_file.name
+                self.generate_json_netlist(temp_json_path)
+            
+            try:
+                # Create schematic generator that outputs directly to the project directory
+                generator = SchematicGenerator(str(output_path.parent), project_name)
+                
+                # Generate the complete project using the temporary JSON file
+                result = generator.generate_project(
+                    json_file=temp_json_path,
+                    schematic_placement=placement_algorithm,
+                    generate_pcb=generate_pcb,
+                    force_regenerate=force_regenerate,
+                    draw_bounding_boxes=False
+                )
+            finally:
+                # Clean up the temporary JSON file
+                import os
+                try:
+                    os.unlink(temp_json_path)
+                except OSError:
+                    pass
+            
+            if result.get('success', True):  # Default to success if not specified
+                context_logger.info(
+                    "KiCad project generated successfully",
+                    component="CIRCUIT",
+                    project_name=project_name,
+                    output_path=str(output_path)
+                )
+                print(f"KiCad project '{project_name}' generated successfully in {output_path}/")
+            else:
+                error_msg = result.get('error', 'Unknown error occurred during project generation')
+                context_logger.error(
+                    "KiCad project generation failed",
+                    component="CIRCUIT",
+                    project_name=project_name,
+                    error=error_msg
+                )
+                raise CircuitSynthError(f"KiCad project generation failed: {error_msg}")
+                
+        except ImportError as e:
+            error_msg = f"KiCad integration not available: {e}"
+            context_logger.error(error_msg, component="CIRCUIT")
+            raise CircuitSynthError(error_msg) from e
+        except Exception as e:
+            error_msg = f"Failed to generate KiCad project '{project_name}': {e}"
+            context_logger.error(error_msg, component="CIRCUIT", project_name=project_name)
+            raise CircuitSynthError(error_msg) from e
     
     def simulate(self):
         """
