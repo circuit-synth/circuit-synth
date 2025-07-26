@@ -1,0 +1,342 @@
+{
+  "name": "netlist6",
+  "components": {},
+  "nets": {},
+  "subcircuits": [
+    {
+      "name": "op-amp",
+      "components": {
+        "C1": {
+          "reference": "C1",
+          "value": "0.1uF",
+          "symbol": "",
+          "footprint": "Capacitor_SMD:C_0603_1608Metric",
+          "description": "Unpolarized capacitor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "op-amp",
+            "Sheetfile": "op-amp.kicad_sch",
+            "ki_keywords": "cap capacitor",
+            "ki_fp_filters": "C_*"
+          }
+        },
+        "R1": {
+          "reference": "R1",
+          "value": "10k",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "op-amp",
+            "Sheetfile": "op-amp.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        },
+        "R2": {
+          "reference": "R2",
+          "value": "100k",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "op-amp",
+            "Sheetfile": "op-amp.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        },
+        "U1": {
+          "reference": "U1",
+          "value": "~",
+          "symbol": "",
+          "footprint": "Package_TO_SOT_SMD:SOT-23-5",
+          "description": "Operational amplifier, single",
+          "pins": {},
+          "properties": {
+            "Sim.Pins": "1=in+ 2=in- 3=vcc 4=vee 5=out",
+            "Sim.Device": "SUBCKT",
+            "Sim.Library": "${KICAD8_SYMBOL_DIR}/Simulation_SPICE.sp",
+            "Sim.Name": "kicad_builtin_opamp",
+            "Sheetname": "op-amp",
+            "Sheetfile": "op-amp.kicad_sch",
+            "ki_keywords": "simulation"
+          }
+        }
+      },
+      "nets": {
+        "+3V3": [
+          {
+            "component": "U1",
+            "pin": {
+              "number": "3",
+              "name": "V+",
+              "type": "power_in"
+            }
+          }
+        ],
+        "VIN": [
+          {
+            "component": "U1",
+            "pin": {
+              "number": "1",
+              "name": "+",
+              "type": "input"
+            }
+          }
+        ],
+        "op_amp_out": [
+          {
+            "component": "C1",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R2",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U1",
+            "pin": {
+              "number": "5",
+              "name": "",
+              "type": "output"
+            }
+          }
+        ],
+        "GND": [
+          {
+            "component": "C1",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R1",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U1",
+            "pin": {
+              "number": "4",
+              "name": "V-",
+              "type": "power_in"
+            }
+          }
+        ],
+        "Net-(U1--)": [
+          {
+            "component": "R1",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R2",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U1",
+            "pin": {
+              "number": "2",
+              "name": "-",
+              "type": "input"
+            }
+          }
+        ]
+      },
+      "subcircuits": []
+    },
+    {
+      "name": "op-amp1",
+      "components": {
+        "C2": {
+          "reference": "C2",
+          "value": "1uF",
+          "symbol": "",
+          "footprint": "Capacitor_SMD:C_0603_1608Metric",
+          "description": "Unpolarized capacitor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "op-amp1",
+            "Sheetfile": "op-amp2.kicad_sch",
+            "ki_keywords": "cap capacitor",
+            "ki_fp_filters": "C_*"
+          }
+        },
+        "R3": {
+          "reference": "R3",
+          "value": "10k",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "op-amp1",
+            "Sheetfile": "op-amp2.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        },
+        "R4": {
+          "reference": "R4",
+          "value": "100k",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "op-amp1",
+            "Sheetfile": "op-amp2.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        },
+        "U2": {
+          "reference": "U2",
+          "value": "~",
+          "symbol": "",
+          "footprint": "Package_TO_SOT_SMD:SOT-23-5",
+          "description": "Operational amplifier, single",
+          "pins": {},
+          "properties": {
+            "Sim.Pins": "1=in+ 2=in- 3=vcc 4=vee 5=out",
+            "Sim.Device": "SUBCKT",
+            "Sim.Library": "${KICAD8_SYMBOL_DIR}/Simulation_SPICE.sp",
+            "Sim.Name": "kicad_builtin_opamp",
+            "Sheetname": "op-amp1",
+            "Sheetfile": "op-amp2.kicad_sch",
+            "ki_keywords": "simulation"
+          }
+        }
+      },
+      "nets": {
+        "+3V3": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "3",
+              "name": "V+",
+              "type": "power_in"
+            }
+          }
+        ],
+        "VIN": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "1",
+              "name": "+",
+              "type": "input"
+            }
+          }
+        ],
+        "op_amp_out": [
+          {
+            "component": "C2",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R4",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "5",
+              "name": "",
+              "type": "output"
+            }
+          }
+        ],
+        "GND": [
+          {
+            "component": "C2",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R3",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "4",
+              "name": "V-",
+              "type": "power_in"
+            }
+          }
+        ],
+        "Net-(U2--)": [
+          {
+            "component": "R3",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R4",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "2",
+              "name": "-",
+              "type": "input"
+            }
+          }
+        ]
+      },
+      "subcircuits": []
+    }
+  ],
+  "properties": {
+    "source": "/Users/shanemattner/Desktop/test_project/test_project.kicad_sch",
+    "date": "2025-02-25T19:29:07-0800",
+    "tool": "Eeschema 8.0.8"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "test_execution_timestamp": 1753507717.728051,
+  "overall_duration_seconds": 1.8705511093139648,
+  "total_test_suites": 2,
+  "successful_suites": 2,
+  "failed_suites": 0,
+  "success_rate": 100.0,
+  "rust_cache_status": {
+    "working": true,
+    "performance_improvement": 0.0,
+    "integration_successful": false
+  },
+  "suite_results": [
+    {
+      "suite_name": "cache_clearing",
+      "success": true,
+      "duration_seconds": 1.8703029155731201,
+      "summary": {
+        "caches_cleared": true,
+        "cache_locations": {
+          "python_symbol_cache": [],
+          "python_footprint_cache": [],
+          "rust_cache": [],
+          "temp_caches": [],
+          "kicad_caches": []
+        }
+      },
+      "output_files": [
+        "/Users/shanemattner/Desktop/Circuit_Synth/submodules/circuit-synth/cache_test_results/cache_locations.json"
+      ],
+      "error_message": null
+    },
+    {
+      "suite_name": "rust_cache_validation",
+      "success": true,
+      "duration_seconds": 0.0,
+      "summary": {
+        "skipped": true,
+        "reason": "rust_unified_cache removed"
+      },
+      "output_files": [],
+      "error_message": null
+    }
+  ],
+  "output_files": [
+    "/Users/shanemattner/Desktop/Circuit_Synth/submodules/circuit-synth/cache_test_results/cache_locations.json"
+  ],
+  "recommendations": [
+    "\u2139\ufe0f  Rust unified cache validation skipped (removed from project)."
+  ]
+}

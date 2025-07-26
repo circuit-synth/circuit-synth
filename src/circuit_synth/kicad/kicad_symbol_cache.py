@@ -16,11 +16,6 @@ from typing import Dict, Any, Optional, List
 
 # Use Python implementation for symbol cache (Infrastructure Preservation Strategy)
 # Rust modules are preserved as standalone components for future integration
-import warnings
-warnings.warn(
-    "Using Python symbol cache implementation for Component subscript compatibility",
-    UserWarning
-)
 RUST_SYMBOL_CACHE_AVAILABLE = False
 
 # Import the parser

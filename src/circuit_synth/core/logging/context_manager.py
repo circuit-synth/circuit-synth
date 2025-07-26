@@ -113,7 +113,7 @@ class UserContext:
             'session_id': self.session_id,
             'request_id': self.request_id,
             'chat_id': self.chat_id,
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now().astimezone().isoformat()
         }
 
 class SessionManager:
@@ -145,7 +145,7 @@ class SessionManager:
     
     def register_session(self, user_id: str, session_id: str) -> None:
         """Register a new session or update existing one."""
-        now = datetime.utcnow()
+        now = datetime.now().astimezone()
         
         with self._lock:
             if session_id not in self.sessions:

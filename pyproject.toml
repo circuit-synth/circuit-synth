@@ -38,12 +38,8 @@ dependencies = [
     "rich>=10.0.0",
     "loguru>=0.5.0",
     "psutil>=5.9.0",
-    # LLM and AI dependencies
-    "google-generativeai>=0.5.0",
-    "google-adk>=1.0.0",
-    "openai>=1.35.0",
-    "anthropic>=0.25.0",
-    "litellm>=1.0.0",
+    # Cache and performance dependencies
+    "cachetools>=5.3.0",
     # Additional data processing
     "sexpdata>=0.0.3",
     # Async support
@@ -55,11 +51,17 @@ dependencies = [
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=3.0.0",
+    "pytest-mock>=3.14.0",
     "black>=22.0.0",
     "isort>=5.10.0",
     "flake8>=4.0.0",
     "mypy>=0.950",
     "pre-commit>=2.17.0",
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-mock>=3.14.0",
+    "memory-profiler>=0.60.0",
 ]
 
 [project.urls]
@@ -88,3 +90,17 @@ python_version = "3.8"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow running tests",
+    "integration: marks tests as integration tests",
+    "functional: marks tests as functional tests",
+    "cache: marks tests as cache-related tests",
+]
