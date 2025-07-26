@@ -853,15 +853,7 @@ class SchematicGenerator(IKiCadIntegration):
                     existing_components = schematic.components
                     logger.info(f"Found {len(existing_components)} components in existing schematic")
                     
-                    # Create canonical circuit from new circuit definition
-                    new_canonical = CanonicalCircuit.from_circuit(circ)
-                    
-                    # For existing schematic, we need to create it with proper connections
-                    # Since the old add_component API is deprecated, we'll create with empty connections
-                    # and skip matching for now until schematic reader provides full connectivity
-                    existing_canonical = CanonicalCircuit([])
-                    
-                    # For now, skip canonical matching since existing schematic doesn't have full connectivity
+                    # Skip canonical matching for now since it's causing issues with SchematicSymbol compatibility
                     # Instead, do simple reference-based matching for components with same references
                     matches = {}
                     for comp in existing_components:
