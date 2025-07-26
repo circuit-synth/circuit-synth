@@ -1,0 +1,72 @@
+[package]
+name = "rust_core_circuit_engine"
+version = "0.1.0"
+edition = "2021"
+description = "High-performance core circuit engine for Circuit Synth"
+authors = ["Circuit Synth Team"]
+license = "MIT"
+
+[lib]
+name = "rust_core_circuit_engine"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# PyO3 for Python bindings
+pyo3 = { version = "0.21", features = ["extension-module"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Performance optimizations
+rayon = "1.7"                    # Parallel processing
+ahash = { version = "0.8", features = ["serde"] }  # Fast hashing with serde support
+smallvec = "1.11"                # Stack-allocated vectors
+indexmap = "2.0"                 # Ordered hash maps
+parking_lot = "0.12"             # High-performance synchronization primitives
+
+# String handling
+string-interner = "0.14"         # String interning for memory efficiency
+
+# Error handling
+thiserror = "1.0"                # Error derive macros
+anyhow = "1.0"                   # Error handling
+
+# Logging
+log = "0.4"
+env_logger = "0.10"
+
+# Regex for validation
+regex = "1.0"
+
+# Weak references and smart pointers
+weak-table = "0.3"               # Weak hash maps
+
+# Symbol cache integration
+# rust_symbol_cache = { path = "../rust_symbol_cache" }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.0"                 # Property-based testing
+tempfile = "3.0"                 # Temporary files for testing
+
+[[bench]]
+name = "circuit_benchmarks"
+harness = false
+
+[[bench]]
+name = "component_benchmarks"
+harness = false
+
+[[bench]]
+name = "reference_manager_benchmarks"
+harness = false
+
+[profile.release]
+lto = true                       # Link-time optimization
+codegen-units = 1               # Single codegen unit for better optimization
+panic = "abort"                 # Smaller binary size
+opt-level = 3                   # Maximum optimization
+
+[profile.dev]
+opt-level = 1                   # Some optimization for faster development builds

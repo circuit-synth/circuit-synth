@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "circuit_synth"
+version = "0.1.0"
+description = "Pythonic circuit design for production-ready KiCad projects"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Circuit Synth Contributors", email = "contact@circuitsynth.com"},
+]
+keywords = ["circuit", "design", "kicad", "electronics", "pcb", "schematic"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+]
+
+dependencies = [
+    "numpy>=1.20.0",
+    "scipy>=1.7.0",
+    "matplotlib>=3.3.0",
+    "networkx>=2.6.0",
+    "pydantic>=2.0.0",
+    "PyYAML>=5.4.0",
+    "click>=8.0.0",
+    "rich>=10.0.0",
+    "loguru>=0.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=3.0.0",
+    "black>=22.0.0",
+    "isort>=5.10.0",
+    "flake8>=4.0.0",
+    "mypy>=0.950",
+    "pre-commit>=2.17.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/circuitsynth/circuit-synth"
+Documentation = "https://circuitsynth.readthedocs.io"
+Repository = "https://github.com/circuitsynth/circuit-synth"
+Issues = "https://github.com/circuitsynth/circuit-synth/issues"
+
+[tool.setuptools]
+packages = ["circuit_synth"]
+package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+circuit_synth = ["py.typed"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

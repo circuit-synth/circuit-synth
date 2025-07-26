@@ -1,0 +1,86 @@
+[
+  {
+    "name": "VBAT",
+    "shape": "input",
+    "position": {
+      "x": 74.93,
+      "y": 82.55
+    },
+    "orientation": 0.0,
+    "effects": {
+      "font_size": 1.27,
+      "justify": "left"
+    },
+    "uuid": "rust-generated-0"
+  },
+  {
+    "name": "PC13",
+    "shape": "input",
+    "position": {
+      "x": 74.93,
+      "y": 85.09
+    },
+    "orientation": 0.0,
+    "effects": {
+      "font_size": 1.27,
+      "justify": "left"
+    },
+    "uuid": "rust-generated-1"
+  },
+  {
+    "name": "PA0",
+    "shape": "input",
+    "position": {
+      "x": 74.93,
+      "y": 92.71000000000001
+    },
+    "orientation": 0.0,
+    "effects": {
+      "font_size": 1.27,
+      "justify": "left"
+    },
+    "uuid": "rust-generated-2"
+  },
+  {
+    "name": "PA1",
+    "shape": "input",
+    "position": {
+      "x": 74.93,
+      "y": 95.25
+    },
+    "orientation": 0.0,
+    "effects": {
+      "font_size": 1.27,
+      "justify": "left"
+    },
+    "uuid": "rust-generated-3"
+  },
+  {
+    "name": "PA2",
+    "shape": "input",
+    "position": {
+      "x": 74.93,
+      "y": 97.79
+    },
+    "orientation": 0.0,
+    "effects": {
+      "font_size": 1.27,
+      "justify": "left"
+    },
+    "uuid": "rust-generated-4"
+  },
+  {
+    "name": "PA3",
+    "shape": "input",
+    "position": {
+      "x": 74.93,
+      "y": 100.33
+    },
+    "orientation": 0.0,
+    "effects": {
+      "font_size": 1.27,
+      "justify": "left"
+    },
+    "uuid": "rust-generated-5"
+  }
+]

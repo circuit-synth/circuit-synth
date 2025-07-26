@@ -1,0 +1,39 @@
+[package]
+name = "rust_force_directed_placement"
+version = "0.1.0"
+edition = "2021"
+description = "High-performance force-directed placement algorithm for PCB components"
+license = "MIT"
+
+[lib]
+name = "rust_force_directed_placement"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+pyo3 = { version = "0.20", features = ["extension-module"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rayon = "1.8"
+nalgebra = "0.32"
+rand = "0.8"
+thiserror = "1.0"
+log = "0.4"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+approx = "0.5"
+
+[[bench]]
+name = "force_directed_benchmark"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.bench]
+opt-level = 3
+lto = true
+codegen-units = 1

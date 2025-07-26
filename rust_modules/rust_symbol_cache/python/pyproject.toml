@@ -1,0 +1,68 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "rust-symbol-cache"
+version = "0.1.0"
+description = "High-performance Rust implementation of KiCad Symbol Library Cache"
+authors = [
+    {name = "Circuit Synth Team", email = "team@circuitsynth.com"},
+]
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+]
+keywords = ["kicad", "eda", "electronics", "symbols", "cache", "performance"]
+
+[project.urls]
+Homepage = "https://github.com/circuitsynth/rust-symbol-cache"
+Repository = "https://github.com/circuitsynth/rust-symbol-cache"
+Documentation = "https://rust-symbol-cache.readthedocs.io"
+
+[tool.maturin]
+python-source = "python"
+module-name = "rust_symbol_cache._rust_symbol_cache"
+features = ["pyo3/extension-module"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88

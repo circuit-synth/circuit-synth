@@ -1,0 +1,87 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "rust-force-directed-placement"
+version = "0.1.0"
+description = "High-performance force-directed placement algorithm for PCB components"
+authors = [
+    {name = "Circuit Synth Team", email = "team@circuitsynth.com"},
+]
+readme = "README.md"
+license = {text = "MIT"}
+keywords = ["pcb", "placement", "force-directed", "optimization", "rust"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-benchmark>=4.0",
+    "numpy>=1.20",
+    "matplotlib>=3.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/circuitsynth/rust-force-directed-placement"
+Repository = "https://github.com/circuitsynth/rust-force-directed-placement"
+Documentation = "https://rust-force-directed-placement.readthedocs.io"
+Changelog = "https://github.com/circuitsynth/rust-force-directed-placement/blob/main/CHANGELOG.md"
+
+[tool.maturin]
+python-source = "python"
+module-name = "rust_force_directed_placement._rust_force_directed_placement"
+features = ["pyo3/extension-module"]
+
+[tool.pytest.ini_options]
+testpaths = ["python/tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "benchmark: marks tests as benchmarks",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88

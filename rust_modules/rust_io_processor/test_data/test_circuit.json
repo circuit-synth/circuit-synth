@@ -1,0 +1,38 @@
+{
+  "name": "test_circuit",
+  "description": "Test circuit for benchmarking",
+  "components": {
+    "R1": {
+      "symbol": "Device:R",
+      "reference": "R1",
+      "value": "1k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "pins": [
+        {
+          "pin_id": 1,
+          "name": "~",
+          "num": "1",
+          "function": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 0
+        },
+        {
+          "pin_id": 2,
+          "name": "~",
+          "num": "2",
+          "function": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 180
+        }
+      ]
+    }
+  },
+  "nets": {},
+  "subcircuits": []
+}

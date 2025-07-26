@@ -1,0 +1,15 @@
+(kicad_sch (version 20230121)
+  (generator "rust_kicad_schematic_writer")
+  (uuid "rust-generated-schematic")
+  (paper "A4")
+  (lib_symbols)
+  
+  ; Generated 6 hierarchical labels
+  ; Components: 1
+  ; Nets: 6
+  
+  (sheet_instances
+    (path "/" (page "1"))
+  )
+  (embedded_fonts no)
+)

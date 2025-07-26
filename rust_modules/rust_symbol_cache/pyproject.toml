@@ -1,0 +1,20 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "rust_symbol_cache"
+version = "0.1.0"
+description = "High-performance Rust implementation of KiCad Symbol Library Cache"
+authors = [
+    {name = "Circuit Synth Team"}
+]
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
