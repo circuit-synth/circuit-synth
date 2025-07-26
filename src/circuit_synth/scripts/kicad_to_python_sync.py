@@ -234,6 +234,70 @@ class LLMCodeUpdater:
         """Initialize the LLM code updater"""
         self.llm_available = self._check_llm_availability()
     
+    def _sanitize_variable_name(self, name: str) -> str:
+        """
+        Convert a net or signal name to a valid Python variable name.
+        
+        Rules:
+        - Replace invalid characters with underscores
+        - Prefix with underscore if starts with a digit
+        - Handle common power net naming conventions
+        """
+        # Handle common power net special cases first
+        if name in ['3V3', '3.3V', '+3V3', '+3.3V']:
+            return '_3v3'
+        elif name in ['5V', '+5V', '5.0V', '+5.0V']:
+            return '_5v'
+        elif name in ['12V', '+12V', '12.0V', '+12.0V']:
+            return '_12v'
+        elif name in ['VCC', 'VDD', 'VDDA', 'VIN']:
+            return name.lower()
+        elif name in ['GND', 'GROUND', 'VSS', 'VSSA']:
+            return 'gnd'
+        
+        # Convert to lowercase and replace invalid characters
+        var_name = name.lower()
+        var_name = var_name.replace('+', 'p').replace('-', 'n').replace('.', '_')
+        var_name = var_name.replace('/', '_').replace('\\', '_').replace(' ', '_')
+        
+        # Remove any remaining non-alphanumeric characters except underscore
+        import re
+        var_name = re.sub(r'[^a-zA-Z0-9_]', '_', var_name)
+        
+        # Prefix with underscore if starts with a digit
+        if var_name and var_name[0].isdigit():
+            var_name = '_' + var_name
+        
+        # Ensure it's not empty and doesn't conflict with Python keywords
+        if not var_name or var_name in ['class', 'def', 'if', 'else', 'for', 'while', 'import', 'from', 'return']:
+            var_name = 'net_' + var_name
+            
+        return var_name
+    
+    def _sanitize_component_type_name(self, lib_id: str) -> str:
+        """
+        Convert a component lib_id to a valid Python variable name for component types.
+        
+        Example: "Connector:USB_C_Plug_USB2.0" -> "Connector_USB_C_Plug_USB2_0"
+        """
+        # Replace invalid characters with underscores
+        comp_type = lib_id.replace(":", "_").replace("-", "_").replace(".", "_")
+        comp_type = comp_type.replace("/", "_").replace("\\", "_").replace(" ", "_")
+        
+        # Remove any remaining non-alphanumeric characters except underscore
+        import re
+        comp_type = re.sub(r'[^a-zA-Z0-9_]', '_', comp_type)
+        
+        # Prefix with underscore if starts with a digit
+        if comp_type and comp_type[0].isdigit():
+            comp_type = '_' + comp_type
+        
+        # Ensure it's not empty and doesn't conflict with Python keywords
+        if not comp_type or comp_type in ['class', 'def', 'if', 'else', 'for', 'while', 'import', 'from', 'return']:
+            comp_type = 'component_' + comp_type
+            
+        return comp_type
+    
     def _check_llm_availability(self) -> bool:
         """Check if LLM services are available"""
         try:
@@ -648,9 +712,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         content.append("    # Create main nets")
         for net in sorted(unique_nets):
             if net in ['3V3', 'GND', 'VCC', 'VDD']:
-                net_var = net.lower()
-                if net == '3V3':
-                    net_var = '_3v3'
+                net_var = self._sanitize_variable_name(net)
                 content.append(f"    {net_var} = Net('{net}')")
         content.append("    ")
         
@@ -723,7 +785,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         # Add component definitions
         component_types = {}
         for comp in circuit.components:
-            comp_type = comp.lib_id.replace(":", "_").replace("-", "_")
+            comp_type = self._sanitize_component_type_name(comp.lib_id)
             if comp_type not in component_types:
                 content.append(f'# {comp.lib_id} component definition')
                 content.append(f'{comp_type} = Component(')
@@ -742,11 +804,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         # Add any additional nets from this circuit (avoiding duplicates)
         if circuit.nets:
             for net in sorted(circuit.nets):
-                net_var = net.lower().replace('+', 'p').replace('-', 'n').replace('.', '_')
-                if net in ['3V3', 'VCC', 'VDD']:
-                    net_var = '_3v3'
-                elif net == 'GND':
-                    net_var = 'gnd'
+                net_var = self._sanitize_variable_name(net)
                 
                 # Only add if not already in the list
                 if net_var not in net_params:
@@ -768,7 +826,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         if circuit.components:
             content.append('    # Components')
             for comp in circuit.components:
-                comp_type = comp.lib_id.replace(":", "_").replace("-", "_")
+                comp_type = self._sanitize_component_type_name(comp.lib_id)
                 comp_var = comp.reference.lower()
                 content.append(f'    {comp_var} = {comp_type}()')
                 content.append(f'    {comp_var}.ref = "{comp.reference}"')
@@ -808,11 +866,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
                     subcircuit = all_circuits[subcircuit_name]
                     if subcircuit.nets:
                         for net in sorted(subcircuit.nets):
-                            net_var = net.lower().replace('+', 'p').replace('-', 'n').replace('.', '_')
-                            if net in ['3V3', 'VCC', 'VDD']:
-                                net_var = '_3v3'
-                            elif net == 'GND':
-                                net_var = 'gnd'
+                            net_var = self._sanitize_variable_name(net)
                             
                             # Only add if not already in the list
                             if net_var not in subcircuit_params:
@@ -851,9 +905,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
             f'"""',
             '',
             'import logging',
-            'import os',
             'from circuit_synth import *',
-            'from circuit_synth.kicad.unified_kicad_integration import create_unified_kicad_integration',
             '',
         ])
         
@@ -896,11 +948,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         if all_nets:
             content.append('    # Create main nets')
             for net in sorted(all_nets):
-                net_var = net.lower().replace('+', 'p').replace('-', 'n').replace('.', '_')
-                if net in ['3V3', 'VCC', 'VDD']:
-                    net_var = '_3v3'
-                elif net == 'GND':
-                    net_var = 'gnd'
+                net_var = self._sanitize_variable_name(net)
                 content.append(f'    {net_var} = Net("{net}")')
             content.append('    ')
         
@@ -917,11 +965,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
                 root_circuit = all_circuits[root_name]
                 if root_circuit.nets:
                     for net in sorted(root_circuit.nets):
-                        net_var = net.lower().replace('+', 'p').replace('-', 'n').replace('.', '_')
-                        if net in ['3V3', 'VCC', 'VDD']:
-                            net_var = '_3v3'
-                        elif net == 'GND':
-                            net_var = 'gnd'
+                        net_var = self._sanitize_variable_name(net)
                         
                         # Only add if not already in the list
                         if net_var not in net_params:
@@ -942,11 +986,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
                 subcircuit = all_circuits[subcircuit_name]
                 if subcircuit.nets:
                     for net in sorted(subcircuit.nets):
-                        net_var = net.lower().replace('+', 'p').replace('-', 'n').replace('.', '_')
-                        if net in ['3V3', 'VCC', 'VDD']:
-                            net_var = '_3v3'
-                        elif net == 'GND':
-                            net_var = 'gnd'
+                        net_var = self._sanitize_variable_name(net)
                         
                         # Only add if not already in the list
                         if net_var not in net_params:
@@ -989,29 +1029,14 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         
         content.extend([
             "if __name__ == '__main__':",
-            "    c = main_circuit()",
-            "    netlist_text = c.generate_text_netlist()",
-            "    print(netlist_text)",
-            f'    c.generate_json_netlist("{project_name}.json")',
-            f'    c.generate_kicad_netlist("{project_name}.net")',
+            "    circuit = main_circuit()",
             "    ",
-            "    # Create output directory for KiCad project",
-            '    output_dir = "kicad_output"',
-            "    os.makedirs(output_dir, exist_ok=True)",
+            "    # Generate netlists",
+            f'    circuit.generate_kicad_netlist("{project_name}.net")',
+            f'    circuit.generate_json_netlist("{project_name}.json")',
             "    ",
-            "    # Generate KiCad project with schematic",
-            '    logger.info(f"Generating KiCad project in {output_dir}")',
-            f'    logger.info(f"Using JSON file: {project_name}.json")',
-            "    ",
-            f'    gen = create_unified_kicad_integration(output_dir, "{project_name}")',
-            "    gen.generate_project(",
-            f'        "{project_name}.json",',
-            '        schematic_placement="connection_aware",',
-            "        generate_pcb=True,",
-            "        force_regenerate=True,",
-            "        draw_bounding_boxes=True",
-            "    )",
-            '    logger.info(f"KiCad project generated successfully in {output_dir}")'
+            "    # Generate KiCad project",
+            f'    circuit.generate_kicad_project("{project_name}")'
         ])
         
         return '\n'.join(content)
