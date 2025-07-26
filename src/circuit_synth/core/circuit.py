@@ -244,7 +244,8 @@ class Circuit:
     def generate_kicad_project(self, project_name: str, 
                              generate_pcb: bool = True,
                              force_regenerate: bool = True,
-                             placement_algorithm: str = "connection_aware") -> None:
+                             placement_algorithm: str = "connection_aware",
+                             draw_bounding_boxes: bool = False) -> None:
         """
         Generate a complete KiCad project (schematic + PCB) from this circuit.
         
@@ -257,6 +258,7 @@ class Circuit:
             generate_pcb: Whether to generate PCB in addition to schematic (default: True)
             force_regenerate: Force regeneration of existing files (default: True)
             placement_algorithm: Component placement algorithm to use (default: "connection_aware")
+            draw_bounding_boxes: Whether to draw visual bounding boxes around components (default: False)
         
         Example:
             >>> circuit = esp32s3_simple()
@@ -298,7 +300,7 @@ class Circuit:
                     schematic_placement=placement_algorithm,
                     generate_pcb=generate_pcb,
                     force_regenerate=force_regenerate,
-                    draw_bounding_boxes=False
+                    draw_bounding_boxes=draw_bounding_boxes
                 )
             finally:
                 # Clean up the temporary JSON file

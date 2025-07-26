@@ -52,8 +52,8 @@ class SymbolBoundingBoxCalculator:
         max_x = float('-inf')
         max_y = float('-inf')
         
-        # Process main symbol shapes
-        shapes = symbol_data.get('shapes', [])
+        # Process main symbol shapes (handle both 'shapes' and 'graphics' keys)
+        shapes = symbol_data.get('shapes', []) or symbol_data.get('graphics', [])
         for shape in shapes:
             shape_bounds = cls._get_shape_bounds(shape)
             if shape_bounds:
@@ -77,8 +77,8 @@ class SymbolBoundingBoxCalculator:
         # Process sub-symbols
         sub_symbols = symbol_data.get('sub_symbols', [])
         for sub in sub_symbols:
-            # Sub-symbols can have their own shapes and pins
-            sub_shapes = sub.get('shapes', [])
+            # Sub-symbols can have their own shapes and pins (handle both 'shapes' and 'graphics' keys)
+            sub_shapes = sub.get('shapes', []) or sub.get('graphics', [])
             for shape in sub_shapes:
                 shape_bounds = cls._get_shape_bounds(shape)
                 if shape_bounds:
