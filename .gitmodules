@@ -1,0 +1,9 @@
+[submodule "submodules/pcb"]
+	path = submodules/pcb
+	url = https://github.com/diodeinc/pcb.git
+[submodule "submodules/skidl"]
+	path = submodules/skidl
+	url = https://github.com/devbisme/skidl.git
+[submodule "submodules/tscircuit"]
+	path = submodules/tscircuit
+	url = https://github.com/tscircuit/tscircuit.git

@@ -4,7 +4,13 @@ Pythonic circuit design for professional KiCad projects
 
 ## Overview
 
-Circuit Synth is an open-source Python library designed specifically for KiCad that provides bidirectional import/export between KiCad projects and Python code. The library enables transparent, programmatic circuit design for professional development workflows.
+Circuit Synth is an open-source Python library that fits seamlessly into normal EE workflows without getting too fancy. Unlike domain-specific languages that require learning new syntax, circuit-synth uses simple, transparent Python code that any engineer can understand and modify.
+
+**Core Principles:**
+- **Simple Python Code**: No special DSL to learn - just Python classes and functions
+- **Transparent to Users**: Generated KiCad files are clean and human-readable
+- **Bidirectional Updates**: KiCad can remain the source of truth - import existing projects and export changes back
+- **Normal EE Workflow**: Integrates with existing KiCad-based development processes
 
 **Current Status**: Circuit-synth is ready for professional use with the following capabilities:
 - Places components functionally (not yet optimized for intelligent board layout)
@@ -67,13 +73,24 @@ if __name__ == '__main__':
     circuit.generate_kicad_project("esp32s3_simple")
 ```
 
-## Features
+## Key Differentiators
 
-- **Bidirectional KiCad Integration**: Import existing KiCad projects to Python and export Python circuits to KiCad
-- **Professional Transparency**: Designed for use in professional development with clear, readable code generation
-- **KiCad-Specific**: Purpose-built for KiCad workflows and conventions
+### Bidirectional KiCad Integration
+Unlike other circuit design tools that generate KiCad files as output only, circuit-synth provides true bidirectional updates:
+- **Import existing KiCad projects** into Python for programmatic modification
+- **Export Python circuits** to clean, readable KiCad projects
+- **KiCad remains source of truth** - make manual changes in KiCad and sync back to Python
+- **Hybrid workflows** - combine manual design with automated generation
+
+### Engineering-Friendly Approach
+- **No Domain-Specific Language**: Uses standard Python syntax that any engineer can read and modify
+- **Transparent Output**: Generated KiCad files are clean and human-readable, not machine-generated gibberish
+- **Fits Existing Workflows**: Designed to integrate with normal EE development processes, not replace them
+- **Professional Development**: Built for real engineering teams, not just hobbyists
+
+### Additional Features
 - **Pythonic Circuit Design**: Define circuits using intuitive Python classes and decorators
-- **Component Management**: Built-in component library with easy extensibility
+- **Component Management**: Built-in component library with easy extensibility  
 - **Smart Placement**: Automatic component placement algorithms
 - **Type Safety**: Full type hints support for better IDE integration
 - **Extensible Architecture**: Clean interfaces for custom implementations
