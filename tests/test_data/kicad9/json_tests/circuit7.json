@@ -1,0 +1,1627 @@
+{
+  "name": "netlist7",
+  "components": {
+    "C1": {
+      "reference": "C1",
+      "value": "0.1uF",
+      "symbol": "",
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "description": "Unpolarized capacitor",
+      "pins": {},
+      "properties": {
+        "Sheetname": "Root",
+        "Sheetfile": "test_project.kicad_sch",
+        "ki_keywords": "cap capacitor",
+        "ki_fp_filters": "C_*"
+      }
+    },
+    "U1": {
+      "reference": "U1",
+      "value": "ESP32-C6-MINI-1",
+      "symbol": "",
+      "footprint": "RF_Module:ESP32-C6-MINI-1",
+      "description": "RF Module, ESP32-C6 SoC, Wi-Fi 802.11b/g/n/ax, Bluetooth, BLE, Zigbee, Thread, 32-bit, 3.3V, SMD, onboard antenna",
+      "pins": {},
+      "properties": {
+        "Sheetname": "Root",
+        "Sheetfile": "test_project.kicad_sch",
+        "ki_keywords": "Radio BT ESP Espressif",
+        "ki_fp_filters": "ESP32?C6?MINI?1*"
+      }
+    }
+  },
+  "nets": {
+    "+3V3": [
+      {
+        "component": "C1",
+        "pin": {
+          "number": "1",
+          "name": "",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "3",
+          "name": "3V3",
+          "type": "power_in"
+        }
+      }
+    ],
+    "COMMS.I2C1_SCL": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "18",
+          "name": "IO13",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "COMMS.I2C1_SDA": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "17",
+          "name": "IO12",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "COMMS.I2C2_SCL": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "25",
+          "name": "IO19",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "COMMS.I2C2_SDA": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "24",
+          "name": "IO18",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "GND": [
+      {
+        "component": "C1",
+        "pin": {
+          "number": "2",
+          "name": "",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "1",
+          "name": "GND",
+          "type": "power_in"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "11",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "14",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "2",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "36",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "37",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "38",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "39",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "40",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "41",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "42",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "43",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "44",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "45",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "46",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "47",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "48",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "49",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "50",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "51",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "52",
+          "name": "GND",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "53",
+          "name": "GND",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(U1-EN-Pad8)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "8",
+          "name": "EN",
+          "type": "input"
+        }
+      }
+    ],
+    "unconnected-(U1-IO0-Pad12)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "12",
+          "name": "IO0",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO1-Pad13)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "13",
+          "name": "IO1",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO2-Pad5)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "5",
+          "name": "IO2",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO3-Pad6)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "6",
+          "name": "IO3",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO4-Pad9)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "9",
+          "name": "IO4",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO5-Pad10)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "10",
+          "name": "IO5",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO6-Pad15)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "15",
+          "name": "IO6",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO7-Pad16)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "16",
+          "name": "IO7",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO8-Pad22)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "22",
+          "name": "IO8",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO9-Pad23)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "23",
+          "name": "IO9",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO14-Pad19)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "19",
+          "name": "IO14",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO15-Pad20)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "20",
+          "name": "IO15",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO20-Pad26)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "26",
+          "name": "IO20",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO21-Pad27)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "27",
+          "name": "IO21",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO22-Pad28)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "28",
+          "name": "IO22",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-IO23-Pad29)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "29",
+          "name": "IO23",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-NC-Pad4)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "4",
+          "name": "NC",
+          "type": "unspecified"
+        }
+      }
+    ],
+    "unconnected-(U1-NC-Pad7)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "7",
+          "name": "NC",
+          "type": "unspecified"
+        }
+      }
+    ],
+    "unconnected-(U1-NC-Pad21)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "21",
+          "name": "NC",
+          "type": "unspecified"
+        }
+      }
+    ],
+    "unconnected-(U1-NC-Pad32)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "32",
+          "name": "NC",
+          "type": "unspecified"
+        }
+      }
+    ],
+    "unconnected-(U1-NC-Pad33)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "33",
+          "name": "NC",
+          "type": "unspecified"
+        }
+      }
+    ],
+    "unconnected-(U1-NC-Pad34)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "34",
+          "name": "NC",
+          "type": "unspecified"
+        }
+      }
+    ],
+    "unconnected-(U1-NC-Pad35)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "35",
+          "name": "NC",
+          "type": "unspecified"
+        }
+      }
+    ],
+    "unconnected-(U1-RXD0-Pad30)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "30",
+          "name": "RXD0",
+          "type": "bidirectional"
+        }
+      }
+    ],
+    "unconnected-(U1-TXD0-Pad31)": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "31",
+          "name": "TXD0",
+          "type": "bidirectional"
+        }
+      }
+    ]
+  },
+  "subcircuits": [
+    {
+      "name": "ESP321",
+      "components": {
+        "C2": {
+          "reference": "C2",
+          "value": "0.1uF",
+          "symbol": "",
+          "footprint": "Capacitor_SMD:C_0603_1608Metric",
+          "description": "Unpolarized capacitor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "ESP321",
+            "Sheetfile": "esp32_1.kicad_sch",
+            "ki_keywords": "cap capacitor",
+            "ki_fp_filters": "C_*"
+          }
+        },
+        "U2": {
+          "reference": "U2",
+          "value": "ESP32-C6-MINI-1",
+          "symbol": "",
+          "footprint": "RF_Module:ESP32-C6-MINI-1",
+          "description": "RF Module, ESP32-C6 SoC, Wi-Fi 802.11b/g/n/ax, Bluetooth, BLE, Zigbee, Thread, 32-bit, 3.3V, SMD, onboard antenna",
+          "pins": {},
+          "properties": {
+            "Sheetname": "ESP321",
+            "Sheetfile": "esp32_1.kicad_sch",
+            "ki_keywords": "Radio BT ESP Espressif",
+            "ki_fp_filters": "ESP32?C6?MINI?1*"
+          }
+        }
+      },
+      "nets": {
+        "+3V3": [
+          {
+            "component": "C2",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "3",
+              "name": "3V3",
+              "type": "power_in"
+            }
+          }
+        ],
+        "COMMS.I2C1_SCL": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "18",
+              "name": "IO13",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "COMMS.I2C1_SDA": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "17",
+              "name": "IO12",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "COMMS.I2C2_SCL": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "25",
+              "name": "IO19",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "COMMS.I2C2_SDA": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "24",
+              "name": "IO18",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "GND": [
+          {
+            "component": "C2",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "1",
+              "name": "GND",
+              "type": "power_in"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "11",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "14",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "2",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "36",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "37",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "38",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "39",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "40",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "41",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "42",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "43",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "44",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "45",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "46",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "47",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "48",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "49",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "50",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "51",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "52",
+              "name": "GND",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "U2",
+            "pin": {
+              "number": "53",
+              "name": "GND",
+              "type": "passive"
+            }
+          }
+        ],
+        "unconnected-(U2-EN-Pad8)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "8",
+              "name": "EN",
+              "type": "input"
+            }
+          }
+        ],
+        "unconnected-(U2-IO0-Pad12)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "12",
+              "name": "IO0",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO1-Pad13)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "13",
+              "name": "IO1",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO2-Pad5)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "5",
+              "name": "IO2",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO3-Pad6)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "6",
+              "name": "IO3",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO4-Pad9)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "9",
+              "name": "IO4",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO5-Pad10)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "10",
+              "name": "IO5",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO6-Pad15)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "15",
+              "name": "IO6",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO7-Pad16)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "16",
+              "name": "IO7",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO8-Pad22)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "22",
+              "name": "IO8",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO9-Pad23)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "23",
+              "name": "IO9",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO14-Pad19)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "19",
+              "name": "IO14",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO15-Pad20)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "20",
+              "name": "IO15",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO20-Pad26)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "26",
+              "name": "IO20",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO21-Pad27)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "27",
+              "name": "IO21",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO22-Pad28)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "28",
+              "name": "IO22",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-IO23-Pad29)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "29",
+              "name": "IO23",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-NC-Pad4)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "4",
+              "name": "NC",
+              "type": "unspecified"
+            }
+          }
+        ],
+        "unconnected-(U2-NC-Pad7)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "7",
+              "name": "NC",
+              "type": "unspecified"
+            }
+          }
+        ],
+        "unconnected-(U2-NC-Pad21)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "21",
+              "name": "NC",
+              "type": "unspecified"
+            }
+          }
+        ],
+        "unconnected-(U2-NC-Pad32)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "32",
+              "name": "NC",
+              "type": "unspecified"
+            }
+          }
+        ],
+        "unconnected-(U2-NC-Pad33)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "33",
+              "name": "NC",
+              "type": "unspecified"
+            }
+          }
+        ],
+        "unconnected-(U2-NC-Pad34)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "34",
+              "name": "NC",
+              "type": "unspecified"
+            }
+          }
+        ],
+        "unconnected-(U2-NC-Pad35)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "35",
+              "name": "NC",
+              "type": "unspecified"
+            }
+          }
+        ],
+        "unconnected-(U2-RXD0-Pad30)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "30",
+              "name": "RXD0",
+              "type": "bidirectional"
+            }
+          }
+        ],
+        "unconnected-(U2-TXD0-Pad31)": [
+          {
+            "component": "U2",
+            "pin": {
+              "number": "31",
+              "name": "TXD0",
+              "type": "bidirectional"
+            }
+          }
+        ]
+      },
+      "subcircuits": [
+        {
+          "name": "esp32_3",
+          "components": {
+            "C3": {
+              "reference": "C3",
+              "value": "0.1uF",
+              "symbol": "",
+              "footprint": "Capacitor_SMD:C_0603_1608Metric",
+              "description": "Unpolarized capacitor",
+              "pins": {},
+              "properties": {
+                "Sheetname": "esp32_3",
+                "Sheetfile": "esp32_3.kicad_sch",
+                "ki_keywords": "cap capacitor",
+                "ki_fp_filters": "C_*"
+              }
+            },
+            "U3": {
+              "reference": "U3",
+              "value": "ESP32-C6-MINI-1",
+              "symbol": "",
+              "footprint": "RF_Module:ESP32-C6-MINI-1",
+              "description": "RF Module, ESP32-C6 SoC, Wi-Fi 802.11b/g/n/ax, Bluetooth, BLE, Zigbee, Thread, 32-bit, 3.3V, SMD, onboard antenna",
+              "pins": {},
+              "properties": {
+                "Sheetname": "esp32_3",
+                "Sheetfile": "esp32_3.kicad_sch",
+                "ki_keywords": "Radio BT ESP Espressif",
+                "ki_fp_filters": "ESP32?C6?MINI?1*"
+              }
+            }
+          },
+          "nets": {
+            "+3V3": [
+              {
+                "component": "C3",
+                "pin": {
+                  "number": "1",
+                  "name": "",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "3",
+                  "name": "3V3",
+                  "type": "power_in"
+                }
+              }
+            ],
+            "COMMS.I2C1_SCL": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "15",
+                  "name": "IO6",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "COMMS.I2C1_SDA": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "10",
+                  "name": "IO5",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "COMMS.I2C2_SCL": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "16",
+                  "name": "IO7",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "COMMS.I2C2_SDA": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "22",
+                  "name": "IO8",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "GND": [
+              {
+                "component": "C3",
+                "pin": {
+                  "number": "2",
+                  "name": "",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "1",
+                  "name": "GND",
+                  "type": "power_in"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "11",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "14",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "2",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "36",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "37",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "38",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "39",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "40",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "41",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "42",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "43",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "44",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "45",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "46",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "47",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "48",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "49",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "50",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "51",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "52",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "53",
+                  "name": "GND",
+                  "type": "passive"
+                }
+              }
+            ],
+            "unconnected-(U3-EN-Pad8)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "8",
+                  "name": "EN",
+                  "type": "input"
+                }
+              }
+            ],
+            "unconnected-(U3-IO0-Pad12)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "12",
+                  "name": "IO0",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO1-Pad13)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "13",
+                  "name": "IO1",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO2-Pad5)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "5",
+                  "name": "IO2",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO3-Pad6)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "6",
+                  "name": "IO3",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO4-Pad9)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "9",
+                  "name": "IO4",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO9-Pad23)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "23",
+                  "name": "IO9",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO12-Pad17)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "17",
+                  "name": "IO12",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO13-Pad18)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "18",
+                  "name": "IO13",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO14-Pad19)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "19",
+                  "name": "IO14",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO15-Pad20)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "20",
+                  "name": "IO15",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO18-Pad24)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "24",
+                  "name": "IO18",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO19-Pad25)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "25",
+                  "name": "IO19",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO20-Pad26)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "26",
+                  "name": "IO20",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO21-Pad27)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "27",
+                  "name": "IO21",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO22-Pad28)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "28",
+                  "name": "IO22",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-IO23-Pad29)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "29",
+                  "name": "IO23",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-NC-Pad4)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "4",
+                  "name": "NC",
+                  "type": "unspecified"
+                }
+              }
+            ],
+            "unconnected-(U3-NC-Pad7)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "7",
+                  "name": "NC",
+                  "type": "unspecified"
+                }
+              }
+            ],
+            "unconnected-(U3-NC-Pad21)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "21",
+                  "name": "NC",
+                  "type": "unspecified"
+                }
+              }
+            ],
+            "unconnected-(U3-NC-Pad32)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "32",
+                  "name": "NC",
+                  "type": "unspecified"
+                }
+              }
+            ],
+            "unconnected-(U3-NC-Pad33)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "33",
+                  "name": "NC",
+                  "type": "unspecified"
+                }
+              }
+            ],
+            "unconnected-(U3-NC-Pad34)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "34",
+                  "name": "NC",
+                  "type": "unspecified"
+                }
+              }
+            ],
+            "unconnected-(U3-NC-Pad35)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "35",
+                  "name": "NC",
+                  "type": "unspecified"
+                }
+              }
+            ],
+            "unconnected-(U3-RXD0-Pad30)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "30",
+                  "name": "RXD0",
+                  "type": "bidirectional"
+                }
+              }
+            ],
+            "unconnected-(U3-TXD0-Pad31)": [
+              {
+                "component": "U3",
+                "pin": {
+                  "number": "31",
+                  "name": "TXD0",
+                  "type": "bidirectional"
+                }
+              }
+            ]
+          },
+          "subcircuits": []
+        }
+      ]
+    }
+  ],
+  "properties": {
+    "source": "/Users/shanemattner/Desktop/test_project/test_project.kicad_sch",
+    "date": "2025-02-25T20:16:49-0800",
+    "tool": "Eeschema 8.0.8"
+  }
+}

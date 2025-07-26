@@ -1,0 +1,944 @@
+{
+  "name": "circuit3",
+  "components": {
+    "C1": {
+      "reference": "C1",
+      "value": "10uF",
+      "symbol": "",
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "description": "Unpolarized capacitor",
+      "pins": {},
+      "properties": {
+        "Sheetname": "Root",
+        "Sheetfile": "circuit3.kicad_sch",
+        "ki_keywords": "cap capacitor",
+        "ki_fp_filters": "C_*"
+      }
+    },
+    "P1": {
+      "reference": "P1",
+      "value": "USB_C_Plug_USB2.0",
+      "symbol": "",
+      "footprint": "",
+      "description": "USB 2.0-only Type-C Plug connector",
+      "pins": {},
+      "properties": {
+        "Sheetname": "Root",
+        "Sheetfile": "circuit3.kicad_sch",
+        "ki_keywords": "usb universal serial bus type-C USB2.0",
+        "ki_fp_filters": "USB*C*Plug*"
+      }
+    },
+    "R1": {
+      "reference": "R1",
+      "value": "10k",
+      "symbol": "",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "description": "Resistor",
+      "pins": {},
+      "properties": {
+        "Sheetname": "Root",
+        "Sheetfile": "circuit3.kicad_sch",
+        "ki_keywords": "R res resistor",
+        "ki_fp_filters": "R_*"
+      }
+    },
+    "U1": {
+      "reference": "U1",
+      "value": "ESP32-C6-MINI-1",
+      "symbol": "",
+      "footprint": "RF_Module:ESP32-C6-MINI-1",
+      "description": "RF Module, ESP32-C6 SoC, Wi-Fi 802.11b/g/n/ax, Bluetooth, BLE, Zigbee, Thread, 32-bit, 3.3V, SMD, onboard antenna",
+      "pins": {},
+      "properties": {
+        "Sheetname": "Root",
+        "Sheetfile": "circuit3.kicad_sch",
+        "ki_keywords": "Radio BT ESP Espressif",
+        "ki_fp_filters": "ESP32?C6?MINI?1*"
+      }
+    }
+  },
+  "nets": {
+    "+3V3": {
+      "name": "+3V3",
+      "code": "1",
+      "nodes": [
+        {
+          "component": "C1",
+          "pin": {
+            "number": "1",
+            "name": "",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "3",
+            "name": "3V3",
+            "type": "power_in"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "+3V3"
+    },
+    "+5V": {
+      "name": "+5V",
+      "code": "2",
+      "nodes": [
+        {
+          "component": "P1",
+          "pin": {
+            "number": "A4",
+            "name": "VBUS",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "P1",
+          "pin": {
+            "number": "A9",
+            "name": "VBUS",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "P1",
+          "pin": {
+            "number": "B4",
+            "name": "VBUS",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "P1",
+          "pin": {
+            "number": "B9",
+            "name": "VBUS",
+            "type": "passive"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "+5V"
+    },
+    "D+": {
+      "name": "D+",
+      "code": "3",
+      "nodes": [
+        {
+          "component": "P1",
+          "pin": {
+            "number": "A6",
+            "name": "D+",
+            "type": "bidirectional"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "18",
+            "name": "IO13",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": true,
+      "hierarchical_name": "/D+"
+    },
+    "D-": {
+      "name": "D-",
+      "code": "4",
+      "nodes": [
+        {
+          "component": "P1",
+          "pin": {
+            "number": "A7",
+            "name": "D-",
+            "type": "bidirectional"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "17",
+            "name": "IO12",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": true,
+      "hierarchical_name": "/D-"
+    },
+    "GND": {
+      "name": "GND",
+      "code": "5",
+      "nodes": [
+        {
+          "component": "C1",
+          "pin": {
+            "number": "2",
+            "name": "",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "P1",
+          "pin": {
+            "number": "A1",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "P1",
+          "pin": {
+            "number": "A12",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "P1",
+          "pin": {
+            "number": "B1",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "P1",
+          "pin": {
+            "number": "B12",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "P1",
+          "pin": {
+            "number": "S1",
+            "name": "SHIELD",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "R1",
+          "pin": {
+            "number": "2",
+            "name": "",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "1",
+            "name": "GND",
+            "type": "power_in"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "11",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "14",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "2",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "36",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "37",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "38",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "39",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "40",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "41",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "42",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "43",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "44",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "45",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "46",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "47",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "48",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "49",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "50",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "51",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "52",
+            "name": "GND",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "53",
+            "name": "GND",
+            "type": "passive"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "GND"
+    },
+    "Net-(P1-CC)": {
+      "name": "Net-(P1-CC)",
+      "code": "6",
+      "nodes": [
+        {
+          "component": "P1",
+          "pin": {
+            "number": "A5",
+            "name": "CC",
+            "type": "bidirectional"
+          }
+        },
+        {
+          "component": "R1",
+          "pin": {
+            "number": "1",
+            "name": "",
+            "type": "passive"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "Net-(P1-CC)"
+    },
+    "unconnected-(P1-VCONN-PadB5)": {
+      "name": "unconnected-(P1-VCONN-PadB5)",
+      "code": "7",
+      "nodes": [
+        {
+          "component": "P1",
+          "pin": {
+            "number": "B5",
+            "name": "VCONN",
+            "type": "unspecified"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(P1-VCONN-PadB5)"
+    },
+    "unconnected-(U1-EN-Pad8)": {
+      "name": "unconnected-(U1-EN-Pad8)",
+      "code": "8",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "8",
+            "name": "EN",
+            "type": "input"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-EN-Pad8)"
+    },
+    "unconnected-(U1-IO0-Pad12)": {
+      "name": "unconnected-(U1-IO0-Pad12)",
+      "code": "9",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "12",
+            "name": "IO0",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO0-Pad12)"
+    },
+    "unconnected-(U1-IO1-Pad13)": {
+      "name": "unconnected-(U1-IO1-Pad13)",
+      "code": "10",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "13",
+            "name": "IO1",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO1-Pad13)"
+    },
+    "unconnected-(U1-IO2-Pad5)": {
+      "name": "unconnected-(U1-IO2-Pad5)",
+      "code": "11",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "5",
+            "name": "IO2",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO2-Pad5)"
+    },
+    "unconnected-(U1-IO3-Pad6)": {
+      "name": "unconnected-(U1-IO3-Pad6)",
+      "code": "12",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "6",
+            "name": "IO3",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO3-Pad6)"
+    },
+    "unconnected-(U1-IO4-Pad9)": {
+      "name": "unconnected-(U1-IO4-Pad9)",
+      "code": "13",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "9",
+            "name": "IO4",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO4-Pad9)"
+    },
+    "unconnected-(U1-IO5-Pad10)": {
+      "name": "unconnected-(U1-IO5-Pad10)",
+      "code": "14",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "10",
+            "name": "IO5",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO5-Pad10)"
+    },
+    "unconnected-(U1-IO6-Pad15)": {
+      "name": "unconnected-(U1-IO6-Pad15)",
+      "code": "15",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "15",
+            "name": "IO6",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO6-Pad15)"
+    },
+    "unconnected-(U1-IO7-Pad16)": {
+      "name": "unconnected-(U1-IO7-Pad16)",
+      "code": "16",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "16",
+            "name": "IO7",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO7-Pad16)"
+    },
+    "unconnected-(U1-IO8-Pad22)": {
+      "name": "unconnected-(U1-IO8-Pad22)",
+      "code": "17",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "22",
+            "name": "IO8",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO8-Pad22)"
+    },
+    "unconnected-(U1-IO9-Pad23)": {
+      "name": "unconnected-(U1-IO9-Pad23)",
+      "code": "18",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "23",
+            "name": "IO9",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO9-Pad23)"
+    },
+    "unconnected-(U1-IO14-Pad19)": {
+      "name": "unconnected-(U1-IO14-Pad19)",
+      "code": "19",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "19",
+            "name": "IO14",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO14-Pad19)"
+    },
+    "unconnected-(U1-IO15-Pad20)": {
+      "name": "unconnected-(U1-IO15-Pad20)",
+      "code": "20",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "20",
+            "name": "IO15",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO15-Pad20)"
+    },
+    "unconnected-(U1-IO18-Pad24)": {
+      "name": "unconnected-(U1-IO18-Pad24)",
+      "code": "21",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "24",
+            "name": "IO18",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO18-Pad24)"
+    },
+    "unconnected-(U1-IO19-Pad25)": {
+      "name": "unconnected-(U1-IO19-Pad25)",
+      "code": "22",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "25",
+            "name": "IO19",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO19-Pad25)"
+    },
+    "unconnected-(U1-IO20-Pad26)": {
+      "name": "unconnected-(U1-IO20-Pad26)",
+      "code": "23",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "26",
+            "name": "IO20",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO20-Pad26)"
+    },
+    "unconnected-(U1-IO21-Pad27)": {
+      "name": "unconnected-(U1-IO21-Pad27)",
+      "code": "24",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "27",
+            "name": "IO21",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO21-Pad27)"
+    },
+    "unconnected-(U1-IO22-Pad28)": {
+      "name": "unconnected-(U1-IO22-Pad28)",
+      "code": "25",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "28",
+            "name": "IO22",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO22-Pad28)"
+    },
+    "unconnected-(U1-IO23-Pad29)": {
+      "name": "unconnected-(U1-IO23-Pad29)",
+      "code": "26",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "29",
+            "name": "IO23",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-IO23-Pad29)"
+    },
+    "unconnected-(U1-NC-Pad4)": {
+      "name": "unconnected-(U1-NC-Pad4)",
+      "code": "27",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "4",
+            "name": "NC",
+            "type": "unspecified"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-NC-Pad4)"
+    },
+    "unconnected-(U1-NC-Pad7)": {
+      "name": "unconnected-(U1-NC-Pad7)",
+      "code": "28",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "7",
+            "name": "NC",
+            "type": "unspecified"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-NC-Pad7)"
+    },
+    "unconnected-(U1-NC-Pad21)": {
+      "name": "unconnected-(U1-NC-Pad21)",
+      "code": "29",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "21",
+            "name": "NC",
+            "type": "unspecified"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-NC-Pad21)"
+    },
+    "unconnected-(U1-NC-Pad32)": {
+      "name": "unconnected-(U1-NC-Pad32)",
+      "code": "30",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "32",
+            "name": "NC",
+            "type": "unspecified"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-NC-Pad32)"
+    },
+    "unconnected-(U1-NC-Pad33)": {
+      "name": "unconnected-(U1-NC-Pad33)",
+      "code": "31",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "33",
+            "name": "NC",
+            "type": "unspecified"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-NC-Pad33)"
+    },
+    "unconnected-(U1-NC-Pad34)": {
+      "name": "unconnected-(U1-NC-Pad34)",
+      "code": "32",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "34",
+            "name": "NC",
+            "type": "unspecified"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-NC-Pad34)"
+    },
+    "unconnected-(U1-NC-Pad35)": {
+      "name": "unconnected-(U1-NC-Pad35)",
+      "code": "33",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "35",
+            "name": "NC",
+            "type": "unspecified"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-NC-Pad35)"
+    },
+    "unconnected-(U1-RXD0-Pad30)": {
+      "name": "unconnected-(U1-RXD0-Pad30)",
+      "code": "34",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "30",
+            "name": "RXD0",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-RXD0-Pad30)"
+    },
+    "unconnected-(U1-TXD0-Pad31)": {
+      "name": "unconnected-(U1-TXD0-Pad31)",
+      "code": "35",
+      "nodes": [
+        {
+          "component": "U1",
+          "pin": {
+            "number": "31",
+            "name": "TXD0",
+            "type": "bidirectional"
+          }
+        }
+      ],
+      "sheetpath": "/",
+      "is_hierarchical": false,
+      "hierarchical_name": "unconnected-(U1-TXD0-Pad31)"
+    }
+  },
+  "subcircuits": [],
+  "properties": {
+    "source": "/Users/shanemattner/Desktop/Circuit_Synth/tests/test_data/kicad9/kicad_projects/circuit3/circuit3.kicad_sch",
+    "date": "2025-03-02T20:56:15-0800",
+    "tool": "Eeschema 9.0.0"
+  }
+}

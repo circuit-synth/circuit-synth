@@ -23,11 +23,6 @@ except ImportError:
     # Fallback to Python implementation
     from .force_directed import ForceDirectedPlacer, apply_force_directed_placement
     RUST_PLACEMENT_AVAILABLE = False
-    import warnings
-    warnings.warn(
-        "Rust force-directed placement not available, using Python fallback",
-        UserWarning
-    )
 
 __all__ = [
     'ComponentWrapper',

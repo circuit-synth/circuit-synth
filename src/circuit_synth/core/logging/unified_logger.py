@@ -145,7 +145,7 @@ class ContextLogger:
             'session': current_session.get() or 'none',
             'request_id': current_request.get() or '',
             'chat_id': current_chat.get() or '',
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now().astimezone().isoformat(),
             **kwargs
         }
         return extras
@@ -249,7 +249,7 @@ class PerformanceLogger:
             'unit': unit,
             'user_id': current_user.get() or 'system',
             'session_id': current_session.get() or 'none',
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now().astimezone().isoformat(),
             'metadata': metadata
         }
         
@@ -448,7 +448,7 @@ class LLMConversationLogger:
                         turn.error = {
                             'error_type': type(error).__name__,
                             'error_message': str(error),
-                            'timestamp': datetime.utcnow().isoformat(),
+                            'timestamp': datetime.now().astimezone().isoformat(),
                             'context': context
                         }
                         break

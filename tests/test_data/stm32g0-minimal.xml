@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Minimal STM32G0 device definition for testing -->
+<device>
+    <device family="g0" name="stm32g071rb" type="stm32g071rbt6"/>
+    <driver name="gpio">
+        <!-- I2C1 pins -->
+        <gpio port="A" pin="11">
+            <signal driver="i2c" instance="1" name="scl" af="6"/>
+        </gpio>
+        <gpio port="A" pin="12">
+            <signal driver="i2c" instance="1" name="sda" af="6"/>
+        </gpio>
+        <gpio port="B" pin="6">
+            <signal driver="i2c" instance="1" name="scl" af="6"/>
+        </gpio>
+        <gpio port="B" pin="7">
+            <signal driver="i2c" instance="1" name="sda" af="6"/>
+        </gpio>
+        
+        <!-- SPI1 pins -->
+        <gpio port="A" pin="5">
+            <signal driver="spi" instance="1" name="sck" af="5"/>
+            <signal driver="tim" instance="2" name="ch1" af="1"/>
+        </gpio>
+        <gpio port="A" pin="6">
+            <signal driver="spi" instance="1" name="miso" af="5"/>
+        </gpio>
+        <gpio port="A" pin="7">
+            <signal driver="spi" instance="1" name="mosi" af="5"/>
+        </gpio>
+        
+        <!-- USART2 pins -->
+        <gpio port="A" pin="2">
+            <signal driver="usart" instance="2" name="tx" af="7"/>
+        </gpio>
+        <gpio port="A" pin="3">
+            <signal driver="usart" instance="2" name="rx" af="7"/>
+        </gpio>
+        
+        <!-- ADC pins -->
+        <gpio port="A" pin="0">
+            <signal driver="adc" instance="1" name="in0"/>
+        </gpio>
+        <gpio port="A" pin="1">
+            <signal driver="adc" instance="1" name="in1"/>
+        </gpio>
+    </driver>
+</device>
