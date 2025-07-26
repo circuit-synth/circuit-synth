@@ -49,6 +49,7 @@ if __name__ == '__main__':
     # Generate KiCad project directly (no intermediate files needed)
     c.generate_kicad_project(
         "python_generated_reference_design",
-        force_regenerate=False
+        force_regenerate=False,
+        draw_bounding_boxes=True,
     )
 
