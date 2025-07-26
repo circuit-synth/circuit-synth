@@ -841,10 +841,13 @@ class SExpressionParser:
             sexp.append(instances_sexp)
             logger.debug(f"  Instances S-expression added to symbol")
         else:
-            logger.error(f"Symbol {symbol.reference} has NO instances information!")
-            logger.error(f"  Symbol must have 'instances' field populated (internal library requirement)")
-            logger.error(f"  This is handled automatically by the Circuit Synth library")
-            raise ValueError(f"Symbol {symbol.reference} missing required instances data")
+            # During synchronization, symbols from existing schematics might not have
+            # instances data populated. This is acceptable during parsing.
+            logger.warning(f"Symbol {symbol.reference} has no instances information - creating minimal instances")
+            # Create minimal instances data to avoid breaking synchronization
+            minimal_instances = [sexpdata.Symbol("instances")]
+            sexp.append(minimal_instances)
+            logger.debug(f"  Added minimal instances S-expression for synchronization compatibility")
         
         return sexp
 

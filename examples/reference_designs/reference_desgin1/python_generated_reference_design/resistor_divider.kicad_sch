@@ -277,8 +277,8 @@
 	(symbol
 		(lib_id Device:R)
 		(at 60.96 90.17 0)
-		(in_bom no)
-		(on_board no)
+		(in_bom yes)
+		(on_board yes)
 		(dnp no)
 		(uuid 39a44672-40d2-4623-9859-2afae299f9d1)
 		(property
@@ -312,13 +312,22 @@
 				(hide yes)
 			)
 		)
-		(instances)
+		(instances
+			(project
+				"090c2e97-1b39-4ce2-a8e2-7c82eb1d5b33"
+				(path
+					"/090c2e97-1b39-4ce2-a8e2-7c82eb1d5b33/9dc51fe2-5b74-4dc5-925d-ec0371140177"
+					(reference R2)
+					(unit 1)
+				)
+			)
+		)
 	)
 	(symbol
 		(lib_id Device:C)
 		(at 76.2 85.09 0)
-		(in_bom no)
-		(on_board no)
+		(in_bom yes)
+		(on_board yes)
 		(dnp no)
 		(uuid 4887b2df-8b1c-4df8-8b61-3b4fd408dc28)
 		(property
@@ -352,13 +361,22 @@
 				(hide yes)
 			)
 		)
-		(instances)
+		(instances
+			(project
+				"090c2e97-1b39-4ce2-a8e2-7c82eb1d5b33"
+				(path
+					"/090c2e97-1b39-4ce2-a8e2-7c82eb1d5b33/9dc51fe2-5b74-4dc5-925d-ec0371140177"
+					(reference C1)
+					(unit 1)
+				)
+			)
+		)
 	)
 	(symbol
 		(lib_id Device:R)
 		(at 60.96 68.58 0)
-		(in_bom no)
-		(on_board no)
+		(in_bom yes)
+		(on_board yes)
 		(dnp no)
 		(uuid a865e6f0-32dd-4f58-8003-0c76cafd826b)
 		(property
@@ -392,7 +410,16 @@
 				(hide yes)
 			)
 		)
-		(instances)
+		(instances
+			(project
+				"090c2e97-1b39-4ce2-a8e2-7c82eb1d5b33"
+				(path
+					"/090c2e97-1b39-4ce2-a8e2-7c82eb1d5b33/9dc51fe2-5b74-4dc5-925d-ec0371140177"
+					(reference R1)
+					(unit 1)
+				)
+			)
+		)
 	)
 	(wire
 		(pts
