@@ -64,6 +64,22 @@ test = [
     "memory-profiler>=0.60.0",
 ]
 
+[project.scripts]
+# Sync scripts
+kicad-to-python = "circuit_synth.scripts.kicad_to_python_sync:main"
+python-to-kicad = "circuit_synth.scripts.python_to_kicad_sync:main"
+
+# Symbol management scripts  
+preload-symbols = "circuit_synth.scripts.preload_symbols:main"
+preparse-symbols = "circuit_synth.scripts.preparse_kicad_symbols:main"
+
+# PCB tracking (requires additional modules not in open source)
+# pcb-tracker = "circuit_synth.scripts.pcb_tracker_basic:cli"
+
+# Import/Export tools
+netlist-import = "circuit_synth.kicad.netlist_importer:main"
+json-to-python = "circuit_synth.codegen.json_to_python_project:main"
+
 [project.urls]
 Homepage = "https://github.com/circuitsynth/circuit-synth"
 Documentation = "https://circuitsynth.readthedocs.io"

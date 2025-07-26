@@ -675,3 +675,31 @@ def _phase8_generate_main_py(root: Circuit,
     with open(fp,"w",encoding="utf-8") as f:
         f.write("\n".join(lines))
     logger.info("Wrote main.py => %s", fp)
+
+def main():
+    """CLI entry point for JSON to Python project generation."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Generate Python project from Circuit-Synth JSON')
+    parser.add_argument('input_json', help='Input Circuit-Synth JSON file')
+    parser.add_argument('output_dir', help='Output directory for Python project')
+    parser.add_argument('--debug', action='store_true', help='Enable debug logging')
+    
+    args = parser.parse_args()
+    
+    # Configure logging
+    level = logging.DEBUG if args.debug else logging.INFO
+    logging.basicConfig(level=level, format='%(asctime)s - %(levelname)s - %(name)s - %(message)s')
+    
+    try:
+        circuit = circuit_synth_json_to_python_project(args.input_json, args.output_dir)
+        print(f"✓ Successfully generated Python project in {args.output_dir}")
+        return 0
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        logger.exception("Full error traceback:")
+        return 1
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(main())

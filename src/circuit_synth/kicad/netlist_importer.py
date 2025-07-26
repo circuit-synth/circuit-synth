@@ -1953,24 +1953,31 @@ def convert_netlist(input_path: Path, output_path: Path) -> None:
         logger.error(f"Error during netlist conversion: {e}")
         raise
 
+def main():
+    """CLI entry point for netlist import."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Convert KiCad netlist to Circuit-Synth JSON')
+    parser.add_argument('input_netlist', type=Path, help='Input KiCad netlist file (.net)')
+    parser.add_argument('output_json', type=Path, help='Output JSON file')
+    parser.add_argument('--debug', action='store_true', help='Enable debug logging')
+    
+    args = parser.parse_args()
+    
+    # Configure logging
+    level = logging.DEBUG if args.debug else logging.INFO
+    logging.basicConfig(level=level, format='%(asctime)s - %(levelname)s - %(name)s - %(message)s')
+    
+    try:
+        convert_netlist(args.input_netlist, args.output_json)
+        print(f"✓ Successfully converted {args.input_netlist} to {args.output_json}")
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return 1
+    
+    return 0
+
 # Example usage (if run as script)
 if __name__ == "__main__":
-    # Configure logging for script execution
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(name)s - %(message)s')
-
-    # Define input and output paths (replace with actual paths)
-    # Use Path objects for better cross-platform compatibility
-    script_dir = Path(__file__).parent
-    project_root = script_dir.parent.parent.parent # Adjust based on actual structure
-    example_netlist = project_root / "examples/example_kicad_project/example_kicad_project.net"
-    output_json = project_root / "test_output/imported_netlist_debug.json"
-
-    logger.info(f"Running script directly. Project root estimated as: {project_root}")
-    logger.info(f"Input netlist path: {example_netlist}")
-    logger.info(f"Output JSON path: {output_json}")
-
-
-    if not example_netlist.exists():
-         logger.error(f"Input netlist file not found: {example_netlist.resolve()}")
-    else:
-        convert_netlist(example_netlist, output_json)
+    import sys
+    sys.exit(main())
