@@ -1,0 +1,1063 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 371fdca2-6b6f-43a1-9125-029fbab60c95)
+	(paper A4)
+	(lib_symbols)
+	(paper A4)
+	(title_block
+		(title root)
+		(date 2025-07-25)
+		(company Circuit-Synth)
+	)
+	(hierarchical_label
+		3V3
+		(shape input)
+		(at 77.31 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 1cfa346b-fec6-4988-8a5f-e30a9ac0850b)
+	)
+	(hierarchical_label
+		5V
+		(shape input)
+		(at 77.31 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid f19e457d-2093-4dbf-8c12-bd7d8444e399)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 77.31 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 7d55cd07-5f93-4223-916c-0db8770b5e1b)
+	)
+	(hierarchical_label
+		3V3
+		(shape input)
+		(at 130.65 53.34 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid d2d572de-377c-4550-ae57-a5ecab3395b6)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 130.65 55.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 1f18cfcc-e933-4988-80b6-2acfe99665fb)
+	)
+	(hierarchical_label
+		HW_VER
+		(shape input)
+		(at 130.65 58.42 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid b9433e92-1a58-459e-9b55-832766eba14b)
+	)
+	(hierarchical_label
+		INT1
+		(shape input)
+		(at 130.65 60.96 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 8a8290bc-6cff-412f-aa01-adf328bda812)
+	)
+	(hierarchical_label
+		INT2
+		(shape input)
+		(at 130.65 63.5 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 95661c57-b86f-44e2-831f-549f56dc26a0)
+	)
+	(hierarchical_label
+		N$1
+		(shape input)
+		(at 130.65 66.04 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 1a071aac-48d2-4d38-8196-f30b7f72af16)
+	)
+	(hierarchical_label
+		N$2
+		(shape input)
+		(at 130.65 68.58 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 07015d5f-5a2e-4f50-b408-ce7b8a4ef9a0)
+	)
+	(hierarchical_label
+		N$3
+		(shape input)
+		(at 130.65 71.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid f0563aa7-9fc4-4243-a168-cbe767099329)
+	)
+	(hierarchical_label
+		N$4
+		(shape input)
+		(at 130.65 73.66 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 4b279143-7d36-4f5a-aa69-6d7296df2907)
+	)
+	(hierarchical_label
+		N$5
+		(shape input)
+		(at 130.65 76.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid dc2e9ed3-1660-4686-aaff-eee47c9d619f)
+	)
+	(hierarchical_label
+		N$6
+		(shape input)
+		(at 130.65 78.74 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 830243c5-4028-4e5f-af38-4c1a2d1ee79e)
+	)
+	(hierarchical_label
+		SPI_CS
+		(shape input)
+		(at 130.65 81.28 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid be22d942-3526-476d-b468-db12ebcddef8)
+	)
+	(hierarchical_label
+		SPI_MI
+		(shape input)
+		(at 130.65 83.82000000000001 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 7343d569-c5c0-41dd-bf7f-189a2273429b)
+	)
+	(hierarchical_label
+		SPI_MO
+		(shape input)
+		(at 130.65 86.36 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid d6fb4db8-da18-475c-a5ec-621a79db3e91)
+	)
+	(hierarchical_label
+		SPI_SCK
+		(shape input)
+		(at 130.65 88.9 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 16531821-0d57-46d3-8e6b-de101a55571e)
+	)
+	(hierarchical_label
+		USB_DM
+		(shape input)
+		(at 130.65 91.44 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 69f7384c-8762-4b29-bfbf-e9465bd430d1)
+	)
+	(hierarchical_label
+		USB_DP
+		(shape input)
+		(at 130.65 93.98 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 802636ab-9257-4eff-8e6f-e12cca74c770)
+	)
+	(hierarchical_label
+		5V
+		(shape input)
+		(at 82.39 129.54 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 3838782c-ebaf-483e-953f-2316ca60287e)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 82.39 132.08 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid fe3ffac3-17c3-4108-b9b2-31e237e47323)
+	)
+	(hierarchical_label
+		N$7
+		(shape input)
+		(at 82.39 134.62 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid a43af0af-72e2-4d3d-b257-019fb8026254)
+	)
+	(hierarchical_label
+		USB_DM
+		(shape input)
+		(at 82.39 137.16 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 80328371-772b-4bc2-b11f-501c727d09dd)
+	)
+	(hierarchical_label
+		USB_DM_CONN
+		(shape input)
+		(at 82.39 139.7 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 4e4f81fe-9ac8-4169-b46b-46970784cfe4)
+	)
+	(hierarchical_label
+		USB_DP
+		(shape input)
+		(at 82.39 142.24 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 8777f4b5-84e7-4c68-b12f-223b058ecca8)
+	)
+	(hierarchical_label
+		USB_DP_CONN
+		(shape input)
+		(at 82.39 144.78 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 34508a39-8ef7-4435-933f-fdd33b6094f8)
+	)
+	(hierarchical_label
+		3V3
+		(shape input)
+		(at 140.81 128.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 42f376d7-7cae-4e33-81cb-b97cce8180de)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 140.81 130.81 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid e8f1d6fd-9237-476c-97d5-812a99aa2e5c)
+	)
+	(hierarchical_label
+		INT1
+		(shape input)
+		(at 140.81 133.35 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 796b184c-f013-435b-9f3b-f1b75420317b)
+	)
+	(hierarchical_label
+		INT2
+		(shape input)
+		(at 140.81 135.89000000000001 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 9391ba61-77bc-4cf1-a934-ecc90f91c20c)
+	)
+	(hierarchical_label
+		SPI_CS
+		(shape input)
+		(at 140.81 138.43 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid da572262-cee7-4e4b-8894-9a0e75dbb719)
+	)
+	(hierarchical_label
+		SPI_MI
+		(shape input)
+		(at 140.81 140.97 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 49c54978-9db5-4fcf-8765-705dfa3f03c2)
+	)
+	(hierarchical_label
+		SPI_MO
+		(shape input)
+		(at 140.81 143.51 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 2b0f0a6d-82da-4d9e-8578-b76823732053)
+	)
+	(hierarchical_label
+		SPI_SCK
+		(shape input)
+		(at 140.81 146.05 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid e4ea4e34-1c92-4079-9716-395b0c5043df)
+	)
+	(sheet
+		(at 38.1 36.83)
+		(size 39.21 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 820df602-408f-4f77-9cd0-34f46b0b9dfc)
+		(property
+			"Sheetname"
+			"regulator"
+			(at 38.1 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"regulator.kicad_sch"
+			(at 38.1 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			3V3
+			passive
+			(at 76.04 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 119e3dee-e2d9-4a18-b02a-c875a67cc241)
+		)
+		(pin
+			5V
+			passive
+			(at 76.04 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid d9e65cfa-7854-485d-8b4d-f67ac6605204)
+		)
+		(pin
+			GND
+			passive
+			(at 76.04 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 7d8d196b-ddc2-4dfe-af8d-5a4fe1d35069)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 86.36 50.8)
+		(size 44.29 53.34)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 611cea57-d378-48ba-be35-41a223a9066e)
+		(property
+			"Sheetname"
+			"Comms_processor"
+			(at 86.36 49.529999999999994 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"Comms_processor.kicad_sch"
+			(at 86.36 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			3V3
+			passive
+			(at 129.38 53.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid ca0fea3b-5b35-4d80-ae05-76f61e14714f)
+		)
+		(pin
+			GND
+			passive
+			(at 129.38 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 3f09b5f0-5ae1-4ebd-aa83-b1fa9ec7c1b1)
+		)
+		(pin
+			HW_VER
+			passive
+			(at 129.38 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 2fe76418-4f3d-49ed-8fc8-c9b3e2c4ad85)
+		)
+		(pin
+			INT1
+			passive
+			(at 129.38 60.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 85dfc359-6ce2-451d-b5e5-9571a2d4f38d)
+		)
+		(pin
+			INT2
+			passive
+			(at 129.38 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 15d54adf-502b-4ae1-84ea-319380fb41d0)
+		)
+		(pin
+			N$1
+			passive
+			(at 129.38 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid e297f2aa-818c-4d2d-b925-9665a06d1fb4)
+		)
+		(pin
+			N$2
+			passive
+			(at 129.38 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 71c91261-71cc-47ea-93bc-4e5624d1a4e6)
+		)
+		(pin
+			N$3
+			passive
+			(at 129.38 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid c8ebf49f-f819-45dd-bbfe-9daeef9eae50)
+		)
+		(pin
+			N$4
+			passive
+			(at 129.38 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid f634afda-298d-4f00-a9cc-0c3c439ab609)
+		)
+		(pin
+			N$5
+			passive
+			(at 129.38 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid a4ab1a18-3d25-4ec1-85e6-2e7cce8d36ea)
+		)
+		(pin
+			N$6
+			passive
+			(at 129.38 78.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid c630bebc-f8aa-4c2c-a24a-1619f150b8dc)
+		)
+		(pin
+			SPI_CS
+			passive
+			(at 129.38 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 51301d0b-fc44-487a-b6f0-43aacb6ad2f6)
+		)
+		(pin
+			SPI_MI
+			passive
+			(at 129.38 83.82000000000001 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 48fe1b33-41f0-4ee4-83af-b3c01f3d3f81)
+		)
+		(pin
+			SPI_MO
+			passive
+			(at 129.38 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 75a04c42-93f8-4c62-a9c0-126e5beb5b58)
+		)
+		(pin
+			SPI_SCK
+			passive
+			(at 129.38 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 90cb7422-502a-4673-9995-c30639f8551e)
+		)
+		(pin
+			USB_DM
+			passive
+			(at 129.38 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid b7146028-8e4a-4ae0-bfbd-6b0fe7bb212f)
+		)
+		(pin
+			USB_DP
+			passive
+			(at 129.38 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 997bed71-cf65-4052-bfa1-2636935db4c8)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 33.02 127.0)
+		(size 49.37 27.94)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid c885e2ec-a963-4311-ba21-2c795dda6da0)
+		(property
+			"Sheetname"
+			"USB_Port"
+			(at 33.02 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"USB_Port.kicad_sch"
+			(at 33.02 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			5V
+			passive
+			(at 81.12 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 4c699fbd-1e6a-4f7b-8286-49e2fa326a67)
+		)
+		(pin
+			GND
+			passive
+			(at 81.12 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid a4f57519-7af2-4eae-9f94-42d04e5801e4)
+		)
+		(pin
+			N$7
+			passive
+			(at 81.12 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 3545ba3c-9158-4f63-85fc-e32237af8fa4)
+		)
+		(pin
+			USB_DM
+			passive
+			(at 81.12 137.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid e6f1974d-d705-4619-9942-0f3d1adf6ed7)
+		)
+		(pin
+			USB_DM_CONN
+			passive
+			(at 81.12 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid bab10507-87d5-43f6-90e5-a8d3f344e25d)
+		)
+		(pin
+			USB_DP
+			passive
+			(at 81.12 142.24 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 77feb3b7-d029-4e61-ac87-ef2f6f42209c)
+		)
+		(pin
+			USB_DP_CONN
+			passive
+			(at 81.12 144.78 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 5b17fe44-6eb6-47d9-95b8-e020c97c41f9)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 96.52 125.73)
+		(size 44.29 30.48)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid c61c8e5c-cad3-4c4d-9400-1ca7334a452d)
+		(property
+			"Sheetname"
+			"IMU_Circuit"
+			(at 96.52 124.46000000000001 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"IMU_Circuit.kicad_sch"
+			(at 96.52 157.48000000000002 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			3V3
+			passive
+			(at 139.54 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 8f4aa5ba-b5ef-4619-9668-1d2ae027298b)
+		)
+		(pin
+			GND
+			passive
+			(at 139.54 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 2d4fc735-b891-44f0-88db-282dbb9c733c)
+		)
+		(pin
+			INT1
+			passive
+			(at 139.54 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid c86e46ef-2c67-4e22-9b65-bbcf5006fd7a)
+		)
+		(pin
+			INT2
+			passive
+			(at 139.54 135.89000000000001 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid c90d584e-fcff-48d6-933b-ba4a02c375e1)
+		)
+		(pin
+			SPI_CS
+			passive
+			(at 139.54 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid adb3d38a-d706-4dcf-86fb-e745ab6c03bb)
+		)
+		(pin
+			SPI_MI
+			passive
+			(at 139.54 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 26c8d315-3073-460a-a5de-15238f646a91)
+		)
+		(pin
+			SPI_MO
+			passive
+			(at 139.54 143.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 3d35abd9-facf-4eeb-b0bd-0b3661c55ccf)
+		)
+		(pin
+			SPI_SCK
+			passive
+			(at 139.54 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 6aba726e-9f98-4d75-abfe-4262b96a79e5)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path
+			"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

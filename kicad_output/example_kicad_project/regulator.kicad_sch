@@ -1,0 +1,636 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 29723323-13c2-46ae-a362-c97f636f9a95)
+	(paper A4)
+	(paper A4)
+	(lib_symbols
+		(symbol "Device:C"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"C"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"C"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				""
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"~"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"Unpolarized capacitor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"cap capacitor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"C_*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "C_0_1"
+				(polyline
+					(pts
+						(xy -2.032 0.762)
+						(xy 2.032 0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.032 -0.762)
+						(xy 2.032 -0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "C_1_1"
+				(pin
+					passive
+					line
+					(at 0.0 3.81 270)
+					(length 2.794)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 0.0 -3.81 90)
+					(length 2.794)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+		(symbol "Regulator_Linear:NCP1117-3.3_SOT223"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"U"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"NCP1117-3.3_SOT223"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				"Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"http://www.onsemi.com/pub_link/Collateral/NCP1117-D.PDF"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"1A Low drop-out regulator, Fixed Output 3.3V, SOT-223"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"REGULATOR LDO 3.3V"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"SOT?223*TabPin2*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "NCP1117-3.3_SOT223_0_1"
+				(rectangle
+					(start -5.08 -5.08)
+					(end 5.08 1.905)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "NCP1117-3.3_SOT223_1_1"
+				(pin
+					power_in
+					line
+					(at -7.62 0.0 0)
+					(length 2.54)
+					(name
+						VI
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					power_in
+					line
+					(at 0.0 -7.62 90)
+					(length 2.54)
+					(name
+						GND
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					power_out
+					line
+					(at 7.62 0.0 180)
+					(length 2.54)
+					(name
+						VO
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+	)
+	(title_block
+		(title regulator)
+		(date 2025-07-25)
+		(company Circuit-Synth)
+	)
+	(symbol
+		(lib_id Regulator_Linear:NCP1117-3.3_SOT223)
+		(at 45.72 58.42 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid b943e7bc-61ee-4c9e-9eaa-2a67c45ae70a)
+		(property
+			"Reference"
+			"U2"
+			(at 45.72 53.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+			(at 45.72 68.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference U2)
+					(unit 1)
+				)
+			)
+			(project
+				"example_kicad_project"
+				(path
+					"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/820df602-408f-4f77-9cd0-34f46b0b9dfc"
+					(reference U2)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id Device:C)
+		(at 76.2 60.96 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid e7ff4d08-b587-4e29-815e-af9fd77a0cab)
+		(property
+			"Reference"
+			"C4"
+			(at 76.2 55.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Value"
+			"10uF"
+			(at 76.2 65.96000000000001 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Capacitor_SMD:C_0805_2012Metric"
+			(at 76.2 70.96000000000001 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference C4)
+					(unit 1)
+				)
+			)
+			(project
+				"example_kicad_project"
+				(path
+					"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/820df602-408f-4f77-9cd0-34f46b0b9dfc"
+					(reference C4)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id Device:C)
+		(at 96.52 60.96 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid b0936d25-feb5-4115-a7ee-bca6121b106a)
+		(property
+			"Reference"
+			"C6"
+			(at 96.52 55.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Value"
+			"10uF"
+			(at 96.52 65.96000000000001 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Capacitor_SMD:C_0805_2012Metric"
+			(at 96.52 70.96000000000001 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference C6)
+					(unit 1)
+				)
+			)
+			(project
+				"example_kicad_project"
+				(path
+					"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/820df602-408f-4f77-9cd0-34f46b0b9dfc"
+					(reference C6)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		5V
+		(shape input)
+		(at 38.1 58.42 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 33efe2a9-c9ca-429d-b281-46ae8092ba0d)
+	)
+	(hierarchical_label
+		5V
+		(shape input)
+		(at 76.2 57.15 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 286509fa-ec51-400d-97a3-c1ffdddab3d7)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 45.72 66.04 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 94800d3f-f947-4a9f-b15c-d21bb72de947)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 76.2 64.77 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid f2c61c66-77f8-4b7a-b05f-b6cd76c0ed3a)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 96.52 64.77 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid fc2665a6-7985-47b6-a330-ccc15a1a8d07)
+	)
+	(hierarchical_label
+		3V3
+		(shape input)
+		(at 53.339999999999996 58.42 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid eb6ea213-b96b-464f-863e-e94dc9b99d77)
+	)
+	(hierarchical_label
+		3V3
+		(shape input)
+		(at 96.52 57.15 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid bd66cc12-f0ca-4dd0-bace-8d7ca7924e57)
+	)
+	(rectangle
+		(start 35.941 41.101)
+		(end 55.498999999999995 83.279)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(uuid 676c34e5-4a39-4630-b438-ebd5992bd14b)
+	)
+	(rectangle
+		(start 71.2 47.451)
+		(end 81.2 79.469)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(uuid 27226f20-6bef-47b4-bf0c-f60b4fcc3670)
+	)
+	(rectangle
+		(start 91.52 47.451)
+		(end 101.52 79.469)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(uuid a263e63b-ded0-40f0-b9c7-6ec9e61e7134)
+	)
+	(sheet_instances
+		(path
+			"/a749f405-c7ad-4be2-acf7-eb735b082507/c1cf464d-b050-4e72-b2de-2f1b9b2f4d40/820df602-408f-4f77-9cd0-34f46b0b9dfc"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

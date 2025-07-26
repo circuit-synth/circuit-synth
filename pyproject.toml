@@ -7,7 +7,7 @@ name = "circuit_synth"
 version = "0.1.0"
 description = "Pythonic circuit design for production-ready KiCad projects"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {text = "MIT"}
 authors = [
     {name = "Circuit Synth Contributors", email = "contact@circuitsynth.com"},
@@ -18,7 +18,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -28,6 +27,7 @@ classifiers = [
 ]
 
 dependencies = [
+    # Core dependencies
     "numpy>=1.20.0",
     "scipy>=1.7.0",
     "matplotlib>=3.3.0",
@@ -37,6 +37,18 @@ dependencies = [
     "click>=8.0.0",
     "rich>=10.0.0",
     "loguru>=0.5.0",
+    "psutil>=5.9.0",
+    # LLM and AI dependencies
+    "google-generativeai>=0.5.0",
+    "google-adk>=1.0.0",
+    "openai>=1.35.0",
+    "anthropic>=0.25.0",
+    "litellm>=1.0.0",
+    # Additional data processing
+    "sexpdata>=0.0.3",
+    # Async support
+    "aiohttp>=3.9.0",
+    "aiofiles>=23.2.0",
 ]
 
 [project.optional-dependencies]
