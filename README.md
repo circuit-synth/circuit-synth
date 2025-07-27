@@ -408,6 +408,194 @@ We welcome contributions! Here's how to get started:
 - Test your changes with `uv run python examples/example_kicad_project.py`
 - Use the Docker environment for testing: `./scripts/circuit-synth-docker python examples/example_kicad_project.py`
 
+## Manual Testing Checklist
+
+**Run these manual tests on every major change to ensure system integrity:**
+
+### 1. Core Example Script Testing
+
+**Local Environment:**
+```bash
+# Run the primary example script locally
+uv run python examples/example_kicad_project.py
+
+# Verify generated files exist
+ls -la example_kicad_project/
+```
+
+**Docker Environment:**
+```bash
+# Test the same script in Docker environment
+./scripts/circuit-synth-docker python examples/example_kicad_project.py
+
+# Verify files are generated in Docker context
+./scripts/circuit-synth-docker ls -la example_kicad_project/
+```
+
+**Verification Steps:**
+- ✅ Script completes without errors
+- ✅ Generates complete KiCad project directory
+- ✅ Creates `.kicad_sch`, `.kicad_pcb`, `.kicad_pro`, and `.net` files
+- ✅ Annotation system debug output appears (docstring extraction)
+
+### 2. KiCad Project Inspection
+
+**Open Generated Project in KiCad:**
+```bash
+# Open the generated project
+kicad example_kicad_project/example_kicad_project.kicad_pro
+```
+
+**Schematic Verification:**
+- ✅ All components are placed and visible
+- ✅ Net connections are correct (no unconnected pins)
+- ✅ Hierarchical structure is properly organized
+- ✅ Annotations appear as text boxes with docstring content
+- ✅ Component references are sequential and logical (R1, R2, C1, C2, etc.)
+- ✅ Net names are clean and descriptive (5V, 3V3, GND, USB_DM, etc.)
+
+**PCB Layout Verification:**
+- ✅ All components are placed on PCB (not overlapping)
+- ✅ All nets have proper connectivity (ratsnest shows connections)
+- ✅ Footprints are correct and match schematic symbols
+- ✅ Bounding boxes are drawn around components (if `draw_bounding_boxes=True`)
+
+### 3. Docker Command Testing
+
+**Basic Docker Commands:**
+```bash
+# Test help command
+./scripts/circuit-synth-docker --help
+
+# Test version information
+./scripts/circuit-synth-docker python -c "import circuit_synth; print(circuit_synth.__version__)"
+
+# Test package installation status
+./scripts/circuit-synth-docker pip list | grep circuit-synth
+```
+
+**File System Operations:**
+```bash
+# Test file creation and access
+./scripts/circuit-synth-docker touch test_file.txt
+./scripts/circuit-synth-docker ls -la test_file.txt
+./scripts/circuit-synth-docker rm test_file.txt
+```
+
+### 4. Regression Test Suite
+
+**Automated Test Execution:**
+```bash
+# Run unit tests
+uv run pytest tests/unit/test_core_circuit.py -v
+
+# Run functional tests
+cd tests/functional_tests/test_01_resistor_divider && uv run python test_netlist_comparison.py
+cd tests/functional_tests/test_02_import_resistor_divider && uv run python test_kicad_import.py  
+cd tests/functional_tests/test_03_round_trip_python_kicad_python && uv run python test_round_trip.py
+cd tests/functional_tests/test_04_nested_kicad_sch_import && uv run python test_complex_hierarchical_structure.py
+
+# Run integration tests
+uv run pytest tests/kicad_netlist_exporter/test_sheet_hierarchy.py -v
+uv run pytest tests/kicad_netlist_exporter/test_netlist_exporter_basics.py -v
+```
+
+**Success Criteria:**
+- ✅ All unit tests pass (18/18)
+- ✅ All functional tests complete successfully
+- ✅ Integration tests pass without errors
+- ✅ No regression in existing functionality
+
+### 5. System Integration Verification
+
+**Web Dashboard (if available):**
+```bash
+# Test dashboard startup
+uv run circuit-synth-web
+# Verify: Dashboard starts without critical errors
+```
+
+**LLM Analysis Pipeline:**
+```bash
+# Test analysis system availability
+uv run python -m circuit_synth.intelligence.scripts.llm_circuit_analysis --help
+# Verify: Help output appears, no import errors
+```
+
+### 6. Advanced Validation
+
+**Hierarchical Structure Testing:**
+- ✅ Test complex hierarchical projects (3+ levels deep)
+- ✅ Verify proper nested import chains in generated Python
+- ✅ Confirm parameter passing through hierarchy levels
+- ✅ Check that KiCad→Python→KiCad round-trip preserves structure
+
+**Bidirectional Sync Testing:**
+- ✅ Import existing KiCad project to Python
+- ✅ Modify Python code and regenerate KiCad
+- ✅ Verify changes appear correctly in KiCad
+- ✅ Test that manual KiCad changes can be preserved
+
+**Component and Net Validation:**
+- ✅ Test various component types (resistors, capacitors, ICs, connectors)
+- ✅ Verify footprint assignments are correct
+- ✅ Check net naming conventions and cleanup
+- ✅ Test pin mapping for complex components (ESP32, connectors)
+
+### 7. Performance and Resource Testing
+
+**Resource Usage:**
+```bash
+# Monitor memory usage during generation
+time uv run python examples/example_kicad_project.py
+
+# Check generated file sizes are reasonable
+du -h example_kicad_project/
+```
+
+**Docker Performance:**
+```bash
+# Test Docker startup time
+time ./scripts/circuit-synth-docker echo "Docker ready"
+
+# Compare Docker vs local execution time  
+time ./scripts/circuit-synth-docker python examples/example_kicad_project.py
+```
+
+### 8. Error Handling and Edge Cases
+
+**Error Condition Testing:**
+- ✅ Test with invalid component references
+- ✅ Test with missing footprints or symbols
+- ✅ Test with circular hierarchical dependencies
+- ✅ Verify graceful error messages and recovery
+
+**Edge Case Validation:**
+- ✅ Test empty circuits
+- ✅ Test very large circuits (100+ components)
+- ✅ Test circuits with no nets
+- ✅ Test circuits with only power nets
+
+## Manual Testing Frequency
+
+**Before Each Commit:**
+- Run core example script (local + Docker)
+- Execute unit tests
+- Verify no regressions in key functionality
+
+**Before Each Release:**
+- Complete full manual testing checklist
+- Perform KiCad project inspection
+- Run entire regression test suite
+- Test Docker commands and environment
+- Validate hierarchical and bidirectional features
+
+**After Major Refactoring:**
+- Execute complete testing checklist
+- Additional focus on changed subsystems
+- Performance regression testing
+- Cross-platform validation (if applicable)
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
