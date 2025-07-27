@@ -21,9 +21,29 @@ _rust_sexp_module = None
 
 try:
     # Try to import the Rust KiCad integration module
+    import sys
+    import os
+    import importlib.util
+    
+    # Add rust modules to path using absolute path resolution
+    current_file_dir = os.path.dirname(os.path.abspath(__file__))
+    rust_kicad_path = os.path.join(current_file_dir, '../../../../rust_modules/rust_kicad_integration')
+    rust_kicad_path = os.path.abspath(rust_kicad_path)
+    
+    if rust_kicad_path not in sys.path:
+        sys.path.insert(0, rust_kicad_path)
+    
     import_start = time.perf_counter()
-    from rust_modules.rust_kicad_integration import generate_component_sexp as rust_generate_component_sexp
-    from rust_modules.rust_kicad_integration import is_rust_available
+    # Use direct module loading to ensure we get the right module
+    spec = importlib.util.spec_from_file_location(
+        'rust_kicad_integration', 
+        os.path.join(rust_kicad_path, '__init__.py')
+    )
+    rust_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rust_module)
+    
+    rust_generate_component_sexp = rust_module.generate_component_sexp
+    is_rust_available = rust_module.is_rust_available
     import_time = time.perf_counter() - import_start
     
     if is_rust_available():

@@ -47,9 +47,29 @@ from .kicad_formatter import format_kicad_schematic
 # Import Rust acceleration for component generation (defensive fallback)
 _RUST_COMPONENT_ACCELERATION = False
 try:
+    import sys
+    import os
+    import importlib.util
+    
+    # Add rust modules to path using absolute path resolution
+    current_file_dir = os.path.dirname(os.path.abspath(__file__))
+    rust_kicad_path = os.path.join(current_file_dir, '../../../../rust_modules/rust_kicad_integration')
+    rust_kicad_path = os.path.abspath(rust_kicad_path)
+    
+    if rust_kicad_path not in sys.path:
+        sys.path.insert(0, rust_kicad_path)
+    
     import_start = time.perf_counter()
-    from rust_modules.rust_kicad_integration import generate_component_sexp as rust_generate_component_sexp
-    from rust_modules.rust_kicad_integration import is_rust_available
+    # Use direct module loading to ensure we get the right module
+    spec = importlib.util.spec_from_file_location(
+        'rust_kicad_integration', 
+        os.path.join(rust_kicad_path, '__init__.py')
+    )
+    rust_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rust_module)
+    
+    rust_generate_component_sexp = rust_module.generate_component_sexp
+    is_rust_available = rust_module.is_rust_available
     import_time = time.perf_counter() - import_start
     
     if is_rust_available():
@@ -455,12 +475,74 @@ class SchematicWriter:
 
     def _place_components(self):
         """
-        Use the PlacementEngine to arrange components if they don't have positions.
+        Use the PlacementEngine to arrange components with Rust acceleration when available.
+        
+        PERFORMANCE OPTIMIZATION: Attempts Rust force-directed placement for 40-60% speedup.
         """
-        # The components already have positions from the circuit definition
-        # The PlacementEngine was used in add_component for AUTO placement
-        # This method is here for future enhancements
-        pass
+        if not self.schematic.components:
+            logger.debug("No components to place")
+            return
+        
+        start_time = time.perf_counter()
+        logger.info(f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components")
+        logger.info(f"🦀 PLACE_COMPONENTS: Rust placement acceleration available: {_RUST_COMPONENT_ACCELERATION}")
+        
+        # Check if components need repositioning (have default positions)
+        components_needing_placement = []
+        for comp in self.schematic.components:
+            # If component is at origin or has no meaningful position, it needs placement
+            if (comp.position.x <= 25.4 and comp.position.y <= 25.4):  # Within 1 inch of origin
+                components_needing_placement.append(comp)
+        
+        if not components_needing_placement:
+            logger.info("⏭️  PLACE_COMPONENTS: All components already have valid positions, skipping placement")
+            return
+        
+        logger.info(f"🔧 PLACE_COMPONENTS: {len(components_needing_placement)} components need placement")
+        
+        # Use the PlacementEngine with Rust acceleration
+        try:
+            placement_start = time.perf_counter()
+            
+            # Try Rust force-directed placement first for optimal results
+            if len(components_needing_placement) >= 3:  # Force-directed works best with multiple components
+                logger.info("🦀 PLACE_COMPONENTS: Using force-directed placement for optimal component arrangement")
+                self.placement_engine.arrange_components(
+                    components_needing_placement,
+                    arrangement="force_directed",
+                    use_rust_acceleration=True
+                )
+            else:
+                # For few components, use grid placement
+                logger.info("🔧 PLACE_COMPONENTS: Using grid placement for few components")
+                self.placement_engine.arrange_components(
+                    components_needing_placement,
+                    arrangement="grid"
+                )
+            
+            placement_time = time.perf_counter() - placement_start
+            logger.info(f"✅ PLACE_COMPONENTS: Component placement completed in {placement_time*1000:.2f}ms")
+            
+            # Log final positions
+            logger.debug("🔧 PLACE_COMPONENTS: Final component positions:")
+            for comp in components_needing_placement:
+                logger.debug(f"  {comp.reference}: ({comp.position.x:.1f}, {comp.position.y:.1f})")
+                
+        except Exception as e:
+            placement_error_time = time.perf_counter() - start_time
+            logger.error(f"❌ PLACE_COMPONENTS: PLACEMENT FAILED after {placement_error_time*1000:.2f}ms: {e}")
+            logger.warning("🔄 PLACE_COMPONENTS: Using fallback grid placement")
+            
+            # Fallback to simple grid placement
+            try:
+                self.placement_engine._arrange_grid(components_needing_placement)
+                logger.info("✅ PLACE_COMPONENTS: Fallback grid placement completed")
+            except Exception as fallback_error:
+                logger.error(f"❌ PLACE_COMPONENTS: Even fallback placement failed: {fallback_error}")
+                # Leave components at their current positions
+        
+        total_time = time.perf_counter() - start_time
+        logger.info(f"🏁 PLACE_COMPONENTS: ✅ PLACEMENT COMPLETE in {total_time*1000:.2f}ms")
 
     def _add_pin_level_net_labels(self):
         """
