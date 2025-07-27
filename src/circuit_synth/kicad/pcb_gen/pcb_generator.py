@@ -603,14 +603,23 @@ class PCBGenerator:
         Returns:
             True if netlist was applied, False otherwise
         """
-        # Find netlist file
+        # Find netlist file - check multiple locations
         netlist_path = self.project_dir / f"{self.project_name}.net"
         if not netlist_path.exists():
+            # Check in parent directory where it's commonly generated
+            netlist_path = self.project_dir.parent / f"{self.project_name}.net"
+        if not netlist_path.exists():
             # Check in parent directory with circuit_synth_ prefix
-            netlist_path = self.project_dir.parent.parent / f"circuit_synth_{self.project_name}.net"
+            netlist_path = self.project_dir.parent / f"circuit_synth_{self.project_name}.net"
+        if not netlist_path.exists():
+            # Check in grandparent directory
+            netlist_path = self.project_dir.parent.parent / f"{self.project_name}.net"
         
         if not netlist_path.exists():
             logger.warning(f"No netlist file found for {self.project_name}")
+            logger.warning(f"  Searched in: {self.project_dir}")
+            logger.warning(f"  Searched in: {self.project_dir.parent}")
+            logger.warning(f"  Searched in: {self.project_dir.parent.parent}")
             return False
         
         logger.info(f"Parsing netlist from {netlist_path}")

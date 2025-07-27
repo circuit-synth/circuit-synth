@@ -101,3 +101,36 @@ orchestrator → architect (analyze requirements, plan implementation)
 architect → code (implement the algorithm following the plan)  
 orchestrator → (coordinate testing, documentation, integration)
 ```
+
+## Repository Structure
+
+### CRITICAL: Two Circuit-Synth Repositories
+
+There are **TWO** distinct circuit-synth repositories that you must be aware of:
+
+1. **Private Repository**: `Circuit_Synth2/` (closed source)
+   - This is the original project where most functionality was initially developed
+   - Contains the complete, mature implementation
+   - Located at `/Users/shanemattner/Desktop/Circuit_Synth2/`
+   - This is the private, closed-source version
+
+2. **Open Source Repository**: `Circuit_Synth2/submodules/circuit-synth/` (open source)
+   - This is the open-source version created as a submodule
+   - Some functionality from the private repo was **not copied over properly**
+   - Located at `/Users/shanemattner/Desktop/Circuit_Synth2/submodules/circuit-synth/`
+   - **This is where all new development should happen**
+
+### Development Guidelines
+
+- **ALWAYS work in the open source repo**: `/Users/shanemattner/Desktop/Circuit_Synth2/submodules/circuit-synth/`
+- When referencing functionality, be explicit about which repo you're looking at
+- If functionality exists in the private repo but is missing from the open source repo, it needs to be ported over
+- **Never make changes to the private repo** - all development goes in the open source version
+- Keep track of which repo contains which functionality to avoid confusion
+
+### Repository References
+
+When discussing code or functionality:
+- **Private repo**: Reference as "private Circuit_Synth2 repo" or "closed source repo"
+- **Open source repo**: Reference as "open source circuit-synth repo" or "submodule repo"
+- **Default assumption**: Unless specified otherwise, all work should be done in the **open source repo**

@@ -369,20 +369,25 @@ class SchematicGenerator(IKiCadIntegration):
         kicad_pro_file = self.project_dir / f"{self.project_name}.kicad_pro"
         kicad_sch_file = self.project_dir / f"{self.project_name}.kicad_sch"
         
+        # Check for hierarchical projects: also look for root.kicad_sch
+        root_sch_file = self.project_dir / "root.kicad_sch"
+        
         # Both files must exist for a valid project
         project_exists = kicad_pro_file.exists()
-        schematic_exists = kicad_sch_file.exists()
+        schematic_exists = kicad_sch_file.exists() or root_sch_file.exists()
         
         if project_exists and schematic_exists:
             return True
-        elif project_exists or schematic_exists:
-            # Incomplete project - warn but treat as new
+        elif project_exists or kicad_sch_file.exists() or root_sch_file.exists():
+            # Only warn if truly incomplete (no schematic files at all)
             if project_exists and not schematic_exists:
-                logger.warning("⚠️  Incomplete project detected - .kicad_pro exists but .kicad_sch is missing")
-            else:
-                logger.warning("⚠️  Incomplete project detected - .kicad_sch exists but .kicad_pro is missing")
-            logger.warning("    Treating as new project creation")
-            return False
+                logger.warning("⚠️  Incomplete project detected - .kicad_pro exists but no schematic files found")
+                logger.warning("    Treating as new project creation")
+                return False
+            elif not project_exists and schematic_exists:
+                logger.warning("⚠️  Incomplete project detected - schematic files exist but .kicad_pro is missing")
+                logger.warning("    Treating as new project creation")
+                return False
         
         return False
 
