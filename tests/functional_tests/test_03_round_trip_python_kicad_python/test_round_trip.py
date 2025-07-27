@@ -208,23 +208,30 @@ def test_round_trip_python_kicad_python():
         temp_project_dir = temp_path / "reference_project_copy"
         shutil.copytree(reference_python_project, temp_project_dir)
         
+        # Create a dedicated KiCad output directory
         kicad_output_dir = temp_path / "generated_kicad"
+        kicad_output_dir.mkdir(exist_ok=True)
         
-        # Modify the main.py to generate KiCad project to temp directory
+        # Modify the main.py to generate KiCad project with just the name
+        # Run from the KiCad output directory so files are generated there
         temp_main_file = temp_project_dir / "main.py"
         modified_main_code = original_main_code.replace(
             'circuit.generate_kicad_project("resistor_divider_project", force_regenerate=True)',
-            f'circuit.generate_kicad_project(r"{kicad_output_dir}", force_regenerate=True)'
+            'circuit.generate_kicad_project("generated_project", force_regenerate=True)'
         )
         
         # Write the modified main.py
         with open(temp_main_file, 'w') as f:
             f.write(modified_main_code)
         
-        # Run the reference hierarchical project to generate KiCad files in temp
+        # Run the reference hierarchical project to generate KiCad files
+        # Change working directory to KiCad output dir so files are generated there
+        env = os.environ.copy()
+        env['PYTHONPATH'] = str(temp_project_dir) + ':' + env.get('PYTHONPATH', '')
+        
         result = subprocess.run([
-            "uv", "run", "python", "main.py"
-        ], cwd=str(temp_project_dir), capture_output=True, text=True)
+            "uv", "run", "python", str(temp_main_file)
+        ], cwd=str(kicad_output_dir), capture_output=True, text=True, env=env)
         
         if result.returncode != 0:
             print(f"STDOUT: {result.stdout}")
@@ -240,27 +247,33 @@ def test_round_trip_python_kicad_python():
             created_files = list(temp_path.glob("**/*"))
             pytest.fail(f"KiCad project was not generated at: {kicad_output_dir}. Created files: {created_files}")
         
-        # Find the .kicad_pro file (check what was actually created)
+        # Find the .kicad_pro file in the generated project subdirectory
         print(f"Looking for .kicad_pro files in: {kicad_output_dir}")
         if kicad_output_dir.exists():
             created_in_kicad_dir = list(kicad_output_dir.glob("*"))
             print(f"Files in KiCad output dir: {created_in_kicad_dir}")
         
-        # Also check all temp files
-        all_temp_files = list(temp_path.glob("**/*"))
-        print(f"All files in temp dir: {all_temp_files}")
-        
-        kicad_project_files = list(kicad_output_dir.glob("*.kicad_pro"))
-        if not kicad_project_files:
-            # Try to find .kicad_pro files anywhere in temp
-            all_kicad_files = list(temp_path.glob("**/*.kicad_pro"))
-            if all_kicad_files:
-                kicad_project_file = all_kicad_files[0]
-                print(f"Found .kicad_pro file at: {kicad_project_file}")
+        # Look for .kicad_pro files in the generated project subdirectory
+        project_subdir = kicad_output_dir / "generated_project"
+        if project_subdir.exists():
+            kicad_project_files = list(project_subdir.glob("*.kicad_pro"))
+            if kicad_project_files:
+                kicad_project_file = kicad_project_files[0]
+                print(f"Found .kicad_pro file in project subdir: {kicad_project_file}")
             else:
-                pytest.fail(f"No .kicad_pro files found anywhere in temp directory")
+                pytest.fail(f"No .kicad_pro files found in project subdirectory: {project_subdir}")
         else:
-            kicad_project_file = kicad_project_files[0]
+            # Fallback: look in the main KiCad output directory
+            kicad_project_files = list(kicad_output_dir.glob("*.kicad_pro"))
+            if kicad_project_files:
+                kicad_project_file = kicad_project_files[0]
+                print(f"Found .kicad_pro file in main dir: {kicad_project_file}")
+            else:
+                pytest.fail(f"No .kicad_pro files found in KiCad output directory: {kicad_output_dir}")
+        
+        # Update kicad_output_dir to point to the actual project directory for later use
+        if project_subdir.exists():
+            kicad_output_dir = project_subdir
         
         print(f"✓ KiCad project generated: {kicad_project_file}")
         
