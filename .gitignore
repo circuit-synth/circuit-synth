@@ -156,3 +156,6 @@ Cargo.lock
 *-backups/
 fp-info-cache
 example_kicad_project/
+# Build and test artifacts
+cache/
+test_output/

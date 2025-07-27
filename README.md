@@ -191,16 +191,16 @@ Circuit-synth can be run in Docker containers with full KiCad library support:
 
 ```bash
 # Build the Docker image
-./build-docker.sh
+./docker/build-docker.sh
 
 # Run any circuit-synth command in Docker
-./circuit-synth-docker python examples/example_kicad_project.py
+./scripts/circuit-synth-docker python examples/example_kicad_project.py
 
 # Run with interactive shell
-./circuit-synth-docker --interactive bash
+./scripts/circuit-synth-docker --interactive bash
 
 # Run without KiCad libraries (faster startup)
-./circuit-synth-docker --no-libs python -c "import circuit_synth; print('Ready!')"
+./scripts/circuit-synth-docker --no-libs python -c "import circuit_synth; print('Ready!')"
 ```
 
 **Docker Features:**
@@ -208,20 +208,39 @@ Circuit-synth can be run in Docker containers with full KiCad library support:
 - Official KiCad symbol and footprint libraries included
 - Automatic file persistence to local `output/` directory
 - Security through non-root user execution
+- Two Dockerfile options: simplified Python-only (main) and full Rust build (`docker/Dockerfile.rust-build`)
 
 **Docker Commands:**
 ```bash
 # Universal command runner
-./circuit-synth-docker <any-python-command>
+./scripts/circuit-synth-docker <any-python-command>
 
 # KiCad library-specific runner
-./run-with-kicad.sh --official-libs
+./scripts/run-with-kicad.sh --official-libs
 
-# Docker Compose services
-docker-compose up circuit-synth        # Basic service
-docker-compose up circuit-synth-dev    # Development mode
-docker-compose up circuit-synth-test   # Test runner
+# Docker Compose services (from docker/ directory)
+cd docker && docker-compose up circuit-synth        # Basic service
+cd docker && docker-compose up circuit-synth-dev    # Development mode
+cd docker && docker-compose up circuit-synth-test   # Test runner
 ```
+
+**Docker Build Options:**
+```bash
+# Quick Python-only build (recommended)
+./docker/build-docker.sh
+
+# Full build with Rust modules (advanced users)
+docker build -f docker/Dockerfile.rust-build -t circuit-synth-rust .
+
+# Windows users
+./docker/build-docker.bat
+```
+
+#### Docker Attribution
+
+The Docker implementation is a collaborative effort:
+- **Original implementation**: Kumuda Subramanyam Govardhanam (@KumudaSG) - comprehensive Rust module compilation support
+- **Enhancements**: KiCad library integration, simplified Python-only build, universal command runners, and build automation
 
 ## Documentation
 
@@ -229,7 +248,48 @@ Full documentation is available at [https://circuit-synth.readthedocs.io](https:
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! Here's how to get started:
+
+### Development Setup
+
+**Prerequisites:**
+- Python 3.9 or higher
+- [uv](https://docs.astral.sh/uv/) (recommended package manager)
+- Git
+
+**Getting Started:**
+
+1. **Fork and clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/circuit-synth.git
+   cd circuit-synth
+   ```
+
+2. **Install dependencies (recommended with uv):**
+   ```bash
+   # Install the project in development mode
+   uv pip install -e ".[dev]"
+   
+   # Install dependencies
+   uv sync
+   ```
+
+3. **Alternative installation with pip:**
+   ```bash
+   # Create and activate virtual environment
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   
+   # Install in development mode
+   pip install -e ".[dev]"
+   ```
+
+**Development Guidelines:**
+- Follow existing code style and patterns
+- Write tests for new functionality
+- Update documentation as needed
+- Test your changes with `uv run python examples/example_kicad_project.py`
+- Use the Docker environment for testing: `./scripts/circuit-synth-docker python examples/example_kicad_project.py`
 
 ## License
 
