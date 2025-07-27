@@ -42,10 +42,13 @@ def circuit(_func=None, *, name=None, comments=True):
             # Capture docstring to use as circuit description
             docstring = func.__doc__ or ""  # or you could .strip() if you prefer
 
+            # Check if enable_comments decorator was used
+            use_comments = comments or getattr(func, '_enable_comments', False)
+            
             c = Circuit(
                 name=name or func.__name__,
                 description=docstring,
-                auto_comments=comments
+                auto_comments=use_comments
             )
 
             # Link it as a subcircuit if there's a parent
@@ -71,3 +74,21 @@ def circuit(_func=None, *, name=None, comments=True):
     else:
         # @circuit
         return _decorator(_func)
+
+
+def enable_comments(func):
+    """
+    Decorator that enables automatic docstring extraction for circuit functions.
+    This is equivalent to using @circuit(comments=True) but provides a more explicit API.
+    
+    Usage:
+        @enable_comments
+        @circuit(name="my_circuit")
+        def my_circuit():
+            '''This docstring becomes a schematic annotation.'''
+            pass
+    """
+    # This decorator just marks the function for comment extraction
+    # The actual logic is handled by the @circuit decorator
+    func._enable_comments = True
+    return func
