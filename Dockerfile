@@ -49,6 +49,7 @@ COPY src/ ./src/
 # Create virtual environment and install Python dependencies
 RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:${PATH}"
+ENV VIRTUAL_ENV="/app/venv"
 RUN pip install --no-cache-dir -e .
 
 # Copy remaining project files
