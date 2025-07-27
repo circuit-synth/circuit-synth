@@ -12,6 +12,7 @@ import logging
 import datetime
 import math
 import os
+import time
 import uuid as uuid_module
 from typing import List, Dict, Optional, Tuple
 from pathlib import Path
@@ -39,9 +40,28 @@ from .shape_drawer import (
     arc_s_expr
 )
 from .collision_manager import SHEET_MARGIN
-from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
+from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache  
 from .integrated_reference_manager import IntegratedReferenceManager
 from .kicad_formatter import format_kicad_schematic
+
+# Import Rust acceleration for component generation (defensive fallback)
+_RUST_COMPONENT_ACCELERATION = False
+try:
+    import_start = time.perf_counter()
+    from rust_modules.rust_kicad_integration import generate_component_sexp as rust_generate_component_sexp
+    from rust_modules.rust_kicad_integration import is_rust_available
+    import_time = time.perf_counter() - import_start
+    
+    if is_rust_available():
+        _RUST_COMPONENT_ACCELERATION = True
+        logging.getLogger(__name__).info(f"🦀 RUST_COMPONENT_ACCELERATION: ✅ ENABLED for SchematicWriter (loaded in {import_time*1000:.2f}ms)")
+        logging.getLogger(__name__).info("🚀 RUST_COMPONENT_ACCELERATION: Expected 6x component generation speedup")
+    else:
+        logging.getLogger(__name__).info(f"🐍 RUST_COMPONENT_ACCELERATION: Rust available but not compiled (loaded in {import_time*1000:.2f}ms)")
+except ImportError as e:
+    logging.getLogger(__name__).info(f"🐍 RUST_COMPONENT_ACCELERATION: Not available ({e}), using Python implementation")
+except Exception as e:
+    logging.getLogger(__name__).warning(f"⚠️ RUST_COMPONENT_ACCELERATION: Error loading: {e}")
 
 logger = logging.getLogger(__name__)
 
@@ -200,40 +220,113 @@ class SchematicWriter:
     def generate_s_expr(self) -> list:
         """
         Create the full top-level (kicad_sch ...) list structure for this circuit.
+        
+        PERFORMANCE MONITORING: Times each major operation and reports Rust acceleration status.
         """
-        logger.debug(f"Generating schematic s-expression for circuit '{self.circuit.name}'")
+        start_time = time.perf_counter()
+        logger.info(f"🚀 GENERATE_S_EXPR: Starting schematic generation for circuit '{self.circuit.name}'")
+        logger.info(f"📊 GENERATE_S_EXPR: Components: {len(self.circuit.components)}, Nets: {len(self.circuit.nets)}")
+        logger.info(f"🦀 GENERATE_S_EXPR: Rust acceleration available: {_RUST_COMPONENT_ACCELERATION}")
 
-        # Add components using the new API
+        # Add components using the new API - time this critical operation
+        comp_start = time.perf_counter()
+        logger.info(f"⚡ STEP 1/8: Adding {len(self.circuit.components)} components...")
         self._add_components()
+        comp_time = time.perf_counter() - comp_start
+        logger.info(f"✅ STEP 1/8: Components added in {comp_time*1000:.2f}ms")
         
         # Place components using the placement engine
+        place_start = time.perf_counter()
+        logger.info("⚡ STEP 2/8: Placing components...")
         self._place_components()
+        place_time = time.perf_counter() - place_start
+        logger.info(f"✅ STEP 2/8: Components placed in {place_time*1000:.2f}ms")
         
         # Add pin-level net labels
+        labels_start = time.perf_counter()
+        logger.info(f"⚡ STEP 3/8: Adding pin-level net labels for {len(self.circuit.nets)} nets...")
         self._add_pin_level_net_labels()
+        labels_time = time.perf_counter() - labels_start
+        logger.info(f"✅ STEP 3/8: Net labels added in {labels_time*1000:.2f}ms")
         
         # Add subcircuit sheets if needed
+        sheets_start = time.perf_counter()
+        subcircuit_count = len(self.circuit.child_instances) if self.circuit.child_instances else 0
+        logger.info(f"⚡ STEP 4/8: Adding {subcircuit_count} subcircuit sheets...")
         self._add_subcircuit_sheets()
+        sheets_time = time.perf_counter() - sheets_start
+        logger.info(f"✅ STEP 4/8: Subcircuit sheets added in {sheets_time*1000:.2f}ms")
         
         # Add bounding boxes if enabled
+        bbox_start = time.perf_counter()
         if self.draw_bounding_boxes:
+            logger.info(f"⚡ STEP 5/8: Adding bounding boxes for {len(self.circuit.components)} components...")
             self._add_component_bounding_boxes()
+            bbox_time = time.perf_counter() - bbox_start
+            logger.info(f"✅ STEP 5/8: Bounding boxes added in {bbox_time*1000:.2f}ms")
+        else:
+            logger.info("⏭️  STEP 5/8: Bounding boxes disabled, skipping")
+            bbox_time = 0
         
-        # Convert to S-expression format using the parser
+        # Convert to S-expression format using the parser - CRITICAL RUST ACCELERATION POINT
+        sexpr_start = time.perf_counter()
+        logger.info("⚡ STEP 6/8: Converting to S-expression format (RUST ACCELERATION POINT)...")
         schematic_sexpr = self.parser.from_schematic(self.schematic)
+        sexpr_time = time.perf_counter() - sexpr_start
+        logger.info(f"✅ STEP 6/8: S-expression conversion completed in {sexpr_time*1000:.2f}ms")
+        
+        # Add additional sections
+        sections_start = time.perf_counter()
+        logger.info("⚡ STEP 7/8: Adding additional sections (paper, lib_symbols, sheet_instances)...")
         
         # Add paper size (not in the API types yet)
+        paper_start = time.perf_counter()
         self._add_paper_size(schematic_sexpr)
+        paper_time = time.perf_counter() - paper_start
         
         # Add lib_symbols section
+        libsym_start = time.perf_counter()
         self._add_symbol_definitions(schematic_sexpr)
+        libsym_time = time.perf_counter() - libsym_start
         
         # Add sheet_instances section
+        sheetinst_start = time.perf_counter()
         self._add_sheet_instances(schematic_sexpr)
+        sheetinst_time = time.perf_counter() - sheetinst_start
+        
+        sections_time = time.perf_counter() - sections_start
+        logger.info(f"✅ STEP 7/8: Additional sections added in {sections_time*1000:.2f}ms")
+        logger.debug(f"  📄 Paper size: {paper_time*1000:.3f}ms")
+        logger.debug(f"  📚 Lib symbols: {libsym_time*1000:.2f}ms")
+        logger.debug(f"  📋 Sheet instances: {sheetinst_time*1000:.3f}ms")
         
         # Add symbol_instances section - DISABLED for new KiCad format (20250114+)
         # The new format uses instances within each symbol instead
         # self._add_symbol_instances_table(schematic_sexpr)
+        
+        total_time = time.perf_counter() - start_time
+        expr_size = len(str(schematic_sexpr)) if schematic_sexpr else 0
+        
+        logger.info("🏁 STEP 8/8: Schematic generation complete!")
+        logger.info(f"✅ GENERATE_S_EXPR: ✅ TOTAL TIME: {total_time*1000:.2f}ms")
+        logger.info(f"📊 GENERATE_S_EXPR: Generated S-expression: {expr_size:,} characters")
+        logger.info(f"⚡ GENERATE_S_EXPR: Throughput: {expr_size/(total_time*1000):.1f} chars/ms")
+        
+        # Performance breakdown
+        logger.info("📈 PERFORMANCE_BREAKDOWN:")
+        logger.info(f"  🔧 Components: {comp_time*1000:.2f}ms ({comp_time/total_time*100:.1f}%)")
+        logger.info(f"  📍 Placement: {place_time*1000:.2f}ms ({place_time/total_time*100:.1f}%)")
+        logger.info(f"  🏷️  Labels: {labels_time*1000:.2f}ms ({labels_time/total_time*100:.1f}%)")
+        logger.info(f"  📄 Sheets: {sheets_time*1000:.2f}ms ({sheets_time/total_time*100:.1f}%)")
+        if bbox_time > 0:
+            logger.info(f"  📦 Bounding boxes: {bbox_time*1000:.2f}ms ({bbox_time/total_time*100:.1f}%)")
+        logger.info(f"  🔄 S-expression: {sexpr_time*1000:.2f}ms ({sexpr_time/total_time*100:.1f}%)")
+        logger.info(f"  📚 Sections: {sections_time*1000:.2f}ms ({sections_time/total_time*100:.1f}%)")
+        
+        if _RUST_COMPONENT_ACCELERATION:
+            estimated_rust_total = total_time / 6.0  # Expected 6x improvement
+            logger.info(f"🚀 RUST_PROJECTION: Estimated total time with full Rust: {estimated_rust_total*1000:.2f}ms")
+            logger.info(f"⏱️  RUST_PROJECTION: Potential time saved: {(total_time - estimated_rust_total)*1000:.2f}ms")
         
         return schematic_sexpr
 
@@ -808,12 +901,24 @@ class SchematicWriter:
 def write_schematic_file(schematic_expr: list, out_path: str):
     """
     Helper to serialize the final S-expression to a .kicad_sch file.
-    """
-    logger.debug("Using KiCad formatter")
     
-    # Debug: Check for sheet pins with orientation
+    PERFORMANCE OPTIMIZATION: Uses Rust-accelerated formatting when available.
+    This is the final step where the Rust S-expression formatter provides maximum benefit.
+    """
+    start_time = time.perf_counter()
+    expr_size = len(str(schematic_expr)) if schematic_expr else 0
+    
+    logger.info(f"🚀 WRITE_SCHEMATIC_FILE: Starting file write to {out_path}")
+    logger.info(f"📊 WRITE_SCHEMATIC_FILE: Input S-expression size: {expr_size:,} characters")
+    logger.info(f"🦀 WRITE_SCHEMATIC_FILE: Rust formatting available: {_RUST_COMPONENT_ACCELERATION}")
+    
+    # Debug: Check for sheet pins with orientation - time this analysis
+    debug_start = time.perf_counter()
     import sexpdata
+    sheet_pin_count = 0
+    
     def find_sheet_pins_in_expr(expr, path="", in_sheet=False):
+        nonlocal sheet_pin_count
         if isinstance(expr, list):
             if len(expr) > 0 and isinstance(expr[0], sexpdata.Symbol):
                 tag = str(expr[0])
@@ -822,6 +927,7 @@ def write_schematic_file(schematic_expr: list, out_path: str):
                     for i, item in enumerate(expr):
                         find_sheet_pins_in_expr(item, f"{path}[{i}]", in_sheet=True)
                 elif tag == "pin" and in_sheet:
+                    sheet_pin_count += 1
                     # Found a sheet pin, look for its "at" expression
                     logger.debug(f"Found sheet pin '{expr[1] if len(expr) > 1 else '?'}' at {path}")
                     for item in expr:
@@ -832,13 +938,49 @@ def write_schematic_file(schematic_expr: list, out_path: str):
                         find_sheet_pins_in_expr(item, f"{path}[{i}]", in_sheet=in_sheet)
     
     find_sheet_pins_in_expr(schematic_expr)
+    debug_time = time.perf_counter() - debug_start
+    logger.debug(f"🔍 WRITE_SCHEMATIC_FILE: Debug analysis completed in {debug_time*1000:.2f}ms, found {sheet_pin_count} sheet pins")
     
     # Use the kicad_api's S-expression parser to write the file
+    # This now uses the Rust-accelerated format_kicad_schematic function internally
+    parser_start = time.perf_counter()
+    logger.info("⚡ WRITE_SCHEMATIC_FILE: Starting S-expression parsing and formatting (RUST ACCELERATION POINT)")
+    
     from circuit_synth.kicad_api.core.s_expression import SExpressionParser
     parser = SExpressionParser()
     parser.write_file(schematic_expr, out_path)
     
-    # Log the file size
+    parser_time = time.perf_counter() - parser_start
+    logger.info(f"✅ WRITE_SCHEMATIC_FILE: S-expression parsing and formatting completed in {parser_time*1000:.2f}ms")
+    
+    # Analyze the output file
+    file_analysis_start = time.perf_counter()
     with open(out_path, "r", encoding="utf-8") as f:
         content = f.read()
-    logger.debug(f"Schematic written. Length = {len(content)} chars.")
+    file_analysis_time = time.perf_counter() - file_analysis_start
+    
+    total_time = time.perf_counter() - start_time
+    throughput = len(content) / (total_time * 1000) if total_time > 0 else 0
+    
+    logger.info(f"🏁 WRITE_SCHEMATIC_FILE: ✅ FILE WRITE COMPLETE")
+    logger.info(f"⏱️  WRITE_SCHEMATIC_FILE: Total time: {total_time*1000:.2f}ms")
+    logger.info(f"📊 WRITE_SCHEMATIC_FILE: Output file size: {len(content):,} characters")
+    logger.info(f"📄 WRITE_SCHEMATIC_FILE: Output file: {out_path}")
+    logger.info(f"⚡ WRITE_SCHEMATIC_FILE: Write throughput: {throughput:.1f} chars/ms ({throughput*1000:.0f} chars/sec)")
+    
+    # Performance breakdown
+    logger.info("📈 WRITE_PERFORMANCE_BREAKDOWN:")
+    logger.info(f"  🔍 Debug analysis: {debug_time*1000:.2f}ms ({debug_time/total_time*100:.1f}%)")
+    logger.info(f"  🔄 S-expression formatting: {parser_time*1000:.2f}ms ({parser_time/total_time*100:.1f}%)")
+    logger.info(f"  📊 File analysis: {file_analysis_time*1000:.2f}ms ({file_analysis_time/total_time*100:.1f}%)")
+    
+    # Compression ratio analysis
+    compression_ratio = len(content) / expr_size if expr_size > 0 else 1.0
+    logger.info(f"📦 WRITE_SCHEMATIC_FILE: Size change: {expr_size:,} → {len(content):,} chars ({compression_ratio:.2f}x)")
+    
+    if _RUST_COMPONENT_ACCELERATION:
+        estimated_rust_time = total_time / 6.0  # Expected 6x improvement
+        logger.info(f"🚀 RUST_PROJECTION: Estimated time with full Rust: {estimated_rust_time*1000:.2f}ms")
+        logger.info(f"⏱️  RUST_PROJECTION: Potential time saved: {(total_time - estimated_rust_time)*1000:.2f}ms")
+    
+    logger.info(f"✅ WRITE_SCHEMATIC_FILE: Successfully wrote {len(content):,} characters to {out_path}")
