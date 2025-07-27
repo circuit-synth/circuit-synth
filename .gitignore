@@ -155,3 +155,4 @@ Cargo.lock
 *.kicad_pro-bak
 *-backups/
 fp-info-cache
+example_kicad_project/
