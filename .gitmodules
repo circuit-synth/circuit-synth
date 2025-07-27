@@ -13,3 +13,6 @@
 [submodule "kicad-libraries/footprints"]
 	path = kicad-libraries/footprints
 	url = https://gitlab.com/kicad/libraries/kicad-footprints.git
+[submodule "submodules/kicad-cli-docker"]
+	path = submodules/kicad-cli-docker
+	url = https://gitlab.com/kicad/packaging/kicad-cli-docker.git

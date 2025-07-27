@@ -99,6 +99,38 @@ Multiple algorithms available in `kicad_api/pcb/placement/`:
 - **Spiral**: Compact arrangements for space-constrained designs
 - **Connection-aware**: Default algorithm optimizing for connectivity
 
+## Containerization Architecture
+
+### Docker Infrastructure
+Circuit-Synth supports containerized development and deployment through multiple Docker configurations:
+
+- **Basic Container** (`Dockerfile`): Core Circuit-Synth functionality in lightweight container
+- **KiCad Integration** (`docker/Dockerfile.kicad-integrated`): Multi-stage build with KiCad nightly
+- **Cross-Platform** (`docker/Dockerfile.kicad-emulated`): Platform emulation for ARM64 compatibility
+- **Production Ready** (`docker/Dockerfile.kicad-production`): Robust deployment with fallbacks
+
+### Container Orchestration
+- **Docker Compose**: Multiple configurations for different deployment scenarios
+- **Architecture Detection**: `scripts/docker-kicad-modern.sh` for automatic platform detection
+- **Library Management**: Volume mounting for KiCad symbol and footprint libraries
+- **Environment Configuration**: Proper environment variables for KiCad library paths
+
+### Development Workflow
+```bash
+# Build basic container
+docker build -t circuit-synth:simple -f Dockerfile .
+
+# Run with KiCad libraries
+docker run --rm \
+  -v "$(pwd)/examples":/app/examples \
+  -v "$(pwd)/output":/app/output \
+  -v "$(pwd)/kicad-libraries/symbols":/usr/share/kicad/symbols:ro \
+  -v "$(pwd)/kicad-libraries/footprints":/usr/share/kicad/footprints:ro \
+  -e KICAD_SYMBOL_DIR=/usr/share/kicad/symbols \
+  -e KICAD_FOOTPRINT_DIR=/usr/share/kicad/footprints \
+  circuit-synth:simple python examples/example_kicad_project.py
+```
+
 ## Integration Architecture
 
 ### Symbol and Footprint Management
