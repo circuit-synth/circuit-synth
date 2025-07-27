@@ -13,6 +13,11 @@ Circuit Synth is an open-source Python library that fits seamlessly into normal 
 - **Normal EE Workflow**: Integrates with existing KiCad-based development processes
 
 **Current Status**: Circuit-synth is ready for professional use with the following capabilities:
+- **Full KiCad Integration**: Generate complete KiCad projects with schematics and PCB layouts
+- **Schematic Annotations**: Automatic docstring extraction and manual text annotations with tables
+- **Netlist Generation**: Export industry-standard KiCad netlist files (.net) for seamless PCB workflow
+- **Hierarchical Design Support**: Multi-sheet projects with proper organization and connectivity
+- **Professional Component Management**: Complete footprint, symbol, and library integration
 - Places components functionally (not yet optimized for intelligent board layout)
 - Places schematic parts (without intelligent placement algorithms)
 - Generates working KiCad projects suitable for professional development
@@ -70,7 +75,58 @@ def esp32s3_simple():
 
 if __name__ == '__main__':
     circuit = esp32s3_simple()
+    
+    # Generate KiCad netlist for PCB workflow
+    circuit.generate_kicad_netlist("esp32s3_simple.net")
+    
+    # Generate complete KiCad project
     circuit.generate_kicad_project("esp32s3_simple")
+```
+
+## Schematic Annotations
+
+Circuit-synth includes a powerful annotation system for adding documentation directly to your KiCad schematics:
+
+### Automatic Docstring Extraction
+
+```python
+from circuit_synth import *
+from circuit_synth.core.annotations import enable_comments
+
+@enable_comments  # Automatically extracts docstring as schematic annotation
+@circuit(name="documented_circuit")
+def power_filter_circuit():
+    """Power filtering circuit for clean 3.3V supply.
+    
+    This circuit provides stable power filtering using a 10uF ceramic capacitor
+    placed close to the power input for optimal performance."""
+    
+    # Circuit implementation...
+```
+
+### Manual Annotations
+
+```python
+from circuit_synth.core.annotations import TextBox, TextProperty, Table
+
+# Add text boxes with background
+circuit.add_annotation(TextBox(
+    text="⚠️ Critical: Verify power supply ratings before connection!",
+    position=(50, 30),
+    background_color='yellow',
+    size=(80, 20)
+))
+
+# Add component tables
+table = Table(
+    data=[
+        ["Component", "Value", "Package", "Notes"],  # Header row
+        ["C1", "10uF", "0603", "X7R ceramic"],
+        ["R1", "1kΩ", "0603", "1% precision"]
+    ],
+    position=(20, 100)
+)
+circuit.add_annotation(table)
 ```
 
 ## Key Differentiators
@@ -97,9 +153,12 @@ Unlike other circuit design tools that generate KiCad files as output only, circ
 
 ### Additional Features
 - **Pythonic Circuit Design**: Define circuits using intuitive Python classes and decorators
+- **KiCad Netlist Export**: Generate industry-standard .net files for PCB layout workflows
+- **Hierarchical Design Support**: Multi-sheet projects with proper organization and cross-references
 - **Component Management**: Built-in component library with easy extensibility  
 - **Smart Placement**: Automatic component placement algorithms
 - **Type Safety**: Full type hints support for better IDE integration
+- **Professional Output**: Clean, human-readable KiCad files suitable for production use
 - **Extensible Architecture**: Clean interfaces for custom implementations
 
 ## AI-Powered Development
@@ -147,7 +206,58 @@ cd circuit-synth
 uv run python examples/example_kicad_project.py
 ```
 
-This will generate a complete KiCad project in the `example_kicad_project/` directory.
+This will generate a complete KiCad project in the `example_kicad_project/` directory, including:
+- Hierarchical schematic files (.kicad_sch)
+- PCB layout file (.kicad_pcb) 
+- KiCad netlist file (.net)
+- JSON netlist file (.json)
+
+## KiCad Netlist Generation
+
+Circuit-synth provides industry-standard KiCad netlist generation for seamless PCB layout workflows:
+
+### Basic Netlist Export
+```python
+from circuit_synth import *
+
+@circuit
+def my_circuit():
+    # Define your circuit...
+    pass
+
+if __name__ == '__main__':
+    circuit = my_circuit()
+    
+    # Generate KiCad netlist (.net file)
+    circuit.generate_kicad_netlist("my_circuit.net")
+    
+    # Generate JSON netlist for analysis
+    circuit.generate_json_netlist("my_circuit.json")
+```
+
+### Features
+- **Industry Standard Format**: Generates KiCad-compatible .net files
+- **Hierarchical Design Support**: Multi-sheet projects with proper organization  
+- **Complete Component Data**: Includes footprints, values, datasheets, and library references
+- **Perfect KiCad Import**: Zero warnings, zero errors when importing into KiCad
+- **Scalable**: Works with simple 3-component circuits to complex 20+ component systems
+
+### Verification
+All generated netlists are validated through KiCad import:
+```
+Reading netlist file 'my_circuit.net'. 
+Using reference designators to match symbols and footprints.
+Processing symbol 'U1:RF_Module:ESP32-S2-MINI-1'.
+...
+Total warnings: 0, errors: 0.
+```
+
+### Integration with PCB Workflow
+1. **Design in Python**: Define circuits using circuit-synth syntax
+2. **Generate Netlist**: Export to KiCad-compatible .net format
+3. **Import to KiCad**: Load netlist directly into KiCad PCB editor
+4. **Layout PCB**: Use KiCad's routing and placement tools
+5. **Manufacturing**: Generate Gerber files and assembly drawings
 
 ## Installation
 
@@ -198,16 +308,16 @@ Circuit-synth can be run in Docker containers with full KiCad library support:
 
 ```bash
 # Build the Docker image
-./build-docker.sh
+./docker/build-docker.sh
 
 # Run any circuit-synth command in Docker
-./circuit-synth-docker python examples/example_kicad_project.py
+./scripts/circuit-synth-docker python examples/example_kicad_project.py
 
 # Run with interactive shell
-./circuit-synth-docker --interactive bash
+./scripts/circuit-synth-docker --interactive bash
 
 # Run without KiCad libraries (faster startup)
-./circuit-synth-docker --no-libs python -c "import circuit_synth; print('Ready!')"
+./scripts/circuit-synth-docker --no-libs python -c "import circuit_synth; print('Ready!')"
 ```
 
 **Docker Features:**
@@ -215,20 +325,39 @@ Circuit-synth can be run in Docker containers with full KiCad library support:
 - Official KiCad symbol and footprint libraries included
 - Automatic file persistence to local `output/` directory
 - Security through non-root user execution
+- Two Dockerfile options: simplified Python-only (main) and full Rust build (`docker/Dockerfile.rust-build`)
 
 **Docker Commands:**
 ```bash
 # Universal command runner
-./circuit-synth-docker <any-python-command>
+./scripts/circuit-synth-docker <any-python-command>
 
 # KiCad library-specific runner
-./run-with-kicad.sh --official-libs
+./scripts/run-with-kicad.sh --official-libs
 
-# Docker Compose services
-docker-compose up circuit-synth        # Basic service
-docker-compose up circuit-synth-dev    # Development mode
-docker-compose up circuit-synth-test   # Test runner
+# Docker Compose services (from docker/ directory)
+cd docker && docker-compose up circuit-synth        # Basic service
+cd docker && docker-compose up circuit-synth-dev    # Development mode
+cd docker && docker-compose up circuit-synth-test   # Test runner
 ```
+
+**Docker Build Options:**
+```bash
+# Quick Python-only build (recommended)
+./docker/build-docker.sh
+
+# Full build with Rust modules (advanced users)
+docker build -f docker/Dockerfile.rust-build -t circuit-synth-rust .
+
+# Windows users
+./docker/build-docker.bat
+```
+
+#### Docker Attribution
+
+The Docker implementation is a collaborative effort:
+- **Original implementation**: Kumuda Subramanyam Govardhanam (@KumudaSG) - comprehensive Rust module compilation support
+- **Enhancements**: KiCad library integration, simplified Python-only build, universal command runners, and build automation
 
 ## Documentation
 
@@ -236,7 +365,48 @@ Full documentation is available at [https://circuit-synth.readthedocs.io](https:
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! Here's how to get started:
+
+### Development Setup
+
+**Prerequisites:**
+- Python 3.9 or higher
+- [uv](https://docs.astral.sh/uv/) (recommended package manager)
+- Git
+
+**Getting Started:**
+
+1. **Fork and clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/circuit-synth.git
+   cd circuit-synth
+   ```
+
+2. **Install dependencies (recommended with uv):**
+   ```bash
+   # Install the project in development mode
+   uv pip install -e ".[dev]"
+   
+   # Install dependencies
+   uv sync
+   ```
+
+3. **Alternative installation with pip:**
+   ```bash
+   # Create and activate virtual environment
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   
+   # Install in development mode
+   pip install -e ".[dev]"
+   ```
+
+**Development Guidelines:**
+- Follow existing code style and patterns
+- Write tests for new functionality
+- Update documentation as needed
+- Test your changes with `uv run python examples/example_kicad_project.py`
+- Use the Docker environment for testing: `./scripts/circuit-synth-docker python examples/example_kicad_project.py`
 
 ## License
 

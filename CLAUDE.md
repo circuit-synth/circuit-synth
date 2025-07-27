@@ -134,3 +134,214 @@ When discussing code or functionality:
 - **Private repo**: Reference as "private Circuit_Synth2 repo" or "closed source repo"
 - **Open source repo**: Reference as "open source circuit-synth repo" or "submodule repo"
 - **Default assumption**: Unless specified otherwise, all work should be done in the **open source repo**
+
+## Annotation System
+
+The circuit-synth repository includes a comprehensive annotation system that enables automatic and manual documentation of Python-generated circuit designs. This system provides seamless integration between Python code documentation and KiCad schematic annotations.
+
+### Overview
+
+The annotation system consists of three main components:
+
+1. **Decorator-based automatic annotations** - Extracts docstrings from decorated functions
+2. **Manual annotation classes** - Provides structured annotation objects for custom documentation
+3. **JSON export pipeline** - Serializes annotations to JSON for KiCad integration
+
+### Key Components
+
+#### 1. Decorator Flags (`@enable_comments`)
+
+The `@enable_comments` decorator automatically extracts function docstrings and converts them into schematic annotations:
+
+```python
+from circuit_synth.annotations import enable_comments
+
+@enable_comments
+def create_amplifier_stage():
+    """
+    Creates a common-emitter amplifier stage.
+    
+    This circuit provides voltage amplification with a gain of approximately 100.
+    Input impedance: ~1kΩ, Output impedance: ~3kΩ
+    """
+    # Circuit implementation...
+    pass
+```
+
+#### 2. Manual Annotation Classes
+
+Three annotation classes provide structured documentation capabilities:
+
+**TextBox Annotations:**
+```python
+from circuit_synth.annotations import TextBox
+
+# Create a text box annotation
+note = TextBox(
+    text="High-frequency bypass capacitor for supply rail filtering",
+    position=(50, 30),
+    size=(40, 15),
+    style="note"
+)
+```
+
+**TextProperty Annotations:**
+```python
+from circuit_synth.annotations import TextProperty
+
+# Add property annotation to a component
+component_note = TextProperty(
+    text="R1: Sets bias current to 2.5mA",
+    position=(10, 5),
+    style="property"
+)
+```
+
+**Table Annotations:**
+```python
+from circuit_synth.annotations import Table
+
+# Create a specifications table
+specs_table = Table(
+    headers=["Parameter", "Min", "Typical", "Max", "Unit"],
+    rows=[
+        ["Supply Voltage", "3.0", "3.3", "3.6", "V"],
+        ["Gain", "95", "100", "105", "dB"],
+        ["Bandwidth", "1", "10", "20", "MHz"]
+    ],
+    position=(100, 50),
+    title="Amplifier Specifications"
+)
+```
+
+#### 3. JSON Export Pipeline
+
+The annotation system includes a complete serialization pipeline that converts annotations to JSON format compatible with KiCad:
+
+```python
+from circuit_synth.annotations import export_annotations_to_json
+
+# Export all annotations from a design
+annotations = [text_box, component_note, specs_table]
+json_output = export_annotations_to_json(annotations, "amplifier_design")
+```
+
+### Usage Examples
+
+#### Automatic Annotation Workflow
+
+1. **Decorate functions** with `@enable_comments` to enable automatic docstring extraction
+2. **Write descriptive docstrings** following standard Python conventions
+3. **Run the design generation** - annotations are captured automatically
+4. **Export to JSON** for KiCad integration
+
+```python
+@enable_comments
+def design_filter_circuit():
+    """
+    Second-order Butterworth low-pass filter.
+    
+    Cutoff frequency: 1kHz
+    Roll-off: -40dB/decade above cutoff
+    Input/Output impedance: 50Ω
+    """
+    # Implementation creates filter components
+    return circuit
+```
+
+#### Manual Annotation Workflow
+
+1. **Create annotation objects** during circuit generation
+2. **Position annotations** relative to components or absolute coordinates
+3. **Collect annotations** in a list or annotation manager
+4. **Export to JSON** alongside automatic annotations
+
+```python
+def create_power_supply():
+    # Create circuit components
+    
+    # Add manual annotations
+    annotations = [
+        TextBox(
+            text="Regulation: ±0.1% line/load",
+            position=(75, 25),
+            style="specification"
+        ),
+        Table(
+            headers=["Rail", "Voltage", "Current"],
+            rows=[
+                ["+5V", "5.00V", "2.0A"],
+                ["-5V", "-5.00V", "0.5A"],
+                ["+12V", "12.00V", "1.0A"]
+            ],
+            position=(120, 60),
+            title="Power Rail Specifications"
+        )
+    ]
+    
+    return circuit, annotations
+```
+
+### Technical Implementation Details
+
+#### Data Flow Architecture
+
+The annotation system implements a robust data flow from Python generation to KiCad integration:
+
+1. **Collection Phase**: Annotations are gathered during circuit generation
+2. **Validation Phase**: Annotation objects are validated for completeness
+3. **Serialization Phase**: Objects are converted to JSON with proper formatting
+4. **Export Phase**: JSON is written with KiCad-compatible structure
+
+#### S-expression Formatting Fixes
+
+The system includes comprehensive S-expression formatting with proper string escaping for KiCad compatibility:
+
+- **String Escaping**: Handles special characters in annotation text
+- **Coordinate Formatting**: Ensures proper numeric formatting for positions
+- **Style Mapping**: Maps annotation styles to KiCad text properties
+- **Hierarchical Structure**: Maintains proper S-expression nesting
+
+```python
+# Example of formatted S-expression output
+(text "High-frequency bypass capacitor" (at 50.8 76.2 0)
+  (effects (font (size 1.27 1.27)) (justify left))
+  (uuid "annotation-uuid-here")
+)
+```
+
+#### JSON Schema Structure
+
+The export pipeline follows a consistent JSON schema:
+
+```json
+{
+  "design_name": "amplifier_design",
+  "timestamp": "2025-01-27T10:30:00Z",
+  "annotations": [
+    {
+      "type": "textbox",
+      "id": "unique-id",
+      "text": "annotation content",
+      "position": {"x": 50, "y": 30},
+      "size": {"width": 40, "height": 15},
+      "style": "note",
+      "metadata": {
+        "source": "automatic|manual",
+        "function": "function_name"
+      }
+    }
+  ]
+}
+```
+
+### Integration with KiCad
+
+The annotation system provides seamless integration with KiCad schematics:
+
+1. **JSON Import**: KiCad can import the generated JSON files
+2. **S-expression Compatibility**: All formatting follows KiCad standards
+3. **Layer Management**: Annotations are placed on appropriate schematic layers
+4. **UUID Tracking**: Each annotation receives a unique identifier for updates
+
+This implementation provides a complete end-to-end solution for documenting Python-generated circuit designs with both automatic and manual annotation capabilities.

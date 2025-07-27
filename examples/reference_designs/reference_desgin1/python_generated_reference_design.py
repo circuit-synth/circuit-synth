@@ -48,8 +48,14 @@ if __name__ == '__main__':
     
     # Generate KiCad project directly (no intermediate files needed)
     c.generate_kicad_project(
-        "python_generated_reference_design",
+        "python_generated_design",
         force_regenerate=False,
         draw_bounding_boxes=True,
     )
+    
+    # Generate KiCad netlist file
+    logger.info("Generating KiCad netlist...")
+    netlist_path = os.path.join("python_generated_design", "python_generated_design.net")
+    c.generate_kicad_netlist(netlist_path)
+    logger.info(f"KiCad netlist generated: {netlist_path}")
 

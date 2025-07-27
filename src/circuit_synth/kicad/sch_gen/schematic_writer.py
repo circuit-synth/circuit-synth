@@ -219,6 +219,9 @@ class SchematicWriter:
         if self.draw_bounding_boxes:
             self._add_component_bounding_boxes()
         
+        # Add text annotations (TextBox, TextProperty, etc.)
+        self._add_annotations()
+        
         # Convert to S-expression format using the parser
         schematic_sexpr = self.parser.from_schematic(self.schematic)
         
@@ -553,6 +556,173 @@ class SchematicWriter:
             except Exception as e:
                 logger.error(f"Failed to add bounding box for {comp.reference} ({comp.lib_id}): {e}")
                 continue
+
+    def _add_annotations(self):
+        """Add text annotations (TextBox, TextProperty, etc.) to the schematic."""
+        if not hasattr(self.circuit, '_annotations') or not self.circuit._annotations:
+            return
+            
+        logger.debug(f"Adding {len(self.circuit._annotations)} annotations to schematic")
+        
+        for annotation in self.circuit._annotations:
+            try:
+                # Handle both annotation objects and dictionary data
+                if isinstance(annotation, dict):
+                    annotation_type = annotation.get('type', 'Unknown')
+                elif hasattr(annotation, '__class__'):
+                    annotation_type = annotation.__class__.__name__
+                else:
+                    annotation_type = type(annotation).__name__
+                    
+                if annotation_type == 'TextBox':
+                    self._add_textbox_annotation(annotation)
+                elif annotation_type == 'TextProperty':
+                    self._add_text_annotation(annotation)
+                elif annotation_type == 'Table':
+                    self._add_table_annotation(annotation)
+                else:
+                    logger.warning(f"Unknown annotation type: {annotation_type}")
+                    
+            except Exception as e:
+                logger.error(f"Failed to add annotation {annotation}: {e}")
+
+    def _add_textbox_annotation(self, textbox):
+        """Add a TextBox annotation as a KiCad text_box element."""
+        from circuit_synth.kicad_api.core.types import Text
+        
+        # Handle both dictionary data and object data
+        if isinstance(textbox, dict):
+            text = textbox.get('text', '')
+            position = textbox.get('position', (184.0, 110.0))  # Double the default coordinates
+            text_size = textbox.get('text_size', 1.27)
+            print(f"DEBUG: Processing dict textbox at position {position} with text: {text[:50]}...")
+            rotation = textbox.get('rotation', 0)
+            size = textbox.get('size', (40.0, 20.0))
+            margins = textbox.get('margins', (1.0, 1.0, 1.0, 1.0))
+            background = textbox.get('background', True)
+            background_color = textbox.get('background_color', 'white')
+            border = textbox.get('border', True)
+            uuid = textbox.get('uuid', '')
+        else:
+            text = textbox.text
+            position = textbox.position
+            text_size = textbox.text_size
+            rotation = textbox.rotation
+            print(f"DEBUG: Processing object textbox at position {position} with text: {text[:50]}...")
+            size = textbox.size
+            margins = textbox.margins
+            background = textbox.background
+            background_color = textbox.background_color
+            border = textbox.border
+            uuid = textbox.uuid
+        
+        # Create a Text object (we'll handle the box in S-expression generation)
+        print(f"DEBUG: Creating Text element with Point({position[0]}, {position[1]})")
+        text_element = Text(
+            content=text,
+            position=Point(position[0], position[1]),
+            size=text_size,
+            orientation=rotation
+        )
+        print(f"DEBUG: Text element created with position: {text_element.position}")
+        
+        # Store additional textbox properties for S-expression generation
+        text_element._is_textbox = True
+        text_element._textbox_size = size
+        text_element._textbox_margins = margins
+        text_element._textbox_background = background
+        text_element._textbox_background_color = background_color
+        text_element._textbox_border = border
+        text_element._textbox_uuid = uuid
+        
+        self.schematic.add_text(text_element)
+        logger.debug(f"Added TextBox annotation: '{text}' at {position}")
+
+    def _add_text_annotation(self, text_prop):
+        """Add a TextProperty annotation as a simple KiCad text element.""" 
+        from circuit_synth.kicad_api.core.types import Text
+        
+        # Handle both dictionary data and object data
+        if isinstance(text_prop, dict):
+            text = text_prop.get('text', '')
+            position = text_prop.get('position', (10.0, 10.0))
+            size = text_prop.get('size', 1.27)
+            rotation = text_prop.get('rotation', 0)
+            bold = text_prop.get('bold', False)
+            italic = text_prop.get('italic', False)
+            color = text_prop.get('color', 'black')
+            uuid = text_prop.get('uuid', '')
+        else:
+            text = text_prop.text
+            position = text_prop.position
+            size = text_prop.size
+            rotation = text_prop.rotation
+            bold = text_prop.bold
+            italic = text_prop.italic
+            color = text_prop.color
+            uuid = text_prop.uuid
+        
+        text_element = Text(
+            content=text,
+            position=Point(position[0], position[1]),
+            size=size,
+            orientation=rotation
+        )
+        
+        # Store additional text properties
+        text_element._text_bold = bold
+        text_element._text_italic = italic
+        text_element._text_color = color
+        text_element._text_uuid = uuid
+        
+        self.schematic.add_text(text_element)
+        logger.debug(f"Added TextProperty annotation: '{text}' at {position}")
+
+    def _add_table_annotation(self, table):
+        """Add a Table annotation as multiple text elements."""
+        # Handle both dictionary data and object data
+        if isinstance(table, dict):
+            data = table.get('data', [])
+            position = table.get('position', (10.0, 10.0))
+            cell_width = table.get('cell_width', 20.0)
+            cell_height = table.get('cell_height', 5.0)
+            text_size = table.get('text_size', 1.0)
+            header_bold = table.get('header_bold', True)
+            uuid = table.get('uuid', '')
+        else:
+            data = table.data
+            position = table.position
+            cell_width = table.cell_width
+            cell_height = table.cell_height
+            text_size = table.text_size
+            header_bold = table.header_bold
+            uuid = table.uuid
+            
+        logger.debug(f"Adding Table annotation with {len(data)} rows at {position}")
+        
+        x_start, y_start = position
+        
+        for row_idx, row in enumerate(data):
+            for col_idx, cell_text in enumerate(row):
+                if cell_text:  # Skip empty cells
+                    cell_x = x_start + (col_idx * cell_width)
+                    cell_y = y_start + (row_idx * cell_height)
+                    
+                    from circuit_synth.kicad_api.core.types import Text
+                    
+                    text_element = Text(
+                        content=str(cell_text),
+                        position=Point(cell_x, cell_y),
+                        size=text_size
+                    )
+                    
+                    # Make header row bold
+                    if row_idx == 0 and header_bold:
+                        text_element._text_bold = True
+                    
+                    text_element._text_uuid = f"{uuid}_{row_idx}_{col_idx}"
+                    
+                    self.schematic.add_text(text_element)
 
     def _add_paper_size(self, schematic_expr: list):
         """Add paper size to the schematic expression."""
