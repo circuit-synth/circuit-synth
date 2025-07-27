@@ -1066,11 +1066,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
                 if net_var not in net_params:
                     net_params.append(net_var)
         
-        # If no nets found, add a placeholder to avoid empty parameter list
-        if not net_params:
-            net_params = ['# No nets with connections found']
-        
-        # Generate circuit function with net parameters
+        # Generate circuit function with net parameters (empty if no nets)
         param_str = ', '.join(net_params)
         content.extend([
             '@circuit',
@@ -1081,6 +1077,11 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
             f'    logger.info("Creating {circuit.name} subcircuit")',
             '    ',
         ])
+        
+        # Add comment if no net parameters were found
+        if not net_params:
+            content.append('    # No nets with connections found')
+            content.append('    ')
         
         # Add components
         if circuit.components:
