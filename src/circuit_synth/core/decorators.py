@@ -11,17 +11,22 @@ def set_current_circuit(circuit):
     global _CURRENT_CIRCUIT
     _CURRENT_CIRCUIT = circuit
 
-def circuit(_func=None, *, name=None):
+def circuit(_func=None, *, name=None, comments=True):
     """
-    Decorator that can be used in two ways:
+    Decorator that can be used in three ways:
       1) @circuit
          def my_circuit(...):
              ...
       2) @circuit(name="someCircuitName")
          def my_circuit(...):
              ...
+      3) @circuit(name="someCircuitName", comments=False)
+         def my_circuit(...):
+             ...
 
     Creates a new Circuit object, optionally using `name` as the circuit name.
+    If comments=True (default), the function's docstring will be added as a 
+    text annotation on the generated schematic.
     If there's an existing current circuit (the "parent"), the new circuit is
     attached to the parent as a subcircuit. Then references are finalized
     before returning the child circuit.
@@ -39,7 +44,8 @@ def circuit(_func=None, *, name=None):
 
             c = Circuit(
                 name=name or func.__name__,
-                description=docstring
+                description=docstring,
+                auto_comments=comments
             )
 
             # Link it as a subcircuit if there's a parent

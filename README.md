@@ -14,6 +14,7 @@ Circuit Synth is an open-source Python library that fits seamlessly into normal 
 
 **Current Status**: Circuit-synth is ready for professional use with the following capabilities:
 - **Full KiCad Integration**: Generate complete KiCad projects with schematics and PCB layouts
+- **Schematic Annotations**: Automatic docstring extraction and manual text annotations with tables
 - **Netlist Generation**: Export industry-standard KiCad netlist files (.net) for seamless PCB workflow
 - **Hierarchical Design Support**: Multi-sheet projects with proper organization and connectivity
 - **Professional Component Management**: Complete footprint, symbol, and library integration
@@ -80,6 +81,52 @@ if __name__ == '__main__':
     
     # Generate complete KiCad project
     circuit.generate_kicad_project("esp32s3_simple")
+```
+
+## Schematic Annotations
+
+Circuit-synth includes a powerful annotation system for adding documentation directly to your KiCad schematics:
+
+### Automatic Docstring Extraction
+
+```python
+from circuit_synth import *
+from circuit_synth.core.annotations import enable_comments
+
+@enable_comments  # Automatically extracts docstring as schematic annotation
+@circuit(name="documented_circuit")
+def power_filter_circuit():
+    """Power filtering circuit for clean 3.3V supply.
+    
+    This circuit provides stable power filtering using a 10uF ceramic capacitor
+    placed close to the power input for optimal performance."""
+    
+    # Circuit implementation...
+```
+
+### Manual Annotations
+
+```python
+from circuit_synth.core.annotations import TextBox, TextProperty, Table
+
+# Add text boxes with background
+circuit.add_annotation(TextBox(
+    text="⚠️ Critical: Verify power supply ratings before connection!",
+    position=(50, 30),
+    background_color='yellow',
+    size=(80, 20)
+))
+
+# Add component tables
+table = Table(
+    headers=["Component", "Value", "Package", "Notes"],
+    rows=[
+        ["C1", "10uF", "0603", "X7R ceramic"],
+        ["R1", "1kΩ", "0603", "1% precision"]
+    ],
+    position=(20, 100)
+)
+circuit.add_annotation(table)
 ```
 
 ## Key Differentiators

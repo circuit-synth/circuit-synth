@@ -19,9 +19,10 @@ from ._logger import context_logger
 class Circuit:
     from .component import Component  # for type-hinting
 
-    def __init__(self, name=None, description=None):
+    def __init__(self, name=None, description=None, auto_comments=True):
         self.name = name or "UnnamedCircuit"
         self.description = description
+        self.auto_comments = auto_comments
         self._components = {}
         self._nets = {}
         # self._unnamed_net_counter = 1 # Removed: Counter is now managed by ReferenceManager
@@ -29,6 +30,7 @@ class Circuit:
         self._subcircuits = []
         self._component_list = []
         self._reference_manager = ReferenceManager()
+        self._annotations = []  # Store TextProperty, TextBox, etc.
 
 
     def validate_reference(self, ref: str) -> bool:
@@ -160,10 +162,39 @@ class Circuit:
             total_components=len(self._components)
         )
 
+        # Auto-generate docstring annotation if enabled
+        if self.auto_comments and self.description and self.description.strip():
+            self._add_docstring_annotation()
+
         # Recursively finalize subcircuits
         for sc in self._subcircuits:
             sc.finalize_references()
 
+    def _add_docstring_annotation(self):
+        """Add a TextBox annotation with the circuit's docstring."""
+        from .annotations import TextBox
+        
+        # Position the docstring in the top-left area of the schematic
+        # Using a reasonable default position and size
+        docstring_box = TextBox(
+            text=self.description.strip(),
+            position=(10.0, 10.0),  # 10mm from top-left corner
+            size=(80.0, 30.0),  # 80mm wide, 30mm tall
+            text_size=1.2,
+            bold=True,
+            background=True,
+            background_color="lightyellow",
+            border=True,
+            justify="left top"
+        )
+        
+        self.add_annotation(docstring_box)
+        context_logger.debug(
+            "Added auto-generated docstring annotation",
+            component="CIRCUIT", 
+            circuit_name=self.name,
+            text_length=len(self.description)
+        )
 
     def generate_text_netlist(self) -> str:
         """
@@ -194,6 +225,16 @@ class Circuit:
                 circuit_name=self.name
             )
             self._nets[net.name] = net
+
+    def add_annotation(self, annotation):
+        """Add a text annotation (TextProperty, TextBox, etc.) to this circuit."""
+        self._annotations.append(annotation)
+        context_logger.debug(
+            "Added annotation to circuit",
+            component="CIRCUIT",
+            annotation_type=type(annotation).__name__,
+            circuit_name=self.name
+        )
 
     def to_dict(self) -> Dict[str, Any]:
         """

@@ -62,6 +62,8 @@ class Circuit:
         # We'll store subcircuit usage references here for building hierarchical sheets.
         # x, y, width, height are added during collision placement
         self.child_instances = []
+        # Annotations for text elements
+        self._annotations = []
 
     def add_component(self, comp: SchematicSymbol):
         logger.debug(f"Adding component {comp.reference} ({comp.lib_id}) to circuit '{self.name}'")
@@ -228,6 +230,13 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             "sub_name": child_circ.name,
             "instance_label": ""  # assigned later
         })
+
+    # Parse annotations
+    annotations_data = circ_data.get("annotations", [])
+    for annotation_dict in annotations_data:
+        # Convert JSON annotation back to annotation object
+        # For now, just store the dictionary data
+        circuit._annotations.append(annotation_dict)
 
     return circuit
 

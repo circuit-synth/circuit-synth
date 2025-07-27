@@ -155,6 +155,7 @@ class NetlistExporter:
             "components": {},  # Standardized: Dictionary keyed by component reference
             "nets": {},
             "subcircuits": [],
+            "annotations": [],  # Add annotations to JSON data
         }
 
         # 1) Collect all components
@@ -191,6 +192,10 @@ class NetlistExporter:
         for sc in self.circuit._subcircuits:
             exporter = NetlistExporter(sc)
             data["subcircuits"].append(exporter.to_dict())
+
+        # 4) Add annotations to JSON data
+        for annotation in self.circuit._annotations:
+            data["annotations"].append(annotation.to_dict())
 
         return data
 

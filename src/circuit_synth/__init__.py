@@ -15,6 +15,17 @@ from .core import (
     circuit,
 )
 
+# Annotation imports
+from .core.annotations import (
+    TextProperty,
+    TextBox,
+    Table,
+    Graphic,
+    add_text,
+    add_text_box,
+    add_table,
+)
+
 # Exception imports
 from .core import (
     ComponentError,
@@ -60,6 +71,14 @@ __all__ = [
     "Net",
     "Pin",
     "circuit",
+    # Annotations
+    "TextProperty",
+    "TextBox",
+    "Table",
+    "Graphic",
+    "add_text",
+    "add_text_box",
+    "add_table",
     # Exceptions
     "ComponentError",
     "ValidationError",
