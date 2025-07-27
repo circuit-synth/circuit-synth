@@ -11,6 +11,7 @@ This test validates that the KiCad project import generates Python code that:
 import pytest
 import tempfile
 import shutil
+import os
 from pathlib import Path
 import ast
 import re
@@ -219,92 +220,120 @@ def test_kicad_to_python_import():
     with open(reference_resistor_divider_file, 'r') as f:
         reference_code = f.read()
     
-    # Create temporary directory for generated code
-    with tempfile.TemporaryDirectory() as temp_dir:
+    # Check if we should preserve files for manual inspection
+    preserve_files = os.getenv('PRESERVE_FILES', '0') == '1'
+    
+    if preserve_files:
+        # Create a persistent temp directory for manual inspection
+        temp_dir = tempfile.mkdtemp(prefix="circuit_synth_kicad_import_")
         temp_path = Path(temp_dir)
+        print(f"🔍 PRESERVE_FILES=1: Files will be saved to: {temp_path}")
+        temp_dir_context = None
+    else:
+        # Use auto-cleanup temporary directory
+        temp_dir_context = tempfile.TemporaryDirectory()
+        temp_dir = temp_dir_context.__enter__()
+        temp_path = Path(temp_dir)
+    
+    try:
+        # Create a temporary output directory for the hierarchical project
+        temp_output_dir = temp_path / "imported_project"
+        temp_output_dir.mkdir()
         
-        try:
-            # Create a temporary output directory for the hierarchical project
-            temp_output_dir = temp_path / "imported_project"
-            temp_output_dir.mkdir()
+        # Use the actual KiCadToPythonSyncer for real import functionality
+        syncer = KiCadToPythonSyncer(
+            kicad_project=str(kicad_project_file),
+            python_file=str(temp_output_dir),  # Directory for hierarchical output
+            preview_only=False,  # Actually create the files
+            create_backup=False  # No backup needed for temporary files
+        )
+        
+        # Use the sync method to perform actual KiCad-to-Python import
+        success = syncer.sync()
+        
+        if not success:
+            pytest.fail(f"KiCad-to-Python sync failed")
+        
+        # Look for the main.py file that should be generated
+        main_py_file = temp_output_dir / "main.py"
+        if not main_py_file.exists():
+            # List what files were actually created
+            created_files = list(temp_output_dir.glob("*.py"))
+            pytest.fail(f"KiCadToPythonSyncer did not create main.py. Created files: {created_files}")
+        
+        # Look for the actual circuit file (resistor_divider.py) which contains the components
+        circuit_py_file = temp_output_dir / "resistor_divider.py"
+        if not circuit_py_file.exists():
+            # Fallback to main.py if no separate circuit file
+            circuit_py_file = main_py_file
+        
+        # Read the generated Python code from the actual circuit file
+        with open(circuit_py_file, 'r') as f:
+            generated_code = f.read()
+        
+        print(f"KiCadToPythonSyncer generated hierarchical project")
+        print(f"Analyzing circuit code from: {circuit_py_file.name} ({len(generated_code)} characters)")
+        
+        # Also check for other circuit files
+        circuit_files = list(temp_output_dir.glob("*.py"))
+        print(f"Generated circuit files: {[f.name for f in circuit_files]}")
+        
+        # Save generated code for inspection
+        generated_file = temp_path / "generated_resistor_divider.py"
+        with open(generated_file, 'w') as f:
+            f.write(generated_code)
+        
+        # Analyze generated code structure to validate KiCad import worked
+        generated_analyzer = PythonCodeAnalyzer(generated_code)
+        
+        print(f"✅ KiCad-to-Python import test SUCCESSFUL!")
+        print(f"  - KiCad project: {kicad_project_file}")
+        print(f"  - Generated hierarchical project with {len(circuit_files)} files")
+        print(f"  - Successfully parsed KiCad and generated Python code")
+        print(f"  - Components found: R1, R2 (via Device_R template)")
+        print(f"  - Connections generated: {len(generated_analyzer.get_connection_structure())} patterns")
+        print(f"  - Real KiCad-to-Python logic working correctly!")
+        
+        # Validate that the essential KiCad import functionality is working
+        gen_connections = generated_analyzer.get_connection_structure() 
+        if len(gen_connections) == 0:
+            pytest.fail("No connections found in generated code - KiCad import failed")
+        
+        # Check that we have R1 and R2 components being created
+        if 'r1.ref = "R1"' not in generated_code:
+            pytest.fail("R1 component not found in generated code")
+        if 'r2.ref = "R2"' not in generated_code:
+            pytest.fail("R2 component not found in generated code")
+        
+        # Check that we have the resistor_divider function definition
+        if 'def resistor_divider(' not in generated_code:
+            pytest.fail("resistor_divider function not found in generated code")
+        
+        # Success! The KiCad-to-Python syncer is working and generating real Python code from KiCad
+        
+        if preserve_files:
+            print(f"📁 Files preserved for inspection at: {temp_path}")
+            print(f"   - Imported project: {temp_output_dir}")
+            print(f"   - Generated code copy: {generated_file}")
+        else:
+            print(f"  All files generated in temporary directory - will be cleaned up automatically")
             
-            # Use the actual KiCadToPythonSyncer for real import functionality
-            syncer = KiCadToPythonSyncer(
-                kicad_project=str(kicad_project_file),
-                python_file=str(temp_output_dir),  # Directory for hierarchical output
-                preview_only=False,  # Actually create the files
-                create_backup=False  # No backup needed for temporary files
-            )
-            
-            # Use the sync method to perform actual KiCad-to-Python import
-            success = syncer.sync()
-            
-            if not success:
-                pytest.fail(f"KiCad-to-Python sync failed")
-            
-            # Look for the main.py file that should be generated
-            main_py_file = temp_output_dir / "main.py"
-            if not main_py_file.exists():
-                # List what files were actually created
-                created_files = list(temp_output_dir.glob("*.py"))
-                pytest.fail(f"KiCadToPythonSyncer did not create main.py. Created files: {created_files}")
-            
-            # Look for the actual circuit file (resistor_divider.py) which contains the components
-            circuit_py_file = temp_output_dir / "resistor_divider.py"
-            if not circuit_py_file.exists():
-                # Fallback to main.py if no separate circuit file
-                circuit_py_file = main_py_file
-            
-            # Read the generated Python code from the actual circuit file
-            with open(circuit_py_file, 'r') as f:
-                generated_code = f.read()
-            
-            print(f"KiCadToPythonSyncer generated hierarchical project")
-            print(f"Analyzing circuit code from: {circuit_py_file.name} ({len(generated_code)} characters)")
-            
-            # Also check for other circuit files
-            circuit_files = list(temp_output_dir.glob("*.py"))
-            print(f"Generated circuit files: {[f.name for f in circuit_files]}")
-            
-            # Save generated code for inspection
-            generated_file = temp_path / "generated_resistor_divider.py"
-            with open(generated_file, 'w') as f:
-                f.write(generated_code)
-            
-            # Analyze generated code structure to validate KiCad import worked
-            generated_analyzer = PythonCodeAnalyzer(generated_code)
-            
-            print(f"✅ KiCad-to-Python import test SUCCESSFUL!")
-            print(f"  - KiCad project: {kicad_project_file}")
-            print(f"  - Generated hierarchical project with {len(circuit_files)} files")
-            print(f"  - Successfully parsed KiCad and generated Python code")
-            print(f"  - Components found: R1, R2 (via Device_R template)")
-            print(f"  - Connections generated: {len(generated_analyzer.get_connection_structure())} patterns")
-            print(f"  - Real KiCad-to-Python logic working correctly!")
-            
-            # Validate that the essential KiCad import functionality is working
-            gen_connections = generated_analyzer.get_connection_structure() 
-            if len(gen_connections) == 0:
-                pytest.fail("No connections found in generated code - KiCad import failed")
-            
-            # Check that we have R1 and R2 components being created
-            if 'r1.ref = "R1"' not in generated_code:
-                pytest.fail("R1 component not found in generated code")
-            if 'r2.ref = "R2"' not in generated_code:
-                pytest.fail("R2 component not found in generated code")
-            
-            # Check that we have the resistor_divider function definition
-            if 'def resistor_divider(' not in generated_code:
-                pytest.fail("resistor_divider function not found in generated code")
-            
-            # Success! The KiCad-to-Python syncer is working and generating real Python code from KiCad
-            
-        except ImportError as e:
-            pytest.skip(f"KiCad import functionality not implemented: {e}")
-        except AttributeError as e:
-            pytest.skip(f"Circuit code generation not implemented: {e}")
-        except Exception as e:
-            pytest.fail(f"KiCad import failed: {e}")
+    except ImportError as e:
+        if temp_dir_context:
+            temp_dir_context.__exit__(None, None, None)
+        pytest.skip(f"KiCad import functionality not implemented: {e}")
+    except AttributeError as e:
+        if temp_dir_context:
+            temp_dir_context.__exit__(None, None, None)
+        pytest.skip(f"Circuit code generation not implemented: {e}")
+    except Exception as e:
+        if temp_dir_context:
+            temp_dir_context.__exit__(None, None, None)
+        pytest.fail(f"KiCad import failed: {e}")
+    finally:
+        # Clean up the temporary directory context if we're using auto-cleanup
+        if temp_dir_context:
+            temp_dir_context.__exit__(None, None, None)
 
 
 
