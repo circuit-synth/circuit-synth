@@ -45,9 +45,21 @@ try:
             # First, try Rust cache for maximum performance
             try:
                 rust_cache = get_global_cache()
-                symbol_data = rust_cache.get_symbol_data(symbol_id)
+                
+                # Handle symbol ID format: Rust expects "LibName:SymbolName"
+                if ':' not in symbol_id:
+                    # Convert common symbols to proper format
+                    formatted_symbol_id = f"Device:{symbol_id}"
+                    context_logger.debug(
+                        f"🔧 RUST_CACHE: Converting symbol ID format: {symbol_id} → {formatted_symbol_id}",
+                        component="SYMBOL_CACHE"
+                    )
+                else:
+                    formatted_symbol_id = symbol_id
+                
+                symbol_data = rust_cache.get_symbol_data(formatted_symbol_id)
                 context_logger.info(
-                    f"🦀 RUST_CACHE: Ultra-fast symbol loaded: {symbol_id}",
+                    f"🦀 RUST_CACHE: Ultra-fast symbol loaded: {formatted_symbol_id}",
                     component="SYMBOL_CACHE"
                 )
                 # Convert Rust SymbolData to expected format
