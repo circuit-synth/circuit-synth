@@ -226,6 +226,9 @@ def test_kicad_to_python_import():
     if preserve_files:
         # Generate files in local test directory for easy manual inspection
         temp_path = test_dir / "generated_output"
+        # Clear existing directory to avoid conflicts
+        if temp_path.exists():
+            shutil.rmtree(temp_path)
         temp_path.mkdir(exist_ok=True)
         print(f"🔍 PRESERVE_FILES=1: Files will be saved to: {temp_path}")
         temp_dir_context = None
