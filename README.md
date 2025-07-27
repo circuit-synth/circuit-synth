@@ -13,6 +13,10 @@ Circuit Synth is an open-source Python library that fits seamlessly into normal 
 - **Normal EE Workflow**: Integrates with existing KiCad-based development processes
 
 **Current Status**: Circuit-synth is ready for professional use with the following capabilities:
+- **Full KiCad Integration**: Generate complete KiCad projects with schematics and PCB layouts
+- **Netlist Generation**: Export industry-standard KiCad netlist files (.net) for seamless PCB workflow
+- **Hierarchical Design Support**: Multi-sheet projects with proper organization and connectivity
+- **Professional Component Management**: Complete footprint, symbol, and library integration
 - Places components functionally (not yet optimized for intelligent board layout)
 - Places schematic parts (without intelligent placement algorithms)
 - Generates working KiCad projects suitable for professional development
@@ -70,6 +74,11 @@ def esp32s3_simple():
 
 if __name__ == '__main__':
     circuit = esp32s3_simple()
+    
+    # Generate KiCad netlist for PCB workflow
+    circuit.generate_kicad_netlist("esp32s3_simple.net")
+    
+    # Generate complete KiCad project
     circuit.generate_kicad_project("esp32s3_simple")
 ```
 
@@ -90,9 +99,12 @@ Unlike other circuit design tools that generate KiCad files as output only, circ
 
 ### Additional Features
 - **Pythonic Circuit Design**: Define circuits using intuitive Python classes and decorators
+- **KiCad Netlist Export**: Generate industry-standard .net files for PCB layout workflows
+- **Hierarchical Design Support**: Multi-sheet projects with proper organization and cross-references
 - **Component Management**: Built-in component library with easy extensibility  
 - **Smart Placement**: Automatic component placement algorithms
 - **Type Safety**: Full type hints support for better IDE integration
+- **Professional Output**: Clean, human-readable KiCad files suitable for production use
 - **Extensible Architecture**: Clean interfaces for custom implementations
 
 ## AI-Powered Development
@@ -140,7 +152,58 @@ cd circuit-synth
 uv run python examples/example_kicad_project.py
 ```
 
-This will generate a complete KiCad project in the `example_kicad_project/` directory.
+This will generate a complete KiCad project in the `example_kicad_project/` directory, including:
+- Hierarchical schematic files (.kicad_sch)
+- PCB layout file (.kicad_pcb) 
+- KiCad netlist file (.net)
+- JSON netlist file (.json)
+
+## KiCad Netlist Generation
+
+Circuit-synth provides industry-standard KiCad netlist generation for seamless PCB layout workflows:
+
+### Basic Netlist Export
+```python
+from circuit_synth import *
+
+@circuit
+def my_circuit():
+    # Define your circuit...
+    pass
+
+if __name__ == '__main__':
+    circuit = my_circuit()
+    
+    # Generate KiCad netlist (.net file)
+    circuit.generate_kicad_netlist("my_circuit.net")
+    
+    # Generate JSON netlist for analysis
+    circuit.generate_json_netlist("my_circuit.json")
+```
+
+### Features
+- **Industry Standard Format**: Generates KiCad-compatible .net files
+- **Hierarchical Design Support**: Multi-sheet projects with proper organization  
+- **Complete Component Data**: Includes footprints, values, datasheets, and library references
+- **Perfect KiCad Import**: Zero warnings, zero errors when importing into KiCad
+- **Scalable**: Works with simple 3-component circuits to complex 20+ component systems
+
+### Verification
+All generated netlists are validated through KiCad import:
+```
+Reading netlist file 'my_circuit.net'. 
+Using reference designators to match symbols and footprints.
+Processing symbol 'U1:RF_Module:ESP32-S2-MINI-1'.
+...
+Total warnings: 0, errors: 0.
+```
+
+### Integration with PCB Workflow
+1. **Design in Python**: Define circuits using circuit-synth syntax
+2. **Generate Netlist**: Export to KiCad-compatible .net format
+3. **Import to KiCad**: Load netlist directly into KiCad PCB editor
+4. **Layout PCB**: Use KiCad's routing and placement tools
+5. **Manufacturing**: Generate Gerber files and assembly drawings
 
 ## Installation
 

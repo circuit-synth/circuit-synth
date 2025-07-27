@@ -10,6 +10,8 @@ from pathlib import Path
 from .exception import CircuitSynthError
 from .json_encoder import CircuitSynthJSONEncoder
 
+logger = logging.getLogger(__name__)
+
 # Use Rust implementation for netlist processing (Phase 4 migration)
 # Temporarily disabled due to PyO3 linking issues - using Python fallback
 RUST_NETLIST_AVAILABLE = False
@@ -19,23 +21,27 @@ try:
     # RUST_NETLIST_AVAILABLE = True
     raise ImportError("Rust netlist processor temporarily disabled")
 except ImportError:
-    # Fallback to simple implementation for open source version
-    def convert_json_to_netlist(json_data, output_path):
-        """Simple netlist conversion for open source version."""
-        # Basic implementation that writes a simple netlist format
-        with open(output_path, 'w') as f:
-            f.write("# Simple netlist format\n")
-            if 'components' in json_data:
-                for comp in json_data['components']:
-                    f.write(f"# Component: {comp.get('ref', 'Unknown')}\n")
-            if 'nets' in json_data:
-                for net in json_data['nets']:
-                    f.write(f"# Net: {net.get('name', 'Unknown')}\n")
-        return True
-    
-    RUST_NETLIST_AVAILABLE = False
-
-logger = logging.getLogger(__name__)
+    # Use the proper KiCad netlist exporter instead of simple fallback
+    try:
+        from ..kicad.netlist_exporter import convert_json_to_netlist
+        RUST_NETLIST_AVAILABLE = False
+        logger.debug("Using KiCad netlist exporter for netlist generation")
+    except ImportError:
+        # Final fallback to simple implementation
+        def convert_json_to_netlist(json_data, output_path):
+            """Simple netlist conversion for open source version."""
+            # Basic implementation that writes a simple netlist format
+            with open(output_path, 'w') as f:
+                f.write("# Simple netlist format\n")
+                if 'components' in json_data:
+                    for comp in json_data['components']:
+                        f.write(f"# Component: {comp.get('ref', 'Unknown')}\n")
+                if 'nets' in json_data:
+                    for net in json_data['nets']:
+                        f.write(f"# Net: {net.get('name', 'Unknown')}\n")
+            return True
+        
+        RUST_NETLIST_AVAILABLE = False
 
 class NetlistExporter:
     """
@@ -350,7 +356,7 @@ class NetlistExporter:
 
             # Convert the temporary JSON to the KiCad netlist
             output_path = Path(filename)
-            convert_json_to_netlist(str(temp_json_file), str(output_path))
+            convert_json_to_netlist(Path(temp_json_file), output_path)
             logger.info("KiCad netlist successfully generated at '%s'", filename)
 
         except Exception as e:

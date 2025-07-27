@@ -313,9 +313,16 @@ def root():
 if __name__ == '__main__':
     circuit = root()
     
-    # Generate netlists
+    # Generate netlists first
+    logger.warning("Generating KiCad netlist...")
     circuit.generate_kicad_netlist("example_kicad_project.net")
+    logger.warning("KiCad netlist generated: example_kicad_project.net")
+    
+    logger.warning("Generating JSON netlist...")
     circuit.generate_json_netlist("example_kicad_project.json")
+    logger.warning("JSON netlist generated: example_kicad_project.json")
     
     # Generate KiCad project
+    logger.warning("Generating KiCad project...")
     circuit.generate_kicad_project("example_kicad_project", force_regenerate=False, draw_bounding_boxes=True)
+    logger.warning("KiCad project generation completed!")
