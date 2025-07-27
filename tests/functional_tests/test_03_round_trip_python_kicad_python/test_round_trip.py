@@ -186,9 +186,9 @@ def test_round_trip_python_kicad_python():
     preserve_files = os.getenv('PRESERVE_FILES', '0') == '1'
     
     if preserve_files:
-        # Create a persistent temp directory for manual inspection
-        temp_dir = tempfile.mkdtemp(prefix="circuit_synth_round_trip_")
-        temp_path = Path(temp_dir)
+        # Generate files in local test directory for easy manual inspection
+        temp_path = test_dir / "generated_output"
+        temp_path.mkdir(exist_ok=True)
         print(f"🔍 PRESERVE_FILES=1: Files will be saved to: {temp_path}")
         temp_dir_context = None
     else:
@@ -382,10 +382,11 @@ def test_round_trip_python_kicad_python():
         print(f"  Generated {len(python_files)} Python files including {circuit_file.name}")
         
         if preserve_files:
-            print(f"📁 Files preserved for inspection at: {temp_path}")
-            print(f"   - Original project copy: {temp_path / 'reference_project_copy'}")
-            print(f"   - Generated KiCad files: {kicad_output_dir}")
-            print(f"   - Round-trip Python files: {python_output_dir}")
+            print(f"📁 Files preserved in local test directory: {temp_path}")
+            print(f"   - Original project copy: {(temp_path / 'reference_project_copy').relative_to(test_dir)}")
+            print(f"   - Generated KiCad files: {kicad_output_dir.relative_to(test_dir)}")
+            print(f"   - Round-trip Python files: {python_output_dir.relative_to(test_dir)}")
+            print(f"   - Use 'git clean -fd' to remove generated files when done")
         else:
             print(f"  All files generated in temporary directory - will be cleaned up automatically")
             

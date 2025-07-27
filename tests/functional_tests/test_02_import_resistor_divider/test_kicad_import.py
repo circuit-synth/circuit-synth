@@ -224,9 +224,9 @@ def test_kicad_to_python_import():
     preserve_files = os.getenv('PRESERVE_FILES', '0') == '1'
     
     if preserve_files:
-        # Create a persistent temp directory for manual inspection
-        temp_dir = tempfile.mkdtemp(prefix="circuit_synth_kicad_import_")
-        temp_path = Path(temp_dir)
+        # Generate files in local test directory for easy manual inspection
+        temp_path = test_dir / "generated_output"
+        temp_path.mkdir(exist_ok=True)
         print(f"🔍 PRESERVE_FILES=1: Files will be saved to: {temp_path}")
         temp_dir_context = None
     else:
@@ -312,9 +312,10 @@ def test_kicad_to_python_import():
         # Success! The KiCad-to-Python syncer is working and generating real Python code from KiCad
         
         if preserve_files:
-            print(f"📁 Files preserved for inspection at: {temp_path}")
-            print(f"   - Imported project: {temp_output_dir}")
-            print(f"   - Generated code copy: {generated_file}")
+            print(f"📁 Files preserved in local test directory: {temp_path}")
+            print(f"   - Imported project: {temp_output_dir.relative_to(test_dir)}")
+            print(f"   - Generated code copy: {generated_file.relative_to(test_dir)}")
+            print(f"   - Use 'git clean -fd' to remove generated files when done")
         else:
             print(f"  All files generated in temporary directory - will be cleaned up automatically")
             
