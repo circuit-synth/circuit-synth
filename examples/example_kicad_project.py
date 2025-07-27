@@ -1,11 +1,28 @@
 #!/usr/bin/env python3
 import logging
+import time
+import cProfile
+import pstats
+import io
 from circuit_synth import *
 
 # Configure logging to reduce noise - only show warnings and errors
 logging.basicConfig(level=logging.WARNING)
 
 logger = logging.getLogger(__name__)
+
+# Timing decorator for functions
+def timed_function(func_name):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            start_time = time.perf_counter()
+            result = func(*args, **kwargs)
+            end_time = time.perf_counter()
+            duration = end_time - start_time
+            print(f"⏱️  {func_name}: {duration:.4f}s")
+            return result
+        return wrapper
+    return decorator
 
 # Keep existing component definitions
 C_10uF_0805 = Component(
@@ -311,11 +328,49 @@ def root():
 
 
 if __name__ == '__main__':
+    print("🚀 Starting circuit generation with performance profiling...")
+    total_start = time.perf_counter()
+    
+    # Profile the entire execution
+    profiler = cProfile.Profile()
+    profiler.enable()
+    
+    # Circuit creation
+    print("\n📋 Creating circuit...")
+    circuit_start = time.perf_counter()
     circuit = root()
+    circuit_end = time.perf_counter()
+    print(f"⏱️  Circuit creation: {circuit_end - circuit_start:.4f}s")
     
-    # Generate netlists
+    # KiCad netlist generation
+    print("\n🔌 Generating KiCad netlist...")
+    kicad_netlist_start = time.perf_counter()
     circuit.generate_kicad_netlist("example_kicad_project.net")
-    circuit.generate_json_netlist("example_kicad_project.json")
+    kicad_netlist_end = time.perf_counter()
+    print(f"⏱️  KiCad netlist generation: {kicad_netlist_end - kicad_netlist_start:.4f}s")
     
-    # Generate KiCad project
+    # JSON netlist generation
+    print("\n📄 Generating JSON netlist...")
+    json_netlist_start = time.perf_counter()
+    circuit.generate_json_netlist("example_kicad_project.json")
+    json_netlist_end = time.perf_counter()
+    print(f"⏱️  JSON netlist generation: {json_netlist_end - json_netlist_start:.4f}s")
+    
+    # KiCad project generation
+    print("\n🏗️  Generating KiCad project...")
+    kicad_project_start = time.perf_counter()
     circuit.generate_kicad_project("example_kicad_project", force_regenerate=False, draw_bounding_boxes=True)
+    kicad_project_end = time.perf_counter()
+    print(f"⏱️  KiCad project generation: {kicad_project_end - kicad_project_start:.4f}s")
+    
+    profiler.disable()
+    
+    total_end = time.perf_counter()
+    print(f"\n🎯 Total execution time: {total_end - total_start:.4f}s")
+    
+    # Generate detailed profiling report
+    print("\n📊 Top 20 most time-consuming functions:")
+    s = io.StringIO()
+    ps = pstats.Stats(profiler, stream=s).sort_stats('cumulative')
+    ps.print_stats(20)
+    print(s.getvalue())
