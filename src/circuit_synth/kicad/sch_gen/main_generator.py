@@ -49,7 +49,8 @@ except ImportError:
             return placements
     
     LLM_PLACEMENT_AVAILABLE = False
-from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
+# Use optimized symbol cache from core.component for better performance
+from circuit_synth.core.component import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
 from .symbol_geometry import SymbolBoundingBoxCalculator
 from circuit_synth.kicad.sch_editor.schematic_reader import SchematicReader
@@ -430,7 +431,8 @@ class SchematicGenerator(IKiCadIntegration):
         try:
             # Import necessary classes
             from ...kicad_api.core.types import Rectangle, Point
-            from ..kicad_symbol_cache import SymbolLibCache
+            # Use optimized symbol cache from core.component for better performance
+            from circuit_synth.core.component import SymbolLibCache
             from .symbol_geometry import SymbolBoundingBoxCalculator
             
             # Get the synchronized schematic
@@ -1283,7 +1285,8 @@ class SchematicGenerator(IKiCadIntegration):
     def get_symbol_libraries(self) -> List[str]:
         """Get list of available symbol libraries."""
         try:
-            from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
+            # Use optimized symbol cache from core.component for better performance
+            from circuit_synth.core.component import SymbolLibCache
             cache = SymbolLibCache()
             return list(cache.get_all_libraries().keys())
         except Exception as e:

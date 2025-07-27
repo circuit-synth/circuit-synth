@@ -40,7 +40,8 @@ from .shape_drawer import (
     arc_s_expr
 )
 from .collision_manager import SHEET_MARGIN
-from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache  
+# Use optimized symbol cache from core.component for better performance
+from circuit_synth.core.component import SymbolLibCache  
 from .integrated_reference_manager import IntegratedReferenceManager
 from .kicad_formatter import format_kicad_schematic
 
