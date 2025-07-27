@@ -88,24 +88,26 @@ class HierarchicalStructureValidator:
         assert expected_files == actual_files, f"Expected files {expected_files}, got {actual_files}"
     
     def validate_import_chain(self):
-        """Validate the import relationships (currently generates flat structure)."""
+        """Validate the hierarchical import relationships."""
         
-        # main.py should import both resistor_divider and capacitor_bank
-        # NOTE: Current converter generates flat structure, not true hierarchy
+        # CORRECT HIERARCHICAL STRUCTURE EXPECTED:
+        # main.py should import resistor_divider only
         assert 'resistor_divider' in self.import_chains.get('main.py', []), \
             "main.py should import resistor_divider"
-        assert 'capacitor_bank' in self.import_chains.get('main.py', []), \
-            "main.py should import capacitor_bank (flat structure)"
         
-        # resistor_divider.py should NOT import capacitor_bank (flat structure)
-        # This is different from expected hierarchical structure but matches current behavior
+        # main.py should NOT import capacitor_bank directly (it's nested in resistor_divider)
+        main_imports = self.import_chains.get('main.py', [])
+        assert 'capacitor_bank' not in main_imports, \
+            f"main.py should NOT import capacitor_bank directly (found in: {main_imports}). " \
+            f"capacitor_bank should be imported by resistor_divider.py"
+        
+        # resistor_divider.py SHOULD import capacitor_bank (nested hierarchy)
         resistor_imports = self.import_chains.get('resistor_divider.py', [])
-        circuit_imports = [imp for imp in resistor_imports if imp in ['capacitor_bank']]
-        # For now, accept either hierarchical or flat structure
-        # assert len(circuit_imports) == 0, \
-        #     f"resistor_divider.py imports {circuit_imports} (current flat structure)"
+        assert 'capacitor_bank' in resistor_imports, \
+            f"resistor_divider.py should import capacitor_bank (found: {resistor_imports}). " \
+            f"The KiCad project has capacitor_bank as a subcircuit within resistor_divider."
         
-        # capacitor_bank.py should not import other circuit modules (leaf node in both structures)
+        # capacitor_bank.py should not import other circuit modules (leaf node)
         cap_imports = self.import_chains.get('capacitor_bank.py', [])
         circuit_imports = [imp for imp in cap_imports if imp in ['main', 'resistor_divider']]
         assert len(circuit_imports) == 0, \
@@ -187,8 +189,42 @@ def test_complex_hierarchical_structure():
             pytest.fail(f"No .kicad_pro file found in {kicad_project_dir}")
         
         kicad_project_file = kicad_pro_files[0]
+        print(f"\n🔍 DEBUGGING KiCad-to-Python Conversion")
+        print(f"📁 KiCad project: {kicad_project_file}")
+        print(f"📂 Output directory: {output_dir}")
+        
+        # List all KiCad files in the project
+        kicad_files = list(kicad_project_dir.glob("*.kicad_sch"))
+        print(f"📄 KiCad schematic files found:")
+        for file in kicad_files:
+            print(f"   - {file.name}")
+        
+        # Analyze the KiCad project structure before conversion
+        print(f"\n🔬 ANALYZING KiCad PROJECT STRUCTURE")
+        with open(kicad_project_file.parent / "complex_hierarchical.kicad_sch", 'r') as f:
+            main_sch_content = f.read()
+        
+        # Find hierarchical sheets in main schematic
+        import re
+        sheet_matches = re.findall(r'\(property "Sheetname" "([^"]+)"', main_sch_content)
+        print(f"📋 Hierarchical sheets in main schematic: {sheet_matches}")
+        
+        # Check resistor_divider.kicad_sch for nested sheets
+        resistor_sch_path = kicad_project_file.parent / "resistor_divider.kicad_sch"
+        if resistor_sch_path.exists():
+            with open(resistor_sch_path, 'r') as f:
+                resistor_sch_content = f.read()
+            nested_sheets = re.findall(r'\(property "Sheetname" "([^"]+)"', resistor_sch_content)
+            print(f"🔗 Nested sheets in resistor_divider: {nested_sheets}")
+        
+        print(f"\n⚙️ EXPECTED HIERARCHY:")
+        print(f"   main.kicad_sch")
+        print(f"   ├── resistor_divider.kicad_sch") 
+        print(f"   │   └── capacitor_bank.kicad_sch")
+        print(f"   └── (other sheets if any)")
         
         # Initialize KiCad-to-Python syncer
+        print(f"\n🔄 STARTING CONVERSION...")
         syncer = KiCadToPythonSyncer(
             kicad_project=str(kicad_project_file),
             python_file=str(output_dir),
@@ -200,6 +236,56 @@ def test_complex_hierarchical_structure():
         success = syncer.sync()
         if not success:
             pytest.fail("KiCad-to-Python conversion failed")
+        
+        print(f"✅ Conversion completed")
+        
+        # Analyze generated files
+        print(f"\n📝 GENERATED PYTHON FILES:")
+        generated_files = list(output_dir.glob("*.py"))
+        for file in generated_files:
+            print(f"   - {file.name}")
+            
+        # Show the content of generated main.py for debugging
+        main_py_path = output_dir / "main.py"
+        if main_py_path.exists():
+            print(f"\n📄 GENERATED main.py CONTENT:")
+            with open(main_py_path, 'r') as f:
+                content = f.read()
+            print(f"```python")
+            for i, line in enumerate(content.split('\n')[:50], 1):  # First 50 lines
+                print(f"{i:2d}: {line}")
+            print(f"```")
+            
+            # Analyze imports
+            import_lines = [line.strip() for line in content.split('\n') if line.strip().startswith('from ') and 'import' in line]
+            print(f"\n🔍 IMPORT ANALYSIS:")
+            for imp in import_lines:
+                print(f"   {imp}")
+        
+        # Show the content of generated resistor_divider.py 
+        resistor_py_path = output_dir / "resistor_divider.py"
+        if resistor_py_path.exists():
+            print(f"\n📄 GENERATED resistor_divider.py CONTENT:")
+            with open(resistor_py_path, 'r') as f:
+                content = f.read()
+            import_lines = [line.strip() for line in content.split('\n') if line.strip().startswith('from ') and 'import' in line]
+            print(f"🔍 IMPORTS IN resistor_divider.py:")
+            for imp in import_lines:
+                print(f"   {imp}")
+            print(f"📋 Has capacitor_bank import: {'capacitor_bank' in content}")
+            print(f"📋 Has capacitor_bank instantiation: {'capacitor_bank(' in content}")
+            
+        print(f"\n🚨 HIERARCHY ISSUE ANALYSIS:")
+        print(f"❌ PROBLEM: Converter is generating FLAT structure instead of NESTED structure")
+        print(f"   - main.py imports BOTH resistor_divider AND capacitor_bank")
+        print(f"   - resistor_divider.py does NOT import capacitor_bank") 
+        print(f"   - This ignores the KiCad hierarchical nesting")
+        print(f"")
+        print(f"✅ CORRECT BEHAVIOR SHOULD BE:")
+        print(f"   - main.py imports ONLY resistor_divider")
+        print(f"   - resistor_divider.py imports capacitor_bank")
+        print(f"   - capacitor_bank.py imports nothing (leaf)")
+        print(f"")
         
         # Validate the generated hierarchical structure
         validator = HierarchicalStructureValidator(output_dir)
