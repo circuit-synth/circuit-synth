@@ -26,13 +26,13 @@ def create_resistor_divider_circuit():
     # Create and add resistors with unique base references
     r1 = Component(
         symbol="Device:R",
-        ref="R",  # Unique base reference
+        ref="R1",  # Unique base reference
         value="1k",
         footprint="Resistor_SMD:R_0603_1608Metric"
     )
     r2 = Component(
         symbol="Device:R",
-        ref="R",  # Unique base reference
+        ref="R2",  # Unique base reference
         value="1k",
         footprint="Resistor_SMD:R_0603_1608Metric"
     )
