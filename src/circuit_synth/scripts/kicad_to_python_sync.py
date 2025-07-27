@@ -22,8 +22,10 @@ import logging
 import sys
 import os
 import re
+import subprocess
+import tempfile
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass
 
 # Configure logging
@@ -53,18 +55,139 @@ class Component:
         }
 
 
+@dataclass 
+class Net:
+    """Net representation with actual pin connections"""
+    name: str
+    connections: List[Tuple[str, str]]  # List of (component_ref, pin) tuples
+    
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'connections': self.connections
+        }
+
+
 @dataclass
 class Circuit:
-    """Simple circuit representation"""
+    """Circuit representation with real netlist data"""
     name: str
     components: List[Component]
-    nets: List[str]
+    nets: List[Net]
     schematic_file: str = ""
     is_hierarchical_sheet: bool = False
 
 
+class KiCadNetlistParser:
+    """Parse KiCad netlist files to extract real connections"""
+    
+    def __init__(self):
+        pass
+    
+    def parse_netlist(self, netlist_path: Path) -> Tuple[List[Component], List[Net]]:
+        """Parse a KiCad .net file to extract components and nets with real connections"""
+        logger.info(f"Parsing KiCad netlist: {netlist_path}")
+        
+        if not netlist_path.exists():
+            logger.error(f"Netlist file not found: {netlist_path}")
+            return [], []
+        
+        try:
+            with open(netlist_path, 'r') as f:
+                content = f.read()
+            
+            # Parse S-expressions to extract components and nets
+            components = self._parse_components_from_netlist(content)
+            nets = self._parse_nets_from_netlist(content)
+            
+            logger.info(f"Parsed {len(components)} components and {len(nets)} nets from netlist")
+            
+            # Debug: log netlist content if parsing fails
+            if len(components) == 0 and len(nets) == 0:
+                logger.warning("Netlist parsing returned no results - debugging netlist content:")
+                logger.debug(f"Netlist content (first 500 chars): {content[:500]}")
+                
+            return components, nets
+            
+        except Exception as e:
+            logger.error(f"Failed to parse netlist {netlist_path}: {e}")
+            return [], []
+    
+    def _parse_components_from_netlist(self, content: str) -> List[Component]:
+        """Extract component information from netlist"""
+        components = []
+        
+        # Find all component definitions in (components ...) block
+        components_match = re.search(r'\(components(.*?)\)\s*\(libparts', content, re.DOTALL)
+        if not components_match:
+            return components
+        
+        components_block = components_match.group(1)
+        
+        # Find individual component entries - handle multi-line format
+        comp_matches = re.findall(r'\(comp \(ref "([^"]+)"\)\s*\(value "([^"]*)"\)(.*?)(?=\(comp \(ref|\Z)', components_block, re.DOTALL)
+        
+        for ref, value, comp_data in comp_matches:
+            # Extract footprint
+            footprint_match = re.search(r'\(footprint "([^"]*)"', comp_data)
+            footprint = footprint_match.group(1) if footprint_match else ""
+            
+            # Extract libsource (lib_id)
+            libsource_match = re.search(r'\(libsource \(lib "([^"]+)"\) \(part "([^"]+)"\)', comp_data)
+            if libsource_match:
+                lib = libsource_match.group(1)
+                part = libsource_match.group(2)
+                lib_id = f"{lib}:{part}"
+            else:
+                lib_id = "Unknown:Unknown"
+            
+            component = Component(
+                reference=ref,
+                lib_id=lib_id,
+                value=value,
+                footprint=footprint
+            )
+            components.append(component)
+            logger.debug(f"Parsed component: {ref} = {lib_id} ({value})")
+        
+        return components
+    
+    def _parse_nets_from_netlist(self, content: str) -> List[Net]:
+        """Extract net connections from netlist"""
+        nets = []
+        
+        # Find all net definitions in (nets ...) block
+        nets_match = re.search(r'\(nets(.*?)\)\s*$', content, re.DOTALL)
+        if not nets_match:
+            return nets
+        
+        nets_block = nets_match.group(1)
+        
+        # Find individual net entries - match actual KiCad format from the netlist
+        net_matches = re.findall(r'\(net \(code "(\d+)"\) \(name "([^"]+)"\) \(class "[^"]*"\)(.*?)(?=\(net|\Z)', nets_block, re.DOTALL)
+        
+        for code, net_name, nodes_block in net_matches:
+            connections = []
+            
+            # Find all node connections in this net
+            node_matches = re.findall(r'\(node \(ref "([^"]+)"\) \(pin "([^"]+)"\)', nodes_block)
+            
+            for ref, pin in node_matches:
+                connections.append((ref, pin))
+            
+            if connections:  # Only add nets that have connections
+                net = Net(
+                    name=net_name,
+                    connections=connections
+                )
+                nets.append(net)
+                logger.debug(f"Parsed net: {net_name} with {len(connections)} connections")
+        
+        return nets
+
+
 class KiCadParser:
-    """Parse KiCad files to extract components"""
+    """Parse KiCad files to extract components and generate netlists"""
     
     def __init__(self, kicad_project: str):
         self.kicad_project = Path(kicad_project)
@@ -79,14 +202,138 @@ class KiCadParser:
                 logger.error(f"No .kicad_pro file found in directory: {kicad_project}")
         
         self.project_dir = self.kicad_project.parent
+        self.netlist_parser = KiCadNetlistParser()
+    
+    def generate_netlist(self) -> Optional[Path]:
+        """Generate KiCad netlist from schematic using kicad-cli"""
+        logger.info("Generating KiCad netlist from schematic")
+        
+        try:
+            # Create temporary directory for netlist
+            temp_dir = Path(tempfile.mkdtemp())
+            netlist_path = temp_dir / f"{self.kicad_project.stem}.net"
+            
+            # Run kicad-cli to generate netlist
+            cmd = [
+                "kicad-cli", "sch", "export", "netlist",
+                "--output", str(netlist_path),
+                str(self.kicad_project.parent / f"{self.kicad_project.stem}.kicad_sch")
+            ]
+            
+            logger.info(f"Running: {' '.join(cmd)}")
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            
+            if netlist_path.exists():
+                logger.info(f"Generated netlist: {netlist_path}")
+                return netlist_path
+            else:
+                logger.error("Netlist generation failed - file not created")
+                return None
+                
+        except subprocess.CalledProcessError as e:
+            logger.error(f"kicad-cli failed: {e}")
+            logger.error(f"stdout: {e.stdout}")
+            logger.error(f"stderr: {e.stderr}")
+            return None
+        except Exception as e:
+            logger.error(f"Failed to generate netlist: {e}")
+            return None
     
     def parse_circuits(self) -> Dict[str, Circuit]:
-        """Parse KiCad project and extract hierarchical circuit information"""
+        """Parse KiCad project using real netlist data"""
         logger.info(f"Parsing KiCad project: {self.kicad_project}")
         
         if not self.kicad_project.exists():
             logger.error(f"KiCad project not found: {self.kicad_project}")
             return {}
+        
+        try:
+            # Step 1: Generate real KiCad netlist
+            netlist_path = self.generate_netlist()
+            if not netlist_path:
+                logger.warning("Failed to generate KiCad netlist, falling back to schematic parsing")
+                return self._parse_circuits_from_schematics()
+            
+            # Step 2: Parse netlist to get real connections
+            components, nets = self.netlist_parser.parse_netlist(netlist_path)
+            
+            # Step 3: Find hierarchical structure from schematics
+            hierarchical_info = self._analyze_hierarchical_structure()
+            
+            # Step 4: Create circuit representation with real connections
+            circuits = {}
+            
+            if hierarchical_info:
+                # Distribute components across hierarchical sheets based on schematic analysis
+                for sheet_name, sheet_components in hierarchical_info.items():
+                    # Filter components that belong to this sheet
+                    sheet_component_refs = {comp.reference for comp in sheet_components}
+                    sheet_actual_components = [comp for comp in components if comp.reference in sheet_component_refs]
+                    
+                    # Filter nets that connect to components in this sheet
+                    sheet_nets = []
+                    for net in nets:
+                        sheet_connections = [(ref, pin) for ref, pin in net.connections if ref in sheet_component_refs]
+                        if sheet_connections:
+                            sheet_net = Net(name=net.name, connections=sheet_connections)
+                            sheet_nets.append(sheet_net)
+                    
+                    circuit = Circuit(
+                        name=sheet_name,
+                        components=sheet_actual_components,
+                        nets=sheet_nets,
+                        schematic_file=f"{sheet_name}.kicad_sch",
+                        is_hierarchical_sheet=(sheet_name != "main")
+                    )
+                    circuits[sheet_name] = circuit
+                    logger.info(f"Created {sheet_name}: {len(sheet_actual_components)} components, {len(sheet_nets)} nets with real connections")
+            else:
+                # Single flat circuit
+                circuit = Circuit(
+                    name="main",
+                    components=components,
+                    nets=nets,
+                    schematic_file=f"{self.kicad_project.stem}.kicad_sch",
+                    is_hierarchical_sheet=False
+                )
+                circuits["main"] = circuit
+                logger.info(f"Created flat circuit: {len(components)} components, {len(nets)} nets with real connections")
+            
+            # Clean up temporary netlist
+            if netlist_path and netlist_path.exists():
+                netlist_path.unlink()
+                netlist_path.parent.rmdir()
+            
+            return circuits
+            
+        except Exception as e:
+            logger.error(f"Failed to parse KiCad project: {e}")
+            return {}
+    
+    def _analyze_hierarchical_structure(self) -> Dict[str, List[Component]]:
+        """Analyze schematic files to understand hierarchical structure"""
+        hierarchical_info = {}
+        
+        # Find all schematic files
+        schematic_files = list(self.project_dir.glob("*.kicad_sch"))
+        logger.info(f"Analyzing hierarchical structure from {len(schematic_files)} schematic files")
+        
+        for sch_file in schematic_files:
+            components, _ = self._parse_schematic_file(sch_file)
+            
+            # Determine circuit name and type
+            circuit_name = sch_file.stem
+            if circuit_name == self.kicad_project.stem:
+                circuit_name = "main"
+            
+            hierarchical_info[circuit_name] = components
+            logger.info(f"Sheet {circuit_name}: {len(components)} components")
+        
+        return hierarchical_info
+    
+    def _parse_circuits_from_schematics(self) -> Dict[str, Circuit]:
+        """Fallback: Parse circuits from schematics only (no real connections)"""
+        logger.warning("Using fallback schematic parsing without real netlist connections")
         
         try:
             # Find all schematic files
@@ -96,11 +343,13 @@ class KiCadParser:
             circuits = {}
             
             for sch_file in schematic_files:
-                components, nets = self._parse_schematic_file(sch_file)
+                components, net_names = self._parse_schematic_file(sch_file)
+                
+                # Convert net names to Net objects with empty connections (fallback)
+                nets = [Net(name=name, connections=[]) for name in net_names]
                 
                 # Determine if this is a hierarchical sheet or main schematic
                 is_main_schematic = sch_file.stem == self.kicad_project.stem
-                # root.kicad_sch contains actual components and should be treated as a hierarchical sheet
                 is_hierarchical = sch_file.stem == "root" or (not is_main_schematic and sch_file.stem != "root")
                 
                 circuit_name = sch_file.stem
@@ -116,20 +365,20 @@ class KiCadParser:
                 )
                 
                 circuits[circuit_name] = circuit
-                logger.info(f"Parsed {circuit_name}: {len(components)} components, {len(nets)} nets")
+                logger.info(f"Parsed {circuit_name}: {len(components)} components, {len(nets)} nets (no connections)")
             
             return circuits
             
         except Exception as e:
-            logger.error(f"Failed to parse KiCad project: {e}")
+            logger.error(f"Failed to parse KiCad schematics: {e}")
             return {}
     
-    def _parse_schematic_file(self, schematic_file: Path) -> tuple:
-        """Parse a single schematic file"""
+    def _parse_schematic_file(self, schematic_file: Path) -> Tuple[List[Component], List[str]]:
+        """Parse a single schematic file to extract components and net names"""
         logger.info(f"Parsing schematic: {schematic_file.name}")
         
         components = []
-        nets = set()
+        net_names = set()
         
         try:
             with open(schematic_file, 'r') as f:
@@ -149,12 +398,12 @@ class KiCadParser:
                 # Clean up the label (remove quotes)
                 clean_label = label.strip('"')
                 if clean_label and not clean_label.startswith('N$'):  # Skip auto-generated nets
-                    nets.add(clean_label)
+                    net_names.add(clean_label)
         
         except Exception as e:
             logger.error(f"Failed to parse schematic {schematic_file}: {e}")
         
-        return components, nets
+        return components, list(net_names)
     
     def _extract_symbol_blocks(self, content: str) -> List[str]:
         """Extract symbol blocks from schematic content"""
@@ -233,6 +482,70 @@ class LLMCodeUpdater:
     def __init__(self):
         """Initialize the LLM code updater"""
         self.llm_available = self._check_llm_availability()
+    
+    def _sanitize_variable_name(self, name: str) -> str:
+        """
+        Convert a net or signal name to a valid Python variable name.
+        
+        Rules:
+        - Replace invalid characters with underscores
+        - Prefix with underscore if starts with a digit
+        - Handle common power net naming conventions
+        """
+        # Handle common power net special cases first
+        if name in ['3V3', '3.3V', '+3V3', '+3.3V']:
+            return '_3v3'
+        elif name in ['5V', '+5V', '5.0V', '+5.0V']:
+            return '_5v'
+        elif name in ['12V', '+12V', '12.0V', '+12.0V']:
+            return '_12v'
+        elif name in ['VCC', 'VDD', 'VDDA', 'VIN']:
+            return name.lower()
+        elif name in ['GND', 'GROUND', 'VSS', 'VSSA']:
+            return 'gnd'
+        
+        # Convert to lowercase and replace invalid characters
+        var_name = name.lower()
+        var_name = var_name.replace('+', 'p').replace('-', 'n').replace('.', '_')
+        var_name = var_name.replace('/', '_').replace('\\', '_').replace(' ', '_')
+        
+        # Remove any remaining non-alphanumeric characters except underscore
+        import re
+        var_name = re.sub(r'[^a-zA-Z0-9_]', '_', var_name)
+        
+        # Prefix with underscore if starts with a digit
+        if var_name and var_name[0].isdigit():
+            var_name = '_' + var_name
+        
+        # Ensure it's not empty and doesn't conflict with Python keywords
+        if not var_name or var_name in ['class', 'def', 'if', 'else', 'for', 'while', 'import', 'from', 'return']:
+            var_name = 'net_' + var_name
+            
+        return var_name
+    
+    def _sanitize_component_type_name(self, lib_id: str) -> str:
+        """
+        Convert a component lib_id to a valid Python variable name for component types.
+        
+        Example: "Connector:USB_C_Plug_USB2.0" -> "Connector_USB_C_Plug_USB2_0"
+        """
+        # Replace invalid characters with underscores
+        comp_type = lib_id.replace(":", "_").replace("-", "_").replace(".", "_")
+        comp_type = comp_type.replace("/", "_").replace("\\", "_").replace(" ", "_")
+        
+        # Remove any remaining non-alphanumeric characters except underscore
+        import re
+        comp_type = re.sub(r'[^a-zA-Z0-9_]', '_', comp_type)
+        
+        # Prefix with underscore if starts with a digit
+        if comp_type and comp_type[0].isdigit():
+            comp_type = '_' + comp_type
+        
+        # Ensure it's not empty and doesn't conflict with Python keywords
+        if not comp_type or comp_type in ['class', 'def', 'if', 'else', 'for', 'while', 'import', 'from', 'return']:
+            comp_type = 'component_' + comp_type
+            
+        return comp_type
     
     def _check_llm_availability(self) -> bool:
         """Check if LLM services are available"""
@@ -543,11 +856,15 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         # Generate Python files for each hierarchical circuit
         for circuit_name, circuit in circuits.items():
             if circuit.is_hierarchical_sheet:
-                # Only generate subcircuit files for circuits that have components or meaningful content
-                if len(circuit.components) > 0 or circuit_name == "root":
-                    # Generate subcircuit Python file with correct naming
-                    filename = f"{circuit_name}.py"
-                    python_files[filename] = self._generate_subcircuit_file(circuit, circuits)
+                # Generate subcircuit files for all hierarchical sheets
+                filename = f"{circuit_name}.py"
+                python_files[filename] = self._generate_subcircuit_file(circuit, circuits)
+                logger.info(f"Generated subcircuit file: {filename}")
+            elif circuit_name != "main":
+                # Also generate files for non-main non-hierarchical circuits (like resistor_divider)
+                filename = f"{circuit_name}.py"
+                python_files[filename] = self._generate_subcircuit_file(circuit, circuits)
+                logger.info(f"Generated circuit file: {filename}")
         
         return python_files
     
@@ -648,9 +965,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         content.append("    # Create main nets")
         for net in sorted(unique_nets):
             if net in ['3V3', 'GND', 'VCC', 'VDD']:
-                net_var = net.lower()
-                if net == '3V3':
-                    net_var = '_3v3'
+                net_var = self._sanitize_variable_name(net)
                 content.append(f"    {net_var} = Net('{net}')")
         content.append("    ")
         
@@ -723,7 +1038,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         # Add component definitions
         component_types = {}
         for comp in circuit.components:
-            comp_type = comp.lib_id.replace(":", "_").replace("-", "_")
+            comp_type = self._sanitize_component_type_name(comp.lib_id)
             if comp_type not in component_types:
                 content.append(f'# {comp.lib_id} component definition')
                 content.append(f'{comp_type} = Component(')
@@ -735,22 +1050,25 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
                 content.append('')
                 component_types[comp_type] = comp.lib_id
         
-        # Generate net parameter list for function signature
-        # Always include common power nets for consistent hierarchy
-        net_params = ['_3v3', 'gnd']
+        # Generate net parameter list for function signature - fully generalized
+        net_params = []
         
-        # Add any additional nets from this circuit (avoiding duplicates)
+        # Extract unique net names from this circuit's actual connections
         if circuit.nets:
-            for net in sorted(circuit.nets):
-                net_var = net.lower().replace('+', 'p').replace('-', 'n').replace('.', '_')
-                if net in ['3V3', 'VCC', 'VDD']:
-                    net_var = '_3v3'
-                elif net == 'GND':
-                    net_var = 'gnd'
-                
-                # Only add if not already in the list
+            unique_nets = set()
+            for net in circuit.nets:
+                if len(net.connections) > 1:  # Only include nets with actual connections
+                    unique_nets.add(net.name)
+            
+            # Convert to sanitized parameter names
+            for net_name in sorted(unique_nets):
+                net_var = self._sanitize_variable_name(net_name)
                 if net_var not in net_params:
                     net_params.append(net_var)
+        
+        # If no nets found, add a placeholder to avoid empty parameter list
+        if not net_params:
+            net_params = ['# No nets with connections found']
         
         # Generate circuit function with net parameters
         param_str = ', '.join(net_params)
@@ -768,58 +1086,59 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         if circuit.components:
             content.append('    # Components')
             for comp in circuit.components:
-                comp_type = comp.lib_id.replace(":", "_").replace("-", "_")
+                comp_type = self._sanitize_component_type_name(comp.lib_id)
                 comp_var = comp.reference.lower()
                 content.append(f'    {comp_var} = {comp_type}()')
                 content.append(f'    {comp_var}.ref = "{comp.reference}"')
                 content.append('')
         
-        # Add basic power connections using passed nets
-        if circuit.components:
-            content.append('    # Basic power connections')
-            for comp in circuit.components:
-                comp_var = comp.reference.lower()
-                # This is a simplified connection - in reality we'd parse the actual netlist
-                if 'ESP32' in comp.lib_id.upper():
-                    content.append(f'    {comp_var}[3] += _3v3   # VDD')
-                    content.append(f'    {comp_var}[1] += gnd    # GND')
-                elif 'C' in comp.reference:  # Capacitor
-                    content.append(f'    # Power decoupling capacitors')
-                    content.append(f'    {comp_var}[1] += _3v3')
-                    content.append(f'    {comp_var}[2] += gnd')
-                elif 'R' in comp.reference:  # Resistor
-                    content.append(f'    {comp_var}[1] += _3v3')
-                    content.append(f'    {comp_var}[2] += gnd')
+        # Add real connections from netlist data - fully generalized
+        if circuit.nets:
+            content.append('    # Real connections from KiCad netlist')
+            for net in circuit.nets:
+                if len(net.connections) > 1:  # Only connect nets with multiple connections
+                    net_var = self._sanitize_variable_name(net.name)
+                    content.append(f'    # Net: {net.name}')
+                    for comp_ref, pin in net.connections:
+                        comp_var = comp_ref.lower()
+                        if pin.isdigit():
+                            content.append(f'    {comp_var}[{pin}] += {net_var}')
+                        else:
+                            content.append(f'    {comp_var}["{pin}"] += {net_var}')
+                    content.append('    ')
+        else:
+            content.append('    # No netlist connections available')
+            content.append('    # Components are instantiated but not connected')
             content.append('    ')
         
-        # Add subcircuit instantiation for root circuit
+        # Add subcircuit instantiation - fully generalized
         if all_circuits and circuit.name == "root":
-            # Root circuit should instantiate esp32 subcircuit
-            esp32_circuits = [name for name, c in all_circuits.items() 
-                             if c.is_hierarchical_sheet and name != "root"]
-            if esp32_circuits:
+            # Find all subcircuits (non-root hierarchical sheets)
+            subcircuits = [name for name, c in all_circuits.items() 
+                          if c.is_hierarchical_sheet and name != "root"]
+            if subcircuits:
                 content.append('    # Instantiate subcircuits')
-                for subcircuit_name in esp32_circuits:
-                    # Generate parameter list for the subcircuit
-                    # Always include common power nets for consistent hierarchy
-                    subcircuit_params = ['_3v3', 'gnd']
-                    
-                    # Add any additional nets from subcircuit (avoiding duplicates)
+                for subcircuit_name in subcircuits:
                     subcircuit = all_circuits[subcircuit_name]
+                    
+                    # Generate parameter list based on subcircuit's actual nets
+                    subcircuit_params = []
                     if subcircuit.nets:
-                        for net in sorted(subcircuit.nets):
-                            net_var = net.lower().replace('+', 'p').replace('-', 'n').replace('.', '_')
-                            if net in ['3V3', 'VCC', 'VDD']:
-                                net_var = '_3v3'
-                            elif net == 'GND':
-                                net_var = 'gnd'
-                            
-                            # Only add if not already in the list
+                        unique_nets = set()
+                        for net in subcircuit.nets:
+                            if len(net.connections) > 1:
+                                unique_nets.add(net.name)
+                        
+                        for net_name in sorted(unique_nets):
+                            net_var = self._sanitize_variable_name(net_name)
                             if net_var not in subcircuit_params:
                                 subcircuit_params.append(net_var)
                     
-                    param_str = ', '.join(subcircuit_params)
-                    content.append(f'    {subcircuit_name}_instance = {subcircuit_name}({param_str})')
+                    if subcircuit_params:
+                        param_str = ', '.join(subcircuit_params)
+                        content.append(f'    {subcircuit_name}_instance = {subcircuit_name}({param_str})')
+                    else:
+                        content.append(f'    {subcircuit_name}_instance = {subcircuit_name}()')
                 content.append('    ')
         
         content.extend([
@@ -851,9 +1170,7 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
             f'"""',
             '',
             'import logging',
-            'import os',
             'from circuit_synth import *',
-            'from circuit_synth.kicad.unified_kicad_integration import create_unified_kicad_integration',
             '',
         ])
         
@@ -888,72 +1205,70 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
             '    ',
         ])
         
-        # Create main nets
+        # Create main nets from actual netlist data - fully generalized
         all_nets = set()
         for circuit in all_circuits.values():
-            all_nets.update(circuit.nets)
+            for net in circuit.nets:
+                if len(net.connections) > 1:  # Only include nets with actual connections
+                    all_nets.add(net.name)
         
         if all_nets:
-            content.append('    # Create main nets')
-            for net in sorted(all_nets):
-                net_var = net.lower().replace('+', 'p').replace('-', 'n').replace('.', '_')
-                if net in ['3V3', 'VCC', 'VDD']:
-                    net_var = '_3v3'
-                elif net == 'GND':
-                    net_var = 'gnd'
-                content.append(f'    {net_var} = Net("{net}")')
+            content.append('    # Create main nets from KiCad netlist')
+            for net_name in sorted(all_nets):
+                net_var = self._sanitize_variable_name(net_name)
+                content.append(f'    {net_var} = Net("{net_name}")')
             content.append('    ')
         
-        # Instantiate root subcircuit (hierarchical entry point)
+        # Instantiate root subcircuit (hierarchical entry point) - fully generalized
         root_circuits = [name for name in subcircuits if name == "root"]
         if root_circuits:
-            content.append('    # Instantiate subcircuits')
+            content.append('    # Instantiate root subcircuit')
             for root_name in root_circuits:
-                # Generate net parameter list for root call
-                # Always include common power nets for consistent hierarchy
-                net_params = ['_3v3', 'gnd']
-                
-                # Add any additional nets from root circuit (avoiding duplicates)
                 root_circuit = all_circuits[root_name]
+                
+                # Generate net parameter list based on root circuit's actual nets
+                net_params = []
                 if root_circuit.nets:
-                    for net in sorted(root_circuit.nets):
-                        net_var = net.lower().replace('+', 'p').replace('-', 'n').replace('.', '_')
-                        if net in ['3V3', 'VCC', 'VDD']:
-                            net_var = '_3v3'
-                        elif net == 'GND':
-                            net_var = 'gnd'
-                        
-                        # Only add if not already in the list
+                    unique_nets = set()
+                    for net in root_circuit.nets:
+                        if len(net.connections) > 1:
+                            unique_nets.add(net.name)
+                    
+                    for net_name in sorted(unique_nets):
+                        net_var = self._sanitize_variable_name(net_name)
                         if net_var not in net_params:
                             net_params.append(net_var)
                 
-                param_str = ', '.join(net_params)
-                content.append(f'    {root_name}_instance = {root_name}({param_str})')
+                if net_params:
+                    param_str = ', '.join(net_params)
+                    content.append(f'    {root_name}_instance = {root_name}({param_str})')
+                else:
+                    content.append(f'    {root_name}_instance = {root_name}()')
                 content.append('')
         elif subcircuits:
             # Fallback: if no root, instantiate all subcircuits directly
-            content.append('    # Instantiate subcircuits')
+            content.append('    # Instantiate all subcircuits')
             for subcircuit_name in subcircuits:
-                # Generate net parameter list for subcircuit call
-                # Always include common power nets for consistent hierarchy
-                net_params = ['_3v3', 'gnd']
-                
-                # Add any additional nets from subcircuit (avoiding duplicates)
                 subcircuit = all_circuits[subcircuit_name]
+                
+                # Generate net parameter list based on subcircuit's actual nets
+                net_params = []
                 if subcircuit.nets:
-                    for net in sorted(subcircuit.nets):
-                        net_var = net.lower().replace('+', 'p').replace('-', 'n').replace('.', '_')
-                        if net in ['3V3', 'VCC', 'VDD']:
-                            net_var = '_3v3'
-                        elif net == 'GND':
-                            net_var = 'gnd'
-                        
-                        # Only add if not already in the list
+                    unique_nets = set()
+                    for net in subcircuit.nets:
+                        if len(net.connections) > 1:
+                            unique_nets.add(net.name)
+                    
+                    for net_name in sorted(unique_nets):
+                        net_var = self._sanitize_variable_name(net_name)
                         if net_var not in net_params:
                             net_params.append(net_var)
                 
-                param_str = ', '.join(net_params)
-                content.append(f'    {subcircuit_name}_instance = {subcircuit_name}({param_str})')
+                if net_params:
+                    param_str = ', '.join(net_params)
+                    content.append(f'    {subcircuit_name}_instance = {subcircuit_name}({param_str})')
+                else:
+                    content.append(f'    {subcircuit_name}_instance = {subcircuit_name}()')
                 content.append('')
         
         # Add main circuit components (if any)
@@ -989,29 +1304,14 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         
         content.extend([
             "if __name__ == '__main__':",
-            "    c = main_circuit()",
-            "    netlist_text = c.generate_text_netlist()",
-            "    print(netlist_text)",
-            f'    c.generate_json_netlist("{project_name}.json")',
-            f'    c.generate_kicad_netlist("{project_name}.net")',
+            "    circuit = main_circuit()",
             "    ",
-            "    # Create output directory for KiCad project",
-            '    output_dir = "kicad_output"',
-            "    os.makedirs(output_dir, exist_ok=True)",
+            "    # Generate netlists",
+            f'    circuit.generate_kicad_netlist("{project_name}.net")',
+            f'    circuit.generate_json_netlist("{project_name}.json")',
             "    ",
-            "    # Generate KiCad project with schematic",
-            '    logger.info(f"Generating KiCad project in {output_dir}")',
-            f'    logger.info(f"Using JSON file: {project_name}.json")',
-            "    ",
-            f'    gen = create_unified_kicad_integration(output_dir, "{project_name}")',
-            "    gen.generate_project(",
-            f'        "{project_name}.json",',
-            '        schematic_placement="connection_aware",',
-            "        generate_pcb=True,",
-            "        force_regenerate=True,",
-            "        draw_bounding_boxes=True",
-            "    )",
-            '    logger.info(f"KiCad project generated successfully in {output_dir}")'
+            "    # Generate KiCad project",
+            f'    circuit.generate_kicad_project("{project_name}")'
         ])
         
         return '\n'.join(content)
