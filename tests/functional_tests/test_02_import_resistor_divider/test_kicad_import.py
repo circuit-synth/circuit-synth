@@ -101,14 +101,17 @@ class PythonCodeAnalyzer:
     
     def _get_string_value(self, node: ast.AST) -> str:
         """Extract string value from AST node."""
-        if isinstance(node, ast.Str):
+        # Use ast.Constant for Python 3.8+ (recommended approach)
+        if isinstance(node, ast.Constant):
+            if isinstance(node.value, str):
+                return node.value
+            elif isinstance(node.value, (int, float)):
+                return str(node.value)
+        # Fallback for older Python versions or edge cases
+        elif hasattr(ast, 'Str') and isinstance(node, ast.Str):
             return node.s
-        elif isinstance(node, ast.Constant) and isinstance(node.value, str):
-            return node.value
-        elif isinstance(node, ast.Num):
+        elif hasattr(ast, 'Num') and isinstance(node, ast.Num):
             return str(node.n)
-        elif isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
-            return str(node.value)
         return None
     
     def get_component_structure(self) -> Dict[str, Dict[str, str]]:
