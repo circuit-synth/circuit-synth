@@ -153,6 +153,43 @@ uv sync
 pip install -e ".[dev]"
 ```
 
+### Using Docker
+
+Circuit-synth can be run in Docker containers with full KiCad library support:
+
+```bash
+# Build the Docker image
+./build-docker.sh
+
+# Run any circuit-synth command in Docker
+./circuit-synth-docker python examples/example_kicad_project.py
+
+# Run with interactive shell
+./circuit-synth-docker --interactive bash
+
+# Run without KiCad libraries (faster startup)
+./circuit-synth-docker --no-libs python -c "import circuit_synth; print('Ready!')"
+```
+
+**Docker Features:**
+- Pre-configured environment with all dependencies
+- Official KiCad symbol and footprint libraries included
+- Automatic file persistence to local `output/` directory
+- Security through non-root user execution
+
+**Docker Commands:**
+```bash
+# Universal command runner
+./circuit-synth-docker <any-python-command>
+
+# KiCad library-specific runner
+./run-with-kicad.sh --official-libs
+
+# Docker Compose services
+docker-compose up circuit-synth        # Basic service
+docker-compose up circuit-synth-dev    # Development mode
+docker-compose up circuit-synth-test   # Test runner
+```
 
 ## Documentation
 

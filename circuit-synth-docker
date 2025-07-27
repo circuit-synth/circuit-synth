@@ -1,0 +1,171 @@
+#!/bin/bash
+
+# Circuit Synth Docker Runner - Execute any Circuit Synth command in Docker
+# Usage: ./circuit-synth-docker [OPTIONS] <command>
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_status() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Default values
+IMAGE_NAME="circuit-synth-simple"
+USE_OFFICIAL_LIBS=true
+INTERACTIVE=false
+COMMAND=""
+
+# Usage function
+show_usage() {
+    echo "Circuit Synth Docker Runner - Execute any Circuit Synth command in Docker"
+    echo ""
+    echo "Usage: $0 [OPTIONS] <command>"
+    echo ""
+    echo "Options:"
+    echo "  --no-libs           Don't mount KiCad libraries"
+    echo "  --interactive, -i   Run in interactive mode"
+    echo "  --image NAME        Docker image to use (default: circuit-synth-simple)"
+    echo "  --help, -h          Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  # Run any Python script"
+    echo "  $0 python examples/example_kicad_project.py"
+    echo "  $0 python examples/my_circuit.py"
+    echo ""
+    echo "  # Run Circuit Synth console scripts"
+    echo "  $0 kicad-to-python /path/to/project.kicad_pro"
+    echo "  $0 python -m circuit_synth.scripts.kicad_to_python_sync --help"
+    echo ""
+    echo "  # Interactive shell"
+    echo "  $0 --interactive"
+    echo "  $0 -i bash"
+    echo ""
+    echo "  # Python REPL with Circuit Synth loaded"
+    echo "  $0 -i python"
+    echo ""
+    echo "  # Run tests"
+    echo "  $0 pytest tests/unit/test_core_circuit.py -v"
+    echo ""
+    echo "  # Install additional packages and run"
+    echo "  $0 bash -c 'pip install matplotlib && python my_plotting_script.py'"
+    echo ""
+    echo "  # Run without KiCad libraries (faster startup)"
+    echo "  $0 --no-libs python -c \"import circuit_synth; print('Ready!')\""
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --no-libs)
+            USE_OFFICIAL_LIBS=false
+            shift
+            ;;
+        --interactive|-i)
+            INTERACTIVE=true
+            shift
+            ;;
+        --image)
+            IMAGE_NAME="$2"
+            shift 2
+            ;;
+        --help|-h)
+            show_usage
+            exit 0
+            ;;
+        *)
+            # Everything else is the command to run
+            COMMAND="$*"
+            break
+            ;;
+    esac
+done
+
+# If no command specified and interactive mode, default to bash
+if [ -z "$COMMAND" ] && [ "$INTERACTIVE" = true ]; then
+    COMMAND="bash"
+fi
+
+# If no command at all, show usage
+if [ -z "$COMMAND" ]; then
+    print_error "No command specified"
+    echo ""
+    show_usage
+    exit 1
+fi
+
+# Build Docker run command
+DOCKER_CMD="docker run --rm"
+
+# Add interactive flags if needed
+if [ "$INTERACTIVE" = true ]; then
+    DOCKER_CMD="$DOCKER_CMD -it"
+fi
+
+# Add volume mounts
+DOCKER_CMD="$DOCKER_CMD -v $(pwd)/src:/app/src"
+DOCKER_CMD="$DOCKER_CMD -v $(pwd)/examples:/app/examples"
+DOCKER_CMD="$DOCKER_CMD -v $(pwd)/tests:/app/tests"
+DOCKER_CMD="$DOCKER_CMD -v $(pwd)/output:/app/output"
+
+# Handle KiCad library mounting
+if [ "$USE_OFFICIAL_LIBS" = true ]; then
+    print_status "Mounting official KiCad libraries..."
+    
+    # Check if submodules exist
+    if [ -d "../kicad-symbols" ]; then
+        DOCKER_CMD="$DOCKER_CMD -v $(realpath ../kicad-symbols):/app/kicad-libs/symbols:ro"
+        DOCKER_CMD="$DOCKER_CMD -e KICAD_SYMBOL_DIR=/app/kicad-libs/symbols"
+    else
+        print_warning "KiCad symbols submodule not found - symbols will not be available"
+    fi
+    
+    if [ -d "../kicad-footprints" ]; then
+        DOCKER_CMD="$DOCKER_CMD -v $(realpath ../kicad-footprints):/app/kicad-libs/footprints:ro"
+        DOCKER_CMD="$DOCKER_CMD -e KICAD_FOOTPRINT_DIR=/app/kicad-libs/footprints"
+    else
+        print_warning "KiCad footprints submodule not found - footprints will not be available"
+    fi
+else
+    print_status "Skipping KiCad libraries (faster startup)"
+fi
+
+# Set working directory and add image
+DOCKER_CMD="$DOCKER_CMD -w /app $IMAGE_NAME"
+
+# Add the command
+DOCKER_CMD="$DOCKER_CMD $COMMAND"
+
+# Execute the command
+print_status "Executing: $COMMAND"
+print_status "Docker command: $DOCKER_CMD"
+echo ""
+eval $DOCKER_CMD
+
+if [ $? -eq 0 ]; then
+    echo ""
+    print_success "Command completed successfully!"
+else
+    echo ""
+    print_error "Command failed!"
+    exit 1
+fi
