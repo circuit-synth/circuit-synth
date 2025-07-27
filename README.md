@@ -128,8 +128,8 @@ pip install maturin
 
 **Compilation Process:**
 ```bash
-# Navigate to the Rust module directory
-cd rust_modules/rust_kicad_schematic_writer
+# Navigate to the Rust module directory  
+cd rust_modules/rust_kicad_integration
 
 # Build and install the Rust extension (development mode)
 maturin develop --release
@@ -270,7 +270,7 @@ python rust_modules/rust_integration/test_simple_rust_tdd.py
 1. **"Rust module not found"**
    ```bash
    # Solution: Compile the Rust module
-   cd rust_modules/rust_kicad_schematic_writer
+   cd rust_modules/rust_kicad_integration
    maturin develop --release
    ```
 
@@ -310,7 +310,7 @@ try:
     
 except Exception as e:
     print(f"❌ Error: {e}")
-    print("💡 Try compiling Rust module: cd rust_modules/rust_kicad_schematic_writer && maturin develop --release")
+    print("💡 Try compiling Rust module: cd rust_modules/rust_kicad_integration && maturin develop --release")
 ```
 
 ## AI-Powered Development
