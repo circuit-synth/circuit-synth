@@ -7,3 +7,9 @@
 [submodule "submodules/tscircuit"]
 	path = submodules/tscircuit
 	url = https://github.com/tscircuit/tscircuit.git
+[submodule "kicad-libraries/symbols"]
+	path = kicad-libraries/symbols
+	url = https://gitlab.com/kicad/libraries/kicad-symbols.git
+[submodule "kicad-libraries/footprints"]
+	path = kicad-libraries/footprints
+	url = https://gitlab.com/kicad/libraries/kicad-footprints.git
