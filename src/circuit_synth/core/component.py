@@ -20,34 +20,87 @@ from .decorators import get_current_circuit
 from .simple_pin_access import SimplifiedPinAccess, PinGroup
 from ._logger import context_logger
 
-# Import the actual KiCad symbol cache implementation
+# Import the optimized KiCad API symbol cache implementation
 try:
-    from ..kicad.kicad_symbol_cache import SymbolLibCache
-    context_logger.debug("Using KiCad SymbolLibCache implementation", component="COMPONENT")
+    from ..kicad_api.core.symbol_cache import SymbolLibraryCache as OptimizedSymbolCache
+    _symbol_cache_instance = OptimizedSymbolCache()
+    context_logger.debug("Using optimized KiCad API SymbolLibraryCache implementation", component="COMPONENT")
+    
+    class SymbolLibCache:
+        """Wrapper to maintain compatibility with legacy interface while using optimized cache."""
+        @staticmethod
+        def get_symbol_data(symbol_id: str):
+            """Get symbol data using the optimized cache."""
+            symbol_def = _symbol_cache_instance.get_symbol(symbol_id)
+            if not symbol_def:
+                context_logger.warning(
+                    f"Symbol not found in optimized cache: {symbol_id}",
+                    component="SYMBOL_CACHE"
+                )
+                return {}
+            
+            # Convert SymbolDefinition to legacy format
+            pins_data = []
+            for pin in symbol_def.pins:
+                pins_data.append({
+                    "number": pin.number,
+                    "name": pin.name,
+                    "electrical_type": pin.type,
+                    "x": pin.position.x,
+                    "y": pin.position.y,
+                    "orientation": pin.orientation,
+                    "length": getattr(pin, 'length', 2.54)
+                })
+            
+            return {
+                "name": symbol_def.name,
+                "reference": symbol_def.reference_prefix,
+                "description": symbol_def.description,
+                "keywords": symbol_def.keywords,
+                "datasheet": symbol_def.datasheet,
+                "pins": pins_data,
+                "units": symbol_def.units,
+                "power_symbol": symbol_def.power_symbol
+            }
+        
+        @staticmethod
+        def get_symbol(*args, **kwargs):
+            # Compatibility method
+            return SymbolLibCache.get_symbol_data(*args, **kwargs)
+
 except ImportError as e:
     context_logger.warning(
-        "Failed to import KiCad SymbolLibCache, using placeholder",
+        "Failed to import optimized SymbolLibraryCache, falling back to legacy cache",
         component="COMPONENT",
         error=str(e)
     )
-    # Fallback placeholder for symbol cache if KiCad implementation not available
-    class SymbolLibCache:
-        """Placeholder for symbol library cache."""
-        @staticmethod
-        def get_symbol(*args, **kwargs):
-            # In open source version, return empty dict to skip symbol validation
-            return {}
-        
-        @staticmethod
-        def get_symbol_data(*args, **kwargs):
-            # In open source version, return empty dict to skip symbol validation
-            context_logger.warning(
-                "SymbolLibCache.get_symbol_data called - returning empty dict (placeholder implementation)",
-                component="SYMBOL_CACHE",
-                args=args,
-                kwargs=kwargs
-            )
-            return {}
+    try:
+        from ..kicad.kicad_symbol_cache import SymbolLibCache
+        context_logger.debug("Using legacy KiCad SymbolLibCache implementation", component="COMPONENT")
+    except ImportError as e2:
+        context_logger.warning(
+            "Failed to import legacy SymbolLibCache, using placeholder",
+            component="COMPONENT",
+            error=str(e2)
+        )
+        # Fallback placeholder for symbol cache if KiCad implementation not available
+        class SymbolLibCache:
+            """Placeholder for symbol library cache."""
+            @staticmethod
+            def get_symbol(*args, **kwargs):
+                # In open source version, return empty dict to skip symbol validation
+                return {}
+            
+            @staticmethod
+            def get_symbol_data(*args, **kwargs):
+                # In open source version, return empty dict to skip symbol validation
+                context_logger.warning(
+                    "SymbolLibCache.get_symbol_data called - returning empty dict (placeholder implementation)",
+                    component="SYMBOL_CACHE",
+                    args=args,
+                    kwargs=kwargs
+                )
+                return {}
 
 @dataclass
 class Component(SimplifiedPinAccess):
