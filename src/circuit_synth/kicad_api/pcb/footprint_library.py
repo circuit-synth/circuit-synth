@@ -170,7 +170,8 @@ class FootprintLibraryCache:
                             pad_count=fp_data.get('pad_count', 0),
                             pad_types=set(fp_data.get('pad_types', [])),
                             body_size=tuple(fp_data.get('body_size', [0.0, 0.0])),
-                            courtyard_area=fp_data.get('courtyard_area', 0.0)
+                            courtyard_area=fp_data.get('courtyard_area', 0.0),
+                            models_3d=fp_data.get('models_3d', [])
                         )
                         self._footprint_index[fp_id] = info
                     
@@ -217,10 +218,9 @@ class FootprintLibraryCache:
     def _extract_basic_info(self, file_path: Path, library_name: str) -> Optional[FootprintInfo]:
         """Extract just basic metadata from a footprint file (fast)."""
         try:
-            # Read only the first few KB to get metadata
+            # Read more content to capture 3D models which are typically at the end
             with open(file_path, 'r', encoding='utf-8') as f:
-                # Read in chunks to find key metadata
-                content = f.read(4096)  # Usually metadata is at the start
+                content = f.read(8192)  # Read more to capture 3D models
                 
                 # Quick extraction using string operations (faster than full parsing)
                 info = FootprintInfo(
@@ -250,6 +250,21 @@ class FootprintLibraryCache:
                 if ' thru_hole ' in content or '(pad thru_hole' in content:
                     info.pad_types.add('thru_hole')
                 
+                # Extract 3D models
+                models_3d = []
+                model_pos = 0
+                while True:
+                    model_start = content.find('(model "', model_pos)
+                    if model_start == -1:
+                        break
+                    model_end = content.find('"', model_start + 8)
+                    if model_end == -1:
+                        break
+                    model_path = content[model_start + 8:model_end]
+                    models_3d.append(model_path)
+                    model_pos = model_end
+                info.models_3d = models_3d
+                
                 # Generate keywords
                 keywords = set()
                 if info.tags:
@@ -260,6 +275,7 @@ class FootprintLibraryCache:
                     keywords.update(desc_words)
                 info.keywords = ' '.join(sorted(keywords))
                 
+                logger.debug(f"Extracted {len(models_3d)} 3D models from {file_path.name}")
                 return info
                 
         except Exception as e:
@@ -288,7 +304,8 @@ class FootprintLibraryCache:
                     'pad_count': info.pad_count,
                     'pad_types': list(info.pad_types),
                     'body_size': list(info.body_size),
-                    'courtyard_area': info.courtyard_area
+                    'courtyard_area': info.courtyard_area,
+                    'models_3d': info.models_3d
                 }
             
             with open(self._index_file, 'w') as f:
