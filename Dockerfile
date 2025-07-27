@@ -1,10 +1,10 @@
-# Use Python 3.11 slim image as base
+# Simple working Docker setup for Circuit Synth
 FROM python:3.11-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV RUST_LOG=info
+ENV PYTHONPATH=/app/src
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -15,56 +15,18 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Rust toolchain
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
-
-# Install the correct target for the current platform
-RUN rustup target add x86_64-unknown-linux-gnu
-
 # Set working directory
 WORKDIR /app
-
-# Copy Rust module dependencies first for better caching
-COPY rust_modules/ ./rust_modules/
-
-# Install maturin for Rust-Python bindings
-RUN pip install --no-cache-dir maturin
-
-# Build Rust modules
-RUN cd rust_modules/rust_core_circuit_engine && maturin build --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_force_directed_placement && maturin build --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_io_processor && maturin build --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_kicad_schematic_writer && maturin build --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_netlist_processor && maturin build --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_pin_calculator && maturin build --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_reference_manager && maturin build --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_symbol_cache && maturin build --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_symbol_search && maturin build --release --target x86_64-unknown-linux-gnu
 
 # Copy Python project files
 COPY pyproject.toml setup.py README.md ./
 COPY src/ ./src/
 
-# Create virtual environment and install Python dependencies
-RUN python -m venv /app/venv
-ENV PATH="/app/venv/bin:${PATH}"
-ENV VIRTUAL_ENV="/app/venv"
+# Install Python dependencies (no Rust modules for now)
 RUN pip install --no-cache-dir -e .
 
 # Copy remaining project files
 COPY . .
-
-# Install Rust modules in development mode
-RUN cd rust_modules/rust_core_circuit_engine && maturin develop --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_force_directed_placement && maturin develop --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_io_processor && maturin develop --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_kicad_schematic_writer && maturin develop --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_netlist_processor && maturin develop --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_pin_calculator && maturin develop --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_reference_manager && maturin develop --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_symbol_cache && maturin develop --release --target x86_64-unknown-linux-gnu
-RUN cd rust_modules/rust_symbol_search && maturin develop --release --target x86_64-unknown-linux-gnu
 
 # Create a non-root user for security
 RUN useradd --create-home --shell /bin/bash circuit_synth
