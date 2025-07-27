@@ -42,6 +42,11 @@ try:
         @staticmethod
         def get_symbol_data(symbol_id: str):
             """Get symbol data using ultra-fast Rust cache with smart fallback."""
+            context_logger.info(
+                f"🔍 SYMBOL_REQUEST: Starting symbol lookup for: {symbol_id}",
+                component="SYMBOL_CACHE"
+            )
+            
             # First, try Rust cache for maximum performance
             try:
                 rust_cache = get_global_cache()
@@ -50,7 +55,7 @@ try:
                 if ':' not in symbol_id:
                     # Convert common symbols to proper format
                     formatted_symbol_id = f"Device:{symbol_id}"
-                    context_logger.debug(
+                    context_logger.info(
                         f"🔧 RUST_CACHE: Converting symbol ID format: {symbol_id} → {formatted_symbol_id}",
                         component="SYMBOL_CACHE"
                     )
@@ -59,16 +64,24 @@ try:
                 
                 symbol_data = rust_cache.get_symbol_data(formatted_symbol_id)
                 context_logger.info(
-                    f"🦀 RUST_CACHE: Ultra-fast symbol loaded: {formatted_symbol_id}",
+                    f"🦀 RUST_CACHE: ✅ Ultra-fast symbol loaded: {formatted_symbol_id}",
                     component="SYMBOL_CACHE"
                 )
+                
                 # Convert Rust SymbolData to expected format
+                result = None
                 if hasattr(symbol_data, 'to_dict'):
-                    return symbol_data.to_dict()
+                    result = symbol_data.to_dict()
                 elif hasattr(symbol_data, '__dict__'):
-                    return symbol_data.__dict__
+                    result = symbol_data.__dict__
                 else:
-                    return symbol_data
+                    result = symbol_data
+                
+                context_logger.info(
+                    f"📊 SYMBOL_DATA: Returned data keys: {list(result.keys()) if isinstance(result, dict) else type(result)}",
+                    component="SYMBOL_CACHE"
+                )
+                return result
             except Exception as e:
                 # Smart fallback: Avoid repeated Rust calls for known missing symbols
                 error_str = str(e).lower()
@@ -104,10 +117,14 @@ try:
         @staticmethod
         def _fallback_get_symbol_data(symbol_id: str):
             """Fallback to optimized KiCad API cache if Rust fails."""
+            context_logger.info(
+                f"🐍 PYTHON_FALLBACK: Starting fallback lookup for: {symbol_id}",
+                component="SYMBOL_CACHE"
+            )
             try:
                 fallback_cache = SymbolLibCache._get_fallback_cache()
                 if not fallback_cache:
-                    context_logger.warning(f"No fallback cache available for {symbol_id}", component="SYMBOL_CACHE")
+                    context_logger.warning(f"❌ PYTHON_CACHE: No fallback cache available for {symbol_id}", component="SYMBOL_CACHE")
                     return {}
                 
                 symbol_def = fallback_cache.get_symbol(symbol_id)
@@ -115,10 +132,10 @@ try:
                     context_logger.warning(f"❌ PYTHON_CACHE: Symbol not found: {symbol_id}", component="SYMBOL_CACHE")
                     return {}
                 
-                context_logger.info(f"🐍 PYTHON_CACHE: Symbol loaded from optimized cache: {symbol_id}", component="SYMBOL_CACHE")
+                context_logger.info(f"🐍 PYTHON_CACHE: ✅ Symbol loaded from optimized cache: {symbol_id}", component="SYMBOL_CACHE")
                 
                 # Convert SymbolDefinition to legacy format - optimized conversion
-                return {
+                result = {
                     "name": symbol_def.name,
                     "reference": symbol_def.reference_prefix,
                     "description": symbol_def.description,
@@ -139,6 +156,12 @@ try:
                     "units": symbol_def.units,
                     "power_symbol": symbol_def.power_symbol
                 }
+                
+                context_logger.info(
+                    f"📊 PYTHON_CACHE: Returned data keys: {list(result.keys())} with {len(result.get('pins', []))} pins",
+                    component="SYMBOL_CACHE"
+                )
+                return result
             except Exception as fallback_error:
                 context_logger.error(
                     f"💥 CACHE_FAILURE: Both Rust and Python caches failed for {symbol_id}: {fallback_error}",
