@@ -64,9 +64,46 @@ if __name__ == '__main__':
 
 ---
 
-## Test 1.5: Import KiCad Project to Python and Verify No Changes
+## Test 2: Import KiCad Project to Python and Generate Matching Code
 
-**Objective**: Verify round-trip stability (Python → KiCad → Python)
+**Objective**: Verify KiCad → Python import generates correct circuit representation
+
+### Steps:
+1. Use reference KiCad project (resistor divider)
+2. Import KiCad project to Python circuit representation
+3. Generate Python code that recreates the circuit
+4. Compare generated Python code with reference Python file
+5. Verify structural equivalence and correctness
+
+### Expected Results:
+- ✅ Imported circuit structure matches KiCad project
+- ✅ Component references (R1, R2) correctly identified
+- ✅ Net connections (VIN, MID, GND) properly reconstructed
+- ✅ Generated Python code closely matches reference implementation
+- ✅ Component values and footprints correctly imported
+
+### Test Code:
+```python
+#!/usr/bin/env python3
+from circuit_synth import import_kicad_project
+
+# Import KiCad project and generate Python code
+imported_circuit = import_kicad_project("reference_resistor_divider")
+generated_code = imported_circuit.generate_python_code()
+
+# Compare with reference implementation
+with open("reference_resistor_divider.py", "r") as f:
+    reference_code = f.read()
+
+# Validate structural equivalence
+assert_circuit_equivalence(imported_circuit, reference_circuit)
+```
+
+---
+
+## Test 3: Round-Trip Verification (Python → KiCad → Python)
+
+**Objective**: Verify round-trip stability and no data loss
 
 ### Steps:
 1. Using project from Test 1
@@ -94,7 +131,7 @@ diff -r test_simple test_simple_backup
 
 ---
 
-## Test 2: Modify KiCad Project Manually and Test Round-Trip
+## Test 4: Modify KiCad Project Manually and Test Round-Trip
 
 **Objective**: Verify manual KiCad changes are preserved during Python updates
 
@@ -128,12 +165,12 @@ Match: ✅/❌
 
 ---
 
-## Test 3: Import KiCad Project to Python - Should There Be Changes?
+## Test 5: Import KiCad Project to Python - Should There Be Changes?
 
 **Objective**: Determine expected behavior when KiCad project contains manual additions
 
 ### Steps:
-1. Using modified project from Test 2
+1. Using modified project from Test 4
 2. Import to Python circuit representation
 3. Analyze what gets imported vs. ignored
 
@@ -151,12 +188,12 @@ Match: ✅/❌
 
 ---
 
-## Test 4: Re-run Python File and Verify KiCad Project Unchanged
+## Test 6: Re-run Python File and Verify KiCad Project Unchanged
 
 **Objective**: Verify incremental updates don't overwrite manual work
 
 ### Steps:
-1. Using manually modified project from Test 2
+1. Using manually modified project from Test 4
 2. Re-run original Python script (no changes to Python code)
 3. Verify KiCad project unchanged
 
@@ -170,7 +207,7 @@ Match: ✅/❌
 
 ---
 
-## Test 5: Add Component to Resistor Divider in KiCad
+## Test 7: Add Component to Resistor Divider in KiCad
 
 **Objective**: Test importing manually added components from KiCad
 
@@ -198,39 +235,6 @@ imported_circuit = import_from_kicad("test_simple")
 components = get_components(imported_circuit)
 assert "C1" in components
 assert components["C1"].value == "100nF"
-```
-
----
-
-## Test 6: Add New Component in Python and Verify Incremental Update
-
-**Objective**: Test adding components in Python while preserving KiCad manual work
-
-### Steps:
-1. Using project with manually added C1 from Test 5
-2. **Modify Python code to add:**
-   - LED (D1) with current limiting resistor (R3)
-   - Connect LED circuit to OUT net
-3. Re-generate KiCad project
-4. Verify incremental update
-
-### Expected Results:
-- ✅ New D1 and R3 appear in KiCad
-- ✅ Manual C1 preserved
-- ✅ Manual component positions preserved
-- ✅ Manual wires preserved
-- ✅ New components have reasonable automatic placement
-- ✅ No warnings during generation
-
-### Updated Python Code:
-```python
-# Add to simple_resistor_divider():
-LED1 = Component("Device:LED", ref="D1", footprint="LED_SMD:LED_0603_1608Metric")
-R3 = Component("Device:R", ref="R3", value="330", footprint="Resistor_SMD:R_0603_1608Metric")
-
-R3[1] += OUT
-R3[2] += LED1[1]  # Anode
-LED1[2] += GND    # Cathode
 ```
 
 ---
