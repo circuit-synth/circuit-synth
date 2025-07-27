@@ -119,8 +119,8 @@ circuit.add_annotation(TextBox(
 
 # Add component tables
 table = Table(
-    headers=["Component", "Value", "Package", "Notes"],
-    rows=[
+    data=[
+        ["Component", "Value", "Package", "Notes"],  # Header row
         ["C1", "10uF", "0603", "X7R ceramic"],
         ["R1", "1kΩ", "0603", "1% precision"]
     ],
