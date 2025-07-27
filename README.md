@@ -95,6 +95,38 @@ Unlike other circuit design tools that generate KiCad files as output only, circ
 - **Type Safety**: Full type hints support for better IDE integration
 - **Extensible Architecture**: Clean interfaces for custom implementations
 
+## AI-Powered Development
+
+Circuit-synth includes a specialized Claude agent for expert guidance on circuit-synth syntax, structure, and best practices. The agent helps with:
+
+- **Code Reviews**: Analyzing circuit-synth projects for proper structure and conventions
+- **Best Practices**: Guidance on component reuse, net management, and circuit organization  
+- **Syntax Help**: Examples and patterns for proper circuit-synth implementation
+- **Refactoring**: Suggestions for improving code maintainability and clarity
+
+### Using the Circuit-Synth Agent
+
+The agent is available in `.claude/agents/circuit-synth.md` and specializes in:
+
+```python
+# Component reuse patterns the agent recommends
+C_10uF_0805 = Component(
+    symbol="Device:C", ref="C", value="10uF",
+    footprint="Capacitor_SMD:C_0805_2012Metric"
+)
+
+# Then instantiate with unique references
+cap_input = C_10uF_0805()
+cap_input.ref = "C4"  # Override ref for specific instance
+```
+
+The agent provides structured feedback on:
+- Component definition and reuse patterns
+- Circuit structure and @circuit decorator usage
+- Net management and naming conventions
+- Pin connection syntax (integer vs string access)
+- Code organization and maintainability
+
 ## Quick Start
 
 Try circuit-synth immediately without installation:
