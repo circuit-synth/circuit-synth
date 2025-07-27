@@ -1242,6 +1242,7 @@ class SExpressionParser:
 
     def _textbox_to_sexp(self, text) -> List:
         """Convert TextBox to KiCad text_box S-expression format."""
+        print(f"DEBUG: Converting textbox to S-expression with position ({text.position.x}, {text.position.y})")
         # Based on your example format
         sexp = [
             sexpdata.Symbol("text_box"),

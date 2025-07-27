@@ -172,22 +172,30 @@ class Circuit:
 
     def _add_docstring_annotation(self):
         """Add a TextBox annotation with the circuit's docstring."""
+        # Check if docstring annotation already exists to prevent duplicates
+        for annotation in self._annotations:
+            if hasattr(annotation, 'text') and annotation.text.strip() == self.description.strip():
+                return  # Already added
+            elif isinstance(annotation, dict) and annotation.get('text', '').strip() == self.description.strip():
+                return  # Already added
+        
         from .annotations import TextBox
         
         # Position the docstring in the top-left area of the schematic
         # Using a reasonable default position and size
         docstring_box = TextBox(
             text=self.description.strip(),
-            position=(10.0, 10.0),  # 10mm from top-left corner
+            position=(184.0, 110.0),  # Double the coordinates to account for KiCad scaling
             size=(80.0, 30.0),  # 80mm wide, 30mm tall
             text_size=1.2,
             bold=True,
             background=True,
             background_color="lightyellow",
             border=True,
-            justify="left top"
+            justify="center center"
         )
         
+        print(f"DEBUG: Creating docstring annotation for circuit '{self.name}' at position {docstring_box.position}")
         self.add_annotation(docstring_box)
         context_logger.debug(
             "Added auto-generated docstring annotation",

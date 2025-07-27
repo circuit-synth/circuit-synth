@@ -593,8 +593,9 @@ class SchematicWriter:
         # Handle both dictionary data and object data
         if isinstance(textbox, dict):
             text = textbox.get('text', '')
-            position = textbox.get('position', (10.0, 10.0))
+            position = textbox.get('position', (184.0, 110.0))  # Double the default coordinates
             text_size = textbox.get('text_size', 1.27)
+            print(f"DEBUG: Processing dict textbox at position {position} with text: {text[:50]}...")
             rotation = textbox.get('rotation', 0)
             size = textbox.get('size', (40.0, 20.0))
             margins = textbox.get('margins', (1.0, 1.0, 1.0, 1.0))
@@ -607,6 +608,7 @@ class SchematicWriter:
             position = textbox.position
             text_size = textbox.text_size
             rotation = textbox.rotation
+            print(f"DEBUG: Processing object textbox at position {position} with text: {text[:50]}...")
             size = textbox.size
             margins = textbox.margins
             background = textbox.background
@@ -615,12 +617,14 @@ class SchematicWriter:
             uuid = textbox.uuid
         
         # Create a Text object (we'll handle the box in S-expression generation)
+        print(f"DEBUG: Creating Text element with Point({position[0]}, {position[1]})")
         text_element = Text(
             content=text,
             position=Point(position[0], position[1]),
             size=text_size,
             orientation=rotation
         )
+        print(f"DEBUG: Text element created with position: {text_element.position}")
         
         # Store additional textbox properties for S-expression generation
         text_element._is_textbox = True
