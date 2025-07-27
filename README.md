@@ -79,8 +79,15 @@ if __name__ == '__main__':
 Unlike other circuit design tools that generate KiCad files as output only, circuit-synth provides true bidirectional updates:
 - **Import existing KiCad projects** into Python for programmatic modification
 - **Export Python circuits** to clean, readable KiCad projects
+- **Hierarchical Structure Support** - correctly handles complex multi-level circuit hierarchies
 - **KiCad remains source of truth** - make manual changes in KiCad and sync back to Python
 - **Hybrid workflows** - combine manual design with automated generation
+
+**Hierarchical Conversion Features:**
+- **Multi-level Hierarchies**: Supports arbitrary depth circuit nesting (main → subcircuit → sub-subcircuit)
+- **Proper Import Chains**: Generates clean Python imports matching KiCad hierarchical structure
+- **Parameter Passing**: Automatically handles net parameter passing between hierarchical levels
+- **Clean Code Generation**: Produces readable, maintainable Python code with proper separation of concerns
 
 ### Engineering-Friendly Approach
 - **No Domain-Specific Language**: Uses standard Python syntax that any engineer can read and modify

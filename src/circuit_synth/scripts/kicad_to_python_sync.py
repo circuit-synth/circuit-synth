@@ -722,10 +722,18 @@ class LLMCodeUpdater:
         Convert a net or signal name to a valid Python variable name.
         
         Rules:
+        - Remove hierarchical path prefixes (/path/to/NET → NET)
         - Replace invalid characters with underscores
         - Prefix with underscore if starts with a digit
         - Handle common power net naming conventions
         """
+        # 🔧 HIERARCHICAL FIX: Remove hierarchical path prefixes
+        # Convert "/resistor_divider/GND" to "GND"
+        if '/' in name:
+            # Take the last part after the final slash
+            name = name.split('/')[-1]
+            logger.debug(f"🔍 NET NAME DEBUG: Cleaned hierarchical name to: {name}")
+        
         # Handle common power net special cases first
         if name in ['3V3', '3.3V', '+3V3', '+3.3V']:
             return '_3v3'
@@ -737,6 +745,8 @@ class LLMCodeUpdater:
             return name.lower()
         elif name in ['GND', 'GROUND', 'VSS', 'VSSA']:
             return 'gnd'
+        elif name in ['MID', 'MIDDLE', 'OUT', 'OUTPUT']:
+            return name.lower()
         
         # Convert to lowercase and replace invalid characters
         var_name = name.lower()
@@ -1303,21 +1313,26 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
                 content.append('')
                 component_types[comp_type] = comp.lib_id
         
-        # Generate net parameter list for function signature - fully generalized
+        # 🔧 HIERARCHICAL FIX: Generate net parameter list for function signature
         net_params = []
         
         # Extract unique net names from this circuit's actual connections
         if circuit.nets:
             unique_nets = set()
             for net in circuit.nets:
-                if len(net.connections) > 1:  # Only include nets with actual connections
-                    unique_nets.add(net.name)
+                # 🔧 FIX: Include ALL nets, not just those with multiple connections
+                # Hierarchical circuits need all nets that cross boundaries
+                unique_nets.add(net.name)
+                logger.debug(f"🔍 NET PARAM DEBUG: Added net {net.name} to {circuit.name}")
             
             # Convert to sanitized parameter names
             for net_name in sorted(unique_nets):
                 net_var = self._sanitize_variable_name(net_name)
                 if net_var not in net_params:
                     net_params.append(net_var)
+                    logger.debug(f"🔍 NET PARAM DEBUG: Parameter {net_var} for {circuit.name}")
+        
+        logger.info(f"🔍 NET PARAM DEBUG: {circuit.name} final parameters: {net_params}")
         
         # Generate circuit function with net parameters (empty if no nets)
         param_str = ', '.join(net_params)
@@ -1352,7 +1367,9 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
             for net in circuit.nets:
                 if len(net.connections) > 1:  # Only connect nets with multiple connections
                     net_var = self._sanitize_variable_name(net.name)
-                    content.append(f'    # Net: {net.name}')
+                    # 🔧 HIERARCHICAL FIX: Clean net name for comment
+                    clean_net_name = self._sanitize_variable_name(net.name)
+                    content.append(f'    # Net: {clean_net_name}')
                     for comp_ref, pin in net.connections:
                         comp_var = comp_ref.lower()
                         if pin.isdigit():
@@ -1373,13 +1390,13 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
                     child_subcircuit = all_circuits[child_name]
                     logger.info(f"🔍 HIERARCHICAL DEBUG: {circuit.name} instantiating child: {child_name}")
                     
-                    # Generate parameter list based on child subcircuit's actual nets
+                    # 🔧 HIERARCHICAL FIX: Generate parameter list based on ALL child subcircuit nets
                     subcircuit_params = []
                     if child_subcircuit.nets:
                         unique_nets = set()
                         for net in child_subcircuit.nets:
-                            if len(net.connections) > 1:
-                                unique_nets.add(net.name)
+                            # 🔧 FIX: Include ALL nets for proper hierarchical parameter passing
+                            unique_nets.add(net.name)
                         
                         for net_name in sorted(unique_nets):
                             net_var = self._sanitize_variable_name(net_name)
@@ -1480,14 +1497,16 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         all_nets = set()
         for circuit in all_circuits.values():
             for net in circuit.nets:
-                if len(net.connections) > 1:  # Only include nets with actual connections
-                    all_nets.add(net.name)
+                # 🔧 HIERARCHICAL FIX: Include ALL nets for proper main circuit creation
+                all_nets.add(net.name)
         
         if all_nets:
             content.append('    # Create main nets from KiCad netlist')
             for net_name in sorted(all_nets):
                 net_var = self._sanitize_variable_name(net_name)
-                content.append(f'    {net_var} = Net("{net_name}")')
+                # 🔧 HIERARCHICAL FIX: Use clean net names in Net() creation
+                clean_net_name = self._sanitize_variable_name(net_name).upper()
+                content.append(f'    {net_var} = Net("{clean_net_name}")')
             content.append('    ')
         
         # 🔧 HIERARCHICAL FIX: Instantiate only direct children based on hierarchical tree
@@ -1498,13 +1517,13 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
                     child_circuit = all_circuits[child_name]
                     logger.info(f"🔍 HIERARCHICAL DEBUG: Instantiating direct child: {child_name}")
                     
-                    # Generate net parameter list based on child circuit's actual nets
+                    # 🔧 HIERARCHICAL FIX: Generate net parameter list based on child circuit's ALL nets
                     net_params = []
                     if child_circuit.nets:
                         unique_nets = set()
                         for net in child_circuit.nets:
-                            if len(net.connections) > 1:
-                                unique_nets.add(net.name)
+                            # 🔧 FIX: Include ALL nets for proper hierarchical parameter passing
+                            unique_nets.add(net.name)
                         
                         for net_name in sorted(unique_nets):
                             net_var = self._sanitize_variable_name(net_name)
