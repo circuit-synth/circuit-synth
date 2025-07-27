@@ -19,7 +19,7 @@ logging.getLogger('circuit_synth').setLevel(logging.DEBUG)
 def create_resistor_divider_circuit():
     """Create a simple circuit with two resistors to demonstrate proper labeling"""
     # Create nets
-    abc = Net("abc")  # KiCad sync: Updated net name from VCC to abc
+    vin = Net("VIN") 
     gnd = Net("GND")
     mid = Net("MID")  # Net connecting the two resistors
     
@@ -38,9 +38,9 @@ def create_resistor_divider_circuit():
     )
     
     # Connect resistors in series
-    r1["1"] += abc  # Connect R1 pin 1 to abc
-    r1["2"] += mid  # Connect R1 pin 2 to mid
-    r2["1"] += mid  # Connect R2 pin 1 to mid
+    r1["1"] += vin  # Connect R1 pin 1 to VIN
+    r1["2"] += mid  # Connect R1 pin 2 to MID
+    r2["1"] += mid  # Connect R2 pin 1 to MID
     r2["2"] += gnd  # Connect R2 pin 2 to GND
 
 
@@ -49,10 +49,4 @@ circuit_instance = create_resistor_divider_circuit()
 
 if __name__ == "__main__":
     # Generate KiCad project (force create to ensure fresh generation)
-    circuit_instance.generate_kicad_project("single_resistor_project", force_create=True)
-    
-    print("Two resistor circuit generated successfully!")
-    print("Circuit demonstrates:")
-    print("  - Proper reference assignment (R1, R2)")
-    print("  - Net labeling at component pins")
-    print("  - Wire connections between components")
+    circuit_instance.generate_kicad_project("generated_resistor_divider")

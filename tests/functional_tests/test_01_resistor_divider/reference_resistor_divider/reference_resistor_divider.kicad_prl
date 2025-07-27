@@ -58,7 +58,7 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "example_project.kicad_prl",
+    "filename": "reference_resistor_divider.kicad_prl",
     "version": 5
   },
   "net_inspector_panel": {

@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "eeschema")
 	(generator_version "9.0")
-	(uuid "1de448ad-b594-4f83-af0f-9cf47945b88b")
+	(uuid "517c9eb4-eee3-4f77-a6be-dac1d7aebd8c")
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
@@ -130,62 +130,62 @@
 			(embedded_fonts no)
 		)
 	)
+	(hierarchical_label "MID"
+		(shape input)
+		(at 116.84 83.82 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "20a6f48b-29ad-46b3-97ec-0b732f6a395e")
+	)
+	(hierarchical_label "MID"
+		(shape input)
+		(at 130.81 76.2 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "4af3c5ad-c8b6-485b-b15b-783697aac76f")
+	)
 	(hierarchical_label "GND"
 		(shape input)
-		(at 44.45 39.37 270)
+		(at 130.81 83.82 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right)
 		)
-		(uuid "283a3cba-3f55-4fdb-9b80-69b9b84395cc")
+		(uuid "b0a89eb2-52fb-44c5-8df7-4d0b0a21a922")
 	)
-	(hierarchical_label "MID"
+	(hierarchical_label "VIN"
 		(shape input)
-		(at 44.45 31.75 90)
+		(at 116.84 76.2 90)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid "82254fa5-757b-4456-acac-6cb585a4e2b5")
-	)
-	(hierarchical_label "MID"
-		(shape input)
-		(at 35.56 39.37 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "992c0922-4a3d-45c5-b2b0-dd88f4ff35c9")
-	)
-	(hierarchical_label "abc"
-		(shape input)
-		(at 35.56 31.75 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "9d92d5a6-8459-4ffa-948b-ba69eccd805e")
+		(uuid "dede37e3-ae1e-4f07-bfaf-bec777d497a5")
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 44.45 35.56 0)
+		(at 116.84 80.01 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "79e08b98-2708-4966-b004-209427f1b061")
-		(property "Reference" "R2"
-			(at 46.99 34.2899 0)
+		(uuid "8ffc7fb4-e406-4a14-aa60-36ec385cddee")
+		(property "Reference" "R1"
+			(at 119.38 78.7399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -193,8 +193,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1k"
-			(at 46.99 36.8299 0)
+		(property "Value" "R"
+			(at 119.38 81.2799 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -202,8 +202,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 42.672 35.56 90)
+		(property "Footprint" ""
+			(at 115.062 80.01 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -212,7 +212,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 44.45 35.56 0)
+			(at 116.84 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -221,7 +221,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 44.45 35.56 0)
+			(at 116.84 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -230,15 +230,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "7e10aed3-eff5-4f48-b135-cc4028c80ce8")
+			(uuid "82a6230f-8a57-40dd-bd1c-6c5cf790570e")
 		)
 		(pin "2"
-			(uuid "4f0239d8-e1f7-47a5-a9d2-b04704f5ac80")
+			(uuid "55b2d16b-efbc-4fe6-910d-dd09bc5fe191")
 		)
 		(instances
-			(project "example_project"
-				(path "/d499b4c1-22fb-42fd-ab60-08beb6e86e07/93ed37ef-bb3d-4eac-9e31-b6104c43837d"
-					(reference "R2")
+			(project "reference_resistor_divider"
+				(path "/5b37051a-fda5-41ce-8ba2-2d45ec98b413/52d8602f-1738-4e0c-9e15-97f02bbe16de"
+					(reference "R1")
 					(unit 1)
 				)
 			)
@@ -246,16 +246,16 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 35.56 35.56 0)
+		(at 130.81 80.01 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "79e08b98-2708-4966-b004-209427f1b062")
-		(property "Reference" "R1"
-			(at 38.1 34.2899 0)
+		(uuid "8ffc7fb4-e406-4a14-aa60-36ec385cddef")
+		(property "Reference" "R2"
+			(at 133.35 78.7399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -263,8 +263,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1k"
-			(at 38.1 36.8299 0)
+		(property "Value" "R"
+			(at 133.35 81.2799 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -272,8 +272,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 33.782 35.56 90)
+		(property "Footprint" ""
+			(at 129.032 80.01 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -282,7 +282,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 35.56 35.56 0)
+			(at 130.81 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -291,7 +291,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 35.56 35.56 0)
+			(at 130.81 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -300,15 +300,15 @@
 			)
 		)
 		(pin "1"
-			(uuid "7e10aed3-eff5-4f48-b135-cc4028c80ce9")
+			(uuid "82a6230f-8a57-40dd-bd1c-6c5cf790570f")
 		)
 		(pin "2"
-			(uuid "4f0239d8-e1f7-47a5-a9d2-b04704f5ac81")
+			(uuid "55b2d16b-efbc-4fe6-910d-dd09bc5fe192")
 		)
 		(instances
-			(project "example_project"
-				(path "/d499b4c1-22fb-42fd-ab60-08beb6e86e07/93ed37ef-bb3d-4eac-9e31-b6104c43837d"
-					(reference "R1")
+			(project "reference_resistor_divider"
+				(path "/5b37051a-fda5-41ce-8ba2-2d45ec98b413/52d8602f-1738-4e0c-9e15-97f02bbe16de"
+					(reference "R2")
 					(unit 1)
 				)
 			)

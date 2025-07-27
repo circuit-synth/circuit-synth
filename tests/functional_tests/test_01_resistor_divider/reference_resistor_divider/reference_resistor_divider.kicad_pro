@@ -249,7 +249,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "example_project.kicad_pro",
+    "filename": "reference_resistor_divider.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -409,11 +409,11 @@
   },
   "sheets": [
     [
-      "d499b4c1-22fb-42fd-ab60-08beb6e86e07",
+      "5b37051a-fda5-41ce-8ba2-2d45ec98b413",
       "Root"
     ],
     [
-      "93ed37ef-bb3d-4eac-9e31-b6104c43837d",
+      "52d8602f-1738-4e0c-9e15-97f02bbe16de",
       "resistor_divider"
     ]
   ],
