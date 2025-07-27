@@ -76,6 +76,7 @@ class Circuit:
     nets: List[Net]
     schematic_file: str = ""
     is_hierarchical_sheet: bool = False
+    hierarchical_tree: Optional[Dict[str, List[str]]] = None  # Parent-child relationships
 
 
 class KiCadNetlistParser:
@@ -241,7 +242,7 @@ class KiCadParser:
     
     def parse_circuits(self) -> Dict[str, Circuit]:
         """Parse KiCad project using real netlist data"""
-        logger.info(f"Parsing KiCad project: {self.kicad_project}")
+        logger.info(f"🔍 HIERARCHICAL DEBUG: Starting parse_circuits for {self.kicad_project}")
         
         if not self.kicad_project.exists():
             logger.error(f"KiCad project not found: {self.kicad_project}")
@@ -249,26 +250,62 @@ class KiCadParser:
         
         try:
             # Step 1: Generate real KiCad netlist
+            logger.info("🔍 HIERARCHICAL DEBUG: Step 1 - Generating KiCad netlist")
             netlist_path = self.generate_netlist()
             if not netlist_path:
                 logger.warning("Failed to generate KiCad netlist, falling back to schematic parsing")
                 return self._parse_circuits_from_schematics()
             
             # Step 2: Parse netlist to get real connections
+            logger.info("🔍 HIERARCHICAL DEBUG: Step 2 - Parsing netlist for components and nets")
             components, nets = self.netlist_parser.parse_netlist(netlist_path)
             
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Netlist parsing results:")
+            logger.info(f"  - Total components from netlist: {len(components)}")
+            for comp in components:
+                logger.info(f"    * {comp.reference}: {comp.lib_id} = {comp.value}")
+            logger.info(f"  - Total nets from netlist: {len(nets)}")
+            for net in nets:
+                logger.info(f"    * {net.name}: {len(net.connections)} connections")
+                for ref, pin in net.connections:
+                    logger.info(f"      - {ref}[{pin}]")
+            
             # Step 3: Find hierarchical structure from schematics
+            logger.info("🔍 HIERARCHICAL DEBUG: Step 3 - Analyzing hierarchical structure")
             hierarchical_info = self._analyze_hierarchical_structure()
             
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Hierarchical analysis results:")
+            if hierarchical_info:
+                for sheet_name, sheet_components in hierarchical_info.items():
+                    logger.info(f"  - Sheet '{sheet_name}': {len(sheet_components)} components")
+                    for comp in sheet_components:
+                        logger.info(f"    * {comp.reference}: {comp.lib_id}")
+            else:
+                logger.info("  - No hierarchical structure detected")
+            
+            # Step 3.5: Build hierarchical tree for import relationships
+            logger.info("🔍 HIERARCHICAL DEBUG: Step 3.5 - Building hierarchical tree")
+            hierarchical_tree = self._build_hierarchical_tree(hierarchical_info)
+            
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Hierarchical tree results:")
+            for parent, children in hierarchical_tree.items():
+                logger.info(f"  - {parent} -> {children}")
+            
             # Step 4: Create circuit representation with real connections
+            logger.info("🔍 HIERARCHICAL DEBUG: Step 4 - Creating circuit representations")
             circuits = {}
             
             if hierarchical_info:
+                logger.info("🔍 HIERARCHICAL DEBUG: Using hierarchical approach")
                 # Distribute components across hierarchical sheets based on schematic analysis
                 for sheet_name, sheet_components in hierarchical_info.items():
+                    logger.info(f"🔍 HIERARCHICAL DEBUG: Processing sheet '{sheet_name}'")
+                    
                     # Filter components that belong to this sheet
                     sheet_component_refs = {comp.reference for comp in sheet_components}
                     sheet_actual_components = [comp for comp in components if comp.reference in sheet_component_refs]
+                    
+                    logger.info(f"  - Components in {sheet_name}: {[comp.reference for comp in sheet_actual_components]}")
                     
                     # Filter nets that connect to components in this sheet
                     sheet_nets = []
@@ -277,27 +314,35 @@ class KiCadParser:
                         if sheet_connections:
                             sheet_net = Net(name=net.name, connections=sheet_connections)
                             sheet_nets.append(sheet_net)
+                            logger.info(f"  - Net {net.name} in {sheet_name}: {sheet_connections}")
                     
                     circuit = Circuit(
                         name=sheet_name,
                         components=sheet_actual_components,
                         nets=sheet_nets,
                         schematic_file=f"{sheet_name}.kicad_sch",
-                        is_hierarchical_sheet=(sheet_name != "main")
+                        is_hierarchical_sheet=(sheet_name != "main"),
+                        hierarchical_tree=hierarchical_tree
                     )
                     circuits[sheet_name] = circuit
-                    logger.info(f"Created {sheet_name}: {len(sheet_actual_components)} components, {len(sheet_nets)} nets with real connections")
+                    logger.info(f"🔍 HIERARCHICAL DEBUG: Created {sheet_name}: {len(sheet_actual_components)} components, {len(sheet_nets)} nets")
             else:
+                logger.info("🔍 HIERARCHICAL DEBUG: Using flat circuit approach")
                 # Single flat circuit
                 circuit = Circuit(
                     name="main",
                     components=components,
                     nets=nets,
                     schematic_file=f"{self.kicad_project.stem}.kicad_sch",
-                    is_hierarchical_sheet=False
+                    is_hierarchical_sheet=False,
+                    hierarchical_tree=hierarchical_tree
                 )
                 circuits["main"] = circuit
-                logger.info(f"Created flat circuit: {len(components)} components, {len(nets)} nets with real connections")
+                logger.info(f"🔍 HIERARCHICAL DEBUG: Created flat circuit: {len(components)} components, {len(nets)} nets")
+            
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Final circuits created:")
+            for name, circuit in circuits.items():
+                logger.info(f"  - {name}: {len(circuit.components)} components, {len(circuit.nets)} nets, hierarchical={circuit.is_hierarchical_sheet}")
             
             # Clean up temporary netlist
             if netlist_path and netlist_path.exists():
@@ -312,24 +357,213 @@ class KiCadParser:
     
     def _analyze_hierarchical_structure(self) -> Dict[str, List[Component]]:
         """Analyze schematic files to understand hierarchical structure"""
+        logger.info("🔍 HIERARCHICAL DEBUG: Starting _analyze_hierarchical_structure")
         hierarchical_info = {}
         
         # Find all schematic files
         schematic_files = list(self.project_dir.glob("*.kicad_sch"))
-        logger.info(f"Analyzing hierarchical structure from {len(schematic_files)} schematic files")
+        logger.info(f"🔍 HIERARCHICAL DEBUG: Found {len(schematic_files)} schematic files:")
+        for sch_file in schematic_files:
+            logger.info(f"  - {sch_file.name}")
+        
+        # Parse main schematic to find sheet instances
+        main_sch_file = self.project_dir / f"{self.kicad_project.stem}.kicad_sch"
+        if main_sch_file.exists():
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Parsing main schematic for sheet instances: {main_sch_file.name}")
+            sheet_instances = self._parse_sheet_instances(main_sch_file)
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Found {len(sheet_instances)} sheet instances:")
+            for sheet_path, sheet_file in sheet_instances.items():
+                logger.info(f"  - {sheet_path} -> {sheet_file}")
+        else:
+            logger.warning(f"🔍 HIERARCHICAL DEBUG: Main schematic file not found: {main_sch_file}")
+            sheet_instances = {}
         
         for sch_file in schematic_files:
-            components, _ = self._parse_schematic_file(sch_file)
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Parsing schematic file: {sch_file.name}")
+            components, net_names = self._parse_schematic_file(sch_file)
             
             # Determine circuit name and type
             circuit_name = sch_file.stem
             if circuit_name == self.kicad_project.stem:
                 circuit_name = "main"
             
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Circuit '{circuit_name}' from {sch_file.name}:")
+            logger.info(f"  - Components: {len(components)}")
+            for comp in components:
+                logger.info(f"    * {comp.reference}: {comp.lib_id}")
+            logger.info(f"  - Net names: {net_names}")
+            
             hierarchical_info[circuit_name] = components
-            logger.info(f"Sheet {circuit_name}: {len(components)} components")
+        
+        logger.info(f"🔍 HIERARCHICAL DEBUG: Final hierarchical structure:")
+        for sheet_name, components in hierarchical_info.items():
+            logger.info(f"  - {sheet_name}: {len(components)} components")
         
         return hierarchical_info
+    
+    def _build_hierarchical_tree(self, hierarchical_info: Dict[str, List[Component]]) -> Dict[str, List[str]]:
+        """Build a tree structure showing parent-child relationships between sheets"""
+        logger.info("🔍 HIERARCHICAL DEBUG: Building hierarchical tree")
+        hierarchical_tree = {}
+        
+        # Find all schematic files and their sheet instances
+        schematic_files = list(self.project_dir.glob("*.kicad_sch"))
+        
+        for sch_file in schematic_files:
+            circuit_name = sch_file.stem
+            if circuit_name == self.kicad_project.stem:
+                circuit_name = "main"
+            
+            # Parse this schematic file for sheet instances
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Analyzing {circuit_name} for child sheets")
+            sheet_instances = self._parse_sheet_instances(sch_file)
+            
+            # Extract child sheet names
+            child_sheets = []
+            for sheet_name, sheet_file in sheet_instances.items():
+                # Convert sheet file to circuit name
+                child_circuit_name = Path(sheet_file).stem
+                child_sheets.append(child_circuit_name)
+                logger.info(f"🔍 HIERARCHICAL DEBUG: {circuit_name} has child: {child_circuit_name}")
+            
+            hierarchical_tree[circuit_name] = child_sheets
+        
+        logger.info(f"🔍 HIERARCHICAL DEBUG: Complete hierarchical tree:")
+        for parent, children in hierarchical_tree.items():
+            logger.info(f"  - {parent}: {children}")
+        
+        return hierarchical_tree
+    
+    def _parse_sheet_instances(self, main_sch_file: Path) -> Dict[str, str]:
+        """Parse main schematic to find hierarchical sheet instances and their relationships"""
+        logger.info(f"🔍 HIERARCHICAL DEBUG: Parsing sheet instances from {main_sch_file}")
+        sheet_instances = {}
+        
+        try:
+            with open(main_sch_file, 'r') as f:
+                content = f.read()
+            
+            # Look for (sheet ...) blocks in the main schematic
+            # These define hierarchical sheet instances
+            sheet_blocks = self._extract_sheet_blocks(content)
+            
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Found {len(sheet_blocks)} sheet blocks")
+            
+            for block in sheet_blocks:
+                sheet_info = self._parse_sheet_block(block)
+                if sheet_info:
+                    sheet_path, sheet_file = sheet_info
+                    sheet_instances[sheet_path] = sheet_file
+                    logger.info(f"🔍 HIERARCHICAL DEBUG: Sheet instance: {sheet_path} -> {sheet_file}")
+            
+            # Also look for sheet_instances definitions which show the hierarchy
+            instance_blocks = self._extract_sheet_instance_blocks(content)
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Found {len(instance_blocks)} sheet instance definition blocks")
+            
+            for block in instance_blocks:
+                instance_info = self._parse_sheet_instance_block(block)
+                if instance_info:
+                    logger.info(f"🔍 HIERARCHICAL DEBUG: Sheet instance definition: {instance_info}")
+                    
+        except Exception as e:
+            logger.error(f"🔍 HIERARCHICAL DEBUG: Failed to parse sheet instances: {e}")
+        
+        return sheet_instances
+    
+    def _extract_sheet_blocks(self, content: str) -> List[str]:
+        """Extract (sheet ...) blocks from schematic content"""
+        blocks = []
+        pos = 0
+        
+        while True:
+            start = content.find('(sheet', pos)
+            if start == -1:
+                break
+                
+            # Find the matching closing parenthesis
+            depth = 0
+            end = start
+            for i, char in enumerate(content[start:], start):
+                if char == '(':
+                    depth += 1
+                elif char == ')':
+                    depth -= 1
+                    if depth == 0:
+                        end = i + 1
+                        break
+            
+            if end > start:
+                blocks.append(content[start:end])
+                pos = end
+            else:
+                pos = start + 1
+        
+        return blocks
+    
+    def _extract_sheet_instance_blocks(self, content: str) -> List[str]:
+        """Extract (sheet_instances ...) blocks from schematic content"""
+        blocks = []
+        
+        # Look for sheet_instances block
+        start = content.find('(sheet_instances')
+        if start != -1:
+            # Find the matching closing parenthesis
+            depth = 0
+            end = start
+            for i, char in enumerate(content[start:], start):
+                if char == '(':
+                    depth += 1
+                elif char == ')':
+                    depth -= 1
+                    if depth == 0:
+                        end = i + 1
+                        break
+            
+            if end > start:
+                blocks.append(content[start:end])
+        
+        return blocks
+    
+    def _parse_sheet_block(self, block: str) -> Optional[Tuple[str, str]]:
+        """Parse a (sheet ...) block to extract sheet file and path information"""
+        try:
+            # Extract the sheet name - look for Sheetname property
+            name_match = re.search(r'\(property\s+"Sheetname"\s+"([^"]+)"', block)
+            sheet_name = name_match.group(1) if name_match else None
+            
+            # Extract the sheet file reference - look for Sheetfile property
+            file_match = re.search(r'\(property\s+"Sheetfile"\s+"([^"]+)"', block)
+            sheet_file = file_match.group(1) if file_match else None
+            
+            if sheet_name and sheet_file:
+                logger.info(f"🔍 HIERARCHICAL DEBUG: Parsed sheet block: {sheet_name} -> {sheet_file}")
+                return (sheet_name, sheet_file)
+            else:
+                logger.warning(f"🔍 HIERARCHICAL DEBUG: Could not parse sheet block: name={sheet_name}, file={sheet_file}")
+                logger.debug(f"🔍 HIERARCHICAL DEBUG: Sheet block content: {block[:200]}...")
+                return None
+                
+        except Exception as e:
+            logger.error(f"🔍 HIERARCHICAL DEBUG: Failed to parse sheet block: {e}")
+            return None
+    
+    def _parse_sheet_instance_block(self, block: str) -> Optional[Dict]:
+        """Parse a (sheet_instances ...) block to extract hierarchical path information"""
+        try:
+            # Extract path and sheet_name information from sheet instances
+            # This shows the actual hierarchical structure
+            instance_matches = re.findall(r'\(path\s+"([^"]+)"\s*\(reference\s+"([^"]+)"\)\s*\(unit\s+\d+\)', block)
+            
+            instances = {}
+            for path, reference in instance_matches:
+                instances[path] = reference
+                logger.info(f"🔍 HIERARCHICAL DEBUG: Sheet instance path: {path} -> {reference}")
+            
+            return instances if instances else None
+            
+        except Exception as e:
+            logger.error(f"🔍 HIERARCHICAL DEBUG: Failed to parse sheet instance block: {e}")
+            return None
     
     def _parse_circuits_from_schematics(self) -> Dict[str, Circuit]:
         """Fallback: Parse circuits from schematics only (no real connections)"""
@@ -839,7 +1073,11 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
     
     def _template_generate_hierarchical_code(self, circuits: Dict[str, Circuit]) -> Dict[str, str]:
         """Fallback template-based code generation"""
-        logger.info("Using template-based code generation")
+        logger.info("🔍 HIERARCHICAL DEBUG: Starting _template_generate_hierarchical_code")
+        logger.info(f"🔍 HIERARCHICAL DEBUG: Input circuits: {list(circuits.keys())}")
+        
+        for name, circuit in circuits.items():
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Circuit '{name}': hierarchical={circuit.is_hierarchical_sheet}, components={len(circuit.components)}")
         
         python_files = {}
         
@@ -848,23 +1086,31 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
         for circuit_name, circuit in circuits.items():
             if not circuit.is_hierarchical_sheet:
                 main_circuit = circuit
+                logger.info(f"🔍 HIERARCHICAL DEBUG: Found main circuit: {circuit_name}")
                 break
         
         if main_circuit:
+            logger.info(f"🔍 HIERARCHICAL DEBUG: Generating main.py for circuit: {main_circuit.name}")
             python_files["main.py"] = self._generate_main_file(main_circuit, circuits)
+        else:
+            logger.warning("🔍 HIERARCHICAL DEBUG: No main circuit found - all circuits are hierarchical")
         
         # Generate Python files for each hierarchical circuit
         for circuit_name, circuit in circuits.items():
             if circuit.is_hierarchical_sheet:
                 # Generate subcircuit files for all hierarchical sheets
                 filename = f"{circuit_name}.py"
+                logger.info(f"🔍 HIERARCHICAL DEBUG: Generating hierarchical subcircuit file: {filename}")
                 python_files[filename] = self._generate_subcircuit_file(circuit, circuits)
-                logger.info(f"Generated subcircuit file: {filename}")
+                logger.info(f"🔍 HIERARCHICAL DEBUG: Generated subcircuit file: {filename}")
             elif circuit_name != "main":
                 # Also generate files for non-main non-hierarchical circuits (like resistor_divider)
                 filename = f"{circuit_name}.py"
+                logger.info(f"🔍 HIERARCHICAL DEBUG: Generating non-main circuit file: {filename}")
                 python_files[filename] = self._generate_subcircuit_file(circuit, circuits)
-                logger.info(f"Generated circuit file: {filename}")
+                logger.info(f"🔍 HIERARCHICAL DEBUG: Generated circuit file: {filename}")
+        
+        logger.info(f"🔍 HIERARCHICAL DEBUG: Final generated files: {list(python_files.keys())}")
         
         return python_files
     
@@ -1021,13 +1267,20 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
             '',
         ]
         
-        # Add imports for any subcircuits this circuit might call
-        if all_circuits and circuit.name == "root":
-            # Root circuit should import and call esp32
-            esp32_circuits = [name for name, c in all_circuits.items() 
-                             if c.is_hierarchical_sheet and name != "root"]
-            for subcircuit_name in esp32_circuits:
-                content.append(f'from {subcircuit_name} import {subcircuit_name}')
+        # 🔧 HIERARCHICAL FIX: Add imports based on hierarchical tree
+        hierarchical_tree = circuit.hierarchical_tree or {}
+        child_circuits = hierarchical_tree.get(circuit.name, [])
+        
+        logger.info(f"🔍 HIERARCHICAL DEBUG: Subcircuit {circuit.name} children: {child_circuits}")
+        
+        if child_circuits:
+            # Import only direct children
+            for child_name in child_circuits:
+                if child_name in all_circuits:
+                    content.append(f'from {child_name} import {child_name}')
+                    logger.info(f"🔍 HIERARCHICAL DEBUG: {circuit.name} imports {child_name}")
+        else:
+            logger.info(f"🔍 HIERARCHICAL DEBUG: {circuit.name} has no children - no imports needed")
         
         content.extend([
             '',
@@ -1112,21 +1365,19 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
             content.append('    # Components are instantiated but not connected')
             content.append('    ')
         
-        # Add subcircuit instantiation - fully generalized
-        if all_circuits and circuit.name == "root":
-            # Find all subcircuits (non-root hierarchical sheets)
-            subcircuits = [name for name, c in all_circuits.items() 
-                          if c.is_hierarchical_sheet and name != "root"]
-            if subcircuits:
-                content.append('    # Instantiate subcircuits')
-                for subcircuit_name in subcircuits:
-                    subcircuit = all_circuits[subcircuit_name]
+        # 🔧 HIERARCHICAL FIX: Add subcircuit instantiation based on hierarchical tree
+        if child_circuits:
+            content.append('    # Instantiate child subcircuits (hierarchical)')
+            for child_name in child_circuits:
+                if child_name in all_circuits:
+                    child_subcircuit = all_circuits[child_name]
+                    logger.info(f"🔍 HIERARCHICAL DEBUG: {circuit.name} instantiating child: {child_name}")
                     
-                    # Generate parameter list based on subcircuit's actual nets
+                    # Generate parameter list based on child subcircuit's actual nets
                     subcircuit_params = []
-                    if subcircuit.nets:
+                    if child_subcircuit.nets:
                         unique_nets = set()
-                        for net in subcircuit.nets:
+                        for net in child_subcircuit.nets:
                             if len(net.connections) > 1:
                                 unique_nets.add(net.name)
                         
@@ -1137,10 +1388,14 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
                     
                     if subcircuit_params:
                         param_str = ', '.join(subcircuit_params)
-                        content.append(f'    {subcircuit_name}_instance = {subcircuit_name}({param_str})')
+                        content.append(f'    {child_name}_instance = {child_name}({param_str})')
+                        logger.info(f"🔍 HIERARCHICAL DEBUG: {circuit.name} instantiates: {child_name}({param_str})")
                     else:
-                        content.append(f'    {subcircuit_name}_instance = {subcircuit_name}()')
-                content.append('    ')
+                        content.append(f'    {child_name}_instance = {child_name}()')
+                        logger.info(f"🔍 HIERARCHICAL DEBUG: {circuit.name} instantiates: {child_name}()")
+            content.append('    ')
+        else:
+            logger.info(f"🔍 HIERARCHICAL DEBUG: {circuit.name} has no children - no instantiation needed")
         
         content.extend([
             f'    logger.info("{circuit.name} subcircuit created")',
@@ -1151,10 +1406,16 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
     
     def _generate_main_file(self, main_circuit: Circuit, all_circuits: Dict[str, Circuit]) -> str:
         """Generate main Python file that instantiates subcircuits"""
+        logger.info("🔍 HIERARCHICAL DEBUG: Starting _generate_main_file")
         
         # Find hierarchical subcircuits
         subcircuits = [name for name, circuit in all_circuits.items() 
                       if circuit.is_hierarchical_sheet]
+        
+        logger.info(f"🔍 HIERARCHICAL DEBUG: Identified subcircuits: {subcircuits}")
+        logger.info(f"🔍 HIERARCHICAL DEBUG: All circuits: {list(all_circuits.keys())}")
+        for name, circuit in all_circuits.items():
+            logger.info(f"  - {name}: hierarchical={circuit.is_hierarchical_sheet}, components={len(circuit.components)}")
         
         content = [
             "#!/usr/bin/env python3",
@@ -1175,14 +1436,23 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
             '',
         ])
         
-        # Add imports for top-level subcircuits (typically just root)
-        root_circuits = [name for name in subcircuits if name == "root"]
-        if root_circuits:
-            # Import only root circuit - it will handle deeper hierarchy
-            for root_name in root_circuits:
-                content.append(f'from {root_name} import {root_name}')
+        # 🔧 HIERARCHICAL FIX: Use hierarchical tree for correct imports
+        hierarchical_tree = main_circuit.hierarchical_tree or {}
+        logger.info(f"🔍 HIERARCHICAL DEBUG: Using hierarchical tree for imports: {hierarchical_tree}")
+        
+        # Import only direct children of main circuit
+        main_children = hierarchical_tree.get("main", [])
+        logger.info(f"🔍 HIERARCHICAL DEBUG: Main circuit children: {main_children}")
+        
+        if main_children:
+            # Import only direct children - they will handle their own sub-imports
+            for child_name in main_children:
+                if child_name in all_circuits:
+                    content.append(f'from {child_name} import {child_name}')
+                    logger.info(f"🔍 HIERARCHICAL DEBUG: Added import: from {child_name} import {child_name}")
         else:
-            # Fallback: import all subcircuits if no root exists
+            # Fallback: if no hierarchical tree or no children, import all subcircuits
+            logger.warning("🔍 HIERARCHICAL DEBUG: No hierarchical children found, falling back to flat imports")
             for subcircuit_name in subcircuits:
                 content.append(f'from {subcircuit_name} import {subcircuit_name}')
         
@@ -1220,35 +1490,39 @@ Focus on creating a clean, functional hierarchy that makes engineering sense.
                 content.append(f'    {net_var} = Net("{net_name}")')
             content.append('    ')
         
-        # Instantiate root subcircuit (hierarchical entry point) - fully generalized
-        root_circuits = [name for name in subcircuits if name == "root"]
-        if root_circuits:
-            content.append('    # Instantiate root subcircuit')
-            for root_name in root_circuits:
-                root_circuit = all_circuits[root_name]
-                
-                # Generate net parameter list based on root circuit's actual nets
-                net_params = []
-                if root_circuit.nets:
-                    unique_nets = set()
-                    for net in root_circuit.nets:
-                        if len(net.connections) > 1:
-                            unique_nets.add(net.name)
+        # 🔧 HIERARCHICAL FIX: Instantiate only direct children based on hierarchical tree
+        if main_children:
+            content.append('    # Instantiate direct child subcircuits (hierarchical)')
+            for child_name in main_children:
+                if child_name in all_circuits:
+                    child_circuit = all_circuits[child_name]
+                    logger.info(f"🔍 HIERARCHICAL DEBUG: Instantiating direct child: {child_name}")
                     
-                    for net_name in sorted(unique_nets):
-                        net_var = self._sanitize_variable_name(net_name)
-                        if net_var not in net_params:
-                            net_params.append(net_var)
-                
-                if net_params:
-                    param_str = ', '.join(net_params)
-                    content.append(f'    {root_name}_instance = {root_name}({param_str})')
-                else:
-                    content.append(f'    {root_name}_instance = {root_name}()')
-                content.append('')
+                    # Generate net parameter list based on child circuit's actual nets
+                    net_params = []
+                    if child_circuit.nets:
+                        unique_nets = set()
+                        for net in child_circuit.nets:
+                            if len(net.connections) > 1:
+                                unique_nets.add(net.name)
+                        
+                        for net_name in sorted(unique_nets):
+                            net_var = self._sanitize_variable_name(net_name)
+                            if net_var not in net_params:
+                                net_params.append(net_var)
+                    
+                    if net_params:
+                        param_str = ', '.join(net_params)
+                        content.append(f'    {child_name}_instance = {child_name}({param_str})')
+                        logger.info(f"🔍 HIERARCHICAL DEBUG: Added instantiation: {child_name}({param_str})")
+                    else:
+                        content.append(f'    {child_name}_instance = {child_name}()')
+                        logger.info(f"🔍 HIERARCHICAL DEBUG: Added instantiation: {child_name}()")
+                    content.append('')
         elif subcircuits:
-            # Fallback: if no root, instantiate all subcircuits directly
-            content.append('    # Instantiate all subcircuits')
+            # Fallback: if no hierarchical children, instantiate all subcircuits directly
+            logger.warning("🔍 HIERARCHICAL DEBUG: Falling back to flat subcircuit instantiation")
+            content.append('    # Instantiate all subcircuits (fallback)')
             for subcircuit_name in subcircuits:
                 subcircuit = all_circuits[subcircuit_name]
                 
