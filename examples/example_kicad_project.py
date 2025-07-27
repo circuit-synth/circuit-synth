@@ -318,4 +318,4 @@ if __name__ == '__main__':
     circuit.generate_json_netlist("example_kicad_project.json")
     
     # Generate KiCad project
-    circuit.generate_kicad_project("example_kicad_project")
+    circuit.generate_kicad_project("example_kicad_project", force_regenerate=False, draw_bounding_boxes=True)

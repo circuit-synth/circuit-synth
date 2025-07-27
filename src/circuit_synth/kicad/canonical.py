@@ -108,23 +108,48 @@ class CanonicalCircuit:
             # Process components in the order they appear in the circuit
             for idx, component in enumerate(circuit.components):
                 # Determine component type in symbol:value format
-                # Extract just the symbol name from the full library:symbol format
-                symbol = component.symbol.split(':')[-1] if ':' in component.symbol else component.symbol
-                # For circuit_synth components, value is stored in the value field
+                # Handle both circuit_synth components (with 'symbol' attr) and SchematicSymbol objects (with 'lib_id' attr)
+                if hasattr(component, 'symbol'):
+                    # This is a circuit_synth component
+                    symbol = component.symbol.split(':')[-1] if ':' in component.symbol else component.symbol
+                elif hasattr(component, 'lib_id'):
+                    # This is a SchematicSymbol from schematic reader
+                    symbol = component.lib_id.split(':')[-1] if ':' in component.lib_id else component.lib_id
+                else:
+                    logger.warning(f"Unknown component type: {type(component)}")
+                    symbol = "unknown"
+                
+                # For both types, value is stored in the value field
                 value = component.value if component.value else ""
                 component_type = f"{symbol}:{value}"
                 
                 # Process each pin connection
-                for pin in component:
-                    if pin.net:
-                        conn = CanonicalConnection(
-                            component_index=idx,
-                            pin=str(pin.num),
-                            net_name=pin.net.name,
-                            component_type=component_type
-                        )
-                        connections.append(conn)
-                        logger.debug(f"Added connection: {conn}")
+                if hasattr(component, '__iter__'):
+                    # This is a circuit_synth component (iterable)
+                    for pin in component:
+                        if pin.net:
+                            conn = CanonicalConnection(
+                                component_index=idx,
+                                pin=str(pin.num),
+                                net_name=pin.net.name,
+                                component_type=component_type
+                            )
+                            connections.append(conn)
+                            logger.debug(f"Added connection: {conn}")
+                elif hasattr(component, 'pins'):
+                    # This is a SchematicSymbol (has pins attribute)
+                    for pin in component.pins:
+                        if pin.net_name:  # SchematicPin has net_name instead of pin.net.name
+                            conn = CanonicalConnection(
+                                component_index=idx,
+                                pin=str(pin.number),  # SchematicPin has number instead of num
+                                net_name=pin.net_name,
+                                component_type=component_type
+                            )
+                            connections.append(conn)
+                            logger.debug(f"Added connection: {conn}")
+                else:
+                    logger.warning(f"Component {component} has no pins or is not iterable")
         
         logger.info(f"Created canonical form with {len(connections)} connections")
         

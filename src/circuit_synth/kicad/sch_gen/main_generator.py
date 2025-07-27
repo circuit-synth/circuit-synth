@@ -850,36 +850,51 @@ class SchematicGenerator(IKiCadIntegration):
                     # Read existing schematic
                     reader = SchematicReader()
                     schematic = reader.read_file(str(existing_sch_path))
-                    existing_components = schematic.get_components() if hasattr(schematic, 'get_components') else []
+                    existing_components = schematic.components
                     logger.info(f"Found {len(existing_components)} components in existing schematic")
                     
-                    # Create canonical circuit from new circuit definition
+                    # Create canonical circuit from existing schematic components
+                    from circuit_synth.kicad.canonical import CanonicalConnection, CanonicalCircuit
+                    
+                    # Build canonical circuit from existing SchematicSymbol objects
+                    existing_connections = []
+                    for idx, comp in enumerate(existing_components):
+                        # Get component type in symbol:value format
+                        symbol = comp.lib_id.split(':')[-1] if ':' in comp.lib_id else comp.lib_id
+                        value = comp.value if comp.value else ""
+                        component_type = f"{symbol}:{value}"
+                        
+                        # For now, we'll skip pin connections since SchematicReader doesn't populate them with net info
+                        # This is a limitation - we can only match by component type, not full connectivity
+                        # Add a placeholder connection to represent the component exists
+                        conn = CanonicalConnection(
+                            component_index=idx,
+                            pin="placeholder",
+                            net_name="placeholder", 
+                            component_type=component_type
+                        )
+                        existing_connections.append(conn)
+                    
+                    existing_canonical = CanonicalCircuit(existing_connections)
+                    
+                    # Create canonical circuit from new circuit definition  
                     new_canonical = CanonicalCircuit.from_circuit(circ)
                     
-                    # For existing schematic, we need to create it with proper connections
-                    # Since the old add_component API is deprecated, we'll create with empty connections
-                    # and skip matching for now until schematic reader provides full connectivity
-                    existing_canonical = CanonicalCircuit([])
-                    
-                    # For now, skip canonical matching since existing schematic doesn't have full connectivity
-                    # Instead, do simple reference-based matching for components with same references
-                    matches = {}
-                    for comp in existing_components:
-                        ref = comp['reference']
-                        # Check if a component with same reference exists in new circuit
-                        for new_comp in circ.components:
-                            if new_comp.reference == ref:
-                                matches[ref] = ref
-                                break
-                    
-                    logger.info(f"Matched {len(matches)} components by reference between existing and new circuits")
+                    # Match components using canonical matching
+                    from circuit_synth.kicad.canonical import CircuitMatcher
+                    matcher = CircuitMatcher()
+                    matches = matcher.match_circuits(existing_canonical, new_canonical)
+                    logger.info(f"Matched {len(matches)} components using canonical matching between existing and new circuits")
                     
                     # Extract positions for matched components
                     for existing_ref, new_ref in matches.items():
                         for comp in existing_components:
-                            if comp['reference'] == existing_ref:
-                                existing_positions[new_ref] = (comp['x'], comp['y'])
-                                logger.debug(f"Preserving position for {new_ref}: ({comp['x']}, {comp['y']})")
+                            if comp.reference == existing_ref:
+                                # SchematicSymbol position is a tuple (x, y, rotation)
+                                if comp.position:
+                                    x, y = comp.position[0], comp.position[1]  # Extract x, y from position tuple
+                                    existing_positions[new_ref] = (x, y)
+                                    logger.debug(f"Preserving position for {new_ref}: ({x}, {y})")
                                 break
                     
                     logger.info(f"Preserving positions for {len(existing_positions)} matched components")
