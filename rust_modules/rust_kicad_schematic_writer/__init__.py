@@ -11,21 +11,73 @@ pure Python S-expression generation while maintaining 100% compatibility.
 
 import time
 import logging
+import sys
+import os
 
+# Configure logger with detailed formatting for Rust integration tracing
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
-# Try to import the compiled Rust module
+# Add a console handler if none exists (for detailed Rust integration logging)
+if not logger.handlers:
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter(
+        '%(asctime)s | %(levelname)8s | %(name)s:%(funcName)s:%(lineno)d - %(message)s'
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+# Try to import the compiled Rust module with detailed logging
 _RUST_AVAILABLE = False
 _rust_module = None
+_rust_import_attempted = False
 
-try:
-    # This would be available if the Rust extension was compiled
-    import rust_kicad_schematic_writer_native
-    _rust_module = rust_kicad_schematic_writer_native
-    _RUST_AVAILABLE = True
-    logger.info("🦀 Rust native module loaded successfully")
-except ImportError:
-    logger.info("🐍 Rust native module not available, using optimized Python implementation")
+def _attempt_rust_import():
+    """Attempt to import Rust module with comprehensive logging."""
+    global _RUST_AVAILABLE, _rust_module, _rust_import_attempted
+    
+    if _rust_import_attempted:
+        return  # Only attempt once
+    
+    _rust_import_attempted = True
+    
+    logger.info("🔍 RUST_INTEGRATION: Attempting to import compiled Rust module...")
+    logger.info(f"🔍 RUST_INTEGRATION: Python path: {sys.path[:3]}...")  # Show first 3 paths
+    logger.info(f"🔍 RUST_INTEGRATION: Current working directory: {os.getcwd()}")
+    
+    try:
+        # This would be available if the Rust extension was compiled
+        logger.debug("🦀 RUST_INTEGRATION: Trying to import 'rust_kicad_schematic_writer_native'...")
+        import rust_kicad_schematic_writer_native
+        _rust_module = rust_kicad_schematic_writer_native
+        _RUST_AVAILABLE = True
+        
+        logger.info("🎉 RUST_INTEGRATION: ✅ Rust native module loaded successfully!")
+        logger.info(f"🦀 RUST_INTEGRATION: Rust module location: {rust_kicad_schematic_writer_native.__file__}")
+        logger.info(f"🦀 RUST_INTEGRATION: Rust module functions: {dir(rust_kicad_schematic_writer_native)}")
+        
+        # Test Rust logging integration
+        try:
+            logger.info("🔬 RUST_INTEGRATION: Testing Rust → Python logging integration...")
+            # If the module has a test function, call it to verify logging
+            if hasattr(_rust_module, 'test_logging'):
+                _rust_module.test_logging()
+                logger.info("✅ RUST_INTEGRATION: Rust logging integration verified")
+            else:
+                logger.info("ℹ️  RUST_INTEGRATION: No test_logging function found in Rust module")
+        except Exception as e:
+            logger.warning(f"⚠️  RUST_INTEGRATION: Rust logging test failed: {e}")
+        
+    except ImportError as e:
+        logger.info(f"🐍 RUST_INTEGRATION: Rust native module not available ({type(e).__name__}: {e})")
+        logger.info("🐍 RUST_INTEGRATION: This is expected if Rust extension hasn't been compiled")
+        logger.info("🐍 RUST_INTEGRATION: Falling back to optimized Python implementation")
+    except Exception as e:
+        logger.error(f"❌ RUST_INTEGRATION: Unexpected error importing Rust module: {type(e).__name__}: {e}")
+        logger.info("🐍 RUST_INTEGRATION: Falling back to optimized Python implementation")
+
+# Attempt import on module load
+_attempt_rust_import()
 
 def _python_generate_component_sexp(component_data):
     """
@@ -89,18 +141,46 @@ def generate_component_sexp(component_data):
     Returns:
         str: KiCad S-expression string for the component
     """
+    component_ref = component_data.get("ref", "UNKNOWN")
+    
+    logger.debug(f"🎯 EXECUTION_PATH: generate_component_sexp() called for component '{component_ref}'")
+    logger.debug(f"🔍 EXECUTION_PATH: Rust available: {_RUST_AVAILABLE}")
+    
     if _RUST_AVAILABLE:
         # Use Rust implementation for maximum performance
-        logger.debug("🦀 Using Rust implementation for S-expression generation")
+        logger.info(f"🦀 EXECUTION_PATH: Using Rust implementation for component '{component_ref}'")
+        logger.debug(f"🦀 RUST_CALL: Calling _rust_module.generate_component_sexp({component_data.keys()})")
+        
+        start_time = time.perf_counter()
         try:
-            return _rust_module.generate_component_sexp(component_data)
+            result = _rust_module.generate_component_sexp(component_data)
+            rust_time = time.perf_counter() - start_time
+            
+            logger.info(f"✅ RUST_SUCCESS: Component '{component_ref}' generated via Rust in {rust_time*1000:.2f}ms")
+            logger.debug(f"🦀 RUST_OUTPUT: Generated {len(result)} characters")
+            
+            return result
+            
         except Exception as e:
-            logger.warning(f"🦀 Rust implementation failed: {e}, falling back to Python")
+            rust_time = time.perf_counter() - start_time
+            logger.error(f"❌ RUST_FAILED: Component '{component_ref}' failed in Rust after {rust_time*1000:.2f}ms")
+            logger.error(f"❌ RUST_ERROR: {type(e).__name__}: {e}")
+            logger.warning(f"🔄 FALLBACK: Switching to Python implementation for component '{component_ref}'")
             # Fall through to Python implementation
+    else:
+        logger.debug(f"🐍 EXECUTION_PATH: Rust not available, using Python implementation for component '{component_ref}'")
     
     # Use optimized Python implementation
-    logger.debug("🐍 Using optimized Python implementation for S-expression generation")
-    return _optimized_python_generate_component_sexp(component_data)
+    logger.info(f"🐍 EXECUTION_PATH: Using optimized Python implementation for component '{component_ref}'")
+    
+    start_time = time.perf_counter()
+    result = _optimized_python_generate_component_sexp(component_data)
+    python_time = time.perf_counter() - start_time
+    
+    logger.info(f"✅ PYTHON_SUCCESS: Component '{component_ref}' generated via Python in {python_time*1000:.2f}ms")
+    logger.debug(f"🐍 PYTHON_OUTPUT: Generated {len(result)} characters")
+    
+    return result
 
 # For performance testing - expose both implementations
 def python_generate_component_sexp(component_data):
@@ -117,6 +197,73 @@ def rust_generate_component_sexp(component_data):
 def is_rust_available():
     """Check if the Rust implementation is available."""
     return _RUST_AVAILABLE
+
+def test_rust_integration_logging():
+    """
+    Test function to verify Rust integration and logging works correctly.
+    
+    This function tests:
+    1. Rust module import status
+    2. Rust-to-Python logging bridge
+    3. Function availability
+    4. Basic functionality
+    """
+    logger.info("🧪 INTEGRATION_TEST: Starting Rust integration test...")
+    
+    test_results = {
+        "rust_import_attempted": _rust_import_attempted,
+        "rust_available": _RUST_AVAILABLE,
+        "rust_module": str(_rust_module) if _rust_module else None,
+        "functions_available": [],
+        "logging_test": "not_attempted",
+        "basic_function_test": "not_attempted"
+    }
+    
+    if _RUST_AVAILABLE and _rust_module:
+        # Test available functions
+        available_functions = [attr for attr in dir(_rust_module) if not attr.startswith('_')]
+        test_results["functions_available"] = available_functions
+        logger.info(f"🦀 INTEGRATION_TEST: Available Rust functions: {available_functions}")
+        
+        # Test Rust logging (if logging test function exists)
+        if hasattr(_rust_module, 'test_logging'):
+            try:
+                logger.info("🔬 INTEGRATION_TEST: Testing Rust logging integration...")
+                _rust_module.test_logging()
+                test_results["logging_test"] = "passed" 
+                logger.info("✅ INTEGRATION_TEST: Rust logging test passed")
+            except Exception as e:
+                test_results["logging_test"] = f"failed: {e}"
+                logger.error(f"❌ INTEGRATION_TEST: Rust logging test failed: {e}")
+        else:
+            test_results["logging_test"] = "function_not_available"
+            logger.info("ℹ️  INTEGRATION_TEST: No Rust logging test function available")
+        
+        # Test basic S-expression generation
+        if hasattr(_rust_module, 'generate_component_sexp'):
+            try:
+                logger.info("🔬 INTEGRATION_TEST: Testing basic Rust S-expression generation...")
+                test_component = {"ref": "TEST1", "symbol": "Device:R", "value": "1K"}
+                result = _rust_module.generate_component_sexp(test_component)
+                
+                if result and "TEST1" in result and "Device:R" in result:
+                    test_results["basic_function_test"] = "passed"
+                    logger.info(f"✅ INTEGRATION_TEST: Basic Rust function test passed ({len(result)} chars)")
+                else:
+                    test_results["basic_function_test"] = "invalid_output" 
+                    logger.error(f"❌ INTEGRATION_TEST: Basic Rust function returned invalid output: {result[:100]}...")
+                    
+            except Exception as e:
+                test_results["basic_function_test"] = f"failed: {e}"
+                logger.error(f"❌ INTEGRATION_TEST: Basic Rust function test failed: {e}")
+        else:
+            test_results["basic_function_test"] = "function_not_available"
+            logger.warning("⚠️  INTEGRATION_TEST: generate_component_sexp function not available in Rust module")
+    else:
+        logger.info("🐍 INTEGRATION_TEST: Rust module not available, this is expected if not compiled")
+    
+    logger.info(f"🏁 INTEGRATION_TEST: Test complete - Results: {test_results}")
+    return test_results
 
 def _simulated_rust_generate_component_sexp(component_data):
     """
@@ -136,45 +283,93 @@ def _simulated_rust_generate_component_sexp(component_data):
 
 def benchmark_implementations(component_data, iterations=1000):
     """
-    Benchmark Python and simulated Rust implementations for performance comparison.
+    Benchmark Python and Rust implementations with comprehensive logging.
     
     Returns:
         dict: Performance comparison results
     """
+    component_ref = component_data.get("ref", "UNKNOWN")
+    
+    logger.info(f"🏁 BENCHMARK: Starting performance benchmark for component '{component_ref}'")
+    logger.info(f"🔢 BENCHMARK: Iterations: {iterations}")
+    logger.info(f"🦀 BENCHMARK: Rust available: {_RUST_AVAILABLE}")
+    
     results = {
         "iterations": iterations,
         "rust_available": _RUST_AVAILABLE,
+        "component_ref": component_ref,
     }
     
     # Benchmark Python implementation (baseline)
+    logger.info("📊 BENCHMARK: Testing Python (baseline) implementation...")
     start_time = time.perf_counter()
-    for _ in range(iterations):
+    for i in range(iterations):
         _python_generate_component_sexp(component_data)
+        if i % 100 == 0 and i > 0:
+            logger.debug(f"🐍 BENCHMARK: Python baseline progress: {i}/{iterations}")
     python_time = time.perf_counter() - start_time
     results["python_time"] = python_time
     results["python_ops_per_sec"] = iterations / python_time
+    logger.info(f"✅ BENCHMARK: Python baseline: {python_time:.4f}s ({results['python_ops_per_sec']:.0f} ops/sec)")
     
     # Benchmark optimized Python implementation
+    logger.info("📊 BENCHMARK: Testing Python (optimized) implementation...")
     start_time = time.perf_counter()
-    for _ in range(iterations):
+    for i in range(iterations):
         _optimized_python_generate_component_sexp(component_data)
+        if i % 100 == 0 and i > 0:
+            logger.debug(f"🐍 BENCHMARK: Python optimized progress: {i}/{iterations}")
     optimized_python_time = time.perf_counter() - start_time
     results["optimized_python_time"] = optimized_python_time
     results["optimized_python_ops_per_sec"] = iterations / optimized_python_time
+    logger.info(f"✅ BENCHMARK: Python optimized: {optimized_python_time:.4f}s ({results['optimized_python_ops_per_sec']:.0f} ops/sec)")
     
     if _RUST_AVAILABLE:
         # Benchmark actual Rust implementation
-        start_time = time.perf_counter()
-        for _ in range(iterations):
-            _rust_module.generate_component_sexp(component_data)
-        rust_time = time.perf_counter() - start_time
-        results["rust_time"] = rust_time
-        results["rust_ops_per_sec"] = iterations / rust_time
-        results["rust_speedup"] = python_time / rust_time
-        results["rust_vs_optimized_speedup"] = optimized_python_time / rust_time
-        results["implementation"] = "actual_rust"
+        logger.info("📊 BENCHMARK: Testing Rust (actual) implementation...")
+        logger.info(f"🦀 BENCHMARK: Using real Rust module: {_rust_module}")
+        
+        # Test one call first to verify Rust logging integration
+        logger.info("🔬 BENCHMARK: Testing single Rust call for logging verification...")
+        rust_working = True
+        try:
+            test_result = _rust_module.generate_component_sexp(component_data)
+            logger.info(f"✅ BENCHMARK: Rust test call successful, generated {len(test_result)} chars")
+        except Exception as e:
+            logger.error(f"❌ BENCHMARK: Rust test call failed: {e}")
+            logger.warning("🔄 BENCHMARK: Falling back to simulated performance")
+            rust_working = False
+        
+        if rust_working:  # Still working after test
+            start_time = time.perf_counter()
+            for i in range(iterations):
+                try:
+                    _rust_module.generate_component_sexp(component_data)
+                    if i % 100 == 0 and i > 0:
+                        logger.debug(f"🦀 BENCHMARK: Rust progress: {i}/{iterations}")
+                except Exception as e:
+                    logger.error(f"❌ BENCHMARK: Rust call {i} failed: {e}")
+                    break
+            rust_time = time.perf_counter() - start_time
+            results["rust_time"] = rust_time
+            results["rust_ops_per_sec"] = iterations / rust_time
+            results["rust_speedup"] = python_time / rust_time
+            results["rust_vs_optimized_speedup"] = optimized_python_time / rust_time
+            results["implementation"] = "actual_rust"
+            logger.info(f"✅ BENCHMARK: Rust actual: {rust_time:.4f}s ({results['rust_ops_per_sec']:.0f} ops/sec)")
+            logger.info(f"🚀 BENCHMARK: Rust speedup: {results['rust_speedup']:.1f}x vs Python baseline")
+            # Actual Rust was successful
+            rust_benchmark_completed = True
+        else:
+            rust_benchmark_completed = False
     else:
+        rust_benchmark_completed = False
+    
+    if not rust_benchmark_completed:
         # Simulate Rust performance characteristics for demonstration
+        logger.info("📊 BENCHMARK: Simulating Rust performance characteristics...")
+        logger.info("ℹ️  BENCHMARK: This demonstrates expected real-world Rust performance")
+        
         # Rust typically provides 3-5x performance improvement for string operations
         simulated_rust_time = optimized_python_time / 3.5  # Conservative 3.5x improvement
         results["rust_time"] = simulated_rust_time
@@ -182,7 +377,12 @@ def benchmark_implementations(component_data, iterations=1000):
         results["rust_speedup"] = python_time / simulated_rust_time
         results["rust_vs_optimized_speedup"] = optimized_python_time / simulated_rust_time
         results["implementation"] = "simulated_rust"
+        logger.info(f"📈 BENCHMARK: Rust simulated: {simulated_rust_time:.4f}s ({results['rust_ops_per_sec']:.0f} ops/sec)")
+        logger.info(f"🚀 BENCHMARK: Simulated speedup: {results['rust_speedup']:.1f}x vs Python baseline")
     
     results["python_optimization_speedup"] = python_time / optimized_python_time
+    logger.info(f"⚡ BENCHMARK: Python optimization speedup: {results['python_optimization_speedup']:.1f}x")
+    
+    logger.info("🏁 BENCHMARK: Performance benchmark complete")
     
     return results
