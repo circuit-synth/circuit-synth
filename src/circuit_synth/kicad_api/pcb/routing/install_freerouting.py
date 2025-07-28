@@ -38,7 +38,7 @@ def check_java():
         result = subprocess.run(["java", "-version"], capture_output=True, text=True)
         if result.returncode == 0:
             print("✓ Java is installed")
-            print(f"  {result.stderr.strip().split('\\n')[0]}")
+            print(f"  {result.stderr.strip().split(chr(10))[0]}")
             return True
     except FileNotFoundError:
         pass

@@ -9,7 +9,7 @@ import logging
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 from ..core.s_expression import SExpressionParser
 from ..core.types import BoundingBox, Point, Schematic, SchematicSymbol, Sheet, SheetPin
