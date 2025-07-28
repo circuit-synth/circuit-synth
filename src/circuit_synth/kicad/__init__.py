@@ -1,6 +1,6 @@
 """KiCad integration package."""
 
-from .project_notes import ProjectNotesManager
 from .kicad_symbol_cache import SymbolLibCache
+from .project_notes import ProjectNotesManager
 
-__all__ = ['ProjectNotesManager', 'SymbolLibCache']
+__all__ = ["ProjectNotesManager", "SymbolLibCache"]

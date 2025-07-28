@@ -562,8 +562,8 @@
     "templates": {},
     "unique_circuits": [
       "div2",
-      "divider",
-      "div3"
+      "div3",
+      "divider"
     ],
     "duplicate_groups": {}
   }

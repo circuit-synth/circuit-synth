@@ -2,42 +2,47 @@
 # File: src/circuit_synth/core/component.py
 ##############################
 
+import keyword
 import os
 import re
-import keyword
 import warnings
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Union, Iterator
+from typing import Any, Dict, Iterator, List, Optional, Union
 
-from .pin import Pin
+from ._logger import context_logger
+from .decorators import get_current_circuit
 from .exception import (
     CircuitSynthError,
     ComponentError,
-    ValidationError,
     LibraryNotFound,
+    ValidationError,
 )
-from .decorators import get_current_circuit
-from .simple_pin_access import SimplifiedPinAccess, PinGroup
-from ._logger import context_logger
+from .pin import Pin
+from .simple_pin_access import PinGroup, SimplifiedPinAccess
 
 # Import the actual KiCad symbol cache implementation
 try:
     from ..kicad.kicad_symbol_cache import SymbolLibCache
-    context_logger.debug("Using KiCad SymbolLibCache implementation", component="COMPONENT")
+
+    context_logger.debug(
+        "Using KiCad SymbolLibCache implementation", component="COMPONENT"
+    )
 except ImportError as e:
     context_logger.warning(
         "Failed to import KiCad SymbolLibCache, using placeholder",
         component="COMPONENT",
-        error=str(e)
+        error=str(e),
     )
+
     # Fallback placeholder for symbol cache if KiCad implementation not available
     class SymbolLibCache:
         """Placeholder for symbol library cache."""
+
         @staticmethod
         def get_symbol(*args, **kwargs):
             # In open source version, return empty dict to skip symbol validation
             return {}
-        
+
         @staticmethod
         def get_symbol_data(*args, **kwargs):
             # In open source version, return empty dict to skip symbol validation
@@ -45,9 +50,10 @@ except ImportError as e:
                 "SymbolLibCache.get_symbol_data called - returning empty dict (placeholder implementation)",
                 component="SYMBOL_CACHE",
                 args=args,
-                kwargs=kwargs
+                kwargs=kwargs,
             )
             return {}
+
 
 @dataclass
 class Component(SimplifiedPinAccess):
@@ -58,7 +64,7 @@ class Component(SimplifiedPinAccess):
     so something like:
         comp["GND"] += net
     will connect *all* GND pins to that net.
-    
+
     Additional fields can be passed as keyword arguments and will be stored
     in _extra_fields for later access (e.g., mfg_part_num, tolerance, etc.).
     """
@@ -73,23 +79,33 @@ class Component(SimplifiedPinAccess):
     _extra_fields: Dict[str, Any] = field(default_factory=dict, repr=False)
 
     # Store pins by integer index
-    _pins: Dict[str, Pin] = field(default_factory=dict, init=False, repr=False)  # Now keyed by pin number instead of index
+    _pins: Dict[str, Pin] = field(
+        default_factory=dict, init=False, repr=False
+    )  # Now keyed by pin number instead of index
 
     # For name-based lookup, store lists of pins by name
-    _pin_names: Dict[str, List[Pin]] = field(default_factory=dict, init=False, repr=False)
-
+    _pin_names: Dict[str, List[Pin]] = field(
+        default_factory=dict, init=False, repr=False
+    )
 
     _is_prefix: bool = field(default=False, init=False, repr=False)
     _user_reference: str = field(default="", init=False, repr=False)
 
     ALLOWED_REASSIGN = {"value"}
 
-    def __init__(self, symbol: str, ref: Optional[str] = None, value: Optional[str] = None,
-                 footprint: Optional[str] = None, datasheet: Optional[str] = None,
-                 description: Optional[str] = None, **kwargs):
+    def __init__(
+        self,
+        symbol: str,
+        ref: Optional[str] = None,
+        value: Optional[str] = None,
+        footprint: Optional[str] = None,
+        datasheet: Optional[str] = None,
+        description: Optional[str] = None,
+        **kwargs,
+    ):
         """
         Initialize Component with support for arbitrary additional fields.
-        
+
         Args:
             symbol: KiCad symbol reference (e.g., "Device:R")
             ref: Component reference (e.g., "R1")
@@ -105,7 +121,7 @@ class Component(SimplifiedPinAccess):
         self._pin_names = {}
         self._is_prefix = False
         self._user_reference = ""
-        
+
         # Set the standard dataclass fields (this will trigger __setattr__ for ref)
         self.symbol = symbol
         self.ref = ref
@@ -113,14 +129,14 @@ class Component(SimplifiedPinAccess):
         self.footprint = footprint
         self.datasheet = datasheet
         self.description = description
-        
+
         # Store any additional keyword arguments in _extra_fields (validation happens later)
         for key, value in kwargs.items():
             self._extra_fields[key] = value
-        
+
         # Call the original post_init logic
         self.__post_init__()
-        
+
         # Now validate the extra fields after the object is fully initialized
         for key, value in kwargs.items():
             try:
@@ -140,13 +156,25 @@ class Component(SimplifiedPinAccess):
                 component="COMPONENT",
                 symbol=self.symbol,
                 has_pins="pins" in symbol_data,
-                pin_count=len(symbol_data.get("pins", [])) if "pins" in symbol_data else 0
+                pin_count=(
+                    len(symbol_data.get("pins", [])) if "pins" in symbol_data else 0
+                ),
             )
         except FileNotFoundError as e:
-            context_logger.error("Library file not found for symbol", component="COMPONENT", symbol=self.symbol, error=str(e))
+            context_logger.error(
+                "Library file not found for symbol",
+                component="COMPONENT",
+                symbol=self.symbol,
+                error=str(e),
+            )
             raise LibraryNotFound(f"Failed to load symbol '{self.symbol}': {e}")
         except KeyError as e:
-            context_logger.error("Symbol not found in library", component="COMPONENT", symbol=self.symbol, error=str(e))
+            context_logger.error(
+                "Symbol not found in library",
+                component="COMPONENT",
+                symbol=self.symbol,
+                error=str(e),
+            )
             raise LibraryNotFound(f"Symbol not found: '{self.symbol}': {e}")
         except Exception as e:
             # fallback for anything else
@@ -154,7 +182,7 @@ class Component(SimplifiedPinAccess):
                 "Error while loading symbol from cache",
                 component="COMPONENT",
                 symbol=self.symbol,
-                error=str(e)
+                error=str(e),
             )
             raise LibraryNotFound(f"Failed to load symbol '{self.symbol}': {e}")
 
@@ -167,7 +195,7 @@ class Component(SimplifiedPinAccess):
         if "keywords" not in self._extra_fields and symbol_data.get("keywords"):
             self._extra_fields["ki_keywords"] = symbol_data.get("keywords")
         if "ki_fp_filters" not in self._extra_fields and symbol_data.get("fp_filters"):
-             self._extra_fields["ki_fp_filters"] = symbol_data.get("fp_filters")
+            self._extra_fields["ki_fp_filters"] = symbol_data.get("fp_filters")
 
         # Clear any old pin data in case we re-init
         self._pins.clear()
@@ -180,9 +208,13 @@ class Component(SimplifiedPinAccess):
         for pin_info in symbol_data.get("pins", []):
             pin_num = pin_info.get("number", "")
             if not pin_num:  # Skip pins without numbers
-                context_logger.warning("Skipping pin without number in symbol", component="COMPONENT", symbol=self.symbol)
+                context_logger.warning(
+                    "Skipping pin without number in symbol",
+                    component="COMPONENT",
+                    symbol=self.symbol,
+                )
                 continue
-                
+
             new_pin = Pin(
                 name=pin_info.get("name", "~"),
                 num=pin_num,
@@ -206,7 +238,7 @@ class Component(SimplifiedPinAccess):
                 if nm not in self._pin_names:
                     self._pin_names[nm] = []
                 self._pin_names[nm].append(new_pin)
-        
+
         context_logger.debug(
             "Component pins loaded",
             component="COMPONENT",
@@ -214,7 +246,7 @@ class Component(SimplifiedPinAccess):
             ref=self.ref,
             pins_loaded=pins_loaded,
             pin_numbers=list(self._pins.keys()),
-            pin_names=list(self._pin_names.keys())
+            pin_names=list(self._pin_names.keys()),
         )
 
         # Handle case where no reference is provided
@@ -223,27 +255,27 @@ class Component(SimplifiedPinAccess):
             self._user_reference = ""
             self._is_prefix = True
             return
-        
+
         # Validate non-empty string references
         if not self.ref.strip():
             raise ValidationError("Reference must be a non-empty string")
-        
+
         # Use the reference provided in constructor
         user_ref = self.ref.strip()
         # Only set _user_reference and _is_prefix if not already set by __setattr__
         if not hasattr(self, "_user_reference"):
             self._user_reference = user_ref
-            
+
             # Check if final or prefix-only
             trailing_digits = re.search(r"\d+$", user_ref)
             self._is_prefix = not bool(trailing_digits)
-            
+
             context_logger.debug(
                 "Component detected reference",
                 component="COMPONENT",
                 symbol=self.symbol,
                 reference_type="final" if not self._is_prefix else "prefix",
-                reference=user_ref
+                reference=user_ref,
             )
 
         # See if there's an active circuit
@@ -254,13 +286,13 @@ class Component(SimplifiedPinAccess):
                 "No active circuit for component - can be used as template",
                 component="COMPONENT",
                 reference=self.ref,
-                symbol=self.symbol
+                symbol=self.symbol,
             )
             return
 
         # If we do have an active circuit, add the component
         circuit.add_component(self)
-        
+
     def _validate_symbol(self, symbol: str):
         if not symbol or not isinstance(symbol, str):
             raise CircuitSynthError("Invalid symbol format: Must be non-empty string.")
@@ -273,7 +305,9 @@ class Component(SimplifiedPinAccess):
     def __getattr__(self, name: str) -> Any:
         if name in self._extra_fields:
             return self._extra_fields[name]
-        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+        raise AttributeError(
+            f"'{type(self).__name__}' object has no attribute '{name}'"
+        )
 
     def __setattr__(self, name: str, value: Any) -> None:
         if name == "_validate_property":
@@ -285,25 +319,29 @@ class Component(SimplifiedPinAccess):
             # Allow None values during initialization, but validate string references
             if value is not None and (not isinstance(value, str) or not value.strip()):
                 raise ValidationError("Reference must be a non-empty string")
-            
+
             # Store the user's reference (handle None values)
             if value is None:
                 super().__setattr__("_user_reference", "")
-                super().__setattr__("_is_prefix", True)  # Default to prefix when no reference
-                context_logger.debug("Component reference set to None", component="COMPONENT")
+                super().__setattr__(
+                    "_is_prefix", True
+                )  # Default to prefix when no reference
+                context_logger.debug(
+                    "Component reference set to None", component="COMPONENT"
+                )
             else:
                 cleaned_value = value.strip()
                 super().__setattr__("_user_reference", cleaned_value)
-                
+
                 # Check if it's a final reference (has trailing digits)
                 trailing_digits = re.search(r"\d+$", cleaned_value)
                 super().__setattr__("_is_prefix", not bool(trailing_digits))
-                
+
                 context_logger.debug(
                     "Component reference set",
                     component="COMPONENT",
                     reference=value,
-                    reference_type="final" if not self._is_prefix else "prefix"
+                    reference_type="final" if not self._is_prefix else "prefix",
                 )
 
         # Dataclass fields
@@ -328,7 +366,7 @@ class Component(SimplifiedPinAccess):
             raise ValidationError("start with a digit")
         if keyword.iskeyword(name):
             raise ValidationError("reserved keyword")
-        if not re.match(r'^[A-Za-z][A-Za-z0-9_]*$', name):
+        if not re.match(r"^[A-Za-z][A-Za-z0-9_]*$", name):
             raise ValidationError("invalid characters")
         if isinstance(value, str) and not value.strip():
             raise ValidationError("cannot be empty")
@@ -344,7 +382,7 @@ class Component(SimplifiedPinAccess):
                 "trailing digits in ref, can't clone from a final ref. "
                 "Please supply a new prefix or final ref manually."
             )
-        
+
         # If we're cloning a template component (no ref) inside a circuit context,
         # generate a default prefix based on the symbol
         ref_to_use = self.ref
@@ -355,14 +393,14 @@ class Component(SimplifiedPinAccess):
                 # Use the symbol name as prefix (e.g., "Device:R" -> "R")
                 default_prefix = symbol_parts[1]
                 # Clean up the prefix to be a valid reference
-                default_prefix = re.sub(r'[^A-Za-z0-9_]', '', default_prefix)
+                default_prefix = re.sub(r"[^A-Za-z0-9_]", "", default_prefix)
                 if default_prefix and default_prefix[0].isalpha():
                     ref_to_use = default_prefix
                 else:
                     ref_to_use = "U"  # Generic fallback
             else:
                 ref_to_use = "U"  # Generic fallback
-        
+
         new_c = type(self)(
             symbol=self.symbol,
             ref=ref_to_use,
@@ -404,33 +442,40 @@ class Component(SimplifiedPinAccess):
             "ref": self.ref,
             "value": self.value,
             "footprint": self.footprint,
-            "datasheet": self.datasheet, # Keep top-level for direct access
-            "description": self.description, # Keep top-level for direct access
-            "properties": properties, # Add standard properties dict
-            "tstamps": None, # Placeholder for UUID/timestamp
-            "_extra_fields": dict(self._extra_fields), # Keep original for now if needed elsewhere
+            "datasheet": self.datasheet,  # Keep top-level for direct access
+            "description": self.description,  # Keep top-level for direct access
+            "properties": properties,  # Add standard properties dict
+            "tstamps": None,  # Placeholder for UUID/timestamp
+            "_extra_fields": dict(
+                self._extra_fields
+            ),  # Keep original for now if needed elsewhere
             "pins": [],
         }
-        
+
         # Add all extra fields to the top level for easy access
         for key, value in self._extra_fields.items():
             if key not in data and key not in ["ki_keywords", "ki_fp_filters"]:
                 data[key] = value
-        
+
         # Sort pins by number for consistent output
-        sorted_pins = sorted(self._pins.items(), key=lambda x: int(x[0]) if x[0].isdigit() else float('inf'))
+        sorted_pins = sorted(
+            self._pins.items(),
+            key=lambda x: int(x[0]) if x[0].isdigit() else float("inf"),
+        )
         for pin_num, pin_obj in sorted_pins:
-            data["pins"].append({
-                "pin_id": pin_num,  # Use pin number instead of index
-                "name": pin_obj.name,
-                "num": pin_obj.num,
-                "func": pin_obj.func,
-                "unit": pin_obj.unit,
-                "x": pin_obj.x,
-                "y": pin_obj.y,
-                "length": pin_obj.length,
-                "orientation": pin_obj.orientation,
-            })
+            data["pins"].append(
+                {
+                    "pin_id": pin_num,  # Use pin number instead of index
+                    "name": pin_obj.name,
+                    "num": pin_obj.num,
+                    "func": pin_obj.func,
+                    "unit": pin_obj.unit,
+                    "x": pin_obj.x,
+                    "y": pin_obj.y,
+                    "length": pin_obj.length,
+                    "orientation": pin_obj.orientation,
+                }
+            )
         return data
 
     @classmethod
@@ -450,8 +495,14 @@ class Component(SimplifiedPinAccess):
         )
 
         known_top = {
-            "symbol", "ref", "value", "footprint", "datasheet",
-            "description", "pins", "_extra_fields",
+            "symbol",
+            "ref",
+            "value",
+            "footprint",
+            "datasheet",
+            "description",
+            "pins",
+            "_extra_fields",
         }
         for k, v in data.items():
             if k not in known_top:
@@ -465,9 +516,13 @@ class Component(SimplifiedPinAccess):
         for pinfo in data.get("pins", []):
             pin_num = pinfo.get("num", "")
             if not pin_num:  # Skip pins without numbers
-                context_logger.warning("Skipping pin without number in component", component="COMPONENT", component_ref=comp.ref)
+                context_logger.warning(
+                    "Skipping pin without number in component",
+                    component="COMPONENT",
+                    component_ref=comp.ref,
+                )
                 continue
-                
+
             if pin_num in comp._pins:
                 raise ComponentError(f"Duplicate pin number '{pin_num}' in from_dict")
 
@@ -486,7 +541,7 @@ class Component(SimplifiedPinAccess):
 
             # Store by pin number
             comp._pins[pin_num] = pin_obj
-            
+
             # Also store by name if it has one
             pin_name = pinfo.get("name")
             if pin_name and pin_name not in ("~", ""):
@@ -507,7 +562,9 @@ class Component(SimplifiedPinAccess):
         Useful for debugging symbol pin naming mismatches.
         """
         lines = []
-        lines.append(f"--- Pin listing for Component '{self.ref}' (symbol='{self.symbol}') ---")
+        lines.append(
+            f"--- Pin listing for Component '{self.ref}' (symbol='{self.symbol}') ---"
+        )
         for idx, pin in sorted(self._pins.items(), key=lambda x: x[0]):
             lines.append(f"  Pin index={idx}, name='{pin.name}', number='{pin.num}'")
         return "\n".join(lines)

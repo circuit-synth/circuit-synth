@@ -4,12 +4,15 @@ from functools import wraps
 
 _CURRENT_CIRCUIT = None
 
+
 def get_current_circuit():
     return _CURRENT_CIRCUIT
+
 
 def set_current_circuit(circuit):
     global _CURRENT_CIRCUIT
     _CURRENT_CIRCUIT = circuit
+
 
 def circuit(_func=None, *, name=None, comments=True):
     """
@@ -25,7 +28,7 @@ def circuit(_func=None, *, name=None, comments=True):
              ...
 
     Creates a new Circuit object, optionally using `name` as the circuit name.
-    If comments=True (default), the function's docstring will be added as a 
+    If comments=True (default), the function's docstring will be added as a
     text annotation on the generated schematic.
     If there's an existing current circuit (the "parent"), the new circuit is
     attached to the parent as a subcircuit. Then references are finalized
@@ -36,6 +39,7 @@ def circuit(_func=None, *, name=None, comments=True):
         @wraps(func)
         def _wrapper(*args, **kwargs):
             from .circuit import Circuit  # local import to avoid circular import
+
             global _CURRENT_CIRCUIT
 
             parent_circuit = _CURRENT_CIRCUIT
@@ -43,12 +47,12 @@ def circuit(_func=None, *, name=None, comments=True):
             docstring = func.__doc__ or ""  # or you could .strip() if you prefer
 
             # Check if enable_comments decorator was used
-            use_comments = comments or getattr(func, '_enable_comments', False)
-            
+            use_comments = comments or getattr(func, "_enable_comments", False)
+
             c = Circuit(
                 name=name or func.__name__,
                 description=docstring,
-                auto_comments=use_comments
+                auto_comments=use_comments,
             )
 
             # Link it as a subcircuit if there's a parent
@@ -80,7 +84,7 @@ def enable_comments(func):
     """
     Decorator that enables automatic docstring extraction for circuit functions.
     This is equivalent to using @circuit(comments=True) but provides a more explicit API.
-    
+
     Usage:
         @enable_comments
         @circuit(name="my_circuit")

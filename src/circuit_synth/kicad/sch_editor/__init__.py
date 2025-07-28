@@ -16,17 +16,18 @@ Key components:
 - SchematicExporter: Writes modified schematics back to files
 """
 
-from .schematic_reader import SchematicReader
 from .schematic_comparer import SchematicComparer
 from .schematic_editor import SchematicEditor
 from .schematic_exporter import SchematicExporter
+from .schematic_reader import SchematicReader
+
 # S-expression parser is now imported from kicad_api.core
 
 __all__ = [
     "SchematicReader",
-    "SchematicComparer", 
+    "SchematicComparer",
     "SchematicEditor",
     "SchematicExporter",
     "SExpressionParser",
-    "SExpressionWriter"
+    "SExpressionWriter",
 ]

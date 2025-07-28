@@ -6,19 +6,21 @@ components for improved accuracy and performance.
 """
 
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
-from ..core.types import Schematic, SchematicSymbol
 from ..core.s_expression import SExpressionParser
+from ..core.types import Schematic, SchematicSymbol
 from .component_manager import ComponentManager
-from .search_engine import SearchEngine, SearchQueryBuilder
 from .connection_tracer import ConnectionTracer
 from .net_matcher import NetMatcher
+from .search_engine import SearchEngine, SearchQueryBuilder
 from .sync_strategies import (
-    SyncStrategy, ReferenceMatchStrategy, 
-    ValueFootprintStrategy, ConnectionMatchStrategy
+    ConnectionMatchStrategy,
+    ReferenceMatchStrategy,
+    SyncStrategy,
+    ValueFootprintStrategy,
 )
 
 logger = logging.getLogger(__name__)
@@ -27,131 +29,138 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SyncReport:
     """Report of synchronization results."""
+
     matched: Dict[str, str] = field(default_factory=dict)  # circuit_id -> kicad_ref
     added: List[str] = field(default_factory=list)
     modified: List[str] = field(default_factory=list)
     removed: List[str] = field(default_factory=list)
     preserved: List[str] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for compatibility."""
         return {
-            'matched_components': self.matched,
-            'components_to_add': [{'circuit_id': cid} for cid in self.added],
-            'components_to_modify': [{'reference': ref} for ref in self.modified],
-            'components_to_preserve': [{'reference': ref} for ref in self.preserved],
-            'summary': {
-                'matched': len(self.matched),
-                'added': len(self.added),
-                'modified': len(self.modified),
-                'preserved': len(self.preserved),
-                'removed': len(self.removed)
-            }
+            "matched_components": self.matched,
+            "components_to_add": [{"circuit_id": cid} for cid in self.added],
+            "components_to_modify": [{"reference": ref} for ref in self.modified],
+            "components_to_preserve": [{"reference": ref} for ref in self.preserved],
+            "summary": {
+                "matched": len(self.matched),
+                "added": len(self.added),
+                "modified": len(self.modified),
+                "preserved": len(self.preserved),
+                "removed": len(self.removed),
+            },
         }
 
 
 class APISynchronizer:
     """
     API-based synchronizer for updating KiCad schematics from Circuit Synth.
-    
+
     This class uses the new KiCad API components for improved matching
     and manipulation of schematic elements.
     """
-    
+
     def __init__(self, schematic_path: str, preserve_user_components: bool = True):
         """
         Initialize the API synchronizer.
-        
+
         Args:
             schematic_path: Path to the KiCad schematic file
             preserve_user_components: Whether to keep components not in circuit
         """
         self.schematic_path = Path(schematic_path)
         self.preserve_user_components = preserve_user_components
-        
+
         # Load schematic
         self.parser = SExpressionParser()
         self.schematic = self._load_schematic()
-        
+
         # Initialize API components
         self.component_manager = ComponentManager(self.schematic)
         self.search_engine = SearchEngine(self.schematic)
         self.connection_tracer = ConnectionTracer(self.schematic)
         self.net_matcher = NetMatcher(self.connection_tracer)
-        
+
         # Initialize matching strategies
         self.strategies = [
             ReferenceMatchStrategy(self.search_engine),
             ConnectionMatchStrategy(self.net_matcher),
-            ValueFootprintStrategy(self.search_engine)
+            ValueFootprintStrategy(self.search_engine),
         ]
-        
+
         logger.info(f"APISynchronizer initialized for: {schematic_path}")
-    
+
     def _load_schematic(self) -> Schematic:
         """Load schematic from file and recursively load all hierarchical sheets."""
         # Load the main schematic
         main_schematic = self.parser.parse_file(str(self.schematic_path))
-        
+
         # Track loaded files to avoid infinite recursion
         loaded_files = set()
         loaded_files.add(str(self.schematic_path.resolve()))
-        
+
         # Recursively load all components from hierarchical sheets
-        self._load_sheets_recursively(main_schematic, self.schematic_path.parent, loaded_files)
-        
+        self._load_sheets_recursively(
+            main_schematic, self.schematic_path.parent, loaded_files
+        )
+
         return main_schematic
-    
-    def _load_sheets_recursively(self, schematic: Schematic, base_path: Path, loaded_files: set):
+
+    def _load_sheets_recursively(
+        self, schematic: Schematic, base_path: Path, loaded_files: set
+    ):
         """Recursively load components from all hierarchical sheets."""
         for sheet in schematic.sheets:
             # Construct the full path to the sheet file
             sheet_path = base_path / sheet.filename
-            
+
             # Skip if we've already loaded this file (avoid infinite recursion)
             if str(sheet_path.resolve()) in loaded_files:
                 continue
-                
+
             if sheet_path.exists():
-                logger.info(f"Loading hierarchical sheet: {sheet.name} from {sheet.filename}")
+                logger.info(
+                    f"Loading hierarchical sheet: {sheet.name} from {sheet.filename}"
+                )
                 loaded_files.add(str(sheet_path.resolve()))
-                
+
                 # Parse the sheet schematic
                 sheet_schematic = self.parser.parse_file(str(sheet_path))
-                
+
                 # Add all components from the sheet to the main schematic
                 for comp in sheet_schematic.components:
                     schematic.add_component(comp)
-                
+
                 # Add all wires from the sheet
                 for wire in sheet_schematic.wires:
                     schematic.add_wire(wire)
-                
+
                 # Add all labels from the sheet
                 for label in sheet_schematic.labels:
                     schematic.add_label(label)
-                
+
                 # Recursively load any sub-sheets
                 if sheet_schematic.sheets:
                     self._load_sheets_recursively(schematic, base_path, loaded_files)
             else:
                 logger.warning(f"Sheet file not found: {sheet_path}")
-    
+
     def sync_with_circuit(self, circuit) -> SyncReport:
         """
         Synchronize the KiCad schematic with a Circuit Synth circuit.
-        
+
         Args:
             circuit: Circuit object from Circuit Synth
-            
+
         Returns:
             SyncReport with synchronization results
         """
         logger.info("Starting API-based synchronization")
 
         report = SyncReport()
-        
+
         try:
             # Extract components from circuit
             circuit_components = self._extract_circuit_components(circuit)
@@ -166,120 +175,142 @@ class APISynchronizer:
             self._process_matches(circuit_components, kicad_components, matches, report)
 
             # Handle unmatched components
-            self._process_unmatched(circuit_components, kicad_components, matches, report)
+            self._process_unmatched(
+                circuit_components, kicad_components, matches, report
+            )
 
             # Save changes
             self._save_schematic()
-            
-            logger.info(f"Synchronization complete: {len(report.matched)} matched, "
-                       f"{len(report.added)} added, {len(report.modified)} modified")
-            
+
+            logger.info(
+                f"Synchronization complete: {len(report.matched)} matched, "
+                f"{len(report.added)} added, {len(report.modified)} modified"
+            )
+
         except Exception as e:
             logger.error(f"Synchronization failed: {e}")
             print(f"[ERROR] Synchronization failed: {e}")
             import traceback
+
             traceback.print_exc()
             report.errors.append(str(e))
             raise
-        
+
         return report
-    
+
     def _extract_circuit_components(self, circuit) -> Dict[str, Dict[str, Any]]:
         """Extract component information from Circuit Synth circuit."""
         result = {}
-        
+
         # Recursive function to get all components including from subcircuits
         def get_all_components(circ):
             components = []
-            
+
             # Get direct components
-            if hasattr(circ, '_components'):
+            if hasattr(circ, "_components"):
                 components.extend(circ._components.values())
-            elif hasattr(circ, 'components'):
+            elif hasattr(circ, "components"):
                 components.extend(circ.components)
-            
+
             # Get components from subcircuits
-            if hasattr(circ, '_subcircuits'):
+            if hasattr(circ, "_subcircuits"):
                 for subcircuit in circ._subcircuits:
                     components.extend(get_all_components(subcircuit))
-            
+
             return components
-        
+
         # Get all components recursively
         all_components = get_all_components(circuit)
-        
+
         for comp in all_components:
-            comp_id = comp.id if hasattr(comp, 'id') else comp.ref
+            comp_id = comp.id if hasattr(comp, "id") else comp.ref
             result[comp_id] = {
-                'id': comp_id,
-                'reference': comp.ref,
-                'value': comp.value,
-                'symbol': getattr(comp, 'symbol', None),  # Add symbol field
-                'footprint': getattr(comp, 'footprint', None),
-                'pins': self._extract_pin_info(comp),
-                'original': comp
+                "id": comp_id,
+                "reference": comp.ref,
+                "value": comp.value,
+                "symbol": getattr(comp, "symbol", None),  # Add symbol field
+                "footprint": getattr(comp, "footprint", None),
+                "pins": self._extract_pin_info(comp),
+                "original": comp,
             }
 
         return result
-    
+
     def _extract_pin_info(self, component) -> Dict[str, str]:
         """Extract pin to net mapping for a component."""
         pins = {}
-        if hasattr(component, '_pins'):
+        if hasattr(component, "_pins"):
             for pin_num, pin in component._pins.items():
                 if pin.net:
                     pins[pin_num] = pin.net.name
         return pins
-    
-    def _match_components(self, circuit_components: Dict, 
-                         kicad_components: Dict) -> Dict[str, str]:
+
+    def _match_components(
+        self, circuit_components: Dict, kicad_components: Dict
+    ) -> Dict[str, str]:
         """Match components using multiple strategies."""
         all_matches = {}
-        
+
         for strategy in self.strategies:
             matches = strategy.match_components(circuit_components, kicad_components)
-            
+
             # Add new matches that don't conflict
             for circuit_id, kicad_ref in matches.items():
-                if circuit_id not in all_matches and kicad_ref not in all_matches.values():
+                if (
+                    circuit_id not in all_matches
+                    and kicad_ref not in all_matches.values()
+                ):
                     all_matches[circuit_id] = kicad_ref
-        
+
         return all_matches
-    
-    def _process_matches(self, circuit_components: Dict, kicad_components: Dict,
-                        matches: Dict[str, str], report: SyncReport):
+
+    def _process_matches(
+        self,
+        circuit_components: Dict,
+        kicad_components: Dict,
+        matches: Dict[str, str],
+        report: SyncReport,
+    ):
         """Process matched components for updates."""
         for circuit_id, kicad_ref in matches.items():
             circuit_comp = circuit_components[circuit_id]
             kicad_comp = kicad_components[kicad_ref]
-            
+
             # Check if update needed
             if self._needs_update(circuit_comp, kicad_comp):
                 success = self.component_manager.update_component(
                     kicad_ref,
-                    value=circuit_comp['value'],
-                    footprint=circuit_comp.get('footprint')
+                    value=circuit_comp["value"],
+                    footprint=circuit_comp.get("footprint"),
                 )
                 if success:
                     report.modified.append(kicad_ref)
-    
+
     def _needs_update(self, circuit_comp: Dict, kicad_comp: SchematicSymbol) -> bool:
         """Check if a component needs updating."""
-        if circuit_comp['value'] != kicad_comp.value:
+        if circuit_comp["value"] != kicad_comp.value:
             return True
-        if circuit_comp.get('footprint') and circuit_comp['footprint'] != kicad_comp.footprint:
+        if (
+            circuit_comp.get("footprint")
+            and circuit_comp["footprint"] != kicad_comp.footprint
+        ):
             return True
         return False
-    
-    def _process_unmatched(self, circuit_components: Dict, kicad_components: Dict,
-                          matches: Dict[str, str], report: SyncReport):
+
+    def _process_unmatched(
+        self,
+        circuit_components: Dict,
+        kicad_components: Dict,
+        matches: Dict[str, str],
+        report: SyncReport,
+    ):
         """Process unmatched components."""
         # Find circuit components to add
         matched_circuit_ids = set(matches.keys())
         for circuit_id, comp_data in circuit_components.items():
             if circuit_id not in matched_circuit_ids:
                 self._add_component(comp_data, report)
-        
+
         # Find KiCad components to preserve/remove
         matched_kicad_refs = set(matches.values())
         for kicad_ref in kicad_components:
@@ -289,46 +320,46 @@ class APISynchronizer:
                 else:
                     self.component_manager.remove_component(kicad_ref)
                     report.removed.append(kicad_ref)
-    
+
     def _add_component(self, comp_data: Dict, report: SyncReport):
         """Add a new component to the schematic."""
         # Determine library ID from component type
         lib_id = self._determine_library_id(comp_data)
-        
+
         component = self.component_manager.add_component(
             library_id=lib_id,
-            reference=comp_data['reference'],
-            value=comp_data['value'],
-            footprint=comp_data.get('footprint'),
-            placement_strategy='edge_right'  # Place new components on right edge
+            reference=comp_data["reference"],
+            value=comp_data["value"],
+            footprint=comp_data.get("footprint"),
+            placement_strategy="edge_right",  # Place new components on right edge
         )
-        
+
         if component:
-            report.added.append(comp_data['id'])
-    
+            report.added.append(comp_data["id"])
+
     def _determine_library_id(self, comp_data: Dict) -> str:
         """Determine KiCad library ID from component data."""
         # Check if the component has a symbol field
-        if 'symbol' in comp_data and comp_data['symbol']:
-            return comp_data['symbol']
-        
+        if "symbol" in comp_data and comp_data["symbol"]:
+            return comp_data["symbol"]
+
         # Fallback to simple mapping based on reference
-        ref = comp_data['reference']
-        if ref.startswith('R'):
-            return 'Device:R'
-        elif ref.startswith('C'):
-            return 'Device:C'
-        elif ref.startswith('L'):
-            return 'Device:L'
-        elif ref.startswith('D'):
-            return 'Device:D'
-        elif ref.startswith('U'):
-            return 'Device:R'  # Generic IC placeholder
-        elif ref.startswith('J') or ref.startswith('P'):
-            return 'Connector:Conn_01x02_Pin'  # Generic connector
+        ref = comp_data["reference"]
+        if ref.startswith("R"):
+            return "Device:R"
+        elif ref.startswith("C"):
+            return "Device:C"
+        elif ref.startswith("L"):
+            return "Device:L"
+        elif ref.startswith("D"):
+            return "Device:D"
+        elif ref.startswith("U"):
+            return "Device:R"  # Generic IC placeholder
+        elif ref.startswith("J") or ref.startswith("P"):
+            return "Connector:Conn_01x02_Pin"  # Generic connector
         else:
-            return 'Device:R'  # Default
-    
+            return "Device:R"  # Default
+
     def _save_schematic(self):
         """Save the modified schematic."""
         # Convert schematic to S-expression

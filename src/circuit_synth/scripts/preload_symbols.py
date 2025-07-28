@@ -2,10 +2,11 @@
 """
 Script to preload KiCad symbol libraries into the cache for faster access.
 """
+import argparse
 import os
 import re
-import argparse
 from pathlib import Path
+
 import sexpdata
 
 # Import for tab completion
@@ -14,39 +15,42 @@ try:
 except ImportError:
     argcomplete = None
 
+
 def _get_default_kicad_symbol_path():
     """Get the default KiCad symbol path for the current platform."""
     import platform
     from pathlib import Path
-    
+
     if platform.system() == "Darwin":  # macOS
         possible_paths = [
             "/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/",
-            "/Applications/KiCad9/KiCad.app/Contents/SharedSupport/symbols/"
+            "/Applications/KiCad9/KiCad.app/Contents/SharedSupport/symbols/",
         ]
     elif platform.system() == "Linux":
         possible_paths = [
             "/usr/share/kicad/symbols/",
             "/usr/local/share/kicad/symbols/",
-            "/snap/kicad/current/usr/share/kicad/symbols/"
+            "/snap/kicad/current/usr/share/kicad/symbols/",
         ]
     elif platform.system() == "Windows":
         possible_paths = [
             "C:\\Program Files\\KiCad\\share\\kicad\\symbols\\",
-            "C:\\Program Files (x86)\\KiCad\\share\\kicad\\symbols\\"
+            "C:\\Program Files (x86)\\KiCad\\share\\kicad\\symbols\\",
         ]
     else:
         possible_paths = ["/usr/share/kicad/symbols/"]
-    
+
     # Find the first existing path
     for path in possible_paths:
         if Path(path).exists():
             return path
-    
+
     # Fallback to Linux default
     return "/usr/share/kicad/symbols/"
 
+
 from circuit_synth.kicad.symbol_lib_parser_manager import SharedParserManager
+
 
 def extract_symbol_names(sym_file_path: Path):
     """
@@ -81,6 +85,7 @@ def extract_symbol_names(sym_file_path: Path):
 
     return symbol_names
 
+
 def preload_all_symbols(library_root: Path, verbose: bool = False):
     """
     Recursively find all *.kicad_sym files in `library_root`,
@@ -107,7 +112,7 @@ def preload_all_symbols(library_root: Path, verbose: bool = False):
 
         print(f"  Found {len(symbol_list)} symbols in {sym_file.name} => {lib_name}")
         total_symbols += len(symbol_list)
-        
+
         for sym_name in symbol_list:
             full_symbol_id = f"{lib_name}:{sym_name}"
             try:
@@ -122,7 +127,10 @@ def preload_all_symbols(library_root: Path, verbose: bool = False):
                     print(f"    WARNING: Could not parse {full_symbol_id}: {e}")
 
     # Done – all discovered symbols are now in the disk cache
-    print(f"Preloading complete! Cached {cached_symbols}/{total_symbols} symbols ({failed_symbols} failed)")
+    print(
+        f"Preloading complete! Cached {cached_symbols}/{total_symbols} symbols ({failed_symbols} failed)"
+    )
+
 
 def main():
     """Main function to preload KiCad symbols."""
@@ -133,30 +141,33 @@ def main():
         "--lib-path",
         type=Path,
         default=os.environ.get("KICAD_SYMBOL_DIR", _get_default_kicad_symbol_path()),
-        help="Path to KiCad symbol libraries (default: KICAD_SYMBOL_DIR environment variable or KiCad default location)"
+        help="Path to KiCad symbol libraries (default: KICAD_SYMBOL_DIR environment variable or KiCad default location)",
     )
     parser.add_argument(
-        "--verbose", "-v",
+        "--verbose",
+        "-v",
         action="store_true",
-        help="Enable verbose output showing each symbol being cached"
+        help="Enable verbose output showing each symbol being cached",
     )
-    
+
     # Enable tab completion if argcomplete is available
     if argcomplete:
         argcomplete.autocomplete(parser)
-        
+
     args = parser.parse_args()
-    
+
     # Preload symbols from the specified path
     lib_root = Path(args.lib_path)
     if not lib_root.exists():
         print(f"Error: Symbol library path does not exist: {lib_root}")
         return 1
-        
+
     print(f"Using symbol library path: {lib_root}")
     preload_all_symbols(lib_root, verbose=args.verbose)
     return 0
 
+
 if __name__ == "__main__":
     import sys
+
     sys.exit(main())

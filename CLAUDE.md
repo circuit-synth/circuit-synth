@@ -2,6 +2,34 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Essential Commands
+
+### Git & GitHub Operations
+```bash
+# Create PR (Claude excels at git operations)
+git add . && git commit -m "your message" && git push && gh pr create
+
+# View recent commits and changes
+git log --oneline -10
+git diff HEAD~1
+
+# Check GitHub issues and PRs
+gh issue list
+gh pr list
+```
+
+### Docker Operations
+```bash
+# Build production image
+docker build -f docker/Dockerfile.kicad-production -t circuit-synth .
+
+# Run with KiCad integration
+docker-compose -f docker/docker-compose.production.yml up
+
+# Development environment
+docker-compose -f docker/docker-compose.yml run --rm circuit-synth-dev
+```
+
 ## Development Commands
 
 ### Installation and Setup
@@ -22,6 +50,7 @@ pip install -e ".[dev]"
 ```
 
 ### Code Quality and Testing
+**IMPORTANT: Always run linting and tests after making changes**
 ```bash
 # Format code
 black src/
@@ -31,15 +60,11 @@ isort src/
 flake8 src/
 mypy src/
 
-# Run tests (recommended with uv)
-uv run pytest
-
-# Run tests with coverage
+# Run tests with coverage (preferred)
 uv run pytest --cov=circuit_synth
 
-# Alternative with pip
-pytest
-pytest --cov=circuit_synth
+# Run specific test file
+uv run pytest tests/unit/test_core_circuit.py -v
 ```
 
 ### Building and Distribution
@@ -62,44 +87,194 @@ python -m build
 pip install -e .
 ```
 
+### KiCad Component Search
+```bash
+# Primary slash commands for finding KiCad components
+# /find-symbol STM32 - Search for STM32 symbols
+# /find-footprint LQFP - Search for LQFP footprints
+
+# Development slash commands (for contributors)
+# /dev-run-tests - Run comprehensive test suite
+# /dev-update-and-commit "description" - Update docs and commit changes
+
+# Manual search in KiCad libraries (if needed)
+find /usr/share/kicad/symbols -name "*.kicad_sym" | xargs grep -l "STM32"
+find /usr/share/kicad/footprints -name "*.kicad_mod" | grep -i lqfp
+```
+
+## Code Style Guidelines
+
+**IMPORTANT: Follow these conventions exactly**
+- Use modern Python with type hints and dataclasses
+- NO inheritance complexity or global state management
+- Follow SOLID, KISS, YAGNI, and DRY principles
+- Prefer composition over inheritance
+- Use descriptive variable and function names
+- Write comprehensive docstrings for public APIs
+
+## Workflow Preferences
+
+**Test-Driven Development (TDD) - MANDATORY APPROACH:**
+1. **Write tests first** based on expected input/output behavior
+2. **Run tests to confirm they fail** (red phase)
+3. **Write minimal code** to make tests pass (green phase)
+4. **Refactor and improve** while keeping tests passing
+5. **Test thoroughly at each step** - don't assume code works
+6. **YOU MUST run linting and type checking** before committing
+
+**Incremental Development Philosophy:**
+- **Make slow, steady progress** - small incremental changes are better than large jumps
+- **Test every assumption** - don't assume your code does what you think it does
+- **Validate behavior continuously** - run tests after every small change
+- **Confirm expectations** - manually verify outputs match what you expect
+- **One feature at a time** - complete and thoroughly test one feature before moving to the next
+- **Example workflow**: Write test → Run test (fails) → Write minimal code → Run test (passes) → Manually verify output → Move to next small piece
+
+**Planning Before Coding:**
+- Always ask Claude to make a plan before implementing
+- Use "think" keywords for extended thinking mode
+- Break complex tasks into smaller, actionable steps
+
+**Debugging Strategy:**
+- **Add extensive logging during development**: Use Python's `logging` module liberally when troubleshooting or implementing new features
+- **Log key data points**: Component creation, net connections, file operations, API calls
+- **Remove non-essential logs when feature is complete**: Keep only critical error logs and high-level status messages
+- **Example**: `logging.debug(f"Creating component {ref} with symbol {symbol}")` during development, remove when stable
+
+## Memory Bank System
+
+**CRITICAL: Use memory-bank/ effectively for context preservation**
+
+The `memory-bank/` directory maintains project context and technical knowledge across sessions. Use it strategically:
+
+### Memory Bank Structure
+```
+memory-bank/
+├── progress/          # Development progress tracking
+├── decisions/         # Technical decisions and rationale  
+├── patterns/          # Reusable code patterns and solutions
+├── issues/           # Known issues and workarounds
+└── knowledge/        # Domain-specific insights and learnings
+```
+
+### How to Use Memory Bank
+
+**1. Progress Tracking (`memory-bank/progress/`):**
+- Create focused entries for significant technical milestones
+- Document **what** was implemented and **why** it was needed
+- Keep entries concise (2-3 sentences maximum)
+- Use date-based filenames: `2025-07-28-feature-name.md`
+
+**2. Technical Decisions (`memory-bank/decisions/`):**
+- Record architectural choices and trade-offs
+- Document **why** you chose one approach over alternatives
+- Include context about constraints and requirements
+
+**3. Reusable Patterns (`memory-bank/patterns/`):**
+- Save common circuit-synth code patterns
+- Document successful component configurations
+- Record KiCad symbol/footprint mappings that work well
+
+**4. Issue Tracking (`memory-bank/issues/`):**
+- Document known bugs with workarounds
+- Track compatibility issues between tools
+- Record debugging strategies that worked
+
+**Example Memory Bank Entry:**
+```markdown
+# KiCad Symbol Search Optimization
+
+## Summary
+Implemented cross-platform KiCad library search with fallback paths for macOS and Linux.
+
+## Key Changes
+- Added `/find-symbol` command with grep-based search across multiple library paths
+- Handles both standard KiCad installations and Homebrew locations on macOS
+
+## Impact
+Users can now reliably find KiCad symbols regardless of installation method.
+```
+
 ## Agent Workflow
 
-This repository uses a structured agent workflow for handling complex tasks. Always start in **orchestrator** mode, which coordinates other specialized agents.
+**CRITICAL: Use specialized agents for optimal results**
 
-### Standard Workflow
+This repository uses a structured agent workflow. Always start with **orchestrator** for complex multi-step tasks.
 
-1. **orchestrator**: Entry point for all complex tasks
-   - Analyzes the overall request and breaks it down into coordinated subtasks
-   - Delegates specialized work to appropriate agents
-   - Manages dependencies and ensures proper sequencing
+### Available Agents and Their Expertise
 
-2. **architect**: Planning and analysis phase
-   - Breaks down complex or unclear tasks into actionable steps
-   - Gathers requirements and asks clarifying questions
-   - Creates structured todo lists and implementation plans
-   - Provides architectural guidance and design decisions
+1. **orchestrator** - Master coordinator for complex projects
+   - **When to use**: Multi-step tasks spanning different domains
+   - **Capabilities**: Breaks down complex requests, delegates to specialists, manages dependencies
+   - **Example**: "Build a complete ESP32 development board with power management"
 
-3. **code**: Implementation phase  
-   - Performs actual coding changes following best practices
-   - Reviews code against SOLID, KISS, YAGNI, and DRY principles
-   - Implements solutions based on architect's plans
-   - Ensures code quality and maintainability
+2. **architect** - Planning and requirements analysis
+   - **When to use**: Unclear requirements, need structured planning
+   - **Capabilities**: Requirement gathering, task breakdown, technical planning
+   - **Example**: "Plan the implementation of a new PCB routing algorithm"
 
-### When to Use Each Agent
+3. **code** - Software engineering best practices
+   - **When to use**: Code implementation, refactoring, code reviews
+   - **Capabilities**: SOLID principles, design patterns, code quality
+   - **Example**: "Refactor the component creation system for better maintainability"
 
-- **Start with orchestrator** for any multi-step or complex request
-- Use **architect** when you need to plan, analyze requirements, or break down tasks
-- Use **code** when you need to implement, review, or refactor code
-- Let **orchestrator** coordinate the handoffs between agents
+4. **circuit-synth** - Circuit design and KiCad integration specialist
+   - **When to use**: Circuit design, component selection, KiCad workflows
+   - **Capabilities**: Uses `/find-symbol` and `/find-footprint`, circuit topology expertise
+   - **Example**: "Design a USB-C power delivery circuit with proper protection"
 
-### Example Flow
+5. **general-purpose** - Research and complex searches
+   - **When to use**: Open-ended research, file searching across large codebases
+   - **Capabilities**: Multi-round searching, code analysis, documentation research
+   - **Example**: "Find all references to voltage regulator implementations in the codebase"
 
+### Agent Usage Strategy
+
+**Start Right:**
+```bash
+# Complex multi-domain task
+Task(subagent_type="orchestrator", description="Build ESP32 board", prompt="Design complete ESP32 development board with USB-C, power management, and programming interface")
+
+# Planning unclear requirements  
+Task(subagent_type="architect", description="Plan PCB algorithm", prompt="Analyze requirements and create implementation plan for new PCB component placement algorithm")
+
+# Circuit-specific design work
+Task(subagent_type="circuit-synth", description="Design power circuit", prompt="Create 3.3V/5V dual rail power supply circuit with USB-C input and protection")
 ```
-User Request: "Add a new placement algorithm for PCB components"
+
+**Let Orchestrator Coordinate:**
+- Don't manually chain agents - let orchestrator manage the workflow
+- Orchestrator will delegate to architect → circuit-synth → code as needed
+- Trust the orchestrator to choose the right specialist for each subtask
+
+### Example Workflows
+
+**Circuit Design Request:**
+```
+User: "Design an ESP32 development board with USB-C and LDO regulator"
+
+orchestrator → architect (analyze requirements, plan circuit topology)  
+architect → circuit-synth (find components, design circuit connections)
+circuit-synth → code (implement Python circuit-synth code)
+orchestrator → (coordinate testing, KiCad generation, validation)
+```
+
+**Code Enhancement Request:**
+```
+User: "Add a new placement algorithm for PCB components"
 
 orchestrator → architect (analyze requirements, plan implementation)
-architect → code (implement the algorithm following the plan)  
+architect → code (implement algorithm following best practices)  
 orchestrator → (coordinate testing, documentation, integration)
+```
+
+**Research/Analysis Request:**
+```
+User: "Find all voltage regulator patterns used in existing circuits"
+
+orchestrator → general-purpose (search codebase, analyze patterns)
+general-purpose → architect (organize findings, identify patterns)
+orchestrator → (coordinate documentation, recommendations)
 ```
 
 ## Repository Structure
@@ -345,3 +520,104 @@ The annotation system provides seamless integration with KiCad schematics:
 4. **UUID Tracking**: Each annotation receives a unique identifier for updates
 
 This implementation provides a complete end-to-end solution for documenting Python-generated circuit designs with both automatic and manual annotation capabilities.
+
+## Circuit-Synth Specific Knowledge
+
+### Core Components and Patterns
+
+**Component Creation:**
+```python
+# Standard component pattern
+component = Component(
+    symbol="Library:SymbolName",        # Use /find-symbol to locate
+    ref="U",                           # Reference prefix (U, R, C, etc.)
+    footprint="Library:FootprintName", # Use /find-footprint to locate
+    value="optional_value"             # For passives (resistors, caps)
+)
+```
+
+**Net Management:**
+```python
+# Create nets for connections
+VCC_3V3 = Net('VCC_3V3')  # Descriptive names
+GND = Net('GND')
+
+# Connect components to nets
+component["pin_name"] += net_name
+component[1] += VCC_3V3  # Pin numbers for simple components
+```
+
+**Circuit Decorators:**
+```python
+@circuit(name="circuit_name")
+def my_circuit():
+    """Docstring becomes schematic annotation"""
+    # Circuit implementation
+    return circuit  # Optional explicit return
+```
+
+### Common Libraries and Footprints
+
+**Microcontrollers:**
+- ESP32: `RF_Module:ESP32-S3-MINI-1`
+- STM32: `MCU_ST_STM32F4:STM32F407VETx` (use /find-symbol STM32)
+- Arduino: `MCU_Module:Arduino_UNO_R3`
+
+**Passives:**
+- Resistors: `Device:R` with footprints like `Resistor_SMD:R_0603_1608Metric`
+- Capacitors: `Device:C` with footprints like `Capacitor_SMD:C_0603_1608Metric`
+- Inductors: `Device:L` with appropriate footprints
+
+**Connectors:**
+- USB-C: `Connector:USB_C_Receptacle_*` (search with /find-symbol)
+- Headers: `Connector_Generic:Conn_01x*` or `Conn_02x*`
+- Power jacks: `Connector:Barrel_Jack_*`
+
+### KiCad Integration Best Practices
+
+**Symbol and Footprint Naming:**
+- Always use full library:name format
+- Verify symbols exist before using (run /find-symbol first)
+- Match footprint to component package exactly
+
+**Net Naming Conventions:**
+- Power nets: `VCC_5V`, `VCC_3V3`, `GND`
+- Signal nets: `USB_DP`, `USB_DM`, descriptive names
+- Avoid generic names like `Net1`, `Net2`
+
+**Reference Designators:**
+- Follow standard conventions: U (ICs), R (resistors), C (capacitors), L (inductors), J (connectors)
+- Let circuit-synth auto-assign numbers: `ref="U"` becomes `U1`, `U2`, etc.
+
+### Common Patterns
+
+**Power Supply Design:**
+```python
+# Voltage regulator with decoupling
+vreg = Component(symbol="Regulator_Linear:AMS1117-3.3", ref="U", footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2")
+cap_in = Component(symbol="Device:C", ref="C", value="10uF", footprint="Capacitor_SMD:C_0805_2012Metric")
+cap_out = Component(symbol="Device:C", ref="C", value="22uF", footprint="Capacitor_SMD:C_0805_2012Metric")
+```
+
+**USB Interface:**
+```python
+usb_conn = Component(symbol="Connector:USB_C_Receptacle_USB2.0", ref="J", footprint="Connector_USB:USB_C_Receptacle_*")
+# Connect VBUS, GND, D+, D- appropriately
+```
+
+### Troubleshooting Common Issues
+
+**Symbol/Footprint Not Found:**
+- Use /find-symbol and /find-footprint commands
+- Check exact spelling and capitalization
+- Verify library names match KiCad standard libraries
+
+**Net Connection Problems:**
+- Ensure pin names match exactly (case sensitive)
+- Use integers for simple component pins: `component[1]`, `component[2]`
+- Use strings for named pins: `component["VCC"]`, `component["GND"]`
+
+**KiCad Generation Issues:**
+- Check that all components have valid symbols and footprints
+- Verify net connections are complete (no unconnected pins)
+- Ensure reference designators are unique and follow conventions

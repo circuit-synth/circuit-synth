@@ -6,63 +6,57 @@ A Python framework for programmatic circuit design with KiCad integration.
 
 __version__ = "0.1.0"
 
+# Dependency injection imports
+# Exception imports
 # Core imports
 from .core import (
     Circuit,
+    CircuitSynthError,
     Component,
+    ComponentError,
+    DependencyContainer,
+    IDependencyContainer,
     Net,
     Pin,
+    ServiceLocator,
+    ValidationError,
     circuit,
 )
 
 # Annotation imports
 from .core.annotations import (
-    TextProperty,
-    TextBox,
-    Table,
     Graphic,
+    Table,
+    TextBox,
+    TextProperty,
+    add_table,
     add_text,
     add_text_box,
-    add_table,
 )
-
-# Exception imports
-from .core import (
-    ComponentError,
-    ValidationError,
-    CircuitSynthError,
-)
-
-# Dependency injection imports
-from .core import (
-    DependencyContainer,
-    ServiceLocator,
-    IDependencyContainer,
-)
-
-# Interfaces imports
-from .interfaces import (
-    IKiCadIntegration,
-    ICircuitModel,
-    KiCadGenerationConfig,
-)
-
-# KiCad API imports
-from .kicad_api import (
-    Schematic,
-    SchematicSymbol,
-    Wire,
-    Junction,
-    Label,
-)
+from .core.enhanced_netlist_exporter import EnhancedNetlistExporter
+from .core.netlist_exporter import NetlistExporter
 
 # Reference manager and netlist exporters
 from .core.reference_manager import ReferenceManager
-from .core.netlist_exporter import NetlistExporter
-from .core.enhanced_netlist_exporter import EnhancedNetlistExporter
+
+# Interfaces imports
+from .interfaces import (
+    ICircuitModel,
+    IKiCadIntegration,
+    KiCadGenerationConfig,
+)
 
 # KiCad integration
 from .kicad.unified_kicad_integration import create_unified_kicad_integration
+
+# KiCad API imports
+from .kicad_api import (
+    Junction,
+    Label,
+    Schematic,
+    SchematicSymbol,
+    Wire,
+)
 
 __all__ = [
     # Core

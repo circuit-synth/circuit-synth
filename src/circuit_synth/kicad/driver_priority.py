@@ -1,10 +1,12 @@
 from enum import IntEnum
 
+
 class DriverPriority(IntEnum):
     """Enum defining priority levels for net drivers.
-    
+
     Higher values indicate higher priority in determining net names.
     """
+
     INVALID = -1
     NONE = 0
     PIN = 1

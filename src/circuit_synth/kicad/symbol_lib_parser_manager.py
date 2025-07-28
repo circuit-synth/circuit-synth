@@ -1,13 +1,14 @@
 # FILE: src/circuit_synth/kicad/symbol_lib_parser_manager.py
 
-import os
 import logging
+import os
 import threading
-from typing import Optional, Dict
+from typing import Dict, Optional
 
-from .symbol_lib_parser import KicadSymbolParser, KicadSymbol
+from .symbol_lib_parser import KicadSymbol, KicadSymbolParser
 
 logger = logging.getLogger(__name__)
+
 
 class SharedParserManager:
     """
@@ -27,7 +28,9 @@ class SharedParserManager:
         """
         with cls._lock:
             if cls._parser_instance is None:
-                logger.debug("SharedParserManager: Creating new KicadSymbolParser instance.")
+                logger.debug(
+                    "SharedParserManager: Creating new KicadSymbolParser instance."
+                )
                 cls._parser_instance = KicadSymbolParser()
             cls._test_mode = test_mode
             return cls._parser_instance

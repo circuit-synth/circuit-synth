@@ -7,79 +7,66 @@ This module contains fundamental components:
 - Symbol library cache
 """
 
-from .types import (
-    # Enums
-    ElementType,
-    WireRoutingStyle,
-    WireStyle,
-    LabelType,
-    PlacementStrategy,
-    
-    # Core data structures
-    Point,
+from .s_expression import SExpressionParser
+from .symbol_cache import SymbolDefinition, SymbolLibraryCache, get_symbol_cache
+from .types import (  # Enums; Core data structures; Search types; Connection types
     BoundingBox,
-    SchematicPin,
-    SymbolInstance,
-    SchematicSymbol,
-    Wire,
-    Label,
-    Text,
+    ConnectionEdge,
+    ConnectionNode,
+    ElementType,
     Junction,
-    Sheet,
-    SheetPin,
+    Label,
+    LabelType,
     Net,
+    NetTrace,
+    PlacementStrategy,
+    Point,
     Schematic,
-    
-    # Search types
+    SchematicPin,
+    SchematicSymbol,
     SearchCriteria,
     SearchResult,
-    
-    # Connection types
-    ConnectionNode,
-    ConnectionEdge,
-    NetTrace,
+    Sheet,
+    SheetPin,
+    SymbolInstance,
+    Text,
+    Wire,
+    WireRoutingStyle,
+    WireStyle,
 )
-
-from .s_expression import SExpressionParser
-from .symbol_cache import SymbolLibraryCache, SymbolDefinition, get_symbol_cache
 
 __all__ = [
     # Enums
-    'ElementType',
-    'WireRoutingStyle',
-    'WireStyle',
-    'LabelType',
-    'PlacementStrategy',
-    
+    "ElementType",
+    "WireRoutingStyle",
+    "WireStyle",
+    "LabelType",
+    "PlacementStrategy",
     # Core data structures
-    'Point',
-    'BoundingBox',
-    'SchematicPin',
-    'SymbolInstance',
-    'SchematicSymbol',
-    'Wire',
-    'Label',
-    'Text',
-    'Junction',
-    'Sheet',
-    'SheetPin',
-    'Net',
-    'Schematic',
-    
+    "Point",
+    "BoundingBox",
+    "SchematicPin",
+    "SymbolInstance",
+    "SchematicSymbol",
+    "Wire",
+    "Label",
+    "Text",
+    "Junction",
+    "Sheet",
+    "SheetPin",
+    "Net",
+    "Schematic",
     # Search types
-    'SearchCriteria',
-    'SearchResult',
-    
+    "SearchCriteria",
+    "SearchResult",
     # Connection types
-    'ConnectionNode',
-    'ConnectionEdge',
-    'NetTrace',
-    
+    "ConnectionNode",
+    "ConnectionEdge",
+    "NetTrace",
     # Parser
-    'SExpressionParser',
-    
+    "SExpressionParser",
     # Symbol cache
-    'SymbolLibraryCache',
-    'SymbolDefinition',
-    'get_symbol_cache',
+    "SymbolLibraryCache",
+    "SymbolDefinition",
+    "get_symbol_cache",
 ]

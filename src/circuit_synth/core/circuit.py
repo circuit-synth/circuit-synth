@@ -1,19 +1,20 @@
 # FILE: src/circuit_synth/core/circuit.py
 
-import re
-from typing import List, Dict, Optional, Any
 import json
-import tempfile
 import os
-from pathlib import Path # Import Path
+import re
+import tempfile
+from pathlib import Path  # Import Path
+from typing import Any, Dict, List, Optional
 
-from .net import Net
-from .exception import ValidationError, CircuitSynthError
-from .reference_manager import ReferenceManager
+from ._logger import context_logger
+from .exception import CircuitSynthError, ValidationError
 from .json_encoder import CircuitSynthJSONEncoder
+from .net import Net
+
 # Import the exporter function
 from .netlist_exporter import NetlistExporter
-from ._logger import context_logger
+from .reference_manager import ReferenceManager
 
 
 class Circuit:
@@ -31,7 +32,6 @@ class Circuit:
         self._component_list = []
         self._reference_manager = ReferenceManager()
         self._annotations = []  # Store TextProperty, TextBox, etc.
-
 
     def validate_reference(self, ref: str) -> bool:
         """Check if reference is available in this circuit's scope"""
@@ -51,13 +51,13 @@ class Circuit:
             "Added subcircuit to parent",
             component="CIRCUIT",
             subcircuit_name=subcirc.name,
-            parent_name=self.name
+            parent_name=self.name,
         )
 
     def add_component(self, comp: "Component"):
         """Register a Component with this Circuit."""
         user_ref = comp._user_reference
-        
+
         # Handle components with no reference - generate a default prefix
         if not user_ref:
             # Generate a default prefix based on the component symbol
@@ -66,21 +66,21 @@ class Circuit:
                 # Use the symbol name as prefix (e.g., "Device:R" -> "R")
                 default_prefix = symbol_parts[1]
                 # Clean up the prefix to be a valid reference
-                default_prefix = re.sub(r'[^A-Za-z0-9_]', '', default_prefix)
+                default_prefix = re.sub(r"[^A-Za-z0-9_]", "", default_prefix)
                 if default_prefix and default_prefix[0].isalpha():
                     user_ref = default_prefix
                 else:
                     user_ref = "U"  # Generic fallback
             else:
                 user_ref = "U"  # Generic fallback
-            
+
             # Update the component's reference
             comp._user_reference = user_ref
             comp._is_prefix = True
-        
+
         # Check if reference is final (has trailing digits)
         has_trailing_digits = bool(re.search(r"\d+$", user_ref))
-        
+
         if has_trailing_digits:
             # For final references, validate through hierarchy
             if not self._reference_manager.validate_reference(user_ref):
@@ -100,13 +100,13 @@ class Circuit:
             comp._is_prefix = False  # Mark as final reference
             self._components[user_ref] = comp
             self._component_list.append(comp)
-            
+
             context_logger.debug(
                 "Component with final reference registered",
                 component="CIRCUIT",
                 reference=user_ref,
                 symbol=comp.symbol,
-                circuit_name=self.name
+                circuit_name=self.name,
             )
         else:
             # For prefix references, store with placeholder
@@ -117,7 +117,7 @@ class Circuit:
                 prefix_reference=user_ref,
                 placeholder_key=placeholder_key,
                 symbol=comp.symbol,
-                circuit_name=self.name
+                circuit_name=self.name,
             )
             comp.ref = user_ref
             comp._is_prefix = True  # Mark as prefix reference
@@ -126,11 +126,15 @@ class Circuit:
 
     def finalize_references(self):
         """Auto-assign references for any components that only had a prefix."""
-        context_logger.debug("Starting reference finalization", component="CIRCUIT", circuit_name=self.name)
+        context_logger.debug(
+            "Starting reference finalization",
+            component="CIRCUIT",
+            circuit_name=self.name,
+        )
 
         newly_assigned = {}
         to_remove = []
-        
+
         for key, comp in self._components.items():
             # Only process components with prefix references
             if key.startswith("(prefix)") and comp._is_prefix:
@@ -140,13 +144,13 @@ class Circuit:
                 comp._is_prefix = False  # Mark as final reference
                 newly_assigned[final_ref] = comp
                 to_remove.append(key)
-                
+
                 context_logger.debug(
                     "Assigned final reference for prefix",
                     component="CIRCUIT",
                     final_reference=final_ref,
                     prefix=prefix,
-                    circuit_name=self.name
+                    circuit_name=self.name,
                 )
 
         # Update component dictionaries
@@ -159,7 +163,7 @@ class Circuit:
             "Finished reference finalization",
             component="CIRCUIT",
             circuit_name=self.name,
-            total_components=len(self._components)
+            total_components=len(self._components),
         )
 
         # Auto-generate docstring annotation if enabled
@@ -174,34 +178,45 @@ class Circuit:
         """Add a TextBox annotation with the circuit's docstring."""
         # Check if docstring annotation already exists to prevent duplicates
         for annotation in self._annotations:
-            if hasattr(annotation, 'text') and annotation.text.strip() == self.description.strip():
+            if (
+                hasattr(annotation, "text")
+                and annotation.text.strip() == self.description.strip()
+            ):
                 return  # Already added
-            elif isinstance(annotation, dict) and annotation.get('text', '').strip() == self.description.strip():
+            elif (
+                isinstance(annotation, dict)
+                and annotation.get("text", "").strip() == self.description.strip()
+            ):
                 return  # Already added
-        
+
         from .annotations import TextBox
-        
+
         # Position the docstring in the top-left area of the schematic
         # Using a reasonable default position and size
         docstring_box = TextBox(
             text=self.description.strip(),
-            position=(184.0, 110.0),  # Double the coordinates to account for KiCad scaling
+            position=(
+                184.0,
+                110.0,
+            ),  # Double the coordinates to account for KiCad scaling
             size=(80.0, 30.0),  # 80mm wide, 30mm tall
             text_size=1.2,
             bold=True,
             background=True,
             background_color="lightyellow",
             border=True,
-            justify="center center"
+            justify="center center",
         )
-        
-        print(f"DEBUG: Creating docstring annotation for circuit '{self.name}' at position {docstring_box.position}")
+
+        print(
+            f"DEBUG: Creating docstring annotation for circuit '{self.name}' at position {docstring_box.position}"
+        )
         self.add_annotation(docstring_box)
         context_logger.debug(
             "Added auto-generated docstring annotation",
-            component="CIRCUIT", 
+            component="CIRCUIT",
             circuit_name=self.name,
-            text_length=len(self.description)
+            text_length=len(self.description),
         )
 
     def generate_text_netlist(self) -> str:
@@ -220,7 +235,6 @@ class Circuit:
         exporter = NetlistExporter(self)
         return exporter.generate_full_netlist()
 
-
     def add_net(self, net: Net):
         if not net.name:
             # Use the ReferenceManager to get a globally unique name
@@ -230,7 +244,7 @@ class Circuit:
                 "Registering net in circuit",
                 component="CIRCUIT",
                 net_name=net.name,
-                circuit_name=self.name
+                circuit_name=self.name,
             )
             self._nets[net.name] = net
 
@@ -241,7 +255,7 @@ class Circuit:
             "Added annotation to circuit",
             component="CIRCUIT",
             annotation_type=type(annotation).__name__,
-            circuit_name=self.name
+            circuit_name=self.name,
         )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -265,9 +279,7 @@ class Circuit:
     # UPDATED FLATTENED JSON LOGIC (SHOWING ALL NETS USED BY LOCAL COMPONENTS)
     # --------------------------------------------------------------------------
     def to_flattened_list(
-        self,
-        parent_name: str = None,
-        flattened: List[Dict[str, Any]] = None
+        self, parent_name: str = None, flattened: List[Dict[str, Any]] = None
     ) -> List[Dict[str, Any]]:
         """
         Build or update a shared `flattened` list of circuit data dicts.
@@ -282,7 +294,6 @@ class Circuit:
         exporter = NetlistExporter(self)
         return exporter.generate_flattened_json_netlist(filename)
 
-
     def generate_kicad_netlist(self, filename: str) -> None:
         """
         Generate a KiCad netlist (.net) file for this circuit and its hierarchy.
@@ -290,19 +301,22 @@ class Circuit:
         exporter = NetlistExporter(self)
         return exporter.generate_kicad_netlist(filename)
 
-    def generate_kicad_project(self, project_name: str, 
-                             generate_pcb: bool = True,
-                             force_regenerate: bool = True,
-                             placement_algorithm: str = "connection_aware",
-                             draw_bounding_boxes: bool = False,
-                             generate_ratsnest: bool = True) -> None:
+    def generate_kicad_project(
+        self,
+        project_name: str,
+        generate_pcb: bool = True,
+        force_regenerate: bool = True,
+        placement_algorithm: str = "connection_aware",
+        draw_bounding_boxes: bool = False,
+        generate_ratsnest: bool = True,
+    ) -> None:
         """
         Generate a complete KiCad project (schematic + PCB) from this circuit.
-        
+
         This method provides a simplified API that handles all the boilerplate setup
         required for KiCad project generation, creating the project directory and
         generating KiCad files directly without intermediate JSON files.
-        
+
         Args:
             project_name: Name of the KiCad project and directory to create
             generate_pcb: Whether to generate PCB in addition to schematic (default: True)
@@ -310,7 +324,7 @@ class Circuit:
             placement_algorithm: Component placement algorithm to use (default: "connection_aware")
             draw_bounding_boxes: Whether to draw visual bounding boxes around components (default: False)
             generate_ratsnest: Whether to generate ratsnest connections in PCB (default: True)
-        
+
         Example:
             >>> circuit = esp32s3_simple()
             >>> circuit.generate_kicad_project("esp32s3_simple")
@@ -318,33 +332,36 @@ class Circuit:
         try:
             # Import KiCad schematic generator directly
             from ..kicad.sch_gen.main_generator import SchematicGenerator
-            
+
             # Finalize references before generation
             self.finalize_references()
-            
+
             # Create output directory with the project name
             output_path = Path(project_name).resolve()
             output_path.mkdir(parents=True, exist_ok=True)
-            
+
             context_logger.info(
                 "Starting KiCad project generation",
                 component="CIRCUIT",
                 project_name=project_name,
                 output_dir=str(output_path),
                 generate_pcb=generate_pcb,
-                placement_algorithm=placement_algorithm
+                placement_algorithm=placement_algorithm,
             )
-            
+
             # Create a temporary JSON file for the circuit (will be cleaned up)
             import tempfile
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as temp_file:
+
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".json", delete=False
+            ) as temp_file:
                 temp_json_path = temp_file.name
                 self.generate_json_netlist(temp_json_path)
-            
+
             try:
                 # Create schematic generator that outputs directly to the project directory
                 generator = SchematicGenerator(str(output_path.parent), project_name)
-                
+
                 # Generate the complete project using the temporary JSON file
                 result = generator.generate_project(
                     json_file=temp_json_path,
@@ -352,60 +369,67 @@ class Circuit:
                     generate_pcb=generate_pcb,
                     force_regenerate=force_regenerate,
                     draw_bounding_boxes=draw_bounding_boxes,
-                    generate_ratsnest=generate_ratsnest
+                    generate_ratsnest=generate_ratsnest,
                 )
             finally:
                 # Clean up the temporary JSON file
                 import os
+
                 try:
                     os.unlink(temp_json_path)
                 except OSError:
                     pass
-            
-            if result.get('success', True):  # Default to success if not specified
+
+            if result.get("success", True):  # Default to success if not specified
                 context_logger.info(
                     "KiCad project generated successfully",
                     component="CIRCUIT",
                     project_name=project_name,
-                    output_path=str(output_path)
+                    output_path=str(output_path),
                 )
-                print(f"KiCad project '{project_name}' generated successfully in {output_path}/")
+                print(
+                    f"KiCad project '{project_name}' generated successfully in {output_path}/"
+                )
             else:
-                error_msg = result.get('error', 'Unknown error occurred during project generation')
+                error_msg = result.get(
+                    "error", "Unknown error occurred during project generation"
+                )
                 context_logger.error(
                     "KiCad project generation failed",
                     component="CIRCUIT",
                     project_name=project_name,
-                    error=error_msg
+                    error=error_msg,
                 )
                 raise CircuitSynthError(f"KiCad project generation failed: {error_msg}")
-                
+
         except ImportError as e:
             error_msg = f"KiCad integration not available: {e}"
             context_logger.error(error_msg, component="CIRCUIT")
             raise CircuitSynthError(error_msg) from e
         except Exception as e:
             error_msg = f"Failed to generate KiCad project '{project_name}': {e}"
-            context_logger.error(error_msg, component="CIRCUIT", project_name=project_name)
+            context_logger.error(
+                error_msg, component="CIRCUIT", project_name=project_name
+            )
             raise CircuitSynthError(error_msg) from e
-    
+
     def simulate(self):
         """
         Create a simulator instance for this circuit.
-        
+
         This method provides access to circuit simulation capabilities using
         PySpice as the backend. The returned simulator object can be used to
         run various analyses such as DC operating point, transient, and AC.
-        
+
         Returns:
             CircuitSimulator: Simulator object for running analyses
-            
+
         Example:
             >>> circuit = voltage_divider()
             >>> sim = circuit.simulate()
             >>> result = sim.operating_point()
             >>> print(f"Output voltage: {result.get_voltage('VOUT'):.3f} V")
-            
+
         Raises:
             ImportError: If simulation dependencies are not installed
             CircuitSynthError: If circuit cannot be converted for simulation
@@ -413,33 +437,39 @@ class Circuit:
         try:
             from ..simulation import CircuitSimulator
         except ImportError as e:
-            context_logger.error("Simulation module not available", component="CIRCUIT", error=str(e))
+            context_logger.error(
+                "Simulation module not available", component="CIRCUIT", error=str(e)
+            )
             raise ImportError(
                 "Circuit simulation requires PySpice and its dependencies. "
                 "Install with: pip install circuit-synth[simulation]"
             ) from e
-            
-        context_logger.info("Creating simulator for circuit", component="CIRCUIT", circuit_name=self.name)
+
+        context_logger.info(
+            "Creating simulator for circuit",
+            component="CIRCUIT",
+            circuit_name=self.name,
+        )
         return CircuitSimulator(self)
-    
+
     @property
     def components(self):
         """
         Return a list of all components in this circuit.
-        
+
         This property provides access to components as a list, which is expected
         by many parts of the codebase that iterate over circuit.components.
-        
+
         Returns:
             List[Component]: List of all components in this circuit
         """
         return list(self._components.values())
-    
+
     @property
     def nets(self):
         """
         Return a dictionary of all nets in this circuit.
-        
+
         Returns:
             Dict[str, Net]: Dictionary of nets keyed by net name
         """

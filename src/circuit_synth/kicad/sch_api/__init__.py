@@ -21,51 +21,49 @@ Main Classes:
 - BulkOperations: Operations on multiple components
 """
 
-from .component_manager import ComponentManager
-from .reference_manager import ReferenceManager
-from .placement_engine import PlacementEngine
-from .component_search import ComponentSearch
 from .bulk_operations import BulkOperations
+from .component_manager import ComponentManager
+from .component_search import ComponentSearch
 from .exceptions import (
     ComponentError,
     ComponentNotFoundError,
+    ConnectionError,
     InvalidLibraryError,
     PlacementError,
-    ConnectionError
 )
 from .models import (
-    RemovalOptions,
-    RemovalResult,
-    MoveOptions,
-    MoveResult,
     CloneOptions,
     ComponentConnections,
-    WireStyle
+    MoveOptions,
+    MoveResult,
+    RemovalOptions,
+    RemovalResult,
+    WireStyle,
 )
+from .placement_engine import PlacementEngine
+from .reference_manager import ReferenceManager
 
 __all__ = [
     # Core classes
-    'ComponentManager',
-    'ReferenceManager',
-    'PlacementEngine',
-    'ComponentSearch',
-    'BulkOperations',
-    
+    "ComponentManager",
+    "ReferenceManager",
+    "PlacementEngine",
+    "ComponentSearch",
+    "BulkOperations",
     # Exceptions
-    'ComponentError',
-    'ComponentNotFoundError',
-    'InvalidLibraryError',
-    'PlacementError',
-    'ConnectionError',
-    
+    "ComponentError",
+    "ComponentNotFoundError",
+    "InvalidLibraryError",
+    "PlacementError",
+    "ConnectionError",
     # Models
-    'RemovalOptions',
-    'RemovalResult',
-    'MoveOptions',
-    'MoveResult',
-    'CloneOptions',
-    'ComponentConnections',
-    'WireStyle'
+    "RemovalOptions",
+    "RemovalResult",
+    "MoveOptions",
+    "MoveResult",
+    "CloneOptions",
+    "ComponentConnections",
+    "WireStyle",
 ]
 
-__version__ = '0.1.0'
+__version__ = "0.1.0"

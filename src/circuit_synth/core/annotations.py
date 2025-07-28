@@ -1,18 +1,19 @@
 # FILE: src/circuit_synth/core/annotations.py
 
 """
-Annotation components for adding text, graphics, and other non-electrical 
+Annotation components for adding text, graphics, and other non-electrical
 elements to circuit schematics.
 """
 
 import uuid
-from typing import Tuple, List, Dict, Any, Optional
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 
 @dataclass
 class TextProperty:
     """Simple text annotation for schematics."""
+
     text: str
     position: Tuple[float, float]  # (x, y) in mm
     size: float = 1.27  # Text size in mm (KiCad default)
@@ -22,11 +23,11 @@ class TextProperty:
     rotation: int = 0  # 0, 90, 180, 270 degrees
     justify: str = "left top"  # KiCad justification
     uuid: str = None
-    
+
     def __post_init__(self):
         if self.uuid is None:
             self.uuid = str(uuid.uuid4())
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert annotation to dictionary format for JSON export."""
         return {
@@ -39,17 +40,23 @@ class TextProperty:
             "color": self.color,
             "rotation": self.rotation,
             "justify": self.justify,
-            "uuid": self.uuid
+            "uuid": self.uuid,
         }
 
 
-@dataclass 
+@dataclass
 class TextBox:
     """Text with optional background box and border."""
+
     text: str
     position: Tuple[float, float]  # (x, y) in mm
     size: Tuple[float, float] = (40.0, 20.0)  # (width, height) in mm
-    margins: Tuple[float, float, float, float] = (1.0, 1.0, 1.0, 1.0)  # top, right, bottom, left
+    margins: Tuple[float, float, float, float] = (
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+    )  # top, right, bottom, left
     text_size: float = 1.27
     bold: bool = False
     italic: bool = False
@@ -62,11 +69,11 @@ class TextBox:
     justify: str = "left top"
     rotation: int = 0
     uuid: str = None
-    
+
     def __post_init__(self):
         if self.uuid is None:
             self.uuid = str(uuid.uuid4())
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert annotation to dictionary format for JSON export."""
         return {
@@ -86,13 +93,14 @@ class TextBox:
             "border_color": self.border_color,
             "justify": self.justify,
             "rotation": self.rotation,
-            "uuid": self.uuid
+            "uuid": self.uuid,
         }
 
 
 @dataclass
 class Table:
     """Tabular data display on schematic."""
+
     data: List[List[str]]  # List of rows, each row is list of cells
     position: Tuple[float, float]  # (x, y) in mm
     cell_width: float = 20.0  # mm
@@ -102,11 +110,11 @@ class Table:
     border_width: float = 0.1
     header_bold: bool = True
     uuid: str = None
-    
+
     def __post_init__(self):
         if self.uuid is None:
             self.uuid = str(uuid.uuid4())
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert annotation to dictionary format for JSON export."""
         return {
@@ -119,17 +127,23 @@ class Table:
             "border": self.border,
             "border_width": self.border_width,
             "header_bold": self.header_bold,
-            "uuid": self.uuid
+            "uuid": self.uuid,
         }
 
 
 class Graphic:
     """Factory class for creating graphic elements."""
-    
+
     @staticmethod
-    def rectangle(position: Tuple[float, float], width: float, height: float,
-                  style: str = "solid", color: str = "black", 
-                  fill: bool = False, fill_color: str = "white") -> Dict[str, Any]:
+    def rectangle(
+        position: Tuple[float, float],
+        width: float,
+        height: float,
+        style: str = "solid",
+        color: str = "black",
+        fill: bool = False,
+        fill_color: str = "white",
+    ) -> Dict[str, Any]:
         """Create a rectangle graphic element."""
         return {
             "type": "rectangle",
@@ -140,13 +154,18 @@ class Graphic:
             "color": color,
             "fill": fill,
             "fill_color": fill_color,
-            "uuid": str(uuid.uuid4())
+            "uuid": str(uuid.uuid4()),
         }
-    
+
     @staticmethod
-    def circle(center: Tuple[float, float], radius: float,
-               style: str = "solid", color: str = "black",
-               fill: bool = False, fill_color: str = "white") -> Dict[str, Any]:
+    def circle(
+        center: Tuple[float, float],
+        radius: float,
+        style: str = "solid",
+        color: str = "black",
+        fill: bool = False,
+        fill_color: str = "white",
+    ) -> Dict[str, Any]:
         """Create a circle graphic element."""
         return {
             "type": "circle",
@@ -156,13 +175,17 @@ class Graphic:
             "color": color,
             "fill": fill,
             "fill_color": fill_color,
-            "uuid": str(uuid.uuid4())
+            "uuid": str(uuid.uuid4()),
         }
-    
+
     @staticmethod
-    def line(start: Tuple[float, float], end: Tuple[float, float],
-             style: str = "solid", color: str = "black", 
-             width: float = 0.1) -> Dict[str, Any]:
+    def line(
+        start: Tuple[float, float],
+        end: Tuple[float, float],
+        style: str = "solid",
+        color: str = "black",
+        width: float = 0.1,
+    ) -> Dict[str, Any]:
         """Create a line graphic element."""
         return {
             "type": "line",
@@ -171,7 +194,7 @@ class Graphic:
             "style": style,
             "color": color,
             "width": width,
-            "uuid": str(uuid.uuid4())
+            "uuid": str(uuid.uuid4()),
         }
 
 
@@ -181,7 +204,7 @@ def add_text(text: str, position: Tuple[float, float], **kwargs) -> TextProperty
 
 
 def add_text_box(text: str, position: Tuple[float, float], **kwargs) -> TextBox:
-    """Convenience function to create a TextBox.""" 
+    """Convenience function to create a TextBox."""
     return TextBox(text=text, position=position, **kwargs)
 
 
