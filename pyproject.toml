@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=61.0", "wheel", "setuptools-rust>=1.5.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -49,6 +49,8 @@ dependencies = [
     "google-adk>=0.1.0",
     "google-genai>=0.1.0",
     "maturin>=1.9.2",
+    # Rust build dependencies
+    "setuptools-rust>=1.5.1",
 ]
 
 [project.optional-dependencies]
@@ -89,6 +91,25 @@ Homepage = "https://github.com/circuit-synth/circuit-synth"
 Documentation = "https://circuit-synth.readthedocs.io"
 Repository = "https://github.com/circuit-synth/circuit-synth"
 Issues = "https://github.com/circuit-synth/circuit-synth/issues"
+
+# Rust extensions for performance acceleration
+[[tool.setuptools-rust.ext-modules]]
+target = "circuit_synth.rust.kicad_writer"
+path = "rust_modules/rust_kicad_integration/Cargo.toml"
+binding = "PyO3"
+debug = false
+
+[[tool.setuptools-rust.ext-modules]]
+target = "circuit_synth.rust.symbol_cache" 
+path = "rust_modules/rust_symbol_cache/Cargo.toml"
+binding = "PyO3"
+debug = false
+
+[[tool.setuptools-rust.ext-modules]]
+target = "circuit_synth.rust.placement"
+path = "rust_modules/rust_force_directed_placement/Cargo.toml"
+binding = "PyO3"
+debug = false
 
 [tool.setuptools]
 package-dir = {"" = "src"}
