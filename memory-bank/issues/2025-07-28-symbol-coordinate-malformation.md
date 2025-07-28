@@ -1,7 +1,7 @@
 # Symbol Coordinate Malformation Issue - 2025-07-28
 
-## Issue Summary
-KiCad symbols are now visible in the schematic viewer but display with incorrect internal positioning and malformed graphics. Components appear as rectangles with misaligned text and internal graphics elements.
+## Issue Summary - URGENT FINAL BLOCKER
+KiCad symbols are now visible in the schematic viewer but display with malformed internal positioning and graphics. This is the **final blocker** for complete KiCad integration - symbols render but coordinates are incorrect.
 
 ## Visual Evidence
 Screenshot shows:
@@ -81,12 +81,25 @@ But coordinate transformation may be corrupting positions during conversion.
 2. Verify graphics data preservation through cache layers
 3. Check coordinate precision loss during serialization
 
-## Immediate Action Items
+## Immediate Action Items - CRITICAL PATH
 
-1. **Create minimal test case** with single resistor component
-2. **Add coordinate debug logging** to graphics processing pipeline
-3. **Compare generated vs reference** symbol coordinates
-4. **Test coordinate transformations** in isolation
+1. **Phase 1 - Coordinate System Analysis** (URGENT):
+   - Create minimal test case with single resistor component
+   - Export KiCad Device:R symbol as reference for coordinate comparison
+   - Add coordinate debug logging to S-expression graphics processing pipeline
+   - Compare generated vs reference symbol coordinates point-by-point
+
+2. **Phase 2 - Graphics Element Investigation** (HIGH PRIORITY):
+   - Debug pin position calculations in `src/circuit_synth/kicad_api/core/symbol_cache.py`
+   - Check symbol origin/anchor point handling in S-expression generation
+   - Verify coordinate transformations preserve scale and positioning
+   - Test symbol unit/part indexing for multi-unit components
+
+3. **Phase 3 - Implementation Fix** (EXECUTION):
+   - Fix coordinate system mismatch in graphics processing
+   - Correct pin-to-graphics alignment calculations
+   - Validate against KiCad standard library symbols
+   - Test with multiple component types (resistors, capacitors, ICs)
 
 ## Success Criteria
 When fixed, symbols should display with:

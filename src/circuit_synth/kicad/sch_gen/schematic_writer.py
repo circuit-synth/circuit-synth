@@ -24,7 +24,6 @@ logging.basicConfig(
 
 from sexpdata import Symbol, dumps
 
-from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 from circuit_synth.kicad_api.core.s_expression import SExpressionParser
 
 # Add performance timing
@@ -68,8 +67,13 @@ from .shape_drawer import (
     circle_s_expr,
     arc_s_expr
 )
-# Use optimized symbol cache from core.component for better performance
+
+# Use optimized symbol cache from core.component for better performance, 
+# but keep Python fallback for graphics data
 from circuit_synth.core.component import SymbolLibCache  
+# Import Python symbol cache specifically for graphics data
+from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache as PythonSymbolLibCache
+
 from .integrated_reference_manager import IntegratedReferenceManager
 from .kicad_formatter import format_kicad_schematic
 
@@ -1039,6 +1043,26 @@ class SchematicWriter:
                     sym_id,
                 )
                 continue
+
+            # Check if graphics data is missing from Rust cache - if so, use Python fallback
+            if 'graphics' not in lib_data or not lib_data['graphics']:
+                print(f"🔧 Graphics data missing for {sym_id}, using Python fallback")
+                logger.info(f"Graphics data missing for {sym_id}, using Python fallback")
+                try:
+                    python_lib_data = PythonSymbolLibCache.get_symbol_data(sym_id)
+                    if python_lib_data and 'graphics' in python_lib_data:
+                        # Merge graphics data from Python cache into Rust cache data
+                        lib_data['graphics'] = python_lib_data['graphics']
+                        print(f"✅ Added {len(python_lib_data['graphics'])} graphics elements from Python cache for {sym_id}")
+                        logger.info(f"Added {len(python_lib_data['graphics'])} graphics elements from Python cache")
+                    else:
+                        print(f"⚠️  Python fallback also has no graphics for {sym_id}")
+                        logger.warning(f"Python fallback also has no graphics for {sym_id}")
+                except Exception as e:
+                    print(f"❌ Failed to get graphics from Python fallback for {sym_id}: {e}")
+                    logger.warning(f"Failed to get graphics from Python fallback for {sym_id}: {e}")
+            else:
+                print(f"✅ Graphics data already available for {sym_id} ({len(lib_data.get('graphics', []))} elements)")
 
             if isinstance(lib_data, list):
                 # It's already an S-expression block
