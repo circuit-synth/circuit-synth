@@ -37,20 +37,48 @@ jobs:
         
         # Download only the specific libraries we need for testing
         echo "📋 Downloading Device.kicad_sym..."
-        sudo wget -q -O /usr/share/kicad/symbols/Device.kicad_sym \
-          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/Device.kicad_sym"
+        if sudo wget --progress=bar:force -O /usr/share/kicad/symbols/Device.kicad_sym \
+          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/Device.kicad_sym"; then
+          echo "✅ Device.kicad_sym downloaded ($(sudo stat -c%s /usr/share/kicad/symbols/Device.kicad_sym) bytes)"
+        else
+          echo "❌ Failed to download Device.kicad_sym"
+          exit 1
+        fi
         
         echo "📋 Downloading power.kicad_sym..."
-        sudo wget -q -O /usr/share/kicad/symbols/power.kicad_sym \
-          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/power.kicad_sym"
+        if sudo wget --progress=bar:force -O /usr/share/kicad/symbols/power.kicad_sym \
+          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/power.kicad_sym"; then
+          echo "✅ power.kicad_sym downloaded ($(sudo stat -c%s /usr/share/kicad/symbols/power.kicad_sym) bytes)"
+        else
+          echo "❌ Failed to download power.kicad_sym"
+          exit 1
+        fi
         
         echo "📋 Downloading Regulator_Linear.kicad_sym..."
-        sudo wget -q -O /usr/share/kicad/symbols/Regulator_Linear.kicad_sym \
-          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/Regulator_Linear.kicad_sym"
+        if sudo wget --progress=bar:force -O /usr/share/kicad/symbols/Regulator_Linear.kicad_sym \
+          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/Regulator_Linear.kicad_sym"; then
+          echo "✅ Regulator_Linear.kicad_sym downloaded ($(sudo stat -c%s /usr/share/kicad/symbols/Regulator_Linear.kicad_sym) bytes)"
+        else
+          echo "❌ Failed to download Regulator_Linear.kicad_sym"
+          exit 1
+        fi
         
-        echo "✅ Symbol libraries downloaded"
+        echo "✅ All symbol libraries downloaded successfully"
         echo "📊 Downloaded $(sudo find /usr/share/kicad/symbols -name "*.kicad_sym" | wc -l) symbol libraries"
-        echo "📋 Size: $(sudo du -sh /usr/share/kicad/symbols | cut -f1)"
+        echo "📋 Total size: $(sudo du -sh /usr/share/kicad/symbols | cut -f1)"
+        echo "📁 Files in directory:"
+        sudo ls -la /usr/share/kicad/symbols/
+        
+        # Verify files contain valid symbols
+        echo "🔍 Verifying symbol files..."
+        for file in /usr/share/kicad/symbols/*.kicad_sym; do
+          if sudo grep -q "kicad_symbol_lib" "$file"; then
+            echo "✅ $(basename "$file") appears to be a valid KiCad symbol library"
+          else
+            echo "❌ $(basename "$file") does not appear to be a valid KiCad symbol library"
+            exit 1
+          fi
+        done
 
     - name: Install dependencies
       run: |
@@ -70,6 +98,40 @@ jobs:
 
     - name: Import sort check with isort
       run: uv run isort --check-only src/
+
+    - name: Debug KiCad Symbol Detection
+      run: |
+        echo "🔍 Debugging KiCad symbol detection..."
+        echo "KICAD_SYMBOL_DIR environment variable: ${KICAD_SYMBOL_DIR:-'not set'}"
+        echo "Checking standard KiCad paths:"
+        for path in "/usr/share/kicad/symbols" "/usr/local/share/kicad/symbols" "/usr/share/kicad/library"; do
+          if [ -d "$path" ]; then
+            echo "✅ $path exists with $(find "$path" -name "*.kicad_sym" 2>/dev/null | wc -l) symbol files"
+            ls "$path"/*.kicad_sym 2>/dev/null | head -3 || echo "No .kicad_sym files found"
+          else
+            echo "❌ $path does not exist"
+          fi
+        done
+        
+        # Test symbol cache directly
+        echo "🧪 Testing symbol cache directly..."
+        uv run python -c "
+from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
+try:
+    dirs = SymbolLibCache._find_kicad_symbol_dirs()
+    print(f'Found KiCad symbol directories: {dirs}')
+    if dirs:
+        cache = SymbolLibCache()
+        cache._build_complete_index()
+        print(f'Built index with {len(cache._library_index)} libraries')
+        print(f'Libraries found: {list(cache._library_index.keys())}')
+    else:
+        print('No KiCad symbol directories found!')
+except Exception as e:
+    print(f'Error: {e}')
+    import traceback
+    traceback.print_exc()
+"
 
     - name: Run tests with pytest
       run: |
