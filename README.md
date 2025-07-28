@@ -1,5 +1,9 @@
 # circuit-synth
 
+[![Documentation](https://readthedocs.org/projects/circuit-synth/badge/?version=latest)](https://circuit-synth.readthedocs.io/en/latest/?badge=latest)
+[![PyPI version](https://badge.fury.io/py/circuit-synth.svg)](https://badge.fury.io/py/circuit-synth)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Pythonic circuit design for professional KiCad projects
 
 ## Overview
@@ -261,19 +265,19 @@ Total warnings: 0, errors: 0.
 
 ## Installation
 
-### Using uv (Recommended)
+### Using PyPI (Recommended)
 
 ```bash
-# Install uv if you don't have it
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Install from PyPI
+pip install circuit-synth
 
-# Install circuit-synth for development
-uv pip install -e ".[dev]"
+# Or using uv (faster)
+uv pip install circuit-synth
 ```
 
-### Using pip (in virtual environment)
+### Development Installation
 
-Since this package isn't published to PyPI yet, install from source:
+For development work:
 
 ```bash
 # Create and activate virtual environment
