@@ -27,6 +27,16 @@ from sexpdata import Symbol, dumps
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 from circuit_synth.kicad_api.core.s_expression import SExpressionParser
 
+# Add performance timing
+try:
+    from ...core.performance_profiler import quick_time
+except ImportError:
+    # Fallback if profiler not available
+    def quick_time(name):
+        def decorator(func):
+            return func
+        return decorator
+
 # Import from KiCad API
 from circuit_synth.kicad_api.core.types import (
     Junction,
@@ -246,6 +256,7 @@ class SchematicWriter:
         logger.debug(f"  - Self UUID (uuid_top): {self.uuid_top}")
         logger.debug(f"  - Project name: {self.project_name}")
 
+    @quick_time("Generate S-Expression")
     def generate_s_expr(self) -> list:
         """
         Create the full top-level (kicad_sch ...) list structure for this circuit.
@@ -377,6 +388,7 @@ class SchematicWriter:
 
         return schematic_sexpr
 
+    @quick_time("Add Components to Schematic")
     def _add_components(self):
         """
         Add all components from the circuit using the ComponentManager.

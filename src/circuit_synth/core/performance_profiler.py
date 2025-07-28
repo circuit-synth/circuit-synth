@@ -10,6 +10,13 @@ from typing import Dict, List, Optional
 from contextlib import contextmanager
 from ._logger import context_logger
 
+# Global performance data collector
+_performance_data = {
+    'operations': {},
+    'start_time': None,
+    'enabled': True
+}
+
 class PerformanceProfiler:
     """Detailed performance profiler for circuit generation."""
     
@@ -113,11 +120,50 @@ def print_performance_summary():
     """Print performance summary."""
     _global_profiler.print_summary()
 
+def quick_time(operation_name: str):
+    """Quick timing decorator that prints immediately - useful for debugging."""
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            start_time = time.perf_counter()
+            print(f"⏱️  Starting {operation_name}...")
+            try:
+                result = func(*args, **kwargs)
+                end_time = time.perf_counter()
+                duration = end_time - start_time
+                print(f"✅ {operation_name}: {duration:.4f}s")
+                return result
+            except Exception as e:
+                end_time = time.perf_counter()
+                duration = end_time - start_time
+                print(f"❌ {operation_name}: {duration:.4f}s (failed: {e})")
+                raise
+        return wrapper
+    return decorator
+
+def time_operation(operation_name: str, func, *args, **kwargs):
+    """Time a function call and print result immediately."""
+    start_time = time.perf_counter()
+    print(f"⏱️  Starting {operation_name}...")
+    try:
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        duration = end_time - start_time
+        print(f"✅ {operation_name}: {duration:.4f}s")
+        return result
+    except Exception as e:
+        end_time = time.perf_counter() 
+        duration = end_time - start_time
+        print(f"❌ {operation_name}: {duration:.4f}s (failed: {e})")
+        raise
+
 # Export timing utilities
 __all__ = [
     'PerformanceProfiler',
     'get_profiler', 
     'profile_operation',
     'profile',
-    'print_performance_summary'
+    'print_performance_summary',
+    'quick_time',
+    'time_operation'
 ]

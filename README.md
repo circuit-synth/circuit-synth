@@ -159,6 +159,56 @@ Unlike other circuit design tools that generate KiCad files as output only, circ
 
 ## Performance Optimization
 
+### Enhanced Performance Profiling System
+
+Circuit-synth includes a comprehensive performance profiling system that provides detailed timing analysis for all circuit generation operations:
+
+#### Key Features
+- **Granular Operation Timing**: Track performance of individual operations like symbol loading, component generation, and schematic writing
+- **Quick Debugging**: `@quick_time` decorator provides immediate timing feedback during development
+- **Performance Summary**: Comprehensive reports showing bottlenecks and optimization opportunities
+- **Strategic Monitoring**: Performance decorators on critical operations in KiCad symbol cache, parser, and schematic writer
+
+#### Usage Examples
+
+**Basic Profiling:**
+```python
+from circuit_synth.core.performance_profiler import profile, print_performance_summary
+
+# Profile circuit generation
+with profile("circuit_generation"):
+    circuit = my_circuit()
+    circuit.generate_kicad_project("test_project")
+
+# Print detailed performance summary
+print_performance_summary()
+```
+
+**Quick Development Debugging:**
+```python
+from circuit_synth.core.performance_profiler import quick_time
+
+@quick_time("Component Creation")
+def create_component():
+    return Component(symbol="Device:R", ref="R", value="10K")
+
+# Output: ⏱️ Starting Component Creation...
+#         ✅ Component Creation: 0.0023s
+```
+
+**Performance Summary Output:**
+```
+📊 PERFORMANCE SUMMARY:
+============================================================
+🕐 Total Time: 2.847s
+
+📈 Get Symbol Data              |  1.234s (43.4%) | avg:  0.617s | count:   2
+📈 Generate S-Expression        |  0.789s (27.7%) | avg:  0.789s | count:   1
+📈 Add Components to Schematic  |  0.456s (16.0%) | avg:  0.456s | count:   1
+📈 Load Symbol Library          |  0.368s (12.9%) | avg:  0.092s | count:   4
+============================================================
+```
+
 ### Rust Integration for High-Performance KiCad Generation
 
 Circuit-synth includes optional Rust modules that provide significant performance improvements for KiCad file generation. The Rust integration uses a defensive design with automatic fallback to ensure reliability.
@@ -464,6 +514,7 @@ circuit.generate_kicad_project("esp32_dev")
 - **🏗️ Hierarchical Design**: Multi-sheet projects with proper organization
 - **📝 Smart Annotations**: Automatic docstring extraction + manual text/tables
 - **⚡ Rust-Accelerated**: Fast symbol lookup and placement algorithms
+- **📊 Performance Profiling**: Comprehensive timing analysis and optimization tools
 
 ## Installation
 

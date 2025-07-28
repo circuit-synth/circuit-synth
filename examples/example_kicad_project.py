@@ -28,7 +28,7 @@ except ImportError as e:
 
 print("⏱️  Importing performance profiler...")
 profiler_import_start = time.perf_counter()
-from circuit_synth.core.performance_profiler import profile, print_performance_summary
+from circuit_synth.core.performance_profiler import profile, print_performance_summary, quick_time
 profiler_import_end = time.perf_counter()
 print(f"   Performance profiler: {profiler_import_end - profiler_import_start:.4f}s")
 

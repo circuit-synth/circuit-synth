@@ -21,6 +21,16 @@ RUST_SYMBOL_CACHE_AVAILABLE = False
 # Import the parser
 from .kicad_symbol_parser import parse_kicad_sym_file
 
+# Add performance timing
+try:
+    from ..core.performance_profiler import quick_time
+except ImportError:
+    # Fallback if profiler not available
+    def quick_time(name):
+        def decorator(func):
+            return func
+        return decorator
+
 logger = logging.getLogger(__name__)
 
 
@@ -66,6 +76,7 @@ class SymbolLibCache:
         return cache_path
 
     @classmethod
+    @quick_time("Get Symbol Data")
     def get_symbol_data(cls, symbol_id: str) -> Dict[str, Any]:
         """Get symbol data by symbol ID (LibraryName:SymbolName)."""
         instance = cls()
@@ -333,6 +344,7 @@ class SymbolLibCache:
 
         return None
 
+    @quick_time("Load Symbol Library")
     def _load_library(self, lib_path: Path) -> Dict[str, Any]:
         """
         Load and cache a library file.
