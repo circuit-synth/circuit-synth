@@ -254,8 +254,10 @@ class SymbolLibCache:
             # Try common KiCad installation paths as fallback
             common_paths = [
                 "/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols",  # macOS
-                "/usr/share/kicad/symbols",  # Linux
+                "/usr/share/kicad/symbols",  # Linux (KiCad 6+)
+                "/usr/share/kicad/library",  # Linux (KiCad 5)
                 "/usr/local/share/kicad/symbols",  # Linux alternative
+                "/usr/local/share/kicad/library",  # Linux alternative (KiCad 5)
                 "C:\\Program Files\\KiCad\\share\\kicad\\symbols",  # Windows
                 "C:\\Program Files (x86)\\KiCad\\share\\kicad\\symbols",  # Windows 32-bit
             ]
@@ -272,7 +274,10 @@ class SymbolLibCache:
             logger.warning("KICAD_SYMBOL_DIR not set or invalid, trying default paths")
             default_dirs = [
                 "/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/",  # macOS
-                "/usr/share/kicad/symbols/",  # Linux
+                "/usr/share/kicad/symbols/",  # Linux (KiCad 6+)
+                "/usr/share/kicad/library/",  # Linux (KiCad 5)
+                "/usr/local/share/kicad/symbols/",  # Linux alternative
+                "/usr/local/share/kicad/library/",  # Linux alternative (KiCad 5)
                 "C:\\Program Files\\KiCad\\share\\kicad\\symbols\\",  # Windows
             ]
 
