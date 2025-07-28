@@ -25,17 +25,12 @@ jobs:
         sudo apt update
         sudo apt install --install-recommends kicad --yes
     
-    - name: Download Required KiCad Symbol Libraries
+    - name: Install KiCad Symbol Libraries
       run: |
-        echo "📦 Downloading required KiCad symbol libraries..."
+        echo "📦 Installing KiCad symbol libraries from repository..."
         sudo mkdir -p /usr/share/kicad/symbols
-        sudo wget -q -O /usr/share/kicad/symbols/Device.kicad_sym \
-          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/Device.kicad_sym"
-        sudo wget -q -O /usr/share/kicad/symbols/power.kicad_sym \
-          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/power.kicad_sym"
-        sudo wget -q -O /usr/share/kicad/symbols/Regulator_Linear.kicad_sym \
-          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/Regulator_Linear.kicad_sym"
-        echo "✅ Downloaded $(sudo find /usr/share/kicad/symbols -name "*.kicad_sym" | wc -l) libraries"
+        sudo cp tests/test_data/kicad_symbols/*.kicad_sym /usr/share/kicad/symbols/
+        echo "✅ Installed $(sudo find /usr/share/kicad/symbols -name "*.kicad_sym" | wc -l) libraries"
 
     - name: Install dependencies
       run: |

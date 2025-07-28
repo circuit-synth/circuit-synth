@@ -29,56 +29,20 @@ jobs:
         sudo apt update
         sudo apt install --install-recommends kicad --yes
     
-    - name: Download Required KiCad Symbol Libraries
+    - name: Install KiCad Symbol Libraries
       run: |
-        echo "📦 Downloading required KiCad symbol libraries from GitLab..."
+        echo "📦 Installing KiCad symbol libraries from repository..."
         # Create symbols directory
         sudo mkdir -p /usr/share/kicad/symbols
         
-        # Download only the specific libraries we need for testing
-        echo "📋 Downloading Device.kicad_sym..."
-        if sudo wget --progress=bar:force -O /usr/share/kicad/symbols/Device.kicad_sym \
-          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/Device.kicad_sym"; then
-          echo "✅ Device.kicad_sym downloaded ($(sudo stat -c%s /usr/share/kicad/symbols/Device.kicad_sym) bytes)"
-        else
-          echo "❌ Failed to download Device.kicad_sym"
-          exit 1
-        fi
+        # Copy symbol libraries from our repository
+        echo "📋 Installing symbol libraries..."
+        sudo cp tests/test_data/kicad_symbols/*.kicad_sym /usr/share/kicad/symbols/
         
-        echo "📋 Downloading power.kicad_sym..."
-        if sudo wget --progress=bar:force -O /usr/share/kicad/symbols/power.kicad_sym \
-          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/power.kicad_sym"; then
-          echo "✅ power.kicad_sym downloaded ($(sudo stat -c%s /usr/share/kicad/symbols/power.kicad_sym) bytes)"
-        else
-          echo "❌ Failed to download power.kicad_sym"
-          exit 1
-        fi
-        
-        echo "📋 Downloading Regulator_Linear.kicad_sym..."
-        if sudo wget --progress=bar:force -O /usr/share/kicad/symbols/Regulator_Linear.kicad_sym \
-          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/Regulator_Linear.kicad_sym"; then
-          echo "✅ Regulator_Linear.kicad_sym downloaded ($(sudo stat -c%s /usr/share/kicad/symbols/Regulator_Linear.kicad_sym) bytes)"
-        else
-          echo "❌ Failed to download Regulator_Linear.kicad_sym"
-          exit 1
-        fi
-        
-        echo "✅ All symbol libraries downloaded successfully"
-        echo "📊 Downloaded $(sudo find /usr/share/kicad/symbols -name "*.kicad_sym" | wc -l) symbol libraries"
+        echo "✅ Installed $(sudo find /usr/share/kicad/symbols -name "*.kicad_sym" | wc -l) symbol libraries"
         echo "📋 Total size: $(sudo du -sh /usr/share/kicad/symbols | cut -f1)"
-        echo "📁 Files in directory:"
+        echo "📁 Files installed:"
         sudo ls -la /usr/share/kicad/symbols/
-        
-        # Verify files contain valid symbols
-        echo "🔍 Verifying symbol files..."
-        for file in /usr/share/kicad/symbols/*.kicad_sym; do
-          if sudo grep -q "kicad_symbol_lib" "$file"; then
-            echo "✅ $(basename "$file") appears to be a valid KiCad symbol library"
-          else
-            echo "❌ $(basename "$file") does not appear to be a valid KiCad symbol library"
-            exit 1
-          fi
-        done
 
     - name: Install dependencies
       run: |
