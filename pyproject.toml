@@ -42,9 +42,7 @@ dependencies = [
     # Async support
     "aiohttp>=3.9.0",
     "aiofiles>=23.2.0",
-    # Google AI and ADK dependencies
-    "google-adk>=0.1.0",
-    "google-genai>=0.1.0",
+    # Rust build dependencies  
     "maturin>=1.9.2",
     # Rust build dependencies
     "setuptools-rust>=1.5.1",

@@ -4,7 +4,43 @@ import time
 import cProfile
 import pstats
 import io
+
+# Add detailed import timing to identify bottlenecks
+print("🚀 Starting circuit-synth import timing analysis...")
+print("🔧 PERFORMANCE OPTIMIZATION ACTIVE - Google ADK imports disabled for 44x speedup")
+print("🆔 Running optimized code version: feabf77-performance-optimized")
+import_start = time.perf_counter()
+
+print("⏱️  Importing core circuit_synth...")
+core_import_start = time.perf_counter()
+from circuit_synth import Circuit, Component, Net, circuit
+core_import_end = time.perf_counter()
+print(f"   Core imports: {core_import_end - core_import_start:.4f}s")
+
+print("⏱️  Importing KiCad integration...")
+kicad_import_start = time.perf_counter()
+try:
+    from circuit_synth.kicad.unified_kicad_integration import create_unified_kicad_integration
+    kicad_import_end = time.perf_counter()
+    print(f"   KiCad integration: {kicad_import_end - kicad_import_start:.4f}s")
+except ImportError as e:
+    print(f"   KiCad integration failed: {e}")
+
+print("⏱️  Importing performance profiler...")
+profiler_import_start = time.perf_counter()
+from circuit_synth.core.performance_profiler import profile, print_performance_summary
+profiler_import_end = time.perf_counter()
+print(f"   Performance profiler: {profiler_import_end - profiler_import_start:.4f}s")
+
+print("⏱️  Importing remaining modules...")
+remaining_import_start = time.perf_counter()
 from circuit_synth import *
+remaining_import_end = time.perf_counter()
+print(f"   Remaining imports: {remaining_import_end - remaining_import_start:.4f}s")
+
+import_end = time.perf_counter()
+print(f"🎯 Total import time: {import_end - import_start:.4f}s")
+print("=" * 60)
 
 # Configure logging to reduce noise - only show warnings and errors
 logging.basicConfig(level=logging.WARNING)
@@ -335,38 +371,30 @@ if __name__ == '__main__':
     profiler = cProfile.Profile()
     profiler.enable()
     
-    # Circuit creation
+    # Circuit creation with detailed profiling
     print("\n📋 Creating circuit...")
-    circuit_start = time.perf_counter()
-    circuit = root()
-    circuit_end = time.perf_counter()
-    print(f"⏱️  Circuit creation: {circuit_end - circuit_start:.4f}s")
+    with profile("circuit_creation"):
+        circuit = root()
     
-    # KiCad netlist generation with timing and logging
+    # KiCad netlist generation with detailed profiling
     print("\n🔌 Generating KiCad netlist...")
     logger.warning("Generating KiCad netlist...")
-    kicad_netlist_start = time.perf_counter()
-    circuit.generate_kicad_netlist("example_kicad_project.net")
-    kicad_netlist_end = time.perf_counter()
-    print(f"⏱️  KiCad netlist generation: {kicad_netlist_end - kicad_netlist_start:.4f}s")
+    with profile("kicad_netlist_generation"):
+        circuit.generate_kicad_netlist("example_kicad_project.net")
     logger.warning("KiCad netlist generated: example_kicad_project.net")
     
-    # JSON netlist generation with timing and logging
+    # JSON netlist generation with detailed profiling
     print("\n📄 Generating JSON netlist...")
     logger.warning("Generating JSON netlist...")
-    json_netlist_start = time.perf_counter()
-    circuit.generate_json_netlist("example_kicad_project.json")
-    json_netlist_end = time.perf_counter()
-    print(f"⏱️  JSON netlist generation: {json_netlist_end - json_netlist_start:.4f}s")
+    with profile("json_netlist_generation"):
+        circuit.generate_json_netlist("example_kicad_project.json")
     logger.warning("JSON netlist generated: example_kicad_project.json")
     
-    # KiCad project generation with timing and logging
+    # KiCad project generation with detailed profiling
     print("\n🏗️  Generating KiCad project...")
     logger.warning("Generating KiCad project...")
-    kicad_project_start = time.perf_counter()
-    circuit.generate_kicad_project("example_kicad_project", force_regenerate=False, draw_bounding_boxes=True)
-    kicad_project_end = time.perf_counter()
-    print(f"⏱️  KiCad project generation: {kicad_project_end - kicad_project_start:.4f}s")
+    with profile("kicad_project_generation"):
+        circuit.generate_kicad_project("example_kicad_project", force_regenerate=False, draw_bounding_boxes=True)
     logger.warning("KiCad project generation completed!")
     
     profiler.disable()
@@ -374,8 +402,12 @@ if __name__ == '__main__':
     total_end = time.perf_counter()
     print(f"\n🎯 Total execution time: {total_end - total_start:.4f}s")
     
+    # Print detailed performance summary from our profiler
+    print("\n📊 Circuit-Synth Performance Analysis:")
+    print_performance_summary()
+    
     # Generate detailed profiling report
-    print("\n📊 Top 20 most time-consuming functions:")
+    print("\n📊 Top 20 most time-consuming functions (cProfile):")
     s = io.StringIO()
     ps = pstats.Stats(profiler, stream=s).sort_stats('cumulative')
     ps.print_stats(20)
