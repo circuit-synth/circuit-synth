@@ -45,43 +45,22 @@ from circuit_synth.core.component import SymbolLibCache
 from .integrated_reference_manager import IntegratedReferenceManager
 from .kicad_formatter import format_kicad_schematic
 
-# Import Rust acceleration for component generation (defensive fallback)
-_RUST_COMPONENT_ACCELERATION = False
+# Import automatic Rust acceleration
 try:
-    import sys
-    import os
-    import importlib.util
+    from circuit_synth.core.rust_integration import generate_component_sexp, get_acceleration_status
+    _rust_status = get_acceleration_status()
+    _RUST_COMPONENT_ACCELERATION = _rust_status['rust_available']
     
-    # Add rust modules to path using absolute path resolution
-    current_file_dir = os.path.dirname(os.path.abspath(__file__))
-    rust_kicad_path = os.path.join(current_file_dir, '../../../../rust_modules/rust_kicad_integration')
-    rust_kicad_path = os.path.abspath(rust_kicad_path)
-    
-    if rust_kicad_path not in sys.path:
-        sys.path.insert(0, rust_kicad_path)
-    
-    import_start = time.perf_counter()
-    # Use direct module loading to ensure we get the right module
-    spec = importlib.util.spec_from_file_location(
-        'rust_kicad_integration', 
-        os.path.join(rust_kicad_path, '__init__.py')
-    )
-    rust_module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(rust_module)
-    
-    rust_generate_component_sexp = rust_module.generate_component_sexp
-    is_rust_available = rust_module.is_rust_available
-    import_time = time.perf_counter() - import_start
-    
-    if is_rust_available():
-        _RUST_COMPONENT_ACCELERATION = True
-        logging.getLogger(__name__).info(f"🦀 RUST_COMPONENT_ACCELERATION: ✅ ENABLED for SchematicWriter (loaded in {import_time*1000:.2f}ms)")
+    if _RUST_COMPONENT_ACCELERATION:
+        logging.getLogger(__name__).info(f"🦀 RUST_COMPONENT_ACCELERATION: ✅ ENABLED for SchematicWriter")
         logging.getLogger(__name__).info("🚀 RUST_COMPONENT_ACCELERATION: Expected 6x component generation speedup")
     else:
-        logging.getLogger(__name__).info(f"🐍 RUST_COMPONENT_ACCELERATION: Rust available but not compiled (loaded in {import_time*1000:.2f}ms)")
+        logging.getLogger(__name__).info(f"🐍 RUST_COMPONENT_ACCELERATION: Using Python fallback")
 except ImportError as e:
+    _RUST_COMPONENT_ACCELERATION = False
     logging.getLogger(__name__).info(f"🐍 RUST_COMPONENT_ACCELERATION: Not available ({e}), using Python implementation")
 except Exception as e:
+    _RUST_COMPONENT_ACCELERATION = False
     logging.getLogger(__name__).warning(f"⚠️ RUST_COMPONENT_ACCELERATION: Error loading: {e}")
 
 logger = logging.getLogger(__name__)
