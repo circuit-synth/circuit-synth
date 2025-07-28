@@ -225,6 +225,13 @@ class SymbolLibCache:
         )
 
     @classmethod
+    def _find_kicad_symbol_dirs(cls) -> List[Path]:
+        """
+        Find KiCad symbol directories. Alias for _parse_kicad_symbol_dirs.
+        """
+        return cls._parse_kicad_symbol_dirs()
+
+    @classmethod
     def _parse_kicad_symbol_dirs(cls) -> List[Path]:
         """
         Parse KICAD_SYMBOL_DIR environment variable which can contain multiple paths
