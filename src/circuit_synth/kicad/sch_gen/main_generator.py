@@ -1301,7 +1301,7 @@ class SchematicGenerator(IKiCadIntegration):
         sheet_symbol_uuid = str(uuid.uuid4())
 
         # Create the cover sheet content
-        cover_content = f"""(kicad_sch (version 20211123) (generator eeschema)
+        cover_content = f"""(kicad_sch (version 20250114) (generator "kicad_api")
 
   (uuid {cover_uuid})
 
