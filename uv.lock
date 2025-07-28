@@ -327,7 +327,10 @@ test = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "black" },
     { name = "build" },
+    { name = "flake8" },
+    { name = "isort" },
     { name = "myst-parser" },
     { name = "pytest-env" },
     { name = "sphinx" },
@@ -372,7 +375,10 @@ provides-extras = ["dev", "test"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "black", specifier = ">=25.1.0" },
     { name = "build", specifier = ">=1.2.2.post1" },
+    { name = "flake8", specifier = ">=7.3.0" },
+    { name = "isort", specifier = ">=6.0.1" },
     { name = "myst-parser", specifier = ">=3.0.1" },
     { name = "pytest-env", specifier = ">=1.1.5" },
     { name = "sphinx", specifier = ">=7.4.7" },
