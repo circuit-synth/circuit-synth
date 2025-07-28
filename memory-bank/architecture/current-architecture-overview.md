@@ -48,6 +48,11 @@ Lower-level KiCad file format handling:
 - **pcb/placement/**: Various placement strategies (force-directed, hierarchical, spiral)
 - **pcb/routing/**: Routing support including Freerouting integration
 
+#### `pcb/`
+PCB-specific functionality and utilities:
+- **ratsnest_generator.py**: Comprehensive ratsnest generation with MST/star topologies
+- **simple_ratsnest.py**: Efficient netlist-to-ratsnest converter for PCB airwire visualization
+
 #### `interfaces/`
 Abstract interfaces for extensibility:
 - **IKiCadIntegration**: KiCad integration contract
@@ -89,7 +94,10 @@ def my_circuit():
 ### KiCad Generation Pattern  
 ```python
 circuit = my_circuit()
-circuit.generate_kicad_project("project_name")  # Simplified API
+circuit.generate_kicad_project(
+    "project_name",  # Simplified API
+    generate_ratsnest=True  # Add visual airwire connections (default: True)
+)
 ```
 
 ### Component Placement
@@ -98,6 +106,14 @@ Multiple algorithms available in `kicad_api/pcb/placement/`:
 - **Hierarchical**: Structured designs respecting circuit hierarchy
 - **Spiral**: Compact arrangements for space-constrained designs
 - **Connection-aware**: Default algorithm optimizing for connectivity
+
+### Ratsnest Generation
+Visual airwire connections showing unrouted net connections in PCB designs:
+- **MST Topology**: Minimum spanning tree for optimal total wire length using Prim's algorithm
+- **Star Topology**: Simple radial connections where all pads connect to first pad
+- **KiCad Integration**: Generates dashed lines on technical layers for visualization
+- **Pipeline Integration**: Automatically runs after PCB generation and file save
+- **Netlist Parsing**: Efficient extraction of connections from KiCad netlist files
 
 ## Containerization Architecture
 
@@ -174,7 +190,8 @@ User Request → orchestrator → architect → code → Result
 3. **Temporary Serialization**: Create temporary JSON representation
 4. **KiCad Generation**: Use SchematicGenerator with placement algorithms
 5. **File Output**: Generate `.kicad_sch`, `.kicad_pcb`, `.kicad_pro` files
-6. **Cleanup**: Remove temporary files
+6. **Ratsnest Generation**: Add visual airwire connections to PCB (if enabled)
+7. **Cleanup**: Remove temporary files
 
 ### Bidirectional Sync (Future)
 - **KiCad → Python**: Import existing KiCad projects to circuit objects

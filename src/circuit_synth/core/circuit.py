@@ -294,7 +294,8 @@ class Circuit:
                              generate_pcb: bool = True,
                              force_regenerate: bool = True,
                              placement_algorithm: str = "connection_aware",
-                             draw_bounding_boxes: bool = False) -> None:
+                             draw_bounding_boxes: bool = False,
+                             generate_ratsnest: bool = True) -> None:
         """
         Generate a complete KiCad project (schematic + PCB) from this circuit.
         
@@ -308,6 +309,7 @@ class Circuit:
             force_regenerate: Force regeneration of existing files (default: True)
             placement_algorithm: Component placement algorithm to use (default: "connection_aware")
             draw_bounding_boxes: Whether to draw visual bounding boxes around components (default: False)
+            generate_ratsnest: Whether to generate ratsnest connections in PCB (default: True)
         
         Example:
             >>> circuit = esp32s3_simple()
@@ -349,7 +351,8 @@ class Circuit:
                     schematic_placement=placement_algorithm,
                     generate_pcb=generate_pcb,
                     force_regenerate=force_regenerate,
-                    draw_bounding_boxes=draw_bounding_boxes
+                    draw_bounding_boxes=draw_bounding_boxes,
+                    generate_ratsnest=generate_ratsnest
                 )
             finally:
                 # Clean up the temporary JSON file
