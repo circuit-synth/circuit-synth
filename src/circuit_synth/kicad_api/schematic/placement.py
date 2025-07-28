@@ -762,11 +762,6 @@ class PlacementEngine:
         
         PERFORMANCE OPTIMIZATION: Uses Rust force-directed placement when available
         for 40-60% performance improvement on large circuits.
-        
-        self, components: List[SchematicSymbol], arrangement: str = "grid"
-    ) -> None:
-        """
-        Arrange multiple components in a pattern with dynamic spacing.
 
         Args:
             components: Components to arrange
@@ -783,8 +778,6 @@ class PlacementEngine:
         if arrangement == "force_directed" and use_rust_acceleration and _RUST_PLACEMENT_AVAILABLE:
             self._arrange_force_directed_rust(components)
         elif arrangement == "grid":
-
-        if arrangement == "grid":
             self._arrange_grid(components)
         elif arrangement == "vertical":
             self._arrange_vertical(components)

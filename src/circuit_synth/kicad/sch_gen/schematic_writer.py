@@ -1283,7 +1283,6 @@ def write_schematic_file(schematic_expr: list, out_path: str):
     import sexpdata
     sheet_pin_count = 0
     
-    """
     logger.debug("Using KiCad formatter")
 
     # Debug: Check for sheet pins with orientation

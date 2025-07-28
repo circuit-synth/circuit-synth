@@ -23,6 +23,13 @@ from .core import (
     circuit,
 )
 
+# Rust-accelerated component creation helpers
+from .core.rust_components import (
+    create_rust_resistor,
+    create_rust_capacitor,
+    get_rust_component_status,
+)
+
 # Annotation imports
 from .core.annotations import (
     Graphic,
@@ -95,6 +102,10 @@ __all__ = [
     "ReferenceManager",
     "NetlistExporter",
     "EnhancedNetlistExporter",
+    # Rust-accelerated component creation
+    "create_rust_resistor",
+    "create_rust_capacitor", 
+    "get_rust_component_status",
     # KiCad integration
     "create_unified_kicad_integration",
 ]
