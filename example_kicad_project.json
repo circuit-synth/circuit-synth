@@ -1,7 +1,7 @@
 {
   "name": "root",
   "description": "\n    Top-level circuit with individual nets instead of buses\n    ",
-  "tstamps": "/root-4839902144/",
+  "tstamps": "/root-4634175168/",
   "source_file": "root.kicad_sch",
   "components": {},
   "nets": {},
@@ -9,7 +9,7 @@
     {
       "name": "regulator",
       "description": "\n    A simple 3.3v regulator designed for 1A max current.\n    Includes 10uF input and output capacitors.\n    ",
-      "tstamps": "/regulator-4839902720/",
+      "tstamps": "/regulator-4634175888/",
       "source_file": "regulator.kicad_sch",
       "components": {
         "U2": {
@@ -235,14 +235,14 @@
           "border_color": "black",
           "justify": "center center",
           "rotation": 0,
-          "uuid": "437f6e09-3f3b-4f6f-9295-38edb581105c"
+          "uuid": "50667b70-80b5-48db-9fd9-98050a120deb"
         }
       ]
     },
     {
       "name": "Comms_processor",
       "description": "\n    Main processor (ESP32-S3) with individual nets for USB, SPI, and interrupts\n    ",
-      "tstamps": "/comms_processor-4848155488/",
+      "tstamps": "/comms_processor-4692237616/",
       "source_file": "Comms_processor.kicad_sch",
       "components": {
         "U1": {
@@ -1311,7 +1311,7 @@
         {
           "name": "Debug_Header",
           "description": "\n    Debug header connections using individual nets\n    ",
-          "tstamps": "/debug_header-4848155584/",
+          "tstamps": "/debug_header-4692238096/",
           "source_file": "Debug_Header.kicad_sch",
           "components": {
             "J1": {
@@ -1490,14 +1490,14 @@
               "border_color": "black",
               "justify": "center center",
               "rotation": 0,
-              "uuid": "5fa47b49-21c6-4118-8c7b-c75d85bab8ce"
+              "uuid": "b8ca166b-4e0d-4caa-94cb-563038a1a0f3"
             }
           ]
         },
         {
           "name": "HW_version",
           "description": "\n    A simple resistor divider to set the HW version.\n    Uses two 10K resistors from 3.3V -> HW_VER -> GND.\n    ",
-          "tstamps": "/hw_version-4872607440/",
+          "tstamps": "/hw_version-4850759728/",
           "source_file": "HW_version.kicad_sch",
           "components": {
             "R11": {
@@ -1704,7 +1704,7 @@
               "border_color": "black",
               "justify": "center center",
               "rotation": 0,
-              "uuid": "1a171ec4-4504-47df-96cb-e81f9a54fda9"
+              "uuid": "8ba87304-cae1-416a-baba-ead3e3e18cd1"
             }
           ]
         }
@@ -1738,14 +1738,14 @@
           "border_color": "black",
           "justify": "center center",
           "rotation": 0,
-          "uuid": "b441e3ed-61a3-45ef-89bd-1976867b9acb"
+          "uuid": "9aa9d246-c80c-47f5-aaef-364bb3343de2"
         }
       ]
     },
     {
       "name": "USB_Port",
       "description": "\n    USB-C port with in-line 22\u03a9 resistors, ESD diodes,\n    CC resistor to GND, and ESD diode on 5V rail.\n    Uses individual nets for D+/D-.\n    ",
-      "tstamps": "/usb_port-4872608448/",
+      "tstamps": "/usb_port-4850760736/",
       "source_file": "USB_Port.kicad_sch",
       "components": {
         "P1": {
@@ -2325,14 +2325,14 @@
           "border_color": "black",
           "justify": "center center",
           "rotation": 0,
-          "uuid": "ee596a19-09bf-4cb0-9d5a-410a7985e0fd"
+          "uuid": "4ebafdc3-aaf5-4e46-a092-65b60d5c762a"
         }
       ]
     },
     {
       "name": "IMU_Circuit",
       "description": "\n    LSM6DSL IMU circuit using SPI interface and interrupt pins.\n    ",
-      "tstamps": "/imu_circuit-4892248112/",
+      "tstamps": "/imu_circuit-4870351248/",
       "source_file": "IMU_Circuit.kicad_sch",
       "components": {
         "U3": {
@@ -2842,7 +2842,7 @@
           "border_color": "black",
           "justify": "center center",
           "rotation": 0,
-          "uuid": "cbf49f0a-bea6-4c11-83cf-21d4a8702bc3"
+          "uuid": "2ed4073c-7131-4110-9a33-7906e9081de6"
         }
       ]
     }
@@ -2876,7 +2876,7 @@
       "border_color": "black",
       "justify": "center center",
       "rotation": 0,
-      "uuid": "61005f98-e881-4122-b915-f18b56258483"
+      "uuid": "979e3e64-935f-42c7-bac3-7d4eed687a87"
     }
   ]
 }
