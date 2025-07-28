@@ -21,9 +21,25 @@ Thank you for your interest in contributing to Circuit-Synth! This document prov
    uv sync
    ```
 
-3. **Verify installation**:
+3. **Optional: Enable Rust acceleration** (6x performance boost):
+   ```bash
+   # Install Rust toolchain if not already installed
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   source ~/.cargo/env
+   
+   # Install maturin for Python-Rust bindings
+   pip install maturin
+   
+   # Compile Rust modules for performance acceleration
+   cd rust_modules/rust_kicad_integration
+   maturin develop --release
+   cd ../..
+   ```
+
+4. **Verify installation** (with optional Rust acceleration):
    ```bash
    uv run python examples/example_kicad_project.py
+   # If Rust is compiled, you'll see performance improvements in the logs
    ```
 
 ### Development Workflow

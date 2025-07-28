@@ -81,9 +81,6 @@ preparse-symbols = "circuit_synth.scripts.preparse_kicad_symbols:main"
 netlist-import = "circuit_synth.kicad.netlist_importer:main"
 json-to-python = "circuit_synth.codegen.json_to_python_project:main"
 
-# Rust performance optimization  
-enable-rust-acceleration = "circuit_synth.scripts.enable_rust:main"
-
 [project.urls]
 Homepage = "https://github.com/circuit-synth/circuit-synth"
 Documentation = "https://circuit-synth.readthedocs.io"
