@@ -436,8 +436,9 @@ class PlacementEngine:
                     x, y, component_size[0], component_size[1]
                 ):
                     final_pos = self._snap_to_grid((x, y))
+                    comp_ref = getattr(component, 'reference', 'unknown') if component else 'unknown'
                     logger.info(
-                        f"Placing {component.reference} at ({final_pos[0]:.1f}, {final_pos[1]:.1f})"
+                        f"Placing {comp_ref} at ({final_pos[0]:.1f}, {final_pos[1]:.1f})"
                     )
                     return final_pos
                 else:

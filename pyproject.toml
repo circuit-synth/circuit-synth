@@ -7,7 +7,7 @@ name = "circuit_synth"
 version = "0.1.0"
 description = "Pythonic circuit design for production-ready KiCad projects"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 license = "MIT"
 authors = [
     {name = "Circuit Synth Contributors", email = "contact@circuitsynth.com"},
@@ -17,9 +17,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
