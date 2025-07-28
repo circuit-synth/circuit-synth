@@ -56,46 +56,16 @@ jobs:
       run: uv run isort --check-only src/
 
     - name: Debug KiCad Symbol Detection
-      env:
-        KICAD_SYMBOL_DIR: ${{ github.workspace }}/tests/test_data/kicad_symbols
       run: |
-        echo "🔍 Debugging KiCad symbol detection..."
-        echo "KICAD_SYMBOL_DIR environment variable: ${KICAD_SYMBOL_DIR:-'not set'}"
-        echo "Checking test data path:"
-        if [ -d "${KICAD_SYMBOL_DIR}" ]; then
-            echo "✅ ${KICAD_SYMBOL_DIR} exists with $(find "${KICAD_SYMBOL_DIR}" -name "*.kicad_sym" 2>/dev/null | wc -l) symbol files"
-            ls "${KICAD_SYMBOL_DIR}"/*.kicad_sym 2>/dev/null || echo "No .kicad_sym files found"
-        else
-            echo "❌ ${KICAD_SYMBOL_DIR} does not exist"
-        fi
+        echo "🔍 Testing pytest-env plugin for KiCad symbols..."
+        echo "📁 Test data directory contents:"
+        ls -la tests/test_data/kicad_symbols/
         
-        # Test symbol cache directly
-        echo "🧪 Testing symbol cache directly..."
-        uv run python -c "
-from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
-try:
-    dirs = SymbolLibCache._find_kicad_symbol_dirs()
-    print(f'Found KiCad symbol directories: {dirs}')
-    if dirs:
-        cache = SymbolLibCache()
-        cache._build_complete_index()
-        print(f'Built index with {len(cache._library_index)} libraries')
-        print(f'Libraries found: {list(cache._library_index.keys())}')
-        
-        # Test loading a specific symbol
-        data = SymbolLibCache.get_symbol_data('Device:R')
-        print(f'✅ Successfully loaded Device:R with {len(data[\"pins\"])} pins')
-    else:
-        print('❌ No KiCad symbol directories found!')
-except Exception as e:
-    print(f'❌ Error: {e}')
-    import traceback
-    traceback.print_exc()
-"
+        # Test that pytest-env plugin is working
+        echo "🧪 Testing pytest-env plugin with a quick test..."
+        uv run pytest tests/unit/io/test_json_loader.py::TestKicadSymbolCache::test_basic_resistor -v --tb=short
 
     - name: Run tests with pytest
-      env:
-        KICAD_SYMBOL_DIR: ${{ github.workspace }}/tests/test_data/kicad_symbols
       run: |
         uv run pytest --cov=circuit_synth --cov-report=xml --cov-report=term-missing -v
 

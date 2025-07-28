@@ -48,8 +48,6 @@ jobs:
       run: echo "Type checking temporarily disabled - too many legacy type issues to resolve"
 
     - name: Quick test run
-      env:
-        KICAD_SYMBOL_DIR: ${{ github.workspace }}/tests/test_data/kicad_symbols
       run: uv run pytest tests/unit/ -v --tb=short
 
   comment-results:

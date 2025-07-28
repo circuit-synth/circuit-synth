@@ -94,8 +94,6 @@ jobs:
         uv pip install -e ".[dev]"
 
     - name: Run tests with pytest
-      env:
-        KICAD_SYMBOL_DIR: ${{ github.workspace }}/tests/test_data/kicad_symbols
       run: |
         uv run pytest --cov=circuit_synth --cov-report=xml --cov-report=term-missing -v
 

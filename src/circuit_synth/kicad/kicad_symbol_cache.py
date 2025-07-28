@@ -251,7 +251,7 @@ class SymbolLibCache:
                 if not dir_path:
                     continue
 
-                path_obj = Path(dir_path)
+                path_obj = Path(dir_path).resolve()  # Resolve relative paths to absolute
                 if path_obj.exists() and path_obj.is_dir():
                     valid_dirs.append(path_obj)
                     logger.debug(f"Added valid symbol directory: {path_obj}")
@@ -289,7 +289,7 @@ class SymbolLibCache:
             ]
 
             for dir_path in default_dirs:
-                path_obj = Path(dir_path)
+                path_obj = Path(dir_path).resolve()
                 if path_obj.exists() and path_obj.is_dir():
                     valid_dirs.append(path_obj)
                     logger.info(f"Using default symbol directory: {path_obj}")
