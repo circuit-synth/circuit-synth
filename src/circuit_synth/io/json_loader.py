@@ -4,12 +4,13 @@ from pathlib import Path
 
 from ..core.circuit import Circuit
 from ..core.component import Component
-from ..core.pin import Pin
-from ..core.net import Net
 from ..core.decorators import get_current_circuit, set_current_circuit
 from ..core.exception import CircuitSynthError
+from ..core.net import Net
+from ..core.pin import Pin
 
 logger = logging.getLogger(__name__)
+
 
 def load_circuit_from_json_file(json_path) -> Circuit:
     """
@@ -55,36 +56,38 @@ def load_circuit_from_dict(data: dict, parent: Circuit = None) -> Circuit:
         # Create Components
         components_data = data.get("components", {})
         component_map = {}
-        
+
         # Handle both dictionary and list formats for components
         if isinstance(components_data, dict):
             # Dictionary format: {"C1": {...}, "R1": {...}}
             comp_items = components_data.items()
         else:
             # List format: [{"ref": "C1", ...}, {"ref": "R1", ...}]
-            comp_items = [(comp.get("ref", "UNKNOWN"), comp) for comp in components_data]
-        
+            comp_items = [
+                (comp.get("ref", "UNKNOWN"), comp) for comp in components_data
+            ]
+
         for comp_ref, comp_info in comp_items:
-            symbol    = comp_info.get("symbol", "Device:???")
+            symbol = comp_info.get("symbol", "Device:???")
             # Handle empty symbols by providing a default based on component type
             if not symbol or symbol.strip() == "":
                 # Try to infer symbol from component reference or description
                 description = comp_info.get("description", "").lower()
-                if comp_ref.startswith('R') or 'resistor' in description:
+                if comp_ref.startswith("R") or "resistor" in description:
                     symbol = "Device:R"
-                elif comp_ref.startswith('C') or 'capacitor' in description:
+                elif comp_ref.startswith("C") or "capacitor" in description:
                     symbol = "Device:C"
-                elif comp_ref.startswith('L') or 'inductor' in description:
+                elif comp_ref.startswith("L") or "inductor" in description:
                     symbol = "Device:L"
-                elif comp_ref.startswith('D') or 'diode' in description:
+                elif comp_ref.startswith("D") or "diode" in description:
                     symbol = "Device:D"
                 else:
                     symbol = "Device:R"  # Default to resistor as it's most common
-            ref       = comp_info.get("reference", comp_info.get("ref", comp_ref))
-            value     = comp_info.get("value")
+            ref = comp_info.get("reference", comp_info.get("ref", comp_ref))
+            value = comp_info.get("value")
             footprint = comp_info.get("footprint")
             datasheet = comp_info.get("datasheet")
-            descr     = comp_info.get("description")
+            descr = comp_info.get("description")
 
             comp_obj = Component(
                 symbol=symbol,
@@ -102,13 +105,13 @@ def load_circuit_from_dict(data: dict, parent: Circuit = None) -> Circuit:
             for pin_data in pins_data:
                 pid = pin_data.get("pin_id", 0)
                 pin_name = pin_data.get("name", "")
-                pin_num  = pin_data.get("num", "")
+                pin_num = pin_data.get("num", "")
                 pin_func = pin_data.get("func", "passive")
                 pin_unit = pin_data.get("unit", 1)
-                pin_x    = pin_data.get("x", 0)
-                pin_y    = pin_data.get("y", 0)
-                pin_len  = pin_data.get("length", 0)
-                pin_ori  = pin_data.get("orientation", 0)
+                pin_x = pin_data.get("x", 0)
+                pin_y = pin_data.get("y", 0)
+                pin_len = pin_data.get("length", 0)
+                pin_ori = pin_data.get("orientation", 0)
 
                 new_pin = Pin(
                     name=pin_name,
@@ -118,7 +121,7 @@ def load_circuit_from_dict(data: dict, parent: Circuit = None) -> Circuit:
                     x=pin_x,
                     y=pin_y,
                     length=pin_len,
-                    orientation=pin_ori
+                    orientation=pin_ori,
                 )
                 new_pin._component_pin_id = pid
                 new_pin._component = comp_obj
@@ -126,15 +129,19 @@ def load_circuit_from_dict(data: dict, parent: Circuit = None) -> Circuit:
 
             new_circ.add_component(comp_obj)
             component_map[ref] = comp_obj
-            logger.debug("  component '%s' (symbol=%s) created with %d pins",
-                         ref, symbol, len(pins_data))
+            logger.debug(
+                "  component '%s' (symbol=%s) created with %d pins",
+                ref,
+                symbol,
+                len(pins_data),
+            )
 
         # Connect pins to nets
         for net_name, pin_connection_list in nets_data.items():
             net_obj = net_map[net_name]
             for pin_conn in pin_connection_list:
                 comp_ref = pin_conn["component"]
-                
+
                 # Handle different pin reference formats
                 if "pin_id" in pin_conn:
                     # Old format: direct pin_id
@@ -144,19 +151,21 @@ def load_circuit_from_dict(data: dict, parent: Circuit = None) -> Circuit:
                     pin_number = pin_conn["pin"].get("number", "")
                     pin_name = pin_conn["pin"].get("name", "")
                     pin_type = pin_conn["pin"].get("type", "passive")
-                    
+
                     # Create a pin if it doesn't exist
                     comp_obj = component_map.get(comp_ref)
                     if comp_obj is None:
-                        raise ValueError(f"JSON references unknown component '{comp_ref}'")
-                    
+                        raise ValueError(
+                            f"JSON references unknown component '{comp_ref}'"
+                        )
+
                     # Find or create pin by number
                     pin_obj = None
                     for existing_pin in comp_obj._pins.values():
                         if existing_pin.num == pin_number:
                             pin_obj = existing_pin
                             break
-                    
+
                     if pin_obj is None:
                         # Create new pin
                         pin_obj = Pin(
@@ -164,18 +173,23 @@ def load_circuit_from_dict(data: dict, parent: Circuit = None) -> Circuit:
                             num=pin_number,
                             func=pin_type,
                             unit=1,
-                            x=0, y=0, length=0, orientation=0
+                            x=0,
+                            y=0,
+                            length=0,
+                            orientation=0,
                         )
                         pin_obj._component = comp_obj
                         # Use pin number as key if no existing pins, otherwise use next available ID
                         pin_id = len(comp_obj._pins)
                         pin_obj._component_pin_id = pin_id
                         comp_obj._pins[pin_id] = pin_obj
-                    
+
                     pin_obj.connect_to_net(net_obj)
                     continue
                 else:
-                    raise ValueError(f"Pin connection format not recognized: {pin_conn}")
+                    raise ValueError(
+                        f"Pin connection format not recognized: {pin_conn}"
+                    )
 
                 comp_obj = component_map.get(comp_ref)
                 if comp_obj is None:
@@ -188,8 +202,9 @@ def load_circuit_from_dict(data: dict, parent: Circuit = None) -> Circuit:
                     )
 
                 pin_obj.connect_to_net(net_obj)
-                logger.debug("  connected %s pin_id=%s to net '%s'",
-                             comp_ref, pin_id, net_name)
+                logger.debug(
+                    "  connected %s pin_id=%s to net '%s'", comp_ref, pin_id, net_name
+                )
 
         # Recursively load subcircuits
         for child_data in data.get("subcircuits", []):

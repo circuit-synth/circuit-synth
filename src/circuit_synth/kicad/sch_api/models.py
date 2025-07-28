@@ -7,33 +7,37 @@ providing a clean interface for component management.
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Optional, Tuple, Dict, Any
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class WireStyle(Enum):
     """Defines how wires should be handled when moving components."""
-    MAINTAIN = "maintain"      # Move wire endpoints with component
-    REDRAW = "redraw"         # Remove and recreate wires
-    STRETCH = "stretch"       # Add intermediate points to maintain angles
+
+    MAINTAIN = "maintain"  # Move wire endpoints with component
+    REDRAW = "redraw"  # Remove and recreate wires
+    STRETCH = "stretch"  # Add intermediate points to maintain angles
 
 
 class RoutingStyle(Enum):
     """Defines wire routing algorithms."""
-    DIRECT = "direct"         # Straight line connection
-    ORTHOGONAL = "orthogonal" # Right-angle routing
-    DIAGONAL = "diagonal"     # 45-degree routing
+
+    DIRECT = "direct"  # Straight line connection
+    ORTHOGONAL = "orthogonal"  # Right-angle routing
+    DIAGONAL = "diagonal"  # 45-degree routing
 
 
 class PlacementStrategy(Enum):
     """Defines component placement strategies."""
-    EDGE = "edge"             # Place at edge of existing components
-    GRID = "grid"             # Place on next available grid position
-    CONTEXTUAL = "contextual" # Place near related components
+
+    EDGE = "edge"  # Place at edge of existing components
+    GRID = "grid"  # Place on next available grid position
+    CONTEXTUAL = "contextual"  # Place near related components
 
 
 @dataclass
 class RemovalOptions:
     """Options for component removal operations."""
+
     remove_connected_wires: bool = False
     remove_orphaned_nets: bool = False
     remove_associated_labels: bool = False
@@ -44,6 +48,7 @@ class RemovalOptions:
 @dataclass
 class RemovalResult:
     """Result of a component removal operation."""
+
     success: bool
     removed_elements: List[Any] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
@@ -53,6 +58,7 @@ class RemovalResult:
 @dataclass
 class MoveOptions:
     """Options for component move operations."""
+
     snap_to_grid: bool = True
     check_collisions: bool = True
     maintain_wires: bool = True
@@ -64,6 +70,7 @@ class MoveOptions:
 @dataclass
 class MoveResult:
     """Result of a component move operation."""
+
     success: bool
     new_position: Optional[Tuple[float, float]] = None
     warnings: List[str] = field(default_factory=list)
@@ -74,6 +81,7 @@ class MoveResult:
 @dataclass
 class CloneOptions:
     """Options for component cloning operations."""
+
     auto_increment_reference: bool = True
     clone_properties: bool = True
     clone_connections: bool = False
@@ -84,6 +92,7 @@ class CloneOptions:
 @dataclass
 class PlacementInfo:
     """Information about component placement."""
+
     position: Tuple[float, float]
     rotation: float = 0.0
     mirror: bool = False
@@ -93,6 +102,7 @@ class PlacementInfo:
 @dataclass
 class ComponentUpdate:
     """Represents an update to a component."""
+
     action: str  # 'add', 'modify', 'remove', 'preserve'
     component: Any  # SchematicSymbol
     placement_info: Optional[PlacementInfo] = None
@@ -102,16 +112,20 @@ class ComponentUpdate:
 @dataclass
 class ComponentConnections:
     """Information about a component's connections."""
+
     wires: List[Any] = field(default_factory=list)  # List[Wire]
-    nets: List[Any] = field(default_factory=list)   # List[Net]
-    labels: List[Any] = field(default_factory=list) # List[Label]
+    nets: List[Any] = field(default_factory=list)  # List[Net]
+    labels: List[Any] = field(default_factory=list)  # List[Label]
     junction_points: List[Tuple[float, float]] = field(default_factory=list)
-    connected_components: List[Any] = field(default_factory=list)  # List[SchematicSymbol]
+    connected_components: List[Any] = field(
+        default_factory=list
+    )  # List[SchematicSymbol]
 
 
 @dataclass
 class PinConnection:
     """Information about a pin connection."""
+
     pin_number: str
     pin_type: str
     net_name: Optional[str] = None
@@ -122,6 +136,7 @@ class PinConnection:
 @dataclass
 class SearchCriteria:
     """Criteria for searching components."""
+
     reference_pattern: Optional[str] = None
     value_pattern: Optional[str] = None
     footprint_pattern: Optional[str] = None
@@ -134,6 +149,7 @@ class SearchCriteria:
 @dataclass
 class AlignmentOptions:
     """Options for component alignment operations."""
+
     alignment: str = "horizontal"  # 'horizontal', 'vertical', 'grid'
     spacing: Optional[float] = None
     reference_component: Optional[str] = None
@@ -143,6 +159,7 @@ class AlignmentOptions:
 @dataclass
 class ValidationResult:
     """Result of component validation."""
+
     is_valid: bool
     errors: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)

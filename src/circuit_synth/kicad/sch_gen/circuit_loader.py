@@ -7,13 +7,13 @@
 #
 # Updated to use SchematicSymbol directly instead of legacy Component class
 
-import logging
 import json
-from pathlib import Path
-from typing import Dict, Any
+import logging
 import uuid as uuid_module
+from pathlib import Path
+from typing import Any, Dict
 
-from circuit_synth.kicad_api.core.types import SchematicSymbol, SchematicPin, Point
+from circuit_synth.kicad_api.core.types import Point, SchematicPin, SchematicSymbol
 
 logger = logging.getLogger(__name__)
 
@@ -22,25 +22,37 @@ class Pin:
     """
     Represents a single pin on a component (including location, orientation, etc.).
     """
-    def __init__(self, number: str, name: str, function: str,
-                 orientation: float, x: float, y: float, length: float):
-        self.number = number     # e.g. "1"
-        self.name = name         # e.g. "GND"
-        self.function = function # e.g. "power_in"
+
+    def __init__(
+        self,
+        number: str,
+        name: str,
+        function: str,
+        orientation: float,
+        x: float,
+        y: float,
+        length: float,
+    ):
+        self.number = number  # e.g. "1"
+        self.name = name  # e.g. "GND"
+        self.function = function  # e.g. "power_in"
         self.orientation = orientation
         self.x = x
         self.y = y
         self.length = length
 
     def __repr__(self):
-        return (f"Pin(number='{self.number}', name='{self.name}', function='{self.function}', "
-                f"orientation={self.orientation}, x={self.x}, y={self.y}, length={self.length})")
+        return (
+            f"Pin(number='{self.number}', name='{self.name}', function='{self.function}', "
+            f"orientation={self.orientation}, x={self.x}, y={self.y}, length={self.length})"
+        )
 
 
 class Net:
     """
     Represents an electrical net (by name) and the pin connections (component ref, pin_number).
     """
+
     def __init__(self, name: str):
         self.name = name
         # Each connection is a tuple (comp_ref, pin_number).
@@ -54,6 +66,7 @@ class Circuit:
     """
     Holds all components (as SchematicSymbols), nets, and child subcircuits (instances).
     """
+
     def __init__(self, name: str):
         self.name = name
         self.components: List[SchematicSymbol] = []
@@ -66,18 +79,24 @@ class Circuit:
         self._annotations = []
 
     def add_component(self, comp: SchematicSymbol):
-        logger.debug(f"Adding component {comp.reference} ({comp.lib_id}) to circuit '{self.name}'")
+        logger.debug(
+            f"Adding component {comp.reference} ({comp.lib_id}) to circuit '{self.name}'"
+        )
         self.components.append(comp)
 
     def add_net(self, net: Net):
-        logger.debug(f"Adding net {net.name} with {len(net.connections)} connections to circuit '{self.name}'")
+        logger.debug(
+            f"Adding net {net.name} with {len(net.connections)} connections to circuit '{self.name}'"
+        )
         self.nets.append(net)
 
     def __repr__(self):
-        return (f"Circuit(name='{self.name}', "
-                f"components=[{', '.join(str(c) for c in self.components)}], "
-                f"nets=[{', '.join(str(n) for n in self.nets)}], "
-                f"child_instances={self.child_instances})")
+        return (
+            f"Circuit(name='{self.name}', "
+            f"components=[{', '.join(str(c) for c in self.components)}], "
+            f"nets=[{', '.join(str(n) for n in self.nets)}], "
+            f"child_instances={self.child_instances})"
+        )
 
 
 def load_circuit_hierarchy(json_file: str) -> (Circuit, Dict[str, Circuit]):
@@ -104,12 +123,12 @@ def load_circuit_hierarchy(json_file: str) -> (Circuit, Dict[str, Circuit]):
 
     # Save the original name for later use as project name
     original_name = top_circuit.name
-    
+
     # Rename the original circuit to match project name in circuit dictionary
     # but keep it as the top circuit (will be referenced by the top_sheet)
     if original_name in all_subcircuits:
         del all_subcircuits[original_name]
-    
+
     # We'll use the original name instead of "Root" for the main schematic
     all_subcircuits[original_name] = top_circuit
 
@@ -117,6 +136,7 @@ def load_circuit_hierarchy(json_file: str) -> (Circuit, Dict[str, Circuit]):
         f"Finished building circuit hierarchy. Found {len(all_subcircuits)} unique subcircuit(s)."
     )
     return top_circuit, all_subcircuits
+
 
 def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
     """
@@ -128,13 +148,13 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
     then store it in sub_dict.
     """
     c_name = circ_data.get("name", "UnnamedCircuit")
-    
+
     # Strip "build_" prefix if present
     if c_name.startswith("build_"):
         c_name = c_name[6:]  # Remove first 6 characters ("build_")
         # Also capitalize words properly (e.g., "root_circuit" -> "Root Circuit")
         c_name = " ".join(word.capitalize() for word in c_name.split("_"))
-    
+
     logger.debug(f"Parsing circuit named '{c_name}'...")
 
     # If we have a collision in name, compare content
@@ -156,14 +176,16 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
     comps_data = circ_data.get("components", {})
     # Handle both list and dict formats
     if isinstance(comps_data, dict):
-        comps_data = [{"ref": ref, **comp_info} for ref, comp_info in comps_data.items()]
-    
+        comps_data = [
+            {"ref": ref, **comp_info} for ref, comp_info in comps_data.items()
+        ]
+
     for comp_dict in comps_data:
         ref = comp_dict["ref"]
         symbol_id = comp_dict["symbol"]
         value = comp_dict.get("value", symbol_id.split(":")[-1])
         footprint = comp_dict.get("footprint", "")
-        
+
         # Create SchematicSymbol directly
         comp = SchematicSymbol(
             reference=ref,
@@ -172,11 +194,9 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             position=Point(0.0, 0.0),  # Will be set during placement
             rotation=0.0,
             footprint=footprint,
-            properties={
-                "hierarchy_path": "/"  # default top-level
-            },
+            properties={"hierarchy_path": "/"},  # default top-level
             pins=[],
-            uuid=str(uuid_module.uuid4())
+            uuid=str(uuid_module.uuid4()),
         )
 
         # Parse pins and convert to SchematicPin
@@ -187,10 +207,10 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
                 name=p.get("name", ""),
                 type=p.get("func", "passive"),  # function -> type
                 position=Point(float(p.get("x", 0)), float(p.get("y", 0))),
-                orientation=int(float(p.get("orientation", 0)))
+                orientation=int(float(p.get("orientation", 0))),
             )
             comp.pins.append(pin_obj)
-        
+
         circuit.add_component(comp)
 
     # Parse nets
@@ -200,36 +220,43 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
         for conn in connections:
             comp_ref = conn["component"]
             pin_data = conn["pin"]
-            
+
             # Enhanced pin identification - store the most specific identifier available
             pin_identifier = None
-            
+
             # First check if name is available (most specific)
             if "name" in pin_data and pin_data["name"] != "~":
                 pin_identifier = pin_data["name"]
-                logger.debug(f"Using pin name '{pin_identifier}' for {comp_ref} in net {net_name}")
+                logger.debug(
+                    f"Using pin name '{pin_identifier}' for {comp_ref} in net {net_name}"
+                )
             # Then check for number
             elif "number" in pin_data:
                 pin_identifier = str(pin_data["number"])
-                logger.debug(f"Using pin number '{pin_identifier}' for {comp_ref} in net {net_name}")
+                logger.debug(
+                    f"Using pin number '{pin_identifier}' for {comp_ref} in net {net_name}"
+                )
             # Finally fall back to pin_id
             else:
                 pin_identifier = str(pin_data.get("pin_id", ""))
-                logger.debug(f"Using pin ID '{pin_identifier}' for {comp_ref} in net {net_name}")
-            
+                logger.debug(
+                    f"Using pin ID '{pin_identifier}' for {comp_ref} in net {net_name}"
+                )
+
             net_obj.connections.append((comp_ref, pin_identifier))
-            logger.debug(f"Added connection: {comp_ref}.{pin_identifier} to net {net_name}")
-            
+            logger.debug(
+                f"Added connection: {comp_ref}.{pin_identifier} to net {net_name}"
+            )
+
         circuit.add_net(net_obj)
 
     # Parse subcircuits
     sub_list = circ_data.get("subcircuits", [])
     for sub_info in sub_list:
         child_circ = _parse_circuit(sub_info, sub_dict)
-        circuit.child_instances.append({
-            "sub_name": child_circ.name,
-            "instance_label": ""  # assigned later
-        })
+        circuit.child_instances.append(
+            {"sub_name": child_circ.name, "instance_label": ""}  # assigned later
+        )
 
     # Parse annotations
     annotations_data = circ_data.get("annotations", [])
@@ -239,6 +266,7 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
         circuit._annotations.append(annotation_dict)
 
     return circuit
+
 
 def _circuits_match(existing_circuit: Circuit, new_data: dict) -> bool:
     """Check if existing_circuit matches the new subcircuit data enough to reuse the same name."""
@@ -261,14 +289,19 @@ def _circuits_match(existing_circuit: Circuit, new_data: dict) -> bool:
 
     return True
 
-def assign_subcircuit_instance_labels(top_circuit: Circuit, sub_dict: Dict[str, Circuit]):
+
+def assign_subcircuit_instance_labels(
+    top_circuit: Circuit, sub_dict: Dict[str, Circuit]
+):
     """
     For each child circuit usage, generate instance_label like sub_name, sub_name1, sub_name2, etc.
     If a sub_name is used only once, we keep it as sub_name (no trailing number).
     If used multiple times, we number them sub_name1, sub_name2, ...
     Then recurse for each child.
     """
-    logger.debug(f"Assigning subcircuit instance labels in circuit '{top_circuit.name}'")
+    logger.debug(
+        f"Assigning subcircuit instance labels in circuit '{top_circuit.name}'"
+    )
     usage_counts = {}
 
     # Count usage frequency of each sub_name

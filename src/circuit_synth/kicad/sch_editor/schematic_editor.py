@@ -3,11 +3,13 @@ KiCad Schematic Editor
 """
 
 import logging
-from typing import List, Any
+from typing import Any, List
+
+import sexpdata
 
 # Import the new API's S-expression parser
 from circuit_synth.kicad_api.core.s_expression import SExpressionParser
-import sexpdata
+
 from .schematic_exporter import SchematicExporter
 
 logger = logging.getLogger(__name__)
@@ -22,7 +24,7 @@ class SchematicEditor:
         self.schematic_path = schematic_path
         self.parser = SExpressionParser()
         # Read file content and parse
-        with open(schematic_path, 'r', encoding='utf-8') as f:
+        with open(schematic_path, "r", encoding="utf-8") as f:
             content = f.read()
         self.data = self.parser.parse_string(content)
 
@@ -39,12 +41,16 @@ class SchematicEditor:
             # but that would require more refactoring
             # For now, we'll just write to a temporary file and read it back
             import tempfile
-            with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.kicad_sch') as f:
+
+            with tempfile.NamedTemporaryFile(
+                mode="w+", delete=False, suffix=".kicad_sch"
+            ) as f:
                 exporter.export_file(f.name)
                 f.seek(0)
                 content = f.read()
                 # Clean up temp file
                 import os
+
                 os.unlink(f.name)
                 return self.parser.parse_string(content)
 
@@ -54,13 +60,19 @@ class SchematicEditor:
         """
         # Get the raw S-expression data
         data = self.schematic_data
-        
+
         # Find the symbol with the matching reference
         for i, item in enumerate(data):
-            if isinstance(item, list) and len(item) > 1 and str(item[0]) == 'symbol':
+            if isinstance(item, list) and len(item) > 1 and str(item[0]) == "symbol":
                 # Find the property with the name "Reference"
                 for prop in item:
-                    if isinstance(prop, list) and len(prop) > 2 and str(prop[0]) == 'property' and str(prop[1]).strip('"') == 'Reference' and str(prop[2]).strip('"') == reference:
+                    if (
+                        isinstance(prop, list)
+                        and len(prop) > 2
+                        and str(prop[0]) == "property"
+                        and str(prop[1]).strip('"') == "Reference"
+                        and str(prop[2]).strip('"') == reference
+                    ):
                         # Found the component, now remove it
                         del data[i]
                         # Update self.data with the modified data
@@ -81,15 +93,15 @@ class SchematicEditor:
         """
         if output_path is None:
             output_path = self.schematic_path
-        
+
         # Use the new formatter from kicad_formatter.py
         from circuit_synth.kicad.sch_gen.kicad_formatter import format_kicad_schematic
-        
+
         # Format the data
         formatted_content = format_kicad_schematic(self.schematic_data)
-        
+
         # Write to file
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(formatted_content)
-        
+
         logger.info(f"Saved schematic to '{output_path}'")

@@ -6,14 +6,15 @@ This module provides base classes for handling component-specific geometry inclu
 - Component dimensions
 """
 
-from dataclasses import dataclass
-from typing import Dict, Tuple, Optional
 import math
+from dataclasses import dataclass
+from typing import Dict, Optional, Tuple
 
 
 @dataclass
 class PinLocation:
     """Represents a pin's location relative to component center."""
+
     x: float  # X offset from center
     y: float  # Y offset from center
     side: str  # Which side of component (left, right, top, bottom)
@@ -22,6 +23,7 @@ class PinLocation:
 @dataclass
 class ComponentDimensions:
     """Represents a component's dimensions."""
+
     width: float
     height: float
     pin_grid: float = 2.54  # Default grid spacing
@@ -29,7 +31,7 @@ class ComponentDimensions:
 
 class ComponentGeometryHandler:
     """Base class for handling component geometry and pin locations."""
-    
+
     def __init__(self, component_type: str):
         """Initialize with component type."""
         self.component_type = component_type
@@ -47,44 +49,48 @@ class ComponentGeometryHandler:
         # Override in subclasses to define pin locations
         pass
 
-    def get_pin_location(self, pin_number: str, rotation: float = 0) -> Optional[Tuple[float, float]]:
+    def get_pin_location(
+        self, pin_number: str, rotation: float = 0
+    ) -> Optional[Tuple[float, float]]:
         """Get pin location relative to component center, accounting for rotation."""
         if pin_number not in self._pin_locations:
             return None
-            
+
         pin = self._pin_locations[pin_number]
-        
+
         # Apply rotation transformation
         theta = math.radians(rotation)
         rotated_x = pin.x * math.cos(theta) - pin.y * math.sin(theta)
         rotated_y = pin.x * math.sin(theta) + pin.y * math.cos(theta)
-        
+
         return (rotated_x, rotated_y)
 
-    def get_bounding_box(self, x: float, y: float, rotation: float) -> Tuple[float, float, float, float]:
+    def get_bounding_box(
+        self, x: float, y: float, rotation: float
+    ) -> Tuple[float, float, float, float]:
         """Get component bounding box at given position and rotation."""
         width = self._dimensions.width
         height = self._dimensions.height
-        
+
         # For 90/270 degree rotations, swap width and height
         if rotation in [90, 270]:
             width, height = height, width
-            
+
         # Calculate corners relative to center
-        left = x - width/2
-        top = y - height/2
-        
+        left = x - width / 2
+        top = y - height / 2
+
         return (left, top, width, height)
 
 
 class ResistorGeometryHandler(ComponentGeometryHandler):
     """Geometry handler for resistor components."""
-    
+
     def _get_default_dimensions(self) -> ComponentDimensions:
         """Get resistor-specific dimensions."""
         dims = ComponentDimensions(
-            width=5.08,   # Standard resistor symbol width
-            height=10.16  # Reduced height for better spacing
+            width=5.08,  # Standard resistor symbol width
+            height=10.16,  # Reduced height for better spacing
         )
         print(f"Creating resistor with dimensions: {dims}")
         return dims
@@ -92,25 +98,22 @@ class ResistorGeometryHandler(ComponentGeometryHandler):
     def _setup_pin_locations(self) -> None:
         """Set up resistor pin locations."""
         # Standard resistor has pins at top and bottom center
-        pin1 = PinLocation(x=0, y=5.08, side="top")    # Pin 1 at top
-        pin2 = PinLocation(x=0, y=-5.08, side="bottom") # Pin 2 at bottom
+        pin1 = PinLocation(x=0, y=5.08, side="top")  # Pin 1 at top
+        pin2 = PinLocation(x=0, y=-5.08, side="bottom")  # Pin 2 at bottom
         print(f"Setting up resistor pins:")
         print(f"  Pin 1 at: ({pin1.x}, {pin1.y})")
         print(f"  Pin 2 at: ({pin2.x}, {pin2.y})")
-        self._pin_locations = {
-            "1": pin1,
-            "2": pin2
-        }
+        self._pin_locations = {"1": pin1, "2": pin2}
 
 
 class PowerSymbolGeometryHandler(ComponentGeometryHandler):
     """Geometry handler for power symbols."""
-    
+
     def _get_default_dimensions(self) -> ComponentDimensions:
         """Get power symbol dimensions."""
         dims = ComponentDimensions(
             width=5.08,  # Increased width for better visibility
-            height=5.08  # Increased height for better spacing
+            height=5.08,  # Increased height for better spacing
         )
         print(f"Creating power symbol with dimensions: {dims}")
         return dims
@@ -123,7 +126,9 @@ class PowerSymbolGeometryHandler(ComponentGeometryHandler):
         self._pin_locations = {"1": pin_loc}
 
 
-def create_geometry_handler(component_type: str, library: str) -> ComponentGeometryHandler:
+def create_geometry_handler(
+    component_type: str, library: str
+) -> ComponentGeometryHandler:
     """Factory function to create appropriate geometry handler for component."""
     if library == "Device" and component_type == "R":
         return ResistorGeometryHandler(component_type)

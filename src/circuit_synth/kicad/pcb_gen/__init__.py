@@ -7,4 +7,4 @@ with support for hierarchical component placement.
 
 from .pcb_generator import PCBGenerator
 
-__all__ = ['PCBGenerator']
+__all__ = ["PCBGenerator"]

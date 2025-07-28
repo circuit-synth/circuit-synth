@@ -1,9 +1,11 @@
 # FILE: src/circuit_synth/core/net.py
 
-from typing import Set, Optional
+from typing import Optional, Set
+
+from ._logger import context_logger
 from .decorators import get_current_circuit
 from .exception import CircuitSynthError
-from ._logger import context_logger
+
 
 class Net:
     """

@@ -4,27 +4,18 @@
 [![PyPI version](https://badge.fury.io/py/circuit-synth.svg)](https://badge.fury.io/py/circuit-synth)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Pythonic circuit design for professional KiCad projects
+**Pythonic circuit design for professional KiCad projects**
 
-## Overview
+Generate complete KiCad projects using simple Python code. No DSL to learn - just Python classes and functions that any engineer can read and modify.
 
-Circuit Synth is an open-source Python library that fits seamlessly into normal EE workflows without getting too fancy. Unlike domain-specific languages that require learning new syntax, circuit-synth uses simple, transparent Python code that any engineer can understand and modify.
+## 🤖 Optimized for Claude Code
 
-**Core Principles:**
-- **Simple Python Code**: No special DSL to learn - just Python classes and functions
-- **Transparent to Users**: Generated KiCad files are clean and human-readable
-- **Bidirectional Updates**: KiCad can remain the source of truth - import existing projects and export changes back
-- **Normal EE Workflow**: Integrates with existing KiCad-based development processes
+This repository is fully optimized for AI-assisted development with Claude Code:
 
-**Current Status**: Circuit-synth is ready for professional use with the following capabilities:
-- **Full KiCad Integration**: Generate complete KiCad projects with schematics and PCB layouts
-- **Schematic Annotations**: Automatic docstring extraction and manual text annotations with tables
-- **Netlist Generation**: Export industry-standard KiCad netlist files (.net) for seamless PCB workflow
-- **Hierarchical Design Support**: Multi-sheet projects with proper organization and connectivity
-- **Professional Component Management**: Complete footprint, symbol, and library integration
-- Places components functionally (not yet optimized for intelligent board layout)
-- Places schematic parts (without intelligent placement algorithms)
-- Generates working KiCad projects suitable for professional development
+- **🔍 Component Search**: `/find-symbol`, `/find-footprint` - Instantly find KiCad symbols and footprints
+- **🏗️ Circuit Design Agent**: Specialized `circuit-synth` agent for expert guidance on component selection and circuit topology
+- **⚡ Development Commands**: `/dev-run-tests`, `/dev-update-and-commit` - Streamlined development workflow
+- **📋 Pre-configured Permissions**: Skip repetitive approval prompts with curated tool allowlists
 
 ## Example
 
@@ -412,409 +403,100 @@ The agent provides structured feedback on:
 - Net management and naming conventions
 - Pin connection syntax (integer vs string access)
 - Code organization and maintainability
+**Perfect for AI-assisted circuit design - just ask Claude to help you build circuits!**
 
 ## Quick Start
 
-Try circuit-synth immediately without installation:
-
 ```bash
-# Clone the repository
+# Clone and run example
 git clone https://github.com/circuit-synth/circuit-synth.git
 cd circuit-synth
-
-# Run the example (automatically installs dependencies with uv)
 uv run python examples/example_kicad_project.py
 ```
 
-This will generate a complete KiCad project in the `example_kicad_project/` directory, including:
-- Hierarchical schematic files (.kicad_sch)
-- PCB layout file (.kicad_pcb) 
-- KiCad netlist file (.net)
-- JSON netlist file (.json)
+Generates a complete KiCad project with schematics, PCB layout, and netlists.
 
-## KiCad Netlist Generation
+## Example Circuit
 
-Circuit-synth provides industry-standard KiCad netlist generation for seamless PCB layout workflows:
-
-### Basic Netlist Export
 ```python
 from circuit_synth import *
 
-@circuit
-def my_circuit():
-    # Define your circuit...
-    pass
-
-if __name__ == '__main__':
-    circuit = my_circuit()
+@circuit(name="esp32_dev_board")
+def esp32_dev_board():
+    """ESP32 development board with USB-C and power regulation"""
     
-    # Generate KiCad netlist (.net file)
-    circuit.generate_kicad_netlist("my_circuit.net")
+    # Create power nets
+    VCC_5V = Net('VCC_5V')
+    VCC_3V3 = Net('VCC_3V3') 
+    GND = Net('GND')
     
-    # Generate JSON netlist for analysis
-    circuit.generate_json_netlist("my_circuit.json")
+    # ESP32 module (use /find-symbol ESP32 to find the right symbol)
+    esp32 = Component(
+        symbol="RF_Module:ESP32-S3-MINI-1",
+        ref="U1",
+        footprint="RF_Module:ESP32-S3-MINI-1"
+    )
+    
+    # Voltage regulator (use /find-footprint SOT23 to find footprint)
+    vreg = Component(
+        symbol="Regulator_Linear:AMS1117-3.3",
+        ref="U2", 
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+    )
+    
+    # Connections
+    esp32["3V3"] += VCC_3V3
+    esp32["GND"] += GND
+    vreg["VIN"] += VCC_5V
+    vreg["VOUT"] += VCC_3V3
+    vreg["GND"] += GND
+
+# Generate KiCad project
+circuit = esp32_dev_board()
+circuit.generate_kicad_project("esp32_dev")
 ```
 
-### Features
-- **Industry Standard Format**: Generates KiCad-compatible .net files
-- **Hierarchical Design Support**: Multi-sheet projects with proper organization  
-- **Complete Component Data**: Includes footprints, values, datasheets, and library references
-- **Perfect KiCad Import**: Zero warnings, zero errors when importing into KiCad
-- **Scalable**: Works with simple 3-component circuits to complex 20+ component systems
+## Key Features
 
-### Verification
-All generated netlists are validated through KiCad import:
-```
-Reading netlist file 'my_circuit.net'. 
-Using reference designators to match symbols and footprints.
-Processing symbol 'U1:RF_Module:ESP32-S2-MINI-1'.
-...
-Total warnings: 0, errors: 0.
-```
-
-### Integration with PCB Workflow
-1. **Design in Python**: Define circuits using circuit-synth syntax
-2. **Generate Netlist**: Export to KiCad-compatible .net format
-3. **Import to KiCad**: Load netlist directly into KiCad PCB editor
-4. **Layout PCB**: Use KiCad's routing and placement tools
-5. **Manufacturing**: Generate Gerber files and assembly drawings
+- **🐍 Pure Python**: Standard Python syntax - no DSL to learn
+- **🔄 Bidirectional KiCad Integration**: Import existing projects, export clean KiCad files
+- **📋 Professional Netlists**: Generate industry-standard KiCad .net files
+- **🏗️ Hierarchical Design**: Multi-sheet projects with proper organization
+- **📝 Smart Annotations**: Automatic docstring extraction + manual text/tables
+- **⚡ Rust-Accelerated**: Fast symbol lookup and placement algorithms
 
 ## Installation
 
-### Using PyPI (Recommended)
-
+**PyPI (Recommended):**
 ```bash
-# Install from PyPI
 pip install circuit-synth
-
-# Or using uv (faster)
-uv pip install circuit-synth
+# or: uv pip install circuit-synth
 ```
 
-### Development Installation
-
-For development work:
-
+**Development:**
 ```bash
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Clone and install
 git clone https://github.com/circuit-synth/circuit-synth.git
 cd circuit-synth
-pip install -e ".[dev]"
+uv sync  # or: pip install -e ".[dev]"
 ```
 
-### Development Setup
-
-For development work:
-
+**Docker:**
 ```bash
-# Clone the repository
-git clone https://github.com/circuit-synth/circuit-synth.git
-cd circuit-synth
-
-# Install with development dependencies using uv
-uv sync
-
-# Or with pip
-pip install -e ".[dev]"
-```
-
-### Using Docker
-
-Circuit-synth can be run in Docker containers with full KiCad library support:
-
-```bash
-# Build the Docker image
 ./docker/build-docker.sh
-
-# Run any circuit-synth command in Docker
 ./scripts/circuit-synth-docker python examples/example_kicad_project.py
-
-# Run with interactive shell
-./scripts/circuit-synth-docker --interactive bash
-
-# Run without KiCad libraries (faster startup)
-./scripts/circuit-synth-docker --no-libs python -c "import circuit_synth; print('Ready!')"
 ```
-
-**Docker Features:**
-- Pre-configured environment with all dependencies
-- Official KiCad symbol and footprint libraries included
-- Automatic file persistence to local `output/` directory
-- Security through non-root user execution
-- Two Dockerfile options: simplified Python-only (main) and full Rust build (`docker/Dockerfile.rust-build`)
-
-**Docker Commands:**
-```bash
-# Universal command runner
-./scripts/circuit-synth-docker <any-python-command>
-
-# KiCad library-specific runner
-./scripts/run-with-kicad.sh --official-libs
-
-# Docker Compose services (from docker/ directory)
-cd docker && docker-compose up circuit-synth        # Basic service
-cd docker && docker-compose up circuit-synth-dev    # Development mode
-cd docker && docker-compose up circuit-synth-test   # Test runner
-```
-
-**Docker Build Options:**
-```bash
-# Quick Python-only build (recommended)
-./docker/build-docker.sh
-
-# Full build with Rust modules (advanced users)
-docker build -f docker/Dockerfile.rust-build -t circuit-synth-rust .
-
-# Windows users
-./docker/build-docker.bat
-```
-
-#### Docker Attribution
-
-The Docker implementation is a collaborative effort:
-- **Original implementation**: Kumuda Subramanyam Govardhanam (@KumudaSG) - comprehensive Rust module compilation support
-- **Enhancements**: KiCad library integration, simplified Python-only build, universal command runners, and build automation
-
-## Documentation
-
-Full documentation is available at [https://circuit-synth.readthedocs.io](https://circuit-synth.readthedocs.io)
 
 ## Contributing
 
-We welcome contributions! Here's how to get started:
+We welcome contributions! See [CLAUDE.md](CLAUDE.md) for development setup and coding standards.
 
-### Development Setup
-
-**Prerequisites:**
-- Python 3.9 or higher
-- [uv](https://docs.astral.sh/uv/) (recommended package manager)
-- Git
-
-**Getting Started:**
-
-1. **Fork and clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/circuit-synth.git
-   cd circuit-synth
-   ```
-
-2. **Install dependencies (recommended with uv):**
-   ```bash
-   # Install the project in development mode
-   uv pip install -e ".[dev]"
-   
-   # Install dependencies
-   uv sync
-   ```
-
-3. **Alternative installation with pip:**
-   ```bash
-   # Create and activate virtual environment
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   
-   # Install in development mode
-   pip install -e ".[dev]"
-   ```
-
-**Development Guidelines:**
-- Follow existing code style and patterns
-- Write tests for new functionality
-- Update documentation as needed
-- Test your changes with `uv run python examples/example_kicad_project.py`
-- Use the Docker environment for testing: `./scripts/circuit-synth-docker python examples/example_kicad_project.py`
-
-## Manual Testing Checklist
-
-**Run these manual tests on every major change to ensure system integrity:**
-
-### 1. Core Example Script Testing
-
-**Local Environment:**
+**Quick start:**
 ```bash
-# Run the primary example script locally
-uv run python examples/example_kicad_project.py
-
-# Verify generated files exist
-ls -la example_kicad_project/
+git clone https://github.com/yourusername/circuit-synth.git
+cd circuit-synth
+uv sync
+uv run python examples/example_kicad_project.py  # Test your setup
 ```
-
-**Docker Environment:**
-```bash
-# Test the same script in Docker environment
-./scripts/circuit-synth-docker python examples/example_kicad_project.py
-
-# Verify files are generated in Docker context
-./scripts/circuit-synth-docker ls -la example_kicad_project/
-```
-
-**Verification Steps:**
-- ✅ Script completes without errors
-- ✅ Generates complete KiCad project directory
-- ✅ Creates `.kicad_sch`, `.kicad_pcb`, `.kicad_pro`, and `.net` files
-- ✅ Annotation system debug output appears (docstring extraction)
-
-### 2. KiCad Project Inspection
-
-**Open Generated Project in KiCad:**
-```bash
-# Open the generated project
-kicad example_kicad_project/example_kicad_project.kicad_pro
-```
-
-**Schematic Verification:**
-- ✅ All components are placed and visible
-- ✅ Net connections are correct (no unconnected pins)
-- ✅ Hierarchical structure is properly organized
-- ✅ Annotations appear as text boxes with docstring content
-- ✅ Component references are sequential and logical (R1, R2, C1, C2, etc.)
-- ✅ Net names are clean and descriptive (5V, 3V3, GND, USB_DM, etc.)
-
-**PCB Layout Verification:**
-- ✅ All components are placed on PCB (not overlapping)
-- ✅ All nets have proper connectivity (ratsnest shows connections)
-- ✅ Footprints are correct and match schematic symbols
-- ✅ Bounding boxes are drawn around components (if `draw_bounding_boxes=True`)
-
-### 3. Docker Command Testing
-
-**Basic Docker Commands:**
-```bash
-# Test help command
-./scripts/circuit-synth-docker --help
-
-# Test version information
-./scripts/circuit-synth-docker python -c "import circuit_synth; print(circuit_synth.__version__)"
-
-# Test package installation status
-./scripts/circuit-synth-docker pip list | grep circuit-synth
-```
-
-**File System Operations:**
-```bash
-# Test file creation and access
-./scripts/circuit-synth-docker touch test_file.txt
-./scripts/circuit-synth-docker ls -la test_file.txt
-./scripts/circuit-synth-docker rm test_file.txt
-```
-
-### 4. Regression Test Suite
-
-**Automated Test Execution:**
-```bash
-# Run unit tests
-uv run pytest tests/unit/test_core_circuit.py -v
-
-# Run functional tests
-cd tests/functional_tests/test_01_resistor_divider && uv run python test_netlist_comparison.py
-cd tests/functional_tests/test_02_import_resistor_divider && uv run python test_kicad_import.py  
-cd tests/functional_tests/test_03_round_trip_python_kicad_python && uv run python test_round_trip.py
-cd tests/functional_tests/test_04_nested_kicad_sch_import && uv run python test_complex_hierarchical_structure.py
-
-# Run integration tests
-uv run pytest tests/kicad_netlist_exporter/test_sheet_hierarchy.py -v
-uv run pytest tests/kicad_netlist_exporter/test_netlist_exporter_basics.py -v
-```
-
-**Success Criteria:**
-- ✅ All unit tests pass (18/18)
-- ✅ All functional tests complete successfully
-- ✅ Integration tests pass without errors
-- ✅ No regression in existing functionality
-
-### 5. System Integration Verification
-
-**Web Dashboard (if available):**
-```bash
-# Test dashboard startup
-uv run circuit-synth-web
-# Verify: Dashboard starts without critical errors
-```
-
-**LLM Analysis Pipeline:**
-```bash
-# Test analysis system availability
-uv run python -m circuit_synth.intelligence.scripts.llm_circuit_analysis --help
-# Verify: Help output appears, no import errors
-```
-
-### 6. Advanced Validation
-
-**Hierarchical Structure Testing:**
-- ✅ Test complex hierarchical projects (3+ levels deep)
-- ✅ Verify proper nested import chains in generated Python
-- ✅ Confirm parameter passing through hierarchy levels
-- ✅ Check that KiCad→Python→KiCad round-trip preserves structure
-
-**Bidirectional Sync Testing:**
-- ✅ Import existing KiCad project to Python
-- ✅ Modify Python code and regenerate KiCad
-- ✅ Verify changes appear correctly in KiCad
-- ✅ Test that manual KiCad changes can be preserved
-
-**Component and Net Validation:**
-- ✅ Test various component types (resistors, capacitors, ICs, connectors)
-- ✅ Verify footprint assignments are correct
-- ✅ Check net naming conventions and cleanup
-- ✅ Test pin mapping for complex components (ESP32, connectors)
-
-### 7. Performance and Resource Testing
-
-**Resource Usage:**
-```bash
-# Monitor memory usage during generation
-time uv run python examples/example_kicad_project.py
-
-# Check generated file sizes are reasonable
-du -h example_kicad_project/
-```
-
-**Docker Performance:**
-```bash
-# Test Docker startup time
-time ./scripts/circuit-synth-docker echo "Docker ready"
-
-# Compare Docker vs local execution time  
-time ./scripts/circuit-synth-docker python examples/example_kicad_project.py
-```
-
-### 8. Error Handling and Edge Cases
-
-**Error Condition Testing:**
-- ✅ Test with invalid component references
-- ✅ Test with missing footprints or symbols
-- ✅ Test with circular hierarchical dependencies
-- ✅ Verify graceful error messages and recovery
-
-**Edge Case Validation:**
-- ✅ Test empty circuits
-- ✅ Test very large circuits (100+ components)
-- ✅ Test circuits with no nets
-- ✅ Test circuits with only power nets
-
-## Manual Testing Frequency
-
-**Before Each Commit:**
-- Run core example script (local + Docker)
-- Execute unit tests
-- Verify no regressions in key functionality
-
-**Before Each Release:**
-- Complete full manual testing checklist
-- Perform KiCad project inspection
-- Run entire regression test suite
-- Test Docker commands and environment
-- Validate hierarchical and bidirectional features
-
-**After Major Refactoring:**
-- Execute complete testing checklist
-- Additional focus on changed subsystems
-- Performance regression testing
-- Cross-platform validation (if applicable)
 
 ## License
 

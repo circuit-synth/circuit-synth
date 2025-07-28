@@ -5,17 +5,20 @@ Parses a KiCad .kicad_sym library file and returns a dictionary of flattened sym
 Handles "extends" inheritance by merging parent symbol data into the child.
 """
 
-import os
 import logging
-from pathlib import Path
-from typing import Dict, Any, List, Optional, Set
-import sexpdata
+import os
 from copy import deepcopy
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set
+
+import sexpdata
 
 logger = logging.getLogger(__name__)
 
+
 class ParseError(Exception):
     pass
+
 
 def parse_kicad_sym_file(file_path: str) -> Dict[str, Any]:
     """
@@ -79,9 +82,7 @@ def parse_kicad_sym_file(file_path: str) -> Dict[str, Any]:
     for name, data in library_dict.items():
         flattened_symbols[name] = _flatten_symbol(name, data, library_dict)
 
-    return {
-        "symbols": flattened_symbols
-    }
+    return {"symbols": flattened_symbols}
 
 
 def _parse_symbol_body(name: str, body: List[Any]) -> Dict[str, Any]:
@@ -94,14 +95,14 @@ def _parse_symbol_body(name: str, body: List[Any]) -> Dict[str, Any]:
     result: Dict[str, Any] = {
         "name": name,
         "extends": None,
-        "properties": {},       # map property_name -> string (generic storage)
-        "description": None,    # Specific field for Description property
-        "datasheet": None,      # Specific field for Datasheet property
-        "keywords": None,       # Specific field for Keywords property
-        "fp_filters": None,     # Specific field for ki_fp_filters property
-        "graphics": [],         # list of shapes
-        "pins": [],             # list of pin definitions
-        "sub_symbols": [],      # sub-symbol blocks (like name_0_1)
+        "properties": {},  # map property_name -> string (generic storage)
+        "description": None,  # Specific field for Description property
+        "datasheet": None,  # Specific field for Datasheet property
+        "keywords": None,  # Specific field for Keywords property
+        "fp_filters": None,  # Specific field for ki_fp_filters property
+        "graphics": [],  # list of shapes
+        "pins": [],  # list of pin definitions
+        "sub_symbols": [],  # sub-symbol blocks (like name_0_1)
         "is_power": False,
     }
 
@@ -125,7 +126,7 @@ def _parse_symbol_body(name: str, body: List[Any]) -> Dict[str, Any]:
                     result["datasheet"] = prop_value
                 elif prop_name_lower == "keywords":
                     result["keywords"] = prop_value
-                elif prop_name_lower == "ki_fp_filters": # KiCad standard name
+                elif prop_name_lower == "ki_fp_filters":  # KiCad standard name
                     result["fp_filters"] = prop_value
 
         elif k == "extends":
@@ -165,11 +166,7 @@ def _parse_subsymbol(sub_name: str, body: List[Any]) -> Dict[str, Any]:
     Sub-symbol blocks often contain additional pins or shapes.
     Example: (symbol "Ammeter_AC_0_1" (pin ...) (arc ...) (rectangle ...) ...)
     """
-    sub_data = {
-        "sub_name": sub_name,
-        "pins": [],
-        "graphics": []
-    }
+    sub_data = {"sub_name": sub_name, "pins": [], "graphics": []}
     for e in body:
         if not isinstance(e, list) or not e:
             continue
@@ -227,7 +224,7 @@ def _parse_pin(pin_list: List[Any]) -> Optional[Dict[str, Any]]:
             "x": x,
             "y": y,
             "orientation": orientation,
-            "length": length
+            "length": length,
         }
     except Exception as e:
         logger.warning(f"Error parsing pin: {e}")
@@ -242,14 +239,14 @@ def _parse_graphic_element(elem: List[Any]) -> Dict[str, Any]:
     shape_type = _key(elem[0])
     shape_data = {
         "shape_type": shape_type,
-        "points": [],       # for polyline or arcs
+        "points": [],  # for polyline or arcs
         "start": None,
         "end": None,
-        "center": None,     # for circles
-        "radius": None,     # for circles
+        "center": None,  # for circles
+        "radius": None,  # for circles
         "stroke_width": 0.254,
         "stroke_type": "default",
-        "fill_type": "none"
+        "fill_type": "none",
     }
 
     # parse subitems
@@ -314,7 +311,10 @@ def _resolve_extends_in_library(library_dict: Dict[str, Any]) -> None:
     for sym_name in list(library_dict.keys()):
         _resolve_symbol_extends(sym_name, library_dict, visited)
 
-def _resolve_symbol_extends(sym_name: str, library_dict: Dict[str, Any], visited: Set[str]) -> None:
+
+def _resolve_symbol_extends(
+    sym_name: str, library_dict: Dict[str, Any], visited: Set[str]
+) -> None:
     if sym_name in visited:
         return
     visited.add(sym_name)
@@ -336,8 +336,8 @@ def _resolve_symbol_extends(sym_name: str, library_dict: Dict[str, Any], visited
 def _merge_parent_into_child(child: Dict[str, Any], parent: Dict[str, Any]) -> None:
     """
     Merge parent's properties, pins, sub_symbols, graphics into child if child does not override them.
-    For example, if child has no pins, we take parent's pins. 
-    If child has some pins, we can optionally combine them. 
+    For example, if child has no pins, we take parent's pins.
+    If child has some pins, we can optionally combine them.
     (Exact rules can vary by your preference.)
     """
     # Merge properties
@@ -361,9 +361,10 @@ def _merge_parent_into_child(child: Dict[str, Any], parent: Dict[str, Any]) -> N
     if parent.get("is_power"):
         child["is_power"] = True
 
-def _flatten_symbol(sym_name: str,
-                    sym_data: Dict[str, Any],
-                    library_dict: Dict[str, Any]) -> Dict[str, Any]:
+
+def _flatten_symbol(
+    sym_name: str, sym_data: Dict[str, Any], library_dict: Dict[str, Any]
+) -> Dict[str, Any]:
     """
     Turn the final, merged data for a symbol into a JSON-serializable dict
     with shape:
@@ -395,7 +396,7 @@ def _flatten_symbol(sym_name: str,
         "fp_filters": sym_data["fp_filters"],
         "pins": pins,
         "graphics": graphics,
-        "is_power": sym_data["is_power"]
+        "is_power": sym_data["is_power"],
     }
 
 

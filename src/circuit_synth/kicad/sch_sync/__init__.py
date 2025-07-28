@@ -11,16 +11,16 @@ Key Components:
 - SchematicUpdater: Updates KiCad schematics while preserving user placement
 """
 
-from .synchronizer import SchematicSynchronizer, SyncReport
 from .component_matcher import ComponentMatcher, MatchResult
-from .schematic_updater import SchematicUpdater, ComponentUpdate, PlacementInfo
+from .schematic_updater import ComponentUpdate, PlacementInfo, SchematicUpdater
+from .synchronizer import SchematicSynchronizer, SyncReport
 
 __all__ = [
-    'SchematicSynchronizer',
-    'SyncReport',
-    'ComponentMatcher',
-    'MatchResult',
-    'SchematicUpdater',
-    'ComponentUpdate',
-    'PlacementInfo'
+    "SchematicSynchronizer",
+    "SyncReport",
+    "ComponentMatcher",
+    "MatchResult",
+    "SchematicUpdater",
+    "ComponentUpdate",
+    "PlacementInfo",
 ]

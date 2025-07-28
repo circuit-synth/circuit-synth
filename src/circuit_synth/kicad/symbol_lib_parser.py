@@ -1,19 +1,19 @@
 # FILE: src/circuit_synth/kicad/symbol_lib_parser.py
 # Unified KiCad symbol parser with graphic elements, pin data, inheritance.
 
-import os
 import logging
-import sexpdata
-from typing import Any, Dict, List, Optional, Set
-from copy import deepcopy
+import os
 import uuid
-
+from copy import deepcopy
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Set
+
+import sexpdata
 
 from circuit_synth.core.exception import (
     LibraryNotFound,
-    SymbolNotFoundError,
     ParseError,
+    SymbolNotFoundError,
 )
 
 logger = logging.getLogger(__name__)
@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class KicadSymbolPin:
     """Represents a pin in a KiCad symbol."""
+
     pin_id: str
     name: str
     number: str
@@ -47,7 +48,7 @@ class KicadSymbolPin:
         }
 
     @classmethod
-    def from_simple_dict(cls, d: Dict[str, Any]) -> 'KicadSymbolPin':
+    def from_simple_dict(cls, d: Dict[str, Any]) -> "KicadSymbolPin":
         """Recreate a pin object from a dict produced by `to_simple_dict()`."""
         return cls(**d)
 
@@ -55,9 +56,10 @@ class KicadSymbolPin:
 @dataclass
 class GraphicElement:
     """Represents a graphical shape in a KiCad symbol (rectangle, circle, arc, etc.)."""
-    shape_type: str               # "rectangle", "circle", "arc", "polyline", ...
+
+    shape_type: str  # "rectangle", "circle", "arc", "polyline", ...
     start: Optional[List[float]]  # e.g. [x, y]
-    end: Optional[List[float]]    # e.g. [x, y]
+    end: Optional[List[float]]  # e.g. [x, y]
     mid: Optional[List[float]] = None  # Add midpoint for arcs
     points: List[List[float]] = field(default_factory=list)  # For polylines
     radius: Optional[float] = None  # For circles
@@ -80,7 +82,7 @@ class GraphicElement:
         }
 
     @classmethod
-    def from_simple_dict(cls, d: Dict[str, Any]) -> 'GraphicElement':
+    def from_simple_dict(cls, d: Dict[str, Any]) -> "GraphicElement":
         """Recreate a graphic object from a dict produced by `to_simple_dict()`."""
         return cls(
             shape_type=d["shape_type"],
@@ -91,7 +93,7 @@ class GraphicElement:
             radius=d.get("radius"),  # Restore radius from dict
             stroke_width=d.get("stroke_width", 0.254),
             stroke_type=d.get("stroke_type", "default"),
-            fill_type=d.get("fill_type", "none")
+            fill_type=d.get("fill_type", "none"),
         )
 
 
@@ -101,6 +103,7 @@ class KicadSymbol:
     Represents a KiCad symbol with its properties, pins, graphics, etc.
     Now also stores 'pin_numbers' mode and a 'pin_names_offset' float if found.
     """
+
     name: str
     reference: str
     properties: Dict[str, str] = field(default_factory=dict)
@@ -111,17 +114,16 @@ class KicadSymbol:
     is_power: bool = False
 
     # Additional fields to capture KiCad-style symbol-level settings:
-    pin_numbers: Optional[str] = None            # e.g. "hide"
-    pin_names_offset: Optional[float] = None     # e.g. 0.254
+    pin_numbers: Optional[str] = None  # e.g. "hide"
+    pin_names_offset: Optional[float] = None  # e.g. 0.254
 
-    def merge_parent(self, parent: 'KicadSymbol') -> None:
+    def merge_parent(self, parent: "KicadSymbol") -> None:
         """
         Merge parent's attributes into this symbol if extends=parent.
         Child overrides where it has data; otherwise inherits parent's data.
         """
         logger.debug(
-            "Merging parent symbol '%s' into child '%s'",
-            parent.name, self.name
+            "Merging parent symbol '%s' into child '%s'", parent.name, self.name
         )
         # Merge properties
         for k, v in parent.properties.items():
@@ -176,12 +178,14 @@ class KicadSymbol:
         }
 
     @classmethod
-    def from_simple_dict(cls, data: Dict[str, Any]) -> 'KicadSymbol':
+    def from_simple_dict(cls, data: Dict[str, Any]) -> "KicadSymbol":
         """
         Rebuild a KicadSymbol from a dictionary that came from `to_simple_dict()`.
         """
         pins = [KicadSymbolPin.from_simple_dict(pd) for pd in data.get("pins", [])]
-        graphics = [GraphicElement.from_simple_dict(gd) for gd in data.get("graphics", [])]
+        graphics = [
+            GraphicElement.from_simple_dict(gd) for gd in data.get("graphics", [])
+        ]
 
         # Recreate `units` => dict of int -> list of KicadSymbolPin
         units_raw = data.get("units", {})
@@ -227,7 +231,6 @@ class KicadSymbolParser:
             cls._instance._initialize()
         return cls._instance
 
-
     def _parse_file(self, filepath: str) -> Dict[str, KicadSymbol]:
         """
         Parse entire .kicad_sym file => dict: {symbol_name: KicadSymbol}
@@ -248,9 +251,12 @@ class KicadSymbolParser:
 
         # pass 1: read symbol definitions
         for item in sexp[1:]:
-            if (isinstance(item, list) and item
-                    and hasattr(item[0], "value")
-                    and item[0].value().lower() == "symbol"):
+            if (
+                isinstance(item, list)
+                and item
+                and hasattr(item[0], "value")
+                and item[0].value().lower() == "symbol"
+            ):
                 # item => (symbol "Name" ... )
                 if len(item) < 2:
                     continue
@@ -309,7 +315,9 @@ class KicadSymbolParser:
                 # e.g. (pin_numbers hide)
                 if len(elem) >= 2:
                     pin_numbers_mode = str(elem[1])
-                    logger.debug("Found pin_numbers='%s' in symbol '%s'", pin_numbers_mode, name)
+                    logger.debug(
+                        "Found pin_numbers='%s' in symbol '%s'", pin_numbers_mode, name
+                    )
 
             elif key == "pin_names":
                 # e.g. (pin_names (offset 0.254))
@@ -320,7 +328,11 @@ class KicadSymbolParser:
                     sub_k = self._get_key(sub_el[0])
                     if sub_k == "offset" and len(sub_el) >= 2:
                         pin_names_offset = float(sub_el[1])
-                        logger.debug("Found pin_names offset=%.3f in symbol '%s'", pin_names_offset, name)
+                        logger.debug(
+                            "Found pin_names offset=%.3f in symbol '%s'",
+                            pin_names_offset,
+                            name,
+                        )
 
             elif key in ("rectangle", "circle", "arc", "polyline", "text", "bezier"):
                 g = self._parse_graphic_element(elem)
@@ -356,15 +368,20 @@ class KicadSymbolParser:
             extends=extends,
             is_power=is_power,
             pin_numbers=pin_numbers_mode,
-            pin_names_offset=pin_names_offset
+            pin_names_offset=pin_names_offset,
         )
         logger.debug(
             "Parsed symbol '%s': reference='%s', pin_numbers=%s, pin_names_offset=%s",
-            name, reference, pin_numbers_mode, pin_names_offset
+            name,
+            reference,
+            pin_numbers_mode,
+            pin_names_offset,
         )
         return sym
 
-    def _parse_subsymbol(self, sub_name: str, sub_body: List[Any]) -> (List[KicadSymbolPin], List[GraphicElement]):
+    def _parse_subsymbol(
+        self, sub_name: str, sub_body: List[Any]
+    ) -> (List[KicadSymbolPin], List[GraphicElement]):
         """Parse a child (symbol ...) block that usually holds pins, shapes, etc."""
         sub_pins: List[KicadSymbolPin] = []
         sub_graphics: List[GraphicElement] = []
@@ -432,11 +449,18 @@ class KicadSymbolParser:
                 x=x,
                 y=y,
                 length=length,
-                orientation=orientation
+                orientation=orientation,
             )
             logger.debug(
                 "Parsed pin: name='%s', number='%s', func='%s', (x=%.2f,y=%.2f), ori=%d, length=%.2f, unit=%d",
-                name, number, function, x, y, orientation, length, unit
+                name,
+                number,
+                function,
+                x,
+                y,
+                orientation,
+                length,
+                unit,
             )
             return pin_obj
 
@@ -464,7 +488,7 @@ class KicadSymbolParser:
         for sub in elem[1:]:
             if not isinstance(sub, list) or not sub:
                 continue
-                
+
             sub_key = self._get_key(sub[0])
             if sub_key in ("start", "center"):
                 # circle uses (center x y)
@@ -477,7 +501,11 @@ class KicadSymbolParser:
                 radius = float(sub[1])
             elif sub_key == "pts":  # Extract points for polylines
                 for pt in sub[1:]:
-                    if isinstance(pt, list) and len(pt) >= 3 and self._get_key(pt[0]) == "xy":
+                    if (
+                        isinstance(pt, list)
+                        and len(pt) >= 3
+                        and self._get_key(pt[0]) == "xy"
+                    ):
                         points.append([float(pt[1]), float(pt[2])])
             elif sub_key == "stroke":
                 for st_item in sub[1:]:
@@ -503,10 +531,10 @@ class KicadSymbolParser:
             radius=radius,  # Include radius
             stroke_width=stroke_w,
             stroke_type=stroke_t,
-            fill_type=fill_t
+            fill_type=fill_t,
         )
         return g_elem
-    
+
     def _parse_property_elem(self, elem: List[Any], prop_dict: Dict[str, str]) -> None:
         """
         Parse something like:
@@ -521,10 +549,10 @@ class KicadSymbolParser:
             return
         prop_name = str(elem[1])
         prop_value = str(elem[2])
-        
+
         # Store the property with both original case and lowercase key for case-insensitive access
         prop_dict[prop_name] = prop_value  # store with original case
-        
+
         # For important properties like "Description", also store with a standardized lowercase key
         # This ensures tests can reliably access these properties regardless of case variations
         if prop_name.lower() == "description":
@@ -535,20 +563,26 @@ class KicadSymbolParser:
 
         # If we want to parse the (at x y r) inside:
         for sub_el in elem[3:]:
-            if (isinstance(sub_el, list) and sub_el
-                    and hasattr(sub_el[0], "value")
-                    and sub_el[0].value().lower() == "at"):
+            if (
+                isinstance(sub_el, list)
+                and sub_el
+                and hasattr(sub_el[0], "value")
+                and sub_el[0].value().lower() == "at"
+            ):
                 # e.g. (at 0.635 2.54 0)
                 # For debugging/logging, you could store it in prop_dict as well:
                 coords = [0.0, 0.0, 0.0]
                 for i in range(1, len(sub_el)):
                     try:
-                        coords[i-1] = float(sub_el[i])
+                        coords[i - 1] = float(sub_el[i])
                     except ValueError:
                         pass
                 logger.debug(
                     "Property '%s' has offset at=(%.3f, %.3f, %.3f)",
-                    prop_name, coords[0], coords[1], coords[2]
+                    prop_name,
+                    coords[0],
+                    coords[1],
+                    coords[2],
                 )
                 # Optionally store in prop_dict:
                 prop_dict[f"{prop_name}_offset"] = str(coords)
@@ -562,7 +596,9 @@ class KicadSymbolParser:
         for sym_name in list(all_symbols.keys()):
             self._resolve_extends_for_symbol(sym_name, all_symbols, visited)
 
-    def _resolve_extends_for_symbol(self, sym_name: str, all_symbols: Dict[str, KicadSymbol], visited: Set[str]) -> None:
+    def _resolve_extends_for_symbol(
+        self, sym_name: str, all_symbols: Dict[str, KicadSymbol], visited: Set[str]
+    ) -> None:
         if sym_name in visited:
             return
         visited.add(sym_name)
@@ -616,18 +652,18 @@ class KicadSymbolParser:
         """
         # Import here to avoid circular imports
         from .kicad_symbol_cache import SymbolLibCache
-        
+
         # Use the enhanced cache to find the library
         lib_path = SymbolLibCache._find_kicad_sym_file(lib_name)
         if lib_path:
             return str(lib_path)
-        
+
         # Fallback to environment variable search
         kicad_dir = os.environ.get("KICAD_SYMBOL_DIR", "")
         candidates = []
         if kicad_dir:
             candidates.append(os.path.join(kicad_dir, f"{lib_name}.kicad_sym"))
-        
+
         for c in candidates:
             if os.path.isfile(c):
                 return c
@@ -641,7 +677,9 @@ class KicadSymbolParser:
         try:
             lib_name, sym_name = symbol_id.split(":")
         except ValueError:
-            raise ValueError(f"Invalid symbol_id format; expected 'LibName:SymbolName', got '{symbol_id}'")
+            raise ValueError(
+                f"Invalid symbol_id format; expected 'LibName:SymbolName', got '{symbol_id}'"
+            )
 
         # Find the library file
         lib_path = self._find_kicad_sym_file(lib_name)
@@ -650,9 +688,11 @@ class KicadSymbolParser:
 
         # Parse the entire library file
         all_symbols = self._parse_file(lib_path)
-        
+
         # Return the specific symbol
         if sym_name not in all_symbols:
-            raise SymbolNotFoundError(f"Symbol '{sym_name}' not found in library '{lib_name}'")
-        
+            raise SymbolNotFoundError(
+                f"Symbol '{sym_name}' not found in library '{lib_name}'"
+            )
+
         return all_symbols[sym_name]

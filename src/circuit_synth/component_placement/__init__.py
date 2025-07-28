@@ -5,30 +5,26 @@ Provides geometry utilities, automated placement algorithms,
 and wire routing functionality for KiCad schematics.
 """
 
+from .force_directed_layout import (
+    ForceDirectedLayout,
+    ForceVector,
+)
 from .geometry import (
-    PinLocation,
     ComponentDimensions,
     ComponentGeometryHandler,
-    ResistorGeometryHandler,
+    PinLocation,
     PowerSymbolGeometryHandler,
+    ResistorGeometryHandler,
     create_geometry_handler,
 )
-
 from .placement import (
-    PlacementNode,
     ComponentPlacer,
+    PlacementNode,
 )
-
 from .wire_routing import (
-    WireSegment,
     WireRouter,
+    WireSegment,
 )
-
-from .force_directed_layout import (
-    ForceVector,
-    ForceDirectedLayout,
-)
-
 
 __all__ = [
     "PinLocation",

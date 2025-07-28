@@ -6,7 +6,9 @@
 # We leave a stub for potential expansions.
 
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 class HierarchyManager:
     def __init__(self, top_circuit):

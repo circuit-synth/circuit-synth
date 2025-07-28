@@ -1,0 +1,17 @@
+{
+  "allowedTools": [
+    "Edit",
+    "Read", 
+    "Write",
+    "Bash(git*)",
+    "Bash(gh*)",
+    "Bash(docker*)",
+    "Bash(uv*)",
+    "Bash(pytest*)",
+    "Bash(black*)",
+    "Bash(isort*)",
+    "Bash(flake8*)",
+    "Bash(mypy*)"
+  ],
+  "description": "Circuit-synth project settings with pre-approved development tools"
+}

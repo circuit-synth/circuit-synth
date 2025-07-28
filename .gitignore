@@ -49,6 +49,9 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# Claude Code local settings
+.claude/local.md
+
 # Translations
 *.mo
 *.pot

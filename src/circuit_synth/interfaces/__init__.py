@@ -2,11 +2,11 @@
 Abstract interfaces for extensibility
 """
 
-from .kicad_interface import IKiCadIntegration, KiCadGenerationConfig
 from .circuit_interface import ICircuitModel
+from .kicad_interface import IKiCadIntegration, KiCadGenerationConfig
 
 __all__ = [
-    'IKiCadIntegration',
-    'KiCadGenerationConfig',
-    'ICircuitModel',
+    "IKiCadIntegration",
+    "KiCadGenerationConfig",
+    "ICircuitModel",
 ]
