@@ -12,10 +12,18 @@ import sys
 # Add the source directory to the path so we can import circuit_synth
 sys.path.insert(0, os.path.abspath('../src'))
 
-project = 'Circuit Synth'
-copyright = '2024, Circuit Synth Contributors'
+project = 'Circuit-Synth'
+copyright = '2025, Circuit Synth Contributors'
 author = 'Circuit Synth Contributors'
-release = '0.1.0'
+
+# Get version from the package
+try:
+    import circuit_synth
+    release = circuit_synth.__version__
+    version = '.'.join(release.split('.')[:2])  # Short version (e.g., "0.1")
+except ImportError:
+    release = '0.1.0'
+    version = '0.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

@@ -126,5 +126,9 @@ markers = [
 [dependency-groups]
 dev = [
     "build>=1.2.2.post1",
+    "myst-parser>=3.0.1",
+    "sphinx>=7.4.7",
+    "sphinx-autodoc-typehints>=2.3.0",
+    "sphinx-rtd-theme>=3.0.2",
     "twine>=6.1.0",
 ]
