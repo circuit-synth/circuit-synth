@@ -29,20 +29,12 @@ jobs:
         sudo apt update
         sudo apt install --install-recommends kicad --yes
     
-    - name: Install KiCad Symbol Libraries
+    - name: Verify KiCad Symbol Libraries
       run: |
-        echo "📦 Installing KiCad symbol libraries from repository..."
-        # Create symbols directory
-        sudo mkdir -p /usr/share/kicad/symbols
-        
-        # Copy symbol libraries from our repository
-        echo "📋 Installing symbol libraries..."
-        sudo cp tests/test_data/kicad_symbols/*.kicad_sym /usr/share/kicad/symbols/
-        
-        echo "✅ Installed $(sudo find /usr/share/kicad/symbols -name "*.kicad_sym" | wc -l) symbol libraries"
-        echo "📋 Total size: $(sudo du -sh /usr/share/kicad/symbols | cut -f1)"
-        echo "📁 Files installed:"
-        sudo ls -la /usr/share/kicad/symbols/
+        echo "📦 Verifying KiCad symbol libraries in repository..."
+        echo "📁 Files in test data:"
+        ls -la tests/test_data/kicad_symbols/
+        echo "📋 Total files: $(find tests/test_data/kicad_symbols -name "*.kicad_sym" | wc -l)"
 
     - name: Install dependencies
       run: |
@@ -65,19 +57,17 @@ jobs:
 
     - name: Debug KiCad Symbol Detection
       env:
-        KICAD_SYMBOL_DIR: /usr/share/kicad/symbols
+        KICAD_SYMBOL_DIR: ${{ github.workspace }}/tests/test_data/kicad_symbols
       run: |
         echo "🔍 Debugging KiCad symbol detection..."
         echo "KICAD_SYMBOL_DIR environment variable: ${KICAD_SYMBOL_DIR:-'not set'}"
-        echo "Checking standard KiCad paths:"
-        for path in "/usr/share/kicad/symbols" "/usr/local/share/kicad/symbols" "/usr/share/kicad/library"; do
-          if [ -d "$path" ]; then
-            echo "✅ $path exists with $(find "$path" -name "*.kicad_sym" 2>/dev/null | wc -l) symbol files"
-            ls "$path"/*.kicad_sym 2>/dev/null | head -3 || echo "No .kicad_sym files found"
-          else
-            echo "❌ $path does not exist"
-          fi
-        done
+        echo "Checking test data path:"
+        if [ -d "${KICAD_SYMBOL_DIR}" ]; then
+            echo "✅ ${KICAD_SYMBOL_DIR} exists with $(find "${KICAD_SYMBOL_DIR}" -name "*.kicad_sym" 2>/dev/null | wc -l) symbol files"
+            ls "${KICAD_SYMBOL_DIR}"/*.kicad_sym 2>/dev/null || echo "No .kicad_sym files found"
+        else
+            echo "❌ ${KICAD_SYMBOL_DIR} does not exist"
+        fi
         
         # Test symbol cache directly
         echo "🧪 Testing symbol cache directly..."
@@ -105,7 +95,7 @@ except Exception as e:
 
     - name: Run tests with pytest
       env:
-        KICAD_SYMBOL_DIR: /usr/share/kicad/symbols
+        KICAD_SYMBOL_DIR: ${{ github.workspace }}/tests/test_data/kicad_symbols
       run: |
         uv run pytest --cov=circuit_synth --cov-report=xml --cov-report=term-missing -v
 

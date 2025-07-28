@@ -83,12 +83,10 @@ jobs:
         sudo apt update
         sudo apt install --install-recommends kicad --yes
     
-    - name: Install KiCad Symbol Libraries
+    - name: Verify KiCad Symbol Libraries
       run: |
-        echo "📦 Installing KiCad symbol libraries from repository..."
-        sudo mkdir -p /usr/share/kicad/symbols
-        sudo cp tests/test_data/kicad_symbols/*.kicad_sym /usr/share/kicad/symbols/
-        echo "✅ Installed $(sudo find /usr/share/kicad/symbols -name "*.kicad_sym" | wc -l) libraries"
+        echo "📦 Verifying KiCad symbol libraries in repository..."
+        ls -la tests/test_data/kicad_symbols/
 
     - name: Install dependencies
       run: |
@@ -97,7 +95,7 @@ jobs:
 
     - name: Run tests with pytest
       env:
-        KICAD_SYMBOL_DIR: /usr/share/kicad/symbols
+        KICAD_SYMBOL_DIR: ${{ github.workspace }}/tests/test_data/kicad_symbols
       run: |
         uv run pytest --cov=circuit_synth --cov-report=xml --cov-report=term-missing -v
 
