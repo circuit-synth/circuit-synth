@@ -5,7 +5,6 @@ import pytest
 import shutil
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 from circuit_synth.core.exception import LibraryNotFound
-from tests.conftest import require_kicad
 
 class TestKicadSymbolCache(unittest.TestCase):
     """Test the new SymbolLibCache functionality for loading KiCad symbols."""
@@ -21,7 +20,6 @@ class TestKicadSymbolCache(unittest.TestCase):
         SymbolLibCache._library_index.clear()
         SymbolLibCache._index_built = False
 
-    @require_kicad
     def test_basic_resistor(self):
         """Test loading a basic resistor symbol (Device:R)"""
         data = SymbolLibCache.get_symbol_data("Device:R")
@@ -36,7 +34,6 @@ class TestKicadSymbolCache(unittest.TestCase):
         # Not a power symbol
         self.assertFalse(data["is_power"], "Resistor is not a power symbol")
 
-    @require_kicad
     def test_resistor_network(self):
         """Test loading a complex resistor network symbol"""
         data = SymbolLibCache.get_symbol_data("Device:R_Network12_Split")
@@ -49,7 +46,6 @@ class TestKicadSymbolCache(unittest.TestCase):
         self.assertIn("network", data.get("description", "").lower(),
                      "Expected 'network' in description")
 
-    @require_kicad
     def test_power_symbols(self):
         """Test loading power symbols like GND and +3V3"""
         # Test GND symbol
@@ -62,7 +58,6 @@ class TestKicadSymbolCache(unittest.TestCase):
         self.assertTrue(v3_data["is_power"], "+3V3 is a power symbol")
         self.assertEqual(len(v3_data["pins"]), 1, "+3V3 typically has 1 pin")
 
-    @require_kicad
     def test_linear_regulator_inheritance(self):
         """Test that inherited symbols maintain consistent structure"""
         parent_data = SymbolLibCache.get_symbol_data("Regulator_Linear:AP1117-15")
@@ -75,7 +70,6 @@ class TestKicadSymbolCache(unittest.TestCase):
             "Child regulator should have same pin count as parent"
         )
 
-    @require_kicad
     def test_symbol_cache(self):
         """Test that the caching mechanism works"""
         # First load should parse the file
