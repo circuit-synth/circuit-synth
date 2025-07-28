@@ -27,15 +27,30 @@ jobs:
       run: |
         sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
         sudo apt update
-        sudo apt install --install-recommends kicad kicad-libraries --yes
+        sudo apt install --install-recommends kicad --yes
     
-    - name: Verify KiCad symbol libraries installation
+    - name: Download Required KiCad Symbol Libraries
       run: |
-        echo "Looking for KiCad symbol directories..."
-        find /usr -name "symbols" -type d 2>/dev/null | grep -i kicad || true
-        find /usr -name "library" -type d 2>/dev/null | grep -i kicad || true
-        find /usr -name "*.kicad_sym" 2>/dev/null | head -5 || true
-        ls -la /usr/share/kicad/ || true
+        echo "📦 Downloading required KiCad symbol libraries from GitLab..."
+        # Create symbols directory
+        sudo mkdir -p /usr/share/kicad/symbols
+        
+        # Download only the specific libraries we need for testing
+        echo "📋 Downloading Device.kicad_sym..."
+        sudo wget -q -O /usr/share/kicad/symbols/Device.kicad_sym \
+          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/Device.kicad_sym"
+        
+        echo "📋 Downloading power.kicad_sym..."
+        sudo wget -q -O /usr/share/kicad/symbols/power.kicad_sym \
+          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/power.kicad_sym"
+        
+        echo "📋 Downloading Regulator_Linear.kicad_sym..."
+        sudo wget -q -O /usr/share/kicad/symbols/Regulator_Linear.kicad_sym \
+          "https://gitlab.com/kicad/libraries/kicad-symbols/-/raw/master/Regulator_Linear.kicad_sym"
+        
+        echo "✅ Symbol libraries downloaded"
+        echo "📊 Downloaded $(sudo find /usr/share/kicad/symbols -name "*.kicad_sym" | wc -l) symbol libraries"
+        echo "📋 Size: $(sudo du -sh /usr/share/kicad/symbols | cut -f1)"
 
     - name: Install dependencies
       run: |
