@@ -64,6 +64,8 @@ jobs:
       run: uv run isort --check-only src/
 
     - name: Debug KiCad Symbol Detection
+      env:
+        KICAD_SYMBOL_DIR: /usr/share/kicad/symbols
       run: |
         echo "🔍 Debugging KiCad symbol detection..."
         echo "KICAD_SYMBOL_DIR environment variable: ${KICAD_SYMBOL_DIR:-'not set'}"
@@ -89,15 +91,21 @@ try:
         cache._build_complete_index()
         print(f'Built index with {len(cache._library_index)} libraries')
         print(f'Libraries found: {list(cache._library_index.keys())}')
+        
+        # Test loading a specific symbol
+        data = SymbolLibCache.get_symbol_data('Device:R')
+        print(f'✅ Successfully loaded Device:R with {len(data[\"pins\"])} pins')
     else:
-        print('No KiCad symbol directories found!')
+        print('❌ No KiCad symbol directories found!')
 except Exception as e:
-    print(f'Error: {e}')
+    print(f'❌ Error: {e}')
     import traceback
     traceback.print_exc()
 "
 
     - name: Run tests with pytest
+      env:
+        KICAD_SYMBOL_DIR: /usr/share/kicad/symbols
       run: |
         uv run pytest --cov=circuit_synth --cov-report=xml --cov-report=term-missing -v
 
