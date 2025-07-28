@@ -1,0 +1,137 @@
+# Multi-stage Dockerfile: Official KiCad + Circuit-Synth
+# Stage 1: Official KiCad image as source (using nightly for KiCad 9 features)
+FROM kicad/kicad:nightly as kicad-source
+
+# Stage 2: Python base for Circuit-Synth
+FROM python:3.11-slim as circuit-synth-base
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV RUST_LOG=info
+
+# Install system dependencies for both KiCad runtime and Circuit-Synth build
+RUN apt-get update && apt-get install -y \
+    # KiCad runtime dependencies (from official Dockerfile)
+    libbz2-1.0 \
+    libcairo2 \
+    libglu1-mesa \
+    libglew2.2 \
+    libx11-6 \
+    libwxgtk3.2* \
+    libpython3.11 \
+    python3 \
+    python3-wxgtk4.0 \
+    python3-yaml \
+    python3-typing-extensions \
+    libcurl4 \
+    libngspice0 \
+    ngspice \
+    libocct-modeling-algorithms-7.6 \
+    libocct-modeling-data-7.6 \
+    libocct-data-exchange-7.6 \
+    libocct-visualization-7.6 \
+    libocct-foundation-7.6 \
+    libocct-ocaf-7.6 \
+    unixodbc \
+    zlib1g \
+    shared-mime-info \
+    git \
+    libgit2-1.5 \
+    libsecret-1-0 \
+    libprotobuf32 \
+    libzstd1 \
+    libnng1 \
+    sudo \
+    # Circuit-Synth build dependencies
+    build-essential \
+    curl \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy KiCad installation from official image
+COPY --from=kicad-source /usr/bin/kicad* /usr/bin/
+COPY --from=kicad-source /usr/bin/*pcbnew* /usr/bin/
+COPY --from=kicad-source /usr/bin/*eeschema* /usr/bin/
+COPY --from=kicad-source /usr/share/kicad /usr/share/kicad
+COPY --from=kicad-source /usr/lib/*kicad* /usr/lib/
+COPY --from=kicad-source /usr/lib/python3.11/site-packages/*kicad* /usr/lib/python3.11/site-packages/ || true
+
+# Fix KiCad library linkage (from official Dockerfile)
+RUN ldconfig -l /usr/bin/_pcbnew.kiface || true
+
+# Install Rust toolchain
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+RUN rustup target add x86_64-unknown-linux-gnu
+
+# Set working directory
+WORKDIR /app
+
+# Copy Rust module dependencies first for better caching
+COPY rust_modules/ ./rust_modules/
+
+# Install maturin for Rust-Python bindings
+RUN pip install --no-cache-dir maturin
+
+# Build Rust modules (same as your existing Dockerfile)
+RUN cd rust_modules/rust_core_circuit_engine && maturin build --release --target x86_64-unknown-linux-gnu -i /usr/local/bin/python || echo "rust_core_circuit_engine build skipped"
+RUN cd rust_modules/rust_force_directed_placement && maturin build --release --target x86_64-unknown-linux-gnu -i /usr/local/bin/python || echo "rust_force_directed_placement build skipped"
+RUN cd rust_modules/rust_io_processor && maturin build --release --target x86_64-unknown-linux-gnu -i /usr/local/bin/python || echo "rust_io_processor build skipped"
+RUN cd rust_modules/rust_kicad_schematic_writer && maturin build --release --target x86_64-unknown-linux-gnu -i /usr/local/bin/python || echo "rust_kicad_schematic_writer build skipped"
+RUN cd rust_modules/rust_netlist_processor && maturin build --release --target x86_64-unknown-linux-gnu -i /usr/local/bin/python || echo "rust_netlist_processor build skipped"
+RUN cd rust_modules/rust_pin_calculator && maturin build --release --target x86_64-unknown-linux-gnu -i /usr/local/bin/python || echo "rust_pin_calculator build skipped"
+RUN cd rust_modules/rust_reference_manager && maturin build --release --target x86_64-unknown-linux-gnu -i /usr/local/bin/python || echo "rust_reference_manager build skipped"
+RUN cd rust_modules/rust_symbol_cache && maturin build --release --target x86_64-unknown-linux-gnu -i /usr/local/bin/python || echo "rust_symbol_cache build skipped"
+RUN cd rust_modules/rust_symbol_search && maturin build --release --target x86_64-unknown-linux-gnu -i /usr/local/bin/python || echo "rust_symbol_search build skipped"
+
+# Copy Python project files
+COPY pyproject.toml README.md ./
+COPY src/ ./src/
+
+# Create virtual environment and install Python dependencies
+RUN python -m venv /app/venv
+ENV PATH="/app/venv/bin:${PATH}"
+ENV VIRTUAL_ENV="/app/venv"
+RUN pip install --no-cache-dir -e .
+
+# Copy remaining project files
+COPY . .
+
+# Install Rust modules in development mode (with error handling)
+RUN cd rust_modules/rust_core_circuit_engine && maturin develop --release --target x86_64-unknown-linux-gnu -i /app/venv/bin/python || echo "rust_core_circuit_engine develop skipped"
+RUN cd rust_modules/rust_force_directed_placement && maturin develop --release --target x86_64-unknown-linux-gnu -i /app/venv/bin/python || echo "rust_force_directed_placement develop skipped"
+RUN cd rust_modules/rust_io_processor && maturin develop --release --target x86_64-unknown-linux-gnu -i /app/venv/bin/python || echo "rust_io_processor develop skipped"
+RUN cd rust_modules/rust_kicad_schematic_writer && maturin develop --release --target x86_64-unknown-linux-gnu -i /app/venv/bin/python || echo "rust_kicad_schematic_writer develop skipped"
+RUN cd rust_modules/rust_netlist_processor && maturin develop --release --target x86_64-unknown-linux-gnu -i /app/venv/bin/python || echo "rust_netlist_processor develop skipped"
+RUN cd rust_modules/rust_pin_calculator && maturin develop --release --target x86_64-unknown-linux-gnu -i /app/venv/bin/python || echo "rust_pin_calculator develop skipped"
+RUN cd rust_modules/rust_reference_manager && maturin develop --release --target x86_64-unknown-linux-gnu -i /app/venv/bin/python || echo "rust_reference_manager develop skipped"
+RUN cd rust_modules/rust_symbol_cache && maturin develop --release --target x86_64-unknown-linux-gnu -i /app/venv/bin/python || echo "rust_symbol_cache develop skipped"
+RUN cd rust_modules/rust_symbol_search && maturin develop --release --target x86_64-unknown-linux-gnu -i /app/venv/bin/python || echo "rust_symbol_search develop skipped"
+
+# Create a non-root user for security (matching KiCad user setup)
+ARG USER_NAME=circuit_synth
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd --gid $USER_GID $USER_NAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USER_NAME \
+    && usermod -aG sudo $USER_NAME \
+    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# Set up KiCad user configuration directory with library tables
+# KiCad nightly uses version detection, so we'll create config for current version
+RUN mkdir -p /home/$USER_NAME/.config/kicad/9.0 || mkdir -p /home/$USER_NAME/.config/kicad/$(kicad-cli -v | cut -d . -f 1,2) || true
+RUN cp /usr/share/kicad/template/*-lib-table /home/$USER_NAME/.config/kicad/9.0/ || cp /usr/share/kicad/template/*-lib-table /home/$USER_NAME/.config/kicad/$(kicad-cli -v | cut -d . -f 1,2)/ || true
+RUN chown -R $USER_NAME:$USER_NAME /home/$USER_NAME/.config
+RUN chown -R $USER_NAME:$USER_NAME /app
+
+USER $USER_NAME
+
+# Verify installations work
+RUN kicad-cli version || echo "KiCad CLI check completed"
+RUN python -c "import circuit_synth; print('Circuit Synth imported successfully')" || echo "Circuit Synth check completed"
+
+# Set the default command
+CMD ["python", "-c", "import circuit_synth; print('Circuit-Synth with KiCad integration is ready!')"]

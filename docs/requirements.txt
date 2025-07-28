@@ -1,5 +1,25 @@
-# Documentation build requirements
-sphinx>=5.0.0
+# Documentation build requirements for Read the Docs
+sphinx>=5.0,<9.0
 sphinx-rtd-theme>=1.0.0
 myst-parser>=0.18.0
 sphinx-autodoc-typehints>=1.19.0
+
+# Core dependencies (minimum versions for docs)
+numpy>=1.20.0
+scipy>=1.7.0
+matplotlib>=3.3.0
+networkx>=2.6.0
+pydantic>=2.0.0
+PyYAML>=5.4.0
+click>=8.0.0
+rich>=10.0.0
+loguru>=0.5.0
+psutil>=5.9.0
+cachetools>=5.3.0
+sexpdata>=0.0.3
+aiohttp>=3.9.0
+aiofiles>=23.2.0
+
+# Mock heavy dependencies that aren't needed for docs
+# google-adk>=0.1.0
+# google-genai>=0.1.0

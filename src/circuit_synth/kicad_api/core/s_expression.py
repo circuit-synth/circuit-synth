@@ -101,7 +101,7 @@ class SExpressionParser:
         # Format with proper indentation
         return self._format_sexp(data)
     
-    def _format_sexp(self, sexp: Any, indent: int = 0, parent_tag: str = None, in_number: bool = False, in_project: bool = False, in_instances: bool = False, in_page: bool = False, in_property_value: bool = False, in_property_name: bool = False, in_generator: bool = False, in_symbol: bool = False, in_lib_symbols: bool = False, in_name: bool = False) -> str:
+    def _format_sexp(self, sexp: Any, indent: int = 0, parent_tag: str = None, in_number: bool = False, in_project: bool = False, in_instances: bool = False, in_page: bool = False, in_property_value: bool = False, in_property_name: bool = False, in_generator: bool = False, in_symbol: bool = False, in_lib_symbols: bool = False, in_name: bool = False, in_text: bool = False) -> str:
         """Format S-expression with proper indentation.
         
         Args:
@@ -117,6 +117,7 @@ class SExpressionParser:
             in_generator: True if we're formatting a generator value
             in_symbol: True if we're formatting a symbol library ID
             in_lib_symbols: True if we're inside a lib_symbols section
+            in_text: True if we're formatting text content
         """
         if not isinstance(sexp, list):
             # Handle symbols and values
@@ -150,9 +151,16 @@ class SExpressionParser:
                 # Symbol library IDs must always be quoted
                 if in_symbol:
                     return '"' + sexp + '"'
+                # Text content must always be quoted
+                if in_text:
+                    # Properly escape newlines and quotes for KiCad format
+                    escaped = sexp.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+                    return '"' + escaped + '"'
                 # Quote strings if they contain spaces or special characters
                 if ' ' in sexp or '\n' in sexp or '"' in sexp or '/' in sexp:
-                    return '"' + sexp.replace('"', '\\"') + '"'
+                    # Properly escape newlines and quotes for KiCad format
+                    escaped = sexp.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+                    return '"' + escaped + '"'
                 # Library IDs with colons (like "Device:R") should be quoted when in symbol context
                 if ':' in sexp and not ' ' in sexp:
                     return sexp
@@ -213,6 +221,8 @@ class SExpressionParser:
         is_generator_expr = (tag_name == "generator")
         # Check if this is a lib_symbols expression
         is_lib_symbols_expr = (tag_name == "lib_symbols")
+        # Check if this is a text expression
+        is_text_expr = (tag_name == "text")
         
         if is_simple:
             # Format on one line
@@ -248,6 +258,9 @@ class SExpressionParser:
                 elif is_generator_expr and i == 1:
                     # For generator expressions, the value at index 1 should be quoted
                     parts.append(self._format_sexp(item, indent, tag_name, in_generator=True, in_instances=in_instances))
+                elif is_text_expr and i == 1:
+                    # For text expressions, the text content at index 1 should be quoted
+                    parts.append(self._format_sexp(item, indent, tag_name, in_text=True, in_instances=in_instances))
                 else:
                     parts.append(self._format_sexp(item, indent, tag_name, in_instances=in_instances))
             return "(" + " ".join(parts) + ")"
@@ -302,6 +315,9 @@ class SExpressionParser:
                     elif is_generator_expr and i == 1:
                         # For generator expressions, the value at index 1 should be quoted
                         result += "\n" + "\t" * (indent + 1) + self._format_sexp(item, indent + 1, tag_name, in_generator=True, in_instances=in_instances)
+                    elif is_text_expr and i == 1:
+                        # For text expressions, the text content at index 1 should be quoted
+                        result += "\n" + "\t" * (indent + 1) + self._format_sexp(item, indent + 1, tag_name, in_text=True, in_instances=in_instances)
                     else:
                         result += "\n" + "\t" * (indent + 1) + self._format_sexp(item, indent + 1, tag_name, in_number=False, in_instances=in_instances)
             result += "\n" + "\t" * indent + ")"
@@ -426,6 +442,10 @@ class SExpressionParser:
         # Add rectangles
         for rectangle in schematic.rectangles:
             sexp.append(self._rectangle_to_sexp(rectangle))
+        
+        # Add text elements (including TextBox)
+        for text in schematic.texts:
+            sexp.append(self._text_to_sexp(text))
         
         # Add sheet_instances only once
         
@@ -1211,3 +1231,146 @@ class SExpressionParser:
             stroke_section.append([sexpdata.Symbol("color"), rect.stroke_color])
         
         return sexp
+
+    def _text_to_sexp(self, text) -> List:
+        """Convert Text element to S-expression (either text or text_box)."""
+        # Check if this is a TextBox (has special attributes)
+        if hasattr(text, '_is_textbox') and text._is_textbox:
+            return self._textbox_to_sexp(text)
+        else:
+            return self._simple_text_to_sexp(text)
+
+    def _textbox_to_sexp(self, text) -> List:
+        """Convert TextBox to KiCad text_box S-expression format."""
+        print(f"DEBUG: Converting textbox to S-expression with position ({text.position.x}, {text.position.y})")
+        # Based on your example format
+        sexp = [
+            sexpdata.Symbol("text_box"),
+            text.content,  # The text content
+            [sexpdata.Symbol("exclude_from_sim"), sexpdata.Symbol("yes")],
+            [sexpdata.Symbol("at"), text.position.x, text.position.y, text.orientation],
+            [sexpdata.Symbol("size"), text._textbox_size[0], text._textbox_size[1]],
+            [sexpdata.Symbol("margins")] + list(text._textbox_margins),
+        ]
+        
+        # Add stroke (border) section
+        stroke_section = [sexpdata.Symbol("stroke")]
+        if text._textbox_border:
+            stroke_section.extend([
+                [sexpdata.Symbol("width"), 0.1],  # Default border width
+                [sexpdata.Symbol("type"), sexpdata.Symbol("solid")]
+            ])
+        else:
+            stroke_section.extend([
+                [sexpdata.Symbol("width"), 0],
+                [sexpdata.Symbol("type"), sexpdata.Symbol("solid")]
+            ])
+        sexp.append(stroke_section)
+        
+        # Add fill (background) section
+        fill_section = [sexpdata.Symbol("fill")]
+        if text._textbox_background:
+            # Convert background color name to RGB
+            bg_color = self._color_name_to_rgb(text._textbox_background_color)
+            fill_section.extend([
+                [sexpdata.Symbol("type"), sexpdata.Symbol("color")],
+                [sexpdata.Symbol("color")] + bg_color + [1]  # RGB + alpha
+            ])
+        else:
+            fill_section.append([sexpdata.Symbol("type"), sexpdata.Symbol("none")])
+        sexp.append(fill_section)
+        
+        # Add text effects
+        effects_section = [sexpdata.Symbol("effects")]
+        font_section = [sexpdata.Symbol("font")]
+        font_section.extend([
+            [sexpdata.Symbol("size"), text.size, text.size],
+            [sexpdata.Symbol("thickness"), 0.254]
+        ])
+        
+        # Add bold/italic if specified
+        if hasattr(text, '_text_bold') and text._text_bold:
+            font_section.append([sexpdata.Symbol("bold"), sexpdata.Symbol("yes")])
+        if hasattr(text, '_text_color') and text._text_color:
+            color_rgb = self._color_name_to_rgb(text._text_color)
+            font_section.append([sexpdata.Symbol("color")] + color_rgb + [1])
+            
+        effects_section.append(font_section)
+        effects_section.append([sexpdata.Symbol("justify"), sexpdata.Symbol("left"), sexpdata.Symbol("top")])
+        sexp.append(effects_section)
+        
+        # Add UUID
+        sexp.append([sexpdata.Symbol("uuid"), text._textbox_uuid])
+        
+        return sexp
+
+    def _simple_text_to_sexp(self, text) -> List:
+        """Convert simple Text to KiCad text S-expression format."""
+        sexp = [
+            sexpdata.Symbol("text"),
+            text.content,
+            [sexpdata.Symbol("exclude_from_sim"), sexpdata.Symbol("yes")],
+            [sexpdata.Symbol("at"), text.position.x, text.position.y, text.orientation]
+        ]
+        
+        # Add text effects
+        effects_section = [sexpdata.Symbol("effects")]
+        font_section = [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), text.size, text.size]]
+        
+        # Add bold/italic if specified
+        if hasattr(text, '_text_bold') and text._text_bold:
+            font_section.append([sexpdata.Symbol("bold"), sexpdata.Symbol("yes")])
+        if hasattr(text, '_text_italic') and text._text_italic:
+            font_section.append([sexpdata.Symbol("italic"), sexpdata.Symbol("yes")])
+        if hasattr(text, '_text_color') and text._text_color:
+            color_rgb = self._color_name_to_rgb(text._text_color)
+            font_section.append([sexpdata.Symbol("color")] + color_rgb + [1])
+            
+        effects_section.append(font_section)
+        sexp.append(effects_section)
+        
+        # Add UUID
+        if hasattr(text, '_text_uuid'):
+            sexp.append([sexpdata.Symbol("uuid"), text._text_uuid])
+        elif hasattr(text, 'uuid'):
+            sexp.append([sexpdata.Symbol("uuid"), text.uuid])
+        else:
+            import uuid as uuid_module
+            sexp.append([sexpdata.Symbol("uuid"), str(uuid_module.uuid4())])
+        
+        return sexp
+
+    def _color_name_to_rgb(self, color_name: str) -> List[int]:
+        """Convert color name to RGB values (0-255)."""
+        color_map = {
+            'black': [0, 0, 0],
+            'white': [255, 255, 255],
+            'red': [255, 0, 0],
+            'green': [0, 255, 0],
+            'blue': [0, 0, 255],
+            'yellow': [255, 255, 0],
+            'cyan': [0, 255, 255],
+            'magenta': [255, 0, 255],
+            'lightyellow': [255, 255, 224],
+            'lightgray': [211, 211, 211],
+            'gray': [128, 128, 128],
+            'darkgray': [64, 64, 64]
+        }
+        
+        if color_name.lower() in color_map:
+            return color_map[color_name.lower()]
+        
+        # Try to parse hex color
+        if color_name.startswith('#'):
+            try:
+                hex_color = color_name[1:]
+                if len(hex_color) == 6:
+                    r = int(hex_color[0:2], 16)
+                    g = int(hex_color[2:4], 16) 
+                    b = int(hex_color[4:6], 16)
+                    return [r, g, b]
+            except ValueError:
+                pass
+        
+        # Default to black
+        return [0, 0, 0]

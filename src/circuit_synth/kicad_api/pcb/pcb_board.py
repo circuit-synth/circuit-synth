@@ -2113,10 +2113,56 @@ class PCBBoard:
                         elif attr_value == 'through_hole':
                             footprint.attr = 'through_hole'
             
+            # Extract 3D model information
+            if 'model' in library_data:
+                for model_data in library_data['model']:
+                    model_info = self._parse_library_model(model_data)
+                    if model_info:
+                        footprint.model_path = model_info['path']
+                        footprint.model_offset = model_info.get('offset', (0.0, 0.0, 0.0))
+                        footprint.model_scale = model_info.get('scale', (1.0, 1.0, 1.0))
+                        footprint.model_rotate = model_info.get('rotate', (0.0, 0.0, 0.0))
+                        logger.debug(f"Added 3D model {model_info['path']} to footprint {reference}")
+                        break  # Use first model for now
+            
             return footprint
             
         except Exception as e:
             logger.error(f"Error creating footprint from library data: {e}")
+            return None
+    
+    def _parse_library_model(self, model_data: Union[List, Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        """Parse 3D model data from library format."""
+        try:
+            # model_data is like ['path/to/model.wrl', ['offset', ['xyz', x, y, z]], ['scale', ['xyz', sx, sy, sz]], ['rotate', ['xyz', rx, ry, rz]]]
+            if not isinstance(model_data, list) or len(model_data) < 1:
+                logger.error(f"Invalid model data format: {model_data}")
+                return None
+            
+            model_path = str(model_data[0])
+            model_info = {'path': model_path}
+            
+            # Parse offset, scale, rotate
+            for item in model_data[1:]:
+                if isinstance(item, list) and len(item) >= 2:
+                    param_type = str(item[0])
+                    if param_type in ['offset', 'scale', 'rotate'] and len(item) > 1:
+                        if isinstance(item[1], list) and len(item[1]) >= 4:
+                            # Format: ['xyz', x, y, z]
+                            xyz_data = item[1]
+                            if str(xyz_data[0]) == 'xyz' and len(xyz_data) >= 4:
+                                try:
+                                    x = float(xyz_data[1])
+                                    y = float(xyz_data[2])
+                                    z = float(xyz_data[3])
+                                    model_info[param_type] = (x, y, z)
+                                except (ValueError, IndexError):
+                                    logger.debug(f"Failed to parse {param_type} values from {xyz_data}")
+            
+            return model_info
+            
+        except Exception as e:
+            logger.error(f"Error parsing model data: {e}")
             return None
 
     def _parse_library_pad(self, pad_data: Union[List, Dict[str, Any]]) -> Optional[Pad]:

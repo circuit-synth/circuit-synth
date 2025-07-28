@@ -26,6 +26,7 @@ from circuit_synth.kicad_api.pcb.routing.freerouting_docker import (
 )
 from circuit_synth.kicad.sch_editor.schematic_reader import SchematicReader
 from circuit_synth.core.circuit import Circuit
+from circuit_synth.pcb.simple_ratsnest import add_ratsnest_to_pcb
 
 logger = logging.getLogger(__name__)
 
@@ -163,7 +164,8 @@ class PCBGenerator:
                      board_size_increment: float = 25.0,  # Reduced from 50.0
                      auto_route: bool = False,  # Disable auto-routing by default (can be slow)
                      routing_passes: int = 4,  # Number of routing passes
-                     routing_effort: float = 1.0) -> bool:  # Routing effort level
+                     routing_effort: float = 1.0,  # Routing effort level
+                     generate_ratsnest: bool = True) -> bool:  # Generate ratsnest connections
         """
         Generate a PCB file from the schematic files in the project.
         
@@ -181,6 +183,7 @@ class PCBGenerator:
             auto_route: If True, automatically route the PCB using Freerouting (default: False)
             routing_passes: Number of routing passes for Freerouting (1-99)
             routing_effort: Routing effort level (0.0-2.0, where 2.0 is maximum)
+            generate_ratsnest: If True, generate ratsnest connections (default: True)
             
         Returns:
             True if successful, False otherwise
@@ -364,6 +367,21 @@ class PCBGenerator:
             # Save PCB file
             pcb.save(self.pcb_path)
             logger.info(f"PCB file saved to: {self.pcb_path}")
+            
+            # Generate ratsnest connections if requested (AFTER PCB save)
+            if generate_ratsnest:
+                logger.info("Generating ratsnest connections...")
+                
+                # Find netlist file
+                netlist_path = self.project_dir / f"{self.project_name}.net"
+                if netlist_path.exists():
+                    success = add_ratsnest_to_pcb(str(self.pcb_path), str(netlist_path))
+                    if success:
+                        logger.info("✓ Ratsnest connections added to PCB")
+                    else:
+                        logger.warning("⚠ No ratsnest connections generated")
+                else:
+                    logger.warning(f"⚠ Netlist file not found: {netlist_path}")
             
             # Update project file to include PCB
             self._update_project_file()
@@ -603,14 +621,23 @@ class PCBGenerator:
         Returns:
             True if netlist was applied, False otherwise
         """
-        # Find netlist file
+        # Find netlist file - check multiple locations
         netlist_path = self.project_dir / f"{self.project_name}.net"
         if not netlist_path.exists():
+            # Check in parent directory where it's commonly generated
+            netlist_path = self.project_dir.parent / f"{self.project_name}.net"
+        if not netlist_path.exists():
             # Check in parent directory with circuit_synth_ prefix
-            netlist_path = self.project_dir.parent.parent / f"circuit_synth_{self.project_name}.net"
+            netlist_path = self.project_dir.parent / f"circuit_synth_{self.project_name}.net"
+        if not netlist_path.exists():
+            # Check in grandparent directory
+            netlist_path = self.project_dir.parent.parent / f"{self.project_name}.net"
         
         if not netlist_path.exists():
             logger.warning(f"No netlist file found for {self.project_name}")
+            logger.warning(f"  Searched in: {self.project_dir}")
+            logger.warning(f"  Searched in: {self.project_dir.parent}")
+            logger.warning(f"  Searched in: {self.project_dir.parent.parent}")
             return False
         
         logger.info(f"Parsing netlist from {netlist_path}")

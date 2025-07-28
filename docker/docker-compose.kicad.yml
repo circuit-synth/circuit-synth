@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  # Main Circuit-Synth service with KiCad integration
+  circuit-synth-kicad:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.kicad-integrated
+    container_name: circuit-synth-kicad
+    volumes:
+      # Mount source code for development
+      - ../src:/app/src
+      - ../examples:/app/examples
+      - ../tests:/app/tests
+      # Mount output directory for generated files
+      - ../output:/app/output
+      # Mount cache directory for persistence
+      - ../cache:/app/cache
+      # Mount KiCad projects directory
+      - ../kicad_projects:/app/kicad_projects
+      # KiCad user config persistence
+      - kicad_config:/home/circuit_synth/.config
+    environment:
+      - PYTHONPATH=/app/src
+      - RUST_LOG=info
+      # KiCad environment variables
+      - KICAD_CONFIG_HOME=/home/circuit_synth/.config/kicad
+      - KICAD_SYMBOL_DIR=/usr/share/kicad/symbols
+      - KICAD_FOOTPRINT_DIR=/usr/share/kicad/footprints
+      - KICAD_3DMODEL_DIR=/usr/share/kicad/3dmodels
+    working_dir: /app
+    command: >
+      python -c "
+      import circuit_synth; 
+      import subprocess;
+      print('Circuit Synth with KiCad integration is ready!');
+      result = subprocess.run(['kicad-cli', 'version'], capture_output=True, text=True);
+      print(f'KiCad CLI Version: {result.stdout.strip()}')
+      "
+    
+  # Development service with interactive shell and KiCad
+  circuit-synth-kicad-dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.kicad-integrated
+    container_name: circuit-synth-kicad-dev
+    volumes:
+      - ../src:/app/src
+      - ../examples:/app/examples
+      - ../tests:/app/tests
+      - ../output:/app/output
+      - ../cache:/app/cache
+      - ../kicad_projects:/app/kicad_projects
+      - kicad_config:/home/circuit_synth/.config
+    environment:
+      - PYTHONPATH=/app/src
+      - RUST_LOG=debug
+      - KICAD_CONFIG_HOME=/home/circuit_synth/.config/kicad
+      - KICAD_SYMBOL_DIR=/usr/share/kicad/symbols
+      - KICAD_FOOTPRINT_DIR=/usr/share/kicad/footprints
+      - KICAD_3DMODEL_DIR=/usr/share/kicad/3dmodels
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+    
+  # Test service with KiCad CLI testing
+  circuit-synth-kicad-test:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.kicad-integrated
+    container_name: circuit-synth-kicad-test
+    volumes:
+      - ../src:/app/src
+      - ../tests:/app/tests
+      - ../test_output:/app/test_output
+      - ../kicad_projects:/app/kicad_projects
+    environment:
+      - PYTHONPATH=/app/src
+      - RUST_LOG=info
+      - KICAD_CONFIG_HOME=/home/circuit_synth/.config/kicad
+      - KICAD_SYMBOL_DIR=/usr/share/kicad/symbols
+      - KICAD_FOOTPRINT_DIR=/usr/share/kicad/footprints
+      - KICAD_3DMODEL_DIR=/usr/share/kicad/3dmodels
+    working_dir: /app
+    command: |
+      bash -c "
+        echo 'Running Circuit-Synth + KiCad integration tests...'
+        kicad-cli version
+        python -c 'import circuit_synth; print(\"Circuit-Synth imported successfully\")'
+        python -m pytest tests/ -v --tb=short
+      "
+
+  # KiCad CLI utilities service (for standalone KiCad operations)
+  kicad-cli:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.kicad-integrated
+    container_name: kicad-cli-utils
+    volumes:
+      - ../kicad_projects:/app/kicad_projects
+      - ../output:/app/output
+      - kicad_config:/home/circuit_synth/.config
+    environment:
+      - KICAD_CONFIG_HOME=/home/circuit_synth/.config/kicad
+      - KICAD_SYMBOL_DIR=/usr/share/kicad/symbols
+      - KICAD_FOOTPRINT_DIR=/usr/share/kicad/footprints
+      - KICAD_3DMODEL_DIR=/usr/share/kicad/3dmodels
+    working_dir: /app/kicad_projects
+    entrypoint: ["kicad-cli"]
+    # Usage: docker-compose -f docker/docker-compose.kicad.yml run kicad-cli sch export pdf --help
+
+volumes:
+  kicad_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/kicad_config
+
+networks:
+  default:
+    name: circuit-synth-kicad-network

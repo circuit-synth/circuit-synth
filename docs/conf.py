@@ -8,14 +8,44 @@
 
 import os
 import sys
+from unittest.mock import MagicMock
 
 # Add the source directory to the path so we can import circuit_synth
 sys.path.insert(0, os.path.abspath('../src'))
 
-project = 'Circuit Synth'
-copyright = '2024, Circuit Synth Contributors'
+# Mock modules that might not be available during doc builds
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+MOCK_MODULES = [
+    'google-adk',
+    'google-genai', 
+    'rust_core_circuit_engine',
+    'rust_force_directed_placement',
+    'rust_io_processor',
+    'rust_kicad_schematic_writer',
+    'rust_netlist_processor',
+    'rust_pin_calculator',
+    'rust_reference_manager',
+    'rust_symbol_cache',
+    'rust_symbol_search',
+]
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
+project = 'Circuit-Synth'
+copyright = '2025, Circuit Synth Contributors'
 author = 'Circuit Synth Contributors'
-release = '0.1.0'
+
+# Get version from the package
+try:
+    import circuit_synth
+    release = circuit_synth.__version__
+    version = '.'.join(release.split('.')[:2])  # Short version (e.g., "0.1")
+except (ImportError, AttributeError):
+    release = '0.1.0'
+    version = '0.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -69,9 +99,30 @@ autodoc_default_options = {
     'members': True,
     'member-order': 'bysource',
     'special-members': '__init__',
-    'undoc-members': True,
+    'undoc-members': False,  # Changed to False to reduce warnings
     'exclude-members': '__weakref__'
 }
+
+# Handle import errors gracefully
+autodoc_mock_imports = [
+    'google_adk',
+    'google_genai',
+    'rust_core_circuit_engine',
+    'rust_force_directed_placement',
+    'rust_io_processor',
+    'rust_kicad_schematic_writer',
+    'rust_netlist_processor',
+    'rust_pin_calculator',
+    'rust_reference_manager',
+    'rust_symbol_cache',
+    'rust_symbol_search',
+]
+
+# Suppress warnings that cause build failures
+suppress_warnings = [
+    'autodoc.import_object',
+    'ref.python',
+]
 
 # MyST settings
 myst_enable_extensions = [

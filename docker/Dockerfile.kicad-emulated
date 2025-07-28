@@ -1,0 +1,137 @@
+# Modern Multi-Platform Docker Solution for KiCad + Circuit-Synth
+# Uses Docker's platform emulation for official KiCad image on any architecture
+
+# Stage 1: Official KiCad image with platform emulation
+FROM --platform=linux/amd64 kicad/kicad:8.0 as kicad-source
+
+# Stage 2: Circuit-Synth on native platform
+FROM python:3.11-slim as circuit-synth-base
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV RUST_LOG=info
+
+# Install system dependencies for KiCad runtime and Circuit-Synth build
+RUN apt-get update && apt-get install -y \
+    # KiCad runtime dependencies (from official Dockerfile)
+    libbz2-1.0 \
+    libcairo2 \
+    libglu1-mesa \
+    libglew2.2 \
+    libx11-6 \
+    libwxgtk3.2* \
+    libpython3.11 \
+    python3 \
+    python3-wxgtk4.0 \
+    python3-yaml \
+    python3-typing-extensions \
+    libcurl4 \
+    libngspice0 \
+    ngspice \
+    libocct-modeling-algorithms-7.6 \
+    libocct-modeling-data-7.6 \
+    libocct-data-exchange-7.6 \
+    libocct-visualization-7.6 \
+    libocct-foundation-7.6 \
+    libocct-ocaf-7.6 \
+    unixodbc \
+    zlib1g \
+    shared-mime-info \
+    git \
+    libgit2-1.5 \
+    libsecret-1-0 \
+    libprotobuf32 \
+    libzstd1 \
+    libnng1 \
+    sudo \
+    # Circuit-Synth build dependencies
+    build-essential \
+    curl \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy KiCad installation from official image (emulated)
+COPY --from=kicad-source /usr/bin/kicad* /usr/bin/
+COPY --from=kicad-source /usr/bin/*pcbnew* /usr/bin/
+COPY --from=kicad-source /usr/bin/*eeschema* /usr/bin/
+COPY --from=kicad-source /usr/share/kicad /usr/share/kicad
+COPY --from=kicad-source /usr/lib/*kicad* /usr/lib/
+COPY --from=kicad-source /usr/lib/python3.11/site-packages/*kicad* /usr/lib/python3.11/site-packages/ || true
+
+# Fix KiCad library linkage (from official Dockerfile)
+RUN ldconfig -l /usr/bin/_pcbnew.kiface || true
+
+# Install Rust toolchain for current architecture
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+RUN rustup target add $(uname -m)-unknown-linux-gnu
+
+# Set working directory
+WORKDIR /app
+
+# Copy Rust module dependencies first for better caching
+COPY rust_modules/ ./rust_modules/
+
+# Install maturin for Rust-Python bindings
+RUN pip install --no-cache-dir maturin
+
+# Build Rust modules with proper error handling
+RUN for module in rust_core_circuit_engine rust_force_directed_placement rust_io_processor rust_kicad_schematic_writer rust_netlist_processor rust_pin_calculator rust_reference_manager rust_symbol_cache rust_symbol_search; do \
+    if [ -d "rust_modules/$module" ]; then \
+        echo "Building $module for $(uname -m)..."; \
+        cd rust_modules/$module && maturin build --release --target $(uname -m)-unknown-linux-gnu -i /usr/local/bin/python || echo "$module build skipped (expected for some modules)"; \
+        cd /app; \
+    else \
+        echo "$module directory not found, skipping"; \
+    fi; \
+done
+
+# Copy Python project files
+COPY pyproject.toml README.md ./
+COPY src/ ./src/
+
+# Create virtual environment and install Python dependencies
+RUN python -m venv /app/venv
+ENV PATH="/app/venv/bin:${PATH}"
+ENV VIRTUAL_ENV="/app/venv"
+RUN pip install --no-cache-dir -e .
+
+# Copy remaining project files
+COPY . .
+
+# Install Rust modules in development mode
+RUN for module in rust_core_circuit_engine rust_force_directed_placement rust_io_processor rust_kicad_schematic_writer rust_netlist_processor rust_pin_calculator rust_reference_manager rust_symbol_cache rust_symbol_search; do \
+    if [ -d "rust_modules/$module" ]; then \
+        echo "Installing $module in development mode..."; \
+        cd rust_modules/$module && maturin develop --release --target $(uname -m)-unknown-linux-gnu -i /app/venv/bin/python || echo "$module develop skipped (expected for some modules)"; \
+        cd /app; \
+    fi; \
+done
+
+# Create non-root user for security (matching KiCad user setup)
+ARG USER_NAME=circuit_synth
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd --gid $USER_GID $USER_NAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USER_NAME \
+    && usermod -aG sudo $USER_NAME \
+    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# Set up KiCad user configuration directory with library tables
+RUN mkdir -p /home/$USER_NAME/.config/kicad/8.0
+RUN cp /usr/share/kicad/template/*-lib-table /home/$USER_NAME/.config/kicad/8.0/ || true
+RUN chown -R $USER_NAME:$USER_NAME /home/$USER_NAME/.config
+RUN chown -R $USER_NAME:$USER_NAME /app
+
+USER $USER_NAME
+
+# Verify installations work
+RUN echo "Architecture: $(uname -m)" && \
+    kicad-cli version && \
+    python -c "import circuit_synth; print('Circuit Synth imported successfully')"
+
+# Set the default command
+CMD ["python", "-c", "import circuit_synth; print('Circuit-Synth with KiCad 8.0 (emulated) is ready!')"]

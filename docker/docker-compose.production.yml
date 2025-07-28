@@ -1,0 +1,164 @@
+# Production-Ready Docker Compose for Circuit-Synth + KiCad
+# Cross-platform compatible with intelligent architecture detection
+
+services:
+  # Main production service
+  circuit-synth:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.kicad-production
+      args:
+        KICAD_VERSION: "9.0"  # Will fallback to 8.0 if 9.0 unavailable
+    image: circuit-synth:production
+    container_name: circuit-synth-production
+    restart: unless-stopped
+    volumes:
+      # Production volume mounts
+      - ../kicad_projects:/app/kicad_projects:rw
+      - ../output:/app/output:rw
+      - kicad_config:/home/circuit_synth/.config:rw
+      - circuit_synth_cache:/app/cache:rw
+    environment:
+      - PYTHONPATH=/app/src
+      - RUST_LOG=info
+      - KICAD_CONFIG_HOME=/home/circuit_synth/.config/kicad
+      - KICAD_SYMBOL_DIR=/usr/share/kicad/symbols
+      - KICAD_FOOTPRINT_DIR=/usr/share/kicad/footprints
+      - KICAD_3DMODEL_DIR=/usr/share/kicad/3dmodels
+      # Production optimizations
+      - PYTHONOPTIMIZE=2
+      - MATURIN_BUILD_ARGS=--release
+    working_dir: /app
+    networks:
+      - circuit-synth-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import circuit_synth; print('healthy')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+  # Development service (inherits from production but with dev overrides)
+  circuit-synth-dev:
+    extends: circuit-synth
+    container_name: circuit-synth-dev
+    restart: "no"
+    volumes:
+      # Development volume mounts (source code editable)
+      - ../src:/app/src:rw
+      - ../examples:/app/examples:rw
+      - ../tests:/app/tests:rw
+      - ../kicad_projects:/app/kicad_projects:rw
+      - ../output:/app/output:rw
+      - kicad_config:/home/circuit_synth/.config:rw
+      - circuit_synth_cache:/app/cache:rw
+    environment:
+      - PYTHONPATH=/app/src
+      - RUST_LOG=debug
+      - KICAD_CONFIG_HOME=/home/circuit_synth/.config/kicad  
+      - KICAD_SYMBOL_DIR=/usr/share/kicad/symbols
+      - KICAD_FOOTPRINT_DIR=/usr/share/kicad/footprints
+      - KICAD_3DMODEL_DIR=/usr/share/kicad/3dmodels
+      # Development optimizations
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
+    tty: true
+    command: ["/bin/bash"]
+    
+  # Testing service
+  circuit-synth-test:
+    extends: circuit-synth
+    container_name: circuit-synth-test
+    restart: "no"
+    volumes:
+      - ../src:/app/src:ro
+      - ../tests:/app/tests:ro
+      - ../test_output:/app/test_output:rw
+      - ../kicad_projects:/app/kicad_projects:ro
+    environment:
+      - PYTHONPATH=/app/src
+      - RUST_LOG=info
+      - KICAD_CONFIG_HOME=/home/circuit_synth/.config/kicad
+      - KICAD_SYMBOL_DIR=/usr/share/kicad/symbols
+      - KICAD_FOOTPRINT_DIR=/usr/share/kicad/footprints
+      - KICAD_3DMODEL_DIR=/usr/share/kicad/3dmodels
+      # Test environment
+      - PYTEST_CURRENT_TEST=""
+    command: |
+      bash -c "
+        echo '🧪 Circuit-Synth Production Test Suite'
+        echo '================================================'
+        echo 'Architecture:' $$(uname -m)
+        echo 'Platform:' $$(python -c 'import platform; print(platform.platform())')
+        
+        echo -e '\n📦 KiCad Integration Check:'
+        kicad-cli version
+        
+        echo -e '\n📚 Library Verification:'
+        echo 'Symbol libraries:' $$(ls /usr/share/kicad/symbols/ | wc -l)
+        echo 'Footprint libraries:' $$(ls /usr/share/kicad/footprints/ | wc -l)
+        
+        echo -e '\n🐍 Circuit-Synth Import Test:'
+        python -c 'import circuit_synth; print(\"✅ Circuit-Synth ready\")'
+        
+        echo -e '\n🔬 Running Core Tests:'
+        python -m pytest tests/unit/test_core_circuit.py -v --tb=short
+        
+        echo -e '\n✅ Production test suite completed'
+      "
+      
+  # KiCad CLI service for standalone operations
+  kicad-cli:
+    extends: circuit-synth
+    container_name: circuit-synth-kicad-cli
+    restart: "no"
+    volumes:
+      - ../kicad_projects:/app/projects:rw
+      - ../output:/app/output:rw
+      - kicad_config:/home/circuit_synth/.config:ro
+    working_dir: /app/projects
+    entrypoint: ["kicad-cli"]
+    command: ["--help"]
+    # Usage: docker-compose run kicad-cli sch export pdf my_project.kicad_sch
+    
+  # Example runner service
+  examples:
+    extends: circuit-synth
+    container_name: circuit-synth-examples
+    restart: "no"
+    volumes:
+      - ../examples:/app/examples:ro
+      - ../output:/app/output:rw
+      - kicad_config:/home/circuit_synth/.config:ro
+    command: |
+      bash -c "
+        echo '🎯 Running Circuit-Synth Example Projects'
+        echo '========================================'
+        
+        if [ -f '/app/examples/example_kicad_project.py' ]; then
+          echo 'Running main example...'
+          timeout 120 python /app/examples/example_kicad_project.py
+          echo 'Generated files:'
+          find /app/output -name '*.kicad_*' -o -name '*.net' | head -10
+        else
+          echo 'No example file found'
+        fi
+      "
+
+# Production volumes with proper permissions and persistence
+volumes:
+  kicad_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/kicad_config
+  circuit_synth_cache:
+    driver: local
+
+# Isolated network for Circuit-Synth services
+networks:
+  circuit-synth-network:
+    driver: bridge
+    name: circuit-synth-production

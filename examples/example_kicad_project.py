@@ -342,26 +342,32 @@ if __name__ == '__main__':
     circuit_end = time.perf_counter()
     print(f"⏱️  Circuit creation: {circuit_end - circuit_start:.4f}s")
     
-    # KiCad netlist generation
+    # KiCad netlist generation with timing and logging
     print("\n🔌 Generating KiCad netlist...")
+    logger.warning("Generating KiCad netlist...")
     kicad_netlist_start = time.perf_counter()
     circuit.generate_kicad_netlist("example_kicad_project.net")
     kicad_netlist_end = time.perf_counter()
     print(f"⏱️  KiCad netlist generation: {kicad_netlist_end - kicad_netlist_start:.4f}s")
+    logger.warning("KiCad netlist generated: example_kicad_project.net")
     
-    # JSON netlist generation
+    # JSON netlist generation with timing and logging
     print("\n📄 Generating JSON netlist...")
+    logger.warning("Generating JSON netlist...")
     json_netlist_start = time.perf_counter()
     circuit.generate_json_netlist("example_kicad_project.json")
     json_netlist_end = time.perf_counter()
     print(f"⏱️  JSON netlist generation: {json_netlist_end - json_netlist_start:.4f}s")
+    logger.warning("JSON netlist generated: example_kicad_project.json")
     
-    # KiCad project generation
+    # KiCad project generation with timing and logging
     print("\n🏗️  Generating KiCad project...")
+    logger.warning("Generating KiCad project...")
     kicad_project_start = time.perf_counter()
     circuit.generate_kicad_project("example_kicad_project", force_regenerate=False, draw_bounding_boxes=True)
     kicad_project_end = time.perf_counter()
     print(f"⏱️  KiCad project generation: {kicad_project_end - kicad_project_start:.4f}s")
+    logger.warning("KiCad project generation completed!")
     
     profiler.disable()
     

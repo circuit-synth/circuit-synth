@@ -333,6 +333,34 @@ class PCBParser:
             if model_elem:
                 footprint.model_path = model_elem[1]
                 # Parse offset, scale, rotate if present
+                offset_elem = self._find_element(model_elem, "offset")
+                if offset_elem:
+                    xyz_elem = self._find_element(offset_elem, "xyz")
+                    if xyz_elem and len(xyz_elem) >= 4:
+                        try:
+                            footprint.model_offset = (float(xyz_elem[1]), float(xyz_elem[2]), float(xyz_elem[3]))
+                        except (ValueError, IndexError):
+                            logger.debug(f"Failed to parse model offset: {xyz_elem}")
+                
+                scale_elem = self._find_element(model_elem, "scale")
+                if scale_elem:
+                    xyz_elem = self._find_element(scale_elem, "xyz")
+                    if xyz_elem and len(xyz_elem) >= 4:
+                        try:
+                            footprint.model_scale = (float(xyz_elem[1]), float(xyz_elem[2]), float(xyz_elem[3]))
+                        except (ValueError, IndexError):
+                            logger.debug(f"Failed to parse model scale: {xyz_elem}")
+                
+                rotate_elem = self._find_element(model_elem, "rotate")
+                if rotate_elem:
+                    xyz_elem = self._find_element(rotate_elem, "xyz")
+                    if xyz_elem and len(xyz_elem) >= 4:
+                        try:
+                            footprint.model_rotate = (float(xyz_elem[1]), float(xyz_elem[2]), float(xyz_elem[3]))
+                        except (ValueError, IndexError):
+                            logger.debug(f"Failed to parse model rotate: {xyz_elem}")
+                
+                logger.debug(f"Parsed 3D model {footprint.model_path} for footprint {footprint.reference}")
                 
             return footprint
             

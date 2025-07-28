@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy Python project files
-COPY pyproject.toml setup.py README.md ./
+COPY pyproject.toml README.md ./
 COPY src/ ./src/
 
 # Install Python dependencies (no Rust modules for now)
