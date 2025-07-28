@@ -27,7 +27,15 @@ jobs:
       run: |
         sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
         sudo apt update
-        sudo apt install --install-recommends kicad --yes
+        sudo apt install --install-recommends kicad kicad-libraries --yes
+    
+    - name: Verify KiCad symbol libraries installation
+      run: |
+        echo "Looking for KiCad symbol directories..."
+        find /usr -name "symbols" -type d 2>/dev/null | grep -i kicad || true
+        find /usr -name "library" -type d 2>/dev/null | grep -i kicad || true
+        find /usr -name "*.kicad_sym" 2>/dev/null | head -5 || true
+        ls -la /usr/share/kicad/ || true
 
     - name: Install dependencies
       run: |
