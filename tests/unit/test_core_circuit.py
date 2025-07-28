@@ -8,6 +8,7 @@ import pytest
 from circuit_synth.core import Circuit, Component, Net, Pin
 from circuit_synth.core.pin import PinType
 from circuit_synth.core.reference_manager import ReferenceManager
+from tests.conftest import require_kicad
 
 
 class TestCircuit:
@@ -21,6 +22,7 @@ class TestCircuit:
         assert len(circuit.nets) == 0
         assert len(circuit._subcircuits) == 0
     
+    @require_kicad
     def test_add_component(self):
         """Test adding components to a circuit."""
         circuit = Circuit("TestCircuit")
@@ -51,6 +53,7 @@ class TestCircuit:
         assert "VCC" in circuit.nets
         assert circuit.nets["VCC"].name == "VCC"
     
+    @require_kicad
     def test_connect_components(self):
         """Test connecting components via nets."""
         circuit = Circuit("TestCircuit")
@@ -81,6 +84,7 @@ class TestCircuit:
         assert net.name == "NET1"
         assert len(net.pins) == 2
     
+    @require_kicad
     def test_subcircuits(self):
         """Test adding subcircuits."""
         main_circuit = Circuit("MainCircuit")
@@ -97,6 +101,7 @@ class TestCircuit:
         # _subcircuits is a list, not a dict
         assert main_circuit._subcircuits[0] == sub_circuit
     
+    @require_kicad
     def test_to_dict(self):
         """Test converting circuit to dictionary."""
         circuit = Circuit("TestCircuit")
@@ -125,6 +130,7 @@ class TestCircuit:
 class TestComponent:
     """Test the Component class."""
     
+    @require_kicad
     def test_component_creation(self):
         """Test creating a component."""
         # Use a symbol that exists in the KiCad library
@@ -135,6 +141,7 @@ class TestComponent:
         assert comp.symbol == "Device:C"
         assert comp.value == "100nF"
     
+    @require_kicad
     def test_component_properties(self):
         """Test component property system."""
         comp = Component("Device:C", ref="C1")
@@ -151,6 +158,7 @@ class TestComponent:
         assert comp.tolerance == "10%"
         assert comp.footprint == "Capacitor_SMD:C_0805_2012Metric"
     
+    @require_kicad
     def test_component_pins(self):
         """Test component pin management."""
         comp = Component("Device:R", ref="R1")
@@ -160,6 +168,7 @@ class TestComponent:
         assert hasattr(comp, '_pins')
         # Note: actual pin count depends on the symbol definition
     
+    @require_kicad
     def test_component_to_dict(self):
         """Test converting component to dictionary."""
         comp = Component("Device:R", ref="R", value="10k")
