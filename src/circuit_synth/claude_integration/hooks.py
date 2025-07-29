@@ -90,7 +90,7 @@ def get_circuit_hooks() -> Dict[str, List[CircuitHook]]:
                     content = f.read()
                 # Look for STM32-related content
                 if 'STM32' in content or 'stm32' in content:
-                    from circuit_synth.chips.microcontrollers.stm32 import STM32PinMapper
+                    from circuit_synth.component_info.microcontrollers.stm32 import STM32PinMapper
                     print('✅ STM32 integration available for pin validation')
                 else:
                     print('ℹ️  No STM32 content detected')
@@ -163,7 +163,7 @@ def get_circuit_hooks() -> Dict[str, List[CircuitHook]]:
                     print('⚠️  JLCPCB integration: Not available')
                 
                 try:
-                    from circuit_synth.chips.microcontrollers.stm32 import STM32PinMapper
+                    from circuit_synth.component_info.microcontrollers.stm32 import STM32PinMapper
                     print('🔧 STM32 integration: Available')
                 except ImportError:
                     print('⚠️  STM32 integration: Not available')

@@ -566,22 +566,29 @@ This implementation provides a complete end-to-end solution for documenting Pyth
 The repository has been reorganized with a scalable directory structure to support multiple chip families and manufacturers:
 
 ```
-src/circuit_synth/
-├── chips/                          # Chip-specific integrations
-│   ├── microcontrollers/           # MCU families
-│   │   ├── stm32/                 # STM32 family integration
-│   │   ├── esp32/                 # ESP32 family (future)
-│   │   ├── pic/                   # PIC family (future)
-│   │   └── avr/                   # AVR family (future)
-│   ├── analog/                    # Analog ICs (op-amps, ADCs, etc.)
-│   ├── power/                     # Power management ICs
-│   └── rf/                        # RF/wireless chips
-├── manufacturing/                  # Manufacturing integrations  
-│   ├── jlcpcb/                   # JLCPCB integration
-│   ├── pcbway/                   # PCBWay (future)
-│   ├── oshpark/                  # OSH Park (future)
-│   └── digikey/                  # Digi-Key sourcing (future)
-└── [other modules...]             # Core circuit-synth modules
+circuit-synth2/
+├── src/circuit_synth/
+│   ├── component_info/           # Component-specific integrations
+│   │   ├── microcontrollers/    # MCU families (STM32, ESP32, PIC, AVR)
+│   │   ├── analog/              # Analog components (op-amps, ADCs, etc.)
+│   │   ├── power/               # Power management components
+│   │   ├── rf/                  # RF/wireless components
+│   │   ├── passives/            # Passive components (future)
+│   │   └── sensors/             # Sensors and measurement (future)
+│   ├── manufacturing/           # Manufacturing integrations  
+│   │   ├── jlcpcb/             # JLCPCB integration
+│   │   ├── pcbway/             # PCBWay (future)
+│   │   ├── oshpark/            # OSH Park (future)
+│   │   └── digikey/            # Digi-Key sourcing (future)
+│   ├── tools/                  # CLI tools and utilities
+│   └── [core modules...]       # Core circuit-synth functionality
+├── examples/                   # User examples organized by complexity
+│   ├── basic/                 # Simple usage examples
+│   ├── advanced/              # Complex feature demonstrations
+│   ├── testing/               # Test and validation scripts
+│   └── tools/                 # Utility scripts
+├── tools/                      # Repository build/CI tools
+└── [other repo files...]
 ```
 
 ### Import Guidelines
@@ -589,15 +596,17 @@ src/circuit_synth/
 **Updated Import Patterns:**
 ```python
 # STM32 integration (moved from circuit_synth.stm32_pinout)
-from circuit_synth.chips.microcontrollers.stm32 import STM32PinMapper
+from circuit_synth.component_info.microcontrollers.stm32 import STM32PinMapper
 
 # JLCPCB integration (moved from circuit_synth.jlc_integration)  
 from circuit_synth.manufacturing.jlcpcb import find_component, search_jlc_components_web
 
-# Future chip families
-from circuit_synth.chips.microcontrollers.esp32 import ESP32PinMapper  # (future)
-from circuit_synth.chips.analog.opamps import OpAmpSelector  # (future)
-from circuit_synth.chips.power.regulators import RegulatorDesigner  # (future)
+# Future component families
+from circuit_synth.component_info.microcontrollers.esp32 import ESP32PinMapper  # (future)
+from circuit_synth.component_info.analog.opamps import OpAmpSelector  # (future)
+from circuit_synth.component_info.power.regulators import RegulatorDesigner  # (future)
+from circuit_synth.component_info.passives.resistors import ResistorSelector  # (future)
+from circuit_synth.component_info.sensors.temperature import TempSensorSelector  # (future)
 
 # Future manufacturing integrations
 from circuit_synth.manufacturing.pcbway import get_pcbway_pricing  # (future)
@@ -611,9 +620,9 @@ from circuit_synth.manufacturing.digikey import search_digikey_parts  # (future)
 
 ### Adding New Integrations
 
-**To add a new chip family:**
-1. Create directory: `src/circuit_synth/chips/[category]/[family]/`
-2. Implement chip-specific functionality (pin mapping, configuration, etc.)
+**To add a new component family:**
+1. Create directory: `src/circuit_synth/component_info/[category]/[family]/`
+2. Implement component-specific functionality (pin mapping, configuration, etc.)  
 3. Add proper `__init__.py` with clear API exports
 4. Update relevant Claude agents and commands
 

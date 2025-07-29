@@ -13,10 +13,18 @@ pin assignment and configuration validation.
 
 # For backward compatibility, re-export key classes
 try:
-    from .peripheral_manager import STM32PeripheralManager
     from .pin_mapper import STM32PinMapper
 
-    __all__ = ["STM32PinMapper", "STM32PeripheralManager"]
+    __all__ = ["STM32PinMapper"]
+
+    # Try to import peripheral manager if it exists
+    try:
+        from .peripheral_manager import STM32PeripheralManager
+
+        __all__.append("STM32PeripheralManager")
+    except ImportError:
+        pass
+
 except ImportError:
     # Graceful fallback if modules don't exist yet
     __all__ = []
