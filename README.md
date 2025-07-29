@@ -6,7 +6,7 @@
 
 **The first circuit design tool built for AI collaboration**
 
-Generate complete KiCad projects using familiar Python syntax. Natural language requests become manufacturable circuits with ready-to-use code - built with standard Python classes that integrate seamlessly into any engineering workflow.
+We don't just build great circuit design APIs - we build the AI expertise to use them optimally. Natural language requests become manufacturable circuits with ready-to-use code, powered by specialized agents with deep domain knowledge and familiar Python syntax that integrates seamlessly into any engineering workflow.
 
 ### ⚡ **Instant Component Intelligence**
 
@@ -289,6 +289,17 @@ Instead of spending hours researching components, just describe what you need. C
 - **🧠 Learning Accelerator**: AI explains decisions and trade-offs
 
 **This isn't just faster circuit design - it's fundamentally better circuit design.**
+
+### **🧠 Why Circuit-Synth is Different**
+
+**Most libraries focus only on APIs. We focus equally on the AI that uses them.**
+
+- **Traditional Approach**: Build great tools → Write documentation → Hope users learn effectively
+- **Circuit-Synth Approach**: Build great tools → Build AI expertise → Deliver optimal results instantly
+
+**We're not just a Python library - we're a complete AI-native engineering platform.** The specialized agents know electrical engineering principles, component selection criteria, manufacturing constraints, and design optimization techniques. This accumulated expertise is as valuable as the code itself.
+
+**Result**: Engineers get professional-quality designs without needing to become experts in every domain first.
 
 ### **🚀 Getting Started with Claude Code**
 
