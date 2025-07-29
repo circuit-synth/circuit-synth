@@ -249,15 +249,24 @@ impl ComponentGenerator {
     }
 
     /// Extract sheet name from path
-    fn extract_sheet_name(&self, path: &str) -> String {
-        // For reference netlist compatibility, always return empty string for Sheetname
-        "".to_string()
+    fn extract_sheet_name(&self, _path: &str) -> String {
+        // Extract the last component of the path or return "Root" for root path
+        if _path == "/" {
+            "Root".to_string()
+        } else {
+            _path.split('/').last().unwrap_or("").to_string()
+        }
     }
 
     /// Generate sheet file name from path
-    fn generate_sheet_file(&self, path: &str) -> String {
-        // For reference netlist compatibility, always return root circuit file
-        "circuit.kicad_sch".to_string()
+    fn generate_sheet_file(&self, _path: &str) -> String {
+        // Generate appropriate sheet file name
+        if _path == "/" {
+            "circuit.kicad_sch".to_string()
+        } else {
+            let sheet_name = _path.split('/').last().unwrap_or("circuit");
+            format!("{}.kicad_sch", sheet_name.to_lowercase())
+        }
     }
 
     /// Normalize sheet path for KiCad format

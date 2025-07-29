@@ -351,30 +351,36 @@ class DefensiveLogger:
 
     def log_performance_summary(self) -> None:
         """Log comprehensive performance summary"""
-        summary = self.get_performance_summary()
+        try:
+            summary = self.get_performance_summary()
 
-        self.logger.info(f"📊 PERFORMANCE SUMMARY [{self.component_name}]")
-        self.logger.info(f"   🔢 Total operations: {summary['total_operations']}")
-        self.logger.info(f"   🦀 Rust operations: {summary['rust_operations']}")
-        self.logger.info(f"   🐍 Python operations: {summary['python_operations']}")
+            self.logger.info(f"📊 PERFORMANCE SUMMARY [{self.component_name}]")
+            self.logger.info(f"   🔢 Total operations: {summary['total_operations']}")
+            self.logger.info(f"   🦀 Rust operations: {summary['rust_operations']}")
+            self.logger.info(f"   🐍 Python operations: {summary['python_operations']}")
 
-        if summary["rust_operations"] > 0:
-            self.logger.info(
-                f"   📈 Rust success rate: {summary['rust_success_rate']:.1%}"
-            )
-            self.logger.info(
-                f"   ⚡ Performance improvement: {summary['performance_improvement']:.1f}x"
-            )
-            self.logger.info(f"   ⏱️  Avg Rust time: {summary['avg_rust_time']:.4f}s")
+            if summary["rust_operations"] > 0:
+                self.logger.info(
+                    f"   📈 Rust success rate: {summary['rust_success_rate']:.1%}"
+                )
+                self.logger.info(
+                    f"   ⚡ Performance improvement: {summary['performance_improvement']:.1f}x"
+                )
+                self.logger.info(
+                    f"   ⏱️  Avg Rust time: {summary['avg_rust_time']:.4f}s"
+                )
 
-        if summary["python_operations"] > 0:
-            self.logger.info(
-                f"   ⏱️  Avg Python time: {summary['avg_python_time']:.4f}s"
-            )
+            if summary["python_operations"] > 0:
+                self.logger.info(
+                    f"   ⏱️  Avg Python time: {summary['avg_python_time']:.4f}s"
+                )
 
-        self.logger.info(f"   🦀 Rust available: {summary['rust_available']}")
-        if summary["rust_auto_disabled"]:
-            self.logger.warning(f"   🚨 Rust auto-disabled due to failures")
+            self.logger.info(f"   🦀 Rust available: {summary['rust_available']}")
+            if summary["rust_auto_disabled"]:
+                self.logger.warning(f"   🚨 Rust auto-disabled due to failures")
+        except (ValueError, OSError):
+            # Ignore logging errors during shutdown (closed file descriptors)
+            pass
 
     @contextmanager
     def defensive_operation(self, operation_name: str, **kwargs):
@@ -422,16 +428,23 @@ def get_defensive_logger(component_name: str) -> DefensiveLogger:
 
 def log_all_performance_summaries() -> None:
     """Log performance summaries for all components"""
-    print("\n" + "=" * 80)
-    print("🛡️  DEFENSIVE LOGGING - FINAL PERFORMANCE SUMMARY")
-    print("=" * 80)
+    try:
+        print("\n" + "=" * 80)
+        print("🛡️  DEFENSIVE LOGGING - FINAL PERFORMANCE SUMMARY")
+        print("=" * 80)
 
-    for logger in _loggers.values():
-        logger.log_performance_summary()
-        print("-" * 80)
+        for logger in _loggers.values():
+            logger.log_performance_summary()
+            print("-" * 80)
+    except (ValueError, OSError):
+        # Ignore logging errors during shutdown (closed file descriptors)
+        pass
 
 
 # Install exit handler to log final summaries
 import atexit
+import os
 
-atexit.register(log_all_performance_summaries)
+# Only register the exit handler if not in test mode
+if not any("pytest" in arg for arg in os.sys.argv):
+    atexit.register(log_all_performance_summaries)

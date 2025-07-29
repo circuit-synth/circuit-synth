@@ -18,6 +18,12 @@ RUST_ONLY=${RUST_ONLY:-false}
 PYTHON_ONLY=${PYTHON_ONLY:-false}
 FAIL_FAST=${FAIL_FAST:-false}
 
+# Global result tracking
+PYTHON_TESTS_PASSED=false
+RUST_TESTS_PASSED=false
+INTEGRATION_TESTS_PASSED=false
+CORE_TESTS_PASSED=false
+
 # Logging functions
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -81,9 +87,11 @@ run_python_tests() {
     
     if [ $python_exit_code -eq 0 ]; then
         log_success "✅ Python tests passed"
+        PYTHON_TESTS_PASSED=true
         return 0
     else
         log_error "❌ Python tests failed"
+        PYTHON_TESTS_PASSED=false
         if [ "$FAIL_FAST" = "true" ]; then
             exit 1
         fi
@@ -111,9 +119,11 @@ run_rust_tests() {
     log_info "Running Rust unit tests..."
     if "$SCRIPT_DIR/test_rust_modules.sh" $rust_args; then
         log_success "✅ Rust tests passed"
+        RUST_TESTS_PASSED=true
         return 0
     else
         log_error "❌ Rust tests failed"
+        RUST_TESTS_PASSED=false
         if [ "$FAIL_FAST" = "true" ]; then
             exit 1
         fi
@@ -138,9 +148,11 @@ run_integration_tests() {
     
     if [ $integration_exit_code -eq 0 ]; then
         log_success "✅ Integration tests passed"
+        INTEGRATION_TESTS_PASSED=true
         return 0
     else
         log_error "❌ Integration tests failed"
+        INTEGRATION_TESTS_PASSED=false
         if [ "$FAIL_FAST" = "true" ]; then
             exit 1
         fi
@@ -157,9 +169,11 @@ test_core_functionality() {
     log_info "Testing core circuit logic..."
     if uv run python examples/example_kicad_project.py >/dev/null 2>&1; then
         log_success "✅ Core circuit logic working"
+        CORE_TESTS_PASSED=true
         return 0
     else
         log_error "❌ Core circuit logic test failed"
+        CORE_TESTS_PASSED=false
         if [ "$FAIL_FAST" = "true" ]; then
             exit 1
         fi
@@ -176,35 +190,33 @@ generate_summary() {
     local integration_status="⏭️ Skipped"
     local core_status="⏭️ Skipped"
     
-    # Check Python test results
-    if [ "$RUST_ONLY" != "true" ] && [ -f "$PROJECT_ROOT/.pytest_cache/v/cache/lastfailed" ]; then
-        if [ -s "$PROJECT_ROOT/.pytest_cache/v/cache/lastfailed" ]; then
-            python_status="❌ Failed"
-        else
-            python_status="✅ Passed"
-        fi
-    elif [ "$RUST_ONLY" != "true" ]; then
-        python_status="✅ Passed"
-    fi
-    
-    # Check Rust test results
-    if [ "$PYTHON_ONLY" != "true" ] && [ -f "$PROJECT_ROOT/rust_test_results.json" ]; then
-        if command -v jq >/dev/null 2>&1; then
-            local failed_modules=$(jq '.summary.failing_modules' "$PROJECT_ROOT/rust_test_results.json" 2>/dev/null || echo "0")
-            if [ "$failed_modules" -gt 0 ]; then
-                rust_status="❌ Failed"
-            else
-                rust_status="✅ Passed"
-            fi
-        else
-            rust_status="✅ Completed"
-        fi
-    fi
-    
-    # Always test integration and core if not Rust-only
+    # Use global result tracking
     if [ "$RUST_ONLY" != "true" ]; then
-        integration_status="✅ Passed"  # Assume passed if we got here
-        core_status="✅ Passed"        # Assume passed if we got here
+        if [ "$PYTHON_TESTS_PASSED" = "true" ]; then
+            python_status="✅ Passed"
+        else
+            python_status="❌ Failed"
+        fi
+        
+        if [ "$INTEGRATION_TESTS_PASSED" = "true" ]; then
+            integration_status="✅ Passed"
+        else
+            integration_status="❌ Failed"
+        fi
+        
+        if [ "$CORE_TESTS_PASSED" = "true" ]; then
+            core_status="✅ Passed"
+        else
+            core_status="❌ Failed"
+        fi
+    fi
+    
+    if [ "$PYTHON_ONLY" != "true" ]; then
+        if [ "$RUST_TESTS_PASSED" = "true" ]; then
+            rust_status="✅ Passed"
+        else
+            rust_status="❌ Failed"
+        fi
     fi
     
     echo "📊 Comprehensive Test Results:"

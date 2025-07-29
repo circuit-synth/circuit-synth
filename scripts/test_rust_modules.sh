@@ -116,16 +116,18 @@ test_rust_module() {
     local tests_failed=0
     
     if echo "$test_output" | grep -q "test result:"; then
-        tests_passed=$(echo "$test_output" | grep "test result:" | sed -n 's/.*\([0-9]\+\) passed.*/\1/p' | head -1)
-        tests_failed=$(echo "$test_output" | grep "test result:" | sed -n 's/.*passed; \([0-9]\+\) failed.*/\1/p' | head -1)
+        # Extract passed and failed counts using grep and cut (more reliable)
+        local result_line=$(echo "$test_output" | grep "test result:" | tail -1)
         
-        # Handle cases where no failures are reported
-        if [ -z "$tests_failed" ]; then
-            tests_failed=0
-        fi
-        if [ -z "$tests_passed" ]; then
-            tests_passed=0
-        fi
+        # Extract passed count: "X passed"
+        tests_passed=$(echo "$result_line" | grep -o '[0-9]\+ passed' | cut -d' ' -f1 || echo "0")
+        
+        # Extract failed count: "Y failed"  
+        tests_failed=$(echo "$result_line" | grep -o '[0-9]\+ failed' | cut -d' ' -f1 || echo "0")
+        
+        # Ensure we have numeric values
+        tests_passed=${tests_passed:-0}
+        tests_failed=${tests_failed:-0}
     fi
     
     if [ $test_exit_code -eq 0 ]; then
