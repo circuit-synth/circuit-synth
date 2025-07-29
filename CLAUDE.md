@@ -141,6 +141,44 @@ find /usr/share/kicad/footprints -name "*.kicad_mod" | grep -i lqfp
 - **Remove non-essential logs when feature is complete**: Keep only critical error logs and high-level status messages
 - **Example**: `logging.debug(f"Creating component {ref} with symbol {symbol}")` during development, remove when stable
 
+**Multi-Attempt Problem Solving Protocol:**
+When you have attempted to fix the same issue 3+ times without success, **STOP** and follow this systematic approach:
+
+1. **Document the Problem State**:
+   - Write a clear problem statement
+   - List all attempted solutions with outcomes
+   - Identify recurring patterns in failures
+   - Note any error messages, symptoms, or clues
+
+2. **Context Management**:
+   - Use `/compact` to compress the conversation context
+   - Save important findings to `memory-bank/issues/` if needed
+   - Clear mental context to approach fresh
+
+3. **Deep Analysis Phase**:
+   - Break the problem into smaller, isolated components
+   - Identify root causes vs. symptoms
+   - Question initial assumptions about the problem
+   - Consider alternative approaches or architectures
+
+4. **Research Phase**:
+   - Use WebSearch to research similar problems, error messages, or techniques
+   - Look for official documentation, Stack Overflow solutions, GitHub issues
+   - Research best practices for the specific technology or domain
+   - Investigate whether the approach itself is fundamentally flawed
+
+5. **Systematic Solution**:
+   - Based on research, create a new approach plan
+   - Test each component in isolation
+   - Implement incrementally with verification at each step
+   - Document the successful solution for future reference
+
+**Example trigger scenarios:**
+- Same CI test failing after 3+ different fix attempts
+- Repeatedly encountering the same error with different "solutions"
+- Multiple approaches to the same feature all hitting similar roadblocks
+- Environment or dependency issues that persist across multiple fixes
+
 ## Memory Bank System
 
 **CRITICAL: Use memory-bank/ effectively for context preservation**

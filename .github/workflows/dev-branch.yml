@@ -1,0 +1,42 @@
+name: Development Branch Tests
+
+on:
+  push:
+    branches-ignore: [ main ]
+  workflow_dispatch:
+
+jobs:
+  dev-tests:
+    name: Development Branch Testing
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Set up Python 3.12
+      run: uv python install 3.12
+
+    - name: Install dependencies
+      run: |
+        uv sync --dev
+        uv pip install -e ".[dev]"
+
+    - name: Quick lint check
+      run: uv run flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics --extend-ignore=F821
+
+    - name: Format check
+      run: uv run black --check src/
+
+    - name: Run unit tests only
+      run: uv run pytest tests/unit/ -v --tb=short
+
+    - name: Comment on commit (if applicable)
+      if: github.event_name == 'push'
+      run: |
+        echo "✅ Development branch tests passed for commit ${{ github.sha }}"
+        echo "Branch: ${{ github.ref_name }}"
+        echo "Ready for PR to main or develop"
