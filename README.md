@@ -8,19 +8,65 @@
 
 Generate complete KiCad projects using simple Python code. No DSL to learn - just Python classes and functions that any engineer can read and modify.
 
-## 🤖 Optimized for Claude Code
+## 🤖 AI-Powered Circuit Design with Claude Code
 
-This repository is fully optimized for AI-assisted development with Claude Code:
+Circuit-synth is **the first circuit design tool built for AI collaboration**. Natural language requests become complete, manufacturable circuits with ready-to-use code.
 
-- **🔍 Component Search**: `/find-symbol`, `/find-footprint` - Instantly find KiCad symbols and footprints
-- **🎯 Smart Component Finding**: `/find-jlc-component`, `/quick-component` - Find manufacturable parts with ready code
-- **🤖 Component Wizard**: `/component-wizard` - Interactive component selection with trade-off analysis
-- **🔧 STM32 MCU Selection**: `/find-stm32-mcu` - AI-powered STM32 selection with complete pin assignments
-- **🏗️ Circuit Design Agent**: Specialized `circuit-synth` agent for expert guidance on component selection and circuit topology
-- **⚡ Development Commands**: `/dev-run-tests`, `/dev-update-and-commit` - Streamlined development workflow
-- **📋 Pre-configured Permissions**: Skip repetitive approval prompts with curated tool allowlists
+### ⚡ **Instant Component Intelligence**
 
-**Perfect for AI-assisted circuit design - just ask Claude to help you build circuits!**
+**Ask for components naturally, get professional results:**
+
+```
+👤 "find a stm32 mcu that has 3 spi's and is available on jlcpcb"
+
+🤖 **STM32G431CBT6** - Perfect match found!
+   📊 Stock: 83,737 units | Price: $2.50@100pcs | LCSC: C529092
+   ✅ 3 SPIs: SPI1, SPI2, SPI3 
+   📦 LQFP-48 package | 128KB Flash, 32KB RAM
+
+   📋 Ready Circuit-Synth Code:
+   stm32g431 = Component(
+       symbol="MCU_ST_STM32G4:STM32G431CBTx",
+       ref="U",
+       footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
+   )
+```
+
+**No catalog browsing. No datasheets. No guesswork. Just instant, accurate results.**
+
+### 🎯 **Professional AI Commands**
+
+- **`/find-mcu`** - Intelligent MCU search with specifications and peripheral matching
+- **`/find-symbol`** - Instantly find KiCad symbols across all libraries  
+- **`/find-footprint`** - Locate correct footprints with package verification
+- **`/check-manufacturing`** - Real-time JLCPCB availability and pricing
+- **`/analyze-power`** - Power tree analysis and regulation recommendations
+- **`/optimize-routing`** - Signal integrity and PCB layout guidance
+
+### 🏗️ **Specialized Design Agents**
+
+- **`circuit-architect`** - Master circuit coordinator for complex multi-domain systems
+- **`power-expert`** - Power supply design and regulation specialist  
+- **`signal-integrity`** - High-speed PCB design and EMI expert
+- **`component-guru`** - Manufacturing optimization and sourcing specialist
+
+### 🔥 **Complete Workflow Example**
+
+```
+👤 "I need a USB-C power delivery circuit with 3.3V and 5V outputs"
+
+🤖 Let me design a complete USB-C PD solution for you...
+
+   [Searches for USB-C controllers with PD support]
+   [Finds optimal regulators with JLCPCB availability] 
+   [Generates complete circuit with protection]
+   [Provides manufacturing-ready component list]
+   [Outputs ready-to-compile circuit-synth code]
+
+📋 Complete implementation ready in 30 seconds!
+```
+
+**This is the future of circuit design - AI that understands electrical engineering.**
 
 ## Quick Start
 
@@ -37,7 +83,7 @@ Generates a complete KiCad project with schematics, PCB layout, and netlists.
 
 ```python
 from circuit_synth import *
-from circuit_synth.jlc_integration import get_component_availability_web
+from circuit_synth.manufacturing.jlcpcb import get_component_availability_web
 
 @circuit(name="esp32_dev_board")
 def esp32_dev_board():
@@ -115,7 +161,7 @@ mcu = Component(
 For advanced use cases, access the pin mapping system directly:
 
 ```python
-from circuit_synth.stm32_pinout import STM32PinMapper
+from circuit_synth.component_info.microcontrollers.stm32 import STM32PinMapper
 
 # Initialize for STM32G4 family
 mapper = STM32PinMapper("g4-31_41", modm_devices_path="external_repos/modm-devices")
@@ -164,6 +210,119 @@ Complete pin mapping support for all major STM32 families:
 - **🏭 Manufacturing Integration**: Real-time component availability and pricing from JLCPCB
 - **🔍 Smart Component Finder**: AI-powered component recommendations with instant circuit-synth code generation
 - **🔧 STM32 Pin Mapping**: Complete STM32 pin assignment with modm-devices integration and conflict resolution
+
+## 🚀 Claude Code Workflow Guide
+
+### **The New Standard for Circuit Design**
+
+Circuit-synth + Claude Code creates the most productive circuit design workflow ever built. Here's how to leverage this powerful combination:
+
+#### **1. Start with Natural Language**
+```
+👤 "Design a motor controller with STM32, 3 half-bridges, current sensing, and CAN bus"
+```
+
+Instead of spending hours researching components, just describe what you need. Claude will:
+- Search the modm-devices database for optimal MCUs
+- Check JLCPCB availability and pricing in real-time  
+- Generate complete circuit-synth code with proper connections
+- Provide manufacturing-ready component recommendations
+
+#### **2. Use Professional AI Commands**
+
+**Component Intelligence:**
+- `/find-mcu 5 uarts` → Finds MCUs with specific peripheral counts
+- `/find-symbol STM32G4` → Locates exact KiCad symbols
+- `/check-manufacturing LM358` → Real-time availability and pricing
+
+**Design Expertise:**
+- `/analyze-power` → Complete power tree analysis
+- `/optimize-routing` → Signal integrity recommendations  
+- `/suggest-improvements` → Design optimization suggestions
+
+#### **3. Leverage Specialized Agents**
+
+**For complex designs, delegate to experts:**
+```
+👤 "I need a power supply that converts 24V to 3.3V and 5V rails"
+
+🤖 I'll use the power-expert agent to design this for you...
+   [Agent analyzes requirements, selects topology, finds components]
+   [Generates complete power tree with protection circuits]
+   [Outputs manufacturing-ready design]
+```
+
+#### **4. Real-World Example: STM32 Selection**
+
+**Traditional workflow:** 2-3 hours of research, datasheets, availability checking
+**Claude Code workflow:** 30 seconds
+
+```
+👤 "/find-mcu STM32 with 3 SPIs available on JLCPCB"
+
+🤖 **STM32G431CBT6** - Perfect match!
+   📊 Stock: 83,737 units | Price: $2.50@100pcs 
+   ✅ 3 SPIs: SPI1, SPI2, SPI3
+   📦 LQFP-48 | 128KB Flash, 32KB RAM
+
+   Ready code:
+   mcu = Component(
+       symbol="MCU_ST_STM32G4:STM32G431CBTx",
+       ref="U",
+       footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
+   )
+```
+
+#### **5. End-to-End Circuit Generation**
+
+**The complete workflow in action:**
+1. **Describe** your requirements in natural language
+2. **Claude searches** components across multiple databases  
+3. **AI agents** provide domain expertise (power, signal integrity, etc.)
+4. **Generate** complete circuit-synth code with verified components
+5. **Export** to KiCad for PCB layout and manufacturing
+
+**Result:** Professional circuit designs in minutes, not days.
+
+### **Why This Changes Everything**
+
+- **🎯 No Research Required**: AI finds optimal components instantly
+- **✅ Manufacturing Ready**: Real-time availability and pricing verification
+- **🔧 Professional Quality**: Expert domain knowledge built-in
+- **⚡ Incredible Speed**: Complete designs in 30 seconds to 5 minutes
+- **🧠 Learning Accelerator**: AI explains decisions and trade-offs
+
+**This isn't just faster circuit design - it's fundamentally better circuit design.**
+
+### **🚀 Getting Started with Claude Code**
+
+**1. Install circuit-synth:**
+```bash
+pip install circuit-synth[claude]  # Includes Claude Code integration
+```
+
+**2. Set up AI agents (optional but recommended):**
+```bash
+python -c "from circuit_synth import setup_claude_integration; setup_claude_integration()"
+```
+
+**3. Start designing with AI:**
+```bash
+# In Claude Code, just ask natural questions:
+"find me an stm32 with 3 spis and can bus"
+"design a 3.3v regulator circuit with thermal protection"
+"help me choose between buck and ldo for this application"
+```
+
+**4. Use professional commands:**
+```bash
+/find-mcu         # Intelligent MCU search
+/check-manufacturing  # Component availability  
+/analyze-power    # Power tree analysis
+# ... and 9 more specialized commands
+```
+
+**The AI handles the complexity. You focus on the design.**
 
 ## Installation
 
