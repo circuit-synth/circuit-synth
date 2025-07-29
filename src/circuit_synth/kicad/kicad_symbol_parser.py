@@ -13,6 +13,18 @@ from typing import Any, Dict, List, Optional, Set
 
 import sexpdata
 
+# Add performance timing
+try:
+    from ..core.performance_profiler import quick_time
+except ImportError:
+    # Fallback if profiler not available
+    def quick_time(name):
+        def decorator(func):
+            return func
+
+        return decorator
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,6 +32,7 @@ class ParseError(Exception):
     pass
 
 
+@quick_time("KiCad Symbol File Parse")
 def parse_kicad_sym_file(file_path: str) -> Dict[str, Any]:
     """
     Parse an entire .kicad_sym file and return a dictionary:

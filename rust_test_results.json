@@ -1,0 +1,72 @@
+{
+  "timestamp": "2025-07-29T07:24:18Z",
+  "modules": {
+    "rust_modules": {
+      "status": "skipped",
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "error_message": "No Cargo.toml"
+    },
+    "rust_core_circuit_engine": {
+      "status": "failed",
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "error_message": "Test failures"
+    },
+    "rust_force_directed_placement": {
+      "status": "passed",
+      "tests_passed": 24,
+      "tests_failed": 0,
+      "error_message": ""
+    },
+    "rust_io_processor": {
+      "status": "failed",
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "error_message": "Test failures"
+    },
+    "rust_kicad_integration": {
+      "status": "failed",
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "error_message": "Test failures"
+    },
+    "rust_netlist_processor": {
+      "status": "passed",
+      "tests_passed": 32,
+      "tests_failed": 0,
+      "error_message": ""
+    },
+    "rust_pin_calculator": {
+      "status": "passed",
+      "tests_passed": 44,
+      "tests_failed": 0,
+      "error_message": ""
+    },
+    "rust_reference_manager": {
+      "status": "passed",
+      "tests_passed": 32,
+      "tests_failed": 0,
+      "error_message": ""
+    },
+    "rust_symbol_cache": {
+      "status": "passed",
+      "tests_passed": 5,
+      "tests_failed": 0,
+      "error_message": ""
+    },
+    "rust_symbol_search": {
+      "status": "failed",
+      "tests_passed": 15,
+      "tests_failed": 8,
+      "error_message": "Test failures"
+    }
+  },
+  "summary": {
+    "total_modules": 10,
+    "tested_modules": 9,
+    "passing_modules": 5,
+    "failing_modules": 4,
+    "skipped_modules": 1
+  }
+}

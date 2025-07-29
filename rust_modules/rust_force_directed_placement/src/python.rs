@@ -1,5 +1,5 @@
 //! Python bindings for force-directed placement algorithm
-//! 
+//!
 //! This module provides PyO3 bindings that maintain 100% API compatibility
 //! with the existing Python implementation for seamless integration.
 
@@ -7,9 +7,11 @@ use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList, PyTuple};
 use std::collections::HashMap;
 
-use crate::types::{Point, Component, Connection, PlacementConfig, PlacementResult as RustPlacementResult};
-use crate::placement::ForceDirectedPlacer;
 use crate::errors::PlacementError;
+use crate::placement::ForceDirectedPlacer;
+use crate::types::{
+    Component, Connection, PlacementConfig, PlacementResult as RustPlacementResult, Point,
+};
 
 /// Python-compatible Point class
 #[pyclass(name = "Point")]
@@ -45,7 +47,10 @@ impl PyPoint {
 
 impl From<Point> for PyPoint {
     fn from(point: Point) -> Self {
-        Self { x: point.x, y: point.y }
+        Self {
+            x: point.x,
+            y: point.y,
+        }
     }
 }
 
@@ -94,7 +99,10 @@ impl PyComponent {
     }
 
     fn __repr__(&self) -> String {
-        format!("Component('{}', '{}', '{}')", self.reference, self.footprint, self.value)
+        format!(
+            "Component('{}', '{}', '{}')",
+            self.reference, self.footprint, self.value
+        )
     }
 
     fn with_position(&mut self, x: f64, y: f64) -> PyResult<()> {
@@ -208,7 +216,8 @@ impl PyPlacementResult {
 
 impl From<RustPlacementResult> for PyPlacementResult {
     fn from(result: RustPlacementResult) -> Self {
-        let positions = result.positions
+        let positions = result
+            .positions
             .into_iter()
             .map(|(k, v)| (k, v.into()))
             .collect();
@@ -292,10 +301,7 @@ impl PyForceDirectedPlacer {
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))?;
 
         // Convert Python types to Rust types
-        let rust_components: Vec<Component> = components
-            .into_iter()
-            .map(|c| c.into())
-            .collect();
+        let rust_components: Vec<Component> = components.into_iter().map(|c| c.into()).collect();
 
         let rust_connections: Vec<Connection> = connections
             .into_iter()
@@ -310,7 +316,8 @@ impl PyForceDirectedPlacer {
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))?;
 
         // Perform placement
-        let result = self.placer
+        let result = self
+            .placer
             .place(rust_components, rust_connections, board_width, board_height)
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
 
@@ -331,12 +338,16 @@ impl PyForceDirectedPlacer {
         for (key, value) in components_dict.iter() {
             let reference: String = key.extract()?;
             let comp_dict: &PyDict = value.extract()?;
-            
+
             let footprint: String = comp_dict.get_item("footprint")?.unwrap().extract()?;
-            let value_str: String = comp_dict.get_item("value")?.unwrap_or(py.None().as_ref(py)).extract().unwrap_or_default();
-            
+            let value_str: String = comp_dict
+                .get_item("value")?
+                .unwrap_or(py.None().as_ref(py))
+                .extract()
+                .unwrap_or_default();
+
             let mut component = PyComponent::new(reference, footprint, value_str);
-            
+
             // Set position if provided
             if let Some(position) = comp_dict.get_item("position")? {
                 let pos_tuple: &PyTuple = position.extract()?;
@@ -344,7 +355,7 @@ impl PyForceDirectedPlacer {
                 let y: f64 = pos_tuple.get_item(1)?.extract()?;
                 component.with_position(x, y)?;
             }
-            
+
             // Set size if provided
             if let Some(size) = comp_dict.get_item("size")? {
                 let size_tuple: &PyTuple = size.extract()?;
@@ -352,13 +363,13 @@ impl PyForceDirectedPlacer {
                 let height: f64 = size_tuple.get_item(1)?.extract()?;
                 component.with_size(width, height)?;
             }
-            
+
             // Set path if provided
             if let Some(path) = comp_dict.get_item("path")? {
                 let path_str: String = path.extract()?;
                 component.with_path(path_str)?;
             }
-            
+
             components.push(component);
         }
 
@@ -376,20 +387,20 @@ impl PyForceDirectedPlacer {
 
         // Convert result to dictionary format
         let result_dict = PyDict::new(py);
-        
+
         let positions_dict = PyDict::new(py);
         for (reference, position) in &result.positions {
             let pos_tuple = PyTuple::new(py, &[position.x, position.y]);
             positions_dict.set_item(reference, pos_tuple)?;
         }
         result_dict.set_item("positions", positions_dict)?;
-        
+
         let rotations_dict = PyDict::new(py);
         for (reference, rotation) in &result.rotations {
             rotations_dict.set_item(reference, rotation)?;
         }
         result_dict.set_item("rotations", rotations_dict)?;
-        
+
         result_dict.set_item("iterations_used", result.iterations_used)?;
         result_dict.set_item("final_energy", result.final_energy)?;
         result_dict.set_item("convergence_achieved", result.convergence_achieved)?;
@@ -401,14 +412,23 @@ impl PyForceDirectedPlacer {
     /// Get placement statistics
     fn get_stats(&self, py: Python) -> PyResult<PyObject> {
         let stats = PyDict::new(py);
-        
+
         stats.set_item("component_spacing", self.placer.config().component_spacing)?;
-        stats.set_item("attraction_strength", self.placer.config().attraction_strength)?;
-        stats.set_item("repulsion_strength", self.placer.config().repulsion_strength)?;
-        stats.set_item("iterations_per_level", self.placer.config().iterations_per_level)?;
+        stats.set_item(
+            "attraction_strength",
+            self.placer.config().attraction_strength,
+        )?;
+        stats.set_item(
+            "repulsion_strength",
+            self.placer.config().repulsion_strength,
+        )?;
+        stats.set_item(
+            "iterations_per_level",
+            self.placer.config().iterations_per_level,
+        )?;
         stats.set_item("damping", self.placer.config().damping)?;
         stats.set_item("enable_rotation", self.placer.config().enable_rotation)?;
-        
+
         Ok(stats.into())
     }
 
@@ -423,7 +443,7 @@ impl PyForceDirectedPlacer {
         enable_rotation: Option<bool>,
     ) -> PyResult<()> {
         let mut config = self.placer.config().clone();
-        
+
         if let Some(spacing) = component_spacing {
             config.component_spacing = spacing;
         }
@@ -481,15 +501,18 @@ pub fn validate_placement_inputs(
 ) -> PyResult<bool> {
     // Convert to Rust types for validation
     let rust_components: Vec<Component> = components.into_iter().map(|c| c.into()).collect();
-    let rust_connections: Vec<Connection> = connections.into_iter().map(|(r1, r2)| Connection::new(r1, r2)).collect();
+    let rust_connections: Vec<Connection> = connections
+        .into_iter()
+        .map(|(r1, r2)| Connection::new(r1, r2))
+        .collect();
 
     // Validate all inputs
     crate::errors::validation::validate_board_dimensions(board_width, board_height)
         .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))?;
-    
+
     crate::errors::validation::validate_components(&rust_components)
         .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))?;
-    
+
     crate::errors::validation::validate_connections(&rust_connections, &rust_components)
         .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))?;
 
@@ -521,11 +544,7 @@ mod tests {
 
     #[test]
     fn test_py_component_creation() {
-        let component = PyComponent::new(
-            "R1".to_string(),
-            "R_0805".to_string(),
-            "10k".to_string()
-        );
+        let component = PyComponent::new("R1".to_string(), "R_0805".to_string(), "10k".to_string());
         assert_eq!(component.reference, "R1");
         assert_eq!(component.footprint, "R_0805");
         assert_eq!(component.value, "10k");
@@ -533,15 +552,12 @@ mod tests {
 
     #[test]
     fn test_component_conversion() {
-        let py_component = PyComponent::new(
-            "R1".to_string(),
-            "R_0805".to_string(),
-            "10k".to_string()
-        );
-        
+        let py_component =
+            PyComponent::new("R1".to_string(), "R_0805".to_string(), "10k".to_string());
+
         let rust_component: Component = py_component.clone().into();
         let back_to_py: PyComponent = rust_component.into();
-        
+
         assert_eq!(py_component.reference, back_to_py.reference);
         assert_eq!(py_component.footprint, back_to_py.footprint);
         assert_eq!(py_component.value, back_to_py.value);

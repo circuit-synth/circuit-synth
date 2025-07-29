@@ -1,22 +1,22 @@
 //! PyO3 bindings for Python integration
-//! 
+//!
 //! Provides seamless integration between Rust I/O processor and Python,
 //! enabling 10-30x performance improvements while maintaining Python API compatibility.
 
-use std::collections::HashMap;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList, PyString};
 use pyo3_asyncio;
-use tokio::runtime::Runtime;
 use serde_json::Value;
-use tracing::{info, error};
+use std::collections::HashMap;
+use tokio::runtime::Runtime;
+use tracing::{error, info};
 
 use crate::error::{IoError, IoResult};
-use crate::json_processor::{JsonLoader, JsonSerializer, CircuitData};
-use crate::kicad_parser::{KiCadParser, SchematicData, PcbData, SymbolLibraryData};
-use crate::validation::{ValidationEngine, ValidationResult};
 use crate::file_io::{AsyncFileOps, FileIoConfig};
+use crate::json_processor::{CircuitData, JsonLoader, JsonSerializer};
+use crate::kicad_parser::{KiCadParser, PcbData, SchematicData, SymbolLibraryData};
 use crate::memory::MemoryManager;
+use crate::validation::{ValidationEngine, ValidationResult};
 
 /// Initialize the Rust I/O processor
 #[pyfunction]
@@ -32,7 +32,10 @@ pub fn get_stats() -> PyResult<PyObject> {
     Python::with_gil(|py| {
         let stats = crate::get_performance_stats();
         pythonize::pythonize(py, &stats).map_err(|e| {
-            PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert stats: {}", e))
+            PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Failed to convert stats: {}",
+                e
+            ))
         })
     })
 }
@@ -41,12 +44,18 @@ pub fn get_stats() -> PyResult<PyObject> {
 #[pyfunction]
 pub fn load_circuit_from_dict(py: Python, data: &PyDict) -> PyResult<PyObject> {
     let rt = Runtime::new().map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+            "Failed to create runtime: {}",
+            e
+        ))
     })?;
 
     // Convert Python dict to serde_json::Value
     let json_value: Value = pythonize::depythonize(data).map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to convert Python dict: {}", e))
+        PyErr::new::<pyo3::exceptions::PyValueError, _>(format!(
+            "Failed to convert Python dict: {}",
+            e
+        ))
     })?;
 
     let result = rt.block_on(async {
@@ -58,14 +67,20 @@ pub fn load_circuit_from_dict(py: Python, data: &PyDict) -> PyResult<PyObject> {
         Ok(circuit) => {
             // Convert Rust CircuitData back to Python dict
             let circuit_json = serde_json::to_value(&circuit).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize circuit: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to serialize circuit: {}",
+                    e
+                ))
             })?;
-            
+
             pythonize::pythonize(py, &circuit_json).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to convert to Python: {}",
+                    e
+                ))
             })
         }
-        Err(e) => Err(PyErr::from(e))
+        Err(e) => Err(PyErr::from(e)),
     }
 }
 
@@ -73,7 +88,10 @@ pub fn load_circuit_from_dict(py: Python, data: &PyDict) -> PyResult<PyObject> {
 #[pyfunction]
 pub fn load_circuit_from_json_file(py: Python, path: &str) -> PyResult<PyObject> {
     let rt = Runtime::new().map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+            "Failed to create runtime: {}",
+            e
+        ))
     })?;
 
     let result = rt.block_on(async {
@@ -85,14 +103,20 @@ pub fn load_circuit_from_json_file(py: Python, path: &str) -> PyResult<PyObject>
         Ok(circuit) => {
             // Convert Rust CircuitData back to Python dict
             let circuit_json = serde_json::to_value(&circuit).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize circuit: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to serialize circuit: {}",
+                    e
+                ))
             })?;
-            
+
             pythonize::pythonize(py, &circuit_json).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to convert to Python: {}",
+                    e
+                ))
             })
         }
-        Err(e) => Err(PyErr::from(e))
+        Err(e) => Err(PyErr::from(e)),
     }
 }
 
@@ -100,12 +124,18 @@ pub fn load_circuit_from_json_file(py: Python, path: &str) -> PyResult<PyObject>
 #[pyfunction]
 pub fn save_circuit_to_json_file(data: &PyDict, path: &str) -> PyResult<()> {
     let rt = Runtime::new().map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+            "Failed to create runtime: {}",
+            e
+        ))
     })?;
 
     // Convert Python dict to CircuitData
     let circuit: CircuitData = pythonize::depythonize(data).map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to convert Python dict: {}", e))
+        PyErr::new::<pyo3::exceptions::PyValueError, _>(format!(
+            "Failed to convert Python dict: {}",
+            e
+        ))
     })?;
 
     let result = rt.block_on(async {
@@ -120,7 +150,10 @@ pub fn save_circuit_to_json_file(data: &PyDict, path: &str) -> PyResult<()> {
 #[pyfunction]
 pub fn parse_kicad_schematic(py: Python, path: &str) -> PyResult<PyObject> {
     let rt = Runtime::new().map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+            "Failed to create runtime: {}",
+            e
+        ))
     })?;
 
     let result = rt.block_on(async {
@@ -131,14 +164,20 @@ pub fn parse_kicad_schematic(py: Python, path: &str) -> PyResult<PyObject> {
     match result {
         Ok(schematic) => {
             let schematic_json = serde_json::to_value(&schematic).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize schematic: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to serialize schematic: {}",
+                    e
+                ))
             })?;
-            
+
             pythonize::pythonize(py, &schematic_json).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to convert to Python: {}",
+                    e
+                ))
             })
         }
-        Err(e) => Err(PyErr::from(e))
+        Err(e) => Err(PyErr::from(e)),
     }
 }
 
@@ -146,7 +185,10 @@ pub fn parse_kicad_schematic(py: Python, path: &str) -> PyResult<PyObject> {
 #[pyfunction]
 pub fn parse_kicad_pcb(py: Python, path: &str) -> PyResult<PyObject> {
     let rt = Runtime::new().map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+            "Failed to create runtime: {}",
+            e
+        ))
     })?;
 
     let result = rt.block_on(async {
@@ -157,14 +199,20 @@ pub fn parse_kicad_pcb(py: Python, path: &str) -> PyResult<PyObject> {
     match result {
         Ok(pcb) => {
             let pcb_json = serde_json::to_value(&pcb).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize PCB: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to serialize PCB: {}",
+                    e
+                ))
             })?;
-            
+
             pythonize::pythonize(py, &pcb_json).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to convert to Python: {}",
+                    e
+                ))
             })
         }
-        Err(e) => Err(PyErr::from(e))
+        Err(e) => Err(PyErr::from(e)),
     }
 }
 
@@ -172,7 +220,10 @@ pub fn parse_kicad_pcb(py: Python, path: &str) -> PyResult<PyObject> {
 #[pyfunction]
 pub fn parse_kicad_symbol(py: Python, path: &str) -> PyResult<PyObject> {
     let rt = Runtime::new().map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+            "Failed to create runtime: {}",
+            e
+        ))
     })?;
 
     let result = rt.block_on(async {
@@ -183,14 +234,20 @@ pub fn parse_kicad_symbol(py: Python, path: &str) -> PyResult<PyObject> {
     match result {
         Ok(library) => {
             let library_json = serde_json::to_value(&library).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize library: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to serialize library: {}",
+                    e
+                ))
             })?;
-            
+
             pythonize::pythonize(py, &library_json).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to convert to Python: {}",
+                    e
+                ))
             })
         }
-        Err(e) => Err(PyErr::from(e))
+        Err(e) => Err(PyErr::from(e)),
     }
 }
 
@@ -198,12 +255,18 @@ pub fn parse_kicad_symbol(py: Python, path: &str) -> PyResult<PyObject> {
 #[pyfunction]
 pub fn validate_circuit_data(py: Python, data: &PyDict) -> PyResult<PyObject> {
     let rt = Runtime::new().map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+            "Failed to create runtime: {}",
+            e
+        ))
     })?;
 
     // Convert Python dict to CircuitData
     let circuit: CircuitData = pythonize::depythonize(data).map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to convert Python dict: {}", e))
+        PyErr::new::<pyo3::exceptions::PyValueError, _>(format!(
+            "Failed to convert Python dict: {}",
+            e
+        ))
     })?;
 
     let result = rt.block_on(async {
@@ -214,14 +277,20 @@ pub fn validate_circuit_data(py: Python, data: &PyDict) -> PyResult<PyObject> {
     match result {
         Ok(validation_result) => {
             let result_json = serde_json::to_value(&validation_result).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize validation result: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to serialize validation result: {}",
+                    e
+                ))
             })?;
-            
+
             pythonize::pythonize(py, &result_json).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to convert to Python: {}",
+                    e
+                ))
             })
         }
-        Err(e) => Err(PyErr::from(e))
+        Err(e) => Err(PyErr::from(e)),
     }
 }
 
@@ -229,12 +298,18 @@ pub fn validate_circuit_data(py: Python, data: &PyDict) -> PyResult<PyObject> {
 #[pyfunction]
 pub fn validate_json_schema(py: Python, data: &PyDict, schema_name: &str) -> PyResult<PyObject> {
     let rt = Runtime::new().map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+            "Failed to create runtime: {}",
+            e
+        ))
     })?;
 
     // Convert Python dict to serde_json::Value
     let json_value: Value = pythonize::depythonize(data).map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to convert Python dict: {}", e))
+        PyErr::new::<pyo3::exceptions::PyValueError, _>(format!(
+            "Failed to convert Python dict: {}",
+            e
+        ))
     })?;
 
     let result = rt.block_on(async {
@@ -246,11 +321,17 @@ pub fn validate_json_schema(py: Python, data: &PyDict, schema_name: &str) -> PyR
         Ok(()) => Ok(py.None()),
         Err(issues) => {
             let issues_json = serde_json::to_value(&issues).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize issues: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to serialize issues: {}",
+                    e
+                ))
             })?;
-            
+
             pythonize::pythonize(py, &issues_json).map_err(|e| {
-                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                    "Failed to convert to Python: {}",
+                    e
+                ))
             })
         }
     }
@@ -260,7 +341,10 @@ pub fn validate_json_schema(py: Python, data: &PyDict, schema_name: &str) -> PyR
 #[pyfunction]
 pub fn read_file_async(path: &str) -> PyResult<Vec<u8>> {
     let rt = Runtime::new().map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+            "Failed to create runtime: {}",
+            e
+        ))
     })?;
 
     let result = rt.block_on(async {
@@ -275,7 +359,10 @@ pub fn read_file_async(path: &str) -> PyResult<Vec<u8>> {
 #[pyfunction]
 pub fn write_file_async(path: &str, data: Vec<u8>) -> PyResult<()> {
     let rt = Runtime::new().map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+            "Failed to create runtime: {}",
+            e
+        ))
     })?;
 
     let result = rt.block_on(async {
@@ -290,7 +377,10 @@ pub fn write_file_async(path: &str, data: Vec<u8>) -> PyResult<()> {
 #[pyfunction]
 pub fn load_circuits_batch(py: Python, paths: Vec<String>) -> PyResult<PyObject> {
     let rt = Runtime::new().map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+            "Failed to create runtime: {}",
+            e
+        ))
     })?;
 
     let result = rt.block_on(async {
@@ -304,7 +394,10 @@ pub fn load_circuits_batch(py: Python, paths: Vec<String>) -> PyResult<PyObject>
         match circuit_result {
             Ok(circuit) => {
                 let circuit_json = serde_json::to_value(&circuit).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize circuit: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to serialize circuit: {}",
+                        e
+                    ))
                 })?;
                 py_results.push(pythonize::pythonize(py, &circuit_json)?);
             }
@@ -321,7 +414,10 @@ pub fn load_circuits_batch(py: Python, paths: Vec<String>) -> PyResult<PyObject>
 #[pyfunction]
 pub fn parse_kicad_files_batch(py: Python, paths: Vec<String>) -> PyResult<PyObject> {
     let rt = Runtime::new().map_err(|e| {
-        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+        PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+            "Failed to create runtime: {}",
+            e
+        ))
     })?;
 
     let result = rt.block_on(async {
@@ -335,7 +431,10 @@ pub fn parse_kicad_files_batch(py: Python, paths: Vec<String>) -> PyResult<PyObj
         match parse_result {
             Ok(kicad_data) => {
                 let data_json = serde_json::to_value(&kicad_data).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize KiCad data: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to serialize KiCad data: {}",
+                        e
+                    ))
                 })?;
                 py_results.push(pythonize::pythonize(py, &data_json)?);
             }
@@ -399,7 +498,7 @@ pub fn configure_file_io(
     max_concurrent_ops: Option<usize>,
 ) -> PyResult<()> {
     let mut config = FileIoConfig::default();
-    
+
     if let Some(threshold) = mmap_threshold {
         config.mmap_threshold = threshold;
     }
@@ -432,9 +531,12 @@ impl PyJsonLoader {
     #[new]
     fn new() -> PyResult<Self> {
         let rt = Runtime::new().map_err(|e| {
-            PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+            PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Failed to create runtime: {}",
+                e
+            ))
         })?;
-        
+
         Ok(PyJsonLoader {
             loader: JsonLoader::new(),
             rt,
@@ -442,44 +544,59 @@ impl PyJsonLoader {
     }
 
     fn load_from_file(&self, py: Python, path: &str) -> PyResult<PyObject> {
-        let result = self.rt.block_on(async {
-            self.loader.load_circuit_from_json_file(path).await
-        });
+        let result = self
+            .rt
+            .block_on(async { self.loader.load_circuit_from_json_file(path).await });
 
         match result {
             Ok(circuit) => {
                 let circuit_json = serde_json::to_value(&circuit).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize circuit: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to serialize circuit: {}",
+                        e
+                    ))
                 })?;
-                
+
                 pythonize::pythonize(py, &circuit_json).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to convert to Python: {}",
+                        e
+                    ))
                 })
             }
-            Err(e) => Err(PyErr::from(e))
+            Err(e) => Err(PyErr::from(e)),
         }
     }
 
     fn load_from_dict(&self, py: Python, data: &PyDict) -> PyResult<PyObject> {
         let json_value: Value = pythonize::depythonize(data).map_err(|e| {
-            PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to convert Python dict: {}", e))
+            PyErr::new::<pyo3::exceptions::PyValueError, _>(format!(
+                "Failed to convert Python dict: {}",
+                e
+            ))
         })?;
 
-        let result = self.rt.block_on(async {
-            self.loader.load_circuit_from_dict(json_value).await
-        });
+        let result = self
+            .rt
+            .block_on(async { self.loader.load_circuit_from_dict(json_value).await });
 
         match result {
             Ok(circuit) => {
                 let circuit_json = serde_json::to_value(&circuit).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize circuit: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to serialize circuit: {}",
+                        e
+                    ))
                 })?;
-                
+
                 pythonize::pythonize(py, &circuit_json).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to convert to Python: {}",
+                        e
+                    ))
                 })
             }
-            Err(e) => Err(PyErr::from(e))
+            Err(e) => Err(PyErr::from(e)),
         }
     }
 }
@@ -496,9 +613,12 @@ impl PyKiCadParser {
     #[new]
     fn new() -> PyResult<Self> {
         let rt = Runtime::new().map_err(|e| {
-            PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+            PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Failed to create runtime: {}",
+                e
+            ))
         })?;
-        
+
         Ok(PyKiCadParser {
             parser: KiCadParser::new(),
             rt,
@@ -506,59 +626,77 @@ impl PyKiCadParser {
     }
 
     fn parse_schematic(&self, py: Python, path: &str) -> PyResult<PyObject> {
-        let result = self.rt.block_on(async {
-            self.parser.parse_schematic(path).await
-        });
+        let result = self
+            .rt
+            .block_on(async { self.parser.parse_schematic(path).await });
 
         match result {
             Ok(schematic) => {
                 let schematic_json = serde_json::to_value(&schematic).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize schematic: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to serialize schematic: {}",
+                        e
+                    ))
                 })?;
-                
+
                 pythonize::pythonize(py, &schematic_json).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to convert to Python: {}",
+                        e
+                    ))
                 })
             }
-            Err(e) => Err(PyErr::from(e))
+            Err(e) => Err(PyErr::from(e)),
         }
     }
 
     fn parse_pcb(&self, py: Python, path: &str) -> PyResult<PyObject> {
-        let result = self.rt.block_on(async {
-            self.parser.parse_pcb(path).await
-        });
+        let result = self
+            .rt
+            .block_on(async { self.parser.parse_pcb(path).await });
 
         match result {
             Ok(pcb) => {
                 let pcb_json = serde_json::to_value(&pcb).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize PCB: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to serialize PCB: {}",
+                        e
+                    ))
                 })?;
-                
+
                 pythonize::pythonize(py, &pcb_json).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to convert to Python: {}",
+                        e
+                    ))
                 })
             }
-            Err(e) => Err(PyErr::from(e))
+            Err(e) => Err(PyErr::from(e)),
         }
     }
 
     fn parse_symbol_library(&self, py: Python, path: &str) -> PyResult<PyObject> {
-        let result = self.rt.block_on(async {
-            self.parser.parse_symbol_library(path).await
-        });
+        let result = self
+            .rt
+            .block_on(async { self.parser.parse_symbol_library(path).await });
 
         match result {
             Ok(library) => {
                 let library_json = serde_json::to_value(&library).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize library: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to serialize library: {}",
+                        e
+                    ))
                 })?;
-                
+
                 pythonize::pythonize(py, &library_json).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to convert to Python: {}",
+                        e
+                    ))
                 })
             }
-            Err(e) => Err(PyErr::from(e))
+            Err(e) => Err(PyErr::from(e)),
         }
     }
 }
@@ -575,9 +713,12 @@ impl PyValidationEngine {
     #[new]
     fn new() -> PyResult<Self> {
         let rt = Runtime::new().map_err(|e| {
-            PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to create runtime: {}", e))
+            PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Failed to create runtime: {}",
+                e
+            ))
         })?;
-        
+
         Ok(PyValidationEngine {
             engine: ValidationEngine::new(),
             rt,
@@ -586,31 +727,43 @@ impl PyValidationEngine {
 
     fn validate_circuit(&self, py: Python, data: &PyDict) -> PyResult<PyObject> {
         let circuit: CircuitData = pythonize::depythonize(data).map_err(|e| {
-            PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to convert Python dict: {}", e))
+            PyErr::new::<pyo3::exceptions::PyValueError, _>(format!(
+                "Failed to convert Python dict: {}",
+                e
+            ))
         })?;
 
-        let result = self.rt.block_on(async {
-            self.engine.validate_circuit_data(&circuit).await
-        });
+        let result = self
+            .rt
+            .block_on(async { self.engine.validate_circuit_data(&circuit).await });
 
         match result {
             Ok(validation_result) => {
                 let result_json = serde_json::to_value(&validation_result).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to serialize validation result: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to serialize validation result: {}",
+                        e
+                    ))
                 })?;
-                
+
                 pythonize::pythonize(py, &result_json).map_err(|e| {
-                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert to Python: {}", e))
+                    PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Failed to convert to Python: {}",
+                        e
+                    ))
                 })
             }
-            Err(e) => Err(PyErr::from(e))
+            Err(e) => Err(PyErr::from(e)),
         }
     }
 
     fn get_stats(&self, py: Python) -> PyResult<PyObject> {
         let stats = self.engine.get_validation_stats();
         pythonize::pythonize(py, &stats).map_err(|e| {
-            PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to convert stats: {}", e))
+            PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Failed to convert stats: {}",
+                e
+            ))
         })
     }
 
@@ -641,11 +794,11 @@ mod tests {
     fn test_json_loader_class() {
         Python::with_gil(|py| {
             let loader = PyJsonLoader::new().unwrap();
-            
+
             // Test with empty dict
-            let empty_dict = [("name", "test"), ("components", "{}"), ("nets", "{}")]
-                .into_py_dict(py);
-            
+            let empty_dict =
+                [("name", "test"), ("components", "{}"), ("nets", "{}")].into_py_dict(py);
+
             // This should work with proper circuit data
             // let result = loader.load_from_dict(py, empty_dict);
             // Note: Would need proper circuit data structure for full test

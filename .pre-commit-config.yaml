@@ -1,0 +1,65 @@
+# .pre-commit-config.yaml - Pre-commit hooks for circuit-synth
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        args: [--line-length=88]
+        files: ^src/.*\.py$
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: [--profile=black]
+        files: ^src/.*\.py$
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args: [--max-line-length=88, --extend-ignore=E203,W503]
+        files: ^src/.*\.py$
+
+  - repo: local
+    hooks:
+      - id: python-tests
+        name: Python Tests
+        entry: uv run pytest
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: false
+        files: ^(src/.*\.py|tests/.*\.py)$
+        
+      - id: rust-tests
+        name: Rust Tests
+        entry: ./scripts/test_rust_modules.sh
+        language: system
+        files: ^rust_modules/.*\.(rs|toml)$
+        pass_filenames: false
+        always_run: false
+
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      - id: fmt
+        name: Rust Format
+        args: [--manifest-path=rust_modules/rust_netlist_processor/Cargo.toml]
+      - id: clippy
+        name: Rust Clippy
+        args: [--manifest-path=rust_modules/rust_netlist_processor/Cargo.toml, --,  -D, warnings]
+
+default_stages: [commit]

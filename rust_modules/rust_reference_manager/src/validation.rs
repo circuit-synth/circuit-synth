@@ -1,5 +1,5 @@
 //! Reference validation utilities
-//! 
+//!
 //! This module provides validation functionality for reference formats,
 //! prefixes, and other constraints to ensure data integrity.
 
@@ -11,19 +11,19 @@ use std::collections::HashSet;
 pub struct ReferenceValidator {
     /// Maximum length for a reference
     max_reference_length: usize,
-    
+
     /// Maximum length for a prefix
     max_prefix_length: usize,
-    
+
     /// Allowed characters in prefixes
     allowed_prefix_chars: HashSet<char>,
-    
+
     /// Allowed characters in reference numbers
     allowed_number_chars: HashSet<char>,
-    
+
     /// Reserved prefixes that cannot be used
     reserved_prefixes: HashSet<String>,
-    
+
     /// Reserved references that cannot be used
     reserved_references: HashSet<String>,
 }
@@ -97,17 +97,21 @@ impl ReferenceValidator {
         }
 
         if reference.len() > self.max_reference_length {
-            return Err(ReferenceError::Validation(ValidationError::ReferenceTooLong {
-                reference: reference.to_string(),
-                max_length: self.max_reference_length,
-            }));
+            return Err(ReferenceError::Validation(
+                ValidationError::ReferenceTooLong {
+                    reference: reference.to_string(),
+                    max_length: self.max_reference_length,
+                },
+            ));
         }
 
         // Check for reserved references
         if self.reserved_references.contains(reference) {
-            return Err(ReferenceError::Validation(ValidationError::ReservedReference {
-                reference: reference.to_string(),
-            }));
+            return Err(ReferenceError::Validation(
+                ValidationError::ReservedReference {
+                    reference: reference.to_string(),
+                },
+            ));
         }
 
         // Parse prefix and number
@@ -138,27 +142,33 @@ impl ReferenceValidator {
 
         // Check for reserved prefixes
         if self.reserved_prefixes.contains(prefix) {
-            return Err(ReferenceError::Validation(ValidationError::ReservedPrefix {
-                prefix: prefix.to_string(),
-            }));
+            return Err(ReferenceError::Validation(
+                ValidationError::ReservedPrefix {
+                    prefix: prefix.to_string(),
+                },
+            ));
         }
 
         // Check characters
         for ch in prefix.chars() {
             if !self.allowed_prefix_chars.contains(&ch) {
-                return Err(ReferenceError::Validation(ValidationError::InvalidPrefixCharacter {
-                    prefix: prefix.to_string(),
-                    invalid_char: ch,
-                }));
+                return Err(ReferenceError::Validation(
+                    ValidationError::InvalidPrefixCharacter {
+                        prefix: prefix.to_string(),
+                        invalid_char: ch,
+                    },
+                ));
             }
         }
 
         // Prefix must start with a letter
         if let Some(first_char) = prefix.chars().next() {
             if !first_char.is_alphabetic() {
-                return Err(ReferenceError::Validation(ValidationError::PrefixMustStartWithLetter {
-                    prefix: prefix.to_string(),
-                }));
+                return Err(ReferenceError::Validation(
+                    ValidationError::PrefixMustStartWithLetter {
+                        prefix: prefix.to_string(),
+                    },
+                ));
             }
         }
 
@@ -174,10 +184,12 @@ impl ReferenceValidator {
         // Check characters
         for ch in number_part.chars() {
             if !self.allowed_number_chars.contains(&ch) {
-                return Err(ReferenceError::Validation(ValidationError::InvalidNumberCharacter {
-                    number_part: number_part.to_string(),
-                    invalid_char: ch,
-                }));
+                return Err(ReferenceError::Validation(
+                    ValidationError::InvalidNumberCharacter {
+                        number_part: number_part.to_string(),
+                        invalid_char: ch,
+                    },
+                ));
             }
         }
 
@@ -195,32 +207,38 @@ impl ReferenceValidator {
     pub fn parse_reference(&self, reference: &str) -> Result<(String, String), ReferenceError> {
         // Find the boundary between letters and numbers
         let mut prefix_end = 0;
-        
+
         for (i, ch) in reference.char_indices() {
             if ch.is_alphabetic() || ch == '_' {
                 prefix_end = i + ch.len_utf8();
             } else if ch.is_numeric() {
                 break;
             } else {
-                return Err(ReferenceError::Validation(ValidationError::InvalidReferenceFormat {
-                    reference: reference.to_string(),
-                    reason: format!("Invalid character '{}' at position {}", ch, i),
-                }));
+                return Err(ReferenceError::Validation(
+                    ValidationError::InvalidReferenceFormat {
+                        reference: reference.to_string(),
+                        reason: format!("Invalid character '{}' at position {}", ch, i),
+                    },
+                ));
             }
         }
 
         if prefix_end == 0 {
-            return Err(ReferenceError::Validation(ValidationError::InvalidReferenceFormat {
-                reference: reference.to_string(),
-                reason: "Reference must start with a letter".to_string(),
-            }));
+            return Err(ReferenceError::Validation(
+                ValidationError::InvalidReferenceFormat {
+                    reference: reference.to_string(),
+                    reason: "Reference must start with a letter".to_string(),
+                },
+            ));
         }
 
         if prefix_end >= reference.len() {
-            return Err(ReferenceError::Validation(ValidationError::InvalidReferenceFormat {
-                reference: reference.to_string(),
-                reason: "Reference must contain a number".to_string(),
-            }));
+            return Err(ReferenceError::Validation(
+                ValidationError::InvalidReferenceFormat {
+                    reference: reference.to_string(),
+                    reason: "Reference must contain a number".to_string(),
+                },
+            ));
         }
 
         let prefix = reference[..prefix_end].to_string();
@@ -240,28 +258,26 @@ impl ReferenceValidator {
     /// Extract the number from a reference
     pub fn extract_number(&self, reference: &str) -> Result<u32, ReferenceError> {
         let (_, number_part) = self.parse_reference(reference)?;
-        number_part.parse::<u32>().map_err(|_| {
-            ReferenceError::Validation(ValidationError::InvalidNumber {
-                number_part,
-            })
-        })
+        number_part
+            .parse::<u32>()
+            .map_err(|_| ReferenceError::Validation(ValidationError::InvalidNumber { number_part }))
     }
 
     /// Generate a reference from prefix and number
     pub fn format_reference(&self, prefix: &str, number: u32) -> Result<String, ReferenceError> {
         self.validate_prefix(prefix)?;
-        
+
         let reference = format!("{}{}", prefix, number);
         self.validate_format(&reference)?;
-        
+
         Ok(reference)
     }
 
     /// Check if a reference is a valid unnamed net reference (N$1, N$2, etc.)
     pub fn is_unnamed_net(&self, reference: &str) -> bool {
-        reference.starts_with("N$") && 
-        reference.len() > 2 && 
-        reference[2..].chars().all(|c| c.is_numeric())
+        reference.starts_with("N$")
+            && reference.len() > 2
+            && reference[2..].chars().all(|c| c.is_numeric())
     }
 
     /// Add a reserved prefix
@@ -294,7 +310,7 @@ mod tests {
     #[test]
     fn test_valid_references() {
         let validator = ReferenceValidator::new();
-        
+
         assert!(validator.validate_format("R1").is_ok());
         assert!(validator.validate_format("C23").is_ok());
         assert!(validator.validate_format("U456").is_ok());
@@ -305,20 +321,20 @@ mod tests {
     #[test]
     fn test_invalid_references() {
         let validator = ReferenceValidator::new();
-        
+
         // Empty reference
         assert!(validator.validate_format("").is_err());
-        
+
         // No number
         assert!(validator.validate_format("R").is_err());
-        
+
         // No prefix
         assert!(validator.validate_format("123").is_err());
-        
+
         // Invalid characters
         assert!(validator.validate_format("R-1").is_err());
         assert!(validator.validate_format("R@1").is_err());
-        
+
         // Reserved references
         assert!(validator.validate_format("GND").is_err());
         assert!(validator.validate_format("VCC").is_err());
@@ -327,12 +343,12 @@ mod tests {
     #[test]
     fn test_prefix_validation() {
         let validator = ReferenceValidator::new();
-        
+
         // Valid prefixes
         assert!(validator.validate_prefix("R").is_ok());
         assert!(validator.validate_prefix("IC").is_ok());
         assert!(validator.validate_prefix("SW_").is_ok());
-        
+
         // Invalid prefixes
         assert!(validator.validate_prefix("").is_err());
         assert!(validator.validate_prefix("1R").is_err());
@@ -343,15 +359,15 @@ mod tests {
     #[test]
     fn test_reference_parsing() {
         let validator = ReferenceValidator::new();
-        
+
         let (prefix, number) = validator.parse_reference("R123").unwrap();
         assert_eq!(prefix, "R");
         assert_eq!(number, "123");
-        
+
         let (prefix, number) = validator.parse_reference("IC_45").unwrap();
         assert_eq!(prefix, "IC_");
         assert_eq!(number, "45");
-        
+
         // Invalid formats
         assert!(validator.parse_reference("123R").is_err());
         assert!(validator.parse_reference("R-123").is_err());
@@ -360,11 +376,11 @@ mod tests {
     #[test]
     fn test_number_extraction() {
         let validator = ReferenceValidator::new();
-        
+
         assert_eq!(validator.extract_number("R123").unwrap(), 123);
         assert_eq!(validator.extract_number("C1").unwrap(), 1);
         assert_eq!(validator.extract_number("U999").unwrap(), 999);
-        
+
         // Invalid numbers
         assert!(validator.extract_number("R").is_err());
         assert!(validator.extract_number("R0123").is_ok()); // Leading zeros are ok
@@ -373,10 +389,10 @@ mod tests {
     #[test]
     fn test_reference_formatting() {
         let validator = ReferenceValidator::new();
-        
+
         assert_eq!(validator.format_reference("R", 1).unwrap(), "R1");
         assert_eq!(validator.format_reference("IC", 123).unwrap(), "IC123");
-        
+
         // Invalid prefix should fail
         assert!(validator.format_reference("1R", 1).is_err());
         assert!(validator.format_reference("N$", 1).is_err());
@@ -385,7 +401,7 @@ mod tests {
     #[test]
     fn test_unnamed_net_detection() {
         let validator = ReferenceValidator::new();
-        
+
         assert!(validator.is_unnamed_net("N$1"));
         assert!(validator.is_unnamed_net("N$123"));
         assert!(!validator.is_unnamed_net("R1"));
@@ -396,7 +412,7 @@ mod tests {
     #[test]
     fn test_prefix_matching() {
         let validator = ReferenceValidator::new();
-        
+
         assert!(validator.matches_prefix("R123", "R"));
         assert!(validator.matches_prefix("IC45", "IC"));
         assert!(!validator.matches_prefix("R123", "C"));
@@ -406,18 +422,18 @@ mod tests {
     #[test]
     fn test_custom_validator() {
         let validator = ReferenceValidator::with_config(
-            32,  // max_reference_length
-            8,   // max_prefix_length
-            vec!["CUSTOM".to_string()], // reserved_prefixes
+            32,                          // max_reference_length
+            8,                           // max_prefix_length
+            vec!["CUSTOM".to_string()],  // reserved_prefixes
             vec!["SPECIAL".to_string()], // reserved_references
         );
-        
+
         // Custom reserved prefix should be rejected
         assert!(validator.validate_prefix("CUSTOM").is_err());
-        
+
         // Custom reserved reference should be rejected
         assert!(validator.validate_format("SPECIAL").is_err());
-        
+
         // Length limits should be enforced
         let long_prefix = "A".repeat(10);
         assert!(validator.validate_prefix(&long_prefix).is_err());

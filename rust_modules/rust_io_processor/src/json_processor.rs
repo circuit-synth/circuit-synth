@@ -1,19 +1,19 @@
 //! High-performance JSON processing engine with circuit data optimization
-//! 
+//!
 //! Provides 20x faster circuit data serialization/deserialization through:
 //! - SIMD-accelerated JSON parsing with simd-json
 //! - Optimized data structures for circuit components
 //! - Streaming JSON processing for large files
 //! - Circuit-specific serialization optimizations
 
+use rayon::prelude::*;
+use serde::{Deserialize, Serialize};
+use simd_json;
 use std::collections::HashMap;
 use std::path::Path;
 use std::sync::Arc;
-use serde::{Deserialize, Serialize};
-use simd_json;
 use tokio::task;
-use rayon::prelude::*;
-use tracing::{debug, info, warn, error};
+use tracing::{debug, error, info, warn};
 
 use crate::error::{IoError, IoResult};
 use crate::file_io::{FileReader, FileWriter};
@@ -132,7 +132,7 @@ impl Default for JsonConfig {
         Self {
             use_simd: true,
             enable_parallel: true,
-            stream_buffer_size: 64 * 1024, // 64KB
+            stream_buffer_size: 64 * 1024,      // 64KB
             max_memory_size: 100 * 1024 * 1024, // 100MB
             circuit_optimizations: true,
         }
@@ -159,18 +159,21 @@ impl JsonLoader {
     }
 
     /// Load circuit from JSON file - equivalent to Python's load_circuit_from_json_file()
-    pub async fn load_circuit_from_json_file<P: AsRef<Path>>(&self, path: P) -> IoResult<CircuitData> {
+    pub async fn load_circuit_from_json_file<P: AsRef<Path>>(
+        &self,
+        path: P,
+    ) -> IoResult<CircuitData> {
         let path = path.as_ref();
         info!("Loading circuit from JSON file: {:?}", path);
 
         let start_time = std::time::Instant::now();
-        
+
         // Read file content
         let content = self.file_reader.read_file_to_string(path).await?;
-        
+
         // Parse JSON with optimizations
         let circuit = self.parse_json_string(&content).await?;
-        
+
         let duration = start_time.elapsed();
         info!(
             "Loaded circuit '{}' from {:?} in {:?} ({} components, {} nets)",
@@ -189,10 +192,10 @@ impl JsonLoader {
         info!("Loading circuit from dictionary data");
 
         let start_time = std::time::Instant::now();
-        
+
         // Convert JSON value to circuit data with optimizations
         let circuit = self.parse_json_value(data).await?;
-        
+
         let duration = start_time.elapsed();
         info!(
             "Loaded circuit '{}' from dict in {:?} ({} components, {} nets)",
@@ -208,7 +211,7 @@ impl JsonLoader {
     /// Parse JSON string with SIMD acceleration
     async fn parse_json_string(&self, content: &str) -> IoResult<CircuitData> {
         let content_size = content.len();
-        
+
         if content_size > self.config.max_memory_size {
             return self.parse_large_json_streaming(content).await;
         }
@@ -226,10 +229,12 @@ impl JsonLoader {
     /// Parse JSON with SIMD acceleration
     async fn parse_with_simd(&self, content: &str) -> IoResult<serde_json::Value> {
         let mut content_bytes = content.as_bytes().to_vec();
-        
+
         task::spawn_blocking(move || {
             simd_json::to_borrowed_value(&mut content_bytes)
-                .map(|borrowed_value| serde_json::to_value(borrowed_value).unwrap_or(serde_json::Value::Null))
+                .map(|borrowed_value| {
+                    serde_json::to_value(borrowed_value).unwrap_or(serde_json::Value::Null)
+                })
                 .map_err(|e| IoError::json_processing(format!("SIMD JSON parsing failed: {}", e)))
         })
         .await
@@ -239,7 +244,7 @@ impl JsonLoader {
     /// Parse JSON with standard serde
     async fn parse_with_serde(&self, content: &str) -> IoResult<serde_json::Value> {
         let content = content.to_string();
-        
+
         task::spawn_blocking(move || {
             serde_json::from_str(&content)
                 .map_err(|e| IoError::json_processing(format!("Serde JSON parsing failed: {}", e)))
@@ -250,14 +255,19 @@ impl JsonLoader {
 
     /// Parse large JSON files with streaming
     async fn parse_large_json_streaming(&self, content: &str) -> IoResult<CircuitData> {
-        warn!("Using streaming parser for large JSON file ({} bytes)", content.len());
-        
+        warn!(
+            "Using streaming parser for large JSON file ({} bytes)",
+            content.len()
+        );
+
         // For very large files, we'd implement a streaming JSON parser
         // For now, fall back to regular parsing with a warning
         self.parse_with_serde(content).await?;
-        
+
         // This would be implemented with a proper streaming JSON parser
-        Err(IoError::json_processing("Streaming JSON parser not yet implemented"))
+        Err(IoError::json_processing(
+            "Streaming JSON parser not yet implemented",
+        ))
     }
 
     /// Parse JSON value to circuit data with optimizations
@@ -272,15 +282,16 @@ impl JsonLoader {
     /// Parse JSON with parallel processing for large circuits
     async fn parse_json_parallel(&self, value: serde_json::Value) -> IoResult<CircuitData> {
         let value_clone = value.clone();
-        
+
         task::spawn_blocking(move || {
             // Deserialize with circuit-specific optimizations
-            let mut circuit: CircuitData = serde_json::from_value(value_clone)
-                .map_err(|e| IoError::json_processing(format!("Circuit deserialization failed: {}", e)))?;
+            let mut circuit: CircuitData = serde_json::from_value(value_clone).map_err(|e| {
+                IoError::json_processing(format!("Circuit deserialization failed: {}", e))
+            })?;
 
             // Apply circuit-specific optimizations
             Self::optimize_circuit_data(&mut circuit);
-            
+
             Ok(circuit)
         })
         .await
@@ -289,12 +300,13 @@ impl JsonLoader {
 
     /// Parse JSON sequentially
     async fn parse_json_sequential(&self, value: serde_json::Value) -> IoResult<CircuitData> {
-        let mut circuit: CircuitData = serde_json::from_value(value)
-            .map_err(|e| IoError::json_processing(format!("Circuit deserialization failed: {}", e)))?;
+        let mut circuit: CircuitData = serde_json::from_value(value).map_err(|e| {
+            IoError::json_processing(format!("Circuit deserialization failed: {}", e))
+        })?;
 
         // Apply circuit-specific optimizations
         Self::optimize_circuit_data(&mut circuit);
-        
+
         Ok(circuit)
     }
 
@@ -309,7 +321,7 @@ impl JsonLoader {
 
             // Optimize pin data
             component.pins.shrink_to_fit();
-            
+
             // Remove empty optional fields to save memory
             if let Some(ref props) = component.properties {
                 if props.is_empty() {
@@ -332,7 +344,10 @@ impl JsonLoader {
     }
 
     /// Batch load multiple circuit files
-    pub async fn load_circuits_batch<P: AsRef<Path>>(&self, paths: Vec<P>) -> Vec<IoResult<CircuitData>> {
+    pub async fn load_circuits_batch<P: AsRef<Path>>(
+        &self,
+        paths: Vec<P>,
+    ) -> Vec<IoResult<CircuitData>> {
         if self.config.enable_parallel {
             self.load_circuits_parallel(paths).await
         } else {
@@ -341,7 +356,10 @@ impl JsonLoader {
     }
 
     /// Load circuits in parallel
-    async fn load_circuits_parallel<P: AsRef<Path>>(&self, paths: Vec<P>) -> Vec<IoResult<CircuitData>> {
+    async fn load_circuits_parallel<P: AsRef<Path>>(
+        &self,
+        paths: Vec<P>,
+    ) -> Vec<IoResult<CircuitData>> {
         use tokio::task::JoinSet;
 
         let mut join_set = JoinSet::new();
@@ -362,7 +380,10 @@ impl JsonLoader {
         while let Some(result) = join_set.join_next().await {
             match result {
                 Ok(circuit_result) => results.push(circuit_result),
-                Err(e) => results.push(Err(IoError::json_processing(format!("Task join error: {}", e)))),
+                Err(e) => results.push(Err(IoError::json_processing(format!(
+                    "Task join error: {}",
+                    e
+                )))),
             }
         }
 
@@ -370,14 +391,17 @@ impl JsonLoader {
     }
 
     /// Load circuits sequentially
-    async fn load_circuits_sequential<P: AsRef<Path>>(&self, paths: Vec<P>) -> Vec<IoResult<CircuitData>> {
+    async fn load_circuits_sequential<P: AsRef<Path>>(
+        &self,
+        paths: Vec<P>,
+    ) -> Vec<IoResult<CircuitData>> {
         let mut results = Vec::new();
-        
+
         for path in paths {
             let result = self.load_circuit_from_json_file(path).await;
             results.push(result);
         }
-        
+
         results
     }
 }
@@ -425,13 +449,15 @@ impl JsonSerializer {
         info!("Saving circuit '{}' to JSON file: {:?}", circuit.name, path);
 
         let start_time = std::time::Instant::now();
-        
+
         // Serialize to JSON string with optimizations
         let json_string = self.serialize_to_string(circuit).await?;
-        
+
         // Write to file
-        self.file_writer.write_file_string(path, &json_string).await?;
-        
+        self.file_writer
+            .write_file_string(path, &json_string)
+            .await?;
+
         let duration = start_time.elapsed();
         info!(
             "Saved circuit '{}' to {:?} in {:?} ({} bytes)",
@@ -447,7 +473,7 @@ impl JsonSerializer {
     /// Serialize circuit to JSON string
     pub async fn serialize_to_string(&self, circuit: &CircuitData) -> IoResult<String> {
         let circuit = circuit.clone();
-        
+
         task::spawn_blocking(move || {
             if cfg!(feature = "json-optimization") {
                 // Use optimized serialization
@@ -464,10 +490,11 @@ impl JsonSerializer {
     /// Serialize circuit to JSON value
     pub async fn serialize_to_value(&self, circuit: &CircuitData) -> IoResult<serde_json::Value> {
         let circuit = circuit.clone();
-        
+
         task::spawn_blocking(move || {
-            serde_json::to_value(&circuit)
-                .map_err(|e| IoError::json_processing(format!("Circuit value serialization failed: {}", e)))
+            serde_json::to_value(&circuit).map_err(|e| {
+                IoError::json_processing(format!("Circuit value serialization failed: {}", e))
+            })
         })
         .await
         .map_err(|e| IoError::json_processing(format!("Task join error: {}", e)))?
@@ -499,7 +526,10 @@ impl JsonSerializer {
         while let Some(result) = join_set.join_next().await {
             match result {
                 Ok(save_result) => results.push(save_result),
-                Err(e) => results.push(Err(IoError::json_processing(format!("Task join error: {}", e)))),
+                Err(e) => results.push(Err(IoError::json_processing(format!(
+                    "Task join error: {}",
+                    e
+                )))),
             }
         }
 
@@ -530,16 +560,18 @@ pub mod utils {
     /// Validate JSON structure for circuit data
     pub fn validate_circuit_json(value: &serde_json::Value) -> IoResult<()> {
         // Check required fields
-        let obj = value.as_object().ok_or_else(|| {
-            IoError::validation("Circuit JSON must be an object")
-        })?;
+        let obj = value
+            .as_object()
+            .ok_or_else(|| IoError::validation("Circuit JSON must be an object"))?;
 
         if !obj.contains_key("name") {
             return Err(IoError::validation("Circuit JSON missing 'name' field"));
         }
 
         if !obj.contains_key("components") {
-            return Err(IoError::validation("Circuit JSON missing 'components' field"));
+            return Err(IoError::validation(
+                "Circuit JSON missing 'components' field",
+            ));
         }
 
         if !obj.contains_key("nets") {
@@ -567,7 +599,7 @@ mod tests {
     #[tokio::test]
     async fn test_json_loader() {
         let loader = JsonLoader::new();
-        
+
         // Test data
         let test_circuit = CircuitData {
             name: "test_circuit".to_string(),
@@ -582,7 +614,7 @@ mod tests {
         // Test serialization
         let serializer = JsonSerializer::new();
         let json_string = serializer.serialize_to_string(&test_circuit).await.unwrap();
-        
+
         // Test deserialization
         let parsed_circuit = loader.parse_json_string(&json_string).await.unwrap();
         assert_eq!(parsed_circuit.name, "test_circuit");
@@ -598,39 +630,42 @@ mod tests {
 
         // Create test circuit
         let mut components = HashMap::new();
-        components.insert("R1".to_string(), ComponentData {
-            symbol: "Device:R".to_string(),
-            reference: "R1".to_string(),
-            value: Some("1k".to_string()),
-            footprint: Some("Resistor_SMD:R_0603_1608Metric".to_string()),
-            datasheet: None,
-            description: None,
-            pins: vec![
-                PinData {
-                    pin_id: 1,
-                    name: "~".to_string(),
-                    num: "1".to_string(),
-                    function: "passive".to_string(),
-                    unit: 1,
-                    x: 0.0,
-                    y: 0.0,
-                    length: 2.54,
-                    orientation: 0,
-                },
-                PinData {
-                    pin_id: 2,
-                    name: "~".to_string(),
-                    num: "2".to_string(),
-                    function: "passive".to_string(),
-                    unit: 1,
-                    x: 5.08,
-                    y: 0.0,
-                    length: 2.54,
-                    orientation: 180,
-                },
-            ],
-            properties: None,
-        });
+        components.insert(
+            "R1".to_string(),
+            ComponentData {
+                symbol: "Device:R".to_string(),
+                reference: "R1".to_string(),
+                value: Some("1k".to_string()),
+                footprint: Some("Resistor_SMD:R_0603_1608Metric".to_string()),
+                datasheet: None,
+                description: None,
+                pins: vec![
+                    PinData {
+                        pin_id: 1,
+                        name: "~".to_string(),
+                        num: "1".to_string(),
+                        function: "passive".to_string(),
+                        unit: 1,
+                        x: 0.0,
+                        y: 0.0,
+                        length: 2.54,
+                        orientation: 0,
+                    },
+                    PinData {
+                        pin_id: 2,
+                        name: "~".to_string(),
+                        num: "2".to_string(),
+                        function: "passive".to_string(),
+                        unit: 1,
+                        x: 5.08,
+                        y: 0.0,
+                        length: 2.54,
+                        orientation: 180,
+                    },
+                ],
+                properties: None,
+            },
+        );
 
         let test_circuit = CircuitData {
             name: "file_test_circuit".to_string(),
@@ -643,11 +678,17 @@ mod tests {
         };
 
         // Save to file
-        serializer.save_circuit_to_json_file(&test_circuit, &file_path).await.unwrap();
+        serializer
+            .save_circuit_to_json_file(&test_circuit, &file_path)
+            .await
+            .unwrap();
 
         // Load from file
-        let loaded_circuit = loader.load_circuit_from_json_file(&file_path).await.unwrap();
-        
+        let loaded_circuit = loader
+            .load_circuit_from_json_file(&file_path)
+            .await
+            .unwrap();
+
         assert_eq!(loaded_circuit.name, "file_test_circuit");
         assert_eq!(loaded_circuit.components.len(), 1);
         assert!(loaded_circuit.components.contains_key("R1"));
@@ -660,19 +701,21 @@ mod tests {
         let serializer = JsonSerializer::new();
 
         // Create test circuits
-        let circuits: Vec<_> = (0..3).map(|i| {
-            let path = dir.path().join(format!("circuit_{}.json", i));
-            let circuit = CircuitData {
-                name: format!("circuit_{}", i),
-                description: Some(format!("Test circuit {}", i)),
-                components: HashMap::new(),
-                nets: HashMap::new(),
-                subcircuits: Vec::new(),
-                duplicate_detection: None,
-                metadata: None,
-            };
-            (circuit, path)
-        }).collect();
+        let circuits: Vec<_> = (0..3)
+            .map(|i| {
+                let path = dir.path().join(format!("circuit_{}.json", i));
+                let circuit = CircuitData {
+                    name: format!("circuit_{}", i),
+                    description: Some(format!("Test circuit {}", i)),
+                    components: HashMap::new(),
+                    nets: HashMap::new(),
+                    subcircuits: Vec::new(),
+                    duplicate_detection: None,
+                    metadata: None,
+                };
+                (circuit, path)
+            })
+            .collect();
 
         // Save batch
         let save_data: Vec<_> = circuits.iter().map(|(c, p)| (c, p)).collect();

@@ -4,14 +4,14 @@
 //! maintaining 100% API compatibility with the existing Python implementation while
 //! delivering 30-50x performance improvements.
 
+use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList, PyString, PyType};
-use pyo3::exceptions::PyValueError;
 use std::collections::HashMap;
 
-use crate::{NetlistProcessor, ProcessingStats};
 use crate::data_transform::{Circuit, Component, Net, NetNode, PinInfo, PinType};
 use crate::errors::{NetlistError, Result};
+use crate::{NetlistProcessor, ProcessingStats};
 
 /// Python wrapper for the Rust NetlistProcessor
 #[pyclass(name = "RustNetlistProcessor")]
@@ -30,75 +30,85 @@ impl PyNetlistProcessor {
     }
 
     /// Generate a complete KiCad netlist from circuit JSON data
-    /// 
+    ///
     /// Args:
     ///     circuit_json (str): JSON string containing circuit data
-    /// 
+    ///
     /// Returns:
     ///     str: Formatted KiCad netlist
-    /// 
+    ///
     /// Raises:
     ///     ValueError: If circuit data is invalid or processing fails
     fn generate_kicad_netlist(&mut self, circuit_json: &str) -> PyResult<String> {
-        let circuit = Circuit::from_json(circuit_json)
-            .map_err(|e| {
-                // Provide more detailed error information for debugging
-                PyValueError::new_err(format!("Invalid circuit JSON: {}", e))
-            })?;
-        
+        let circuit = Circuit::from_json(circuit_json).map_err(|e| {
+            // Provide more detailed error information for debugging
+            PyValueError::new_err(format!("Invalid circuit JSON: {}", e))
+        })?;
+
         // Check if circuit is effectively empty and handle gracefully
         if circuit.is_effectively_empty() {
-            let py_circuit = PyCircuit { circuit: circuit.clone() };
+            let py_circuit = PyCircuit {
+                circuit: circuit.clone(),
+            };
             return Ok(self.generate_empty_circuit_netlist(py_circuit));
         }
-        
-        self.processor.generate_kicad_netlist(&circuit)
+
+        self.processor
+            .generate_kicad_netlist(&circuit)
             .map_err(|e| PyValueError::new_err(format!("Netlist generation failed: {}", e)))
     }
 
     /// Generate only the nets section (for testing/debugging)
-    /// 
+    ///
     /// Args:
     ///     circuit_json (str): JSON string containing circuit data
-    /// 
+    ///
     /// Returns:
     ///     str: Formatted nets section
     fn generate_nets_only(&mut self, circuit_json: &str) -> PyResult<String> {
         let circuit = Circuit::from_json(circuit_json)
             .map_err(|e| PyValueError::new_err(format!("Invalid circuit JSON: {}", e)))?;
-        
-        self.processor.generate_nets_only(&circuit)
+
+        self.processor
+            .generate_nets_only(&circuit)
             .map_err(|e| PyValueError::new_err(format!("Nets generation failed: {}", e)))
     }
 
     /// Generate only the components section
-    /// 
+    ///
     /// Args:
     ///     circuit_json (str): JSON string containing circuit data
-    /// 
+    ///
     /// Returns:
     ///     str: Formatted components section
     fn generate_components_only(&mut self, circuit_json: &str) -> PyResult<String> {
         let circuit = Circuit::from_json(circuit_json)
             .map_err(|e| PyValueError::new_err(format!("Invalid circuit JSON: {}", e)))?;
-        
-        self.processor.generate_components_only(&circuit)
+
+        self.processor
+            .generate_components_only(&circuit)
             .map_err(|e| PyValueError::new_err(format!("Components generation failed: {}", e)))
     }
 
     /// Get performance statistics from the last processing run
-    /// 
+    ///
     /// Returns:
     ///     dict: Performance statistics including timing and memory usage
     fn get_performance_stats(&self) -> PyResult<PyObject> {
         let stats = self.processor.get_performance_stats();
-        
+
         Python::with_gil(|py| {
             let dict = PyDict::new(py);
             dict.set_item("formatting_time_ms", stats.formatting_time_ms)?;
             dict.set_item("net_processing_time_ms", stats.net_processing_time_ms)?;
-            dict.set_item("component_processing_time_ms", stats.component_processing_time_ms)?;
-            dict.set_item("libpart_processing_time_ms", stats.libpart_processing_time_ms)?;
+            dict.set_item(
+                "component_processing_time_ms",
+                stats.component_processing_time_ms,
+            )?;
+            dict.set_item(
+                "libpart_processing_time_ms",
+                stats.libpart_processing_time_ms,
+            )?;
             dict.set_item("total_time_ms", stats.total_time_ms())?;
             dict.set_item("memory_usage_mb", stats.memory_usage_mb())?;
             Ok(dict.into())
@@ -154,13 +164,14 @@ impl PyCircuit {
     fn from_json(_cls: &PyType, json_data: &str) -> PyResult<Self> {
         let circuit = Circuit::from_json(json_data)
             .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {}", e)))?;
-        
+
         Ok(Self { circuit })
     }
 
     /// Convert circuit to JSON string
     fn to_json(&self) -> PyResult<String> {
-        self.circuit.to_json()
+        self.circuit
+            .to_json()
             .map_err(|e| PyValueError::new_err(format!("JSON serialization failed: {}", e)))
     }
 
@@ -192,7 +203,7 @@ impl PyCircuit {
     fn add_component(&mut self, component_json: &str) -> PyResult<()> {
         let component: Component = serde_json::from_str(component_json)
             .map_err(|e| PyValueError::new_err(format!("Invalid component JSON: {}", e)))?;
-        
+
         self.circuit.add_component(component);
         Ok(())
     }
@@ -209,7 +220,8 @@ impl PyCircuit {
 
     /// Get used libraries
     fn get_used_libraries(&self) -> PyResult<Vec<String>> {
-        self.circuit.used_libraries()
+        self.circuit
+            .used_libraries()
             .map_err(|e| PyValueError::new_err(format!("Failed to get libraries: {}", e)))
     }
 }
@@ -268,14 +280,16 @@ impl PyComponent {
 
     /// Get library name
     fn library(&self) -> PyResult<String> {
-        self.component.library()
+        self.component
+            .library()
             .map(|s| s.to_string())
             .map_err(|e| PyValueError::new_err(format!("Invalid symbol: {}", e)))
     }
 
     /// Get part name
     fn part(&self) -> PyResult<String> {
-        self.component.part()
+        self.component
+            .part()
             .map(|s| s.to_string())
             .map_err(|e| PyValueError::new_err(format!("Invalid symbol: {}", e)))
     }
@@ -290,7 +304,11 @@ impl PyComponent {
 
     /// Get pin numbers
     fn get_pin_numbers(&self) -> Vec<String> {
-        self.component.pin_numbers().into_iter().map(|s| s.to_string()).collect()
+        self.component
+            .pin_numbers()
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect()
     }
 
     /// Convert to JSON
@@ -306,23 +324,26 @@ pub fn convert_json_to_netlist(json_path: String, output_path: String) -> PyResu
     // Read JSON file
     let json_content = std::fs::read_to_string(&json_path)
         .map_err(|e| PyValueError::new_err(format!("Failed to read JSON file: {}", e)))?;
-    
+
     // Parse circuit
-    let circuit = Circuit::from_json(&json_content)
-        .map_err(|e| {
-            // Provide more detailed error information for debugging
-            PyValueError::new_err(format!("Invalid circuit JSON: JSON processing error: {}", e))
-        })?;
-    
+    let circuit = Circuit::from_json(&json_content).map_err(|e| {
+        // Provide more detailed error information for debugging
+        PyValueError::new_err(format!(
+            "Invalid circuit JSON: JSON processing error: {}",
+            e
+        ))
+    })?;
+
     // Generate netlist
     let mut processor = NetlistProcessor::new();
-    let netlist = processor.generate_kicad_netlist(&circuit)
+    let netlist = processor
+        .generate_kicad_netlist(&circuit)
         .map_err(|e| PyValueError::new_err(format!("Netlist generation failed: {}", e)))?;
-    
+
     // Write output file
     std::fs::write(&output_path, netlist)
         .map_err(|e| PyValueError::new_err(format!("Failed to write output file: {}", e)))?;
-    
+
     Ok(())
 }
 
@@ -331,24 +352,25 @@ pub fn convert_json_to_netlist(json_path: String, output_path: String) -> PyResu
 pub fn benchmark_netlist_generation(circuit_json: String, iterations: usize) -> PyResult<PyObject> {
     let circuit = Circuit::from_json(&circuit_json)
         .map_err(|e| PyValueError::new_err(format!("Invalid circuit JSON: {}", e)))?;
-    
+
     let mut processor = NetlistProcessor::new();
     let mut times = Vec::with_capacity(iterations);
-    
+
     for _ in 0..iterations {
         let start = std::time::Instant::now();
-        let _result = processor.generate_kicad_netlist(&circuit)
+        let _result = processor
+            .generate_kicad_netlist(&circuit)
             .map_err(|e| PyValueError::new_err(format!("Netlist generation failed: {}", e)))?;
         times.push(start.elapsed().as_secs_f64() * 1000.0); // Convert to milliseconds
         processor.reset();
     }
-    
+
     // Calculate statistics
     let total_time: f64 = times.iter().sum();
     let avg_time = total_time / iterations as f64;
     let min_time = times.iter().fold(f64::INFINITY, |a, &b| a.min(b));
     let max_time = times.iter().fold(0.0f64, |a, &b| a.max(b));
-    
+
     Python::with_gil(|py| {
         let dict = PyDict::new(py);
         dict.set_item("iterations", iterations)?;
@@ -369,12 +391,9 @@ mod tests {
 
     #[test]
     fn test_py_component_creation() {
-        let component = PyComponent::new(
-            "R1".to_string(),
-            "Device:R".to_string(),
-            "10k".to_string()
-        );
-        
+        let component =
+            PyComponent::new("R1".to_string(), "Device:R".to_string(), "10k".to_string());
+
         assert_eq!(component.reference(), "R1");
         assert_eq!(component.symbol(), "Device:R");
         assert_eq!(component.value(), "10k");

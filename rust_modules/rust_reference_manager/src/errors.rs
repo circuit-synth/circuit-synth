@@ -1,5 +1,5 @@
 //! Error types for the reference manager
-//! 
+//!
 //! This module defines all error types used throughout the reference manager,
 //! providing clear error messages and proper error handling.
 
@@ -11,19 +11,19 @@ pub enum ReferenceError {
     /// Validation errors
     #[error("Validation error: {0}")]
     Validation(#[from] ValidationError),
-    
+
     /// Hierarchy management errors
     #[error("Hierarchy error: {0}")]
     HierarchyError(String),
-    
+
     /// Concurrency errors
     #[error("Concurrency error: {0}")]
     ConcurrencyError(String),
-    
+
     /// Configuration errors
     #[error("Configuration error: {0}")]
     ConfigError(String),
-    
+
     /// Internal errors
     #[error("Internal error: {0}")]
     InternalError(String),
@@ -35,86 +35,64 @@ pub enum ValidationError {
     /// Empty reference provided
     #[error("Reference cannot be empty")]
     EmptyReference,
-    
+
     /// Empty prefix provided
     #[error("Prefix cannot be empty")]
     EmptyPrefix,
-    
+
     /// Reference is too long
     #[error("Reference '{reference}' exceeds maximum length of {max_length} characters")]
     ReferenceTooLong {
         reference: String,
         max_length: usize,
     },
-    
+
     /// Prefix is too long
     #[error("Prefix '{prefix}' exceeds maximum length of {max_length} characters")]
-    PrefixTooLong {
-        prefix: String,
-        max_length: usize,
-    },
-    
+    PrefixTooLong { prefix: String, max_length: usize },
+
     /// Reference already in use
     #[error("Reference '{reference}' is already in use")]
-    AlreadyInUse {
-        reference: String,
-    },
-    
+    AlreadyInUse { reference: String },
+
     /// Reserved reference cannot be used
     #[error("Reference '{reference}' is reserved and cannot be used")]
-    ReservedReference {
-        reference: String,
-    },
-    
+    ReservedReference { reference: String },
+
     /// Reserved prefix cannot be used
     #[error("Prefix '{prefix}' is reserved and cannot be used")]
-    ReservedPrefix {
-        prefix: String,
-    },
-    
+    ReservedPrefix { prefix: String },
+
     /// Invalid character in prefix
     #[error("Invalid character '{invalid_char}' in prefix '{prefix}'")]
-    InvalidPrefixCharacter {
-        prefix: String,
-        invalid_char: char,
-    },
-    
+    InvalidPrefixCharacter { prefix: String, invalid_char: char },
+
     /// Invalid character in number part
     #[error("Invalid character '{invalid_char}' in number part '{number_part}'")]
     InvalidNumberCharacter {
         number_part: String,
         invalid_char: char,
     },
-    
+
     /// Prefix must start with a letter
     #[error("Prefix '{prefix}' must start with a letter")]
-    PrefixMustStartWithLetter {
-        prefix: String,
-    },
-    
+    PrefixMustStartWithLetter { prefix: String },
+
     /// Missing number in reference
     #[error("Reference must contain a number")]
     MissingNumber,
-    
+
     /// Invalid number format
     #[error("Invalid number format in '{number_part}'")]
-    InvalidNumber {
-        number_part: String,
-    },
-    
+    InvalidNumber { number_part: String },
+
     /// Invalid reference format
     #[error("Invalid reference format '{reference}': {reason}")]
-    InvalidReferenceFormat {
-        reference: String,
-        reason: String,
-    },
-    
+    InvalidReferenceFormat { reference: String, reason: String },
+
     /// Counter overflow
     #[error("Counter overflow for prefix '{prefix}' (max value: {max_value})")]
-    CounterOverflow {
-        prefix: String,
-        max_value: u32,
-    },
+    CounterOverflow { prefix: String, max_value: u32 },
 }
 
 /// Result type alias for reference manager operations
@@ -128,37 +106,37 @@ impl ReferenceError {
     pub fn hierarchy_error(message: impl Into<String>) -> Self {
         Self::HierarchyError(message.into())
     }
-    
+
     /// Create a concurrency error
     pub fn concurrency_error(message: impl Into<String>) -> Self {
         Self::ConcurrencyError(message.into())
     }
-    
+
     /// Create a configuration error
     pub fn config_error(message: impl Into<String>) -> Self {
         Self::ConfigError(message.into())
     }
-    
+
     /// Create an internal error
     pub fn internal_error(message: impl Into<String>) -> Self {
         Self::InternalError(message.into())
     }
-    
+
     /// Check if this is a validation error
     pub fn is_validation_error(&self) -> bool {
         matches!(self, Self::Validation(_))
     }
-    
+
     /// Check if this is a hierarchy error
     pub fn is_hierarchy_error(&self) -> bool {
         matches!(self, Self::HierarchyError(_))
     }
-    
+
     /// Check if this is a concurrency error
     pub fn is_concurrency_error(&self) -> bool {
         matches!(self, Self::ConcurrencyError(_))
     }
-    
+
     /// Get the error category as a string
     pub fn category(&self) -> &'static str {
         match self {
@@ -169,7 +147,7 @@ impl ReferenceError {
             Self::InternalError(_) => "internal",
         }
     }
-    
+
     /// Get error details for logging
     pub fn details(&self) -> serde_json::Value {
         serde_json::json!({
@@ -206,33 +184,35 @@ impl ValidationError {
             Self::CounterOverflow { .. } => "counter_overflow",
         }
     }
-    
+
     /// Check if this is a format-related error
     pub fn is_format_error(&self) -> bool {
-        matches!(self, 
-            Self::EmptyReference |
-            Self::EmptyPrefix |
-            Self::InvalidPrefixCharacter { .. } |
-            Self::InvalidNumberCharacter { .. } |
-            Self::PrefixMustStartWithLetter { .. } |
-            Self::MissingNumber |
-            Self::InvalidNumber { .. } |
-            Self::InvalidReferenceFormat { .. }
+        matches!(
+            self,
+            Self::EmptyReference
+                | Self::EmptyPrefix
+                | Self::InvalidPrefixCharacter { .. }
+                | Self::InvalidNumberCharacter { .. }
+                | Self::PrefixMustStartWithLetter { .. }
+                | Self::MissingNumber
+                | Self::InvalidNumber { .. }
+                | Self::InvalidReferenceFormat { .. }
         )
     }
-    
+
     /// Check if this is a constraint-related error
     pub fn is_constraint_error(&self) -> bool {
-        matches!(self,
-            Self::ReferenceTooLong { .. } |
-            Self::PrefixTooLong { .. } |
-            Self::AlreadyInUse { .. } |
-            Self::ReservedReference { .. } |
-            Self::ReservedPrefix { .. } |
-            Self::CounterOverflow { .. }
+        matches!(
+            self,
+            Self::ReferenceTooLong { .. }
+                | Self::PrefixTooLong { .. }
+                | Self::AlreadyInUse { .. }
+                | Self::ReservedReference { .. }
+                | Self::ReservedPrefix { .. }
+                | Self::CounterOverflow { .. }
         )
     }
-    
+
     /// Get validation error details for logging
     pub fn details(&self) -> serde_json::Value {
         match self {
@@ -242,7 +222,10 @@ impl ValidationError {
             Self::EmptyPrefix => serde_json::json!({
                 "type": "empty_prefix"
             }),
-            Self::ReferenceTooLong { reference, max_length } => serde_json::json!({
+            Self::ReferenceTooLong {
+                reference,
+                max_length,
+            } => serde_json::json!({
                 "type": "reference_too_long",
                 "reference": reference,
                 "max_length": max_length,
@@ -266,12 +249,18 @@ impl ValidationError {
                 "type": "reserved_prefix",
                 "prefix": prefix
             }),
-            Self::InvalidPrefixCharacter { prefix, invalid_char } => serde_json::json!({
+            Self::InvalidPrefixCharacter {
+                prefix,
+                invalid_char,
+            } => serde_json::json!({
                 "type": "invalid_prefix_character",
                 "prefix": prefix,
                 "invalid_char": invalid_char.to_string()
             }),
-            Self::InvalidNumberCharacter { number_part, invalid_char } => serde_json::json!({
+            Self::InvalidNumberCharacter {
+                number_part,
+                invalid_char,
+            } => serde_json::json!({
                 "type": "invalid_number_character",
                 "number_part": number_part,
                 "invalid_char": invalid_char.to_string()
@@ -341,10 +330,13 @@ mod tests {
             reference: "VERY_LONG_REFERENCE".to_string(),
             max_length: 10,
         });
-        
+
         let details = error.details();
         assert_eq!(details["category"], "validation");
-        assert!(details["message"].as_str().unwrap().contains("VERY_LONG_REFERENCE"));
+        assert!(details["message"]
+            .as_str()
+            .unwrap()
+            .contains("VERY_LONG_REFERENCE"));
     }
 
     #[test]
@@ -353,7 +345,7 @@ mod tests {
             prefix: "R-".to_string(),
             invalid_char: '-',
         };
-        
+
         let details = error.details();
         assert_eq!(details["type"], "invalid_prefix_character");
         assert_eq!(details["prefix"], "R-");
@@ -388,7 +380,7 @@ mod tests {
     fn test_error_chaining() {
         let validation_error = ValidationError::EmptyReference;
         let reference_error = ReferenceError::from(validation_error);
-        
+
         assert!(reference_error.is_validation_error());
         assert_eq!(reference_error.category(), "validation");
     }

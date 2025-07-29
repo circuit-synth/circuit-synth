@@ -2,8 +2,8 @@
 
 #[cfg(test)]
 mod tests {
-    use crate::*;
     use crate::coordinate_transform::{angle_between_positions, rotation_matrix};
+    use crate::*;
     use approx::assert_relative_eq;
 
     // Test data constants
@@ -38,16 +38,19 @@ mod tests {
     #[test]
     fn test_pin_orientation_angles() {
         use types::PinOrientation;
-        
+
         assert_relative_eq!(PinOrientation::Right.to_radians(), 0.0);
         assert_relative_eq!(PinOrientation::Up.to_radians(), std::f64::consts::PI / 2.0);
         assert_relative_eq!(PinOrientation::Left.to_radians(), std::f64::consts::PI);
-        assert_relative_eq!(PinOrientation::Down.to_radians(), 3.0 * std::f64::consts::PI / 2.0);
+        assert_relative_eq!(
+            PinOrientation::Down.to_radians(),
+            3.0 * std::f64::consts::PI / 2.0
+        );
     }
 
     #[test]
     fn test_component_creation_and_pin_management() {
-        use types::{Pin, PinType, PinOrientation};
+        use types::{Pin, PinOrientation, PinType};
 
         let mut component = Component::new("R1".to_string(), Position::new(100.0, 50.0), 0.0);
         assert_eq!(component.reference, "R1");
@@ -133,7 +136,7 @@ mod tests {
 
     #[test]
     fn test_component_pin_transformation() {
-        use types::{Pin, PinType, PinOrientation};
+        use types::{Pin, PinOrientation, PinType};
 
         let mut component = Component::new("R1".to_string(), Position::new(100.0, 50.0), 90.0);
 
@@ -159,11 +162,11 @@ mod tests {
         let results = transform_component_pins(&component);
 
         assert_eq!(results.len(), 2);
-        
+
         // With 90° rotation: (-1.905, 0) -> (0, -1.905) -> (100, 48.095)
         assert_relative_eq!(results[0].global_position.x, 100.0, epsilon = TOLERANCE);
         assert_relative_eq!(results[0].global_position.y, 48.095, epsilon = TOLERANCE);
-        
+
         // With 90° rotation: (1.905, 0) -> (0, 1.905) -> (100, 51.905)
         assert_relative_eq!(results[1].global_position.x, 100.0, epsilon = TOLERANCE);
         assert_relative_eq!(results[1].global_position.y, 51.905, epsilon = TOLERANCE);
@@ -172,7 +175,7 @@ mod tests {
     #[test]
     fn test_pin_calculator_basic_operations() {
         let mut calculator = PinCalculator::new();
-        
+
         // Test empty calculator
         assert_eq!(calculator.calculate_all_pin_positions().len(), 0);
         assert!(calculator.get_component("R1").is_none());
@@ -187,9 +190,9 @@ mod tests {
     #[test]
     fn test_reference_design_components_creation() {
         let components = PinCalculator::create_reference_design_components();
-        
+
         assert_eq!(components.len(), 3);
-        
+
         // Test R1
         let r1 = &components[0];
         assert_eq!(r1.reference, "R1");
@@ -281,7 +284,9 @@ mod tests {
             calculator.add_component(component);
         }
 
-        let labels = calculator.calculate_hierarchical_label_positions(&nets).unwrap();
+        let labels = calculator
+            .calculate_hierarchical_label_positions(&nets)
+            .unwrap();
 
         assert_eq!(labels.len(), 3); // VCC, OUT, GND
 
@@ -319,7 +324,10 @@ mod tests {
         let result = calculator.calculate_pin_position("R1", "1");
         assert!(result.is_err());
         match result.unwrap_err() {
-            PinCalculationError::PinNotFound { component_ref, pin_number } => {
+            PinCalculationError::PinNotFound {
+                component_ref,
+                pin_number,
+            } => {
                 assert_eq!(component_ref, "R1");
                 assert_eq!(pin_number, "1");
             }
@@ -448,8 +456,11 @@ mod tests {
         let duration = start.elapsed();
 
         // Should be much faster than 1ms per calculation (target: <100μs)
-        assert!(duration.as_micros() < 100_000, 
-                "Performance regression: 1000 calculations took {:?}", duration);
+        assert!(
+            duration.as_micros() < 100_000,
+            "Performance regression: 1000 calculations took {:?}",
+            duration
+        );
 
         // Test individual pin calculation performance
         let start = std::time::Instant::now();
@@ -459,8 +470,11 @@ mod tests {
         let duration = start.elapsed();
 
         // Should be very fast for individual calculations (target: <10μs per call)
-        assert!(duration.as_micros() < 100_000,
-                "Performance regression: 10000 individual calculations took {:?}", duration);
+        assert!(
+            duration.as_micros() < 100_000,
+            "Performance regression: 10000 individual calculations took {:?}",
+            duration
+        );
     }
 
     #[test]
@@ -469,11 +483,13 @@ mod tests {
         let local_pin_pos = Position::new(2.54, 1.27); // Standard grid positions
 
         // Test various rotation angles
-        let test_angles = vec![0.0, 30.0, 45.0, 60.0, 90.0, 120.0, 135.0, 150.0, 180.0, 270.0];
+        let test_angles = vec![
+            0.0, 30.0, 45.0, 60.0, 90.0, 120.0, 135.0, 150.0, 180.0, 270.0,
+        ];
 
         for angle in test_angles {
             let result = transform_pin_position(component_pos, local_pin_pos, angle);
-            
+
             // Verify the result is at the correct distance from component center
             let distance = component_pos.distance_to(&result);
             let expected_distance = local_pin_pos.distance_to(&Position::new(0.0, 0.0));

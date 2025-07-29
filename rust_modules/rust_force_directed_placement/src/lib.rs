@@ -1,20 +1,20 @@
 //! High-performance force-directed placement algorithm for PCB components
-//! 
+//!
 //! This crate provides a Rust implementation of force-directed placement algorithms
 //! optimized for PCB component placement with O(n²) performance improvements.
 
-pub mod types;
+pub mod collision;
+pub mod errors;
 pub mod forces;
 pub mod placement;
-pub mod collision;
 pub mod python;
-pub mod errors;
+pub mod types;
 
-pub use types::*;
-pub use forces::*;
-pub use placement::*;
 pub use collision::*;
 pub use errors::*;
+pub use forces::*;
+pub use placement::*;
+pub use types::*;
 
 use pyo3::prelude::*;
 

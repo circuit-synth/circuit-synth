@@ -51,6 +51,39 @@ pip install -e ".[dev]"
 
 ### Code Quality and Testing
 **IMPORTANT: Always run linting and tests after making changes**
+
+**🚀 AUTOMATED TESTING (Recommended):**
+```bash
+# Run all tests (Python + Rust + Integration + Core)
+./scripts/run_all_tests.sh
+
+# Run with verbose output for debugging
+./scripts/run_all_tests.sh --verbose
+
+# Run only Python tests (fast)
+./scripts/run_all_tests.sh --python-only
+
+# Run only Rust tests
+./scripts/run_all_tests.sh --rust-only
+
+# Stop on first failure (for debugging)
+./scripts/run_all_tests.sh --fail-fast
+```
+
+**🦀 RUST TESTING:**
+```bash
+# Test all Rust modules automatically
+./scripts/test_rust_modules.sh
+
+# Test with verbose output and Python integration
+./scripts/test_rust_modules.sh --verbose
+
+# Test specific Rust module manually
+cd rust_modules/rust_netlist_processor
+cargo test --lib --no-default-features
+```
+
+**🐍 TRADITIONAL PYTHON TESTING:**
 ```bash
 # Format code
 black src/
@@ -65,6 +98,9 @@ uv run pytest --cov=circuit_synth
 
 # Run specific test file
 uv run pytest tests/unit/test_core_circuit.py -v
+
+# Run Rust integration tests
+uv run pytest tests/rust_integration/ -v
 ```
 
 ### Building and Distribution

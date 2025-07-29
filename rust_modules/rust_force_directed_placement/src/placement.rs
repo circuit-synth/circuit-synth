@@ -1,19 +1,19 @@
 //! High-performance force-directed placement algorithm
-//! 
+//!
 //! This module implements the main placement algorithm with hierarchical optimization
 //! and provides 100x performance improvement over the Python implementation.
 
-use crate::types::{
-    Component, Connection, Point, Force, BoundingBox, SubcircuitGroup, 
-    PlacementConfig, PlacementResult
-};
-use crate::forces::ForceCalculator;
 use crate::collision::CollisionDetector;
 use crate::errors::PlacementError;
+use crate::forces::ForceCalculator;
+use crate::types::{
+    BoundingBox, Component, Connection, Force, PlacementConfig, PlacementResult, Point,
+    SubcircuitGroup,
+};
 
-use std::collections::{HashMap, HashSet};
+use log::{debug, info, warn};
 use rayon::prelude::*;
-use log::{info, debug, warn};
+use std::collections::{HashMap, HashSet};
 
 /// High-performance force-directed placement engine
 pub struct ForceDirectedPlacer {
@@ -27,7 +27,7 @@ impl ForceDirectedPlacer {
     pub fn new(config: PlacementConfig) -> Self {
         let force_calculator = ForceCalculator::new(config.clone());
         let collision_detector = CollisionDetector::new(config.component_spacing * 0.5);
-        
+
         Self {
             config,
             force_calculator,
@@ -48,7 +48,10 @@ impl ForceDirectedPlacer {
         board_width: f64,
         board_height: f64,
     ) -> Result<PlacementResult, PlacementError> {
-        info!("Starting force-directed placement for {} components", components.len());
+        info!(
+            "Starting force-directed placement for {} components",
+            components.len()
+        );
         info!("Board dimensions: {}x{}mm", board_width, board_height);
 
         if components.is_empty() {
@@ -57,7 +60,7 @@ impl ForceDirectedPlacer {
 
         // Build connection graph for fast lookups
         let connection_graph = self.build_connection_graph(&connections);
-        
+
         // Group components by subcircuit for hierarchical placement
         let mut groups = self.group_by_subcircuit(&mut components);
         info!("Found {} subcircuit groups", groups.len());
@@ -84,13 +87,19 @@ impl ForceDirectedPlacer {
         // Extract final results
         let mut result = PlacementResult::new();
         for component in &components {
-            result.positions.insert(component.reference.clone(), component.position);
-            result.rotations.insert(component.reference.clone(), component.rotation);
+            result
+                .positions
+                .insert(component.reference.clone(), component.position);
+            result
+                .rotations
+                .insert(component.reference.clone(), component.rotation);
         }
-        
+
         result.collision_count = collision_count;
         result.final_energy = self.force_calculator.calculate_system_energy(
-            &components, &connections, &connection_graph
+            &components,
+            &connections,
+            &connection_graph,
         );
 
         info!("Force-directed placement complete");
@@ -100,31 +109,38 @@ impl ForceDirectedPlacer {
     /// Build connection graph for fast neighbor lookups
     fn build_connection_graph(&self, connections: &[Connection]) -> HashMap<String, Vec<String>> {
         let mut graph: HashMap<String, Vec<String>> = HashMap::new();
-        
+
         for connection in connections {
-            graph.entry(connection.ref1.clone())
+            graph
+                .entry(connection.ref1.clone())
                 .or_default()
                 .push(connection.ref2.clone());
-            graph.entry(connection.ref2.clone())
+            graph
+                .entry(connection.ref2.clone())
                 .or_default()
                 .push(connection.ref1.clone());
         }
-        
+
         graph
     }
 
     /// Group components by subcircuit path for hierarchical placement
-    fn group_by_subcircuit(&self, components: &mut [Component]) -> HashMap<String, SubcircuitGroup> {
+    fn group_by_subcircuit(
+        &self,
+        components: &mut [Component],
+    ) -> HashMap<String, SubcircuitGroup> {
         let mut groups: HashMap<String, SubcircuitGroup> = HashMap::new();
-        
+
         for component in components.iter() {
             let path = if component.path.is_empty() {
                 "root".to_string()
             } else {
                 component.path.clone()
             };
-            
-            let group = groups.entry(path.clone()).or_insert_with(|| SubcircuitGroup::new(path));
+
+            let group = groups
+                .entry(path.clone())
+                .or_insert_with(|| SubcircuitGroup::new(path));
             group.add_component(component.reference.clone());
         }
 
@@ -149,10 +165,7 @@ impl ForceDirectedPlacer {
             if let Some(component) = components.iter_mut().find(|c| &c.reference == comp_ref) {
                 let row = i / grid_size;
                 let col = i % grid_size;
-                component.position = Point::new(
-                    col as f64 * spacing,
-                    row as f64 * spacing,
-                );
+                component.position = Point::new(col as f64 * spacing, row as f64 * spacing);
             }
         }
     }
@@ -169,13 +182,21 @@ impl ForceDirectedPlacer {
             return Ok(());
         }
 
-        debug!("Optimizing group {} with {} components", group.path, group.components.len());
+        debug!(
+            "Optimizing group {} with {} components",
+            group.path,
+            group.components.len()
+        );
 
         // Extract components for this group
-        let mut group_components: Vec<Component> = group.components
+        let mut group_components: Vec<Component> = group
+            .components
             .iter()
             .filter_map(|ref_name| {
-                components.iter().find(|c| &c.reference == ref_name).cloned()
+                components
+                    .iter()
+                    .find(|c| &c.reference == ref_name)
+                    .cloned()
             })
             .collect();
 
@@ -203,11 +224,9 @@ impl ForceDirectedPlacer {
             );
 
             // Apply forces and track displacement
-            let total_displacement = self.force_calculator.apply_forces(
-                &mut group_components,
-                &forces,
-                temperature,
-            );
+            let total_displacement =
+                self.force_calculator
+                    .apply_forces(&mut group_components, &forces, temperature);
 
             // Cool down temperature
             temperature *= self.config.cooling_rate;
@@ -225,13 +244,17 @@ impl ForceDirectedPlacer {
 
             // Optimize rotations periodically
             if self.config.enable_rotation && iteration % 10 == 0 {
-                self.force_calculator.optimize_rotations(&mut group_components, connection_graph);
+                self.force_calculator
+                    .optimize_rotations(&mut group_components, connection_graph);
             }
         }
 
         // Update original components with optimized positions
         for optimized_comp in group_components {
-            if let Some(original_comp) = components.iter_mut().find(|c| c.reference == optimized_comp.reference) {
+            if let Some(original_comp) = components
+                .iter_mut()
+                .find(|c| c.reference == optimized_comp.reference)
+            {
                 original_comp.position = optimized_comp.position;
                 original_comp.rotation = optimized_comp.rotation;
             }
@@ -300,7 +323,8 @@ impl ForceDirectedPlacer {
                     for connected_ref in connected_refs {
                         if let Some(connected_group) = ref_to_group.get(connected_ref) {
                             if connected_group != group_path {
-                                *group.connections_to_other_groups
+                                *group
+                                    .connections_to_other_groups
                                     .entry(connected_group.clone())
                                     .or_insert(0) += 1;
                             }
@@ -360,9 +384,12 @@ impl ForceDirectedPlacer {
                 for other_path in &group_list {
                     if other_path != group_path {
                         let other_group = &groups[other_path];
-                        let group_size = (group.bounding_box.width() * group.bounding_box.height()).sqrt();
-                        let other_size = (other_group.bounding_box.width() * other_group.bounding_box.height()).sqrt();
-                        
+                        let group_size =
+                            (group.bounding_box.width() * group.bounding_box.height()).sqrt();
+                        let other_size = (other_group.bounding_box.width()
+                            * other_group.bounding_box.height())
+                        .sqrt();
+
                         let repulsion = self.force_calculator.calculate_group_repulsion(
                             group.center,
                             other_group.center,
@@ -389,7 +416,9 @@ impl ForceDirectedPlacer {
                     // Move all components in the group
                     let group = &groups[group_path];
                     for comp_ref in &group.components {
-                        if let Some(component) = components.iter_mut().find(|c| &c.reference == comp_ref) {
+                        if let Some(component) =
+                            components.iter_mut().find(|c| &c.reference == comp_ref)
+                        {
                             component.position.x += limited_force.fx;
                             component.position.y += limited_force.fy;
                         }
@@ -415,7 +444,11 @@ impl ForceDirectedPlacer {
     }
 
     /// Calculate boundary force for a group
-    fn calculate_group_boundary_force(&self, group: &SubcircuitGroup, board_bounds: &BoundingBox) -> Force {
+    fn calculate_group_boundary_force(
+        &self,
+        group: &SubcircuitGroup,
+        board_bounds: &BoundingBox,
+    ) -> Force {
         let mut force = Force::zero();
         let strength = 20.0;
 
@@ -448,21 +481,34 @@ impl ForceDirectedPlacer {
         let max_iterations = 50;
         let mut final_collision_count = 0;
 
-        info!("Enforcing minimum spacing for {} components", components.len());
+        info!(
+            "Enforcing minimum spacing for {} components",
+            components.len()
+        );
 
         // Two-pass collision resolution
         // Pass 1: Gentle connectivity-aware resolution
         for iteration in 0..(max_iterations / 2) {
             let collisions = self.collision_detector.detect_collisions(components);
             if collisions.is_empty() {
-                info!("No collisions detected after {} gentle iterations", iteration + 1);
+                info!(
+                    "No collisions detected after {} gentle iterations",
+                    iteration + 1
+                );
                 return Ok(0);
             }
 
-            debug!("Gentle iteration {}: Found {} collisions", iteration + 1, collisions.len());
-            
+            debug!(
+                "Gentle iteration {}: Found {} collisions",
+                iteration + 1,
+                collisions.len()
+            );
+
             let resolved = self.resolve_collisions_connectivity_aware(
-                components, &collisions, connection_graph, true
+                components,
+                &collisions,
+                connection_graph,
+                true,
             );
 
             if resolved == 0 {
@@ -474,17 +520,26 @@ impl ForceDirectedPlacer {
         // Pass 2: Strict resolution for remaining collisions
         let remaining_collisions = self.collision_detector.detect_collisions(components);
         if !remaining_collisions.is_empty() {
-            info!("Pass 2: Strict collision resolution for {} remaining collisions", remaining_collisions.len());
+            info!(
+                "Pass 2: Strict collision resolution for {} remaining collisions",
+                remaining_collisions.len()
+            );
 
             for iteration in 0..(max_iterations / 2) {
                 let collisions = self.collision_detector.detect_collisions(components);
                 if collisions.is_empty() {
-                    info!("All collisions resolved after {} strict iterations", iteration + 1);
+                    info!(
+                        "All collisions resolved after {} strict iterations",
+                        iteration + 1
+                    );
                     return Ok(0);
                 }
 
                 let resolved = self.resolve_collisions_connectivity_aware(
-                    components, &collisions, connection_graph, false
+                    components,
+                    &collisions,
+                    connection_graph,
+                    false,
                 );
 
                 if resolved == 0 {
@@ -561,9 +616,15 @@ impl ForceDirectedPlacer {
             resolved_count += 1;
 
             if are_connected {
-                debug!("Gently separating connected components {} and {}", comp1_ref, comp2_ref);
+                debug!(
+                    "Gently separating connected components {} and {}",
+                    comp1_ref, comp2_ref
+                );
             } else {
-                debug!("Separating unconnected components {} and {}", comp1_ref, comp2_ref);
+                debug!(
+                    "Separating unconnected components {} and {}",
+                    comp1_ref, comp2_ref
+                );
             }
         }
 
@@ -586,14 +647,14 @@ mod tests {
     fn test_connection_graph_building() {
         let config = PlacementConfig::default();
         let placer = ForceDirectedPlacer::new(config);
-        
+
         let connections = vec![
             Connection::new("R1".to_string(), "R2".to_string()),
             Connection::new("R2".to_string(), "C1".to_string()),
         ];
-        
+
         let graph = placer.build_connection_graph(&connections);
-        
+
         assert_eq!(graph.get("R1").unwrap(), &vec!["R2"]);
         assert_eq!(graph.get("R2").unwrap(), &vec!["R1", "C1"]);
         assert_eq!(graph.get("C1").unwrap(), &vec!["R2"]);
@@ -603,7 +664,7 @@ mod tests {
     fn test_empty_placement() {
         let config = PlacementConfig::default();
         let mut placer = ForceDirectedPlacer::new(config);
-        
+
         let result = placer.place(vec![], vec![], 100.0, 100.0).unwrap();
         assert!(result.positions.is_empty());
     }
@@ -612,11 +673,13 @@ mod tests {
     fn test_single_component_placement() {
         let config = PlacementConfig::default();
         let mut placer = ForceDirectedPlacer::new(config);
-        
-        let components = vec![
-            Component::new("R1".to_string(), "R_0805".to_string(), "10k".to_string())
-        ];
-        
+
+        let components = vec![Component::new(
+            "R1".to_string(),
+            "R_0805".to_string(),
+            "10k".to_string(),
+        )];
+
         let result = placer.place(components, vec![], 100.0, 100.0).unwrap();
         assert_eq!(result.positions.len(), 1);
         assert!(result.positions.contains_key("R1"));

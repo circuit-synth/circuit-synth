@@ -31,5 +31,10 @@ fn benchmark_reference_update(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, benchmark_reference_creation, benchmark_reference_lookup, benchmark_reference_update);
+criterion_group!(
+    benches,
+    benchmark_reference_creation,
+    benchmark_reference_lookup,
+    benchmark_reference_update
+);
 criterion_main!(benches);
