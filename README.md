@@ -6,7 +6,7 @@
 
 **Pythonic circuit design for professional KiCad projects**
 
-Generate complete KiCad projects using simple Python code. No DSL to learn - just Python classes and functions that any engineer can read and modify.
+Generate complete KiCad projects using familiar Python syntax. Built with standard Python classes and functions that integrate seamlessly into any engineering workflow.
 
 ## 🤖 AI-Powered Circuit Design with Claude Code
 
