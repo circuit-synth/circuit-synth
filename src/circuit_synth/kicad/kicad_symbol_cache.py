@@ -481,7 +481,7 @@ class SymbolLibCache:
     def _find_symbol_file_by_name(self, lib_name: str) -> Optional[Path]:
         """Find symbol file using intelligent file name guessing."""
         kicad_dirs = self._parse_kicad_symbol_dirs()
-        
+
         for kicad_dir in kicad_dirs:
             # Try exact library name first
             candidates = [
@@ -491,80 +491,90 @@ class SymbolLibCache:
                 kicad_dir / f"{lib_name.replace('_', '-')}.kicad_sym",
                 kicad_dir / f"{lib_name.replace('-', '_')}.kicad_sym",
             ]
-            
+
             for candidate in candidates:
                 if candidate.exists():
                     return candidate
-        
+
         return None
 
     def _ripgrep_symbol_search(self, lib_name: str, sym_name: str) -> Optional[Path]:
         """Use ripgrep to quickly find symbol in .kicad_sym files."""
         import subprocess
-        
+
         kicad_dirs = self._parse_kicad_symbol_dirs()
-        
+
         for kicad_dir in kicad_dirs:
             try:
                 # Search for the specific symbol pattern
-                result = subprocess.run([
-                    'rg', '-l',  # list files only
-                    f'\\(symbol\\s+"{sym_name}"',  # regex pattern for symbol definition
-                    str(kicad_dir),
-                    '--type-add', 'kicad:*.kicad_sym',
-                    '--type', 'kicad'
-                ], capture_output=True, text=True, timeout=5)
-                
+                result = subprocess.run(
+                    [
+                        "rg",
+                        "-l",  # list files only
+                        f'\\(symbol\\s+"{sym_name}"',  # regex pattern for symbol definition
+                        str(kicad_dir),
+                        "--type-add",
+                        "kicad:*.kicad_sym",
+                        "--type",
+                        "kicad",
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
+                )
+
                 if result.returncode == 0 and result.stdout.strip():
                     # Return first match
-                    first_file = result.stdout.strip().split('\n')[0]
+                    first_file = result.stdout.strip().split("\n")[0]
                     return Path(first_file)
-                    
+
             except (FileNotFoundError, subprocess.TimeoutExpired):
                 # ripgrep not available or too slow, skip
                 continue
-        
+
         return None
 
     def _python_grep_search(self, lib_name: str, sym_name: str) -> Optional[Path]:
         """Fallback Python-based grep search for symbols."""
         import re
-        
+
         kicad_dirs = self._parse_kicad_symbol_dirs()
         pattern = re.compile(rf'\(symbol\s+"{re.escape(sym_name)}"')
-        
+
         for kicad_dir in kicad_dirs:
             # Search .kicad_sym files
             for sym_file in kicad_dir.rglob("*.kicad_sym"):
                 try:
                     # Read file in chunks to avoid memory issues
-                    with open(sym_file, 'r', encoding='utf-8') as f:
+                    with open(sym_file, "r", encoding="utf-8") as f:
                         chunk = f.read(8192)  # Read first 8KB
                         if pattern.search(chunk):
                             return sym_file
                 except (IOError, UnicodeDecodeError):
                     continue
-        
+
         return None
 
-    def _load_symbol_from_file_direct(self, symbol_file: Path, symbol_id: str) -> Dict[str, Any]:
+    def _load_symbol_from_file_direct(
+        self, symbol_file: Path, symbol_id: str
+    ) -> Dict[str, Any]:
         """Load specific symbol from a known file and return data directly."""
         try:
             lib_name, sym_name = symbol_id.split(":", 1)
-            
+
             # Load the library
             library_data = self._load_library(symbol_file)
             if not library_data or "symbols" not in library_data:
                 raise ValueError(f"No symbols found in {symbol_file}")
-            
+
             # Find the specific symbol
             symbol_data = library_data["symbols"].get(sym_name)
             if not symbol_data:
                 raise KeyError(f"Symbol '{sym_name}' not found in library '{lib_name}'")
-            
+
             logger.debug(f"Successfully loaded {symbol_id} from {symbol_file}")
             return symbol_data
-            
+
         except Exception as e:
             logger.warning(f"Failed to load symbol {symbol_id} from {symbol_file}: {e}")
             raise
