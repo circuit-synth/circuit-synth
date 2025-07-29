@@ -4,13 +4,9 @@
 [![PyPI version](https://badge.fury.io/py/circuit-synth.svg)](https://badge.fury.io/py/circuit-synth)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Pythonic circuit design for professional KiCad projects**
+**The first circuit design tool built for AI collaboration**
 
-Generate complete KiCad projects using familiar Python syntax. Built with standard Python classes and functions that integrate seamlessly into any engineering workflow.
-
-## 🤖 AI-Powered Circuit Design with Claude Code
-
-Circuit-synth is **the first circuit design tool built for AI collaboration**. Natural language requests become complete, manufacturable circuits with ready-to-use code.
+Generate complete KiCad projects using familiar Python syntax. Natural language requests become manufacturable circuits with ready-to-use code - built with standard Python classes that integrate seamlessly into any engineering workflow.
 
 ### ⚡ **Instant Component Intelligence**
 
