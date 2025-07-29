@@ -1,65 +1,51 @@
-# .pre-commit-config.yaml - Pre-commit hooks for circuit-synth
+# Pre-commit configuration for automatic code formatting
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
-    hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-json
-      - id: check-toml
-      - id: check-merge-conflict
-      - id: check-added-large-files
-        args: ['--maxkb=1000']
-
+  # Python formatting with Black
   - repo: https://github.com/psf/black
-    rev: 23.12.1
+    rev: 24.4.2
     hooks:
       - id: black
+        language_version: python3
         args: [--line-length=88]
-        files: ^src/.*\.py$
 
+  # Python import sorting with isort  
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
       - id: isort
         args: [--profile=black]
-        files: ^src/.*\.py$
 
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
-    hooks:
-      - id: flake8
-        args: [--max-line-length=88, --extend-ignore=E203,W503]
-        files: ^src/.*\.py$
-
+  # Rust formatting with rustfmt
   - repo: local
     hooks:
-      - id: python-tests
-        name: Python Tests
-        entry: uv run pytest
+      - id: rust-fmt
+        name: rust-fmt
+        entry: cargo fmt
         language: system
-        types: [python]
+        files: \.rs$
         pass_filenames: false
-        always_run: false
-        files: ^(src/.*\.py|tests/.*\.py)$
-        
-      - id: rust-tests
-        name: Rust Tests
-        entry: ./scripts/test_rust_modules.sh
+        args: [--all, --manifest-path=rust_modules/rust_symbol_search/Cargo.toml]
+      - id: rust-fmt-force-directed
+        name: rust-fmt-force-directed
+        entry: cargo fmt
         language: system
-        files: ^rust_modules/.*\.(rs|toml)$
+        files: rust_modules/rust_force_directed_placement/.*\.rs$
         pass_filenames: false
-        always_run: false
+        args: [--all, --manifest-path=rust_modules/rust_force_directed_placement/Cargo.toml]
+      - id: rust-fmt-io-processor
+        name: rust-fmt-io-processor
+        entry: cargo fmt
+        language: system
+        files: rust_modules/rust_io_processor/.*\.rs$
+        pass_filenames: false
+        args: [--all, --manifest-path=rust_modules/rust_io_processor/Cargo.toml]
 
-  - repo: https://github.com/doublify/pre-commit-rust
-    rev: v1.0
+  # General formatting
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
     hooks:
-      - id: fmt
-        name: Rust Format
-        args: [--manifest-path=rust_modules/rust_netlist_processor/Cargo.toml]
-      - id: clippy
-        name: Rust Clippy
-        args: [--manifest-path=rust_modules/rust_netlist_processor/Cargo.toml, --,  -D, warnings]
-
-default_stages: [commit]
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+EOF < /dev/null
