@@ -21,6 +21,14 @@ from .jlc_web_scraper import (
     enhance_component_with_web_data
 )
 
+from .smart_component_finder import (
+    SmartComponentFinder,
+    ComponentRecommendation,
+    find_component,
+    find_components,
+    print_component_recommendation
+)
+
 __all__ = [
     # API-based interface
     "JlcPartsInterface",
@@ -33,5 +41,12 @@ __all__ = [
     "JlcWebScraper",
     "search_jlc_components_web",
     "get_component_availability_web", 
-    "enhance_component_with_web_data"
+    "enhance_component_with_web_data",
+    
+    # Smart component finder
+    "SmartComponentFinder",
+    "ComponentRecommendation", 
+    "find_component",
+    "find_components",
+    "print_component_recommendation"
 ]

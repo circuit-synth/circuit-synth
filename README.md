@@ -13,6 +13,8 @@ Generate complete KiCad projects using simple Python code. No DSL to learn - jus
 This repository is fully optimized for AI-assisted development with Claude Code:
 
 - **🔍 Component Search**: `/find-symbol`, `/find-footprint` - Instantly find KiCad symbols and footprints
+- **🎯 Smart Component Finding**: `/find-jlc-component`, `/quick-component` - Find manufacturable parts with ready code
+- **🤖 Component Wizard**: `/component-wizard` - Interactive component selection with trade-off analysis
 - **🏗️ Circuit Design Agent**: Specialized `circuit-synth` agent for expert guidance on component selection and circuit topology
 - **⚡ Development Commands**: `/dev-run-tests`, `/dev-update-and-commit` - Streamlined development workflow
 - **📋 Pre-configured Permissions**: Skip repetitive approval prompts with curated tool allowlists
@@ -83,6 +85,7 @@ circuit.generate_kicad_project("esp32_dev")
 - **📝 Smart Annotations**: Automatic docstring extraction + manual text/tables
 - **⚡ Rust-Accelerated**: Fast symbol lookup and placement algorithms
 - **🏭 Manufacturing Integration**: Real-time component availability and pricing from JLCPCB
+- **🔍 Smart Component Finder**: AI-powered component recommendations with instant circuit-synth code generation
 
 ## Installation
 
