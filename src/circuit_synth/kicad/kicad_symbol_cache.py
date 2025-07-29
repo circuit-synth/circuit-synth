@@ -225,6 +225,13 @@ class SymbolLibCache:
         )
 
     @classmethod
+    def _find_kicad_symbol_dirs(cls) -> List[Path]:
+        """
+        Find KiCad symbol directories. Alias for _parse_kicad_symbol_dirs.
+        """
+        return cls._parse_kicad_symbol_dirs()
+
+    @classmethod
     def _parse_kicad_symbol_dirs(cls) -> List[Path]:
         """
         Parse KICAD_SYMBOL_DIR environment variable which can contain multiple paths
@@ -244,7 +251,9 @@ class SymbolLibCache:
                 if not dir_path:
                     continue
 
-                path_obj = Path(dir_path)
+                path_obj = Path(
+                    dir_path
+                ).resolve()  # Resolve relative paths to absolute
                 if path_obj.exists() and path_obj.is_dir():
                     valid_dirs.append(path_obj)
                     logger.debug(f"Added valid symbol directory: {path_obj}")
@@ -254,8 +263,10 @@ class SymbolLibCache:
             # Try common KiCad installation paths as fallback
             common_paths = [
                 "/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols",  # macOS
-                "/usr/share/kicad/symbols",  # Linux
+                "/usr/share/kicad/symbols",  # Linux (KiCad 6+)
+                "/usr/share/kicad/library",  # Linux (KiCad 5)
                 "/usr/local/share/kicad/symbols",  # Linux alternative
+                "/usr/local/share/kicad/library",  # Linux alternative (KiCad 5)
                 "C:\\Program Files\\KiCad\\share\\kicad\\symbols",  # Windows
                 "C:\\Program Files (x86)\\KiCad\\share\\kicad\\symbols",  # Windows 32-bit
             ]
@@ -272,12 +283,15 @@ class SymbolLibCache:
             logger.warning("KICAD_SYMBOL_DIR not set or invalid, trying default paths")
             default_dirs = [
                 "/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/",  # macOS
-                "/usr/share/kicad/symbols/",  # Linux
+                "/usr/share/kicad/symbols/",  # Linux (KiCad 6+)
+                "/usr/share/kicad/library/",  # Linux (KiCad 5)
+                "/usr/local/share/kicad/symbols/",  # Linux alternative
+                "/usr/local/share/kicad/library/",  # Linux alternative (KiCad 5)
                 "C:\\Program Files\\KiCad\\share\\kicad\\symbols\\",  # Windows
             ]
 
             for dir_path in default_dirs:
-                path_obj = Path(dir_path)
+                path_obj = Path(dir_path).resolve()
                 if path_obj.exists() and path_obj.is_dir():
                     valid_dirs.append(path_obj)
                     logger.info(f"Using default symbol directory: {path_obj}")

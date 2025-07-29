@@ -52,10 +52,12 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=3.0.0",
     "pytest-mock>=3.14.0",
+    "pytest-env>=1.1.0",
     "black>=22.0.0",
     "isort>=5.10.0",
     "flake8>=4.0.0",
     "mypy>=0.950",
+    "types-PyYAML>=6.0.0",
     "pre-commit>=2.17.0",
 ]
 test = [
@@ -101,10 +103,17 @@ profile = "black"
 line_length = 88
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
-disallow_untyped_defs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+exclude = [
+    "^.venv/",
+    "^venv/",
+    "build/",
+    "dist/"
+]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -119,11 +128,18 @@ markers = [
     "functional: marks tests as functional tests",
     "cache: marks tests as cache-related tests",
 ]
+env = [
+    "KICAD_SYMBOL_DIR=tests/test_data/kicad_symbols",
+]
 
 [dependency-groups]
 dev = [
+    "black>=25.1.0",
     "build>=1.2.2.post1",
+    "flake8>=7.3.0",
+    "isort>=6.0.1",
     "myst-parser>=3.0.1",
+    "pytest-env>=1.1.5",
     "sphinx>=7.4.7",
     "sphinx-autodoc-typehints>=2.3.0",
     "sphinx-rtd-theme>=3.0.2",

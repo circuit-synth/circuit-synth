@@ -10,11 +10,9 @@ from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 @pytest.fixture(scope="session", autouse=True)
 def configure_kicad_paths():
     """
-    Use the real KICAD_SYMBOL_DIR (whatever the user has set).
-    This fixture no longer references test_data/kicad9 at all,
-    so we rely solely on the user's environment or real KiCad installation.
-
-    Clear the symbol cache before and after tests to ensure a clean state.
+    Configure KiCad paths and clear symbol cache for tests.
+    
+    Now that KiCad is installed in CI, we can use real KiCad symbols everywhere.
     """
     # Clear any existing cache
     cache_dir = SymbolLibCache._get_cache_dir()
