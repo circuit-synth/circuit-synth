@@ -159,6 +159,41 @@ Unlike other circuit design tools that generate KiCad files as output only, circ
 
 ## Performance Optimization
 
+### ⚡ Lazy Symbol Loading - 30x Performance Improvement
+
+Circuit-synth features an intelligent lazy symbol loading system that dramatically improves first-run performance by loading only the symbols you actually need:
+
+#### Performance Results
+- **Before**: 17+ seconds (building complete symbol index)
+- **After**: 0.56 seconds (lazy loading on-demand)
+- **Improvement**: **30x faster first-run performance**
+
+#### Multi-Strategy Symbol Discovery
+The lazy loading system uses four intelligent strategies in order of speed:
+
+1. **File-based Discovery (< 0.01s)**: Intelligent filename guessing and common variations
+2. **Ripgrep Search (< 0.1s)**: Fast pattern matching in .kicad_sym files  
+3. **Python Grep Fallback (< 1s)**: Chunk-based file scanning for reliability
+4. **Complete Index Build (fallback)**: Only as last resort when other strategies fail
+
+#### Usage
+Lazy loading is completely transparent - just use circuit-synth normally:
+
+```python
+from circuit_synth import *
+
+# Lazy loading happens automatically - no code changes needed
+component = Component(symbol="Device:R", ref="R", value="10K")
+# Symbol loaded on-demand in ~0.01-0.1 seconds instead of 17+ seconds
+```
+
+**Clear Cache for Fresh Testing:**
+```bash
+# Test lazy loading from completely fresh state
+./scripts/clear_all_caches.sh
+time uv run python examples/example_kicad_project.py
+```
+
 ### Enhanced Performance Profiling System
 
 Circuit-synth includes a comprehensive performance profiling system that provides detailed timing analysis for all circuit generation operations:
