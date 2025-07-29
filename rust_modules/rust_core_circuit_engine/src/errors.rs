@@ -1,10 +1,10 @@
 //! Error types for the core circuit engine
-//! 
+//!
 //! This module defines all error types used throughout the circuit engine,
 //! with PyO3 integration for seamless Python exception handling.
 
-use pyo3::prelude::*;
 use pyo3::exceptions::PyException;
+use pyo3::prelude::*;
 use thiserror::Error;
 
 /// General circuit-related errors
@@ -12,13 +12,13 @@ use thiserror::Error;
 pub enum CircuitError {
     #[error("Invalid circuit name: {0}")]
     InvalidName(String),
-    
+
     #[error("Circuit hierarchy error: {0}")]
     HierarchyError(String),
-    
+
     #[error("Reference collision: {0}")]
     ReferenceCollision(String),
-    
+
     #[error("Invalid operation: {0}")]
     InvalidOperation(String),
 }
@@ -28,19 +28,19 @@ pub enum CircuitError {
 pub enum ComponentError {
     #[error("Invalid symbol format: {0}")]
     InvalidSymbol(String),
-    
+
     #[error("Symbol not found: {0}")]
     SymbolNotFound(String),
-    
+
     #[error("Invalid component reference: {0}")]
     InvalidReference(String),
-    
+
     #[error("Pin not found: {0}")]
     PinNotFound(String),
-    
+
     #[error("Invalid property: {0}")]
     InvalidProperty(String),
-    
+
     #[error("Component cloning error: {0}")]
     CloningError(String),
 }
@@ -50,19 +50,19 @@ pub enum ComponentError {
 pub enum ValidationError {
     #[error("Invalid reference format: {0}")]
     InvalidReference(String),
-    
+
     #[error("Invalid symbol format: {0}")]
     InvalidSymbol(String),
-    
+
     #[error("Property validation failed: {0}")]
     PropertyValidation(String),
-    
+
     #[error("Type validation failed: {0}")]
     TypeValidation(String),
-    
+
     #[error("Range validation failed: {0}")]
     RangeValidation(String),
-    
+
     #[error("Required field missing: {0}")]
     MissingField(String),
 }
@@ -72,13 +72,13 @@ pub enum ValidationError {
 pub enum NetError {
     #[error("Invalid net connection: {0}")]
     InvalidConnection(String),
-    
+
     #[error("Pin type mismatch: {0}")]
     PinTypeMismatch(String),
-    
+
     #[error("Net not found: {0}")]
     NetNotFound(String),
-    
+
     #[error("Circular connection detected: {0}")]
     CircularConnection(String),
 }
@@ -88,13 +88,13 @@ pub enum NetError {
 pub enum PinError {
     #[error("Invalid pin type: {0}")]
     InvalidType(String),
-    
+
     #[error("Pin already connected: {0}")]
     AlreadyConnected(String),
-    
+
     #[error("Incompatible pin types: {0} cannot connect to {1}")]
     IncompatibleTypes(String, String),
-    
+
     #[error("Pin geometry error: {0}")]
     GeometryError(String),
 }
@@ -104,13 +104,13 @@ pub enum PinError {
 pub enum ReferenceError {
     #[error("Reference already exists: {0}")]
     AlreadyExists(String),
-    
+
     #[error("Invalid reference format: {0}")]
     InvalidFormat(String),
-    
+
     #[error("Reference generation failed: {0}")]
     GenerationFailed(String),
-    
+
     #[error("Hierarchy validation failed: {0}")]
     HierarchyValidation(String),
 }
@@ -128,11 +128,11 @@ impl PyCircuitError {
     fn new(message: String) -> Self {
         PyCircuitError { message }
     }
-    
+
     fn __str__(&self) -> String {
         self.message.clone()
     }
-    
+
     fn __repr__(&self) -> String {
         format!("CircuitError('{}')", self.message)
     }
@@ -150,11 +150,11 @@ impl PyComponentError {
     fn new(message: String) -> Self {
         PyComponentError { message }
     }
-    
+
     fn __str__(&self) -> String {
         self.message.clone()
     }
-    
+
     fn __repr__(&self) -> String {
         format!("ComponentError('{}')", self.message)
     }
@@ -172,11 +172,11 @@ impl PyValidationError {
     fn new(message: String) -> Self {
         PyValidationError { message }
     }
-    
+
     fn __str__(&self) -> String {
         self.message.clone()
     }
-    
+
     fn __repr__(&self) -> String {
         format!("ValidationError('{}')", self.message)
     }
@@ -194,11 +194,11 @@ impl PyNetError {
     fn new(message: String) -> Self {
         PyNetError { message }
     }
-    
+
     fn __str__(&self) -> String {
         self.message.clone()
     }
-    
+
     fn __repr__(&self) -> String {
         format!("NetError('{}')", self.message)
     }
@@ -216,11 +216,11 @@ impl PyPinError {
     fn new(message: String) -> Self {
         PyPinError { message }
     }
-    
+
     fn __str__(&self) -> String {
         self.message.clone()
     }
-    
+
     fn __repr__(&self) -> String {
         format!("PinError('{}')", self.message)
     }
@@ -238,11 +238,11 @@ impl PyReferenceError {
     fn new(message: String) -> Self {
         PyReferenceError { message }
     }
-    
+
     fn __str__(&self) -> String {
         self.message.clone()
     }
-    
+
     fn __repr__(&self) -> String {
         format!("ReferenceError('{}')", self.message)
     }

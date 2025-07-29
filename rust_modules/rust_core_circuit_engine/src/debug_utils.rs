@@ -1,5 +1,5 @@
 //! Debug utilities for enhanced logging in PyO3 context
-//! 
+//!
 //! This module provides additional debugging tools that work reliably
 //! when Rust code is called from Python via PyO3 bindings.
 
@@ -95,10 +95,13 @@ impl DebugTimer {
             start: std::time::Instant::now(),
         }
     }
-    
+
     pub fn checkpoint(&self, checkpoint_name: &str) {
         let elapsed = self.start.elapsed();
-        println!("⏱️  TIMER {}: {} - {:?}", self.name, checkpoint_name, elapsed);
+        println!(
+            "⏱️  TIMER {}: {} - {:?}",
+            self.name, checkpoint_name, elapsed
+        );
         let _ = io::stdout().flush();
     }
 }
@@ -117,10 +120,10 @@ pub fn init_python_logging() {
     if std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "debug");
     }
-    
+
     // Try to initialize env_logger (will fail silently if already initialized)
     let _ = env_logger::try_init();
-    
+
     debug_info!("Rust debug logging initialized for Python context");
 }
 
@@ -133,10 +136,10 @@ pub fn test_debug_output() {
     debug_error!("This is an error message (non-fatal)");
     debug_step!("STEP_1", "Testing step logging");
     debug_only!("This only shows in debug builds");
-    
+
     let _timer = DebugTimer::new("test_operation");
     std::thread::sleep(std::time::Duration::from_millis(10));
-    
+
     println!("🔧 [DEBUG_TEST] All debug utilities tested successfully");
     let _ = io::stdout().flush();
 }
@@ -144,7 +147,7 @@ pub fn test_debug_output() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_debug_macros() {
         debug_print!("Test debug print");
@@ -153,7 +156,7 @@ mod tests {
         debug_warn!("Test warning");
         debug_error!("Test error");
     }
-    
+
     #[test]
     fn test_debug_timer() {
         let timer = DebugTimer::new("test");
