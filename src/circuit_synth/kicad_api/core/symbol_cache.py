@@ -607,6 +607,12 @@ class SymbolLibraryCache:
                 # Extract pin length
                 length = pin_data.get("length", 2.54)
 
+                print(f"DEBUG: Creating SchematicPin for {lib_id}")
+                print(f"  Pin data: {pin_data}")
+                print(
+                    f"  Extracted x={x}, y={y}, length={length}, orientation={orientation}"
+                )
+
                 pin = SchematicPin(
                     number=str(pin_data.get("number", "")),
                     name=str(pin_data.get("name", "~")),
@@ -616,6 +622,10 @@ class SymbolLibraryCache:
                     position=Point(x, y),
                     orientation=orientation,
                     length=length,
+                )
+
+                print(
+                    f"  Created pin: {pin.number} at ({pin.position.x}, {pin.position.y}) length={pin.length}"
                 )
                 pins.append(pin)
 

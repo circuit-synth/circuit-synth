@@ -39,10 +39,14 @@ from .schematic_writer import SchematicWriter, write_schematic_file
 # Google ADK LLM placement removed for performance - using optimized fallback placement
 LLM_PLACEMENT_AVAILABLE = False
 
+
 class LLMPlacementManager:
     """Optimized fallback placement manager (Google ADK removed for 44x performance improvement)."""
+
     def __init__(self, *args, **kwargs):
-        logging.info("Using optimized fallback placement (Google ADK removed for performance)")
+        logging.info(
+            "Using optimized fallback placement (Google ADK removed for performance)"
+        )
 
     def place_components(self, components, nets, existing_placements=None):
         """Fallback to basic grid placement"""
@@ -55,6 +59,8 @@ class LLMPlacementManager:
                 x = 50
                 y += 100
         return placements
+
+
 # Use optimized symbol cache from core.component for better performance
 from circuit_synth.core.component import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
@@ -457,9 +463,9 @@ class SchematicGenerator(IKiCadIntegration):
         """Add bounding boxes to an existing synchronized project."""
         try:
             # Import necessary classes
-            from ...kicad_api.core.types import Rectangle, Point
             # Use optimized symbol cache from core.component for better performance
             from circuit_synth.core.component import SymbolLibCache
+
             from ...kicad_api.core.types import Point, Rectangle
             from ..kicad_symbol_cache import SymbolLibCache
             from .symbol_geometry import SymbolBoundingBoxCalculator

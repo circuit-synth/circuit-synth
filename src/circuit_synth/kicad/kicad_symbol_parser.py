@@ -21,7 +21,9 @@ except ImportError:
     def quick_time(name):
         def decorator(func):
             return func
+
         return decorator
+
 
 logger = logging.getLogger(__name__)
 

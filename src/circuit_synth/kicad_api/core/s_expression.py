@@ -1392,7 +1392,9 @@ class SExpressionParser:
 
         # Add graphic elements sub-symbol
         if symbol_def.graphic_elements:
-            print(f"🎨 Processing {len(symbol_def.graphic_elements)} graphic elements for {symbol_def.lib_id}")
+            print(
+                f"🎨 Processing {len(symbol_def.graphic_elements)} graphic elements for {symbol_def.lib_id}"
+            )
             # Extract symbol name from lib_id (e.g., "Device:R" -> "R")
             symbol_name = (
                 symbol_def.lib_id.split(":")[-1]
@@ -1402,7 +1404,9 @@ class SExpressionParser:
             graphics_symbol = [sexpdata.Symbol("symbol"), f"{symbol_name}_0_1"]
             for i, element in enumerate(symbol_def.graphic_elements):
                 graphic_sexp = self._graphic_element_to_sexp(element)
-                print(f"  Element {i}: {element.get('type', 'unknown')} -> {len(str(graphic_sexp))} chars")
+                print(
+                    f"  Element {i}: {element.get('type', 'unknown')} -> {len(str(graphic_sexp))} chars"
+                )
                 graphics_symbol.append(graphic_sexp)
             sexp.append(graphics_symbol)
             print(f"✅ Added graphics symbol with {len(graphics_symbol)-2} elements")
@@ -1422,7 +1426,13 @@ class SExpressionParser:
             # Track which position/name combinations we've seen to hide duplicates
             seen_positions = {}
 
+            print(
+                f"DEBUG: S-expression generator processing {len(symbol_def.pins)} pins for {symbol_name}"
+            )
             for pin in symbol_def.pins:
+                print(
+                    f"  Pin {pin.number}: name='{pin.name}' pos=({pin.position.x}, {pin.position.y}) length={pin.length}"
+                )
                 # Create a key based on position and name
                 pos_key = f"{pin.position.x},{pin.position.y},{pin.name}"
 
@@ -1443,6 +1453,9 @@ class SExpressionParser:
                 if is_duplicate:
                     pin_sexp.append([sexpdata.Symbol("hide"), sexpdata.Symbol("yes")])
 
+                print(
+                    f"    Writing pin {pin.number}: at ({pin.position.x}, {pin.position.y}, {pin.orientation}) length={pin.length}"
+                )
                 pin_sexp.extend(
                     [
                         [

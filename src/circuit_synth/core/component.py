@@ -23,20 +23,30 @@ from .simple_pin_access import PinGroup, SimplifiedPinAccess
 # Import the ultra-high-performance Rust-accelerated symbol cache (55x faster)
 try:
     from ..kicad.rust_accelerated_symbol_cache import SymbolLibCache
-    context_logger.info("🦀 Rust-accelerated SymbolLibCache loaded (55x performance improvement)", component="COMPONENT")
+
+    context_logger.info(
+        "🦀 Rust-accelerated SymbolLibCache loaded (55x performance improvement)",
+        component="COMPONENT",
+    )
     RUST_SYMBOL_CACHE_AVAILABLE = True
 except ImportError as e:
-    context_logger.warning(f"🔄 Rust symbol cache not available, using Python fallback: {e}", component="COMPONENT")
+    context_logger.warning(
+        f"🔄 Rust symbol cache not available, using Python fallback: {e}",
+        component="COMPONENT",
+    )
     try:
         from ..kicad.kicad_symbol_cache import SymbolLibCache
+
         RUST_SYMBOL_CACHE_AVAILABLE = False
     except ImportError:
         # Last resort - simple fallback
         context_logger.error("No symbol cache available", component="COMPONENT")
+
         class SymbolLibCache:
             @staticmethod
             def get_symbol_data(symbol_id: str):
                 return {}
+
         RUST_SYMBOL_CACHE_AVAILABLE = False
 
 
@@ -191,6 +201,7 @@ class Component(SimplifiedPinAccess):
         # [ {"function": "passive", "name": "~", "number": "1", ...}, ... ]
         pins_loaded = 0
         for pin_info in symbol_data.get("pins", []):
+            print(f"DEBUG CORE: Pin info for {self.symbol}: {pin_info}")
             pin_num = pin_info.get("number", "")
             if not pin_num:  # Skip pins without numbers
                 context_logger.warning(
@@ -205,10 +216,10 @@ class Component(SimplifiedPinAccess):
                 num=pin_num,
                 func=pin_info.get("function", "passive"),
                 unit=1,
-                x=0,
-                y=0,
-                length=0,
-                orientation=0,
+                x=pin_info.get("x", 0),
+                y=pin_info.get("y", 0),
+                length=pin_info.get("length", 2.54),
+                orientation=pin_info.get("orientation", 0),
             )
             new_pin._component = self
             new_pin._component_pin_id = int(pin_num) if pin_num.isdigit() else 0
@@ -423,14 +434,15 @@ class Component(SimplifiedPinAccess):
         # Add other relevant fields from _extra_fields if needed in the future
 
         data = {
-            "symbol": self.symbol,
-            "ref": self.ref,
-            "value": self.value,
-            "footprint": self.footprint,
-            "datasheet": self.datasheet,  # Keep top-level for direct access
-            "description": self.description,  # Keep top-level for direct access
+            "symbol": self.symbol or "",
+            "ref": self.ref or "",
+            "value": self.value or "",
+            "footprint": self.footprint or "",
+            "datasheet": self.datasheet or "",  # Ensure empty string instead of None
+            "description": self.description
+            or "",  # Ensure empty string instead of None
             "properties": properties,  # Add standard properties dict
-            "tstamps": None,  # Placeholder for UUID/timestamp
+            "tstamps": "",  # Use empty string for Rust compatibility
             "_extra_fields": dict(
                 self._extra_fields
             ),  # Keep original for now if needed elsewhere
@@ -452,7 +464,7 @@ class Component(SimplifiedPinAccess):
                 {
                     "pin_id": pin_num,  # Use pin number instead of index
                     "name": pin_obj.name,
-                    "num": pin_obj.num,
+                    "number": pin_obj.num,  # Use "number" for Rust compatibility
                     "func": pin_obj.func,
                     "unit": pin_obj.unit,
                     "x": pin_obj.x,
@@ -499,7 +511,8 @@ class Component(SimplifiedPinAccess):
         comp._pins.clear()
         comp._pin_names.clear()
         for pinfo in data.get("pins", []):
-            pin_num = pinfo.get("num", "")
+            # Handle both "num" (legacy) and "number" (Rust-compatible) fields
+            pin_num = pinfo.get("number", pinfo.get("num", ""))
             if not pin_num:  # Skip pins without numbers
                 context_logger.warning(
                     "Skipping pin without number in component",
