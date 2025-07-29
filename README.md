@@ -4,9 +4,9 @@
 [![PyPI version](https://badge.fury.io/py/circuit-synth.svg)](https://badge.fury.io/py/circuit-synth)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**The first circuit design tool built for AI collaboration**
+**Pythonic circuit design with AI-powered component intelligence**
 
-We don't just build great circuit design APIs - we build the AI expertise to use them optimally. Natural language requests become manufacturable circuits with ready-to-use code, powered by specialized agents with deep domain knowledge and familiar Python syntax that integrates seamlessly into any engineering workflow.
+Generate complete KiCad projects using familiar Python syntax. Integrated AI agents help with component selection, availability checking, and design optimization - while you maintain full control over the circuit implementation.
 
 ### ⚡ **Instant Component Intelligence**
 
@@ -290,16 +290,16 @@ Instead of spending hours researching components, just describe what you need. C
 
 **This isn't just faster circuit design - it's fundamentally better circuit design.**
 
-### **🧠 Why Circuit-Synth is Different**
+### **🧠 Python + AI Working Together**
 
-**Most libraries focus only on APIs. We focus equally on the AI that uses them.**
+Circuit-synth combines the best of both approaches:
 
-- **Traditional Approach**: Build great tools → Write documentation → Hope users learn effectively
-- **Circuit-Synth Approach**: Build great tools → Build AI expertise → Deliver optimal results instantly
+- **✅ Pure Python**: Standard classes and functions you can read, modify, and extend
+- **✅ AI Assistance**: Intelligent component search, availability checking, and optimization suggestions
+- **✅ Your Control**: AI provides recommendations, you make the final decisions
+- **✅ No Lock-in**: Generated Python code works with or without AI features
 
-**We're not just a Python library - we're a complete AI-native engineering platform.** The specialized agents know electrical engineering principles, component selection criteria, manufacturing constraints, and design optimization techniques. This accumulated expertise is as valuable as the code itself.
-
-**Result**: Engineers get professional-quality designs without needing to become experts in every domain first.
+**The result**: Faster development with professional component choices, while maintaining full engineering control.
 
 ### **🚀 Getting Started with Claude Code**
 
