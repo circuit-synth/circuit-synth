@@ -11,7 +11,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from ...kicad.kicad_symbol_parser import parse_kicad_sym_file
 from .types import Point, SchematicPin
@@ -97,6 +97,9 @@ class SymbolLibraryCache:
         # Flag to track if we've built the complete index
         self._index_built: bool = False
 
+        # Track loaded library files for lazy loading
+        self._loaded_libraries: Set[Path] = set()
+
         # Load default libraries
         self._load_default_libraries()
 
@@ -108,7 +111,7 @@ class SymbolLibraryCache:
 
     def get_symbol(self, lib_id: str) -> Optional[SymbolDefinition]:
         """
-        Get a symbol definition by library ID.
+        Get a symbol definition by library ID using lazy search.
 
         Args:
             lib_id: Library ID in format "Library:Symbol"
@@ -120,7 +123,13 @@ class SymbolLibraryCache:
         if lib_id in self._symbols:
             return self._symbols[lib_id]
 
-        # Build index if not already built
+        # Try lazy symbol search first (much faster)
+        symbol = self._lazy_symbol_search(lib_id)
+        if symbol:
+            return symbol
+
+        # Only build complete index as last resort
+        logger.debug(f"Lazy search failed for {lib_id}, falling back to complete index")
         self._build_complete_index()
 
         # Try to parse the lib_id
@@ -453,6 +462,133 @@ class SymbolLibraryCache:
 
         return valid_dirs
 
+    def _lazy_symbol_search(self, lib_id: str) -> Optional[SymbolDefinition]:
+        """
+        Fast lazy search for symbols without building complete index.
+        Uses multiple strategies in order of speed.
+        """
+        try:
+            lib_name, sym_name = lib_id.split(":")
+        except ValueError:
+            logger.error(f"Invalid symbol_id format: {lib_id}")
+            return None
+
+        # Strategy 1: File-based discovery (fastest - < 0.01s)
+        symbol_file = self._find_symbol_file_by_name(lib_name)
+        if symbol_file and symbol_file.exists():
+            logger.debug(f"Found symbol file by name: {symbol_file}")
+            return self._load_symbol_from_file(symbol_file, lib_id)
+
+        # Strategy 2: Ripgrep search (fast - < 0.1s)
+        symbol_file = self._ripgrep_symbol_search(lib_name, sym_name)
+        if symbol_file:
+            logger.debug(f"Found symbol via ripgrep: {symbol_file}")
+            return self._load_symbol_from_file(symbol_file, lib_id)
+
+        # Strategy 3: Python grep fallback (medium - < 1s)
+        symbol_file = self._python_grep_search(lib_name, sym_name)
+        if symbol_file:
+            logger.debug(f"Found symbol via Python grep: {symbol_file}")
+            return self._load_symbol_from_file(symbol_file, lib_id)
+
+        logger.debug(f"Lazy search failed for {lib_id}")
+        return None
+
+    def _find_symbol_file_by_name(self, lib_name: str) -> Optional[Path]:
+        """Find symbol file using intelligent file name guessing."""
+        kicad_dirs = self._parse_kicad_symbol_dirs()
+        
+        for kicad_dir in kicad_dirs:
+            # Try exact library name first
+            candidates = [
+                kicad_dir / f"{lib_name}.kicad_sym",
+                kicad_dir / f"{lib_name.lower()}.kicad_sym",
+                kicad_dir / f"{lib_name.upper()}.kicad_sym",
+                kicad_dir / f"{lib_name.replace('_', '-')}.kicad_sym",
+                kicad_dir / f"{lib_name.replace('-', '_')}.kicad_sym",
+            ]
+            
+            for candidate in candidates:
+                if candidate.exists():
+                    return candidate
+        
+        return None
+
+    def _ripgrep_symbol_search(self, lib_name: str, sym_name: str) -> Optional[Path]:
+        """Use ripgrep to quickly find symbol in .kicad_sym files."""
+        import subprocess
+        
+        kicad_dirs = self._parse_kicad_symbol_dirs()
+        
+        for kicad_dir in kicad_dirs:
+            try:
+                # Search for the specific symbol pattern
+                result = subprocess.run([
+                    'rg', '-l',  # list files only
+                    f'\\(symbol\\s+"{sym_name}"',  # regex pattern for symbol definition
+                    str(kicad_dir),
+                    '--type-add', 'kicad:*.kicad_sym',
+                    '--type', 'kicad'
+                ], capture_output=True, text=True, timeout=5)
+                
+                if result.returncode == 0 and result.stdout.strip():
+                    # Return first match
+                    first_file = result.stdout.strip().split('\n')[0]
+                    return Path(first_file)
+                    
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                # ripgrep not available or too slow, skip
+                continue
+        
+        return None
+
+    def _python_grep_search(self, lib_name: str, sym_name: str) -> Optional[Path]:
+        """Fallback Python-based grep search for symbols."""
+        import re
+        
+        kicad_dirs = self._parse_kicad_symbol_dirs()
+        pattern = re.compile(rf'\(symbol\s+"{re.escape(sym_name)}"')
+        
+        for kicad_dir in kicad_dirs:
+            # Search .kicad_sym files
+            for sym_file in kicad_dir.rglob("*.kicad_sym"):
+                try:
+                    # Read file in chunks to avoid memory issues
+                    with open(sym_file, 'r', encoding='utf-8') as f:
+                        chunk = f.read(8192)  # Read first 8KB
+                        if pattern.search(chunk):
+                            return sym_file
+                except (IOError, UnicodeDecodeError):
+                    continue
+        
+        return None
+
+    def _load_symbol_from_file(self, symbol_file: Path, lib_id: str) -> Optional[SymbolDefinition]:
+        """Load specific symbol from a known file."""
+        try:
+            # Load the library if not already loaded
+            resolved_path = symbol_file.resolve()
+            if resolved_path not in self._loaded_libraries:
+                library_data = self._load_library(symbol_file)
+                
+                # Process symbols from the loaded library
+                for symbol_name, symbol_data in library_data.get("symbols", {}).items():
+                    full_lib_id = f"{symbol_file.stem}:{symbol_name}"
+                    if full_lib_id not in self._symbols:
+                        symbol_def = self._convert_to_symbol_definition(full_lib_id, symbol_data)
+                        if symbol_def:
+                            self._symbols[full_lib_id] = symbol_def
+            
+            # Check if symbol is now available
+            if lib_id in self._symbols:
+                logger.debug(f"Successfully loaded {lib_id} from {symbol_file}")
+                return self._symbols[lib_id]
+            
+        except Exception as e:
+            logger.warning(f"Failed to load symbol {lib_id} from {symbol_file}: {e}")
+        
+        return None
+
     def _extract_symbol_names_fast(self, sym_file_path: Path) -> List[str]:
         """
         Quickly extract symbol names from a .kicad_sym file without full parsing.
@@ -545,6 +681,9 @@ class SymbolLibraryCache:
 
             # Store in memory
             self._library_data[str_path] = library_data
+            
+            # Track as loaded
+            self._loaded_libraries.add(lib_path.resolve())
 
             # Store to disk
             try:
