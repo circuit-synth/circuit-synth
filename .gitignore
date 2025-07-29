@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Test outputs and generated files
+test_outputs/
+*.kicad_pcb-bak
+*.kicad_sch-bak
+
 # C extensions
 *.so
 

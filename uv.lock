@@ -322,6 +322,9 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+claude = [
+    { name = "claude-code-sdk" },
+]
 dev = [
     { name = "black" },
     { name = "flake8" },
@@ -361,6 +364,7 @@ requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.11.0" },
     { name = "black", marker = "extra == 'dev'", specifier = ">=22.0.0" },
     { name = "cachetools", specifier = ">=5.3.0" },
+    { name = "claude-code-sdk", marker = "extra == 'claude'", specifier = ">=0.0.17" },
     { name = "click", specifier = ">=8.0.0" },
     { name = "flake8", marker = "extra == 'dev'", specifier = ">=4.0.0" },
     { name = "google-adk", specifier = ">=0.1.0" },
@@ -388,7 +392,7 @@ requires-dist = [
     { name = "sexpdata", specifier = ">=0.0.3" },
     { name = "types-pyyaml", marker = "extra == 'dev'", specifier = ">=6.0.0" },
 ]
-provides-extras = ["dev", "test"]
+provides-extras = ["dev", "claude", "test"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -402,6 +406,18 @@ dev = [
     { name = "sphinx-autodoc-typehints", specifier = ">=2.3.0" },
     { name = "sphinx-rtd-theme", specifier = ">=3.0.2" },
     { name = "twine", specifier = ">=6.1.0" },
+]
+
+[[package]]
+name = "claude-code-sdk"
+version = "0.0.17"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f0/9f/e275408829ae6c4dcbaf8fc6a57096aa5ec85575772c18c3862052b305ef/claude_code_sdk-0.0.17.tar.gz", hash = "sha256:83362fe0dfdd9455304c628a626e88486a36750dbcdf9b3effa5dd4b9f84023b", size = 22284, upload-time = "2025-07-24T05:51:36.11Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6f/e0/5b11418532548f1d6943752ed5a83c88fabc0c2b0c46365cbb027249a632/claude_code_sdk-0.0.17-py3-none-any.whl", hash = "sha256:52d44fcd04919283c12e422b95f03ffd2354bf65c8b1f16c289ce1245dac285f", size = 16932, upload-time = "2025-07-24T05:51:34.596Z" },
 ]
 
 [[package]]

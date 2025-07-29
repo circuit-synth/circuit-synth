@@ -186,9 +186,17 @@ uv sync  # or: pip install -e ".[dev]"
 ./scripts/circuit-synth-docker python examples/example_kicad_project.py
 ```
 
+**CI Setup:**
+```bash
+# For continuous integration testing
+./tools/ci-setup/setup-ci-symbols.sh
+```
+
 ## Contributing
 
 We welcome contributions! See [CLAUDE.md](CLAUDE.md) for development setup and coding standards.
+
+For AI-powered circuit design features, see [docs/integration/CLAUDE_INTEGRATION.md](docs/integration/CLAUDE_INTEGRATION.md).
 
 **Quick start:**
 ```bash
