@@ -34,6 +34,7 @@ Generates a complete KiCad project with schematics, PCB layout, and netlists.
 
 ```python
 from circuit_synth import *
+from circuit_synth.jlc_integration import get_component_availability_web
 
 @circuit(name="esp32_dev_board")
 def esp32_dev_board():
@@ -51,7 +52,10 @@ def esp32_dev_board():
         footprint="RF_Module:ESP32-S3-MINI-1"
     )
     
-    # Voltage regulator (use /find-footprint SOT23 to find footprint)
+    # Voltage regulator - check availability with JLCPCB
+    jlc_vreg = get_component_availability_web("AMS1117-3.3")
+    print(f"AMS1117-3.3 stock: {jlc_vreg['stock']} units available")
+    
     vreg = Component(
         symbol="Regulator_Linear:AMS1117-3.3",
         ref="U2", 
@@ -78,6 +82,7 @@ circuit.generate_kicad_project("esp32_dev")
 - **🏗️ Hierarchical Design**: Multi-sheet projects with proper organization
 - **📝 Smart Annotations**: Automatic docstring extraction + manual text/tables
 - **⚡ Rust-Accelerated**: Fast symbol lookup and placement algorithms
+- **🏭 Manufacturing Integration**: Real-time component availability and pricing from JLCPCB
 
 ## Installation
 
