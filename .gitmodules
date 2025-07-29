@@ -16,3 +16,6 @@
 [submodule "submodules/kicad-cli-docker"]
 	path = submodules/kicad-cli-docker
 	url = https://gitlab.com/kicad/packaging/kicad-cli-docker.git
+[submodule "src/external_repos/modm-devices"]
+	path = src/external_repos/modm-devices
+	url = https://github.com/modm-io/modm-devices.git
