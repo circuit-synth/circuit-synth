@@ -59,7 +59,7 @@ def get_circuit_hooks() -> Dict[str, List[CircuitHook]]:
             if [[ -n "$SYMBOL" ]]; then
                 echo "🔍 Checking availability for symbol: $SYMBOL"
                 python -c "
-                from circuit_synth.jlc_integration import get_component_availability_web
+                from circuit_synth.manufacturing.jlcpcb import get_component_availability_web
                 try:
                     # Extract component name from symbol
                     symbol_name = '$SYMBOL'.split(':')[-1]
@@ -90,7 +90,7 @@ def get_circuit_hooks() -> Dict[str, List[CircuitHook]]:
                     content = f.read()
                 # Look for STM32-related content
                 if 'STM32' in content or 'stm32' in content:
-                    from circuit_synth.stm32_pinout import STM32PinMapper
+                    from circuit_synth.chips.microcontrollers.stm32 import STM32PinMapper
                     print('✅ STM32 integration available for pin validation')
                 else:
                     print('ℹ️  No STM32 content detected')
@@ -157,13 +157,13 @@ def get_circuit_hooks() -> Dict[str, List[CircuitHook]]:
                 # Check manufacturing integrations
                 python -c "
                 try:
-                    from circuit_synth.jlc_integration import get_component_availability_web
+                    from circuit_synth.manufacturing.jlcpcb import get_component_availability_web
                     print('🏭 JLCPCB integration: Available')
                 except ImportError:
                     print('⚠️  JLCPCB integration: Not available')
                 
                 try:
-                    from circuit_synth.stm32_pinout import STM32PinMapper
+                    from circuit_synth.chips.microcontrollers.stm32 import STM32PinMapper
                     print('🔧 STM32 integration: Available')
                 except ImportError:
                     print('⚠️  STM32 integration: Not available')
