@@ -76,7 +76,7 @@ setup-claude-integration
 **Automatic validation triggers when you:**
 - Edit circuit-synth Python files → Component and design rule validation
 - Create Component definitions → JLC availability checking
-- Work with STM32 designs → Pin assignment verification
+- Work with STM32 designs → Device search and validation
 - Use @circuit decorators → Design rule compliance checking
 
 **Session startup automatically:**

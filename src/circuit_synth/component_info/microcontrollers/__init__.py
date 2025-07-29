@@ -2,14 +2,12 @@
 Microcontroller family integrations.
 
 Provides chip-specific functionality for different MCU families:
-- stm32/: STM32 microcontroller family
-- esp32/: ESP32 microcontroller family (future)
-- pic/: Microchip PIC family (future)
-- avr/: Atmel/Microchip AVR family (future)
+- ESP32: ESP32 microcontroller family (future)
+- PIC: Microchip PIC family (future)
+- AVR: Atmel/Microchip AVR family (future)
 
 Key Features:
 - Intelligent MCU search with modm-devices integration
-- Pin mapping and peripheral assignment
 - Manufacturing constraint awareness
 """
 
@@ -23,10 +21,8 @@ try:
         search_by_peripherals,
         search_stm32,
     )
-    from .stm32 import STM32PinMapper
 
     __all__ = [
-        "STM32PinMapper",
         "ModmDeviceSearch",
         "MCUSpecification",
         "MCUSearchResult",

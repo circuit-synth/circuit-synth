@@ -76,30 +76,6 @@ def get_circuit_hooks() -> Dict[str, List[CircuitHook]]:
             """,
             description="Component availability verification",
         ),
-        # STM32 pin assignment validation
-        CircuitHook(
-            event="PostToolUse",
-            matcher="Edit|Write.*STM32|stm32",
-            command="""
-            # Validate STM32 pin assignments
-            echo "🔍 Checking STM32 pin assignments..."
-            python -c "
-            import sys, re
-            try:
-                with open('$CLAUDE_TOOL_INPUT' if '$CLAUDE_TOOL_INPUT'.endswith('.py') else sys.argv[1], 'r') as f:
-                    content = f.read()
-                # Look for STM32-related content
-                if 'STM32' in content or 'stm32' in content:
-                    from circuit_synth.component_info.microcontrollers.stm32 import STM32PinMapper
-                    print('✅ STM32 integration available for pin validation')
-                else:
-                    print('ℹ️  No STM32 content detected')
-            except Exception as e:
-                print(f'⚠️  STM32 validation not available: {e}')
-            " 2>/dev/null || echo "⚠️  STM32 validation tools not available"
-            """,
-            description="STM32 pin assignment validation",
-        ),
         # Design rule checking for circuit-synth projects
         CircuitHook(
             event="PostToolUse",
@@ -163,10 +139,10 @@ def get_circuit_hooks() -> Dict[str, List[CircuitHook]]:
                     print('⚠️  JLCPCB integration: Not available')
                 
                 try:
-                    from circuit_synth.component_info.microcontrollers.stm32 import STM32PinMapper
-                    print('🔧 STM32 integration: Available')
+                    from circuit_synth.component_info.microcontrollers.modm_device_search import search_stm32
+                    print('🔧 STM32 MCU search: Available')
                 except ImportError:
-                    print('⚠️  STM32 integration: Not available')
+                    print('⚠️  STM32 MCU search: Not available')
                 " 2>/dev/null
                 
                 # Show available agents
