@@ -8,34 +8,25 @@
 
 Generate complete KiCad projects using familiar Python syntax. Integrated AI agents help with component selection, availability checking, and design optimization - while you maintain full control over the circuit implementation.
 
-### ⚡ **Instant Component Intelligence**
+### 🔍 **Component Intelligence**
 
-**Ask for components naturally, get professional results:**
+**Ask for components naturally:**
 
 ```
 👤 "find a stm32 mcu that has 3 spi's and is available on jlcpcb"
 
-🤖 **STM32G431CBT6** - Perfect match found!
+🤖 **STM32G431CBT6** - Found matching component
    📊 Stock: 83,737 units | Price: $2.50@100pcs | LCSC: C529092
    ✅ 3 SPIs: SPI1, SPI2, SPI3 
    📦 LQFP-48 package | 128KB Flash, 32KB RAM
 
-   📋 Ready Circuit-Synth Code:
+   📋 Circuit-Synth Code:
    stm32g431 = Component(
        symbol="MCU_ST_STM32G4:STM32G431CBTx",
        ref="U",
        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
    )
 ```
-
-**No catalog browsing. No datasheets. No guesswork. Just instant, accurate results.**
-
-### 🎯 **AI Commands**
-
-- **`/find-symbol`** - Find KiCad symbols across all libraries  
-- **`/find-footprint`** - Locate correct footprints with package verification
-
-**This is the future of circuit design - AI that understands electrical engineering.**
 
 ## Quick Start
 
@@ -102,44 +93,36 @@ circuit.generate_kicad_project("esp32_dev")
 - **📝 Smart Annotations**: Automatic docstring extraction + manual text/tables
 - **⚡ Rust-Accelerated**: Fast symbol lookup and placement algorithms
 - **🏭 Manufacturing Integration**: Real-time component availability and pricing from JLCPCB
-- **🔍 Smart Component Finder**: AI-powered component recommendations with instant circuit-synth code generation
+- **🔍 Smart Component Finder**: AI-powered component recommendations with circuit-synth code generation
 
-## 🚀 Claude Code Workflow Guide
+## 🚀 Claude Code Integration
 
-### **The New Standard for Circuit Design**
+### **AI-Assisted Circuit Design**
 
-Circuit-synth + Claude Code creates the most productive circuit design workflow ever built. Here's how to leverage this powerful combination:
+Circuit-synth works with Claude Code to streamline component selection and circuit generation:
 
-#### **1. Start with Natural Language**
+#### **1. Natural Language Queries**
 ```
 👤 "Design a motor controller with STM32, 3 half-bridges, current sensing, and CAN bus"
 ```
 
-Instead of spending hours researching components, just describe what you need. Claude will:
-- Search the modm-devices database for optimal MCUs
-- Check JLCPCB availability and pricing in real-time  
-- Generate complete circuit-synth code with proper connections
-- Provide manufacturing-ready component recommendations
+Claude will search components, check availability, and generate circuit-synth code.
 
-#### **2. Use AI Commands**
+#### **2. AI Commands**
 
-- `/find-symbol STM32G4` → Locates exact KiCad symbols
-- `/find-footprint LQFP` → Find correct footprints
+- `/find-symbol STM32G4` → Locates KiCad symbols
+- `/find-footprint LQFP` → Find footprints
 
-#### **3. Real-World Example: STM32 Selection**
-
-**Traditional workflow:** 2-3 hours of research, datasheets, availability checking
-**Claude Code workflow:** 30 seconds
+#### **3. Component Search Example**
 
 ```
-👤 "/find-mcu STM32 with 3 SPIs available on JLCPCB"
+👤 "STM32 with 3 SPIs available on JLCPCB"
 
-🤖 **STM32G431CBT6** - Perfect match!
+🤖 **STM32G431CBT6** - Found matching component
    📊 Stock: 83,737 units | Price: $2.50@100pcs 
    ✅ 3 SPIs: SPI1, SPI2, SPI3
    📦 LQFP-48 | 128KB Flash, 32KB RAM
 
-   Ready code:
    mcu = Component(
        symbol="MCU_ST_STM32G4:STM32G431CBTx",
        ref="U",
@@ -147,59 +130,19 @@ Instead of spending hours researching components, just describe what you need. C
    )
 ```
 
-#### **4. End-to-End Circuit Generation**
+### **Workflow**
 
-**The complete workflow in action:**
-1. **Describe** your requirements in natural language
-2. **Claude searches** components and finds optimal matches  
-3. **Generate** complete circuit-synth code with verified components
-4. **Export** to KiCad for PCB layout and manufacturing
+1. Describe requirements in natural language
+2. Claude searches components and checks availability  
+3. Generate circuit-synth code with verified components
+4. Export to KiCad for PCB layout
 
-**Result:** Professional circuit designs in minutes, not days.
+### **Benefits**
 
-### **Why This Changes Everything**
-
-- **🎯 No Research Required**: AI finds optimal components instantly
-- **✅ Manufacturing Ready**: Real-time availability and pricing verification
-- **🔧 Professional Quality**: Expert domain knowledge built-in
-- **⚡ Incredible Speed**: Complete designs in 30 seconds to 5 minutes
-- **🧠 Learning Accelerator**: AI explains decisions and trade-offs
-
-**This isn't just faster circuit design - it's fundamentally better circuit design.**
-
-### **🧠 Python + AI Working Together**
-
-Circuit-synth combines the best of both approaches:
-
-- **✅ Pure Python**: Standard classes and functions you can read, modify, and extend
-- **✅ AI Assistance**: Intelligent component search, availability checking, and optimization suggestions
-- **✅ Your Control**: AI provides recommendations, you make the final decisions
-- **✅ No Lock-in**: Generated Python code works with or without AI features
-
-**The result**: Faster development with professional component choices, while maintaining full engineering control.
-
-### **🚀 Getting Started with Claude Code**
-
-**1. Install circuit-synth:**
-```bash
-pip install circuit-synth
-```
-
-**2. Start designing with AI:**
-```bash
-# In Claude Code, just ask natural questions:
-"find me an stm32 with 3 spis and can bus"
-"design a 3.3v regulator circuit with thermal protection"
-"help me choose between buck and ldo for this application"
-```
-
-**3. Use AI commands:**
-```bash
-/find-symbol      # Find KiCad symbols
-/find-footprint   # Find component footprints
-```
-
-**The AI handles the complexity. You focus on the design.**
+- **🔍 Component Search**: AI finds suitable components
+- **✅ Availability Check**: Real-time JLCPCB stock verification
+- **🔧 Code Generation**: Ready-to-use circuit-synth code
+- **🧠 Engineering Context**: AI explains component choices
 
 ## Installation
 
