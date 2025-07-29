@@ -455,6 +455,29 @@ The agent provides structured feedback on:
 - Code organization and maintainability
 **Perfect for AI-assisted circuit design - just ask Claude to help you build circuits!**
 
+## 📁 Repository Structure
+
+```
+circuit-synth/
+├── README.md              # This file
+├── CLAUDE.md              # Claude Code instructions  
+├── pyproject.toml         # Python package configuration
+├── docs/                  # 📚 Documentation & guides
+│   ├── SCRIPT_REFERENCE.md    # → Complete script index
+│   ├── AUTOMATED_TESTING.md   # → Testing infrastructure  
+│   ├── RUST_TESTING_GUIDE.md  # → Rust testing guide
+│   └── RUST_PYPI_INTEGRATION.md # → Python-Rust integration
+├── scripts/               # 🔧 All utility scripts  
+│   ├── run_all_tests.sh       # → Comprehensive testing
+│   ├── rebuild_all_rust.sh    # → Rebuild Rust modules
+│   └── test_rust_modules.sh   # → Rust-only testing
+├── src/circuit_synth/     # 🐍 Main Python package
+├── rust_modules/          # 🦀 Rust performance modules  
+└── examples/              # 💡 Usage examples
+```
+
+**📖 Script Reference**: See [`docs/SCRIPT_REFERENCE.md`](docs/SCRIPT_REFERENCE.md) for all available scripts and their usage.
+
 ## Quick Start
 
 ```bash
