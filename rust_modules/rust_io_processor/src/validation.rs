@@ -1,24 +1,24 @@
 //! High-performance validation engine with comprehensive error checking
-//! 
+//!
 //! Provides 30x faster schema validation and error checking through:
 //! - Compiled JSON schema validation with jsonschema crate
 //! - Parallel validation for large datasets
 //! - Circuit-specific validation rules
 //! - Comprehensive error reporting with context
 
-use std::collections::HashMap;
-use std::sync::Arc;
+use jsonschema::{JSONSchema, ValidationError};
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use jsonschema::{JSONSchema, ValidationError};
-use validator::{Validate, ValidationErrors};
-use rayon::prelude::*;
+use std::collections::HashMap;
+use std::sync::Arc;
 use tokio::task;
-use tracing::{debug, info, warn, error};
+use tracing::{debug, error, info, warn};
+use validator::{Validate, ValidationErrors};
 
 use crate::error::{IoError, IoResult};
 use crate::json_processor::CircuitData;
-use crate::kicad_parser::{SchematicData, PcbData, SymbolLibraryData};
+use crate::kicad_parser::{PcbData, SchematicData, SymbolLibraryData};
 use crate::memory::MemoryManager;
 
 /// Validation result with detailed error information
@@ -230,15 +230,19 @@ impl ValidationEngine {
     }
 
     /// Validate JSON against schema
-    pub async fn validate_json_schema(&self, data: &Value, schema_name: &str) -> Result<(), Vec<ValidationIssue>> {
+    pub async fn validate_json_schema(
+        &self,
+        data: &Value,
+        schema_name: &str,
+    ) -> Result<(), Vec<ValidationIssue>> {
         let schema = self.get_or_load_schema(schema_name).await?;
-        
+
         let data_clone = data.clone();
         let schema_clone = Arc::clone(&schema);
-        
+
         task::spawn_blocking(move || {
             let validation_result = schema_clone.validate(&data_clone);
-            
+
             match validation_result {
                 Ok(_) => Ok(()),
                 Err(errors) => {
@@ -261,22 +265,27 @@ impl ValidationEngine {
             }
         })
         .await
-        .map_err(|e| vec![ValidationIssue {
-            severity: ValidationSeverity::Error,
-            category: ValidationCategory::Schema,
-            message: format!("Schema validation task failed: {}", e),
-            field_path: None,
-            line_number: None,
-            column_number: None,
-            expected_value: None,
-            actual_value: None,
-            suggestion: None,
-            rule_id: "schema_task_error".to_string(),
-        }])?
+        .map_err(|e| {
+            vec![ValidationIssue {
+                severity: ValidationSeverity::Error,
+                category: ValidationCategory::Schema,
+                message: format!("Schema validation task failed: {}", e),
+                field_path: None,
+                line_number: None,
+                column_number: None,
+                expected_value: None,
+                actual_value: None,
+                suggestion: None,
+                rule_id: "schema_task_error".to_string(),
+            }]
+        })?
     }
 
     /// Validate circuit-specific rules
-    async fn validate_circuit_rules(&self, circuit: &CircuitData) -> Result<(), Vec<ValidationIssue>> {
+    async fn validate_circuit_rules(
+        &self,
+        circuit: &CircuitData,
+    ) -> Result<(), Vec<ValidationIssue>> {
         let mut issues = Vec::new();
 
         // Rule: Circuit must have a name
@@ -335,7 +344,10 @@ impl ValidationEngine {
     }
 
     /// Validate components in parallel
-    async fn validate_components_parallel(&self, circuit: &CircuitData) -> Result<(), Vec<ValidationIssue>> {
+    async fn validate_components_parallel(
+        &self,
+        circuit: &CircuitData,
+    ) -> Result<(), Vec<ValidationIssue>> {
         use tokio::task::JoinSet;
 
         let mut join_set = JoinSet::new();
@@ -355,7 +367,7 @@ impl ValidationEngine {
         let mut all_issues = Vec::new();
         while let Some(result) = join_set.join_next().await {
             match result {
-                Ok(Ok(())) => {},
+                Ok(Ok(())) => {}
                 Ok(Err(issues)) => all_issues.extend(issues),
                 Err(e) => {
                     all_issues.push(ValidationIssue {
@@ -382,7 +394,10 @@ impl ValidationEngine {
     }
 
     /// Validate components sequentially
-    async fn validate_components_sequential(&self, circuit: &CircuitData) -> Result<(), Vec<ValidationIssue>> {
+    async fn validate_components_sequential(
+        &self,
+        circuit: &CircuitData,
+    ) -> Result<(), Vec<ValidationIssue>> {
         let mut all_issues = Vec::new();
 
         for (ref_id, component) in &circuit.components {
@@ -399,7 +414,10 @@ impl ValidationEngine {
     }
 
     /// Validate a single component
-    fn validate_single_component(ref_id: &str, component: &crate::json_processor::ComponentData) -> Result<(), Vec<ValidationIssue>> {
+    fn validate_single_component(
+        ref_id: &str,
+        component: &crate::json_processor::ComponentData,
+    ) -> Result<(), Vec<ValidationIssue>> {
         let mut issues = Vec::new();
 
         // Rule: Component must have a symbol
@@ -423,13 +441,18 @@ impl ValidationEngine {
             issues.push(ValidationIssue {
                 severity: ValidationSeverity::Warning,
                 category: ValidationCategory::Component,
-                message: format!("Component reference '{}' doesn't match key '{}'", component.reference, ref_id),
+                message: format!(
+                    "Component reference '{}' doesn't match key '{}'",
+                    component.reference, ref_id
+                ),
                 field_path: Some(format!("components.{}.reference", ref_id)),
                 line_number: None,
                 column_number: None,
                 expected_value: Some(ref_id.to_string()),
                 actual_value: Some(component.reference.clone()),
-                suggestion: Some("Ensure component reference matches the dictionary key".to_string()),
+                suggestion: Some(
+                    "Ensure component reference matches the dictionary key".to_string(),
+                ),
                 rule_id: "component_reference_consistency".to_string(),
             });
         }
@@ -456,7 +479,10 @@ impl ValidationEngine {
                 issues.push(ValidationIssue {
                     severity: ValidationSeverity::Error,
                     category: ValidationCategory::Pin,
-                    message: format!("Pin {} of component '{}' must have either name or number", pin_idx, ref_id),
+                    message: format!(
+                        "Pin {} of component '{}' must have either name or number",
+                        pin_idx, ref_id
+                    ),
                     field_path: Some(format!("components.{}.pins[{}]", ref_id, pin_idx)),
                     line_number: None,
                     column_number: None,
@@ -485,7 +511,11 @@ impl ValidationEngine {
                 issues.push(ValidationIssue {
                     severity: ValidationSeverity::Warning,
                     category: ValidationCategory::Net,
-                    message: format!("Net '{}' has only {} connection(s)", net_name, connections.len()),
+                    message: format!(
+                        "Net '{}' has only {} connection(s)",
+                        net_name,
+                        connections.len()
+                    ),
                     field_path: Some(format!("nets.{}", net_name)),
                     line_number: None,
                     column_number: None,
@@ -502,13 +532,18 @@ impl ValidationEngine {
                     issues.push(ValidationIssue {
                         severity: ValidationSeverity::Error,
                         category: ValidationCategory::Net,
-                        message: format!("Net '{}' references unknown component '{}'", net_name, connection.component),
+                        message: format!(
+                            "Net '{}' references unknown component '{}'",
+                            net_name, connection.component
+                        ),
                         field_path: Some(format!("nets.{}[{}].component", net_name, conn_idx)),
                         line_number: None,
                         column_number: None,
                         expected_value: Some("valid component reference".to_string()),
                         actual_value: Some(connection.component.clone()),
-                        suggestion: Some("Ensure the component exists in the components dictionary".to_string()),
+                        suggestion: Some(
+                            "Ensure the component exists in the components dictionary".to_string(),
+                        ),
                         rule_id: "net_valid_component_reference".to_string(),
                     });
                 }
@@ -523,7 +558,10 @@ impl ValidationEngine {
     }
 
     /// Validate KiCad schematic data
-    pub async fn validate_schematic_data(&self, schematic: &SchematicData) -> IoResult<ValidationResult> {
+    pub async fn validate_schematic_data(
+        &self,
+        schematic: &SchematicData,
+    ) -> IoResult<ValidationResult> {
         let start_time = std::time::Instant::now();
         info!("Validating KiCad schematic data");
 
@@ -583,16 +621,19 @@ impl ValidationEngine {
     }
 
     /// Get or load schema from cache
-    async fn get_or_load_schema(&self, schema_name: &str) -> Result<Arc<JSONSchema>, Vec<ValidationIssue>> {
+    async fn get_or_load_schema(
+        &self,
+        schema_name: &str,
+    ) -> Result<Arc<JSONSchema>, Vec<ValidationIssue>> {
         if let Some(cached_schema) = self.schema_cache.get(schema_name) {
             return Ok(Arc::clone(&cached_schema));
         }
 
         // Load schema (in a real implementation, this would load from files)
         let schema_json = self.get_builtin_schema(schema_name)?;
-        
-        let compiled_schema = JSONSchema::compile(&schema_json)
-            .map_err(|e| vec![ValidationIssue {
+
+        let compiled_schema = JSONSchema::compile(&schema_json).map_err(|e| {
+            vec![ValidationIssue {
                 severity: ValidationSeverity::Error,
                 category: ValidationCategory::Schema,
                 message: format!("Failed to compile schema '{}': {}", schema_name, e),
@@ -603,11 +644,13 @@ impl ValidationEngine {
                 actual_value: None,
                 suggestion: Some("Check schema syntax".to_string()),
                 rule_id: "schema_compilation_error".to_string(),
-            }])?;
+            }]
+        })?;
 
         let schema_arc = Arc::new(compiled_schema);
-        self.schema_cache.insert(schema_name.to_string(), Arc::clone(&schema_arc));
-        
+        self.schema_cache
+            .insert(schema_name.to_string(), Arc::clone(&schema_arc));
+
         Ok(schema_arc)
     }
 
@@ -647,7 +690,7 @@ impl ValidationEngine {
                 actual_value: Some(schema_name.to_string()),
                 suggestion: Some("Use a supported schema name".to_string()),
                 rule_id: "unknown_schema".to_string(),
-            }])
+            }]),
         }
     }
 
@@ -696,18 +739,19 @@ mod tests {
     #[tokio::test]
     async fn test_circuit_validation() {
         let engine = ValidationEngine::new();
-        
+
         // Create test circuit
         let mut components = HashMap::new();
-        components.insert("R1".to_string(), ComponentData {
-            symbol: "Device:R".to_string(),
-            reference: "R1".to_string(),
-            value: Some("1k".to_string()),
-            footprint: Some("Resistor_SMD:R_0603_1608Metric".to_string()),
-            datasheet: None,
-            description: None,
-            pins: vec![
-                PinData {
+        components.insert(
+            "R1".to_string(),
+            ComponentData {
+                symbol: "Device:R".to_string(),
+                reference: "R1".to_string(),
+                value: Some("1k".to_string()),
+                footprint: Some("Resistor_SMD:R_0603_1608Metric".to_string()),
+                datasheet: None,
+                description: None,
+                pins: vec![PinData {
                     pin_id: 1,
                     name: "~".to_string(),
                     num: "1".to_string(),
@@ -717,10 +761,10 @@ mod tests {
                     y: 0.0,
                     length: 2.54,
                     orientation: 0,
-                },
-            ],
-            properties: None,
-        });
+                }],
+                properties: None,
+            },
+        );
 
         let circuit = CircuitData {
             name: "test_circuit".to_string(),
@@ -733,7 +777,7 @@ mod tests {
         };
 
         let result = engine.validate_circuit_data(&circuit).await.unwrap();
-        
+
         // Should have warnings about no nets but no errors
         assert!(result.errors.is_empty());
         assert!(!result.warnings.is_empty());
@@ -742,7 +786,7 @@ mod tests {
     #[tokio::test]
     async fn test_invalid_circuit() {
         let engine = ValidationEngine::new();
-        
+
         // Create invalid circuit (empty name)
         let circuit = CircuitData {
             name: "".to_string(), // Invalid: empty name
@@ -755,7 +799,7 @@ mod tests {
         };
 
         let result = engine.validate_circuit_data(&circuit).await.unwrap();
-        
+
         // Should have errors
         assert!(!result.errors.is_empty());
         assert!(!result.is_valid);

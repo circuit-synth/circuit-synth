@@ -1,11 +1,11 @@
 //! Error handling for the Rust I/O processor
-//! 
+//!
 //! Provides comprehensive error types and handling for all I/O operations
 //! with detailed context and Python-compatible error conversion.
 
+use pyo3::{exceptions::PyRuntimeError, PyErr};
 use std::fmt;
 use thiserror::Error;
-use pyo3::{PyErr, exceptions::PyRuntimeError};
 
 /// Result type alias for I/O operations
 pub type IoResult<T> = Result<T, IoError>;
@@ -198,45 +198,76 @@ impl IoError {
                 "message": message,
                 "path": path
             }),
-            IoError::JsonProcessing { message, line, column, .. } => serde_json::json!({
+            IoError::JsonProcessing {
+                message,
+                line,
+                column,
+                ..
+            } => serde_json::json!({
                 "type": "json_processing",
                 "message": message,
                 "line": line,
                 "column": column
             }),
-            IoError::KiCadParsing { message, file_type, line, .. } => serde_json::json!({
+            IoError::KiCadParsing {
+                message,
+                file_type,
+                line,
+                ..
+            } => serde_json::json!({
                 "type": "kicad_parsing",
                 "message": message,
                 "file_type": file_type,
                 "line": line
             }),
-            IoError::Validation { message, field, expected, actual } => serde_json::json!({
+            IoError::Validation {
+                message,
+                field,
+                expected,
+                actual,
+            } => serde_json::json!({
                 "type": "validation",
                 "message": message,
                 "field": field,
                 "expected": expected,
                 "actual": actual
             }),
-            IoError::Memory { message, requested_size, available_size } => serde_json::json!({
+            IoError::Memory {
+                message,
+                requested_size,
+                available_size,
+            } => serde_json::json!({
                 "type": "memory",
                 "message": message,
                 "requested_size": requested_size,
                 "available_size": available_size
             }),
-            IoError::Configuration { message, key, value } => serde_json::json!({
+            IoError::Configuration {
+                message,
+                key,
+                value,
+            } => serde_json::json!({
                 "type": "configuration",
                 "message": message,
                 "key": key,
                 "value": value
             }),
-            IoError::Performance { message, operation, duration_ms, threshold_ms } => serde_json::json!({
+            IoError::Performance {
+                message,
+                operation,
+                duration_ms,
+                threshold_ms,
+            } => serde_json::json!({
                 "type": "performance",
                 "message": message,
                 "operation": operation,
                 "duration_ms": duration_ms,
                 "threshold_ms": threshold_ms
             }),
-            IoError::PythonIntegration { message, python_type } => serde_json::json!({
+            IoError::PythonIntegration {
+                message,
+                python_type,
+            } => serde_json::json!({
                 "type": "python_integration",
                 "message": message,
                 "python_type": python_type
@@ -248,11 +279,7 @@ impl IoError {
 // Convert std::io::Error to IoError
 impl From<std::io::Error> for IoError {
     fn from(err: std::io::Error) -> Self {
-        IoError::file_io_with_source(
-            format!("I/O operation failed: {}", err),
-            None,
-            err,
-        )
+        IoError::file_io_with_source(format!("I/O operation failed: {}", err), None, err)
     }
 }
 
@@ -335,7 +362,7 @@ mod tests {
             .with_file("test.json")
             .with_line(42)
             .with_info("key", "value");
-        
+
         assert_eq!(ctx.operation, "test_operation");
         assert_eq!(ctx.file_path, Some("test.json".to_string()));
         assert_eq!(ctx.line_number, Some(42));

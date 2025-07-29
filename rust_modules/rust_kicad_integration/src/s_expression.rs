@@ -1,11 +1,11 @@
 //! S-expression generation for KiCad schematic files using lexpr
-//! 
+//!
 //! This module handles the conversion of circuit data to KiCad's S-expression format
 //! using the lexpr crate for proper S-expression handling.
 
 use crate::types::*;
-use lexpr::{Value, sexp};
-use log::{info, debug};
+use lexpr::{sexp, Value};
+use log::{debug, info};
 
 /// Generate a complete KiCad schematic S-expression using lexpr
 pub fn generate_schematic_sexp(
@@ -14,8 +14,12 @@ pub fn generate_schematic_sexp(
     config: &SchematicConfig,
 ) -> Result<String, SchematicError> {
     info!("🔄 Generating complete KiCad schematic S-expression with lexpr");
-    info!("📊 Input: {} components, {} labels", circuit_data.components.len(), hierarchical_labels.len());
-    
+    info!(
+        "📊 Input: {} components, {} labels",
+        circuit_data.components.len(),
+        hierarchical_labels.len()
+    );
+
     // Build the main schematic S-expression
     let mut schematic_parts = vec![
         Value::symbol("kicad_sch"),
@@ -23,50 +27,60 @@ pub fn generate_schematic_sexp(
         sexp!((generator "rust_kicad_schematic_writer")),
         sexp!((generator_version "0.1.0")),
         Value::cons(Value::symbol("uuid"), Value::string(config.uuid.clone())),
-        Value::cons(Value::symbol("paper"), Value::string(config.paper_size.clone())),
+        Value::cons(
+            Value::symbol("paper"),
+            Value::string(config.paper_size.clone()),
+        ),
     ];
-    
+
     // Add lib_symbols section (empty for now)
     schematic_parts.push(sexp!((lib_symbols)));
-    
+
     // Add components
     for component in &circuit_data.components {
         let component_sexp = generate_component_sexp(component)?;
         schematic_parts.push(component_sexp);
     }
-    
+
     // Add hierarchical labels
     for label in hierarchical_labels {
         let label_sexp = generate_hierarchical_label_sexp(label)?;
         schematic_parts.push(label_sexp);
     }
-    
+
     // Add sheet_instances
-    schematic_parts.push(sexp!((sheet_instances 
+    schematic_parts.push(sexp!((sheet_instances
         (path "/" (page "1"))
     )));
-    
+
     // Add embedded_fonts
     schematic_parts.push(sexp!((embedded_fonts no)));
-    
+
     // Create the final S-expression
     let schematic_sexp = Value::list(schematic_parts);
-    
+
     // Convert to string
-    let result = lexpr::to_string(&schematic_sexp)
-        .map_err(|e| SchematicError::SerializationError(format!("lexpr serialization failed: {}", e)))?;
-    
-    info!("✅ S-expression generation completed, {} characters", result.len());
-    
+    let result = lexpr::to_string(&schematic_sexp).map_err(|e| {
+        SchematicError::SerializationError(format!("lexpr serialization failed: {}", e))
+    })?;
+
+    info!(
+        "✅ S-expression generation completed, {} characters",
+        result.len()
+    );
+
     Ok(result)
 }
 
 /// Generate S-expression for a component using lexpr
 fn generate_component_sexp(component: &Component) -> Result<Value, SchematicError> {
-    debug!("🔧 Generating component S-expression: {} ({})", component.reference, component.lib_id);
-    
+    debug!(
+        "🔧 Generating component S-expression: {} ({})",
+        component.reference, component.lib_id
+    );
+
     let component_uuid = uuid::Uuid::new_v4().to_string();
-    
+
     // Extract values to avoid field access in sexp! macro
     let pos_x = component.position.x;
     let pos_y = component.position.y;
@@ -76,12 +90,12 @@ fn generate_component_sexp(component: &Component) -> Result<Value, SchematicErro
     let value = component.value.clone();
     let ref_y = pos_y - 2.54;
     let val_y = pos_y + 2.54;
-    
+
     // Build the component S-expression using Value::list
     let mut component_parts = vec![
         Value::symbol("symbol"),
         Value::cons(Value::symbol("lib_id"), Value::string(lib_id)),
-        sexp!((at ,pos_x ,pos_y ,rotation)),
+        sexp!((at, pos_x, pos_y, rotation)),
         sexp!((unit 1)),
         sexp!((exclude_from_sim no)),
         sexp!((in_bom yes)),
@@ -98,15 +112,15 @@ fn generate_component_sexp(component: &Component) -> Result<Value, SchematicErro
             (effects (font (size 1.27 1.27)))
         )),
     ];
-    
+
     // Add pins
     for pin in &component.pins {
         let pin_number = pin.number.clone();
         let pin_uuid = uuid::Uuid::new_v4().to_string();
-        let pin_sexp = sexp!((pin ,pin_number (uuid ,pin_uuid)));
+        let pin_sexp = sexp!((pin, pin_number(uuid, pin_uuid)));
         component_parts.push(pin_sexp);
     }
-    
+
     // Add instances
     let ref_for_instances = component.reference.clone();
     component_parts.push(sexp!((instances
@@ -117,18 +131,23 @@ fn generate_component_sexp(component: &Component) -> Result<Value, SchematicErro
             )
         )
     )));
-    
+
     let component_sexp = Value::list(component_parts);
-    
-    debug!("✅ Component S-expression generated for {}", component.reference);
+
+    debug!(
+        "✅ Component S-expression generated for {}",
+        component.reference
+    );
     Ok(component_sexp)
 }
 
 /// Generate S-expression for a hierarchical label using lexpr
 fn generate_hierarchical_label_sexp(label: &HierarchicalLabel) -> Result<Value, SchematicError> {
-    debug!("🏷️  Generating hierarchical label S-expression: '{}' at ({:.2}, {:.2})",
-           label.name, label.position.x, label.position.y);
-    
+    debug!(
+        "🏷️  Generating hierarchical label S-expression: '{}' at ({:.2}, {:.2})",
+        label.name, label.position.x, label.position.y
+    );
+
     // Extract values to avoid field access in sexp! macro
     let name = label.name.clone();
     let shape = label.shape.to_kicad_string();
@@ -138,18 +157,18 @@ fn generate_hierarchical_label_sexp(label: &HierarchicalLabel) -> Result<Value, 
     let font_size = label.effects.font_size;
     let justify = label.effects.justify.clone();
     let uuid = label.uuid.clone();
-    
-    let label_sexp = sexp!((hierarchical_label ,name
-        (shape ,shape)
-        (at ,pos_x ,pos_y ,orientation)
-        (effects
-            (font (size ,font_size ,font_size))
-            (justify ,justify)
-        )
-        (uuid ,uuid)
+
+    let label_sexp = sexp!((
+        hierarchical_label,
+        name(shape, shape)(at, pos_x, pos_y, orientation)(effects(font(
+            size, font_size, font_size
+        ))(justify, justify))(uuid, uuid)
     ));
-    
-    debug!("✅ Hierarchical label S-expression generated for '{}'", label.name);
+
+    debug!(
+        "✅ Hierarchical label S-expression generated for '{}'",
+        label.name
+    );
     Ok(label_sexp)
 }
 
@@ -199,7 +218,7 @@ pub fn generate_test_hierarchical_label_sexp() -> Value {
 pub fn generate_test_schematic_sexp() -> Value {
     let component_sexp = generate_test_component_sexp();
     let label_sexp = generate_test_hierarchical_label_sexp();
-    
+
     let parts = vec![
         Value::symbol("kicad_sch"),
         sexp!((version 20250114)),
@@ -215,7 +234,7 @@ pub fn generate_test_schematic_sexp() -> Value {
         )),
         sexp!((embedded_fonts no)),
     ];
-    
+
     Value::list(parts)
 }
 
@@ -231,7 +250,7 @@ mod tests {
             "1k".to_string(),
             Position { x: 100.0, y: 100.0 },
         );
-        
+
         component.add_pin(Pin {
             number: "1".to_string(),
             name: "~".to_string(),
@@ -239,10 +258,10 @@ mod tests {
             y: 3.81,
             orientation: 270.0,
         });
-        
+
         let sexp = generate_component_sexp(&component).unwrap();
         let sexp_str = lexpr::to_string(&sexp).unwrap();
-        
+
         assert!(sexp_str.contains("Device:R"));
         assert!(sexp_str.contains("R1"));
         assert!(sexp_str.contains("1k"));
@@ -250,15 +269,12 @@ mod tests {
 
     #[test]
     fn test_hierarchical_label_sexp_generation() {
-        let label = HierarchicalLabel::new(
-            "VCC".to_string(),
-            Position { x: 95.25, y: 58.42 },
-            90.0,
-        );
-        
+        let label =
+            HierarchicalLabel::new("VCC".to_string(), Position { x: 95.25, y: 58.42 }, 90.0);
+
         let sexp = generate_hierarchical_label_sexp(&label).unwrap();
         let sexp_str = lexpr::to_string(&sexp).unwrap();
-        
+
         assert!(sexp_str.contains("hierarchical_label"));
         assert!(sexp_str.contains("VCC"));
         assert!(sexp_str.contains("95.25"));
@@ -273,9 +289,9 @@ mod tests {
             HierarchicalLabel::new("GND".to_string(), Position { x: 100.0, y: 105.0 }, 270.0),
         ];
         let config = SchematicConfig::default();
-        
+
         let sexp_str = generate_schematic_sexp(&circuit_data, &labels, &config).unwrap();
-        
+
         assert!(sexp_str.contains("kicad_sch"));
         assert!(sexp_str.contains("hierarchical_label"));
         assert!(sexp_str.contains("VCC"));
@@ -290,7 +306,7 @@ mod tests {
             (at 100.0 100.0 0)
             (effects (font (size 1.27 1.27)))
         ));
-        
+
         let sexp_str = lexpr::to_string(&test_sexp).unwrap();
         assert!(sexp_str.contains("hierarchical_label"));
         assert!(sexp_str.contains("TEST"));
@@ -298,14 +314,14 @@ mod tests {
 
     fn create_test_circuit() -> CircuitData {
         let mut circuit = CircuitData::new("test_circuit".to_string());
-        
+
         let mut component = Component::new(
             "R1".to_string(),
             "Device:R".to_string(),
             "1k".to_string(),
             Position { x: 100.0, y: 100.0 },
         );
-        
+
         component.add_pin(Pin {
             number: "1".to_string(),
             name: "~".to_string(),
@@ -313,7 +329,7 @@ mod tests {
             y: 3.81,
             orientation: 270.0,
         });
-        
+
         component.add_pin(Pin {
             number: "2".to_string(),
             name: "~".to_string(),
@@ -321,9 +337,9 @@ mod tests {
             y: -3.81,
             orientation: 90.0,
         });
-        
+
         circuit.add_component(component);
-        
+
         circuit
     }
 }

@@ -1,5 +1,5 @@
 //! Core reference manager implementation
-//! 
+//!
 //! This module provides the main ReferenceManager struct that handles
 //! reference generation, validation, and hierarchy management with
 //! high performance and thread safety.
@@ -8,34 +8,34 @@ use crate::errors::{ReferenceError, ValidationError};
 use crate::hierarchy::{HierarchyNode, ReferenceHierarchy};
 use crate::validation::ReferenceValidator;
 
-use ahash::{AHashSet, AHashMap};
+use ahash::{AHashMap, AHashSet};
 use parking_lot::RwLock;
+use std::collections::HashMap;
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::Arc;
 use std::time::Instant;
-use std::collections::HashMap;
 
 /// Thread-safe, high-performance reference manager
 #[derive(Debug)]
 pub struct ReferenceManager {
     /// Unique identifier for this manager instance
     id: u64,
-    
+
     /// Set of used references in this manager
     used_references: Arc<RwLock<AHashSet<String>>>,
-    
+
     /// Counters for each prefix
     prefix_counters: Arc<RwLock<AHashMap<String, AtomicU32>>>,
-    
+
     /// Counter for unnamed nets
     unnamed_net_counter: AtomicU32,
-    
+
     /// Hierarchy management
     hierarchy: Arc<RwLock<HierarchyNode>>,
-    
+
     /// Reference validator
     validator: ReferenceValidator,
-    
+
     /// Performance tracking
     stats: Arc<RwLock<ManagerStats>>,
 }
@@ -72,13 +72,15 @@ impl ManagerStats {
     fn update_generation_time(&mut self, duration_ns: u64) {
         self.references_generated += 1;
         self.total_generation_time_ns += duration_ns;
-        self.avg_generation_time_ns = self.total_generation_time_ns as f64 / self.references_generated as f64;
+        self.avg_generation_time_ns =
+            self.total_generation_time_ns as f64 / self.references_generated as f64;
     }
-    
+
     fn update_validation_time(&mut self, duration_ns: u64) {
         self.validations_performed += 1;
         self.total_validation_time_ns += duration_ns;
-        self.avg_validation_time_ns = self.total_validation_time_ns as f64 / self.validations_performed as f64;
+        self.avg_validation_time_ns =
+            self.total_validation_time_ns as f64 / self.validations_performed as f64;
     }
 }
 
@@ -88,7 +90,7 @@ impl ReferenceManager {
     /// Create a new reference manager
     pub fn new() -> Self {
         let id = MANAGER_ID_COUNTER.fetch_add(1, Ordering::SeqCst);
-        
+
         Self {
             id,
             used_references: Arc::new(RwLock::new(AHashSet::new())),
@@ -122,30 +124,30 @@ impl ReferenceManager {
     /// Register a new reference if it's unique in the hierarchy
     pub fn register_reference(&mut self, reference: &str) -> Result<(), ReferenceError> {
         let start = Instant::now();
-        
+
         // Validate the reference format
         self.validator.validate_format(reference)?;
-        
+
         // Check if reference is available in hierarchy
         if !self.validate_reference(reference) {
             return Err(ReferenceError::Validation(ValidationError::AlreadyInUse {
                 reference: reference.to_string(),
             }));
         }
-        
+
         // Register the reference
         {
             let mut used_refs = self.used_references.write();
             used_refs.insert(reference.to_string());
         }
-        
+
         // Update statistics
         let duration = start.elapsed();
         {
             let mut stats = self.stats.write();
             stats.update_validation_time(duration.as_nanos() as u64);
         }
-        
+
         #[cfg(feature = "logging")]
         log::debug!("Registered reference: {}", reference);
         Ok(())
@@ -154,7 +156,7 @@ impl ReferenceManager {
     /// Validate if a reference is available across the entire hierarchy
     pub fn validate_reference(&self, reference: &str) -> bool {
         let start = Instant::now();
-        
+
         // Check local references
         {
             let used_refs = self.used_references.read();
@@ -162,11 +164,11 @@ impl ReferenceManager {
                 return false;
             }
         }
-        
+
         // Check hierarchy
         let hierarchy = self.hierarchy.read();
         let is_available = hierarchy.is_reference_available(reference);
-        
+
         // Update statistics
         let duration = start.elapsed();
         {
@@ -174,17 +176,17 @@ impl ReferenceManager {
             stats.update_validation_time(duration.as_nanos() as u64);
             stats.hierarchy_lookups += 1;
         }
-        
+
         is_available
     }
 
     /// Generate the next available reference for a prefix
     pub fn generate_next_reference(&mut self, prefix: &str) -> Result<String, ReferenceError> {
         let start = Instant::now();
-        
+
         // Validate prefix format
         self.validator.validate_prefix(prefix)?;
-        
+
         // Get or create counter for this prefix
         let counter = {
             let counters = self.prefix_counters.read();
@@ -194,21 +196,22 @@ impl ReferenceManager {
                 // Need to create new counter
                 drop(counters);
                 let mut counters = self.prefix_counters.write();
-                counters.entry(prefix.to_string())
+                counters
+                    .entry(prefix.to_string())
                     .or_insert_with(|| AtomicU32::new(1))
                     .load(Ordering::SeqCst)
             }
         };
-        
+
         // Find next available reference
         let mut current_counter = counter;
         loop {
             let candidate = format!("{}{}", prefix, current_counter);
-            
+
             if self.validate_reference(&candidate) {
                 // Register the reference
                 self.register_reference(&candidate)?;
-                
+
                 // Update the counter
                 {
                     let counters = self.prefix_counters.read();
@@ -216,27 +219,29 @@ impl ReferenceManager {
                         atomic_counter.store(current_counter + 1, Ordering::SeqCst);
                     }
                 }
-                
+
                 // Update statistics
                 let duration = start.elapsed();
                 {
                     let mut stats = self.stats.write();
                     stats.update_generation_time(duration.as_nanos() as u64);
                 }
-                
+
                 #[cfg(feature = "logging")]
                 log::debug!("Generated reference: {}", candidate);
                 return Ok(candidate);
             }
-            
+
             current_counter += 1;
-            
+
             // Prevent infinite loops (safety check)
             if current_counter > 1_000_000 {
-                return Err(ReferenceError::Validation(ValidationError::CounterOverflow {
-                    prefix: prefix.to_string(),
-                    max_value: 1_000_000,
-                }));
+                return Err(ReferenceError::Validation(
+                    ValidationError::CounterOverflow {
+                        prefix: prefix.to_string(),
+                        max_value: 1_000_000,
+                    },
+                ));
             }
         }
     }
@@ -253,13 +258,13 @@ impl ReferenceManager {
     /// Set initial counters for reference generation
     pub fn set_initial_counters(&mut self, counters: HashMap<String, u32>) {
         let mut prefix_counters = self.prefix_counters.write();
-        
+
         for (prefix, start_num) in counters {
             let current_value = prefix_counters
                 .get(&prefix)
                 .map(|c| c.load(Ordering::SeqCst))
                 .unwrap_or(1);
-            
+
             if start_num > current_value {
                 prefix_counters.insert(prefix.clone(), AtomicU32::new(start_num));
                 #[cfg(feature = "logging")]
@@ -271,17 +276,17 @@ impl ReferenceManager {
     /// Get all used references in this manager and its hierarchy
     pub fn get_all_used_references(&self) -> Vec<String> {
         let mut all_refs = Vec::new();
-        
+
         // Get local references
         {
             let used_refs = self.used_references.read();
             all_refs.extend(used_refs.iter().cloned());
         }
-        
+
         // Get hierarchy references
         let hierarchy = self.hierarchy.read();
         all_refs.extend(hierarchy.get_all_used_references());
-        
+
         all_refs.sort();
         all_refs.dedup();
         all_refs
@@ -293,24 +298,24 @@ impl ReferenceManager {
             let mut used_refs = self.used_references.write();
             used_refs.clear();
         }
-        
+
         {
             let mut counters = self.prefix_counters.write();
             counters.clear();
         }
-        
+
         self.unnamed_net_counter.store(1, Ordering::SeqCst);
-        
+
         {
             let mut hierarchy = self.hierarchy.write();
             hierarchy.clear();
         }
-        
+
         {
             let mut stats = self.stats.write();
             *stats = ManagerStats::default();
         }
-        
+
         #[cfg(feature = "logging")]
         log::debug!("Cleared reference manager {}", self.id);
     }
@@ -321,7 +326,7 @@ impl ReferenceManager {
         let hierarchy = self.hierarchy.read();
         let used_refs = self.used_references.read();
         let counters = self.prefix_counters.read();
-        
+
         serde_json::json!({
             "manager_id": self.id,
             "references_count": used_refs.len(),
@@ -358,7 +363,7 @@ mod tests {
     fn test_manager_creation() {
         let manager1 = ReferenceManager::new();
         let manager2 = ReferenceManager::new();
-        
+
         // Each manager should have unique ID
         assert_ne!(manager1.get_id(), manager2.get_id());
     }
@@ -366,10 +371,10 @@ mod tests {
     #[test]
     fn test_reference_registration() {
         let mut manager = ReferenceManager::new();
-        
+
         // Should be able to register new reference
         assert!(manager.register_reference("R1").is_ok());
-        
+
         // Should not be able to register same reference again
         assert!(manager.register_reference("R1").is_err());
     }
@@ -377,13 +382,13 @@ mod tests {
     #[test]
     fn test_reference_generation() {
         let mut manager = ReferenceManager::new();
-        
+
         let ref1 = manager.generate_next_reference("R").unwrap();
         assert_eq!(ref1, "R1");
-        
+
         let ref2 = manager.generate_next_reference("R").unwrap();
         assert_eq!(ref2, "R2");
-        
+
         // Different prefix should start from 1
         let ref3 = manager.generate_next_reference("C").unwrap();
         assert_eq!(ref3, "C1");
@@ -393,10 +398,10 @@ mod tests {
     fn test_concurrent_access() {
         use std::sync::Arc;
         use std::thread;
-        
+
         let manager = Arc::new(parking_lot::Mutex::new(ReferenceManager::new()));
         let mut handles = vec![];
-        
+
         // Spawn multiple threads generating references
         for i in 0..10 {
             let manager_clone = Arc::clone(&manager);
@@ -407,13 +412,13 @@ mod tests {
             });
             handles.push(handle);
         }
-        
+
         // Collect results
         let mut results = vec![];
         for handle in handles {
             results.push(handle.join().unwrap());
         }
-        
+
         // All results should be unique
         results.sort();
         results.dedup();
@@ -423,15 +428,25 @@ mod tests {
     #[test]
     fn test_performance_stats() {
         let mut manager = ReferenceManager::new();
-        
+
         // Generate some references
         for i in 1..=100 {
             let prefix = if i % 2 == 0 { "R" } else { "C" };
             manager.generate_next_reference(prefix).unwrap();
         }
-        
+
         let stats = manager.get_stats();
-        assert!(stats["performance"]["references_generated"].as_u64().unwrap() > 0);
-        assert!(stats["performance"]["avg_generation_time_ns"].as_f64().unwrap() > 0.0);
+        assert!(
+            stats["performance"]["references_generated"]
+                .as_u64()
+                .unwrap()
+                > 0
+        );
+        assert!(
+            stats["performance"]["avg_generation_time_ns"]
+                .as_f64()
+                .unwrap()
+                > 0.0
+        );
     }
 }

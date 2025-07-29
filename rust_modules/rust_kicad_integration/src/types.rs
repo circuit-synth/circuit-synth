@@ -8,19 +8,19 @@ use std::collections::HashMap;
 pub enum SchematicError {
     #[error("Component not found: {0}")]
     ComponentNotFound(String),
-    
+
     #[error("Pin not found: {0}")]
     PinNotFound(String),
-    
+
     #[error("IO error: {0}")]
     IoError(String),
-    
+
     #[error("Serialization error: {0}")]
     SerializationError(String),
-    
+
     #[error("Invalid data: {0}")]
     InvalidData(String),
-    
+
     #[error("Calculation error: {0}")]
     CalculationError(String),
 }
@@ -116,7 +116,7 @@ impl LabelShape {
     pub fn to_kicad_string(&self) -> &'static str {
         match self {
             LabelShape::Input => "input",
-            LabelShape::Output => "output", 
+            LabelShape::Output => "output",
             LabelShape::Bidirectional => "bidirectional",
             LabelShape::TriState => "tri_state",
             LabelShape::Passive => "passive",
@@ -204,22 +204,38 @@ impl CircuitData {
 
     /// Get total number of pin connections across all nets (including subcircuits)
     pub fn total_connections(&self) -> usize {
-        let local_connections = self.nets.iter().map(|net| net.connected_pins.len()).sum::<usize>();
-        let subcircuit_connections = self.subcircuits.iter().map(|sc| sc.total_connections()).sum::<usize>();
+        let local_connections = self
+            .nets
+            .iter()
+            .map(|net| net.connected_pins.len())
+            .sum::<usize>();
+        let subcircuit_connections = self
+            .subcircuits
+            .iter()
+            .map(|sc| sc.total_connections())
+            .sum::<usize>();
         local_connections + subcircuit_connections
     }
 
     /// Get total number of components (including subcircuits)
     pub fn total_components(&self) -> usize {
         let local_components = self.components.len();
-        let subcircuit_components = self.subcircuits.iter().map(|sc| sc.total_components()).sum::<usize>();
+        let subcircuit_components = self
+            .subcircuits
+            .iter()
+            .map(|sc| sc.total_components())
+            .sum::<usize>();
         local_components + subcircuit_components
     }
 
     /// Get total number of nets (including subcircuits)
     pub fn total_nets(&self) -> usize {
         let local_nets = self.nets.len();
-        let subcircuit_nets = self.subcircuits.iter().map(|sc| sc.total_nets()).sum::<usize>();
+        let subcircuit_nets = self
+            .subcircuits
+            .iter()
+            .map(|sc| sc.total_nets())
+            .sum::<usize>();
         local_nets + subcircuit_nets
     }
 
@@ -229,14 +245,14 @@ impl CircuitData {
         if let Some(component) = self.components.iter().find(|c| c.reference == reference) {
             return Some(component);
         }
-        
+
         // Then search subcircuits recursively
         for subcircuit in &self.subcircuits {
             if let Some(component) = subcircuit.find_component(reference) {
                 return Some(component);
             }
         }
-        
+
         None
     }
 
@@ -246,44 +262,44 @@ impl CircuitData {
         if let Some(net) = self.nets.iter().find(|n| n.name == name) {
             return Some(net);
         }
-        
+
         // Then search subcircuits recursively
         for subcircuit in &self.subcircuits {
             if let Some(net) = subcircuit.find_net(name) {
                 return Some(net);
             }
         }
-        
+
         None
     }
 
     /// Get all components recursively (flattened from all subcircuits)
     pub fn get_all_components(&self) -> Vec<&Component> {
         let mut all_components = Vec::new();
-        
+
         // Add local components
         all_components.extend(self.components.iter());
-        
+
         // Add components from subcircuits recursively
         for subcircuit in &self.subcircuits {
             all_components.extend(subcircuit.get_all_components());
         }
-        
+
         all_components
     }
 
     /// Get all nets recursively (flattened from all subcircuits)
     pub fn get_all_nets(&self) -> Vec<&Net> {
         let mut all_nets = Vec::new();
-        
+
         // Add local nets
         all_nets.extend(self.nets.iter());
-        
+
         // Add nets from subcircuits recursively
         for subcircuit in &self.subcircuits {
             all_nets.extend(subcircuit.get_all_nets());
         }
-        
+
         all_nets
     }
 
@@ -344,7 +360,9 @@ impl Component {
 
     /// Find a pin by number or name
     pub fn find_pin(&self, identifier: &str) -> Option<&Pin> {
-        self.pins.iter().find(|p| p.number == identifier || p.name == identifier)
+        self.pins
+            .iter()
+            .find(|p| p.number == identifier || p.name == identifier)
     }
 }
 

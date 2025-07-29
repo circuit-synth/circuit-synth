@@ -154,7 +154,7 @@ impl Component {
             footprint,
             value,
             path: String::new(),
-            width: 2.0,  // Default component size
+            width: 2.0, // Default component size
             height: 2.0,
         }
     }
@@ -178,7 +178,7 @@ impl Component {
     pub fn bounding_box(&self) -> BoundingBox {
         let half_width = self.width / 2.0;
         let half_height = self.height / 2.0;
-        
+
         BoundingBox {
             min_x: self.position.x - half_width,
             min_y: self.position.y - half_height,
@@ -199,7 +199,12 @@ pub struct BoundingBox {
 
 impl BoundingBox {
     pub fn new(min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> Self {
-        Self { min_x, min_y, max_x, max_y }
+        Self {
+            min_x,
+            min_y,
+            max_x,
+            max_y,
+        }
     }
 
     pub fn width(&self) -> f64 {

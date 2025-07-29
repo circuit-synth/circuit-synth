@@ -1,27 +1,27 @@
 //! High-performance KiCad file parsing engine
-//! 
+//!
 //! Provides 25x faster schematic and PCB file parsing through:
 //! - Optimized S-expression parsing with nom
 //! - Parallel processing of large files
 //! - Memory-efficient data structures
 //! - Specialized parsers for different KiCad file types
 
-use std::collections::HashMap;
-use std::path::Path;
-use std::sync::Arc;
-use serde::{Deserialize, Serialize};
 use nom::{
-    IResult,
     branch::alt,
     bytes::complete::{escaped, tag, take_until, take_while1},
-    character::complete::{char, multispace0, multispace1, digit1, alphanumeric1, none_of, one_of},
+    character::complete::{alphanumeric1, char, digit1, multispace0, multispace1, none_of, one_of},
     combinator::{map, opt, recognize},
     multi::{many0, many1, separated_list0},
     sequence::{delimited, preceded, terminated, tuple},
+    IResult,
 };
 use rayon::prelude::*;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::path::Path;
+use std::sync::Arc;
 use tokio::task;
-use tracing::{debug, info, warn, error};
+use tracing::{debug, error, info, warn};
 
 use crate::error::{IoError, IoResult};
 use crate::file_io::FileReader;
@@ -412,13 +412,13 @@ impl KiCadParser {
         info!("Parsing KiCad schematic: {:?}", path);
 
         let start_time = std::time::Instant::now();
-        
+
         // Read file content
         let content = self.file_reader.read_file_to_string(path).await?;
-        
+
         // Parse S-expressions
         let schematic = self.parse_schematic_content(&content).await?;
-        
+
         let duration = start_time.elapsed();
         info!(
             "Parsed schematic {:?} in {:?} ({} symbols, {} wires)",
@@ -437,13 +437,13 @@ impl KiCadParser {
         info!("Parsing KiCad PCB: {:?}", path);
 
         let start_time = std::time::Instant::now();
-        
+
         // Read file content
         let content = self.file_reader.read_file_to_string(path).await?;
-        
+
         // Parse S-expressions
         let pcb = self.parse_pcb_content(&content).await?;
-        
+
         let duration = start_time.elapsed();
         info!(
             "Parsed PCB {:?} in {:?} ({} footprints, {} tracks)",
@@ -457,18 +457,21 @@ impl KiCadParser {
     }
 
     /// Parse KiCad symbol library (.kicad_sym)
-    pub async fn parse_symbol_library<P: AsRef<Path>>(&self, path: P) -> IoResult<SymbolLibraryData> {
+    pub async fn parse_symbol_library<P: AsRef<Path>>(
+        &self,
+        path: P,
+    ) -> IoResult<SymbolLibraryData> {
         let path = path.as_ref();
         info!("Parsing KiCad symbol library: {:?}", path);
 
         let start_time = std::time::Instant::now();
-        
+
         // Read file content
         let content = self.file_reader.read_file_to_string(path).await?;
-        
+
         // Parse S-expressions
         let library = self.parse_symbol_library_content(&content).await?;
-        
+
         let duration = start_time.elapsed();
         info!(
             "Parsed symbol library {:?} in {:?} ({} symbols)",
@@ -483,41 +486,48 @@ impl KiCadParser {
     /// Parse schematic content
     async fn parse_schematic_content(&self, content: &str) -> IoResult<SchematicData> {
         let content = content.to_string();
-        
-        task::spawn_blocking(move || {
-            Self::parse_schematic_sexp(&content)
-        })
-        .await
-        .map_err(|e| IoError::kicad_parsing(format!("Task join error: {}", e), "schematic".to_string()))?
+
+        task::spawn_blocking(move || Self::parse_schematic_sexp(&content))
+            .await
+            .map_err(|e| {
+                IoError::kicad_parsing(format!("Task join error: {}", e), "schematic".to_string())
+            })?
     }
 
     /// Parse PCB content
     async fn parse_pcb_content(&self, content: &str) -> IoResult<PcbData> {
         let content = content.to_string();
-        
-        task::spawn_blocking(move || {
-            Self::parse_pcb_sexp(&content)
-        })
-        .await
-        .map_err(|e| IoError::kicad_parsing(format!("Task join error: {}", e), "pcb".to_string()))?
+
+        task::spawn_blocking(move || Self::parse_pcb_sexp(&content))
+            .await
+            .map_err(|e| {
+                IoError::kicad_parsing(format!("Task join error: {}", e), "pcb".to_string())
+            })?
     }
 
     /// Parse symbol library content
     async fn parse_symbol_library_content(&self, content: &str) -> IoResult<SymbolLibraryData> {
         let content = content.to_string();
-        
-        task::spawn_blocking(move || {
-            Self::parse_symbol_library_sexp(&content)
-        })
-        .await
-        .map_err(|e| IoError::kicad_parsing(format!("Task join error: {}", e), "symbol_library".to_string()))?
+
+        task::spawn_blocking(move || Self::parse_symbol_library_sexp(&content))
+            .await
+            .map_err(|e| {
+                IoError::kicad_parsing(
+                    format!("Task join error: {}", e),
+                    "symbol_library".to_string(),
+                )
+            })?
     }
 
     /// Parse schematic S-expressions
     fn parse_schematic_sexp(content: &str) -> IoResult<SchematicData> {
         // Parse the main kicad_sch expression
-        let (_, sexp) = parse_sexp(content)
-            .map_err(|e| IoError::kicad_parsing(format!("S-expression parsing failed: {:?}", e), "schematic".to_string()))?;
+        let (_, sexp) = parse_sexp(content).map_err(|e| {
+            IoError::kicad_parsing(
+                format!("S-expression parsing failed: {:?}", e),
+                "schematic".to_string(),
+            )
+        })?;
 
         // Extract schematic data from S-expression
         Self::extract_schematic_data(&sexp)
@@ -526,8 +536,12 @@ impl KiCadParser {
     /// Parse PCB S-expressions
     fn parse_pcb_sexp(content: &str) -> IoResult<PcbData> {
         // Parse the main kicad_pcb expression
-        let (_, sexp) = parse_sexp(content)
-            .map_err(|e| IoError::kicad_parsing(format!("S-expression parsing failed: {:?}", e), "pcb".to_string()))?;
+        let (_, sexp) = parse_sexp(content).map_err(|e| {
+            IoError::kicad_parsing(
+                format!("S-expression parsing failed: {:?}", e),
+                "pcb".to_string(),
+            )
+        })?;
 
         // Extract PCB data from S-expression
         Self::extract_pcb_data(&sexp)
@@ -536,8 +550,12 @@ impl KiCadParser {
     /// Parse symbol library S-expressions
     fn parse_symbol_library_sexp(content: &str) -> IoResult<SymbolLibraryData> {
         // Parse the main kicad_symbol_lib expression
-        let (_, sexp) = parse_sexp(content)
-            .map_err(|e| IoError::kicad_parsing(format!("S-expression parsing failed: {:?}", e), "symbol_library".to_string()))?;
+        let (_, sexp) = parse_sexp(content).map_err(|e| {
+            IoError::kicad_parsing(
+                format!("S-expression parsing failed: {:?}", e),
+                "symbol_library".to_string(),
+            )
+        })?;
 
         // Extract symbol library data from S-expression
         Self::extract_symbol_library_data(&sexp)
@@ -555,8 +573,11 @@ impl KiCadParser {
             }
             _ => {}
         }
-        
-        Err(IoError::kicad_parsing("Invalid schematic format", "schematic"))
+
+        Err(IoError::kicad_parsing(
+            "Invalid schematic format",
+            "schematic",
+        ))
     }
 
     /// Extract PCB data from parsed S-expression
@@ -571,7 +592,7 @@ impl KiCadParser {
             }
             _ => {}
         }
-        
+
         Err(IoError::kicad_parsing("Invalid PCB format", "pcb"))
     }
 
@@ -587,8 +608,11 @@ impl KiCadParser {
             }
             _ => {}
         }
-        
-        Err(IoError::kicad_parsing("Invalid symbol library format", "symbol_library"))
+
+        Err(IoError::kicad_parsing(
+            "Invalid symbol library format",
+            "symbol_library",
+        ))
     }
 
     /// Parse schematic items (simplified implementation)
@@ -757,7 +781,11 @@ impl KiCadParser {
         // In a real implementation, this would parse all symbol properties
         Ok(SchematicSymbol {
             lib_id: "Device:R".to_string(),
-            at: Position { x: 0.0, y: 0.0, rotation: 0.0 },
+            at: Position {
+                x: 0.0,
+                y: 0.0,
+                rotation: 0.0,
+            },
             unit: 1,
             in_bom: true,
             on_board: true,
@@ -784,7 +812,11 @@ impl KiCadParser {
     fn parse_footprint(_list: &[SExp]) -> IoResult<Footprint> {
         Ok(Footprint {
             lib_id: "".to_string(),
-            at: Position { x: 0.0, y: 0.0, rotation: 0.0 },
+            at: Position {
+                x: 0.0,
+                y: 0.0,
+                rotation: 0.0,
+            },
             layer: "F.Cu".to_string(),
             uuid: "".to_string(),
             properties: Vec::new(),
@@ -820,12 +852,15 @@ impl KiCadParser {
             graphic_items: Vec::new(),
             pins: Vec::new(),
         };
-        
+
         Ok((name, symbol))
     }
 
     /// Batch parse multiple KiCad files
-    pub async fn parse_files_batch<P: AsRef<Path>>(&self, paths: Vec<P>) -> Vec<IoResult<KiCadFileData>> {
+    pub async fn parse_files_batch<P: AsRef<Path>>(
+        &self,
+        paths: Vec<P>,
+    ) -> Vec<IoResult<KiCadFileData>> {
         use tokio::task::JoinSet;
 
         let mut join_set = JoinSet::new();
@@ -848,7 +883,7 @@ impl KiCadParser {
                 Ok(parse_result) => results.push(parse_result),
                 Err(e) => results.push(Err(IoError::kicad_parsing(
                     format!("Task join error: {}", e),
-                    "batch".to_string()
+                    "batch".to_string(),
                 ))),
             }
         }
@@ -859,7 +894,7 @@ impl KiCadParser {
     /// Auto-detect file type and parse accordingly
     async fn parse_file_auto_detect<P: AsRef<Path>>(&self, path: P) -> IoResult<KiCadFileData> {
         let path = path.as_ref();
-        
+
         match path.extension().and_then(|ext| ext.to_str()) {
             Some("kicad_sch") => {
                 let schematic = self.parse_schematic(path).await?;
@@ -875,8 +910,8 @@ impl KiCadParser {
             }
             _ => Err(IoError::kicad_parsing(
                 format!("Unsupported file type: {:?}", path),
-                "auto_detect".to_string()
-            ))
+                "auto_detect".to_string(),
+            )),
         }
     }
 }
@@ -972,8 +1007,11 @@ fn sexp_to_schematic(sexp: &SExp) -> IoResult<SchematicData> {
         }
         _ => {}
     }
-    
-    Err(IoError::kicad_parsing("Invalid schematic format".to_string(), "schematic".to_string()))
+
+    Err(IoError::kicad_parsing(
+        "Invalid schematic format".to_string(),
+        "schematic".to_string(),
+    ))
 }
 
 /// Convert S-expression to PCB data
@@ -985,9 +1023,7 @@ fn sexp_to_pcb(sexp: &SExp) -> IoResult<PcbData> {
                     return Ok(PcbData {
                         version: "20230121".to_string(),
                         generator: "kicad".to_string(),
-                        general: GeneralSettings {
-                            thickness: 1.6,
-                        },
+                        general: GeneralSettings { thickness: 1.6 },
                         paper_size: "A4".to_string(),
                         layers: Vec::new(),
                         setup: Setup {
@@ -1006,8 +1042,11 @@ fn sexp_to_pcb(sexp: &SExp) -> IoResult<PcbData> {
         }
         _ => {}
     }
-    
-    Err(IoError::kicad_parsing("Invalid PCB format".to_string(), "pcb".to_string()))
+
+    Err(IoError::kicad_parsing(
+        "Invalid PCB format".to_string(),
+        "pcb".to_string(),
+    ))
 }
 
 /// Convert S-expression to symbol library data
@@ -1026,6 +1065,9 @@ fn sexp_to_symbol_library(sexp: &SExp) -> IoResult<SymbolLibraryData> {
         }
         _ => {}
     }
-    
-    Err(IoError::kicad_parsing("Invalid symbol library format".to_string(), "symbol_library".to_string()))
+
+    Err(IoError::kicad_parsing(
+        "Invalid symbol library format".to_string(),
+        "symbol_library".to_string(),
+    ))
 }

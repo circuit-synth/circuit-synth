@@ -1,11 +1,11 @@
 //! High-performance collision detection for component placement
-//! 
+//!
 //! This module provides optimized collision detection algorithms with spatial
 //! indexing for O(n log n) performance instead of naive O(n²) checking.
 
-use crate::types::{Component, BoundingBox, Point};
-use std::collections::HashMap;
+use crate::types::{BoundingBox, Component, Point};
 use rayon::prelude::*;
+use std::collections::HashMap;
 
 /// High-performance collision detector with spatial indexing
 pub struct CollisionDetector {
@@ -44,7 +44,7 @@ impl CollisionDetector {
                 for j in (i + 1)..cell_components.len() {
                     let idx1 = cell_components[i];
                     let idx2 = cell_components[j];
-                    
+
                     if self.check_collision_pair(&components[idx1], &components[idx2]) {
                         collisions.push((idx1, idx2));
                     }
@@ -70,10 +70,8 @@ impl CollisionDetector {
         for (idx, component) in components.iter().enumerate() {
             let grid_x = (component.position.x / self.grid_size).floor() as i32;
             let grid_y = (component.position.y / self.grid_size).floor() as i32;
-            
-            grid.entry((grid_x, grid_y))
-                .or_default()
-                .push(idx);
+
+            grid.entry((grid_x, grid_y)).or_default().push(idx);
         }
 
         grid
@@ -88,18 +86,23 @@ impl CollisionDetector {
     ) {
         // Define adjacent cell offsets
         let adjacent_offsets = [
-            (1, 0), (0, 1), (1, 1), (-1, 1), // Right, Up, Up-Right, Up-Left
+            (1, 0),
+            (0, 1),
+            (1, 1),
+            (-1, 1), // Right, Up, Up-Right, Up-Left
         ];
 
         for (&(grid_x, grid_y), cell_components) in grid {
             for &offset in &adjacent_offsets {
                 let adjacent_cell = (grid_x + offset.0, grid_y + offset.1);
-                
+
                 if let Some(adjacent_components) = grid.get(&adjacent_cell) {
                     // Check collisions between current cell and adjacent cell
                     for &idx1 in cell_components {
                         for &idx2 in adjacent_components {
-                            if idx1 < idx2 && self.check_collision_pair(&components[idx1], &components[idx2]) {
+                            if idx1 < idx2
+                                && self.check_collision_pair(&components[idx1], &components[idx2])
+                            {
                                 collisions.push((idx1, idx2));
                             }
                         }
@@ -116,9 +119,10 @@ impl CollisionDetector {
         let dx = comp2.position.x - comp1.position.x;
         let dy = comp2.position.y - comp1.position.y;
         let distance_squared = dx * dx + dy * dy;
-        
+
         // Quick rejection test using circular approximation
-        let min_distance = self.spacing + (comp1.width + comp1.height + comp2.width + comp2.height) / 4.0;
+        let min_distance =
+            self.spacing + (comp1.width + comp1.height + comp2.width + comp2.height) / 4.0;
         if distance_squared > min_distance * min_distance {
             return false;
         }
@@ -126,7 +130,7 @@ impl CollisionDetector {
         // More precise bounding box collision detection
         let bbox1 = comp1.bounding_box().expand(self.spacing / 2.0);
         let bbox2 = comp2.bounding_box().expand(self.spacing / 2.0);
-        
+
         bbox1.intersects(&bbox2)
     }
 
@@ -160,7 +164,7 @@ impl CollisionDetector {
                 // Check collisions with components in later chunks
                 for (other_chunk_idx, other_chunk) in chunks.iter().skip(chunk_idx + 1) {
                     let other_base_idx = other_chunk_idx * chunk_size;
-                    
+
                     for (i, comp1) in chunk.iter().enumerate() {
                         for (j, comp2) in other_chunk.iter().enumerate() {
                             if self.check_collision_pair(comp1, comp2) {
@@ -182,7 +186,7 @@ impl CollisionDetector {
     pub fn get_collision_stats(&self, components: &[Component]) -> CollisionStats {
         let collisions = self.detect_collisions(components);
         let total_pairs = components.len() * (components.len() - 1) / 2;
-        
+
         CollisionStats {
             total_components: components.len(),
             total_collisions: collisions.len(),
@@ -273,7 +277,7 @@ impl CourtyardCollisionDetector {
         // Expand bounding boxes by courtyard margin
         let courtyard1 = comp1.bounding_box().expand(self.courtyard_margin);
         let courtyard2 = comp2.bounding_box().expand(self.courtyard_margin);
-        
+
         courtyard1.intersects(&courtyard2)
     }
 
@@ -360,7 +364,7 @@ mod tests {
     #[test]
     fn test_no_collision_detection() {
         let detector = CollisionDetector::new(2.0);
-        
+
         let components = vec![
             Component::new("R1".to_string(), "R_0805".to_string(), "10k".to_string())
                 .with_position(Point::new(0.0, 0.0))
@@ -369,7 +373,7 @@ mod tests {
                 .with_position(Point::new(10.0, 0.0))
                 .with_size(2.0, 1.0),
         ];
-        
+
         let collisions = detector.detect_collisions(&components);
         assert!(collisions.is_empty());
     }
@@ -377,7 +381,7 @@ mod tests {
     #[test]
     fn test_collision_detection() {
         let detector = CollisionDetector::new(2.0);
-        
+
         let components = vec![
             Component::new("R1".to_string(), "R_0805".to_string(), "10k".to_string())
                 .with_position(Point::new(0.0, 0.0))
@@ -386,7 +390,7 @@ mod tests {
                 .with_position(Point::new(1.0, 0.0))
                 .with_size(2.0, 1.0),
         ];
-        
+
         let collisions = detector.detect_collisions(&components);
         assert_eq!(collisions.len(), 1);
         assert_eq!(collisions[0], (0, 1));
@@ -395,14 +399,14 @@ mod tests {
     #[test]
     fn test_collision_stats() {
         let detector = CollisionDetector::new(2.0);
-        
+
         let components = vec![
             Component::new("R1".to_string(), "R_0805".to_string(), "10k".to_string())
                 .with_position(Point::new(0.0, 0.0)),
             Component::new("R2".to_string(), "R_0805".to_string(), "10k".to_string())
                 .with_position(Point::new(5.0, 0.0)),
         ];
-        
+
         let stats = detector.get_collision_stats(&components);
         assert_eq!(stats.total_components, 2);
         assert_eq!(stats.total_collisions, 0);
@@ -412,14 +416,14 @@ mod tests {
     #[test]
     fn test_courtyard_collision_detector() {
         let detector = CourtyardCollisionDetector::new(2.0, 1.0);
-        
+
         let comp1 = Component::new("R1".to_string(), "R_0805".to_string(), "10k".to_string())
             .with_position(Point::new(0.0, 0.0))
             .with_size(2.0, 1.0);
         let comp2 = Component::new("R2".to_string(), "R_0805".to_string(), "10k".to_string())
             .with_position(Point::new(2.5, 0.0))
             .with_size(2.0, 1.0);
-        
+
         // Should collide due to courtyard margin
         assert!(detector.check_courtyard_collision(&comp1, &comp2));
     }

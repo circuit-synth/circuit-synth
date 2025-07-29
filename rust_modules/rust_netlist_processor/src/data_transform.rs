@@ -4,11 +4,11 @@
 //! optimized for performance and memory efficiency. All structures support efficient
 //! serialization/deserialization and are designed to minimize allocations.
 
-use std::collections::HashMap;
+use crate::errors::{NetlistError, Result};
 use serde::{Deserialize, Deserializer, Serialize};
 use smallvec::SmallVec;
-use string_interner::{StringInterner, DefaultSymbol};
-use crate::errors::{NetlistError, Result};
+use std::collections::HashMap;
+use string_interner::{DefaultSymbol, StringInterner};
 
 /// String interner for memory-efficient string storage
 pub type StringPool = StringInterner<DefaultSymbol>;
@@ -197,22 +197,22 @@ impl Component {
 
     /// Get the library name from the symbol
     pub fn library(&self) -> Result<&str> {
-        self.symbol
-            .split(':')
-            .next()
-            .ok_or_else(|| NetlistError::component_error(
-                format!("Invalid symbol format '{}' - expected 'Library:Part'", self.symbol)
+        self.symbol.split(':').next().ok_or_else(|| {
+            NetlistError::component_error(format!(
+                "Invalid symbol format '{}' - expected 'Library:Part'",
+                self.symbol
             ))
+        })
     }
 
     /// Get the part name from the symbol
     pub fn part(&self) -> Result<&str> {
-        self.symbol
-            .split(':')
-            .nth(1)
-            .ok_or_else(|| NetlistError::component_error(
-                format!("Invalid symbol format '{}' - expected 'Library:Part'", self.symbol)
+        self.symbol.split(':').nth(1).ok_or_else(|| {
+            NetlistError::component_error(format!(
+                "Invalid symbol format '{}' - expected 'Library:Part'",
+                self.symbol
             ))
+        })
     }
 
     /// Add a pin to this component
@@ -259,7 +259,7 @@ where
     D: serde::Deserializer<'de>,
 {
     use serde::de::Error;
-    
+
     let opt: Option<String> = Option::deserialize(deserializer)?;
     match opt {
         Some(name) if !name.trim().is_empty() => Ok(name),
@@ -311,7 +311,8 @@ impl Net {
 
     /// Get unique component references connected to this net
     pub fn connected_components(&self) -> Vec<&str> {
-        let mut components: Vec<_> = self.nodes
+        let mut components: Vec<_> = self
+            .nodes
             .iter()
             .map(|node| node.normalized_component_ref())
             .collect();
@@ -357,7 +358,8 @@ impl Circuit {
 
     /// Add a component to this circuit
     pub fn add_component(&mut self, component: Component) {
-        self.components.insert(component.reference.clone(), component);
+        self.components
+            .insert(component.reference.clone(), component);
     }
 
     /// Add a net to this circuit
@@ -373,12 +375,12 @@ impl Circuit {
     /// Get all components recursively (including subcircuits)
     pub fn all_components(&self) -> HashMap<String, &Component> {
         let mut all_components = HashMap::new();
-        
+
         // Add components from this circuit
         for (ref_name, component) in &self.components {
             all_components.insert(ref_name.clone(), component);
         }
-        
+
         // Add components from subcircuits with hierarchical paths
         for subcircuit in &self.subcircuits {
             let sub_components = subcircuit.all_components();
@@ -391,19 +393,19 @@ impl Circuit {
                 all_components.insert(hierarchical_ref, component);
             }
         }
-        
+
         all_components
     }
 
     /// Get all nets recursively (including subcircuits)
     pub fn all_nets(&self) -> HashMap<String, &Net> {
         let mut all_nets = HashMap::new();
-        
+
         // Add nets from this circuit
         for (net_name, net) in &self.nets {
             all_nets.insert(net_name.clone(), net);
         }
-        
+
         // Add nets from subcircuits
         for subcircuit in &self.subcircuits {
             let sub_nets = subcircuit.all_nets();
@@ -411,18 +413,18 @@ impl Circuit {
                 all_nets.insert(net_name, net);
             }
         }
-        
+
         all_nets
     }
 
     /// Get unique libraries used in this circuit
     pub fn used_libraries(&self) -> Result<Vec<String>> {
         let mut libraries = std::collections::HashSet::new();
-        
+
         for component in self.all_components().values() {
             libraries.insert(component.library()?.to_string());
         }
-        
+
         let mut sorted_libs: Vec<_> = libraries.into_iter().collect();
         sorted_libs.sort();
         Ok(sorted_libs)
@@ -439,15 +441,15 @@ impl Circuit {
 
     /// Check if this circuit is effectively empty (no components or nets)
     pub fn is_effectively_empty(&self) -> bool {
-        self.components.is_empty() && self.nets.is_empty() &&
-        self.subcircuits.iter().all(|sc| sc.is_effectively_empty())
+        self.components.is_empty()
+            && self.nets.is_empty()
+            && self.subcircuits.iter().all(|sc| sc.is_effectively_empty())
     }
 
     /// Convert to JSON string
     pub fn to_json(&self) -> Result<String> {
-        serde_json::to_string_pretty(self).map_err(|e| NetlistError::json_error(
-            "Failed to serialize circuit to JSON", Some(e)
-        ))
+        serde_json::to_string_pretty(self)
+            .map_err(|e| NetlistError::json_error("Failed to serialize circuit to JSON", Some(e)))
     }
 }
 
@@ -466,7 +468,7 @@ mod tests {
         assert_eq!(PinType::from_str("input"), PinType::Input);
         assert_eq!(PinType::from_str("INPUT"), PinType::Input);
         assert_eq!(PinType::from_str("unknown"), PinType::Unspecified);
-        
+
         assert_eq!(PinType::Input.to_kicad_str(), "input");
         assert_eq!(PinType::Unspecified.to_kicad_str(), "passive");
     }
@@ -476,7 +478,7 @@ mod tests {
         let mut component = Component::new("R1", "Device:R", "10k");
         component.add_pin(PinInfo::passive("1", "~"));
         component.add_pin(PinInfo::passive("2", "~"));
-        
+
         assert_eq!(component.reference, "R1");
         assert_eq!(component.library().unwrap(), "Device");
         assert_eq!(component.part().unwrap(), "R");
@@ -488,7 +490,7 @@ mod tests {
         let mut net = Net::new("VCC");
         let node = NetNode::new("R1", PinInfo::passive("1", "~"));
         net.add_node(node);
-        
+
         assert!(!net.is_empty());
         assert_eq!(net.connected_components(), vec!["R1"]);
     }
@@ -497,10 +499,10 @@ mod tests {
     fn test_circuit_hierarchy() {
         let mut main_circuit = Circuit::new("Main");
         let mut sub_circuit = Circuit::new("SubCircuit");
-        
+
         sub_circuit.add_component(Component::new("U1", "MCU:STM32", "STM32F407"));
         main_circuit.add_subcircuit(sub_circuit);
-        
+
         let all_components = main_circuit.all_components();
         assert!(all_components.contains_key("/SubCircuit/U1"));
     }

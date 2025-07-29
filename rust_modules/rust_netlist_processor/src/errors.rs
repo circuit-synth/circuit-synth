@@ -216,14 +216,19 @@ mod tests {
     fn test_error_creation() {
         let err = NetlistError::component_error("Test component error");
         assert!(matches!(err, NetlistError::ComponentError { .. }));
-        assert_eq!(err.to_string(), "Component processing error: Test component error");
+        assert_eq!(
+            err.to_string(),
+            "Component processing error: Test component error"
+        );
     }
 
     #[test]
     fn test_error_context() {
-        let result: std::result::Result<(), std::io::Error> = 
-            Err(std::io::Error::new(std::io::ErrorKind::NotFound, "file not found"));
-        
+        let result: std::result::Result<(), std::io::Error> = Err(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "file not found",
+        ));
+
         let with_context = result.context("Failed to read configuration file");
         assert!(with_context.is_err());
     }
@@ -232,7 +237,7 @@ mod tests {
     fn test_json_error_conversion() {
         let json_err = serde_json::from_str::<serde_json::Value>("invalid json");
         assert!(json_err.is_err());
-        
+
         let netlist_err: NetlistError = json_err.unwrap_err().into();
         assert!(matches!(netlist_err, NetlistError::JsonError { .. }));
     }

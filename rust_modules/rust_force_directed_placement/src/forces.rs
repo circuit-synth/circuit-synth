@@ -1,11 +1,11 @@
 //! Force calculation algorithms optimized for performance
-//! 
+//!
 //! This module contains the core O(n²) algorithms that provide the massive
 //! performance improvements over the Python implementation.
 
-use crate::types::{Point, Force, Component, Connection, PlacementConfig, BoundingBox};
-use std::collections::HashMap;
+use crate::types::{BoundingBox, Component, Connection, Force, PlacementConfig, Point};
 use rayon::prelude::*;
+use std::collections::HashMap;
 
 /// High-performance force calculator with parallel processing
 pub struct ForceCalculator {
@@ -59,8 +59,12 @@ impl ForceCalculator {
         // Attraction forces from connected components
         if let Some(connected_refs) = connection_graph.get(&component.reference) {
             for connected_ref in connected_refs {
-                if let Some(connected_comp) = all_components.iter().find(|c| &c.reference == connected_ref) {
-                    let attraction = self.calculate_attraction_force(component, connected_comp, true);
+                if let Some(connected_comp) = all_components
+                    .iter()
+                    .find(|c| &c.reference == connected_ref)
+                {
+                    let attraction =
+                        self.calculate_attraction_force(component, connected_comp, true);
                     total_force += attraction;
                 }
             }
@@ -94,28 +98,28 @@ impl ForceCalculator {
         let dx = comp2.position.x - comp1.position.x;
         let dy = comp2.position.y - comp1.position.y;
         let distance_squared = dx * dx + dy * dy;
-        
+
         // Fast square root approximation for performance
         if distance_squared < 0.01 {
             return Force::zero();
         }
-        
+
         let distance = distance_squared.sqrt();
-        
+
         // Normalize direction vector
         let inv_distance = 1.0 / distance;
         let unit_dx = dx * inv_distance;
         let unit_dy = dy * inv_distance;
-        
+
         // Calculate force magnitude
         let mut strength = self.config.attraction_strength;
         if is_internal {
             strength *= self.config.internal_force_multiplier;
         }
-        
+
         // Linear attraction proportional to distance
         let magnitude = strength * distance / self.config.component_spacing;
-        
+
         Force::new(magnitude * unit_dx, magnitude * unit_dy)
     }
 
@@ -126,7 +130,7 @@ impl ForceCalculator {
         let dx = comp2.position.x - comp1.position.x;
         let dy = comp2.position.y - comp1.position.y;
         let distance_squared = dx * dx + dy * dy;
-        
+
         // Handle overlapping components with random separation
         if distance_squared < 0.01 {
             use rand::Rng;
@@ -137,52 +141,56 @@ impl ForceCalculator {
                 self.config.repulsion_strength * angle.sin(),
             );
         }
-        
+
         let distance = distance_squared.sqrt();
-        
+
         // Normalize direction vector
         let inv_distance = 1.0 / distance;
         let unit_dx = dx * inv_distance;
         let unit_dy = dy * inv_distance;
-        
+
         // Inverse square law with minimum distance clamping
         let effective_distance = distance.max(self.config.component_spacing);
         let distance_ratio = self.config.component_spacing / effective_distance;
         let magnitude = self.config.repulsion_strength * distance_ratio * distance_ratio;
-        
+
         // Repulsion is in opposite direction
         Force::new(-magnitude * unit_dx, -magnitude * unit_dy)
     }
 
     /// Calculate boundary force to keep components within board limits
     #[inline]
-    pub fn calculate_boundary_force(&self, component: &Component, board_bounds: &BoundingBox) -> Force {
+    pub fn calculate_boundary_force(
+        &self,
+        component: &Component,
+        board_bounds: &BoundingBox,
+    ) -> Force {
         let mut force = Force::zero();
         let margin = 10.0;
         let strength = 10.0;
-        
+
         let pos = &component.position;
-        
+
         // Left boundary
         if pos.x < board_bounds.min_x + margin {
             force.fx += strength * (board_bounds.min_x + margin - pos.x) / margin;
         }
-        
+
         // Right boundary
         if pos.x > board_bounds.max_x - margin {
             force.fx -= strength * (pos.x - (board_bounds.max_x - margin)) / margin;
         }
-        
+
         // Top boundary
         if pos.y < board_bounds.min_y + margin {
             force.fy += strength * (board_bounds.min_y + margin - pos.y) / margin;
         }
-        
+
         // Bottom boundary
         if pos.y > board_bounds.max_y - margin {
             force.fy -= strength * (pos.y - (board_bounds.max_y - margin)) / margin;
         }
-        
+
         force
     }
 
@@ -196,21 +204,21 @@ impl ForceCalculator {
         let dx = group2_center.x - group1_center.x;
         let dy = group2_center.y - group1_center.y;
         let distance_squared = dx * dx + dy * dy;
-        
+
         if distance_squared < 0.01 {
             return Force::zero();
         }
-        
+
         let distance = distance_squared.sqrt();
         let inv_distance = 1.0 / distance;
         let unit_dx = dx * inv_distance;
         let unit_dy = dy * inv_distance;
-        
+
         // Stronger attraction for more connections
-        let magnitude = self.config.attraction_strength 
-            * (connection_count as f64 + 1.0).ln() 
-            * distance / 50.0;
-        
+        let magnitude =
+            self.config.attraction_strength * (connection_count as f64 + 1.0).ln() * distance
+                / 50.0;
+
         Force::new(magnitude * unit_dx, magnitude * unit_dy)
     }
 
@@ -225,7 +233,7 @@ impl ForceCalculator {
         let dx = group2_center.x - group1_center.x;
         let dy = group2_center.y - group1_center.y;
         let distance_squared = dx * dx + dy * dy;
-        
+
         if distance_squared < 0.01 {
             use rand::Rng;
             let mut rng = rand::thread_rng();
@@ -235,18 +243,18 @@ impl ForceCalculator {
                 self.config.repulsion_strength * 2.0 * angle.sin(),
             );
         }
-        
+
         let distance = distance_squared.sqrt();
         let min_distance = (group1_size + group2_size) / 2.0 + self.config.component_spacing * 2.0;
-        
+
         let inv_distance = 1.0 / distance;
         let unit_dx = dx * inv_distance;
         let unit_dy = dy * inv_distance;
-        
+
         let effective_distance = distance.max(min_distance);
         let distance_ratio = min_distance / effective_distance;
         let magnitude = self.config.repulsion_strength * 2.0 * distance_ratio * distance_ratio;
-        
+
         Force::new(-magnitude * unit_dx, -magnitude * unit_dy)
     }
 
@@ -264,11 +272,11 @@ impl ForceCalculator {
             if let Some(force) = forces.get(&component.reference) {
                 // Limit movement based on temperature
                 let limited_force = force.limit(max_move);
-                
+
                 // Update position
                 component.position.x += limited_force.fx;
                 component.position.y += limited_force.fy;
-                
+
                 // Track displacement for convergence
                 total_displacement += limited_force.magnitude();
             }
@@ -304,7 +312,7 @@ impl ForceCalculator {
                 let comp1 = &components[i];
                 let comp2 = &components[j];
                 let distance = comp1.position.distance_to(&comp2.position);
-                
+
                 if distance > 0.0 {
                     // Coulomb potential energy: k / r
                     total_energy += self.config.repulsion_strength / distance;
@@ -384,10 +392,10 @@ pub mod parallel {
                     .map(|&(i, j)| {
                         let comp1 = &components[i];
                         let comp2 = &components[j];
-                        
+
                         let repulsion1 = force_calculator.calculate_repulsion_force(comp1, comp2);
                         let repulsion2 = force_calculator.calculate_repulsion_force(comp2, comp1);
-                        
+
                         (i, j, repulsion1, repulsion2)
                     })
                     .collect::<Vec<_>>()
@@ -401,12 +409,12 @@ pub mod parallel {
         pairwise_forces: &[(usize, usize, Force, Force)],
     ) -> Vec<Force> {
         let mut forces = vec![Force::zero(); component_count];
-        
+
         for &(i, j, force1, force2) in pairwise_forces {
             forces[i] += force1;
             forces[j] += force2;
         }
-        
+
         forces
     }
 }
@@ -419,14 +427,14 @@ mod tests {
     fn test_attraction_force_calculation() {
         let config = PlacementConfig::default();
         let calculator = ForceCalculator::new(config);
-        
+
         let comp1 = Component::new("R1".to_string(), "R_0805".to_string(), "10k".to_string())
             .with_position(Point::new(0.0, 0.0));
         let comp2 = Component::new("R2".to_string(), "R_0805".to_string(), "10k".to_string())
             .with_position(Point::new(10.0, 0.0));
-        
+
         let force = calculator.calculate_attraction_force(&comp1, &comp2, false);
-        
+
         assert!(force.fx > 0.0); // Should attract towards comp2
         assert!(force.fy.abs() < 0.001); // No Y component
     }
@@ -435,14 +443,14 @@ mod tests {
     fn test_repulsion_force_calculation() {
         let config = PlacementConfig::default();
         let calculator = ForceCalculator::new(config);
-        
+
         let comp1 = Component::new("R1".to_string(), "R_0805".to_string(), "10k".to_string())
             .with_position(Point::new(0.0, 0.0));
         let comp2 = Component::new("R2".to_string(), "R_0805".to_string(), "10k".to_string())
             .with_position(Point::new(1.0, 0.0));
-        
+
         let force = calculator.calculate_repulsion_force(&comp1, &comp2);
-        
+
         assert!(force.fx < 0.0); // Should repel away from comp2
         assert!(force.fy.abs() < 0.001); // No Y component
     }
@@ -451,13 +459,13 @@ mod tests {
     fn test_boundary_force_calculation() {
         let config = PlacementConfig::default();
         let calculator = ForceCalculator::new(config);
-        
+
         let component = Component::new("R1".to_string(), "R_0805".to_string(), "10k".to_string())
             .with_position(Point::new(5.0, 5.0)); // Near left/top boundaries
-        
+
         let board_bounds = BoundingBox::new(0.0, 0.0, 100.0, 100.0);
         let force = calculator.calculate_boundary_force(&component, &board_bounds);
-        
+
         assert!(force.fx > 0.0); // Should push away from left boundary
         assert!(force.fy > 0.0); // Should push away from top boundary
     }
