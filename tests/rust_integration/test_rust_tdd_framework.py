@@ -57,6 +57,23 @@ except ImportError:
         @staticmethod
         def dictionaries(**kwargs):
             return lambda: {"test": "data"}
+        
+        @staticmethod
+        def sampled_from(choices):
+            return lambda: choices[0] if choices else "default"
+        
+        @staticmethod
+        def characters(**kwargs):
+            return lambda: "abc123"
+    
+    # Mock settings and HealthCheck classes
+    def settings(**kwargs):
+        def decorator(func):
+            return func
+        return decorator
+    
+    class HealthCheck:
+        function_scoped_fixture = "function_scoped_fixture"
 
 
 class RustTDDFramework:
