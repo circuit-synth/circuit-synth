@@ -136,9 +136,8 @@ class ModmDeviceSearch:
                     # Get devices from file
                     devices = dev_file.get_devices()
 
-                    for device_id in devices:
-                        device = modm_devices.device.Device(device_id, dev_file)
-                        family = device.identifier.platform
+                    for device in devices:
+                        family = device.identifier["platform"]
                         if family not in self._devices_cache:
                             self._devices_cache[family] = []
                         self._devices_cache[family].append(device)
@@ -204,23 +203,21 @@ class ModmDeviceSearch:
 
             # Extract device information
             part_number = identifier.string
-            family = identifier.platform
+            family = identifier["platform"]
 
-            # Series extraction (e.g., "g4" from "stm32g431")
-            series = ""
-            if hasattr(identifier, "family"):
-                series = identifier.family
+            # Series extraction (e.g., "f3" from STM32F3)
+            series = identifier.get("family", "")
 
             # Get memory information
             flash_size = self._extract_memory_size(properties, "flash")
             ram_size = self._extract_memory_size(properties, "ram")
 
             # Get package information
-            package = getattr(identifier, "package", "")
+            package = identifier.get("package", "")
             pin_count = self._extract_pin_count(properties)
 
             # Get temperature grade
-            temp_grade = getattr(identifier, "temperature", "")
+            temp_grade = identifier.get("temperature", "")
 
             # Get peripherals
             peripherals = self._extract_peripherals(properties)
@@ -257,9 +254,16 @@ class ModmDeviceSearch:
                 return None
 
             if spec.peripherals:
-                missing_peripherals = set(spec.peripherals) - set(peripherals)
-                if missing_peripherals:
-                    return None
+                # Check if required peripherals are available (case-insensitive, partial match)
+                available_peripheral_names = set(p.upper() for p in peripherals)
+                for required_peripheral in spec.peripherals:
+                    required_upper = required_peripheral.upper()
+                    # Check if any available peripheral starts with the required name
+                    found = any(
+                        p.startswith(required_upper) for p in available_peripheral_names
+                    )
+                    if not found:
+                        return None
 
             # Calculate availability score
             availability_score = self._calculate_availability_score(
@@ -367,14 +371,15 @@ class ModmDeviceSearch:
                 for driver in properties["driver"]:
                     name = driver.get("name", "")
                     if name and name != "core" and name != "gpio":
-                        peripherals.append(name.upper())
-
-                        # Also check for instances
+                        # Check for instances
                         if "instance" in driver:
                             instances = driver["instance"]
                             if isinstance(instances, list):
+                                # Instances can be strings or dicts
                                 for instance in instances:
-                                    if (
+                                    if isinstance(instance, str):
+                                        peripherals.append(f"{name.upper()}{instance}")
+                                    elif (
                                         isinstance(instance, dict)
                                         and "name" in instance
                                     ):
@@ -383,6 +388,11 @@ class ModmDeviceSearch:
                                         )
                             elif isinstance(instances, dict) and "name" in instances:
                                 peripherals.append(f"{name.upper()}{instances['name']}")
+                            elif isinstance(instances, str):
+                                peripherals.append(f"{name.upper()}{instances}")
+                        else:
+                            # No instances, just add the peripheral name
+                            peripherals.append(name.upper())
         except Exception:
             pass
 
@@ -462,8 +472,9 @@ class ModmDeviceSearch:
 
         series_set = set()
         for device in self._devices_cache[family]:
-            if hasattr(device.identifier, "family"):
-                series_set.add(device.identifier.family)
+            series = device.identifier.get("family", "")
+            if series:
+                series_set.add(series)
 
         return sorted(series_set)
 

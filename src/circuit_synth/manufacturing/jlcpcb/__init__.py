@@ -6,6 +6,11 @@ JLC PCB parts availability and pricing data. Supports both API-based and
 web scraping approaches for maximum flexibility.
 """
 
+from .cache import (
+    JLCPCBCache,
+    cached_jlcpcb_search,
+    get_jlcpcb_cache,
+)
 from .jlc_parts_lookup import (
     JlcPartsInterface,
     _calculate_manufacturability_score,
@@ -45,4 +50,8 @@ __all__ = [
     "find_component",
     "find_components",
     "print_component_recommendation",
+    # Caching system
+    "JLCPCBCache",
+    "get_jlcpcb_cache",
+    "cached_jlcpcb_search",
 ]

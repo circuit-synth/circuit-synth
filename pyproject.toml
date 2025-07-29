@@ -48,6 +48,7 @@ dependencies = [
     # Google AI and ADK dependencies
     "google-adk>=0.1.0",
     "google-genai>=0.1.0",
+    "lxml>=6.0.0",
 ]
 
 [project.optional-dependencies]

@@ -1,8 +1,12 @@
 ---
-description: "Search for microcontrollers using modm-devices integration with specifications and peripheral requirements"
+allowed-tools: ['*']
+description: "Find microcontrollers with specifications and JLCPCB availability"
+argument-hint: [requirements: family, peripherals, specifications]
 ---
 
-You are an intelligent microcontroller search assistant that helps users find the perfect MCU for their circuit designs.
+🔍 **Intelligent MCU Search**: $ARGUMENTS
+
+**IMPORTANT**: Use direct modm-devices integration, NOT agents. Follow this exact workflow:
 
 ## Your Capabilities
 
@@ -53,11 +57,53 @@ results = searcher.search_mcus(spec, max_results=5)
 
 ## Your Process
 
-1. **Understand Requirements**: Ask clarifying questions about the user's specific needs
-2. **Search MCUs**: Use the appropriate search function based on their criteria
-3. **Present Results**: Show formatted results with KiCad integration details
-4. **Generate Code**: Provide ready-to-use circuit-synth component definitions
-5. **Suggest Alternatives**: Offer alternative parts if exact matches aren't found
+1. **Understand Requirements**: Parse peripheral counts and specifications precisely
+2. **Search MCUs First**: Use modm-devices integration before checking manufacturing
+3. **Filter by Specifications**: Apply peripheral counts, memory, package requirements
+4. **Cross-Reference Manufacturing**: Check JLCPCB availability for viable candidates
+5. **Verify KiCad Integration**: Ensure symbols/footprints are available
+6. **Present Complete Results**: Include stock, pricing, and ready circuit-synth code
+
+## Workflow for STM32 + JLCPCB Requests
+
+**For queries like "STM32 with 3 SPIs available on JLCPCB":**
+
+1. **Use modm-devices search first**: `search_by_peripherals(["SPI"], family="stm32")`
+2. **Count peripheral instances**: Filter for MCUs with SPI1, SPI2, SPI3 (exactly 3+ SPIs)
+3. **Check JLCPCB availability**: Use `search_jlc_components_web()` for stock verification  
+4. **Verify KiCad symbols**: Ensure circuit-synth integration is complete
+5. **Present best matches**: Sort by availability and provide complete specifications
+
+**CRITICAL**: Always count peripheral instances accurately - "3 SPIs" means exactly that!
+
+### Example Implementation
+
+```python
+# Step 1: Search for STM32s with SPI peripherals
+spi_mcus = search_by_peripherals(["SPI"], family="stm32", max_results=15)
+
+# Step 2: Filter for exactly 3+ SPI instances  
+three_spi_mcus = []
+for mcu in spi_mcus:
+    spi_count = sum(1 for p in mcu.peripherals if "SPI" in p and p.startswith("SPI"))
+    if spi_count >= 3:
+        three_spi_mcus.append(mcu)
+
+# Step 3: Check JLCPCB availability
+from circuit_synth.manufacturing.jlcpcb import search_jlc_components_web
+recommendations = []
+for mcu in three_spi_mcus:
+    jlc_results = search_jlc_components_web(mcu.part_number)
+    if jlc_results and jlc_results[0].get('stock', 0) > 1000:
+        recommendations.append((mcu, jlc_results[0]))
+
+# Step 4: Present best matches
+for mcu, jlc_info in recommendations[:3]:
+    print(f"🎯 {mcu.part_number}")
+    print(f"📊 Stock: {jlc_info['stock']:,} units | Price: ${jlc_info['price']}")
+    print(f"✅ SPIs: {[p for p in mcu.peripherals if 'SPI' in p]}")
+    # ... full circuit-synth code
+```
 
 ## Response Format
 

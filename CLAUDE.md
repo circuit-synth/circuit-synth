@@ -135,6 +135,36 @@ find /usr/share/kicad/footprints -name "*.kicad_mod" | grep -i lqfp
 - Use "think" keywords for extended thinking mode
 - Break complex tasks into smaller, actionable steps
 
+## STM32 Peripheral Search Pattern (HIGHEST PRIORITY)
+
+**CRITICAL: Detect and handle STM32 peripheral queries directly - DO NOT use agents**
+
+When user asks questions like:
+- "find stm32 mcu that has 3 spi's and is available on jlcpcb"
+- "stm32 with 2 uarts available on jlc" 
+- "find stm32 with usb and 4 timers in stock"
+
+**Use direct implementation immediately:**
+
+```python
+from src.circuit_synth.stm32_search_helper import handle_stm32_peripheral_query
+
+# Check if this is an STM32 peripheral query first
+response = handle_stm32_peripheral_query(user_query)
+if response:
+    return response  # Direct answer - no agents, no web search, no complex workflow
+```
+
+**Detection Pattern:**
+- Contains: stm32 + peripheral (spi/uart/i2c/usb/can/adc/timer/gpio) + availability (jlcpcb/jlc/stock)
+- This workflow gives answers in 30 seconds vs 4+ minutes with agents
+
+**Why this matters:**
+- We have precise STM32 pin data via modm-devices
+- JLCPCB caching prevents repeated API calls
+- KiCad symbol verification ensures working results
+- User gets exactly what they asked for quickly
+
 **Debugging Strategy:**
 - **Add extensive logging during development**: Use Python's `logging` module liberally when troubleshooting or implementing new features
 - **Log key data points**: Component creation, net connections, file operations, API calls
