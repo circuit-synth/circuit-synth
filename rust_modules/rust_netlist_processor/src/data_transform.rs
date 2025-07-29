@@ -79,7 +79,8 @@ pub struct PinInfo {
     pub number: String,
     /// Pin name (e.g., "VCC", "GND", "~")
     pub name: String,
-    /// Pin type/function
+    /// Pin type/function - accepts both "pin_type" and "func" field names
+    #[serde(alias = "func")]
     pub pin_type: PinType,
 }
 
@@ -147,7 +148,8 @@ impl NetNode {
 /// Component representation optimized for netlist generation
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Component {
-    /// Component reference designator (e.g., "R1", "U1")
+    /// Component reference designator (e.g., "R1", "U1") - accepts both "reference" and "ref"
+    #[serde(alias = "ref")]
     pub reference: String,
     /// Symbol library reference (e.g., "Device:R", "MCU_ST_STM32F4:STM32F407VGTx")
     pub symbol: String,
@@ -332,7 +334,8 @@ pub struct Circuit {
     pub nets: HashMap<String, Net>,
     /// Subcircuits (hierarchical children)
     pub subcircuits: Vec<Circuit>,
-    /// Circuit timestamp/UUID
+    /// Circuit timestamp/UUID - accepts both "timestamp" and "tstamps"
+    #[serde(alias = "tstamps")]
     pub timestamp: String,
     /// Source file information
     pub source_file: String,
