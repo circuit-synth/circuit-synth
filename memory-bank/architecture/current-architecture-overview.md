@@ -83,7 +83,40 @@ Comprehensive testing system added in recent merge:
 
 ## Key Design Patterns
 
-### Circuit Definition Pattern
+### Hierarchical Circuit Design Pattern (NEW - 2025-07-30)
+Following software engineering principles for professional circuit design:
+
+```python
+@circuit(name="Power_Supply")
+def power_supply_subcircuit():
+    """Single responsibility: USB-C to 3.3V regulation"""
+    # Define power regulation components
+    # Clean interface: VBUS_IN, VCC_3V3_OUT, GND
+    pass
+
+@circuit(name="MCU_Core") 
+def mcu_core_subcircuit():
+    """Single responsibility: STM32 with support circuits"""
+    # Define MCU, oscillator, reset circuit
+    # Interface: VCC_3V3, I2C_SCL/SDA, SWDIO/SWCLK
+    pass
+
+@circuit(name="Main_Circuit")
+def main_circuit():
+    """Top-level integration of subcircuits"""
+    power_supply = power_supply_subcircuit()
+    mcu_core = mcu_core_subcircuit()
+    # Connect subcircuits through well-defined interfaces
+```
+
+**Benefits:**
+- **Single Responsibility**: Each subcircuit handles one function
+- **Clear Interfaces**: Well-defined input/output nets between subcircuits
+- **Modularity**: Easy to modify individual subcircuits without affecting others
+- **Scalability**: Simple to add new functionality as additional subcircuits
+- **Professional Quality**: Matches industry EDA tool hierarchical design practices
+
+### Traditional Circuit Definition Pattern
 ```python
 @circuit
 def my_circuit():
@@ -96,9 +129,16 @@ def my_circuit():
 circuit = my_circuit()
 circuit.generate_kicad_project(
     "project_name",  # Simplified API
-    generate_ratsnest=True  # Add visual airwire connections (default: True)
+    generate_ratsnest=True,  # Add visual airwire connections (default: True)
+    placement_algorithm="hierarchical"  # Use hierarchical placement for subcircuits
 )
 ```
+
+**Hierarchical KiCad Output:**
+- **Main project file**: `project_name.kicad_pro`
+- **Top-level schematic**: `project_name.kicad_sch` 
+- **Individual subcircuit sheets**: `Power_Supply.kicad_sch`, `MCU_Core.kicad_sch`, etc.
+- **PCB layout**: `project_name.kicad_pcb` with hierarchical placement
 
 ### Component Placement
 Multiple algorithms available in `kicad_api/pcb/placement/`:

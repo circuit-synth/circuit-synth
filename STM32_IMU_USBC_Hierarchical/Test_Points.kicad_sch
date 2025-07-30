@@ -1,0 +1,493 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 3ac13ef1-e75b-4e40-8666-d4c0ccbaf5b6)
+	(paper A4)
+	(paper A4)
+	(lib_symbols
+		(symbol "Connector:TestPoint"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"TP"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"TestPoint"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				""
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"~"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"test point"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"test point tp"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"Pin* Test*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "TestPoint_0_1"
+				(circle
+					(center 0.0 3.302)
+					(radius 0.4572)
+					(stroke
+						(width 0.0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "TestPoint_1_1"
+				(pin
+					passive
+					line
+					(at 0.0 0.0 90)
+					(length 2.54)
+					(name
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+	)
+	(title_block
+		(title Test_Points)
+		(date 2025-07-29)
+		(company Circuit-Synth)
+	)
+	(symbol
+		(lib_id Connector:TestPoint)
+		(at 38.1 45.72 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid da8bbd8c-6bb5-40ab-8f7f-d570780b13a4)
+		(property
+			"Reference"
+			"TP1"
+			(at 38.1 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Value"
+			"3V3"
+			(at 38.1 50.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"TestPoint:TestPoint_Pad_D1.5mm"
+			(at 38.1 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference TP1)
+					(unit 1)
+				)
+			)
+			(project
+				"STM32_IMU_USBC_Hierarchical"
+				(path
+					"/3fe08051-55e1-4479-a9ba-a3e40f35f036/02b7daf5-a06b-4ad5-aac2-0d58d199d928/7c6ade81-4c5e-4b4a-976c-cbd20cae1d09"
+					(reference TP1)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id Connector:TestPoint)
+		(at 58.42 45.72 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid c7c4fb89-0203-4504-95f8-24b1c945592e)
+		(property
+			"Reference"
+			"TP2"
+			(at 58.42 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Value"
+			"GND"
+			(at 58.42 50.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"TestPoint:TestPoint_Pad_D1.5mm"
+			(at 58.42 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference TP2)
+					(unit 1)
+				)
+			)
+			(project
+				"STM32_IMU_USBC_Hierarchical"
+				(path
+					"/3fe08051-55e1-4479-a9ba-a3e40f35f036/02b7daf5-a06b-4ad5-aac2-0d58d199d928/7c6ade81-4c5e-4b4a-976c-cbd20cae1d09"
+					(reference TP2)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id Connector:TestPoint)
+		(at 76.2 45.72 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid 6fd72bf9-e584-4cb0-a737-644f92349fa1)
+		(property
+			"Reference"
+			"TP3"
+			(at 76.2 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Value"
+			"I2C_SCL"
+			(at 76.2 50.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"TestPoint:TestPoint_Pad_D1.5mm"
+			(at 76.2 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference TP3)
+					(unit 1)
+				)
+			)
+			(project
+				"STM32_IMU_USBC_Hierarchical"
+				(path
+					"/3fe08051-55e1-4479-a9ba-a3e40f35f036/02b7daf5-a06b-4ad5-aac2-0d58d199d928/7c6ade81-4c5e-4b4a-976c-cbd20cae1d09"
+					(reference TP3)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id Connector:TestPoint)
+		(at 96.52 45.72 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid 27579894-31b9-4b87-b04c-9a26a77b0d21)
+		(property
+			"Reference"
+			"TP4"
+			(at 96.52 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Value"
+			"I2C_SDA"
+			(at 96.52 50.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"TestPoint:TestPoint_Pad_D1.5mm"
+			(at 96.52 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference TP4)
+					(unit 1)
+				)
+			)
+			(project
+				"STM32_IMU_USBC_Hierarchical"
+				(path
+					"/3fe08051-55e1-4479-a9ba-a3e40f35f036/02b7daf5-a06b-4ad5-aac2-0d58d199d928/7c6ade81-4c5e-4b4a-976c-cbd20cae1d09"
+					(reference TP4)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 38.1 45.72 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 18a31949-836a-4060-9f41-086438139836)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 45.72 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid aabfddbe-1eeb-4ec4-963e-ab6079512fd7)
+	)
+	(hierarchical_label
+		I2C_SCL
+		(shape input)
+		(at 76.2 45.72 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 3721e4d6-0590-45e4-93b5-920823d91ffd)
+	)
+	(hierarchical_label
+		I2C_SDA
+		(shape input)
+		(at 96.52 45.72 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 4bafca34-b05d-448d-a9f8-6f4d396e1017)
+	)
+	(text_box
+		"Test Points Subcircuit\n    \n    Strategic test points for debugging and validation.\n    \n    Interface:\n    - VCC_3V3: 3.3V power rail\n    - GND: System ground\n    - I2C_SCL, I2C_SDA: I2C bus signals"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid a476ffde-a394-4853-b8f9-e360ed3aed1e)
+	)
+	(text_box
+		"Test Points Subcircuit\n    \n    Strategic test points for debugging and validation.\n    \n    Interface:\n    - VCC_3V3: 3.3V power rail\n    - GND: System ground\n    - I2C_SCL, I2C_SDA: I2C bus signals"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid a476ffde-a394-4853-b8f9-e360ed3aed1e)
+	)
+	(sheet_instances
+		(path
+			"/3fe08051-55e1-4479-a9ba-a3e40f35f036/02b7daf5-a06b-4ad5-aac2-0d58d199d928/7c6ade81-4c5e-4b4a-976c-cbd20cae1d09"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)
