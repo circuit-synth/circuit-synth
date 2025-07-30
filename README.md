@@ -215,7 +215,8 @@ circuit.generate_kicad_project("esp32_dev")
 - **📝 Smart Annotations**: Automatic docstring extraction + manual text/tables for comprehensive documentation
 - **⚡ Rust-Accelerated**: Fast symbol lookup and hierarchical placement algorithms
 - **🏭 Manufacturing Integration**: Real-time component availability and pricing from JLCPCB with JLCPCB-compatible component selection
-- **🔍 Smart Component Finder**: AI-powered component recommendations with circuit-synth code generation
+- **🔍 Smart Component Finder**: AI-powered component recommendations with circuit-synth code generation  
+- **🤖 5 Specialized AI Agents**: circuit-architect, power-expert, signal-integrity, component-guru, simulation-expert
 - **⚙️ SPICE Simulation**: Professional-grade circuit simulation with PySpice/ngspice backend for subcircuit validation
 
 > **🏗️ New Professional Standard**: All circuits are now generated as hierarchical subcircuits following software engineering principles. This replaces monolithic circuit design with modular, maintainable architecture that scales to complex designs.
@@ -233,11 +234,16 @@ Circuit-synth works with Claude Code to streamline component selection and circu
 
 Claude will search components, check availability, and generate hierarchical circuit-synth code with proper subcircuit organization.
 
-#### **2. AI Commands**
+#### **2. AI Commands & Agents**
 
 - `/find-symbol STM32G4` → Locates KiCad symbols
 - `/find-footprint LQFP` → Find footprints
 - **🆕 `simulation-expert` agent** → SPICE simulation and circuit validation specialist
+
+**Setup AI agents:**
+```bash
+uv run register-agents  # Register all 5 specialized circuit design agents
+```
 
 #### **3. Component Search Example**
 
