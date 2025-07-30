@@ -425,7 +425,9 @@ def main():
     # Update example files
     examples_dir = Path(__file__).parent.parent / "examples" / "agent-training"
     example_files = [
-        examples_dir / "microcontrollers" / "01_esp32_minimal.py",  # Could add STM32 version
+        examples_dir / "microcontrollers" / "01_esp32_minimal.py",
+        examples_dir / "microcontrollers" / "02_stm32_with_crystal.py",
+        examples_dir / "03_complete_stm32_development_board.py",
         # Add more example files as needed
     ]
     
