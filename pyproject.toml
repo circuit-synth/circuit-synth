@@ -85,6 +85,9 @@ preparse-symbols = "circuit_synth.scripts.preparse_kicad_symbols:main"
 netlist-import = "circuit_synth.kicad.netlist_importer:main"
 json-to-python = "circuit_synth.codegen.json_to_python_project:main"
 
+# KiCad Integration
+validate-kicad = "circuit_synth.core.kicad_validator:main"
+
 # Claude Code Integration
 setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
 register-agents = "circuit_synth.claude_integration.agent_registry:main"

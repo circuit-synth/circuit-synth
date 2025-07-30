@@ -341,10 +341,35 @@ See [`docs/SIMULATION_SETUP.md`](docs/SIMULATION_SETUP.md) for ngspice installat
 
 ## Installation
 
+### Prerequisites
+
+**KiCad Installation Required:**
+Circuit-synth requires KiCad 8.0+ to be installed locally for full functionality.
+
+```bash
+# macOS
+brew install kicad
+# or download from: https://www.kicad.org/download/macos/
+
+# Ubuntu/Debian  
+sudo apt install kicad
+
+# Fedora
+sudo dnf install kicad
+
+# Windows
+# Download from: https://www.kicad.org/download/windows/
+```
+
+### Circuit-Synth Installation
+
 **PyPI (Recommended):**
 ```bash
 pip install circuit-synth
 # or: uv pip install circuit-synth
+
+# Verify installation
+python -c "import circuit_synth; circuit_synth.validate_kicad_installation()"
 ```
 
 **Development:**
@@ -355,12 +380,6 @@ uv sync  # or: pip install -e ".[dev]"
 
 # Register AI agents for circuit design assistance
 uv run register-agents
-```
-
-**Docker:**
-```bash
-./docker/build-docker.sh
-./scripts/circuit-synth-docker python examples/example_kicad_project.py
 ```
 
 **CI Setup:**
