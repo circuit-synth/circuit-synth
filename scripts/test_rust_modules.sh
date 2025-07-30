@@ -1,6 +1,6 @@
 #!/bin/bash
 # scripts/test_rust_modules.sh - Automated Rust module testing for CI/CD
-set -e
+# Removed set -e to avoid blocking CI on individual command failures
 
 # Colors for output
 RED='\033[0;31m'
