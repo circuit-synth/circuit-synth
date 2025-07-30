@@ -8,7 +8,7 @@ Tests both API-based and web scraping approaches for component lookup.
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 import requests
-from circuit_synth.jlc_integration import (
+from circuit_synth.manufacturing.jlcpcb import (
     JlcPartsInterface,
     recommend_jlc_component,
     enhance_component_with_jlc_data,
@@ -224,7 +224,7 @@ class TestRecommendationFunctions:
     
     def test_enhance_component_with_jlc_data(self):
         """Test component enhancement with JLC data."""
-        with patch('circuit_synth.jlc_integration.jlc_parts_lookup.recommend_jlc_component') as mock_recommend:
+        with patch('circuit_synth.manufacturing.jlcpcb.jlc_parts_lookup.recommend_jlc_component') as mock_recommend:
             mock_recommend.return_value = {
                 "manufacturer_part": "STM32G030C8T6",
                 "stock": 75000

@@ -9,7 +9,7 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 import requests
 from bs4 import BeautifulSoup
-from circuit_synth.jlc_integration import (
+from circuit_synth.manufacturing.jlcpcb import (
     JlcWebScraper,
     search_jlc_components_web,
     get_component_availability_web,
@@ -194,7 +194,7 @@ class TestConvenienceFunctions:
     
     def test_enhance_component_with_web_data(self):
         """Test component enhancement with web-scraped data."""
-        with patch('circuit_synth.jlc_integration.jlc_web_scraper.get_component_availability_web') as mock_get:
+        with patch('circuit_synth.manufacturing.jlcpcb.jlc_web_scraper.get_component_availability_web') as mock_get:
             mock_get.return_value = {
                 "part_number": "STM32G030C8T6",
                 "stock": 75000,
