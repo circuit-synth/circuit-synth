@@ -302,5 +302,21 @@ def register_circuit_agents():
         print(f"📁 Also created project-local agents for development")
 
 
-if __name__ == "__main__":
+def main():
+    """Main entry point for the register-agents CLI command."""
+    print("🤖 Circuit-Synth Agent Registration")
+    print("=" * 50)
     register_circuit_agents()
+    print("\n✅ Agent registration complete!")
+    print("\nYou can now use these agents in Claude Code:")
+    agents = get_circuit_agents()
+    for agent_name, agent in agents.items():
+        print(f"  • {agent_name}: {agent.description}")
+    print("\nExample usage:")
+    print(
+        '  @Task(subagent_type="simulation-expert", description="Help with simulation", prompt="...")'
+    )
+
+
+if __name__ == "__main__":
+    main()

@@ -346,6 +346,9 @@ pip install circuit-synth
 git clone https://github.com/circuit-synth/circuit-synth.git
 cd circuit-synth
 uv sync  # or: pip install -e ".[dev]"
+
+# Register AI agents for circuit design assistance
+uv run register-agents
 ```
 
 **Docker:**
