@@ -50,10 +50,10 @@ jobs:
       run: echo "Type checking temporarily disabled - too many legacy type issues to resolve"
 
     - name: Format check with black
-      run: uv run black --check src/
+      run: uv run black --check src/ --exclude src/external_repos
 
     - name: Import sort check with isort
-      run: uv run isort --check-only src/
+      run: uv run isort --check-only src/ --skip src/external_repos
 
     - name: Debug KiCad Symbol Detection
       run: |

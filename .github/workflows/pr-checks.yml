@@ -41,10 +41,10 @@ jobs:
         uv pip install -e ".[dev]"
 
     - name: Format check
-      run: uv run black --check src/
+      run: uv run black --check src/ --exclude src/external_repos
 
     - name: Import sort check
-      run: uv run isort --check-only src/
+      run: uv run isort --check-only src/ --skip src/external_repos
 
     - name: Lint check
       run: uv run flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics --extend-ignore=F821
