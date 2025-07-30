@@ -274,7 +274,11 @@ main() {
     
     if [ -z "$modules" ]; then
         log_warning "No Rust modules found in $RUST_MODULES_DIR"
-        exit 0
+        log_info "Directory contents:"
+        ls -la "$RUST_MODULES_DIR" || true
+        log_info "Find command output:"
+        find "$RUST_MODULES_DIR" -maxdepth 1 -type d -name "rust_*" || true
+        exit 1  # Exit with error instead of success to surface the issue
     fi
     
     local failed_count=0
