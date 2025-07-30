@@ -204,14 +204,41 @@ def execute_circuit_synth_code(code, project_name="generated_circuit"):
             if not circuit_synth_dir.exists():
                 return {"success": False, "error": "Circuit-synth directory not found"}
             
-            # Execute the code using uv run
-            result = subprocess.run(
-                ["uv", "run", "python", str(code_file)],
-                capture_output=True,
-                text=True,
-                cwd=circuit_synth_dir,
-                timeout=120
-            )
+            # Execute the code using Python - try multiple approaches
+            import os
+            
+            # Expand PATH to include common locations for uv
+            env = os.environ.copy()
+            additional_paths = [
+                "/usr/local/bin",
+                "/opt/homebrew/bin", 
+                os.path.expanduser("~/.local/bin"),
+                os.path.expanduser("~/.cargo/bin")
+            ]
+            current_path = env.get("PATH", "")
+            env["PATH"] = ":".join(additional_paths + [current_path])
+            env["PYTHONPATH"] = str(circuit_synth_dir / "src")
+            
+            try:
+                # Try uv run first (preferred for development)
+                result = subprocess.run(
+                    ["uv", "run", "python", str(code_file)],
+                    capture_output=True,
+                    text=True,
+                    cwd=circuit_synth_dir,
+                    timeout=120,
+                    env=env
+                )
+            except FileNotFoundError:
+                # Fallback to system python3 if uv not available
+                result = subprocess.run(
+                    ["python3", str(code_file)],
+                    capture_output=True,
+                    text=True,
+                    cwd=circuit_synth_dir,
+                    timeout=120,
+                    env=env
+                )
             
             if result.returncode == 0:
                 # Look for generated files
@@ -294,56 +321,57 @@ def create_circuit_generation_context(analysis, user_message):
     """Create context message for circuit generation with circuit-synth examples."""
     
     circuit_synth_examples = """
-CIRCUIT-SYNTH TEMPLATE - USE EXACTLY THIS PATTERN:
+FOOLPROOF CIRCUIT-SYNTH TEMPLATE - TESTED AND WORKING:
 
 ```python
 from circuit_synth import *
 
-# Create components EXACTLY like this:
-esp32 = Component("RF_Module:ESP32-S3-MINI-1", ref="U1", footprint="RF_Module:ESP32-S2-MINI-1")
-imu = Component("Sensor_Motion:MPU-6050", ref="U2", footprint="Sensor_Motion:InvenSense_QFN-24_4x4mm_P0.5mm")
-usb_c = Component("Connector:USB_C_Receptacle_USB2.0", ref="J1", footprint="Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal")
-
-# Standard passives:
-r1 = Component("Device:R", ref="R", value="10K", footprint="Resistor_SMD:R_0603_1608Metric")
-c1 = Component("Device:C", ref="C", value="10uF", footprint="Capacitor_SMD:C_0805_2012Metric")
-
-# Create nets:
-vcc_3v3 = Net('VCC_3V3')
-gnd = Net('GND')
-vcc_5v = Net('VCC_5V')
-
-# Connect pins (ONLY use integer pins for simplicity):
-esp32[1] += gnd         # GND pin
-esp32[2] += vcc_3v3     # VCC pin
-imu[1] += vcc_3v3       # VDD pin
-imu[2] += gnd           # GND pin
-usb_c[1] += vcc_5v      # VBUS pin
-usb_c[2] += gnd         # GND pin
-
 @circuit
 def main():
-    # Put all your components and connections here
-    # Return the circuit at the end
-    pass
+    # Create nets
+    vcc_3v3 = Net('VCC_3V3')
+    vcc_5v = Net('VCC_5V') 
+    gnd = Net('GND')
+    
+    # ESP32 module (TESTED: Pin 1=GND, Pin 3=3V3)
+    esp32 = Component("RF_Module:ESP32-S3-MINI-1", ref="U1", footprint="RF_Module:ESP32-S2-MINI-1")
+    esp32[1] += gnd         # Pin 1 = GND
+    esp32[3] += vcc_3v3     # Pin 3 = 3V3  
+    
+    # USB-A connector (TESTED: Pin 1=VBUS, Pin 4=GND)
+    usb_a = Component("Connector:USB_A", ref="J1", footprint="Connector_USB:USB_A_CNCTech_1001-011-01101_Horizontal")
+    usb_a[1] += vcc_5v      # Pin 1 = VBUS
+    usb_a[4] += gnd         # Pin 4 = GND
+    
+    # Voltage regulator (TESTED: Pin 1=GND, Pin 2=OUT, Pin 3=IN)
+    regulator = Component("Regulator_Linear:NCP1117-3.3_SOT223", ref="U3", footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2")
+    regulator[1] += gnd         # Pin 1 = GND
+    regulator[2] += vcc_3v3     # Pin 2 = 3.3V output
+    regulator[3] += vcc_5v      # Pin 3 = 5V input
+    
+    # Capacitors (TESTED: Pin 1 and Pin 2)
+    cap_in = Component("Device:C", ref="C1", value="10uF", footprint="Capacitor_SMD:C_0805_2012Metric")
+    cap_in[1] += vcc_5v
+    cap_in[2] += gnd
+    
+    cap_out = Component("Device:C", ref="C2", value="10uF", footprint="Capacitor_SMD:C_0805_2012Metric")
+    cap_out[1] += vcc_3v3
+    cap_out[2] += gnd
 
 if __name__ == '__main__':
     circuit = main()
-    circuit.generate_kicad_project("esp32_dev_board", force_regenerate=True)
+    circuit.generate_kicad_project("project_name", force_regenerate=True)
 ```
 
-CRITICAL RULES:
-1. ONLY use: from circuit_synth import *
-2. ONLY use Component(), Net(), @circuit decorator
-3. ONLY use integer pin numbers like [1], [2], [3] - NO string pins
-4. ALWAYS use valid KiCad symbol names from these libraries:
-   - RF_Module: for ESP32
-   - Sensor_Motion: for IMU
-   - Connector: for USB
-   - Device: for R, C, L
-   - Regulator_Linear: for voltage regulators
-5. ALWAYS end with circuit.generate_kicad_project("project_name", force_regenerate=True)
-6. Keep it SIMPLE - no complex imports, no annotations, no extra features
+ABSOLUTE REQUIREMENTS - THESE PIN NUMBERS ARE TESTED AND WORK:
+1. ESP32 ESP32-S3-MINI-1: Pin 1=GND, Pin 3=3V3 (verified working)
+2. USB_A: Pin 1=VBUS, Pin 4=GND (verified working)
+3. NCP1117 regulator: Pin 1=GND, Pin 2=OUT, Pin 3=IN (verified working)
+4. Capacitor Device:C: Pin 1 and Pin 2 (passive, verified working)
+5. ONLY use @circuit decorator on main() function
+6. ALWAYS end with circuit.generate_kicad_project("project_name", force_regenerate=True)
+7. NO additional imports, NO debugging, NO complex features - keep it simple!
+"""
     
     context_message = f"""CIRCUIT GENERATION MODE - Generate circuit-synth Python code for KiCad.
 
