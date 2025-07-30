@@ -30,23 +30,21 @@ sudo apt-get install ngspice ngspice-doc
 2. Install to `C:\ngspice` or similar location
 3. Add to PATH environment variable
 
-### 2. Install PySpice (Python Interface)
-
-**Using uv (recommended):**
-```bash
-uv pip install PySpice
-```
+### 2. Install Circuit-Synth (PySpice included by default)
 
 **Using pip:**
 ```bash
-pip install PySpice
+pip install circuit-synth
 ```
 
-### 3. Install Circuit-Synth with Simulation Support
-
-**Development installation with simulation extras:**
+**Using uv:**
 ```bash
-uv pip install -e ".[simulation]"
+uv add circuit-synth
+```
+
+**Development installation:**
+```bash
+uv pip install -e .
 ```
 
 ## Verification

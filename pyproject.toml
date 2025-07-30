@@ -69,10 +69,6 @@ claude = [
     # Claude Code SDK integration for AI-powered circuit design
     "claude-code-sdk>=0.0.17",
 ]
-simulation = [
-    # SPICE simulation support
-    "PySpice>=1.5",
-]
 test = [
     "pytest>=7.0.0",
     "pytest-mock>=3.14.0",

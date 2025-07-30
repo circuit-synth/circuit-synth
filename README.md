@@ -237,6 +237,7 @@ Claude will search components, check availability, and generate hierarchical cir
 
 - `/find-symbol STM32G4` → Locates KiCad symbols
 - `/find-footprint LQFP` → Find footprints
+- **🆕 `simulation-expert` agent** → SPICE simulation and circuit validation specialist
 
 #### **3. Component Search Example**
 
@@ -269,6 +270,7 @@ Claude will search components, check availability, and generate hierarchical cir
 - **🔧 Hierarchical Code Generation**: Ready-to-use modular circuit-synth code
 - **🏗️ Professional Architecture**: AI organizes circuits into proper subcircuits
 - **🧠 Engineering Context**: AI explains component choices and hierarchical design decisions
+- **🔬 Simulation Expert**: Dedicated AI agent for SPICE simulation and circuit validation
 
 ## ⚙️ SPICE Simulation Integration
 
@@ -322,14 +324,14 @@ transient = sim.transient_analysis(1e-6, 1e-3)  # 1μs steps, 1ms duration
 ### **Setup**
 
 ```bash
-# Install with simulation support
-pip install circuit-synth[simulation]
+# Install circuit-synth (simulation included by default)
+pip install circuit-synth
 
 # Or with uv
-uv add circuit-synth --extra simulation
+uv add circuit-synth
 ```
 
-See [`docs/SIMULATION_SETUP.md`](docs/SIMULATION_SETUP.md) for complete setup instructions.
+See [`docs/SIMULATION_SETUP.md`](docs/SIMULATION_SETUP.md) for ngspice installation instructions.
 
 ## Installation
 

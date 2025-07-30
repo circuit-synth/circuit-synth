@@ -455,7 +455,7 @@ class Circuit:
     def simulator(self):
         """
         Alias for simulate() method for backward compatibility.
-        
+
         Returns:
             CircuitSimulator: Simulator object for running analyses
         """
