@@ -75,6 +75,9 @@ test = [
 # Sync scripts
 kicad-to-python = "circuit_synth.scripts.kicad_to_python_sync:main"
 python-to-kicad = "circuit_synth.scripts.python_to_kicad_sync:main"
+# Circuit creation tools
+circuit-creator = "circuit_synth.tools.circuit_creator_cli:main"
+setup-claude-integration = "circuit_synth.tools.setup_claude:main"
 
 # Symbol management scripts  
 preload-symbols = "circuit_synth.scripts.preload_symbols:main"
@@ -84,8 +87,7 @@ preparse-symbols = "circuit_synth.scripts.preparse_kicad_symbols:main"
 netlist-import = "circuit_synth.kicad.netlist_importer:main"
 json-to-python = "circuit_synth.codegen.json_to_python_project:main"
 
-# Claude Code Integration
-setup-claude-integration = "circuit_synth.tools.setup_claude:main"
+# Circuit validation
 validate-circuit = "circuit_synth.validation.real_time_check:main"
 
 [project.urls]
