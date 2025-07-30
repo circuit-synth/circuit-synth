@@ -2,6 +2,16 @@
 Circuit-Synth: Open Source Circuit Synthesis Framework
 
 A Python framework for programmatic circuit design with KiCad integration.
+
+🤖 **Claude Code Integration Available**
+For AI-powered circuit design with specialized agents:
+
+    pip install circuit-synth[claude]
+    setup-claude-integration
+
+Or in Python:
+    from circuit_synth import setup_claude_integration
+    setup_claude_integration()
 """
 
 __version__ = "0.1.0"
@@ -39,6 +49,13 @@ from .core.netlist_exporter import NetlistExporter
 # Reference manager and netlist exporters
 from .core.reference_manager import ReferenceManager
 
+# Rust-accelerated component creation helpers
+from .core.rust_components import (
+    create_rust_capacitor,
+    create_rust_resistor,
+    get_rust_component_status,
+)
+
 # Interfaces imports
 from .interfaces import (
     ICircuitModel,
@@ -48,6 +65,22 @@ from .interfaces import (
 
 # KiCad integration
 from .kicad.unified_kicad_integration import create_unified_kicad_integration
+
+
+# Claude Code integration (optional)
+def setup_claude_integration():
+    """Setup Claude Code integration for professional circuit design"""
+    try:
+        from .claude_integration import initialize_claude_integration
+
+        initialize_claude_integration()
+    except ImportError as e:
+        print("⚠️  Claude Code integration not available.")
+        print(
+            "   For AI-powered circuit design, install with: pip install circuit-synth[claude]"
+        )
+        print(f"   Error: {e}")
+
 
 # KiCad API imports
 from .kicad_api import (
@@ -95,6 +128,12 @@ __all__ = [
     "ReferenceManager",
     "NetlistExporter",
     "EnhancedNetlistExporter",
+    # Rust-accelerated component creation
+    "create_rust_resistor",
+    "create_rust_capacitor",
+    "get_rust_component_status",
     # KiCad integration
     "create_unified_kicad_integration",
+    # Claude Code integration
+    "setup_claude_integration",
 ]

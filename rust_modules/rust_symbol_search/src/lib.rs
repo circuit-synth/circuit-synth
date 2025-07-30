@@ -1,25 +1,25 @@
 //! High-performance symbol search engine for KiCad symbols
-//! 
+//!
 //! This crate provides a Rust-based symbol search implementation designed to replace
 //! the Python fuzzy matching and indexing components with significant performance improvements.
-//! 
+//!
 //! Key features:
 //! - Sub-50ms index building for 21,000+ symbols
 //! - Sub-5ms fuzzy searches with high accuracy
 //! - Memory-efficient data structures
 //! - Python bindings via PyO3
 
+pub mod fuzzy;
 pub mod index;
 pub mod search;
 pub mod types;
-pub mod fuzzy;
 
 #[cfg(feature = "python-bindings")]
 pub mod python;
 
 pub use index::SymbolIndex;
 pub use search::SearchEngine;
-pub use types::{Symbol, SymbolData, SearchResult, MatchType, MatchDetails};
+pub use types::{MatchDetails, MatchType, SearchResult, Symbol, SymbolData};
 
 use std::collections::HashMap;
 
@@ -38,7 +38,10 @@ impl RustSymbolSearcher {
     }
 
     /// Build the search index from symbol data
-    pub fn build_index(&mut self, symbols: HashMap<String, String>) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn build_index(
+        &mut self,
+        symbols: HashMap<String, String>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let symbol_data: Vec<SymbolData> = symbols
             .into_iter()
             .map(|(name, library)| SymbolData {
@@ -77,17 +80,17 @@ mod tests {
     #[test]
     fn test_basic_search() {
         let mut searcher = RustSymbolSearcher::new();
-        
+
         let mut symbols = HashMap::new();
         symbols.insert("R".to_string(), "Device".to_string());
         symbols.insert("C".to_string(), "Device".to_string());
         symbols.insert("LM7805_TO220".to_string(), "Regulator_Linear".to_string());
-        
+
         searcher.build_index(symbols).unwrap();
-        
+
         let results = searcher.search("resistor", 5, 0.3);
         assert!(!results.is_empty());
-        
+
         let results = searcher.search("Device:R", 5, 0.3);
         assert!(!results.is_empty());
         assert_eq!(results[0].symbol_name, "R");
@@ -96,26 +99,25 @@ mod tests {
     #[test]
     fn test_performance() {
         let mut searcher = RustSymbolSearcher::new();
-        
+
         // Create a large symbol set
         let mut symbols = HashMap::new();
         for i in 0..10000 {
             symbols.insert(format!("Symbol_{}", i), "TestLib".to_string());
         }
-        
+
         let start = std::time::Instant::now();
         searcher.build_index(symbols).unwrap();
         let build_time = start.elapsed();
-        
+
         println!("Index build time: {:?}", build_time);
         assert!(build_time.as_millis() < 100); // Should be under 100ms
-        
+
         let start = std::time::Instant::now();
         let _results = searcher.search("Symbol_1234", 10, 0.3);
         let search_time = start.elapsed();
-        
+
         println!("Search time: {:?}", search_time);
         assert!(search_time.as_millis() < 10); // Should be under 10ms
     }
 }
-

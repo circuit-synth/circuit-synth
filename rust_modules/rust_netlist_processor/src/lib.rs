@@ -31,17 +31,17 @@
 //! let netlist = processor.generate_kicad_netlist(&circuit).unwrap();
 //! ```
 
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use thiserror::Error;
 
 // Core modules
-pub mod s_expression;
-pub mod net_processor;
 pub mod component_gen;
-pub mod libpart_gen;
 pub mod data_transform;
 pub mod errors;
+pub mod libpart_gen;
+pub mod net_processor;
+pub mod s_expression;
 
 // Python bindings (feature-gated)
 #[cfg(feature = "python-bindings")]
@@ -55,28 +55,31 @@ use pyo3::prelude::*;
 #[pymodule]
 fn rust_netlist_processor(_py: Python, m: &PyModule) -> PyResult<()> {
     // Import all the classes and functions from python_bindings
-    use python_bindings::{PyNetlistProcessor, PyCircuit, PyComponent, convert_json_to_netlist, benchmark_netlist_generation};
-    
+    use python_bindings::{
+        benchmark_netlist_generation, convert_json_to_netlist, PyCircuit, PyComponent,
+        PyNetlistProcessor,
+    };
+
     m.add_class::<PyNetlistProcessor>()?;
     m.add_class::<PyCircuit>()?;
     m.add_class::<PyComponent>()?;
     m.add_function(wrap_pyfunction!(convert_json_to_netlist, m)?)?;
     m.add_function(wrap_pyfunction!(benchmark_netlist_generation, m)?)?;
-    
+
     // Add version information
     m.add("__version__", "0.1.0")?;
     m.add("__author__", "Circuit Synth Team")?;
-    
+
     Ok(())
 }
 
 // Re-export main types
-pub use errors::{NetlistError, Result};
-pub use s_expression::SExprFormatter;
-pub use net_processor::NetProcessor;
 pub use component_gen::ComponentGenerator;
-pub use libpart_gen::LibpartGenerator;
 pub use data_transform::{Circuit, Component, NetNode, PinInfo, PinType};
+pub use errors::{NetlistError, Result};
+pub use libpart_gen::LibpartGenerator;
+pub use net_processor::NetProcessor;
+pub use s_expression::SExprFormatter;
 
 /// Main netlist processor that orchestrates all processing stages
 pub struct NetlistProcessor {
@@ -121,7 +124,7 @@ impl NetlistProcessor {
     pub fn generate_kicad_netlist(&mut self, circuit: &Circuit) -> Result<String> {
         // Clear any previous state
         self.formatter.reset();
-        
+
         // Generate all sections in parallel where possible
         let design_section = self.formatter.generate_design_section(circuit)?;
         let components_section = self.component_gen.generate_components_section(circuit)?;
@@ -148,7 +151,8 @@ impl NetlistProcessor {
     /// Generate only the components section
     pub fn generate_components_only(&mut self, circuit: &Circuit) -> Result<String> {
         let components_section = self.component_gen.generate_components_section(circuit)?;
-        self.formatter.format_components_section(&components_section)
+        self.formatter
+            .format_components_section(&components_section)
     }
 
     /// Get performance statistics from the last processing run
@@ -171,10 +175,10 @@ impl NetlistProcessor {
 
     /// Estimate current memory usage (for performance monitoring)
     fn estimate_memory_usage(&self) -> usize {
-        self.formatter.buffer_capacity() +
-        self.net_processor.memory_usage() +
-        self.component_gen.memory_usage() +
-        self.libpart_gen.memory_usage()
+        self.formatter.buffer_capacity()
+            + self.net_processor.memory_usage()
+            + self.component_gen.memory_usage()
+            + self.libpart_gen.memory_usage()
     }
 }
 
@@ -197,10 +201,10 @@ pub struct ProcessingStats {
 impl ProcessingStats {
     /// Get total processing time in milliseconds
     pub fn total_time_ms(&self) -> f64 {
-        self.formatting_time_ms +
-        self.net_processing_time_ms +
-        self.component_processing_time_ms +
-        self.libpart_processing_time_ms
+        self.formatting_time_ms
+            + self.net_processing_time_ms
+            + self.component_processing_time_ms
+            + self.libpart_processing_time_ms
     }
 
     /// Get memory usage in megabytes

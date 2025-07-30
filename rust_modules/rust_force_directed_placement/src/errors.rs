@@ -124,20 +124,23 @@ pub mod validation {
     /// Validate a component
     pub fn validate_component(component: &Component) -> PlacementResult<()> {
         if component.reference.is_empty() {
-            return Err(PlacementError::invalid_component("Component reference cannot be empty"));
+            return Err(PlacementError::invalid_component(
+                "Component reference cannot be empty",
+            ));
         }
 
         if component.width <= 0.0 || component.height <= 0.0 {
-            return Err(PlacementError::invalid_component(
-                format!("Component {} has invalid dimensions: {}x{}", 
-                    component.reference, component.width, component.height)
-            ));
+            return Err(PlacementError::invalid_component(format!(
+                "Component {} has invalid dimensions: {}x{}",
+                component.reference, component.width, component.height
+            )));
         }
 
         if component.footprint.is_empty() {
-            return Err(PlacementError::invalid_component(
-                format!("Component {} has empty footprint", component.reference)
-            ));
+            return Err(PlacementError::invalid_component(format!(
+                "Component {} has empty footprint",
+                component.reference
+            )));
         }
 
         Ok(())
@@ -147,13 +150,15 @@ pub mod validation {
     pub fn validate_connection(connection: &Connection) -> PlacementResult<()> {
         if connection.ref1.is_empty() || connection.ref2.is_empty() {
             return Err(PlacementError::invalid_connection(
-                &connection.ref1, &connection.ref2
+                &connection.ref1,
+                &connection.ref2,
             ));
         }
 
         if connection.ref1 == connection.ref2 {
             return Err(PlacementError::invalid_connection(
-                &connection.ref1, &connection.ref2
+                &connection.ref1,
+                &connection.ref2,
             ));
         }
 
@@ -163,38 +168,43 @@ pub mod validation {
     /// Validate placement configuration
     pub fn validate_config(config: &PlacementConfig) -> PlacementResult<()> {
         if config.component_spacing <= 0.0 {
-            return Err(PlacementError::invalid_configuration(
-                format!("Component spacing must be positive, got {}", config.component_spacing)
-            ));
+            return Err(PlacementError::invalid_configuration(format!(
+                "Component spacing must be positive, got {}",
+                config.component_spacing
+            )));
         }
 
         if config.attraction_strength < 0.0 {
-            return Err(PlacementError::invalid_configuration(
-                format!("Attraction strength must be non-negative, got {}", config.attraction_strength)
-            ));
+            return Err(PlacementError::invalid_configuration(format!(
+                "Attraction strength must be non-negative, got {}",
+                config.attraction_strength
+            )));
         }
 
         if config.repulsion_strength < 0.0 {
-            return Err(PlacementError::invalid_configuration(
-                format!("Repulsion strength must be non-negative, got {}", config.repulsion_strength)
-            ));
+            return Err(PlacementError::invalid_configuration(format!(
+                "Repulsion strength must be non-negative, got {}",
+                config.repulsion_strength
+            )));
         }
 
         if config.damping <= 0.0 || config.damping > 1.0 {
-            return Err(PlacementError::invalid_configuration(
-                format!("Damping must be in (0, 1], got {}", config.damping)
-            ));
+            return Err(PlacementError::invalid_configuration(format!(
+                "Damping must be in (0, 1], got {}",
+                config.damping
+            )));
         }
 
         if config.cooling_rate <= 0.0 || config.cooling_rate > 1.0 {
-            return Err(PlacementError::invalid_configuration(
-                format!("Cooling rate must be in (0, 1], got {}", config.cooling_rate)
-            ));
+            return Err(PlacementError::invalid_configuration(format!(
+                "Cooling rate must be in (0, 1], got {}",
+                config.cooling_rate
+            )));
         }
 
         if config.iterations_per_level == 0 {
             return Err(PlacementError::invalid_configuration(
-                "Iterations per level must be positive".to_string()
+                "Iterations per level must be positive".to_string(),
             ));
         }
 
@@ -208,9 +218,10 @@ pub mod validation {
         }
 
         if width > 1000.0 || height > 1000.0 {
-            return Err(PlacementError::invalid_configuration(
-                format!("Board dimensions too large: {}x{}mm", width, height)
-            ));
+            return Err(PlacementError::invalid_configuration(format!(
+                "Board dimensions too large: {}x{}mm",
+                width, height
+            )));
         }
 
         Ok(())
@@ -226,11 +237,12 @@ pub mod validation {
         let mut references = std::collections::HashSet::new();
         for component in components {
             validate_component(component)?;
-            
+
             if !references.insert(&component.reference) {
-                return Err(PlacementError::invalid_component(
-                    format!("Duplicate component reference: {}", component.reference)
-                ));
+                return Err(PlacementError::invalid_component(format!(
+                    "Duplicate component reference: {}",
+                    component.reference
+                )));
             }
         }
 
@@ -238,11 +250,12 @@ pub mod validation {
     }
 
     /// Validate a list of connections
-    pub fn validate_connections(connections: &[Connection], components: &[Component]) -> PlacementResult<()> {
-        let component_refs: std::collections::HashSet<_> = components
-            .iter()
-            .map(|c| &c.reference)
-            .collect();
+    pub fn validate_connections(
+        connections: &[Connection],
+        components: &[Component],
+    ) -> PlacementResult<()> {
+        let component_refs: std::collections::HashSet<_> =
+            components.iter().map(|c| &c.reference).collect();
 
         for connection in connections {
             validate_connection(connection)?;
@@ -270,15 +283,16 @@ mod tests {
     fn test_valid_component() {
         let component = Component::new("R1".to_string(), "R_0805".to_string(), "10k".to_string())
             .with_size(2.0, 1.0);
-        
+
         assert!(validation::validate_component(&component).is_ok());
     }
 
     #[test]
     fn test_invalid_component_empty_reference() {
-        let mut component = Component::new("R1".to_string(), "R_0805".to_string(), "10k".to_string());
+        let mut component =
+            Component::new("R1".to_string(), "R_0805".to_string(), "10k".to_string());
         component.reference = String::new();
-        
+
         assert!(validation::validate_component(&component).is_err());
     }
 
@@ -286,7 +300,7 @@ mod tests {
     fn test_invalid_component_zero_dimensions() {
         let component = Component::new("R1".to_string(), "R_0805".to_string(), "10k".to_string())
             .with_size(0.0, 1.0);
-        
+
         assert!(validation::validate_component(&component).is_err());
     }
 

@@ -1,26 +1,26 @@
 //! Rust Pin Calculator - High-performance pin position calculator and coordinate transformer
-//! 
+//!
 //! This library provides fast and accurate pin position calculations for KiCad schematic generation,
 //! with Python bindings for seamless integration with existing Python workflows.
 
-pub mod types;
 pub mod coordinate_transform;
 pub mod pin_calculator;
+pub mod types;
 
 #[cfg(test)]
 pub mod tests;
 
 // Re-export main types and functions for easier access
-pub use types::{
-    Position, Component, Pin, Net, PinReference, HierarchicalLabelPosition,
-    PinPositionResult, CalculationConfig, PinCalculationError, Result,
-    PinType, PinOrientation, LabelOrientation, LabelShape,
-};
 pub use coordinate_transform::{
-    transform_pin_position, transform_component_pins, inverse_transform_pin_position,
-    positions_approximately_equal, calculate_bounding_box, normalize_angle,
+    calculate_bounding_box, inverse_transform_pin_position, normalize_angle,
+    positions_approximately_equal, transform_component_pins, transform_pin_position,
 };
 pub use pin_calculator::PinCalculator;
+pub use types::{
+    CalculationConfig, Component, HierarchicalLabelPosition, LabelOrientation, LabelShape, Net,
+    Pin, PinCalculationError, PinOrientation, PinPositionResult, PinReference, PinType, Position,
+    Result,
+};
 
 #[cfg(feature = "python-bindings")]
 use pyo3::prelude::*;
@@ -120,7 +120,7 @@ impl PyPinCalculator {
         pin_type: String,
         orientation: String,
     ) -> PyResult<()> {
-        use types::{PinType, PinOrientation};
+        use types::{PinOrientation, PinType};
 
         let pin_type_enum = match pin_type.as_str() {
             "input" => PinType::Input,
@@ -157,16 +157,26 @@ impl PyPinCalculator {
             component.add_pin(pin);
             Ok(())
         } else {
-            Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
-                format!("Component {} not found", component_ref)
-            ))
+            Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(format!(
+                "Component {} not found",
+                component_ref
+            )))
         }
     }
 
-    fn calculate_pin_position(&self, component_ref: String, pin_number: String) -> PyResult<(f64, f64)> {
-        match self.calculator.calculate_pin_position(&component_ref, &pin_number) {
+    fn calculate_pin_position(
+        &self,
+        component_ref: String,
+        pin_number: String,
+    ) -> PyResult<(f64, f64)> {
+        match self
+            .calculator
+            .calculate_pin_position(&component_ref, &pin_number)
+        {
             Ok(result) => Ok((result.global_position.x, result.global_position.y)),
-            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string())),
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                e.to_string(),
+            )),
         }
     }
 
@@ -185,10 +195,19 @@ impl PyPinCalculator {
             .collect()
     }
 
-    fn validate_against_reference(&self, component_ref: String, pin_number: String) -> PyResult<bool> {
-        match self.calculator.validate_against_reference(&component_ref, &pin_number) {
+    fn validate_against_reference(
+        &self,
+        component_ref: String,
+        pin_number: String,
+    ) -> PyResult<bool> {
+        match self
+            .calculator
+            .validate_against_reference(&component_ref, &pin_number)
+        {
             Ok(valid) => Ok(valid),
-            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string())),
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                e.to_string(),
+            )),
         }
     }
 
@@ -340,7 +359,9 @@ pub fn calculate_hierarchical_labels(
                 )
             })
             .collect()),
-        Err(e) => Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string())),
+        Err(e) => Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
+            e.to_string(),
+        )),
     }
 }
 
@@ -366,7 +387,7 @@ pub fn estimate_pin_position(
 ) -> PyResult<(f64, f64, f64)> {
     let (x, y, rotation) = component_pos;
     let component_position = Position::new(x, y);
-    
+
     // Create estimated pin definition based on component type and pin number
     let estimated_pin = match lib_id.as_str() {
         lib if lib.contains("Device:R") => {
@@ -375,22 +396,25 @@ pub fn estimate_pin_position(
                 "1" => Pin {
                     number: "1".to_string(),
                     name: Some("~".to_string()),
-                    local_position: Position::new(0.0, 3.81),  // 150mil above center
+                    local_position: Position::new(0.0, 3.81), // 150mil above center
                     pin_type: PinType::Passive,
                     orientation: PinOrientation::Down,
                 },
                 "2" => Pin {
                     number: "2".to_string(),
                     name: Some("~".to_string()),
-                    local_position: Position::new(0.0, -3.81),  // 150mil below center
+                    local_position: Position::new(0.0, -3.81), // 150mil below center
                     pin_type: PinType::Passive,
                     orientation: PinOrientation::Up,
                 },
-                _ => return Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
-                    format!("Unknown pin {} for resistor", pin_id)
-                )),
+                _ => {
+                    return Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(format!(
+                        "Unknown pin {} for resistor",
+                        pin_id
+                    )))
+                }
             }
-        },
+        }
         lib if lib.contains("Device:C") => {
             // Capacitor: similar to resistor
             match pin_id.as_str() {
@@ -408,29 +432,33 @@ pub fn estimate_pin_position(
                     pin_type: PinType::Passive,
                     orientation: PinOrientation::Up,
                 },
-                _ => return Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
-                    format!("Unknown pin {} for capacitor", pin_id)
-                )),
+                _ => {
+                    return Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(format!(
+                        "Unknown pin {} for capacitor",
+                        pin_id
+                    )))
+                }
             }
-        },
+        }
         _ => {
             // Generic component: place pins on left side
             let pin_num: i32 = pin_id.parse().unwrap_or(1);
             let y_offset = (pin_num - 1) as f64 * -2.54; // 100mil spacing
-            
+
             Pin {
                 number: pin_id.clone(),
                 name: Some(pin_id.clone()),
-                local_position: Position::new(-12.7, y_offset),  // 500mil to the left
+                local_position: Position::new(-12.7, y_offset), // 500mil to the left
                 pin_type: PinType::Passive,
                 orientation: PinOrientation::Right,
             }
         }
     };
-    
+
     // Calculate world position using coordinate transformation
-    let world_pos = transform_pin_position(component_position, estimated_pin.local_position, rotation);
-    
+    let world_pos =
+        transform_pin_position(component_position, estimated_pin.local_position, rotation);
+
     // Return position and orientation (convert orientation enum to degrees)
     let orientation_degrees = match estimated_pin.orientation {
         PinOrientation::Right => 0.0,
@@ -438,7 +466,7 @@ pub fn estimate_pin_position(
         PinOrientation::Left => 180.0,
         PinOrientation::Down => 270.0,
     };
-    
+
     Ok((world_pos.x, world_pos.y, orientation_degrees))
 }
 
@@ -460,7 +488,7 @@ fn rust_pin_calculator(_py: Python, m: &PyModule) -> PyResult<()> {
 #[cfg(not(feature = "python-bindings"))]
 pub fn main() {
     println!("Rust Pin Calculator - Command Line Interface");
-    
+
     // Create reference design test
     let components = PinCalculator::create_reference_design_components();
     let config = PinCalculator::create_reference_design_config();
@@ -480,7 +508,7 @@ pub fn main() {
             result.global_position.x,
             result.global_position.y
         );
-        
+
         // Validate against reference
         match calculator.validate_against_reference(&result.component_ref, &result.pin_number) {
             Ok(valid) => println!("  Validation: {}", if valid { "PASS" } else { "FAIL" }),
@@ -496,10 +524,7 @@ pub fn main() {
             for label in labels {
                 println!(
                     "{}: ({:.2}, {:.2}) - {:?}",
-                    label.net_name,
-                    label.position.x,
-                    label.position.y,
-                    label.orientation
+                    label.net_name, label.position.x, label.position.y, label.orientation
                 );
             }
         }

@@ -1,19 +1,19 @@
 //! High-performance file I/O operations with async support
-//! 
+//!
 //! Provides 15x faster file reading and writing operations through:
 //! - Memory-mapped file access for large files
 //! - Async I/O with tokio runtime
 //! - Intelligent buffering strategies
 //! - Parallel processing for batch operations
 
+use dashmap::DashMap;
+use memmap2::MmapOptions;
+use once_cell::sync::Lazy;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::fs;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use memmap2::MmapOptions;
-use dashmap::DashMap;
-use once_cell::sync::Lazy;
-use tracing::{info, debug, warn, error};
+use tracing::{debug, error, info, warn};
 
 use crate::error::{IoError, IoResult};
 use crate::memory::MemoryManager;
@@ -39,7 +39,7 @@ pub struct FileIoConfig {
 impl Default for FileIoConfig {
     fn default() -> Self {
         Self {
-            mmap_threshold: 1024 * 1024, // 1MB
+            mmap_threshold: 1024 * 1024,         // 1MB
             cache_size_limit: 100 * 1024 * 1024, // 100MB
             enable_caching: true,
             buffer_size: 64 * 1024, // 64KB
@@ -168,7 +168,7 @@ impl FileReader {
     pub async fn read_file_to_string<P: AsRef<Path>>(&self, path: P) -> IoResult<String> {
         let path = path.as_ref();
         let data = self.read_file(path).await?;
-        
+
         String::from_utf8(data).map_err(|e| {
             IoError::file_io(
                 format!("File is not valid UTF-8: {:?}, error: {}", path, e),
@@ -212,10 +212,7 @@ impl FileReader {
     /// Cache file data with size limits
     async fn cache_file_data(&self, path: PathBuf, data: Vec<u8>) {
         // Check current cache size
-        let current_cache_size: usize = FILE_CACHE
-            .iter()
-            .map(|entry| entry.value().len())
-            .sum();
+        let current_cache_size: usize = FILE_CACHE.iter().map(|entry| entry.value().len()).sum();
 
         if current_cache_size + data.len() > self.config.cache_size_limit {
             // Evict some entries (simple LRU-like behavior)
@@ -332,7 +329,10 @@ impl FileWriter {
     }
 
     /// Write multiple files concurrently
-    pub async fn write_files_batch<P: AsRef<Path>>(&self, files: Vec<(P, Vec<u8>)>) -> Vec<IoResult<()>> {
+    pub async fn write_files_batch<P: AsRef<Path>>(
+        &self,
+        files: Vec<(P, Vec<u8>)>,
+    ) -> Vec<IoResult<()>> {
         use tokio::task::JoinSet;
 
         let mut join_set = JoinSet::new();
@@ -467,13 +467,16 @@ mod tests {
         let test_data = b"Hello, World!";
 
         let ops = AsyncFileOps::new();
-        
+
         // Write file
-        ops.writer().write_file(&file_path, test_data).await.unwrap();
-        
+        ops.writer()
+            .write_file(&file_path, test_data)
+            .await
+            .unwrap();
+
         // Read file
         let read_data = ops.reader().read_file(&file_path).await.unwrap();
-        
+
         assert_eq!(read_data, test_data);
     }
 
@@ -484,16 +487,19 @@ mod tests {
         let test_data = b"Cached content";
 
         let ops = AsyncFileOps::new();
-        
+
         // Write and read file (should cache it)
-        ops.writer().write_file(&file_path, test_data).await.unwrap();
+        ops.writer()
+            .write_file(&file_path, test_data)
+            .await
+            .unwrap();
         let _read_data1 = ops.reader().read_file(&file_path).await.unwrap();
-        
+
         // Read again (should come from cache)
         let read_data2 = ops.reader().read_file(&file_path).await.unwrap();
-        
+
         assert_eq!(read_data2, test_data);
-        
+
         let stats = ops.get_cache_stats();
         assert!(stats["cache_entries"].as_u64().unwrap() > 0);
     }
@@ -508,15 +514,15 @@ mod tests {
         ];
 
         let ops = AsyncFileOps::new();
-        
+
         // Write files in batch
         let write_results = ops.writer().write_files_batch(files.clone()).await;
         assert!(write_results.iter().all(|r| r.is_ok()));
-        
+
         // Read files in batch
         let paths: Vec<_> = files.iter().map(|(path, _)| path).collect();
         let read_results = ops.reader().read_files_batch(paths).await;
-        
+
         assert!(read_results.iter().all(|r| r.is_ok()));
         assert_eq!(read_results.len(), 3);
     }

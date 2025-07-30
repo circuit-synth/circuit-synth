@@ -4,11 +4,11 @@
 //! execution capabilities. It targets 30x performance improvement over the Python
 //! implementation through optimized data structures and algorithms.
 
+use crate::data_transform::{Circuit, Component, Net, NetNode};
+use crate::errors::{NetlistError, Result};
+use rayon::prelude::*;
 use std::collections::{HashMap, HashSet};
 use std::time::Instant;
-use rayon::prelude::*;
-use crate::data_transform::{Circuit, Net, NetNode, Component};
-use crate::errors::{NetlistError, Result};
 
 /// High-performance net processor with parallel execution
 pub struct NetProcessor {
@@ -60,19 +60,19 @@ impl NetProcessor {
     /// Generate the nets section for KiCad netlist
     pub fn generate_nets_section(&mut self, circuit: &Circuit) -> Result<String> {
         let start_time = Instant::now();
-        
+
         // Clear previous state
         self.reset();
-        
+
         // Process all nets and build the final net list
         let processed_nets = self.process_all_nets(circuit)?;
-        
+
         // Generate the formatted nets section
         let nets_content = self.format_nets_section(&processed_nets)?;
-        
+
         self.last_processing_time = Some(start_time.elapsed());
         self.update_memory_usage();
-        
+
         Ok(nets_content)
     }
 
@@ -90,16 +90,16 @@ impl NetProcessor {
     fn process_all_nets(&mut self, circuit: &Circuit) -> Result<Vec<ProcessedNet>> {
         // First pass: determine net ownership and types
         self.analyze_net_hierarchy(circuit, "/")?;
-        
+
         // Second pass: collect and merge all net nodes
         let all_nets = self.collect_all_nets(circuit, "/")?;
-        
+
         // Third pass: process nets in parallel for performance
         let processed_nets: Result<Vec<_>> = all_nets
             .par_iter()
             .map(|(net_name, nodes)| self.process_single_net(net_name, nodes))
             .collect();
-        
+
         processed_nets
     }
 
@@ -115,13 +115,14 @@ impl NetProcessor {
             } else {
                 self.local_nets.insert(net_name.clone());
             }
-            
+
             // Record ownership (first circuit to define the net owns it)
             if !self.net_ownership.contains_key(net_name) {
-                self.net_ownership.insert(net_name.clone(), path.to_string());
+                self.net_ownership
+                    .insert(net_name.clone(), path.to_string());
             }
         }
-        
+
         // Process subcircuits recursively
         for subcircuit in &circuit.subcircuits {
             let sub_path = if path == "/" {
@@ -131,14 +132,18 @@ impl NetProcessor {
             };
             self.analyze_net_hierarchy(subcircuit, &sub_path)?;
         }
-        
+
         Ok(())
     }
 
     /// Collect all net nodes from the circuit hierarchy
-    fn collect_all_nets(&mut self, circuit: &Circuit, path: &str) -> Result<HashMap<String, Vec<NetNode>>> {
+    fn collect_all_nets(
+        &mut self,
+        circuit: &Circuit,
+        path: &str,
+    ) -> Result<HashMap<String, Vec<NetNode>>> {
         let mut all_nets: HashMap<String, Vec<NetNode>> = HashMap::new();
-        
+
         // Collect nets from this circuit
         for (net_name, net) in &circuit.nets {
             // Handle unnamed nets by generating unique names
@@ -148,17 +153,16 @@ impl NetProcessor {
             } else {
                 self.resolve_net_name(net_name, path)
             };
-            
+
             // Clone nodes and update their paths if needed
             let mut processed_nodes = Vec::new();
             for node in &net.nodes {
                 let mut processed_node = node.clone();
-                
+
                 // Normalize component reference
-                processed_node.component = self.normalize_component_reference(
-                    &node.component, path
-                );
-                
+                processed_node.component =
+                    self.normalize_component_reference(&node.component, path);
+
                 // Handle unconnected pins
                 if node.pin.is_unconnected() {
                     let unconnected_name = format!(
@@ -167,25 +171,27 @@ impl NetProcessor {
                         node.pin.number
                     );
                     self.unconnected_pins.insert(unconnected_name.clone());
-                    
+
                     // Create separate net for unconnected pin
-                    all_nets.entry(unconnected_name)
+                    all_nets
+                        .entry(unconnected_name)
                         .or_insert_with(Vec::new)
                         .push(processed_node);
                     continue;
                 }
-                
+
                 processed_nodes.push(processed_node);
             }
-            
+
             // Add processed nodes to the final net
             if !processed_nodes.is_empty() {
-                all_nets.entry(final_net_name)
+                all_nets
+                    .entry(final_net_name)
                     .or_insert_with(Vec::new)
                     .extend(processed_nodes);
             }
         }
-        
+
         // Process subcircuits recursively
         for subcircuit in &circuit.subcircuits {
             let sub_path = if path == "/" {
@@ -193,17 +199,18 @@ impl NetProcessor {
             } else {
                 format!("{}/{}", path, subcircuit.name)
             };
-            
+
             let sub_nets = self.collect_all_nets(subcircuit, &sub_path)?;
-            
+
             // Merge subcircuit nets
             for (net_name, nodes) in sub_nets {
-                all_nets.entry(net_name)
+                all_nets
+                    .entry(net_name)
                     .or_insert_with(Vec::new)
                     .extend(nodes);
             }
         }
-        
+
         Ok(all_nets)
     }
 
@@ -211,20 +218,21 @@ impl NetProcessor {
     fn process_single_net(&self, net_name: &str, nodes: &[NetNode]) -> Result<ProcessedNet> {
         // Skip empty nets
         if nodes.is_empty() {
-            return Err(NetlistError::net_processing_error(
-                format!("Net '{}' has no connections", net_name)
-            ));
+            return Err(NetlistError::net_processing_error(format!(
+                "Net '{}' has no connections",
+                net_name
+            )));
         }
-        
+
         // Deduplicate nodes (same component + pin)
         let mut unique_nodes = HashMap::new();
         for node in nodes {
             let key = format!("{}:{}", node.component, node.pin.number);
             unique_nodes.insert(key, node.clone());
         }
-        
+
         let final_nodes: Vec<NetNode> = unique_nodes.into_values().collect();
-        
+
         Ok(ProcessedNet {
             name: net_name.to_string(),
             nodes: final_nodes,
@@ -240,24 +248,24 @@ impl NetProcessor {
         if self.is_unnamed_net(net_name) {
             return net_name.to_string();
         }
-        
+
         // Global nets keep their original names
         if self.is_global_net(net_name) {
             return net_name.to_string();
         }
-        
+
         // Unconnected nets keep their generated names
         if net_name.starts_with("unconnected-") {
             return net_name.to_string();
         }
-        
+
         // Hierarchical nets get path prefixes
         if self.hierarchical_nets.contains(net_name) {
             // Check if net already has a hierarchical path
             if net_name.starts_with('/') {
                 return net_name.to_string();
             }
-            
+
             // Add hierarchical path
             if current_path == "/" {
                 format!("/{}", net_name)
@@ -273,10 +281,22 @@ impl NetProcessor {
     /// Check if a net is a global net (power, ground, etc.)
     fn is_global_net(&self, net_name: &str) -> bool {
         let upper_name = net_name.to_uppercase();
-        matches!(upper_name.as_str(),
-            "VCC" | "VDD" | "VSS" | "GND" | "GNDA" | "GNDD" |
-            "+3V3" | "+5V" | "+12V" | "-12V" | "+15V" | "-15V"
-        ) || net_name.starts_with('+') || net_name.starts_with('-')
+        matches!(
+            upper_name.as_str(),
+            "VCC"
+                | "VDD"
+                | "VSS"
+                | "GND"
+                | "GNDA"
+                | "GNDD"
+                | "+3V3"
+                | "+5V"
+                | "+12V"
+                | "-12V"
+                | "+15V"
+                | "-15V"
+        ) || net_name.starts_with('+')
+            || net_name.starts_with('-')
     }
 
     /// Generate a unique name for an unnamed net
@@ -297,7 +317,7 @@ impl NetProcessor {
         if component_ref.starts_with('/') {
             return component_ref.to_string();
         }
-        
+
         // Add hierarchical path for components in subcircuits
         if current_path == "/" {
             component_ref.to_string()
@@ -309,40 +329,41 @@ impl NetProcessor {
     /// Format the complete nets section
     fn format_nets_section(&self, processed_nets: &[ProcessedNet]) -> Result<String> {
         let mut section = String::with_capacity(processed_nets.len() * 512);
-        
+
         // Sort nets for deterministic output
         let mut sorted_nets = processed_nets.to_vec();
         sorted_nets.sort_by(|a, b| a.name.cmp(&b.name));
-        
+
         let mut net_code = 1u32;
-        
+
         for net in &sorted_nets {
             let net_entry = self.format_single_net(net, net_code)?;
             section.push_str(&net_entry);
             section.push('\n');
             net_code += 1;
         }
-        
+
         Ok(section)
     }
 
     /// Format a single net entry
     fn format_single_net(&self, net: &ProcessedNet, net_code: u32) -> Result<String> {
         let mut entry = String::with_capacity(256 + net.nodes.len() * 128);
-        
+
         // Net header
         entry.push_str(&format!(
             "    (net (code \"{}\") (name \"{}\")",
             net_code, net.name
         ));
-        
+
         // Sort nodes for deterministic output
         let mut sorted_nodes = net.nodes.clone();
         sorted_nodes.sort_by(|a, b| {
-            a.normalized_component_ref().cmp(b.normalized_component_ref())
+            a.normalized_component_ref()
+                .cmp(b.normalized_component_ref())
                 .then_with(|| a.pin.number.cmp(&b.pin.number))
         });
-        
+
         // Add nodes
         for node in &sorted_nodes {
             entry.push_str(&format!(
@@ -357,20 +378,20 @@ impl NetProcessor {
                 }
             ));
         }
-        
+
         entry.push_str("\n    )"); // Close net
-        
+
         Ok(entry)
     }
 
     /// Update memory usage estimation
     fn update_memory_usage(&mut self) {
-        self.estimated_memory_usage = 
-            self.net_ownership.capacity() * (std::mem::size_of::<String>() * 2) +
-            self.hierarchical_nets.capacity() * std::mem::size_of::<String>() +
-            self.global_nets.capacity() * std::mem::size_of::<String>() +
-            self.local_nets.capacity() * std::mem::size_of::<String>() +
-            self.unconnected_pins.capacity() * std::mem::size_of::<String>();
+        self.estimated_memory_usage = self.net_ownership.capacity()
+            * (std::mem::size_of::<String>() * 2)
+            + self.hierarchical_nets.capacity() * std::mem::size_of::<String>()
+            + self.global_nets.capacity() * std::mem::size_of::<String>()
+            + self.local_nets.capacity() * std::mem::size_of::<String>()
+            + self.unconnected_pins.capacity() * std::mem::size_of::<String>();
     }
 }
 
@@ -414,19 +435,16 @@ mod tests {
     #[test]
     fn test_component_reference_normalization() {
         let processor = NetProcessor::new();
-        
+
         // Root level component
-        assert_eq!(
-            processor.normalize_component_reference("R1", "/"),
-            "R1"
-        );
-        
+        assert_eq!(processor.normalize_component_reference("R1", "/"), "R1");
+
         // Subcircuit component
         assert_eq!(
             processor.normalize_component_reference("U1", "/MCU"),
             "/MCU/U1"
         );
-        
+
         // Already has path
         assert_eq!(
             processor.normalize_component_reference("/MCU/U1", "/Power"),
@@ -438,21 +456,26 @@ mod tests {
     fn test_net_name_resolution() {
         let mut processor = NetProcessor::new();
         processor.hierarchical_nets.insert("DATA".to_string());
-        
+
         // Global net
         assert_eq!(processor.resolve_net_name("VCC", "/MCU"), "VCC");
-        
+
         // Hierarchical net
         assert_eq!(processor.resolve_net_name("DATA", "/MCU"), "/MCU/DATA");
-        
+
         // Already hierarchical
-        assert_eq!(processor.resolve_net_name("/MCU/DATA", "/Power"), "/MCU/DATA");
+        assert_eq!(
+            processor.resolve_net_name("/MCU/DATA", "/Power"),
+            "/MCU/DATA"
+        );
     }
 
     #[test]
     fn test_memory_usage_tracking() {
         let mut processor = NetProcessor::new();
-        processor.net_ownership.insert("test".to_string(), "/".to_string());
+        processor
+            .net_ownership
+            .insert("test".to_string(), "/".to_string());
         processor.update_memory_usage();
         assert!(processor.memory_usage() > 0);
     }

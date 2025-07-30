@@ -75,10 +75,10 @@ pub enum PinType {
 /// Pin orientation relative to component
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum PinOrientation {
-    Right,   // Pin points to the right
-    Left,    // Pin points to the left
-    Up,      // Pin points up
-    Down,    // Pin points down
+    Right, // Pin points to the right
+    Left,  // Pin points to the left
+    Up,    // Pin points up
+    Down,  // Pin points down
 }
 
 impl PinOrientation {
@@ -202,7 +202,7 @@ pub struct CalculationConfig {
 impl Default for CalculationConfig {
     fn default() -> Self {
         Self {
-            position_tolerance: 0.01, // 0.01mm tolerance
+            position_tolerance: 0.01,  // 0.01mm tolerance
             default_pin_offset: 1.905, // Standard KiCad pin offset
             use_reference_positions: false,
             reference_positions: HashMap::new(),
@@ -225,19 +225,19 @@ pub struct PinPositionResult {
 pub enum PinCalculationError {
     #[error("Component not found: {0}")]
     ComponentNotFound(String),
-    
+
     #[error("Pin not found: {component_ref}.{pin_number}")]
     PinNotFound {
         component_ref: String,
         pin_number: String,
     },
-    
+
     #[error("Invalid rotation angle: {0}")]
     InvalidRotation(f64),
-    
+
     #[error("Position calculation failed: {0}")]
     CalculationFailed(String),
-    
+
     #[error("Reference design mismatch: expected {expected:?}, got {actual:?}")]
     ReferenceDesignMismatch {
         expected: Position,
@@ -256,19 +256,19 @@ mod tests {
     fn test_position_operations() {
         let pos1 = Position::new(1.0, 2.0);
         let pos2 = Position::new(3.0, 4.0);
-        
+
         let sum = pos1.add(&pos2);
         assert_relative_eq!(sum.x, 4.0);
         assert_relative_eq!(sum.y, 6.0);
-        
+
         let diff = pos2.subtract(&pos1);
         assert_relative_eq!(diff.x, 2.0);
         assert_relative_eq!(diff.y, 2.0);
-        
+
         let scaled = pos1.scale(2.0);
         assert_relative_eq!(scaled.x, 2.0);
         assert_relative_eq!(scaled.y, 4.0);
-        
+
         let distance = pos1.distance_to(&pos2);
         assert_relative_eq!(distance, (8.0_f64).sqrt());
     }
@@ -278,13 +278,16 @@ mod tests {
         assert_relative_eq!(PinOrientation::Right.to_radians(), 0.0);
         assert_relative_eq!(PinOrientation::Up.to_radians(), std::f64::consts::PI / 2.0);
         assert_relative_eq!(PinOrientation::Left.to_radians(), std::f64::consts::PI);
-        assert_relative_eq!(PinOrientation::Down.to_radians(), 3.0 * std::f64::consts::PI / 2.0);
+        assert_relative_eq!(
+            PinOrientation::Down.to_radians(),
+            3.0 * std::f64::consts::PI / 2.0
+        );
     }
 
     #[test]
     fn test_component_pin_management() {
         let mut component = Component::new("R1".to_string(), Position::new(0.0, 0.0), 0.0);
-        
+
         let pin1 = Pin {
             number: "1".to_string(),
             name: Some("A".to_string()),
@@ -292,7 +295,7 @@ mod tests {
             pin_type: PinType::Passive,
             orientation: PinOrientation::Left,
         };
-        
+
         let pin2 = Pin {
             number: "2".to_string(),
             name: Some("B".to_string()),
@@ -300,15 +303,15 @@ mod tests {
             pin_type: PinType::Passive,
             orientation: PinOrientation::Right,
         };
-        
+
         component.add_pin(pin1);
         component.add_pin(pin2);
-        
+
         assert_eq!(component.pins.len(), 2);
         assert!(component.get_pin("1").is_some());
         assert!(component.get_pin("2").is_some());
         assert!(component.get_pin("3").is_none());
-        
+
         let pin_numbers = component.get_pin_numbers();
         assert_eq!(pin_numbers, vec!["1", "2"]);
     }

@@ -5,7 +5,7 @@ use rust_pin_calculator::{PinCalculator, Position};
 fn main() {
     println!("=== Rust Pin Calculator CLI ===");
     println!("High-performance pin position calculator for KiCad schematic generation\n");
-    
+
     // Create reference design test
     println!("Creating reference design components...");
     let components = PinCalculator::create_reference_design_components();
@@ -13,8 +13,10 @@ fn main() {
     let mut calculator = PinCalculator::with_config(config);
 
     for component in components {
-        println!("Added component: {} at ({:.2}, {:.2})", 
-                 component.reference, component.position.x, component.position.y);
+        println!(
+            "Added component: {} at ({:.2}, {:.2})",
+            component.reference, component.position.x, component.position.y
+        );
         calculator.add_component(component);
     }
 
@@ -31,7 +33,7 @@ fn main() {
             result.local_position.y,
             result.rotation_applied
         );
-        
+
         // Validate against reference
         match calculator.validate_against_reference(&result.component_ref, &result.pin_number) {
             Ok(valid) => {
@@ -68,7 +70,10 @@ fn main() {
         let _ = calculator.calculate_all_pin_positions();
     }
     let duration = start.elapsed();
-    println!("1000 iterations of pin position calculation: {:?}", duration);
+    println!(
+        "1000 iterations of pin position calculation: {:?}",
+        duration
+    );
     println!("Average per calculation: {:?}", duration / 1000);
 
     // Coordinate transformation examples
@@ -82,7 +87,8 @@ fn main() {
     ];
 
     for (i, (component_pos, local_pin_pos, rotation)) in examples.iter().enumerate() {
-        let result = rust_pin_calculator::transform_pin_position(*component_pos, *local_pin_pos, *rotation);
+        let result =
+            rust_pin_calculator::transform_pin_position(*component_pos, *local_pin_pos, *rotation);
         println!(
             "Example {}: Component({:.1}, {:.1}) + Local({:.1}, {:.1}) @ {:.1}° = Global({:.2}, {:.2})",
             i + 1,

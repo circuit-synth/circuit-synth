@@ -1,10 +1,10 @@
 //! Python bindings for the Rust SymbolLibCache
-//! 
+//!
 //! This module provides a Python interface that maintains 100% API compatibility
 //! with the original Python SymbolLibCache implementation while delivering
 //! 10-50x performance improvements.
 
-use crate::{CacheConfig, SymbolLibCache, SymbolData, SymbolIndexEntry};
+use crate::{CacheConfig, SymbolData, SymbolIndexEntry, SymbolLibCache};
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList, PyString};
 use std::collections::HashMap;
@@ -55,13 +55,16 @@ impl PyCacheConfig {
     ) -> Self {
         let default_cache_path = cache_path.unwrap_or_else(|| {
             dirs::cache_dir()
-                .unwrap_or_else(|| PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".to_string())).join(".cache"))
+                .unwrap_or_else(|| {
+                    PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".to_string()))
+                        .join(".cache")
+                })
                 .join("circuit_synth")
                 .join("symbols")
                 .to_string_lossy()
                 .to_string()
         });
-        
+
         Self {
             enabled,
             ttl_hours,
@@ -200,36 +203,37 @@ impl PySymbolLibCache {
             enabled,
             ttl_hours,
             force_rebuild,
-            cache_path: cache_path
-                .map(PathBuf::from)
-                .unwrap_or_else(|| {
-                    dirs::cache_dir()
-                        .unwrap_or_else(|| PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".to_string())).join(".cache"))
-                        .join("circuit_synth")
-                        .join("symbols")
-                }),
+            cache_path: cache_path.map(PathBuf::from).unwrap_or_else(|| {
+                dirs::cache_dir()
+                    .unwrap_or_else(|| {
+                        PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".to_string()))
+                            .join(".cache")
+                    })
+                    .join("circuit_synth")
+                    .join("symbols")
+            }),
             max_memory_cache_size,
             enable_tier_search,
             parallel_parsing,
         };
-        
+
         Ok(Self {
             cache: SymbolLibCache::with_config(config),
         })
     }
-    
+
     /// Get symbol data by symbol ID (LibraryName:SymbolName)
-    /// 
+    ///
     /// This method maintains 100% API compatibility with the Python implementation
     /// while providing 10-50x performance improvement.
     fn get_symbol_data(&self, py: Python, symbol_id: &str) -> PyResult<PyObject> {
         debug!("Getting symbol data for: {}", symbol_id);
-        
+
         match self.cache.get_symbol_data(symbol_id) {
             Ok(symbol_arc) => {
                 let symbol_data = (*symbol_arc).clone();
                 let py_symbol = PySymbolData::from(symbol_data);
-                
+
                 // Convert to Python dict for compatibility
                 let dict = PyDict::new(py);
                 dict.set_item("name", &py_symbol.name)?;
@@ -238,7 +242,7 @@ impl PySymbolLibCache {
                 dict.set_item("keywords", &py_symbol.keywords)?;
                 dict.set_item("fp_filters", &py_symbol.fp_filters)?;
                 dict.set_item("properties", &py_symbol.properties)?;
-                
+
                 // Convert pins to list of dicts
                 let pins_list = PyList::empty(py);
                 for pin in &py_symbol.pins {
@@ -254,41 +258,41 @@ impl PySymbolLibCache {
                     pins_list.append(pin_dict)?;
                 }
                 dict.set_item("pins", pins_list)?;
-                
+
                 Ok(dict.into())
             }
             Err(e) => {
                 // Convert Rust errors to Python exceptions for compatibility
                 match e {
                     crate::SymbolCacheError::SymbolNotFound { symbol_id } => {
-                        Err(PyErr::new::<pyo3::exceptions::PyKeyError, _>(
-                            format!("Symbol '{}' not found", symbol_id)
-                        ))
+                        Err(PyErr::new::<pyo3::exceptions::PyKeyError, _>(format!(
+                            "Symbol '{}' not found",
+                            symbol_id
+                        )))
                     }
                     crate::SymbolCacheError::LibraryNotFound { library_name } => {
                         Err(PyErr::new::<pyo3::exceptions::PyFileNotFoundError, _>(
-                            format!("Library '{}' not found", library_name)
+                            format!("Library '{}' not found", library_name),
                         ))
                     }
-                    _ => {
-                        Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-                            format!("Cache error: {}", e)
-                        ))
-                    }
+                    _ => Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                        "Cache error: {}",
+                        e
+                    ))),
                 }
             }
         }
     }
-    
+
     /// Get symbol data by name only (searches all libraries)
     fn get_symbol_data_by_name(&self, py: Python, symbol_name: &str) -> PyResult<PyObject> {
         debug!("Getting symbol data by name: {}", symbol_name);
-        
+
         match self.cache.get_symbol_data_by_name(symbol_name) {
             Ok(symbol_arc) => {
                 let symbol_data = (*symbol_arc).clone();
                 let py_symbol = PySymbolData::from(symbol_data);
-                
+
                 // Convert to Python dict for compatibility
                 let dict = PyDict::new(py);
                 dict.set_item("name", &py_symbol.name)?;
@@ -297,7 +301,7 @@ impl PySymbolLibCache {
                 dict.set_item("keywords", &py_symbol.keywords)?;
                 dict.set_item("fp_filters", &py_symbol.fp_filters)?;
                 dict.set_item("properties", &py_symbol.properties)?;
-                
+
                 // Convert pins
                 let pins_list = PyList::empty(py);
                 for pin in &py_symbol.pins {
@@ -313,29 +317,27 @@ impl PySymbolLibCache {
                     pins_list.append(pin_dict)?;
                 }
                 dict.set_item("pins", pins_list)?;
-                
+
                 Ok(dict.into())
             }
-            Err(e) => {
-                Err(PyErr::new::<pyo3::exceptions::PyKeyError, _>(
-                    format!("Symbol '{}' not found: {}", symbol_name, e)
-                ))
-            }
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyKeyError, _>(format!(
+                "Symbol '{}' not found: {}",
+                symbol_name, e
+            ))),
         }
     }
-    
+
     /// Find which library contains a symbol
     fn find_symbol_library(&self, symbol_name: &str) -> PyResult<Option<String>> {
         match self.cache.find_symbol_library(symbol_name) {
             Ok(result) => Ok(result),
-            Err(e) => {
-                Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-                    format!("Error finding symbol library: {}", e)
-                ))
-            }
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Error finding symbol library: {}",
+                e
+            ))),
         }
     }
-    
+
     /// Get all available libraries
     fn get_all_libraries(&self, py: Python) -> PyResult<PyObject> {
         match self.cache.get_all_libraries() {
@@ -346,14 +348,13 @@ impl PySymbolLibCache {
                 }
                 Ok(dict.into())
             }
-            Err(e) => {
-                Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-                    format!("Error getting libraries: {}", e)
-                ))
-            }
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Error getting libraries: {}",
+                e
+            ))),
         }
     }
-    
+
     /// Get all available symbols
     fn get_all_symbols(&self, py: Python) -> PyResult<PyObject> {
         match self.cache.get_all_libraries() {
@@ -366,14 +367,13 @@ impl PySymbolLibCache {
                 }
                 Ok(dict.into())
             }
-            Err(e) => {
-                Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-                    format!("Error getting symbols: {}", e)
-                ))
-            }
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Error getting symbols: {}",
+                e
+            ))),
         }
     }
-    
+
     /// Search symbols by category (tier-based search)
     fn search_symbols_by_category(
         &self,
@@ -381,27 +381,33 @@ impl PySymbolLibCache {
         search_term: &str,
         categories: Vec<String>,
     ) -> PyResult<PyObject> {
-        match self.cache.search_symbols_by_category(search_term, &categories) {
+        match self
+            .cache
+            .search_symbols_by_category(search_term, &categories)
+        {
             Ok(matches) => {
                 let dict = PyDict::new(py);
                 for (symbol_name, entry) in matches {
                     let entry_dict = PyDict::new(py);
                     entry_dict.set_item("lib_name", &entry.library_name)?;
-                    entry_dict.set_item("lib_path", entry.library_path.to_string_lossy().to_string())?;
+                    entry_dict
+                        .set_item("lib_path", entry.library_path.to_string_lossy().to_string())?;
                     entry_dict.set_item("category", &entry.category)?;
-                    entry_dict.set_item("full_symbol_id", format!("{}:{}", entry.library_name, symbol_name))?;
+                    entry_dict.set_item(
+                        "full_symbol_id",
+                        format!("{}:{}", entry.library_name, symbol_name),
+                    )?;
                     dict.set_item(symbol_name, entry_dict)?;
                 }
                 Ok(dict.into())
             }
-            Err(e) => {
-                Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-                    format!("Error searching symbols: {}", e)
-                ))
-            }
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Error searching symbols: {}",
+                e
+            ))),
         }
     }
-    
+
     /// Get all available categories
     fn get_all_categories(&self, py: Python) -> PyResult<PyObject> {
         match self.cache.get_all_categories() {
@@ -412,14 +418,13 @@ impl PySymbolLibCache {
                 }
                 Ok(dict.into())
             }
-            Err(e) => {
-                Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-                    format!("Error getting categories: {}", e)
-                ))
-            }
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Error getting categories: {}",
+                e
+            ))),
         }
     }
-    
+
     /// Get libraries by category
     fn get_libraries_by_category(&self, py: Python, category: &str) -> PyResult<PyObject> {
         if let Some(libraries) = self.cache.inner.category_libraries.get(category) {
@@ -429,12 +434,12 @@ impl PySymbolLibCache {
             Ok(PyList::empty(py).into())
         }
     }
-    
+
     /// Clear all caches
     fn clear_cache(&self) {
         self.cache.clear_cache();
     }
-    
+
     /// Get cache statistics
     fn get_cache_stats(&self, py: Python) -> PyResult<PyObject> {
         let stats = self.cache.get_cache_stats();
@@ -444,38 +449,36 @@ impl PySymbolLibCache {
         }
         Ok(dict.into())
     }
-    
+
     /// Force rebuild of the symbol index
     fn force_rebuild_index(&self) -> PyResult<()> {
         // Clear existing index
         self.cache.clear_cache();
-        
+
         // Force rebuild
         match self.cache.ensure_index_built() {
             Ok(_) => {
                 info!("Symbol index rebuilt successfully");
                 Ok(())
             }
-            Err(e) => {
-                Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-                    format!("Error rebuilding index: {}", e)
-                ))
-            }
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Error rebuilding index: {}",
+                e
+            ))),
         }
     }
-    
+
     /// Rebuild entire cache from scratch
     fn rebuild_cache(&self) -> PyResult<()> {
         match self.cache.rebuild_cache() {
             Ok(_) => Ok(()),
-            Err(e) => {
-                Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-                    format!("Error rebuilding cache: {}", e)
-                ))
-            }
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Error rebuilding cache: {}",
+                e
+            ))),
         }
     }
-    
+
     /// Check cache health and integrity
     fn check_cache_health(&self, py: Python) -> PyResult<PyObject> {
         match self.cache.check_cache_health() {
@@ -502,35 +505,32 @@ impl PySymbolLibCache {
                 }
                 Ok(dict.into())
             }
-            Err(e) => {
-                Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-                    format!("Error checking cache health: {}", e)
-                ))
-            }
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Error checking cache health: {}",
+                e
+            ))),
         }
     }
-    
+
     /// Validate cache directory structure
     fn validate_cache_directory(&self) -> PyResult<bool> {
         match self.cache.validate_cache_directory() {
             Ok(valid) => Ok(valid),
-            Err(e) => {
-                Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-                    format!("Error validating cache directory: {}", e)
-                ))
-            }
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Error validating cache directory: {}",
+                e
+            ))),
         }
     }
-    
+
     /// Initialize cache directory structure
     fn initialize_cache_directory(&self) -> PyResult<()> {
         match self.cache.initialize_cache_directory() {
             Ok(_) => Ok(()),
-            Err(e) => {
-                Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-                    format!("Error initializing cache directory: {}", e)
-                ))
-            }
+            Err(e) => Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!(
+                "Error initializing cache directory: {}",
+                e
+            ))),
         }
     }
 }
@@ -557,19 +557,20 @@ fn init_global_cache(
         enabled,
         ttl_hours,
         force_rebuild,
-        cache_path: cache_path
-            .map(PathBuf::from)
-            .unwrap_or_else(|| {
-                dirs::cache_dir()
-                    .unwrap_or_else(|| PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".to_string())).join(".cache"))
-                    .join("circuit_synth")
-                    .join("symbols")
-            }),
+        cache_path: cache_path.map(PathBuf::from).unwrap_or_else(|| {
+            dirs::cache_dir()
+                .unwrap_or_else(|| {
+                    PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".to_string()))
+                        .join(".cache")
+                })
+                .join("circuit_synth")
+                .join("symbols")
+        }),
         max_memory_cache_size,
         enable_tier_search,
         parallel_parsing,
     };
-    
+
     PySymbolLibCache::from_global_ref(crate::init_global_cache(config))
 }
 
@@ -589,19 +590,20 @@ fn force_reinit_global_cache(
         enabled,
         ttl_hours,
         force_rebuild,
-        cache_path: cache_path
-            .map(PathBuf::from)
-            .unwrap_or_else(|| {
-                dirs::cache_dir()
-                    .unwrap_or_else(|| PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".to_string())).join(".cache"))
-                    .join("circuit_synth")
-                    .join("symbols")
-            }),
+        cache_path: cache_path.map(PathBuf::from).unwrap_or_else(|| {
+            dirs::cache_dir()
+                .unwrap_or_else(|| {
+                    PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".to_string()))
+                        .join(".cache")
+                })
+                .join("circuit_synth")
+                .join("symbols")
+        }),
         max_memory_cache_size,
         enable_tier_search,
         parallel_parsing,
     };
-    
+
     PySymbolLibCache {
         cache: crate::force_reinit_global_cache(config).clone(),
     }

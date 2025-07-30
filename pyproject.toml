@@ -42,9 +42,13 @@ dependencies = [
     # Async support
     "aiohttp>=3.9.0",
     "aiofiles>=23.2.0",
+    # Web scraping for JLC integration
+    "requests>=2.28.0",
+    "beautifulsoup4>=4.11.0",
     # Google AI and ADK dependencies
     "google-adk>=0.1.0",
     "google-genai>=0.1.0",
+    "lxml>=6.0.0",
 ]
 
 [project.optional-dependencies]
@@ -59,6 +63,10 @@ dev = [
     "mypy>=0.950",
     "types-PyYAML>=6.0.0",
     "pre-commit>=2.17.0",
+]
+claude = [
+    # Claude Code SDK integration for AI-powered circuit design
+    "claude-code-sdk>=0.0.17",
 ]
 test = [
     "pytest>=7.0.0",
@@ -78,6 +86,10 @@ preparse-symbols = "circuit_synth.scripts.preparse_kicad_symbols:main"
 # Import/Export tools
 netlist-import = "circuit_synth.kicad.netlist_importer:main"
 json-to-python = "circuit_synth.codegen.json_to_python_project:main"
+
+# Claude Code Integration
+setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
+validate-circuit = "circuit_synth.validation.real_time_check:main"
 
 [project.urls]
 Homepage = "https://github.com/circuit-synth/circuit-synth"

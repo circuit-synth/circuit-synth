@@ -1,5 +1,5 @@
 //! High-performance fuzzy matching for symbol search
-//! 
+//!
 //! This module provides optimized fuzzy string matching algorithms
 //! designed for fast symbol name comparison and scoring.
 
@@ -51,7 +51,7 @@ impl FuzzyMatcher {
 
         // Weighted combination of different algorithms
         let score = ratio * 0.4 + partial * 0.3 + token_sort * 0.2 + token_set * 0.1;
-        
+
         // Apply threshold
         if score >= self.min_threshold {
             score
@@ -63,44 +63,58 @@ impl FuzzyMatcher {
     /// Fast fuzzy matching for large candidate sets
     pub fn fast_match(&self, query: &str, candidates: &[&str]) -> Vec<(usize, f64)> {
         let mut results = Vec::new();
-        
+
         for (idx, candidate) in candidates.iter().enumerate() {
             let score = self.ratio(query, candidate);
             if score >= self.min_threshold {
                 results.push((idx, score));
             }
         }
-        
+
         // Sort by score descending
         results.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(Ordering::Equal));
-        
+
         results
     }
 
     /// Batch fuzzy matching with early termination
-    pub fn batch_match(&self, query: &str, candidates: &[&str], max_results: usize) -> Vec<(usize, f64)> {
+    pub fn batch_match(
+        &self,
+        query: &str,
+        candidates: &[&str],
+        max_results: usize,
+    ) -> Vec<(usize, f64)> {
         let mut results = Vec::with_capacity(max_results);
         let mut min_score = self.min_threshold;
-        
+
         for (idx, candidate) in candidates.iter().enumerate() {
             let score = self.comprehensive_score(query, candidate);
-            
+
             if score >= min_score {
                 // Insert in sorted order
                 let insert_pos = results
-                    .binary_search_by(|probe: &(usize, f64)| probe.1.partial_cmp(&score).unwrap_or(Ordering::Equal).reverse())
+                    .binary_search_by(|probe: &(usize, f64)| {
+                        probe
+                            .1
+                            .partial_cmp(&score)
+                            .unwrap_or(Ordering::Equal)
+                            .reverse()
+                    })
                     .unwrap_or_else(|pos| pos);
-                
+
                 results.insert(insert_pos, (idx, score));
-                
+
                 // Keep only top results
                 if results.len() > max_results {
                     results.truncate(max_results);
-                    min_score = results.last().map(|(_, s)| *s).unwrap_or(self.min_threshold);
+                    min_score = results
+                        .last()
+                        .map(|(_, s)| *s)
+                        .unwrap_or(self.min_threshold);
                 }
             }
         }
-        
+
         results
     }
 
@@ -113,7 +127,7 @@ impl FuzzyMatcher {
     pub fn find_best_match(&self, query: &str, candidates: &[&str]) -> Option<(usize, f64)> {
         let mut best_idx = None;
         let mut best_score = self.min_threshold;
-        
+
         for (idx, candidate) in candidates.iter().enumerate() {
             let score = self.comprehensive_score(query, candidate);
             if score > best_score {
@@ -121,7 +135,7 @@ impl FuzzyMatcher {
                 best_idx = Some(idx);
             }
         }
-        
+
         best_idx.map(|idx| (idx, best_score))
     }
 }
@@ -136,34 +150,38 @@ impl Default for FuzzyMatcher {
 pub fn fast_levenshtein_distance(s1: &str, s2: &str) -> usize {
     let len1 = s1.len();
     let len2 = s2.len();
-    
+
     if len1 == 0 {
         return len2;
     }
     if len2 == 0 {
         return len1;
     }
-    
+
     let s1_chars: Vec<char> = s1.chars().collect();
     let s2_chars: Vec<char> = s2.chars().collect();
-    
+
     let mut prev_row: Vec<usize> = (0..=len2).collect();
     let mut curr_row = vec![0; len2 + 1];
-    
+
     for i in 1..=len1 {
         curr_row[0] = i;
-        
+
         for j in 1..=len2 {
-            let cost = if s1_chars[i - 1] == s2_chars[j - 1] { 0 } else { 1 };
-            
+            let cost = if s1_chars[i - 1] == s2_chars[j - 1] {
+                0
+            } else {
+                1
+            };
+
             curr_row[j] = (curr_row[j - 1] + 1)
                 .min(prev_row[j] + 1)
                 .min(prev_row[j - 1] + cost);
         }
-        
+
         std::mem::swap(&mut prev_row, &mut curr_row);
     }
-    
+
     prev_row[len2]
 }
 
@@ -173,7 +191,7 @@ pub fn similarity_from_distance(s1: &str, s2: &str, distance: usize) -> f64 {
     if max_len == 0 {
         return 1.0;
     }
-    
+
     1.0 - (distance as f64 / max_len as f64)
 }
 
@@ -182,7 +200,7 @@ pub fn fast_similarity(s1: &str, s2: &str) -> f64 {
     if s1 == s2 {
         return 1.0;
     }
-    
+
     let distance = fast_levenshtein_distance(s1, s2);
     similarity_from_distance(s1, s2, distance)
 }
@@ -192,24 +210,24 @@ pub fn ngram_similarity(s1: &str, s2: &str, n: usize) -> f64 {
     if s1 == s2 {
         return 1.0;
     }
-    
+
     let ngrams1 = generate_ngrams(s1, n);
     let ngrams2 = generate_ngrams(s2, n);
-    
+
     if ngrams1.is_empty() && ngrams2.is_empty() {
         return 1.0;
     }
-    
+
     if ngrams1.is_empty() || ngrams2.is_empty() {
         return 0.0;
     }
-    
+
     let set1: std::collections::HashSet<_> = ngrams1.into_iter().collect();
     let set2: std::collections::HashSet<_> = ngrams2.into_iter().collect();
-    
+
     let intersection = set1.intersection(&set2).count();
     let union = set1.union(&set2).count();
-    
+
     if union == 0 {
         0.0
     } else {
@@ -222,15 +240,15 @@ fn generate_ngrams(text: &str, n: usize) -> Vec<String> {
     if text.len() < n {
         return vec![text.to_string()];
     }
-    
+
     let chars: Vec<char> = text.chars().collect();
     let mut ngrams = Vec::new();
-    
+
     for i in 0..=chars.len().saturating_sub(n) {
         let ngram: String = chars[i..i + n].iter().collect();
         ngrams.push(ngram);
     }
-    
+
     ngrams
 }
 
@@ -241,14 +259,14 @@ mod tests {
     #[test]
     fn test_fuzzy_matcher_basic() {
         let matcher = FuzzyMatcher::new(0.5);
-        
+
         // Exact match
         assert_eq!(matcher.ratio("test", "test"), 1.0);
-        
+
         // Similar strings
         let score = matcher.ratio("resistor", "resitor");
         assert!(score > 0.8);
-        
+
         // Different strings
         let score = matcher.ratio("resistor", "capacitor");
         assert!(score < 0.5);
@@ -257,10 +275,10 @@ mod tests {
     #[test]
     fn test_comprehensive_score() {
         let matcher = FuzzyMatcher::new(0.3);
-        
+
         let score = matcher.comprehensive_score("Device:R", "device:r");
         assert!(score > 0.9);
-        
+
         let score = matcher.comprehensive_score("resistor", "R");
         assert!(score > 0.0); // Should find some similarity
     }
@@ -269,10 +287,10 @@ mod tests {
     fn test_batch_matching() {
         let matcher = FuzzyMatcher::new(0.3);
         let candidates = vec!["R", "C", "L", "resistor", "capacitor"];
-        
+
         let results = matcher.batch_match("resistor", &candidates, 3);
         assert!(!results.is_empty());
-        
+
         // Should find "resistor" as best match
         assert_eq!(candidates[results[0].0], "resistor");
         assert!(results[0].1 > 0.9);
@@ -291,10 +309,10 @@ mod tests {
     #[test]
     fn test_ngram_similarity() {
         assert_eq!(ngram_similarity("test", "test", 2), 1.0);
-        
+
         let score = ngram_similarity("resistor", "resitor", 3);
         assert!(score > 0.5);
-        
+
         let score = ngram_similarity("abc", "xyz", 2);
         assert_eq!(score, 0.0);
     }
@@ -302,14 +320,14 @@ mod tests {
     #[test]
     fn test_performance() {
         let matcher = FuzzyMatcher::new(0.3);
-        let candidates: Vec<&str> = (0..1000).map(|i| {
-            Box::leak(format!("Symbol_{}", i).into_boxed_str()) as &str
-        }).collect();
-        
+        let candidates: Vec<&str> = (0..1000)
+            .map(|i| Box::leak(format!("Symbol_{}", i).into_boxed_str()) as &str)
+            .collect();
+
         let start = std::time::Instant::now();
         let _results = matcher.fast_match("Symbol_500", &candidates);
         let duration = start.elapsed();
-        
+
         println!("Fuzzy matching 1000 candidates: {:?}", duration);
         assert!(duration.as_millis() < 10); // Should be under 10ms
     }

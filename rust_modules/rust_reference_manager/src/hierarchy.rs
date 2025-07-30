@@ -1,27 +1,27 @@
 //! Hierarchical reference management
-//! 
+//!
 //! This module provides the hierarchy management functionality that allows
 //! reference managers to be organized in parent-child relationships,
 //! ensuring reference uniqueness across the entire hierarchy.
 
 use crate::errors::ReferenceError;
-use ahash::{AHashSet, AHashMap};
+use ahash::{AHashMap, AHashSet};
 use parking_lot::RwLock;
-use std::sync::{Arc, Weak};
 use std::collections::HashMap;
+use std::sync::{Arc, Weak};
 
 /// A node in the reference hierarchy
 #[derive(Debug)]
 pub struct HierarchyNode {
     /// Unique identifier for this node
     id: u64,
-    
+
     /// Parent node (weak reference to avoid cycles)
     parent: Option<Weak<RwLock<HierarchyNode>>>,
-    
+
     /// Child nodes
     children: AHashMap<u64, Arc<RwLock<HierarchyNode>>>,
-    
+
     /// References used by this node
     local_references: AHashSet<String>,
 }
@@ -45,13 +45,13 @@ impl HierarchyNode {
                 // For now, we'll just store the ID
                 #[cfg(feature = "logging")]
                 #[cfg(feature = "logging")]
-        log::debug!("Setting parent {} for node {}", id, self.id);
+                log::debug!("Setting parent {} for node {}", id, self.id);
                 // TODO: Implement proper parent linking with global registry
             }
             None => {
                 self.parent = None;
                 #[cfg(feature = "logging")]
-        log::debug!("Removed parent for node {}", self.id);
+                log::debug!("Removed parent for node {}", self.id);
             }
         }
         Ok(())
@@ -113,16 +113,16 @@ impl HierarchyNode {
     /// Get all references used in this subtree
     pub fn get_all_used_references(&self) -> Vec<String> {
         let mut all_refs = Vec::new();
-        
+
         // Add local references
         all_refs.extend(self.local_references.iter().cloned());
-        
+
         // Add children references
         for child in self.children.values() {
             let child_node = child.read();
             all_refs.extend(child_node.get_all_used_references());
         }
-        
+
         all_refs
     }
 
@@ -182,7 +182,7 @@ impl HierarchyNode {
 pub struct ReferenceHierarchy {
     /// Global registry of all hierarchy nodes
     nodes: Arc<RwLock<AHashMap<u64, Arc<RwLock<HierarchyNode>>>>>,
-    
+
     /// Root nodes (nodes without parents)
     roots: Arc<RwLock<AHashSet<u64>>>,
 }
@@ -199,39 +199,45 @@ impl ReferenceHierarchy {
     /// Register a new node in the hierarchy
     pub fn register_node(&self, node: Arc<RwLock<HierarchyNode>>) {
         let node_id = node.read().id;
-        
+
         {
             let mut nodes = self.nodes.write();
             nodes.insert(node_id, node.clone());
         }
-        
+
         {
             let mut roots = self.roots.write();
             roots.insert(node_id);
         }
-        
+
         #[cfg(feature = "logging")]
         log::debug!("Registered hierarchy node {}", node_id);
     }
 
     /// Set parent-child relationship between nodes
-    pub fn set_parent_child(&self, child_id: u64, parent_id: Option<u64>) -> Result<(), ReferenceError> {
+    pub fn set_parent_child(
+        &self,
+        child_id: u64,
+        parent_id: Option<u64>,
+    ) -> Result<(), ReferenceError> {
         let nodes = self.nodes.read();
-        
-        let child_node = nodes.get(&child_id)
-            .ok_or_else(|| ReferenceError::HierarchyError(format!("Child node {} not found", child_id)))?;
+
+        let child_node = nodes.get(&child_id).ok_or_else(|| {
+            ReferenceError::HierarchyError(format!("Child node {} not found", child_id))
+        })?;
 
         match parent_id {
             Some(pid) => {
-                let parent_node = nodes.get(&pid)
-                    .ok_or_else(|| ReferenceError::HierarchyError(format!("Parent node {} not found", pid)))?;
+                let parent_node = nodes.get(&pid).ok_or_else(|| {
+                    ReferenceError::HierarchyError(format!("Parent node {} not found", pid))
+                })?;
 
                 // Set up parent-child relationship
                 {
                     let mut child = child_node.write();
                     child.parent = Some(Arc::downgrade(parent_node));
                 }
-                
+
                 {
                     let mut parent = parent_node.write();
                     parent.add_child(child_node.clone());
@@ -244,7 +250,7 @@ impl ReferenceHierarchy {
                 }
 
                 #[cfg(feature = "logging")]
-        log::debug!("Set parent {} for child {}", pid, child_id);
+                log::debug!("Set parent {} for child {}", pid, child_id);
             }
             None => {
                 // Remove parent relationship
@@ -269,7 +275,7 @@ impl ReferenceHierarchy {
                 }
 
                 #[cfg(feature = "logging")]
-        log::debug!("Removed parent for child {}", child_id);
+                log::debug!("Removed parent for child {}", child_id);
             }
         }
 
@@ -336,7 +342,8 @@ impl ReferenceHierarchy {
     /// Get the maximum depth of the hierarchy
     pub fn get_max_depth(&self) -> usize {
         let nodes = self.nodes.read();
-        nodes.values()
+        nodes
+            .values()
             .map(|node| node.read().get_depth())
             .max()
             .unwrap_or(0)
@@ -385,14 +392,14 @@ mod tests {
     #[test]
     fn test_reference_availability() {
         let mut node = HierarchyNode::new(1);
-        
+
         // Initially available
         assert!(node.is_reference_available("R1"));
-        
+
         // Add reference and check availability
         node.add_reference("R1".to_string());
         assert!(!node.is_reference_available("R1"));
-        
+
         // Remove reference and check availability
         node.remove_reference("R1");
         assert!(node.is_reference_available("R1"));
@@ -401,22 +408,22 @@ mod tests {
     #[test]
     fn test_hierarchy_management() {
         let hierarchy = ReferenceHierarchy::new();
-        
+
         let node1 = Arc::new(RwLock::new(HierarchyNode::new(1)));
         let node2 = Arc::new(RwLock::new(HierarchyNode::new(2)));
-        
+
         hierarchy.register_node(node1.clone());
         hierarchy.register_node(node2.clone());
-        
+
         // Set parent-child relationship
         hierarchy.set_parent_child(2, Some(1)).unwrap();
-        
+
         // Add reference to parent
         {
             let mut parent = node1.write();
             parent.add_reference("R1".to_string());
         }
-        
+
         // Child should not be able to use parent's reference
         {
             let child = node2.read();
@@ -427,22 +434,22 @@ mod tests {
     #[test]
     fn test_global_reference_availability() {
         let hierarchy = ReferenceHierarchy::new();
-        
+
         let node1 = Arc::new(RwLock::new(HierarchyNode::new(1)));
         let node2 = Arc::new(RwLock::new(HierarchyNode::new(2)));
-        
+
         hierarchy.register_node(node1.clone());
         hierarchy.register_node(node2.clone());
-        
+
         // Initially available globally
         assert!(hierarchy.is_reference_available_globally("R1"));
-        
+
         // Add to one node
         {
             let mut n1 = node1.write();
             n1.add_reference("R1".to_string());
         }
-        
+
         // Should not be available globally
         assert!(!hierarchy.is_reference_available_globally("R1"));
     }
@@ -450,13 +457,13 @@ mod tests {
     #[test]
     fn test_hierarchy_stats() {
         let hierarchy = ReferenceHierarchy::new();
-        
+
         let node1 = Arc::new(RwLock::new(HierarchyNode::new(1)));
         let node2 = Arc::new(RwLock::new(HierarchyNode::new(2)));
-        
+
         hierarchy.register_node(node1.clone());
         hierarchy.register_node(node2.clone());
-        
+
         let stats = hierarchy.get_hierarchy_stats();
         assert_eq!(stats["total_nodes"].as_u64().unwrap(), 2);
         assert_eq!(stats["root_nodes"].as_u64().unwrap(), 2);

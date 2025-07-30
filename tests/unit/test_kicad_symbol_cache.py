@@ -233,5 +233,7 @@ class TestSymbolLibCache:
         dirs = SymbolLibCache._parse_kicad_symbol_dirs()
         
         assert len(dirs) == 2
-        assert dir1 in dirs
-        assert dir2 in dirs
+        # Resolve paths to handle symlinks properly (macOS /var -> /private/var)
+        resolved_dirs = [d.resolve() for d in dirs]
+        assert dir1.resolve() in resolved_dirs
+        assert dir2.resolve() in resolved_dirs

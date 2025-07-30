@@ -21,5 +21,9 @@ fn benchmark_component_lookup(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, benchmark_component_creation, benchmark_component_lookup);
+criterion_group!(
+    benches,
+    benchmark_component_creation,
+    benchmark_component_lookup
+);
 criterion_main!(benches);

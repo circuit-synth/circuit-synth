@@ -1,14 +1,14 @@
 //! Memory management for high-performance I/O operations
-//! 
+//!
 //! Provides 55% reduction in file operation memory usage through:
 //! - Smart memory pooling and reuse
 //! - Efficient buffer management
 //! - Memory usage tracking and optimization
 
-use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::Arc;
 use dashmap::DashMap;
 use once_cell::sync::Lazy;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
 use tracing::{debug, info, warn};
 
 /// Global memory statistics
@@ -55,7 +55,7 @@ impl MemoryManager {
     pub fn deallocate_buffer(&self, mut buffer: Vec<u8>) {
         let size = buffer.capacity();
         buffer.clear(); // Clear contents but keep capacity
-        
+
         // Add to pool if not full
         let mut pool_entry = BUFFER_POOL.entry(size).or_insert_with(Vec::new);
         if pool_entry.len() < self.max_pool_size {
@@ -64,7 +64,7 @@ impl MemoryManager {
         } else {
             debug!("Pool full, dropping buffer, size: {}", size);
         }
-        
+
         self.track_deallocation(size);
     }
 
@@ -73,11 +73,16 @@ impl MemoryManager {
         let current = self.allocated_bytes.fetch_add(size, Ordering::Relaxed) + size;
         TOTAL_ALLOCATED.fetch_add(size, Ordering::Relaxed);
         ALLOCATION_COUNT.fetch_add(1, Ordering::Relaxed);
-        
+
         // Update peak if necessary
         let mut peak = PEAK_ALLOCATED.load(Ordering::Relaxed);
         while current > peak {
-            match PEAK_ALLOCATED.compare_exchange_weak(peak, current, Ordering::Relaxed, Ordering::Relaxed) {
+            match PEAK_ALLOCATED.compare_exchange_weak(
+                peak,
+                current,
+                Ordering::Relaxed,
+                Ordering::Relaxed,
+            ) {
                 Ok(_) => break,
                 Err(new_peak) => peak = new_peak,
             }
@@ -178,18 +183,23 @@ impl MemoryOptimizer {
     /// Optimize memory usage by clearing unused pools
     pub fn optimize() {
         let mut total_freed = 0;
-        
+
         // Remove pools with excessive buffers
         BUFFER_POOL.retain(|size, buffers| {
-            if buffers.len() > 50 { // Keep max 50 buffers per size
+            if buffers.len() > 50 {
+                // Keep max 50 buffers per size
                 let excess = buffers.len() - 50;
                 buffers.truncate(50);
                 total_freed += excess * size;
-                debug!("Trimmed pool for size {}, freed {} bytes", size, excess * size);
+                debug!(
+                    "Trimmed pool for size {}, freed {} bytes",
+                    size,
+                    excess * size
+                );
             }
             !buffers.is_empty()
         });
-        
+
         if total_freed > 0 {
             info!("Memory optimization freed {} bytes", total_freed);
         }
@@ -201,9 +211,9 @@ impl MemoryOptimizer {
             .iter()
             .map(|entry| entry.key() * entry.value().len())
             .sum();
-        
+
         let current_allocated = TOTAL_ALLOCATED.load(Ordering::Relaxed);
-        
+
         if current_allocated == 0 {
             0.0
         } else {
@@ -214,7 +224,7 @@ impl MemoryOptimizer {
     /// Suggest memory optimizations
     pub fn get_optimization_suggestions() -> Vec<String> {
         let mut suggestions = Vec::new();
-        
+
         let fragmentation = Self::get_fragmentation_ratio();
         if fragmentation > 0.3 {
             suggestions.push(format!(
@@ -222,7 +232,7 @@ impl MemoryOptimizer {
                 fragmentation * 100.0
             ));
         }
-        
+
         let pool_count = BUFFER_POOL.len();
         if pool_count > 100 {
             suggestions.push(format!(
@@ -230,7 +240,7 @@ impl MemoryOptimizer {
                 pool_count
             ));
         }
-        
+
         let peak = PEAK_ALLOCATED.load(Ordering::Relaxed);
         let current = TOTAL_ALLOCATED.load(Ordering::Relaxed);
         if peak > current * 2 {
@@ -240,7 +250,7 @@ impl MemoryOptimizer {
                 current / (1024 * 1024)
             ));
         }
-        
+
         suggestions
     }
 }
@@ -250,7 +260,7 @@ pub fn get_memory_stats() -> serde_json::Value {
     let total_allocated = TOTAL_ALLOCATED.load(Ordering::Relaxed);
     let peak_allocated = PEAK_ALLOCATED.load(Ordering::Relaxed);
     let allocation_count = ALLOCATION_COUNT.load(Ordering::Relaxed);
-    
+
     let pool_stats: Vec<_> = BUFFER_POOL
         .iter()
         .map(|entry| {
@@ -261,12 +271,12 @@ pub fn get_memory_stats() -> serde_json::Value {
             })
         })
         .collect();
-    
+
     let total_pool_memory: usize = pool_stats
         .iter()
         .map(|stat| stat["total_bytes"].as_u64().unwrap() as usize)
         .sum();
-    
+
     serde_json::json!({
         "total_allocated_bytes": total_allocated,
         "total_allocated_mb": total_allocated as f64 / (1024.0 * 1024.0),
@@ -346,11 +356,11 @@ impl StringBuffer {
         if self.chunks.is_empty() {
             return String::new();
         }
-        
+
         if self.chunks.len() == 1 {
             return self.chunks.into_iter().next().unwrap();
         }
-        
+
         let mut result = String::with_capacity(self.total_size);
         for chunk in self.chunks {
             result.push_str(&chunk);
@@ -372,12 +382,12 @@ mod tests {
     #[test]
     fn test_memory_manager() {
         let manager = MemoryManager::new();
-        
+
         // Allocate buffer
         let buffer = manager.allocate_buffer(1024);
         assert_eq!(buffer.len(), 1024);
         assert!(manager.get_current_usage() > 0);
-        
+
         // Return buffer
         manager.deallocate_buffer(buffer);
     }
@@ -385,13 +395,13 @@ mod tests {
     #[test]
     fn test_smart_buffer() {
         let manager = Arc::new(MemoryManager::new());
-        
+
         {
             let mut smart_buf = SmartBuffer::new(512, manager.clone());
             smart_buf.as_mut().extend_from_slice(b"test data");
             assert_eq!(smart_buf.len(), 512);
         } // Buffer should be returned to pool here
-        
+
         // Allocate again - should reuse from pool
         let smart_buf2 = SmartBuffer::new(512, manager.clone());
         assert_eq!(smart_buf2.len(), 512);
@@ -403,7 +413,7 @@ mod tests {
         sb.push_str("Hello");
         sb.push_str(" ");
         sb.push_str("World");
-        
+
         assert_eq!(sb.len(), 11);
         assert_eq!(sb.build(), "Hello World");
     }

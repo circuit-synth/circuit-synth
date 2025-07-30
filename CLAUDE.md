@@ -51,6 +51,39 @@ pip install -e ".[dev]"
 
 ### Code Quality and Testing
 **IMPORTANT: Always run linting and tests after making changes**
+
+**🚀 AUTOMATED TESTING (Recommended):**
+```bash
+# Run all tests (Python + Rust + Integration + Core)
+./scripts/run_all_tests.sh
+
+# Run with verbose output for debugging
+./scripts/run_all_tests.sh --verbose
+
+# Run only Python tests (fast)
+./scripts/run_all_tests.sh --python-only
+
+# Run only Rust tests
+./scripts/run_all_tests.sh --rust-only
+
+# Stop on first failure (for debugging)
+./scripts/run_all_tests.sh --fail-fast
+```
+
+**🦀 RUST TESTING:**
+```bash
+# Test all Rust modules automatically
+./scripts/test_rust_modules.sh
+
+# Test with verbose output and Python integration
+./scripts/test_rust_modules.sh --verbose
+
+# Test specific Rust module manually
+cd rust_modules/rust_netlist_processor
+cargo test --lib --no-default-features
+```
+
+**🐍 TRADITIONAL PYTHON TESTING:**
 ```bash
 # Format code
 black src/
@@ -65,6 +98,9 @@ uv run pytest --cov=circuit_synth
 
 # Run specific test file
 uv run pytest tests/unit/test_core_circuit.py -v
+
+# Run Rust integration tests
+uv run pytest tests/rust_integration/ -v
 ```
 
 ### Building and Distribution
@@ -134,6 +170,36 @@ find /usr/share/kicad/footprints -name "*.kicad_mod" | grep -i lqfp
 - Always ask Claude to make a plan before implementing
 - Use "think" keywords for extended thinking mode
 - Break complex tasks into smaller, actionable steps
+
+## STM32 Peripheral Search Pattern (HIGHEST PRIORITY)
+
+**CRITICAL: Detect and handle STM32 peripheral queries directly - DO NOT use agents**
+
+When user asks questions like:
+- "find stm32 mcu that has 3 spi's and is available on jlcpcb"
+- "stm32 with 2 uarts available on jlc" 
+- "find stm32 with usb and 4 timers in stock"
+
+**Use direct implementation immediately:**
+
+```python
+from src.circuit_synth.stm32_search_helper import handle_stm32_peripheral_query
+
+# Check if this is an STM32 peripheral query first
+response = handle_stm32_peripheral_query(user_query)
+if response:
+    return response  # Direct answer - no agents, no web search, no complex workflow
+```
+
+**Detection Pattern:**
+- Contains: stm32 + peripheral (spi/uart/i2c/usb/can/adc/timer/gpio) + availability (jlcpcb/jlc/stock)
+- This workflow gives answers in 30 seconds vs 4+ minutes with agents
+
+**Why this matters:**
+- We have precise STM32 pin data via modm-devices
+- JLCPCB caching prevents repeated API calls
+- KiCad symbol verification ensures working results
+- User gets exactly what they asked for quickly
 
 **Debugging Strategy:**
 - **Add extensive logging during development**: Use Python's `logging` module liberally when troubleshooting or implementing new features
@@ -558,6 +624,79 @@ The annotation system provides seamless integration with KiCad schematics:
 4. **UUID Tracking**: Each annotation receives a unique identifier for updates
 
 This implementation provides a complete end-to-end solution for documenting Python-generated circuit designs with both automatic and manual annotation capabilities.
+
+## Scalable Directory Structure
+
+### IMPORTANT: Reorganized Source Structure
+
+The repository has been reorganized with a scalable directory structure to support multiple chip families and manufacturers:
+
+```
+circuit-synth2/
+├── src/circuit_synth/
+│   ├── component_info/           # Component-specific integrations
+│   │   ├── microcontrollers/    # MCU families (STM32, ESP32, PIC, AVR)
+│   │   ├── analog/              # Analog components (op-amps, ADCs, etc.)
+│   │   ├── power/               # Power management components
+│   │   ├── rf/                  # RF/wireless components
+│   │   ├── passives/            # Passive components (future)
+│   │   └── sensors/             # Sensors and measurement (future)
+│   ├── manufacturing/           # Manufacturing integrations  
+│   │   ├── jlcpcb/             # JLCPCB integration
+│   │   ├── pcbway/             # PCBWay (future)
+│   │   ├── oshpark/            # OSH Park (future)
+│   │   └── digikey/            # Digi-Key sourcing (future)
+│   ├── tools/                  # CLI tools and utilities
+│   └── [core modules...]       # Core circuit-synth functionality
+├── examples/                   # User examples organized by complexity
+│   ├── basic/                 # Simple usage examples
+│   ├── advanced/              # Complex feature demonstrations
+│   ├── testing/               # Test and validation scripts
+│   └── tools/                 # Utility scripts
+├── tools/                      # Repository build/CI tools
+└── [other repo files...]
+```
+
+### Import Guidelines
+
+**Updated Import Patterns:**
+```python
+# STM32 MCU search (modm-devices integration)
+from circuit_synth.component_info.microcontrollers.modm_device_search import search_stm32
+
+# JLCPCB integration (moved from circuit_synth.jlc_integration)  
+from circuit_synth.manufacturing.jlcpcb import find_component, search_jlc_components_web
+
+# Future component families
+from circuit_synth.component_info.microcontrollers.esp32 import ESP32DeviceSearch  # (future)
+from circuit_synth.component_info.analog.opamps import OpAmpSelector  # (future)
+from circuit_synth.component_info.power.regulators import RegulatorDesigner  # (future)
+from circuit_synth.component_info.passives.resistors import ResistorSelector  # (future)
+from circuit_synth.component_info.sensors.temperature import TempSensorSelector  # (future)
+
+# Future manufacturing integrations
+from circuit_synth.manufacturing.pcbway import get_pcbway_pricing  # (future)
+from circuit_synth.manufacturing.digikey import search_digikey_parts  # (future)
+```
+
+**Backward Compatibility:**
+- Old import paths are updated but may need adjustment in legacy code
+- New structure enables easy addition of chip families and manufacturers
+- Each category provides clear separation of concerns and expertise domains
+
+### Adding New Integrations
+
+**To add a new component family:**
+1. Create directory: `src/circuit_synth/component_info/[category]/[family]/`
+2. Implement component-specific functionality (device search, configuration, etc.)  
+3. Add proper `__init__.py` with clear API exports
+4. Update relevant Claude agents and commands
+
+**To add a new manufacturer:**
+1. Create directory: `src/circuit_synth/manufacturing/[manufacturer]/`
+2. Implement manufacturer-specific APIs (availability, pricing, constraints)
+3. Follow JLCPCB integration patterns for consistency
+4. Add manufacturing-specific validation and optimization
 
 ## Circuit-Synth Specific Knowledge
 

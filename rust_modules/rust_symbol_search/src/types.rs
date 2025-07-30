@@ -133,12 +133,12 @@ pub const COMMON_KEYWORDS: &[&str] = &["resistor", "capacitor", "inductor", "dio
 
 /// Check if a symbol should be boosted as a common component
 pub fn is_common_component(symbol_name: &str, library_name: &str) -> bool {
-    COMMON_SYMBOLS.contains(&symbol_name) ||
-    COMMON_LIBRARIES.contains(&library_name) ||
-    COMMON_KEYWORDS.iter().any(|keyword| {
-        symbol_name.to_lowercase().contains(keyword) ||
-        library_name.to_lowercase().contains(keyword)
-    })
+    COMMON_SYMBOLS.contains(&symbol_name)
+        || COMMON_LIBRARIES.contains(&library_name)
+        || COMMON_KEYWORDS.iter().any(|keyword| {
+            symbol_name.to_lowercase().contains(keyword)
+                || library_name.to_lowercase().contains(keyword)
+        })
 }
 
 #[cfg(test)]

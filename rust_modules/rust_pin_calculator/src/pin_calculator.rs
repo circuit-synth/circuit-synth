@@ -1,10 +1,12 @@
 //! Pin position calculator with reference design matching logic
 
-use crate::types::{
-    Component, Net, Position, HierarchicalLabelPosition, LabelOrientation, LabelShape,
-    PinPositionResult, CalculationConfig, Result, PinCalculationError, PinReference,
+use crate::coordinate_transform::{
+    positions_approximately_equal, transform_component_pins, transform_pin_position,
 };
-use crate::coordinate_transform::{transform_pin_position, transform_component_pins, positions_approximately_equal};
+use crate::types::{
+    CalculationConfig, Component, HierarchicalLabelPosition, LabelOrientation, LabelShape, Net,
+    PinCalculationError, PinPositionResult, PinReference, Position, Result,
+};
 use std::collections::HashMap;
 
 /// Main pin calculator struct
@@ -32,7 +34,8 @@ impl PinCalculator {
 
     /// Add a component to the calculator
     pub fn add_component(&mut self, component: Component) {
-        self.components.insert(component.reference.clone(), component);
+        self.components
+            .insert(component.reference.clone(), component);
     }
 
     /// Get a component by reference
@@ -59,22 +62,21 @@ impl PinCalculator {
         component_ref: &str,
         pin_number: &str,
     ) -> Result<PinPositionResult> {
-        let component = self.components
+        let component = self
+            .components
             .get(component_ref)
             .ok_or_else(|| PinCalculationError::ComponentNotFound(component_ref.to_string()))?;
 
-        let pin = component
-            .get_pin(pin_number)
-            .ok_or_else(|| PinCalculationError::PinNotFound {
-                component_ref: component_ref.to_string(),
-                pin_number: pin_number.to_string(),
-            })?;
+        let pin =
+            component
+                .get_pin(pin_number)
+                .ok_or_else(|| PinCalculationError::PinNotFound {
+                    component_ref: component_ref.to_string(),
+                    pin_number: pin_number.to_string(),
+                })?;
 
-        let global_position = transform_pin_position(
-            component.position,
-            pin.local_position,
-            component.rotation,
-        );
+        let global_position =
+            transform_pin_position(component.position, pin.local_position, component.rotation);
 
         Ok(PinPositionResult {
             component_ref: component_ref.to_string(),
@@ -110,13 +112,14 @@ impl PinCalculator {
         // Calculate positions of all pins in this net
         let mut pin_positions = Vec::new();
         for pin_ref in &net.pins {
-            let pin_result = self.calculate_pin_position(&pin_ref.component_ref, &pin_ref.pin_number)?;
+            let pin_result =
+                self.calculate_pin_position(&pin_ref.component_ref, &pin_ref.pin_number)?;
             pin_positions.push(pin_result.global_position);
         }
 
         // Find the optimal label position
         let label_position = self.find_optimal_label_position(&pin_positions, &net.name)?;
-        
+
         Ok(Some(label_position))
     }
 
@@ -144,10 +147,10 @@ impl PinCalculator {
 
         // Calculate centroid of pin positions
         let centroid = self.calculate_centroid(pin_positions);
-        
+
         // Determine optimal orientation based on pin distribution
         let orientation = self.determine_label_orientation(pin_positions, &centroid);
-        
+
         // Offset the label position to avoid overlapping with components
         let label_position = self.offset_label_position(&centroid, &orientation);
 
@@ -169,14 +172,24 @@ impl PinCalculator {
     }
 
     /// Determine the optimal orientation for a label based on pin distribution
-    fn determine_label_orientation(&self, positions: &[Position], centroid: &Position) -> LabelOrientation {
+    fn determine_label_orientation(
+        &self,
+        positions: &[Position],
+        centroid: &Position,
+    ) -> LabelOrientation {
         if positions.len() < 2 {
             return LabelOrientation::Right;
         }
 
         // Calculate the spread in x and y directions
-        let x_spread = positions.iter().map(|p| (p.x - centroid.x).abs()).fold(0.0, f64::max);
-        let y_spread = positions.iter().map(|p| (p.y - centroid.y).abs()).fold(0.0, f64::max);
+        let x_spread = positions
+            .iter()
+            .map(|p| (p.x - centroid.x).abs())
+            .fold(0.0, f64::max);
+        let y_spread = positions
+            .iter()
+            .map(|p| (p.y - centroid.y).abs())
+            .fold(0.0, f64::max);
 
         // If pins are more spread horizontally, use vertical label orientation
         if x_spread > y_spread {
@@ -187,7 +200,11 @@ impl PinCalculator {
     }
 
     /// Offset label position to avoid component overlap
-    fn offset_label_position(&self, centroid: &Position, orientation: &LabelOrientation) -> Position {
+    fn offset_label_position(
+        &self,
+        centroid: &Position,
+        orientation: &LabelOrientation,
+    ) -> Position {
         let offset = 5.0; // 5mm offset
 
         match orientation {
@@ -199,9 +216,13 @@ impl PinCalculator {
     }
 
     /// Validate calculated positions against reference design
-    pub fn validate_against_reference(&self, component_ref: &str, pin_number: &str) -> Result<bool> {
+    pub fn validate_against_reference(
+        &self,
+        component_ref: &str,
+        pin_number: &str,
+    ) -> Result<bool> {
         let calculated = self.calculate_pin_position(component_ref, pin_number)?;
-        
+
         let reference_key = format!("{}.{}", component_ref, pin_number);
         if let Some(reference_pos) = self.config.reference_positions.get(&reference_key) {
             let matches = positions_approximately_equal(
@@ -227,16 +248,16 @@ impl PinCalculator {
     /// Create reference design configuration for resistor divider circuit
     pub fn create_reference_design_config() -> CalculationConfig {
         let mut reference_positions = HashMap::new();
-        
+
         // Reference design positions from the task specification
         // R1: (95.25, 62.23) with pins at (95.25, 58.42) and (95.25, 66.04)
         reference_positions.insert("R1.1".to_string(), Position::new(95.25, 58.42));
         reference_positions.insert("R1.2".to_string(), Position::new(95.25, 66.04));
-        
+
         // R2: (106.68, 62.23) with pins at (106.68, 58.42) and (106.68, 66.04)
         reference_positions.insert("R2.1".to_string(), Position::new(106.68, 58.42));
         reference_positions.insert("R2.2".to_string(), Position::new(106.68, 66.04));
-        
+
         // C1: (120.65, 63.5) with pins at (120.65, 59.69) and (120.65, 67.31)
         reference_positions.insert("C1.1".to_string(), Position::new(120.65, 59.69));
         reference_positions.insert("C1.2".to_string(), Position::new(120.65, 67.31));
@@ -251,7 +272,7 @@ impl PinCalculator {
 
     /// Create components for reference design testing
     pub fn create_reference_design_components() -> Vec<Component> {
-        use crate::types::{Pin, PinType, PinOrientation};
+        use crate::types::{Pin, PinOrientation, PinType};
 
         let mut components = Vec::new();
 
@@ -365,9 +386,9 @@ mod tests {
     fn test_add_and_get_component() {
         let mut calculator = PinCalculator::new();
         let component = Component::new("R1".to_string(), Position::new(100.0, 50.0), 0.0);
-        
+
         calculator.add_component(component);
-        
+
         assert!(calculator.get_component("R1").is_some());
         assert!(calculator.get_component("R2").is_none());
     }
@@ -376,7 +397,7 @@ mod tests {
     fn test_reference_design_components() {
         let components = PinCalculator::create_reference_design_components();
         assert_eq!(components.len(), 3);
-        
+
         let r1 = &components[0];
         assert_eq!(r1.reference, "R1");
         assert_relative_eq!(r1.position.x, 95.25);
@@ -388,15 +409,15 @@ mod tests {
     fn test_reference_design_pin_positions() {
         let components = PinCalculator::create_reference_design_components();
         let mut calculator = PinCalculator::new();
-        
+
         for component in components {
             calculator.add_component(component);
         }
-        
+
         // Test R1 pin positions
         let r1_pin1 = calculator.calculate_pin_position("R1", "1").unwrap();
         let r1_pin2 = calculator.calculate_pin_position("R1", "2").unwrap();
-        
+
         assert_relative_eq!(r1_pin1.global_position.x, 95.25);
         assert_relative_eq!(r1_pin1.global_position.y, 58.42);
         assert_relative_eq!(r1_pin2.global_position.x, 95.25);
@@ -408,11 +429,11 @@ mod tests {
         let config = PinCalculator::create_reference_design_config();
         let components = PinCalculator::create_reference_design_components();
         let mut calculator = PinCalculator::with_config(config);
-        
+
         for component in components {
             calculator.add_component(component);
         }
-        
+
         // Test validation against reference positions
         assert!(calculator.validate_against_reference("R1", "1").unwrap());
         assert!(calculator.validate_against_reference("R1", "2").unwrap());
@@ -427,15 +448,17 @@ mod tests {
         let components = PinCalculator::create_reference_design_components();
         let nets = PinCalculator::create_reference_design_nets();
         let mut calculator = PinCalculator::new();
-        
+
         for component in components {
             calculator.add_component(component);
         }
-        
-        let labels = calculator.calculate_hierarchical_label_positions(&nets).unwrap();
-        
+
+        let labels = calculator
+            .calculate_hierarchical_label_positions(&nets)
+            .unwrap();
+
         assert_eq!(labels.len(), 3); // VCC, OUT, GND
-        
+
         // Check that all labels have valid positions
         for label in &labels {
             assert!(!label.net_name.is_empty());
@@ -452,9 +475,9 @@ mod tests {
             Position::new(10.0, 0.0),
             Position::new(5.0, 10.0),
         ];
-        
+
         let centroid = calculator.calculate_centroid(&positions);
-        
+
         assert_relative_eq!(centroid.x, 5.0);
         assert_relative_eq!(centroid.y, 10.0 / 3.0);
     }
@@ -463,20 +486,14 @@ mod tests {
     fn test_label_orientation_determination() {
         let calculator = PinCalculator::new();
         let centroid = Position::new(5.0, 5.0);
-        
+
         // Horizontally spread pins should result in vertical label
-        let horizontal_positions = vec![
-            Position::new(0.0, 5.0),
-            Position::new(10.0, 5.0),
-        ];
+        let horizontal_positions = vec![Position::new(0.0, 5.0), Position::new(10.0, 5.0)];
         let orientation = calculator.determine_label_orientation(&horizontal_positions, &centroid);
         assert_eq!(orientation, LabelOrientation::Up);
-        
+
         // Vertically spread pins should result in horizontal label
-        let vertical_positions = vec![
-            Position::new(5.0, 0.0),
-            Position::new(5.0, 10.0),
-        ];
+        let vertical_positions = vec![Position::new(5.0, 0.0), Position::new(5.0, 10.0)];
         let orientation = calculator.determine_label_orientation(&vertical_positions, &centroid);
         assert_eq!(orientation, LabelOrientation::Right);
     }
