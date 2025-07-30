@@ -72,7 +72,16 @@ kicad_plugins/
 
 ## ⚡ Quick Install
 
-### **Automated Installation**
+### **Enhanced Installation (Recommended) - Includes Claude Integration**
+```bash
+cd kicad_plugins/
+uv run python install_claude_plugins.py
+
+# Verify installation
+uv run python verify_installation.py
+```
+
+### **Basic Installation (Legacy)**
 ```bash
 cd kicad_plugins/
 uv run python install_plugin.py
