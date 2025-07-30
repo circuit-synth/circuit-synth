@@ -49,6 +49,7 @@ dependencies = [
     "google-adk>=0.1.0",
     "google-genai>=0.1.0",
     "lxml>=6.0.0",
+    "pyspice>=1.5",
 ]
 
 [project.optional-dependencies]
@@ -67,6 +68,10 @@ dev = [
 claude = [
     # Claude Code SDK integration for AI-powered circuit design
     "claude-code-sdk>=0.0.17",
+]
+simulation = [
+    # SPICE simulation support
+    "PySpice>=1.5",
 ]
 test = [
     "pytest>=7.0.0",

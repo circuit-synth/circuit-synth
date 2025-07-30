@@ -298,7 +298,7 @@ wheels = [
 
 [[package]]
 name = "circuit-synth"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
@@ -315,6 +315,7 @@ dependencies = [
     { name = "numpy" },
     { name = "psutil" },
     { name = "pydantic" },
+    { name = "pyspice" },
     { name = "pyyaml" },
     { name = "requests" },
     { name = "rich" },
@@ -337,6 +338,9 @@ dev = [
     { name = "pytest-env" },
     { name = "pytest-mock" },
     { name = "types-pyyaml" },
+]
+simulation = [
+    { name = "pyspice" },
 ]
 test = [
     { name = "memory-profiler" },
@@ -381,6 +385,8 @@ requires-dist = [
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=2.17.0" },
     { name = "psutil", specifier = ">=5.9.0" },
     { name = "pydantic", specifier = ">=2.0.0" },
+    { name = "pyspice", specifier = ">=1.5" },
+    { name = "pyspice", marker = "extra == 'simulation'", specifier = ">=1.5" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=3.0.0" },
@@ -394,7 +400,7 @@ requires-dist = [
     { name = "sexpdata", specifier = ">=0.0.3" },
     { name = "types-pyyaml", marker = "extra == 'dev'", specifier = ">=6.0.0" },
 ]
-provides-extras = ["dev", "claude", "test"]
+provides-extras = ["dev", "claude", "simulation", "test"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2130,6 +2136,15 @@ wheels = [
 ]
 
 [[package]]
+name = "ply"
+version = "3.11"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e5/69/882ee5c9d017149285cab114ebeab373308ef0f874fcdac9beb90e0ac4da/ply-3.11.tar.gz", hash = "sha256:00c7c1aaa88358b9c765b6d3000c6eec0ba42abca5351b095321aef446081da3", size = 159130, upload-time = "2018-02-15T19:01:31.097Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a3/58/35da89ee790598a0700ea49b2a66594140f44dec458c07e8e3d4979137fc/ply-3.11-py2.py3-none-any.whl", hash = "sha256:096f9b8350b65ebd2fd1346b12452efe5b9607f7482813ffca50c22722a807ce", size = 49567, upload-time = "2018-02-15T19:01:27.172Z" },
+]
+
+[[package]]
 name = "pre-commit"
 version = "4.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2387,6 +2402,24 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e7/82/28175b2414effca1cdac8dc99f76d660e7a4fb0ceefa4b4ab8f5f6742925/pyproject_hooks-1.2.0.tar.gz", hash = "sha256:1e859bd5c40fae9448642dd871adf459e5e2084186e8d2c2a79a824c970da1f8", size = 19228, upload-time = "2024-09-29T09:24:13.293Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl", hash = "sha256:9e5c6bfa8dcc30091c74b0cf803c81fdd29d94f01992a7707bc97babb1141913", size = 10216, upload-time = "2024-09-29T09:24:11.978Z" },
+]
+
+[[package]]
+name = "pyspice"
+version = "1.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cffi" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "ply" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "scipy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0a/c5/8bc8c2838edc410e7751c1fcfe80b7bd1280e35e96661a866743fd6a0700/PySpice-1.5.tar.gz", hash = "sha256:d28448accad98959e0f5932af8736e90a1f3f9ff965121c6881d24cdfca23d22", size = 685039, upload-time = "2021-05-15T23:01:56.438Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/55/5e/b41350ab2547751fa6c81e9da5174af585b41e70e2241e4e46c77f17dd8d/PySpice-1.5-py2.py3-none-any.whl", hash = "sha256:a7512163136a6af5911ba280dc97f70224ed5acfcd5647edbafca9e2053d229c", size = 158492, upload-time = "2021-05-15T23:01:53.938Z" },
 ]
 
 [[package]]
