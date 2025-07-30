@@ -294,79 +294,79 @@ def create_circuit_generation_context(analysis, user_message):
     """Create context message for circuit generation with circuit-synth examples."""
     
     circuit_synth_examples = """
-CIRCUIT-SYNTH SYNTAX EXAMPLES:
+CIRCUIT-SYNTH TEMPLATE - USE EXACTLY THIS PATTERN:
 
-# Basic component creation:
+```python
+from circuit_synth import *
+
+# Create components EXACTLY like this:
 esp32 = Component("RF_Module:ESP32-S3-MINI-1", ref="U1", footprint="RF_Module:ESP32-S2-MINI-1")
-imu = Component("Sensor_Motion:LSM6DSL", ref="U3", footprint="Package_LGA:LGA-14_3x2.5mm_P0.5mm_LayoutBorder3x4y")
-usb_c = Component("Connector:USB_C_Plug_USB2.0", ref="P1", footprint="Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal")
+imu = Component("Sensor_Motion:MPU-6050", ref="U2", footprint="Sensor_Motion:InvenSense_QFN-24_4x4mm_P0.5mm")
+usb_c = Component("Connector:USB_C_Receptacle_USB2.0", ref="J1", footprint="Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal")
 
-# Standard passive components:
-R_10k = Component("Device:R", ref="R", value="10K", footprint="Resistor_SMD:R_0603_1608Metric")
-C_10uF = Component("Device:C", ref="C", value="10uF", footprint="Capacitor_SMD:C_0805_2012Metric")
+# Standard passives:
+r1 = Component("Device:R", ref="R", value="10K", footprint="Resistor_SMD:R_0603_1608Metric")
+c1 = Component("Device:C", ref="C", value="10uF", footprint="Capacitor_SMD:C_0805_2012Metric")
 
-# Net creation and connections:
-_3v3 = Net('3V3')
-GND = Net('GND')
-spi_sck = Net('SPI_SCK')
+# Create nets:
+vcc_3v3 = Net('VCC_3V3')
+gnd = Net('GND')
+vcc_5v = Net('VCC_5V')
 
-# Pin connections (integer and string access):
-esp32[3] += _3v3          # Integer pin access
-imu["VDD"] += _3v3        # String pin access
-esp32["GPIO21"] += spi_sck
+# Connect pins (ONLY use integer pins for simplicity):
+esp32[1] += gnd         # GND pin
+esp32[2] += vcc_3v3     # VCC pin
+imu[1] += vcc_3v3       # VDD pin
+imu[2] += gnd           # GND pin
+usb_c[1] += vcc_5v      # VBUS pin
+usb_c[2] += gnd         # GND pin
 
-# Circuit functions with @circuit decorator:
-@circuit(name="power_supply")
-def power_supply(_5V, _3v3, GND):
-    regulator = Component("Regulator_Linear:NCP1117-3.3_SOT223", ref="U2", footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2")
-    cap_in = Component("Device:C", ref="C", value="10uF", footprint="Capacitor_SMD:C_0805_2012Metric")
-    cap_out = Component("Device:C", ref="C", value="10uF", footprint="Capacitor_SMD:C_0805_2012Metric")
-    
-    regulator[1] += GND
-    regulator[2] += _3v3
-    regulator[3] += _5V
-    cap_in[1] += _5V
-    cap_in[2] += GND
-    cap_out[1] += _3v3
-    cap_out[2] += GND
-
-# Main circuit generation:
 @circuit
-def main_circuit():
-    _5v = Net('5V')
-    _3v3 = Net('3V3') 
-    GND = Net('GND')
-    
-    power_supply(_5v, _3v3, GND)
-    # Add other subcircuits...
-    
+def main():
+    # Put all your components and connections here
+    # Return the circuit at the end
+    pass
+
 if __name__ == '__main__':
-    circuit = main_circuit()
-    circuit.generate_kicad_project("my_project", force_regenerate=True)
-"""
+    circuit = main()
+    circuit.generate_kicad_project("esp32_dev_board", force_regenerate=True)
+```
+
+CRITICAL RULES:
+1. ONLY use: from circuit_synth import *
+2. ONLY use Component(), Net(), @circuit decorator
+3. ONLY use integer pin numbers like [1], [2], [3] - NO string pins
+4. ALWAYS use valid KiCad symbol names from these libraries:
+   - RF_Module: for ESP32
+   - Sensor_Motion: for IMU
+   - Connector: for USB
+   - Device: for R, C, L
+   - Regulator_Linear: for voltage regulators
+5. ALWAYS end with circuit.generate_kicad_project("project_name", force_regenerate=True)
+6. Keep it SIMPLE - no complex imports, no annotations, no extra features
     
-    context_message = f"""I'm working in KiCad and need you to generate a complete circuit-synth Python script.
-
-PROJECT CONTEXT:
-- Design Name: {analysis.get('design_name', 'New Design')}
-- Current Components: {analysis.get('component_count', 0)}
-- Current Nets: {analysis.get('net_count', 0)}
-
-{circuit_synth_examples}
-
-IMPORTANT INSTRUCTIONS:
-1. Generate a COMPLETE circuit-synth Python script
-2. Include all necessary imports: from circuit_synth import *
-3. Use the @circuit decorator for subcircuits
-4. Include a main() function that generates the KiCad project
-5. Use proper component symbols and footprints (refer to examples above)
-6. Create appropriate nets and connections
-7. End with: if __name__ == '__main__': main()
-8. Focus on the circuit described in the user's request
+    context_message = f"""CIRCUIT GENERATION MODE - Generate circuit-synth Python code for KiCad.
 
 USER REQUEST: {user_message}
 
-Please generate a complete, executable circuit-synth Python script for this circuit."""
+{circuit_synth_examples}
+
+MANDATORY INSTRUCTIONS:
+1. Use EXACTLY the template above - don't deviate
+2. ONLY use: from circuit_synth import *
+3. ONLY use integer pin numbers [1], [2], [3] - never use string pin names
+4. Generate a COMPLETE working script that ends with:
+   circuit.generate_kicad_project("project_name", force_regenerate=True)
+5. Use ONLY these proven KiCad symbols:
+   - ESP32: "RF_Module:ESP32-S3-MINI-1"
+   - IMU: "Sensor_Motion:MPU-6050" 
+   - USB-C: "Connector:USB_C_Receptacle_USB2.0"
+   - Resistor: "Device:R"
+   - Capacitor: "Device:C"
+   - Regulator: "Regulator_Linear:NCP1117-3.3_SOT223"
+6. Keep it SIMPLE - no complex features, decorators except @circuit, or extra imports
+
+Generate the COMPLETE Python script now."""
     
     return context_message
 
