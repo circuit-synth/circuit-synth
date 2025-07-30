@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel", "setuptools-rust>=1.5.1"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -42,10 +42,13 @@ dependencies = [
     # Async support
     "aiohttp>=3.9.0",
     "aiofiles>=23.2.0",
-    # Rust build dependencies  
-    "maturin>=1.9.2",
-    # Rust build dependencies
-    "setuptools-rust>=1.5.1",
+    # Web scraping for JLC integration
+    "requests>=2.28.0",
+    "beautifulsoup4>=4.11.0",
+    # Google AI and ADK dependencies
+    "google-adk>=0.1.0",
+    "google-genai>=0.1.0",
+    "lxml>=6.0.0",
 ]
 
 [project.optional-dependencies]
@@ -60,6 +63,10 @@ dev = [
     "mypy>=0.950",
     "types-PyYAML>=6.0.0",
     "pre-commit>=2.17.0",
+]
+claude = [
+    # Claude Code SDK integration for AI-powered circuit design
+    "claude-code-sdk>=0.0.17",
 ]
 test = [
     "pytest>=7.0.0",
@@ -80,33 +87,15 @@ preparse-symbols = "circuit_synth.scripts.preparse_kicad_symbols:main"
 netlist-import = "circuit_synth.kicad.netlist_importer:main"
 json-to-python = "circuit_synth.codegen.json_to_python_project:main"
 
-# Rust performance optimization  
-enable-rust-acceleration = "circuit_synth.scripts.enable_rust:main"
+# Claude Code Integration
+setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
+validate-circuit = "circuit_synth.validation.real_time_check:main"
 
 [project.urls]
 Homepage = "https://github.com/circuit-synth/circuit-synth"
 Documentation = "https://circuit-synth.readthedocs.io"
 Repository = "https://github.com/circuit-synth/circuit-synth"
 Issues = "https://github.com/circuit-synth/circuit-synth/issues"
-
-# Rust extensions for performance acceleration
-[[tool.setuptools-rust.ext-modules]]
-target = "circuit_synth.rust.kicad_writer"
-path = "rust_modules/rust_kicad_integration/Cargo.toml"
-binding = "PyO3"
-debug = false
-
-[[tool.setuptools-rust.ext-modules]]
-target = "circuit_synth.rust.symbol_cache" 
-path = "rust_modules/rust_symbol_cache/Cargo.toml"
-binding = "PyO3"
-debug = false
-
-[[tool.setuptools-rust.ext-modules]]
-target = "circuit_synth.rust.placement"
-path = "rust_modules/rust_force_directed_placement/Cargo.toml"
-binding = "PyO3"
-debug = false
 
 [tool.setuptools]
 package-dir = {"" = "src"}

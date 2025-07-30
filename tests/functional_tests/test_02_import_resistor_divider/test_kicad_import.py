@@ -19,7 +19,7 @@ from typing import Dict, Set, List, Any
 
 # Import circuit-synth functionality for KiCad import
 try:
-    from circuit_synth.scripts.kicad_to_python_sync import KiCadToPythonSyncer
+    from circuit_synth.tools.kicad_to_python_sync import KiCadToPythonSyncer
     from circuit_synth import Circuit, Component, Net
 except ImportError as e:
     pytest.skip(f"Circuit-synth import functionality not available: {e}", allow_module_level=True)
