@@ -141,7 +141,7 @@ __all__ = [
     # KiCad integration and validation
     "create_unified_kicad_integration",
     "validate_kicad_installation",
-    "require_kicad", 
+    "require_kicad",
     "get_kicad_paths",
     "KiCadValidationError",
     # Claude Code integration
