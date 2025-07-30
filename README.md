@@ -94,6 +94,7 @@ circuit.generate_kicad_project("esp32_dev")
 - **⚡ Rust-Accelerated**: Fast symbol lookup and placement algorithms
 - **🏭 Manufacturing Integration**: Real-time component availability and pricing from JLCPCB
 - **🔍 Smart Component Finder**: AI-powered component recommendations with circuit-synth code generation
+- **🎨 KiCad Plugin Integration**: Native AI-powered plugins for both PCB and schematic editors
 
 ## 🚀 Claude Code Integration
 
@@ -143,6 +144,61 @@ Claude will search components, check availability, and generate circuit-synth co
 - **✅ Availability Check**: Real-time JLCPCB stock verification
 - **🔧 Code Generation**: Ready-to-use circuit-synth code
 - **🧠 Engineering Context**: AI explains component choices
+
+## 🎨 KiCad Plugin Integration
+
+Circuit-synth includes **native KiCad plugins** that bring AI-powered circuit analysis directly into KiCad's interface:
+
+### **📋 PCB Editor Plugin**
+- **Access**: Tools → External Plugins → "Circuit-Synth AI"
+- **Features**: 
+  - Complete PCB analysis (components, tracks, board size)
+  - Associated schematic analysis integration
+  - AI-powered design recommendations
+  - Real-time board statistics
+
+### **📐 Schematic Editor Plugin** 
+- **Access**: Tools → Generate Bill of Materials → "Circuit-Synth AI"
+- **Method**: Breakthrough "BOM backdoor" approach
+- **Features**:
+  - Component type analysis and breakdown
+  - Net connectivity mapping
+  - Design complexity assessment
+  - AI-powered optimization suggestions
+
+### **Installation**
+```bash
+# Install plugins to KiCad
+cd kicad_plugins/
+uv run python install_plugin.py
+
+# Or manual installation - see kicad_plugins/INSTALL.md
+```
+
+### **Example Plugin Output**
+```
+🚀 Circuit-Synth AI - Schematic Analysis Results
+
+📋 Project Information:
+• Design: my_circuit
+• Components Found: 17
+
+📐 Component Analysis:
+• Device: 10 components
+• RF_Module: 1 components
+• Regulator_Linear: 1 components
+
+🤖 AI Insights:
+• Design complexity: Low
+• Component diversity: 7 different types
+
+💡 Recommendations:
+• Consider component placement optimization
+• Review power supply decoupling
+• Check signal integrity for high-speed signals
+```
+
+**📚 Full Documentation**: See [kicad_plugins/README.md](kicad_plugins/README.md) for complete installation and usage instructions.
 
 ## Installation
 
