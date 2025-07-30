@@ -7,4 +7,4 @@ including the Smarton AI plugin for intelligent circuit design assistance.
 
 from .smarton_ai_bridge import SmartonAIBridge
 
-__all__ = ['SmartonAIBridge']
+__all__ = ["SmartonAIBridge"]
