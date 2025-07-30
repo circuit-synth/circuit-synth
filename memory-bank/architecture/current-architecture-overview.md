@@ -155,9 +155,9 @@ docker run --rm \
 - **Footprint management**: PCB footprint library handling for layout generation
 
 ### LLM Integration
-- **Google ADK**: Intelligent component placement suggestions
-- **OpenAI/Anthropic APIs**: Design assistance and optimization
-- **Placement agent**: `llm_placement_agent.py` in schematic generation
+- **Deprecated**: LLM-based placement removed for performance optimization
+- **Future**: May reintegrate with lightweight local models
+- **Current**: Using optimized collision-based placement algorithms
 
 ### Logging and Debugging
 Comprehensive logging system in `core/logging/`:

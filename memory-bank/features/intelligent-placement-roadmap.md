@@ -14,7 +14,7 @@ Currently, circuit-synth places components functionally but not intelligently. T
 ### Available Algorithms
 - `connection_aware` (default)
 - `sequential` 
-- `llm` (uses Google ADK/OpenAI for placement suggestions)
+- `llm` (deprecated - removed for performance)
 
 ## Proposed Improvements
 

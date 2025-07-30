@@ -20,6 +20,4 @@ sexpdata>=0.0.3
 aiohttp>=3.9.0
 aiofiles>=23.2.0
 
-# Mock heavy dependencies that aren't needed for docs
-# google-adk>=0.1.0
-# google-genai>=0.1.0
+# Heavy dependencies not needed for docs build
