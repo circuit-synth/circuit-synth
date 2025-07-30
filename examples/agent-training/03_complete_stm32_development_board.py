@@ -151,7 +151,7 @@ def complete_stm32_development_board():
     # 3.3V LDO regulator (AMS1117-3.3 - high stock on JLCPCB)
     regulator_3v3 = Component(
         symbol="Regulator_Linear:AMS1117-3.3", ref="U1",
-        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
     ) # Stock: 234,567 units (LCSC: C6186)
     
     regulator_3v3[1] += system_gnd          # Pin 1: GND
