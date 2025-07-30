@@ -138,9 +138,10 @@ class ClaudeBridge:
             bool: True if connection successful, False otherwise
         """
         try:
-            # Test if Claude Code is available
+            # Test if Claude Code is available (using full path for KiCad compatibility)
+            claude_path = "/Users/shanemattner/.nvm/versions/node/v23.7.0/bin/claude"
             result = subprocess.run(
-                ["claude", "--version"], 
+                [claude_path, "--version"], 
                 capture_output=True, 
                 text=True, 
                 timeout=5
@@ -255,9 +256,10 @@ Please provide helpful advice about this circuit design, considering the compone
             str: Claude's response
         """
         try:
-            # Call Claude CLI with message as argument
+            # Call Claude CLI with message as argument (using full path for KiCad compatibility)
+            claude_path = "/Users/shanemattner/.nvm/versions/node/v23.7.0/bin/claude"
             result = subprocess.run([
-                "claude", 
+                claude_path, 
                 message
             ], capture_output=True, text=True, timeout=30)
             
