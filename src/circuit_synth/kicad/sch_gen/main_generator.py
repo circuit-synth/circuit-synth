@@ -44,9 +44,7 @@ class LLMPlacementManager:
     """Optimized collision-based placement manager for high performance."""
 
     def __init__(self, *args, **kwargs):
-        logging.info(
-            "Using optimized collision-based placement for high performance"
-        )
+        logging.info("Using optimized collision-based placement for high performance")
 
     def place_components(self, components, nets, existing_placements=None):
         """Fallback to basic grid placement"""
