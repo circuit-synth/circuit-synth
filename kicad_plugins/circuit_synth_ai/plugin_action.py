@@ -11,7 +11,7 @@ import threading
 import atexit
 from pathlib import Path
 
-from .ui.main_dialog import CircuitSynthDialog
+from .ui.claude_chat_dialog import ClaudeChatDialog
 
 
 class CircuitSynthAI(pcbnew.ActionPlugin):
@@ -67,8 +67,8 @@ class CircuitSynthAI(pcbnew.ActionPlugin):
                 return
 
             # Create or show the dialog
-            if self.dialog_window is None or not isinstance(self.dialog_window, CircuitSynthDialog):
-                self.dialog_window = CircuitSynthDialog(frame, board)
+            if self.dialog_window is None or not isinstance(self.dialog_window, ClaudeChatDialog):
+                self.dialog_window = ClaudeChatDialog(frame, board)
                 self.dialog_window.Bind(wx.EVT_CLOSE, self.on_close_dialog)
 
             # Show the dialog

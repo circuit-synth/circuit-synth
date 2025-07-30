@@ -31,6 +31,15 @@ This directory contains **working KiCad plugins** that bring AI-powered circuit 
 
 *The enhanced chat plugin provides an interactive AI assistant with real-time conversation, quick action buttons, and complete analysis export capabilities.*
 
+### 🤖 **Claude Code Integration** *(Latest!)*
+- **Real AI Assistant**: Direct integration with Claude Code for genuine AI help
+- **Context-Aware**: Analyzes your actual circuit data for relevant suggestions
+- **Both Editors**: Available in both PCB and schematic editors
+- **Professional UI**: Modern chat interfaces with conversation history
+- **Export Capabilities**: Save AI conversations for documentation
+
+*Bridge your KiCad workflow directly to Claude AI for real-time circuit design assistance.*
+
 ## 📦 Plugin Files
 
 ```
@@ -51,9 +60,12 @@ kicad_plugins/
 │   └── resources/icon.png                 # Plugin icon
 │
 ├── circuit_synth_chat_plugin.py           # Enhanced Schematic Chat Plugin
+├── circuit_synth_claude_schematic_plugin.py # Claude-Integrated Schematic Plugin
 ├── circuit_synth_bom_plugin.py            # Basic Schematic BOM Plugin
 ├── circuit_synth_schematic_analyzer.py   # Standalone schematic analysis tool
+├── claude_bridge.py                       # Claude Code integration bridge
 ├── test_plugin_functionality.py          # Comprehensive validation tests
+├── test_claude_integration.py             # Claude integration test suite
 │
 └── install_plugin.py                     # Automated installer script
 ```
@@ -184,6 +196,7 @@ The schematic plugin uses a **breakthrough approach** discovered on KiCad forums
 ## 📚 Documentation
 
 - **Installation Guide**: [INSTALL.md](./INSTALL.md) - Complete installation instructions
+- **Claude Setup**: [CLAUDE_SETUP.md](./CLAUDE_SETUP.md) - **NEW!** Complete Claude Code integration guide
 - **Hotkey Setup**: [HOTKEY_SETUP.md](./HOTKEY_SETUP.md) - Configure `Ctrl+Shift+A` hotkey access
 - **User Workflows**: [WORKFLOW_GUIDE.md](./WORKFLOW_GUIDE.md) - Optimization strategies and best practices  
 - **Project Summary**: [PLUGIN_SUMMARY.md](./PLUGIN_SUMMARY.md) - Complete technical implementation details
