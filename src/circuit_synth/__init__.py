@@ -66,6 +66,9 @@ from .interfaces import (
 # KiCad integration
 from .kicad.unified_kicad_integration import create_unified_kicad_integration
 
+# Plugin integration
+from .plugins import SmartonAIBridge
+
 
 # Claude Code integration (optional)
 def setup_claude_integration():
@@ -134,6 +137,8 @@ __all__ = [
     "get_rust_component_status",
     # KiCad integration
     "create_unified_kicad_integration",
+    # Plugin integration
+    "SmartonAIBridge",
     # Claude Code integration
     "setup_claude_integration",
 ]

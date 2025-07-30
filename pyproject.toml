@@ -91,6 +91,9 @@ json-to-python = "circuit_synth.codegen.json_to_python_project:main"
 setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
 validate-circuit = "circuit_synth.validation.real_time_check:main"
 
+# Plugin Management
+smarton-ai = "circuit_synth.tools.smarton_ai_manager:main"
+
 [project.urls]
 Homepage = "https://github.com/circuit-synth/circuit-synth"
 Documentation = "https://circuit-synth.readthedocs.io"

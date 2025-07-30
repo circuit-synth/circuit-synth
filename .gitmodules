@@ -19,3 +19,6 @@
 [submodule "src/external_repos/modm-devices"]
 	path = src/external_repos/modm-devices
 	url = https://github.com/modm-io/modm-devices.git
+[submodule "plugins/smarton-ai"]
+	path = plugins/smarton-ai
+	url = https://github.com/smarton-empower/Smarton-AI.git
