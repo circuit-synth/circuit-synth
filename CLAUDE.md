@@ -41,12 +41,18 @@ uv pip install -e ".[dev]"
 
 # Install dependencies
 uv sync
+
+# Register Claude Code agents for AI-assisted circuit design
+uv run register-agents
 ```
 
 **Alternative method - using pip:**
 ```bash
 # If uv is not available
 pip install -e ".[dev]"
+
+# Register agents (after installation)
+register-agents
 ```
 
 ### Code Quality and Testing

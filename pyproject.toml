@@ -46,6 +46,7 @@ dependencies = [
     "requests>=2.28.0",
     "beautifulsoup4>=4.11.0",
     "lxml>=6.0.0",
+    "pyspice>=1.5",
 ]
 
 [project.optional-dependencies]
@@ -86,6 +87,7 @@ json-to-python = "circuit_synth.codegen.json_to_python_project:main"
 
 # Claude Code Integration
 setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
+register-agents = "circuit_synth.claude_integration.agent_registry:main"
 validate-circuit = "circuit_synth.validation.real_time_check:main"
 
 [project.urls]
