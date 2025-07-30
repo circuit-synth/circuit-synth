@@ -85,7 +85,7 @@ netlist-import = "circuit_synth.kicad.netlist_importer:main"
 json-to-python = "circuit_synth.codegen.json_to_python_project:main"
 
 # Claude Code Integration
-setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
+setup-claude-integration = "circuit_synth.tools.setup_claude:main"
 validate-circuit = "circuit_synth.validation.real_time_check:main"
 
 [project.urls]
@@ -101,7 +101,13 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-circuit_synth = ["py.typed"]
+circuit_synth = [
+    "py.typed",
+    "data/examples/**/*",
+    "data/memory-bank/**/*", 
+    "data/CLAUDE.md",
+    "data/tools/**/*"
+]
 
 [tool.black]
 line-length = 88

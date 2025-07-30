@@ -1,0 +1,68 @@
+(kicad_sch
+	(version 20250114)
+	(generator circuit_synth)
+	(generator_version 9.0)
+	(uuid 2e870e6b-b2c3-455f-a727-ceb8ad09c34e)
+	(paper A4)
+	(title_block
+		(title "python_generated_reference_design Cover")
+		(company Circuit-Synth)
+		(date "")
+		(rev "")
+	)
+	(lib_symbols)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+	(sheet
+		(at 60 60)
+		(size 100 80)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 02ed20af-73ef-4935-b870-a1edee308d67)
+		(property
+			"Sheetname"
+			"resistor_divider"
+			(at 60 50 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property
+			"Sheetfile"
+			"resistor_divider.kicad_sch"
+			(at 60 145 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project
+				"python_generated_reference_design"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+)

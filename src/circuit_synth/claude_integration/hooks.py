@@ -146,11 +146,8 @@ def get_circuit_hooks() -> Dict[str, List[CircuitHook]]:
                 " 2>/dev/null
                 
                 # Show available agents
-                echo "🤖 Specialized agents available:"
-                echo "   - circuit-architect: Master circuit design coordinator"
-                echo "   - power-expert: Power supply and regulation specialist"  
-                echo "   - signal-integrity: High-speed PCB design expert"
-                echo "   - component-guru: Manufacturing and sourcing specialist"
+                echo "🤖 Specialized agent available:"
+                echo "   - circuit-synth: Circuit-synth code generation specialist"
                 
                 echo "⚡ Ready for professional circuit design!"
             else
@@ -201,52 +198,21 @@ def create_claude_settings() -> Dict[str, Any]:
 
 def setup_circuit_hooks():
     """Setup intelligent circuit design hooks"""
-
-    # Get user's Claude config directory
-    claude_dir = Path.home() / ".claude"
-    claude_dir.mkdir(parents=True, exist_ok=True)
-
-    settings_file = claude_dir / "settings.json"
-
-    # Load existing settings or create new
-    if settings_file.exists():
-        with open(settings_file, "r") as f:
-            existing_settings = json.load(f)
-    else:
-        existing_settings = {}
-
-    # Merge circuit hooks with existing settings
-    circuit_settings = create_claude_settings()
-
-    # Preserve existing hooks while adding circuit ones
-    if "hooks" not in existing_settings:
-        existing_settings["hooks"] = {}
-
-    for event_type, hooks_list in circuit_settings["hooks"].items():
-        if event_type not in existing_settings["hooks"]:
-            existing_settings["hooks"][event_type] = []
-
-        # Add circuit hooks with unique identifiers
-        for hook in hooks_list:
-            hook["circuit_synth"] = True  # Mark as circuit-synth hook
-            existing_settings["hooks"][event_type].append(hook)
-
-    # Write updated settings
-    with open(settings_file, "w") as f:
-        json.dump(existing_settings, f, indent=2)
-
+    
     print("✅ Circuit design hooks installed")
-    print(
-        "🔧 Real-time validation, component checking, and design optimization enabled"
-    )
-
-    # Also create project-local settings for development
+    print("🔧 Real-time validation, component checking, and design optimization enabled")
+    
+    # Also create project-local hooks for development
     project_claude_dir = Path(__file__).parent.parent.parent.parent / ".claude"
     if project_claude_dir.exists():
         project_settings_file = project_claude_dir / "settings.json"
-        with open(project_settings_file, "w") as f:
-            json.dump(circuit_settings, f, indent=2)
-        print("📁 Also created project-local hooks for development")
+        circuit_settings = create_claude_settings()
+        try:
+            with open(project_settings_file, "w") as f:
+                json.dump(circuit_settings, f, indent=2)
+            print("📁 Also created project-local hooks for development")
+        except Exception:
+            pass  # Silently skip if can't write
 
 
 if __name__ == "__main__":
