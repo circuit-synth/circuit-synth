@@ -44,6 +44,14 @@ from .core.annotations import (
     add_text_box,
 )
 from .core.enhanced_netlist_exporter import EnhancedNetlistExporter
+
+# KiCad integration and validation
+from .core.kicad_validator import (
+    KiCadValidationError,
+    get_kicad_paths,
+    require_kicad,
+    validate_kicad_installation,
+)
 from .core.netlist_exporter import NetlistExporter
 
 # Reference manager and netlist exporters
@@ -61,14 +69,6 @@ from .interfaces import (
     ICircuitModel,
     IKiCadIntegration,
     KiCadGenerationConfig,
-)
-
-# KiCad integration and validation
-from .core.kicad_validator import (
-    KiCadValidationError,
-    get_kicad_paths,
-    require_kicad,
-    validate_kicad_installation,
 )
 from .kicad.unified_kicad_integration import create_unified_kicad_integration
 
