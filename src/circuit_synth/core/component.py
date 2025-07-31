@@ -50,8 +50,6 @@ except ImportError as e:
         RUST_SYMBOL_CACHE_AVAILABLE = False
 
 
-
-
 @dataclass
 class Component(SimplifiedPinAccess):
     """
@@ -203,7 +201,6 @@ class Component(SimplifiedPinAccess):
         # [ {"function": "passive", "name": "~", "number": "1", ...}, ... ]
         pins_loaded = 0
         for pin_info in symbol_data.get("pins", []):
-            print(f"DEBUG CORE: Pin info for {self.symbol}: {pin_info}")
             pin_num = pin_info.get("number", "")
             if not pin_num:  # Skip pins without numbers
                 context_logger.warning(
@@ -246,7 +243,6 @@ class Component(SimplifiedPinAccess):
             pin_numbers=list(self._pins.keys()),
             pin_names=list(self._pin_names.keys()),
         )
-
 
         # Handle case where no reference is provided
         if not self.ref:
@@ -554,7 +550,6 @@ class Component(SimplifiedPinAccess):
                 if n not in comp._pin_names:
                     comp._pin_names[n] = []
                 comp._pin_names[n].append(pin_obj)
-
 
         return comp
 

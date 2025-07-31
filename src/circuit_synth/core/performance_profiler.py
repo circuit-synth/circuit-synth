@@ -136,17 +136,14 @@ def quick_time(operation_name: str):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             start_time = time.perf_counter()
-            print(f"⏱️  Starting {operation_name}...")
             try:
                 result = func(*args, **kwargs)
                 end_time = time.perf_counter()
                 duration = end_time - start_time
-                print(f"✅ {operation_name}: {duration:.4f}s")
                 return result
             except Exception as e:
                 end_time = time.perf_counter()
                 duration = end_time - start_time
-                print(f"❌ {operation_name}: {duration:.4f}s (failed: {e})")
                 raise
 
         return wrapper
@@ -157,17 +154,14 @@ def quick_time(operation_name: str):
 def time_operation(operation_name: str, func, *args, **kwargs):
     """Time a function call and print result immediately."""
     start_time = time.perf_counter()
-    print(f"⏱️  Starting {operation_name}...")
     try:
         result = func(*args, **kwargs)
         end_time = time.perf_counter()
         duration = end_time - start_time
-        print(f"✅ {operation_name}: {duration:.4f}s")
         return result
     except Exception as e:
         end_time = time.perf_counter()
         duration = end_time - start_time
-        print(f"❌ {operation_name}: {duration:.4f}s (failed: {e})")
         raise
 
 
