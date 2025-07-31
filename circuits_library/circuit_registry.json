@@ -1,0 +1,76 @@
+{
+  "circuits": {
+    "microcontrollers.stm32": {
+      "name": "stm32",
+      "description": "stm32 + imu + usb-c",
+      "category": "microcontrollers",
+      "file_path": "microcontrollers/stm32.py",
+      "components": [
+        {
+          "type": "stm32",
+          "part_number": "DEMO_STM32_001",
+          "description": "Demo component for stm32",
+          "stock": 12345,
+          "price": "$1.00@100pcs",
+          "jlc_part": "",
+          "suggested_symbol": "Device:R",
+          "suggested_footprint": "Resistor_SMD:R_0603_1608Metric"
+        },
+        {
+          "type": "imu",
+          "part_number": "DEMO_LSM6DS3_001",
+          "description": "Demo component for LSM6DS3",
+          "stock": 12345,
+          "price": "$1.00@100pcs",
+          "jlc_part": "",
+          "suggested_symbol": "Sensor_Motion:LSM6DS3TR-C",
+          "suggested_footprint": "Resistor_SMD:R_0603_1608Metric"
+        },
+        {
+          "type": "imu",
+          "part_number": "DEMO_MPU6050_001",
+          "description": "Demo component for MPU6050",
+          "stock": 12345,
+          "price": "$1.00@100pcs",
+          "jlc_part": "",
+          "suggested_symbol": "Sensor_Motion:LSM6DS3TR-C",
+          "suggested_footprint": "Resistor_SMD:R_0603_1608Metric"
+        },
+        {
+          "type": "usb-c",
+          "part_number": "TYPE-C-31-M-12",
+          "description": "USB-C Receptacle, SMT",
+          "stock": 23456,
+          "price": "$0.45@100pcs",
+          "jlc_part": "",
+          "suggested_symbol": "Device:R",
+          "suggested_footprint": "Resistor_SMD:R_0603_1608Metric"
+        }
+      ],
+      "requirements": {
+        "name": "stm32",
+        "description": "stm32 + imu + usb-c",
+        "category": "microcontrollers",
+        "components": [
+          "stm32",
+          "imu",
+          "usb-c"
+        ]
+      },
+      "created": "2025-07-30T16:22:19.652987",
+      "version": "1.0",
+      "usage_count": 0
+    }
+  },
+  "categories": [
+    "power",
+    "microcontrollers",
+    "sensors",
+    "interfaces",
+    "complete_boards",
+    "custom"
+  ],
+  "created": "2025-07-30T16:21:54.143183",
+  "version": "1.0",
+  "last_updated": "2025-07-30T16:22:19.652998"
+}

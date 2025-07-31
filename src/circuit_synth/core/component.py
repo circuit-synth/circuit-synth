@@ -53,145 +53,155 @@ except ImportError as e:
 class UnifiedPinAccess:
     """
     Unified pin access interface providing both dot and bracket notation.
-    
+
     Examples:
         component.pins.VCC += net        # Dot notation for named pins
         component.pins[1] += net         # Bracket notation for numbered pins
         component.pins["VCC"] += net     # Bracket notation for named pins
         component.pins.gnd += net        # Case-insensitive access
     """
-    
+
     def __init__(self, component):
         self._component = component
         self._name_aliases = self._build_name_aliases()
-    
+
     def _build_name_aliases(self) -> dict:
         """Build case-insensitive aliases for common pin names."""
         aliases = {}
-        
+
         # Get all pin names from the component
-        if hasattr(self._component, '_pin_names'):
+        if hasattr(self._component, "_pin_names"):
             for name in self._component._pin_names.keys():
                 if name and name != "~":
                     # Create lowercase alias
                     aliases[name.lower()] = name
-                    
+
                     # Create common aliases
                     lower_name = name.lower()
-                    if lower_name in ['vdd', 'vcc', 'v+', 'vplus', 'vpos']:
-                        aliases['vcc'] = name
-                        aliases['vdd'] = name
-                        aliases['vpos'] = name
-                        aliases['vplus'] = name
-                        aliases['v+'] = name
-                    elif lower_name in ['vss', 'gnd', 'ground', 'v-', 'vminus', 'vneg']:
-                        aliases['gnd'] = name
-                        aliases['vss'] = name
-                        aliases['ground'] = name
-                        aliases['vneg'] = name
-                        aliases['vminus'] = name  
-                        aliases['v-'] = name
-                    elif lower_name in ['vdda', 'avdd', 'avcc']:
-                        aliases['vdda'] = name
-                        aliases['avdd'] = name
-                        aliases['avcc'] = name
-                    elif lower_name in ['vssa', 'agnd', 'agnd']:
-                        aliases['vssa'] = name
-                        aliases['agnd'] = name
-                        
+                    if lower_name in ["vdd", "vcc", "v+", "vplus", "vpos"]:
+                        aliases["vcc"] = name
+                        aliases["vdd"] = name
+                        aliases["vpos"] = name
+                        aliases["vplus"] = name
+                        aliases["v+"] = name
+                    elif lower_name in ["vss", "gnd", "ground", "v-", "vminus", "vneg"]:
+                        aliases["gnd"] = name
+                        aliases["vss"] = name
+                        aliases["ground"] = name
+                        aliases["vneg"] = name
+                        aliases["vminus"] = name
+                        aliases["v-"] = name
+                    elif lower_name in ["vdda", "avdd", "avcc"]:
+                        aliases["vdda"] = name
+                        aliases["avdd"] = name
+                        aliases["avcc"] = name
+                    elif lower_name in ["vssa", "agnd", "agnd"]:
+                        aliases["vssa"] = name
+                        aliases["agnd"] = name
+
         return aliases
-    
+
     def __getattr__(self, name: str):
         """
         Dot notation access: component.pins.VCC
-        
+
         Provides case-insensitive access with common aliases.
         """
         # Try exact match first
-        if hasattr(self._component, '_pin_names') and name in self._component._pin_names:
+        if (
+            hasattr(self._component, "_pin_names")
+            and name in self._component._pin_names
+        ):
             pins = self._component._pin_names[name]
             return pins[0] if len(pins) == 1 else PinGroup(pins)
-            
+
         # Try case-insensitive with aliases
         lower_name = name.lower()
         if lower_name in self._name_aliases:
             actual_name = self._name_aliases[lower_name]
             pins = self._component._pin_names[actual_name]
             return pins[0] if len(pins) == 1 else PinGroup(pins)
-            
+
         # Not found - provide helpful error
         available_names = []
-        if hasattr(self._component, '_pin_names'):
-            available_names = [name for name in self._component._pin_names.keys() 
-                             if name and name != "~"]
-        
+        if hasattr(self._component, "_pin_names"):
+            available_names = [
+                name
+                for name in self._component._pin_names.keys()
+                if name and name != "~"
+            ]
+
         available_numbers = []
-        if hasattr(self._component, '_pins'):
+        if hasattr(self._component, "_pins"):
             available_numbers = [num for num in self._component._pins.keys()]
-            
+
         raise ComponentError(
             f"Pin '{name}' not found in {self._component.ref} ({self._component.symbol}). "
             f"Available pin names: {', '.join(available_names) if available_names else 'None'}. "
             f"Available pin numbers: {', '.join(available_numbers) if available_numbers else 'None'}. "
             f"Use component.pins[number] for numbered pins."
         )
-    
+
     def __getitem__(self, pin_id):
         """
         Bracket notation access: component.pins[1] or component.pins["VCC"]
-        
+
         Delegates to the component's existing pin access system.
         """
         return self._component[pin_id]
-    
+
     def __setitem__(self, pin_id, pin):
         """
         Bracket notation assignment: component.pins[1] = pin
-        
-        Delegates to the component's existing pin assignment system.  
+
+        Delegates to the component's existing pin assignment system.
         """
         self._component[pin_id] = pin
-    
+
     def list_all(self) -> str:
         """
         Return a helpful listing of all available pins.
-        
+
         Returns:
             Formatted string showing all pins with numbers and names
         """
         lines = []
         lines.append(f"Pins for {self._component.ref} ({self._component.symbol}):")
-        
+
         # Group pins by number and name
         pin_info = []
-        if hasattr(self._component, '_pins'):
+        if hasattr(self._component, "_pins"):
             for pin_num, pin_obj in sorted(self._component._pins.items()):
-                name_str = f"'{pin_obj.name}'" if pin_obj.name and pin_obj.name != "~" else "unnamed"
+                name_str = (
+                    f"'{pin_obj.name}'"
+                    if pin_obj.name and pin_obj.name != "~"
+                    else "unnamed"
+                )
                 pin_info.append(f"  [{pin_num}] {name_str}")
-        
+
         if pin_info:
             lines.extend(pin_info)
         else:
             lines.append("  No pins available")
-            
+
         # Show aliases
         if self._name_aliases:
             lines.append("\nCommon aliases:")
             for alias, actual in sorted(self._name_aliases.items()):
                 lines.append(f"  .{alias} -> '{actual}'")
-                
+
         return "\n".join(lines)
-    
+
     def __len__(self) -> int:
         """Return number of pins."""
-        return len(self._component._pins) if hasattr(self._component, '_pins') else 0
-    
+        return len(self._component._pins) if hasattr(self._component, "_pins") else 0
+
     def __iter__(self):
         """Iterate over all pins."""
-        if hasattr(self._component, '_pins'):
+        if hasattr(self._component, "_pins"):
             return iter(self._component._pins.values())
         return iter([])
-    
+
     def __repr__(self) -> str:
         pin_count = len(self)
         return f"<UnifiedPinAccess for {self._component.ref}: {pin_count} pins>"
@@ -392,7 +402,7 @@ class Component(SimplifiedPinAccess):
             pin_numbers=list(self._pins.keys()),
             pin_names=list(self._pin_names.keys()),
         )
-        
+
         # Initialize unified pin access interface
         try:
             self.pins = UnifiedPinAccess(self)

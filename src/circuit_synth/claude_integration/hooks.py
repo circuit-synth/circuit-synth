@@ -198,10 +198,12 @@ def create_claude_settings() -> Dict[str, Any]:
 
 def setup_circuit_hooks():
     """Setup intelligent circuit design hooks"""
-    
+
     print("✅ Circuit design hooks installed")
-    print("🔧 Real-time validation, component checking, and design optimization enabled")
-    
+    print(
+        "🔧 Real-time validation, component checking, and design optimization enabled"
+    )
+
     # Also create project-local hooks for development
     project_claude_dir = Path(__file__).parent.parent.parent.parent / ".claude"
     if project_claude_dir.exists():

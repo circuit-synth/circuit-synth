@@ -52,7 +52,7 @@ def get_circuit_agents() -> Dict[str, CircuitSubAgent]:
 
     agents = {}
 
-    # Single focused agent - circuit-synth specialist  
+    # Single focused agent - circuit-synth specialist
     agents["circuit-synth"] = CircuitSubAgent(
         name="circuit-synth",
         description="Circuit-synth code generation and KiCad integration specialist",

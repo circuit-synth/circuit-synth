@@ -9,6 +9,7 @@ DOMAIN: Microcontroller Design
 
 from circuit_synth import Circuit, Component, Net, circuit
 
+
 @circuit
 def stm32_reference_design():
     """
