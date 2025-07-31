@@ -2,35 +2,25 @@
 
 This document lists all scripts in the `scripts/` directory and their purposes.
 
-## 🔧 **Build & Setup Scripts**
-
-### Rust Integration
-- **`scripts/rebuild_all_rust.sh`** - Rebuilds all Rust modules from scratch
-- **`scripts/enable_rust_acceleration.py`** - Enables Rust acceleration for performance
-- **`scripts/setup_integrated_rust.py`** - Sets up integrated Rust environment
-
-### KiCad Symbol Management  
-- **`scripts/download-kicad-symbols.sh`** - Downloads KiCad symbol libraries
-- **`scripts/extract-test-symbols.sh`** - Extracts symbols for testing
-- **`scripts/setup-ci-symbols.sh`** - Sets up symbols for CI environment
-
 ## 🧪 **Testing Scripts**
 
 ### Automated Testing
 - **`scripts/run_all_tests.sh`** - Comprehensive test runner (Python + Rust + Integration)
 - **`scripts/test_rust_modules.sh`** - Automated Rust module testing with JSON output
 
-### Development Tools
-- **`scripts/defensive_baseline.py`** - Baseline defensive programming checks
-- **`scripts/investigate_nondeterminism.py`** - Debugging nondeterministic behavior
+## 🔧 **Build & Setup Scripts**
 
-## 🐳 **Docker & Deployment**
+### Rust Integration
+- **`scripts/rebuild_all_rust.sh`** - Rebuilds all Rust modules from scratch
+- **`scripts/enable_rust_acceleration.py`** - Enables Rust acceleration for performance
 
-- **`scripts/circuit-synth-docker`** - Docker container management
-- **`scripts/deploy-production.sh`** - Production deployment script
-- **`scripts/docker-kicad-modern.sh`** - Modern KiCad Docker setup
-- **`scripts/docker-kicad-test.sh`** - KiCad testing environment
-- **`scripts/run-with-kicad.sh`** - Run with KiCad integration
+### Code Formatting
+- **`scripts/format_all.sh`** - Formats all Python and Rust code
+- **`scripts/setup_formatting.sh`** - Sets up pre-commit hooks for automatic formatting
+
+## 🛠️ **Maintenance & Utilities**
+
+- **`scripts/clear_all_caches.sh`** - Clears all circuit-synth caches for fresh testing
 
 ## 📖 **Quick Reference Commands**
 
@@ -39,7 +29,8 @@ This document lists all scripts in the `scripts/` directory and their purposes.
 ./scripts/run_all_tests.sh                    # Run comprehensive tests
 ./scripts/test_rust_modules.sh               # Test only Rust modules
 ./scripts/rebuild_all_rust.sh                # Rebuild all Rust modules
-./scripts/download-kicad-symbols.sh          # Download KiCad symbols
+./scripts/format_all.sh                      # Format all code
+./scripts/clear_all_caches.sh                # Clear caches
 ./scripts/enable_rust_acceleration.py        # Enable Rust performance
 ```
 
