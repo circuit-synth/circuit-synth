@@ -106,7 +106,7 @@ def main():
     
     # Generate netlists
     print("\n=== Text Netlist ===")
-    text_netlist = circuit.to_netlist()
+    text_netlist = circuit.generate_text_netlist()
     print(text_netlist)
     
     # Save text netlist
@@ -114,12 +114,14 @@ def main():
         f.write(text_netlist)
     
     print("\n=== JSON Netlist ===")
-    json_netlist = circuit.to_json()
-    print(json_netlist)
+    # Generate JSON netlist to file
+    json_path = os.path.join(output_dir, f"{project_name}.json")
+    circuit.generate_json_netlist(json_path)
     
-    # Save JSON netlist
-    with open(os.path.join(output_dir, f"{project_name}.json"), 'w') as f:
-        f.write(json_netlist)
+    # Read and display the JSON
+    with open(json_path, 'r') as f:
+        json_content = f.read()
+    print(json_content)
     
     # Generate KiCad project
     print(f"\n=== Generating KiCad Project in {output_dir} ===")
@@ -130,8 +132,9 @@ def main():
             project_name=project_name
         )
         
-        # Convert circuit to circuit data format
-        circuit_data = json.loads(circuit.to_json())
+        # Convert circuit to circuit data format - read from the JSON file we just created
+        with open(json_path, 'r') as f:
+            circuit_data = json.loads(f.read())
         
         # Generate schematic
         schematic_generator = kicad_integration.get_schematic_generator()

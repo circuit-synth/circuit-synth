@@ -22,3 +22,6 @@
 [submodule "plugins/smarton-ai"]
 	path = plugins/smarton-ai
 	url = https://github.com/smarton-empower/Smarton-AI.git
+[submodule "submodules/kicad-mcp"]
+	path = submodules/kicad-mcp
+	url = https://github.com/lamaalrajih/kicad-mcp.git

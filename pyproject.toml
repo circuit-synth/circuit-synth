@@ -93,6 +93,7 @@ validate-circuit = "circuit_synth.validation.real_time_check:main"
 
 # Plugin Management
 smarton-ai = "circuit_synth.tools.smarton_ai_manager:main"
+install-kicad-plugins = "install_kicad_plugins:main"
 
 [project.urls]
 Homepage = "https://github.com/circuit-synth/circuit-synth"

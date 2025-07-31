@@ -136,25 +136,38 @@ class ClaudeChatDialog(wx.Dialog):
     
     def setup_text_styles(self):
         """Set up rich text styles for the chat area."""
-        # User style
+        # Check if style sheet exists, create if needed
+        style_sheet = self.chat_area.GetStyleSheet()
+        if style_sheet is None:
+            # Create a new style sheet
+            style_sheet = wx.richtext.RichTextStyleSheet()
+            self.chat_area.SetStyleSheet(style_sheet)
+        
+        # User style - create proper RichTextCharacterStyleDefinition
+        user_style_def = wx.richtext.RichTextCharacterStyleDefinition("user")
         user_style = wx.richtext.RichTextAttr()
         user_style.SetBackgroundColour(wx.Colour(230, 245, 255))
         user_style.SetTextColour(wx.Colour(0, 80, 150))
         user_style.SetFontWeight(wx.FONTWEIGHT_BOLD)
-        self.chat_area.GetStyleSheet().AddCharacterStyle("user", user_style)
+        user_style_def.SetStyle(user_style)
+        style_sheet.AddCharacterStyle(user_style_def)
         
         # Claude style
+        claude_style_def = wx.richtext.RichTextCharacterStyleDefinition("claude")
         claude_style = wx.richtext.RichTextAttr()
         claude_style.SetBackgroundColour(wx.Colour(240, 255, 240))
         claude_style.SetTextColour(wx.Colour(0, 120, 0))
         claude_style.SetFontWeight(wx.FONTWEIGHT_NORMAL)
-        self.chat_area.GetStyleSheet().AddCharacterStyle("claude", claude_style)
+        claude_style_def.SetStyle(claude_style)
+        style_sheet.AddCharacterStyle(claude_style_def)
         
         # System style
+        system_style_def = wx.richtext.RichTextCharacterStyleDefinition("system")
         system_style = wx.richtext.RichTextAttr()
         system_style.SetTextColour(wx.Colour(120, 120, 120))
         system_style.SetFontStyle(wx.FONTSTYLE_ITALIC)
-        self.chat_area.GetStyleSheet().AddCharacterStyle("system", system_style)
+        system_style_def.SetStyle(system_style)
+        style_sheet.AddCharacterStyle(system_style_def)
     
     def create_input_section(self, parent_sizer):
         """Create the message input section."""
