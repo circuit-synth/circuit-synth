@@ -130,11 +130,19 @@ def install_plugins():
     pcb_plugins_src = kicad_plugins_dir
     pcb_plugins_dst = kicad_dirs["pcb_plugins"]
     
-    # Install enhanced PCB Claude chat plugin
+    # Install external PCB Claude chat plugin (most compatible)
+    pcb_external_plugin = pcb_plugins_src / "circuit_synth_pcb_external_chat.py"
+    if pcb_external_plugin.exists():
+        shutil.copy2(pcb_external_plugin, pcb_plugins_dst / "circuit_synth_pcb_external_chat.py")
+        print(f"✅ Installed: circuit_synth_pcb_external_chat.py")
+    else:
+        print(f"⚠️  Warning: circuit_synth_pcb_external_chat.py not found")
+    
+    # Install enhanced PCB Claude chat plugin (tkinter version)
     pcb_chat_plugin = pcb_plugins_src / "circuit_synth_pcb_claude_chat.py"
     if pcb_chat_plugin.exists():
         shutil.copy2(pcb_chat_plugin, pcb_plugins_dst / "circuit_synth_pcb_claude_chat.py")
-        print(f"✅ Installed: circuit_synth_pcb_claude_chat.py")
+        print(f"✅ Installed: circuit_synth_pcb_claude_chat.py (tkinter)")
     else:
         print(f"⚠️  Warning: circuit_synth_pcb_claude_chat.py not found")
     
@@ -180,8 +188,9 @@ def install_plugins():
     print(f"")
     print(f"PCB Editor:")
     print(f"  1. Open KiCad PCB Editor")
-    print(f"  2. Look for 'Circuit-Synth PCB Chat' toolbar button")
-    print(f"  3. Click for full Claude AI chat interface with PCB context")
+    print(f"  2. Look for 'Circuit-Synth PCB Chat (External)' toolbar button")
+    print(f"  3. Click to launch external Claude AI chat with PCB context")
+    print(f"  Note: External version avoids tkinter compatibility issues")
     print(f"")
     print(f"Schematic Editor:")
     print(f"  1. Open KiCad Schematic Editor")

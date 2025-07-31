@@ -322,18 +322,31 @@ QUESTION: {user_message}"""
 def show_pcb_claude_chat_gui(analysis_data):
     """Show the main KiCad PCB-Claude chat interface."""
     try:
-        import tkinter as tk
-        from tkinter import scrolledtext, messagebox
+        # Try importing tkinter with error handling
+        try:
+            import tkinter as tk
+            from tkinter import scrolledtext, messagebox
+        except ImportError as e:
+            logger.error(f"❌ tkinter import failed: {e}")
+            print(f"❌ tkinter import failed: {e}")
+            return False
         
         # Initialize Claude bridge
+        print("🔗 Initializing Claude bridge...")
         claude = KiCadPCBClaudeBridge()
         response_queue = queue.Queue()
         
         # Create main window
-        root = tk.Tk()
-        root.title("💬 KiCad PCB-Claude Chat")
-        root.geometry("1000x800")
-        root.configure(bg='#2b2b2b')
+        print("🖼️  Creating GUI window...")
+        try:
+            root = tk.Tk()
+            root.title("💬 KiCad PCB-Claude Chat")
+            root.geometry("1000x800")
+            root.configure(bg='#2b2b2b')
+            print("✅ GUI window created successfully")
+        except Exception as e:
+            print(f"❌ Failed to create GUI window: {e}")
+            return False
         
         # Status frame
         status_frame = tk.Frame(root, bg='#2b2b2b')
@@ -470,6 +483,74 @@ Ask me anything about your PCB design!
         
     except Exception as e:
         logger.error(f"GUI Error: {e}")
+        print(f"❌ tkinter GUI Error: {e}")
+        import traceback
+        print(f"   Traceback: {traceback.format_exc()}")
+        return False
+
+def show_simple_wx_fallback(analysis_data):
+    """Simple wx-based fallback if tkinter fails."""
+    try:
+        print("🔄 Attempting wx fallback interface...")
+        
+        # Create simple wx dialog
+        dialog = wx.Dialog(
+            None,
+            title="🚀 Circuit-Synth PCB Analysis", 
+            size=(600, 500),
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+        )
+        
+        # Main sizer
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        
+        # Title
+        title = wx.StaticText(dialog, label="Circuit-Synth PCB Analysis")
+        title_font = title.GetFont()
+        title_font.SetPointSize(14)
+        title_font.SetWeight(wx.FONTWEIGHT_BOLD)
+        title.SetFont(title_font)
+        main_sizer.Add(title, 0, wx.ALL | wx.CENTER, 10)
+        
+        # Analysis text
+        analysis_text = f"""PCB Project: {analysis_data.get('board_name', 'Unknown')}
+Components: {analysis_data.get('component_count', 0)}
+Board Size: {analysis_data.get('board_size', 'Unknown')}
+Routing: {analysis_data.get('track_segments', 0)} tracks, {analysis_data.get('via_count', 0)} vias
+
+The full Claude AI chat interface requires tkinter support.
+This simplified view shows your PCB analysis.
+
+For full Claude integration:
+1. Ensure tkinter is available in KiCad Python environment
+2. Install Claude CLI: https://claude.ai/code
+3. Try the schematic BOM plugin which may have better compatibility
+
+Component Summary:"""
+        
+        if analysis_data.get('component_types'):
+            for comp_type, count in analysis_data['component_types'].items():
+                analysis_text += f"\n• {comp_type}: {count} components"
+        
+        text_area = wx.TextCtrl(
+            dialog,
+            style=wx.TE_MULTILINE | wx.TE_READONLY,
+            value=analysis_text
+        )
+        main_sizer.Add(text_area, 1, wx.ALL | wx.EXPAND, 10)
+        
+        # Close button
+        close_btn = wx.Button(dialog, wx.ID_CLOSE, "Close")
+        close_btn.Bind(wx.EVT_BUTTON, lambda evt: dialog.EndModal(wx.ID_CLOSE))
+        main_sizer.Add(close_btn, 0, wx.ALL | wx.CENTER, 10)
+        
+        dialog.SetSizer(main_sizer)
+        dialog.ShowModal()
+        dialog.Destroy()
+        return True
+        
+    except Exception as e:
+        print(f"❌ wx fallback also failed: {e}")
         return False
 
 class CircuitSynthPCBClaudeChat(pcbnew.ActionPlugin):
@@ -489,42 +570,62 @@ class CircuitSynthPCBClaudeChat(pcbnew.ActionPlugin):
     def Run(self):
         """Execute the plugin."""
         try:
+            print("💬 Circuit-Synth PCB Chat Starting...")
+            logger.info("Circuit-Synth PCB Chat plugin started")
+            
             # Get the current board
             board = pcbnew.GetBoard()
             if board is None:
-                wx.MessageBox(
-                    "No PCB board found. Please open a PCB file first.",
-                    "Circuit-Synth PCB Chat",
-                    wx.OK | wx.ICON_WARNING
-                )
+                error_msg = "No PCB board found. Please open a PCB file first."
+                print(f"❌ {error_msg}")
+                wx.MessageBox(error_msg, "Circuit-Synth PCB Chat", wx.OK | wx.ICON_WARNING)
                 return
 
-            print("💬 Circuit-Synth PCB Chat Starting...")
+            print("✅ PCB board found, analyzing...")
             
             # Analyze the board
             analysis = analyze_pcb_board(board)
             
             if analysis.get('success'):
-                print(f"✅ Found {analysis['component_count']} components on board")
+                print(f"✅ Board analysis complete: {analysis['component_count']} components")
+                print(f"   Board: {analysis['board_name']}")
+                print(f"   Size: {analysis['board_size']}")
+                print(f"   Routing: {analysis['track_segments']} tracks, {analysis['via_count']} vias")
                 
                 # Show Claude chat interface
-                if show_pcb_claude_chat_gui(analysis):
-                    print("✅ Claude chat interface launched")
+                print("🚀 Launching Claude chat interface...")
+                gui_result = show_pcb_claude_chat_gui(analysis)
+                
+                if gui_result:
+                    print("✅ Claude chat interface launched successfully")
                 else:
-                    wx.MessageBox(
-                        "Failed to launch Claude chat interface. Check console for details.",
-                        "Plugin Error",
-                        wx.OK | wx.ICON_ERROR
-                    )
+                    print("❌ tkinter GUI launch failed, trying wx fallback...")
+                    fallback_result = show_simple_wx_fallback(analysis)
+                    
+                    if fallback_result:
+                        print("✅ wx fallback interface launched successfully")
+                    else:
+                        error_msg = "Failed to launch any GUI interface. Possible issues:\n" + \
+                                   "• tkinter not available in KiCad Python environment\n" + \
+                                   "• Claude CLI not installed or not in PATH\n" + \
+                                   "• GUI permission issues\n\n" + \
+                                   "Check KiCad scripting console (Tools → Scripting Console) for detailed error messages."
+                        print(f"❌ All GUI options failed")
+                        wx.MessageBox(error_msg, "GUI Launch Failed", wx.OK | wx.ICON_ERROR)
             else:
                 error_msg = f"Board analysis failed: {analysis.get('error', 'Unknown error')}"
                 print(f"❌ {error_msg}")
+                logger.error(f"Board analysis failed: {analysis.get('error')}")
                 wx.MessageBox(error_msg, "Analysis Error", wx.OK | wx.ICON_ERROR)
 
         except Exception as e:
             error_msg = f"Plugin error: {str(e)}"
-            print(f"❌ {error_msg}")
-            wx.MessageBox(error_msg, "Plugin Error", wx.OK | wx.ICON_ERROR)
+            print(f"❌ Plugin exception: {error_msg}")
+            logger.error(f"Plugin exception: {e}")
+            import traceback
+            print(f"   Traceback: {traceback.format_exc()}")
+            wx.MessageBox(f"Plugin error: {error_msg}\n\nCheck scripting console for details.", 
+                         "Plugin Error", wx.OK | wx.ICON_ERROR)
 
 # Register the plugin
 CircuitSynthPCBClaudeChat().register()
