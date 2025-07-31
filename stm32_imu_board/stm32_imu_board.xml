@@ -1,0 +1,1175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>/Users/shanemattner/Desktop/Circuit_Synth2/submodules/circuit-synth/stm32_imu_board/stm32_imu_board.kicad_sch</source>
+    <date>2025-07-30T22:30:46-0700</date>
+    <tool>Eeschema 9.0.0</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>stm32_imu_board.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="2" name="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/">
+      <title_block>
+        <title>STM32_IMU_USBC_Board</title>
+        <company>Circuit-Synth</company>
+        <rev/>
+        <date>2025-07-30</date>
+        <source>STM32_IMU_USBC_Board.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="C1">
+      <value>22pF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>b28cd0c7-e4d6-4c26-b415-a59214fd7408</tstamps>
+    </comp>
+    <comp ref="C2">
+      <value>22pF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>7bf6ab64-90f2-45f8-a06a-9f5917dc6f2d</tstamps>
+    </comp>
+    <comp ref="C3">
+      <value>10uF</value>
+      <footprint>Capacitor_SMD:C_0805_2012Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0805_2012Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>ddfde089-0d23-47d3-a9df-2c14a392a19f</tstamps>
+    </comp>
+    <comp ref="C4">
+      <value>22uF</value>
+      <footprint>Capacitor_SMD:C_0805_2012Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0805_2012Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>83533edd-7445-406e-a996-17e4b490c69d</tstamps>
+    </comp>
+    <comp ref="C5">
+      <value>100nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>b4c72f7a-b076-4752-9324-19d3b2e105b9</tstamps>
+    </comp>
+    <comp ref="C6">
+      <value>100nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>f03a1763-9749-4e29-a77c-376b13a543bd</tstamps>
+    </comp>
+    <comp ref="C7">
+      <value>100nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>bffdbb74-efe0-4b45-8f03-4a9b206dec47</tstamps>
+    </comp>
+    <comp ref="C8">
+      <value>100nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>57554252-291d-4be1-8b39-22de23236064</tstamps>
+    </comp>
+    <comp ref="C9">
+      <value>100nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>bc04c0e8-84d5-4ae1-944a-7a2f285642ea</tstamps>
+    </comp>
+    <comp ref="C10">
+      <value>100nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>8c741acf-03f4-46b7-b712-afb530f44b65</tstamps>
+    </comp>
+    <comp ref="C11">
+      <value>10uF</value>
+      <footprint>Capacitor_SMD:C_0805_2012Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0805_2012Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>f43be943-eb74-4a24-90c9-092e7ca5e1e0</tstamps>
+    </comp>
+    <comp ref="C12">
+      <value>100nF</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>7dd84735-b8f7-4ad0-b82f-971e50182f2c</tstamps>
+    </comp>
+    <comp ref="D1">
+      <value>~</value>
+      <footprint>LED_SMD:LED_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">LED_SMD:LED_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="LED" description="Light emitting diode"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="LED diode"/>
+      <property name="ki_fp_filters" value="LED* LED_SMD:* LED_THT:*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>01e1ced1-3a53-4e46-ac2a-20d8d31d6fed</tstamps>
+    </comp>
+    <comp ref="J1">
+      <value>~</value>
+      <footprint>Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12</footprint>
+      <fields>
+        <field name="Footprint">Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector" part="USB_C_Receptacle_USB2.0_16P" description="USB 2.0-only 16P Type-C Receptacle connector"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="usb universal serial bus type-C USB2.0"/>
+      <property name="ki_fp_filters" value="USB*C*Receptacle*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>f2baf4f0-363f-4247-9ee2-53a27328182c</tstamps>
+    </comp>
+    <comp ref="R1">
+      <value>10k</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>ed7d68be-2c76-495a-80f6-5325357aea34</tstamps>
+    </comp>
+    <comp ref="R2">
+      <value>10k</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>02f32674-cc93-474c-b184-7cc6651696fe</tstamps>
+    </comp>
+    <comp ref="R3">
+      <value>4.7k</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>539404f4-bd66-42f8-833b-ac286c5d10a4</tstamps>
+    </comp>
+    <comp ref="R4">
+      <value>4.7k</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>302a36e6-923d-4acd-91aa-8709e4d45769</tstamps>
+    </comp>
+    <comp ref="R5">
+      <value>330</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0603_1608Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>58ee87a4-6142-482a-8c98-5e62376a4cc1</tstamps>
+    </comp>
+    <comp ref="SW1">
+      <value>~</value>
+      <footprint>Button_Switch_SMD:SW_SPST_CK_RS282G05A3</footprint>
+      <fields>
+        <field name="Footprint">Button_Switch_SMD:SW_SPST_CK_RS282G05A3</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Switch" part="SW_Push" description="Push button switch, generic, two pins"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="switch normally-open pushbutton push-button"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>52e6c727-aad4-4a4a-94f1-2e7b08e94d15</tstamps>
+    </comp>
+    <comp ref="U1">
+      <value>~</value>
+      <footprint>Package_QFP:LQFP-100_14x14mm_P0.5mm</footprint>
+      <fields>
+        <field name="Footprint">Package_QFP:LQFP-100_14x14mm_P0.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="MCU_ST_STM32F4" part="STM32F407VGTx" description="STMicroelectronics Arm Cortex-M4 MCU, 1024KB flash, 192KB RAM, 168 MHz, 1.8-3.6V, 82 GPIO, LQFP100"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="Arm Cortex-M4 STM32F4 STM32F407/417"/>
+      <property name="ki_fp_filters" value="LQFP*14x14mm*P0.5mm*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>99f70c43-9c61-4f68-98bf-87ea70834af5</tstamps>
+    </comp>
+    <comp ref="U2">
+      <value>~</value>
+      <footprint>Package_TO_SOT_SMD:SOT-223-3_TabPin2</footprint>
+      <fields>
+        <field name="Footprint">Package_TO_SOT_SMD:SOT-223-3_TabPin2</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Regulator_Linear" part="AMS1117-3.3" description="1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="linear regulator ldo fixed positive"/>
+      <property name="ki_fp_filters" value="SOT?223*TabPin2*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>725ebc10-3145-4449-a775-9a4f58783d01</tstamps>
+    </comp>
+    <comp ref="U3">
+      <value>~</value>
+      <footprint>Package_LGA:LGA-24_3x3mm_P0.43mm</footprint>
+      <fields>
+        <field name="Footprint">Package_LGA:LGA-24_3x3mm_P0.43mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Sensor_Motion" part="MPU-6050" description="InvenSense 6-Axis Motion Sensor, Gyroscope, Accelerometer, I2C"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="mems"/>
+      <property name="ki_fp_filters" value="*QFN*4x4mm*P0.5mm*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>10e028c6-fdc8-46f4-a95a-06b42032163a</tstamps>
+    </comp>
+    <comp ref="Y1">
+      <value>8MHz</value>
+      <footprint>Crystal:Crystal_SMD_HC49-SD_H1.5mm</footprint>
+      <fields>
+        <field name="Footprint">Crystal:Crystal_SMD_HC49-SD_H1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="Crystal" description="Two pin crystal"/>
+      <property name="Sheetname" value="STM32_IMU_USBC_Board"/>
+      <property name="Sheetfile" value="STM32_IMU_USBC_Board.kicad_sch"/>
+      <property name="ki_keywords" value="quartz ceramic resonator oscillator"/>
+      <property name="ki_fp_filters" value="Crystal*"/>
+      <sheetpath names="/STM32_IMU_USBC_Board/" tstamps="/a07d2cfd-08b7-4031-bc34-da2638b9f031/"/>
+      <tstamps>90816478-3a56-42f3-a09e-79d509780d4c</tstamps>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Connector" part="USB_C_Receptacle_USB2.0_16P">
+      <description>USB 2.0-only 16P Type-C Receptacle connector</description>
+      <docs>https://www.usb.org/sites/default/files/documents/usb_type-c.zip</docs>
+      <footprints>
+        <fp>USB*C*Receptacle*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">USB_C_Receptacle_USB2.0_16P</field>
+        <field name="Footprint"/>
+        <field name="Datasheet">https://www.usb.org/sites/default/files/documents/usb_type-c.zip</field>
+        <field name="Description">USB 2.0-only 16P Type-C Receptacle connector</field>
+      </fields>
+      <pins>
+        <pin num="A1" name="GND" type="passive"/>
+        <pin num="A4" name="VBUS" type="passive"/>
+        <pin num="A5" name="CC1" type="bidirectional"/>
+        <pin num="A6" name="D+" type="bidirectional"/>
+        <pin num="A7" name="D-" type="bidirectional"/>
+        <pin num="A8" name="SBU1" type="bidirectional"/>
+        <pin num="A9" name="VBUS" type="passive"/>
+        <pin num="A12" name="GND" type="passive"/>
+        <pin num="B1" name="GND" type="passive"/>
+        <pin num="B4" name="VBUS" type="passive"/>
+        <pin num="B5" name="CC2" type="bidirectional"/>
+        <pin num="B6" name="D+" type="bidirectional"/>
+        <pin num="B7" name="D-" type="bidirectional"/>
+        <pin num="B8" name="SBU2" type="bidirectional"/>
+        <pin num="B9" name="VBUS" type="passive"/>
+        <pin num="B12" name="GND" type="passive"/>
+        <pin num="S1" name="SHIELD" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="C">
+      <description>Unpolarized capacitor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+        <field name="Footprint"/>
+        <field name="Datasheet">~</field>
+        <field name="Description">Unpolarized capacitor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="Crystal">
+      <description>Two pin crystal</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Crystal*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">Y</field>
+        <field name="Value">Crystal</field>
+        <field name="Footprint"/>
+        <field name="Datasheet">~</field>
+        <field name="Description">Two pin crystal</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="LED">
+      <description>Light emitting diode</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>LED*</fp>
+        <fp>LED_SMD:*</fp>
+        <fp>LED_THT:*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">D</field>
+        <field name="Value">LED</field>
+        <field name="Footprint"/>
+        <field name="Datasheet">~</field>
+        <field name="Description">Light emitting diode</field>
+        <field name="Sim.Pins">1=K 2=A</field>
+      </fields>
+      <pins>
+        <pin num="1" name="K" type="passive"/>
+        <pin num="2" name="A" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="R">
+      <description>Resistor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+        <field name="Footprint"/>
+        <field name="Datasheet">~</field>
+        <field name="Description">Resistor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="MCU_ST_STM32F4" part="STM32F407VGTx">
+      <description>STMicroelectronics Arm Cortex-M4 MCU, 1024KB flash, 192KB RAM, 168 MHz, 1.8-3.6V, 82 GPIO, LQFP100</description>
+      <docs>https://www.st.com/resource/en/datasheet/stm32f407vg.pdf</docs>
+      <footprints>
+        <fp>LQFP*14x14mm*P0.5mm*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">STM32F407VGTx</field>
+        <field name="Footprint">Package_QFP:LQFP-100_14x14mm_P0.5mm</field>
+        <field name="Datasheet">https://www.st.com/resource/en/datasheet/stm32f407vg.pdf</field>
+        <field name="Description">STMicroelectronics Arm Cortex-M4 MCU, 1024KB flash, 192KB RAM, 168 MHz, 1.8-3.6V, 82 GPIO, LQFP100</field>
+      </fields>
+      <pins>
+        <pin num="1" name="PE2" type="bidirectional"/>
+        <pin num="2" name="PE3" type="bidirectional"/>
+        <pin num="3" name="PE4" type="bidirectional"/>
+        <pin num="4" name="PE5" type="bidirectional"/>
+        <pin num="5" name="PE6" type="bidirectional"/>
+        <pin num="6" name="VBAT" type="power_in"/>
+        <pin num="7" name="PC13" type="bidirectional"/>
+        <pin num="8" name="PC14" type="bidirectional"/>
+        <pin num="9" name="PC15" type="bidirectional"/>
+        <pin num="10" name="VSS" type="power_in"/>
+        <pin num="11" name="VDD" type="power_in"/>
+        <pin num="12" name="PH0" type="bidirectional"/>
+        <pin num="13" name="PH1" type="bidirectional"/>
+        <pin num="14" name="NRST" type="input"/>
+        <pin num="15" name="PC0" type="bidirectional"/>
+        <pin num="16" name="PC1" type="bidirectional"/>
+        <pin num="17" name="PC2" type="bidirectional"/>
+        <pin num="18" name="PC3" type="bidirectional"/>
+        <pin num="19" name="VDD" type="power_in"/>
+        <pin num="20" name="VSSA" type="power_in"/>
+        <pin num="21" name="VREF+" type="input"/>
+        <pin num="22" name="VDDA" type="power_in"/>
+        <pin num="23" name="PA0" type="bidirectional"/>
+        <pin num="24" name="PA1" type="bidirectional"/>
+        <pin num="25" name="PA2" type="bidirectional"/>
+        <pin num="26" name="PA3" type="bidirectional"/>
+        <pin num="27" name="VSS" type="passive"/>
+        <pin num="28" name="VDD" type="power_in"/>
+        <pin num="29" name="PA4" type="bidirectional"/>
+        <pin num="30" name="PA5" type="bidirectional"/>
+        <pin num="31" name="PA6" type="bidirectional"/>
+        <pin num="32" name="PA7" type="bidirectional"/>
+        <pin num="33" name="PC4" type="bidirectional"/>
+        <pin num="34" name="PC5" type="bidirectional"/>
+        <pin num="35" name="PB0" type="bidirectional"/>
+        <pin num="36" name="PB1" type="bidirectional"/>
+        <pin num="37" name="PB2" type="bidirectional"/>
+        <pin num="38" name="PE7" type="bidirectional"/>
+        <pin num="39" name="PE8" type="bidirectional"/>
+        <pin num="40" name="PE9" type="bidirectional"/>
+        <pin num="41" name="PE10" type="bidirectional"/>
+        <pin num="42" name="PE11" type="bidirectional"/>
+        <pin num="43" name="PE12" type="bidirectional"/>
+        <pin num="44" name="PE13" type="bidirectional"/>
+        <pin num="45" name="PE14" type="bidirectional"/>
+        <pin num="46" name="PE15" type="bidirectional"/>
+        <pin num="47" name="PB10" type="bidirectional"/>
+        <pin num="48" name="PB11" type="bidirectional"/>
+        <pin num="49" name="VCAP_1" type="power_out"/>
+        <pin num="50" name="VDD" type="power_in"/>
+        <pin num="51" name="PB12" type="bidirectional"/>
+        <pin num="52" name="PB13" type="bidirectional"/>
+        <pin num="53" name="PB14" type="bidirectional"/>
+        <pin num="54" name="PB15" type="bidirectional"/>
+        <pin num="55" name="PD8" type="bidirectional"/>
+        <pin num="56" name="PD9" type="bidirectional"/>
+        <pin num="57" name="PD10" type="bidirectional"/>
+        <pin num="58" name="PD11" type="bidirectional"/>
+        <pin num="59" name="PD12" type="bidirectional"/>
+        <pin num="60" name="PD13" type="bidirectional"/>
+        <pin num="61" name="PD14" type="bidirectional"/>
+        <pin num="62" name="PD15" type="bidirectional"/>
+        <pin num="63" name="PC6" type="bidirectional"/>
+        <pin num="64" name="PC7" type="bidirectional"/>
+        <pin num="65" name="PC8" type="bidirectional"/>
+        <pin num="66" name="PC9" type="bidirectional"/>
+        <pin num="67" name="PA8" type="bidirectional"/>
+        <pin num="68" name="PA9" type="bidirectional"/>
+        <pin num="69" name="PA10" type="bidirectional"/>
+        <pin num="70" name="PA11" type="bidirectional"/>
+        <pin num="71" name="PA12" type="bidirectional"/>
+        <pin num="72" name="PA13" type="bidirectional"/>
+        <pin num="73" name="VCAP_2" type="power_out"/>
+        <pin num="74" name="VSS" type="passive"/>
+        <pin num="75" name="VDD" type="power_in"/>
+        <pin num="76" name="PA14" type="bidirectional"/>
+        <pin num="77" name="PA15" type="bidirectional"/>
+        <pin num="78" name="PC10" type="bidirectional"/>
+        <pin num="79" name="PC11" type="bidirectional"/>
+        <pin num="80" name="PC12" type="bidirectional"/>
+        <pin num="81" name="PD0" type="bidirectional"/>
+        <pin num="82" name="PD1" type="bidirectional"/>
+        <pin num="83" name="PD2" type="bidirectional"/>
+        <pin num="84" name="PD3" type="bidirectional"/>
+        <pin num="85" name="PD4" type="bidirectional"/>
+        <pin num="86" name="PD5" type="bidirectional"/>
+        <pin num="87" name="PD6" type="bidirectional"/>
+        <pin num="88" name="PD7" type="bidirectional"/>
+        <pin num="89" name="PB3" type="bidirectional"/>
+        <pin num="90" name="PB4" type="bidirectional"/>
+        <pin num="91" name="PB5" type="bidirectional"/>
+        <pin num="92" name="PB6" type="bidirectional"/>
+        <pin num="93" name="PB7" type="bidirectional"/>
+        <pin num="94" name="BOOT0" type="input"/>
+        <pin num="95" name="PB8" type="bidirectional"/>
+        <pin num="96" name="PB9" type="bidirectional"/>
+        <pin num="97" name="PE0" type="bidirectional"/>
+        <pin num="98" name="PE1" type="bidirectional"/>
+        <pin num="99" name="VSS" type="passive"/>
+        <pin num="100" name="VDD" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="Regulator_Linear" part="AMS1117-3.3">
+      <description>1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223</description>
+      <docs>http://www.advanced-monolithic.com/pdf/ds1117.pdf</docs>
+      <footprints>
+        <fp>SOT?223*TabPin2*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">AMS1117-3.3</field>
+        <field name="Footprint">Package_TO_SOT_SMD:SOT-223-3_TabPin2</field>
+        <field name="Datasheet">http://www.advanced-monolithic.com/pdf/ds1117.pdf</field>
+        <field name="Description">1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223</field>
+      </fields>
+      <pins>
+        <pin num="1" name="GND" type="power_in"/>
+        <pin num="2" name="VO" type="power_out"/>
+        <pin num="3" name="VI" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="Sensor_Motion" part="MPU-6050">
+      <description>InvenSense 6-Axis Motion Sensor, Gyroscope, Accelerometer, I2C</description>
+      <docs>https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6000-Datasheet1.pdf</docs>
+      <footprints>
+        <fp>*QFN*4x4mm*P0.5mm*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">MPU-6050</field>
+        <field name="Footprint">Sensor_Motion:InvenSense_QFN-24_4x4mm_P0.5mm</field>
+        <field name="Datasheet">https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6000-Datasheet1.pdf</field>
+        <field name="Description">InvenSense 6-Axis Motion Sensor, Gyroscope, Accelerometer, I2C</field>
+      </fields>
+      <pins>
+        <pin num="1" name="CLKIN" type="input"/>
+        <pin num="2" name="NC" type="no_connect"/>
+        <pin num="3" name="NC" type="no_connect"/>
+        <pin num="4" name="NC" type="no_connect"/>
+        <pin num="5" name="NC" type="no_connect"/>
+        <pin num="6" name="AUX_DA" type="bidirectional"/>
+        <pin num="7" name="AUX_CL" type="output"/>
+        <pin num="8" name="VLOGIC" type="power_in"/>
+        <pin num="9" name="AD0" type="input"/>
+        <pin num="10" name="REGOUT" type="passive"/>
+        <pin num="11" name="FSYNC" type="input"/>
+        <pin num="12" name="INT" type="output"/>
+        <pin num="13" name="VDD" type="power_in"/>
+        <pin num="14" name="NC" type="no_connect"/>
+        <pin num="15" name="NC" type="no_connect"/>
+        <pin num="16" name="NC" type="no_connect"/>
+        <pin num="17" name="NC" type="no_connect"/>
+        <pin num="18" name="GND" type="power_in"/>
+        <pin num="19" name="RESV" type="no_connect"/>
+        <pin num="20" name="CPOUT" type="passive"/>
+        <pin num="21" name="RESV" type="no_connect"/>
+        <pin num="22" name="RESV" type="no_connect"/>
+        <pin num="23" name="SCL" type="input"/>
+        <pin num="24" name="SDA" type="bidirectional"/>
+      </pins>
+    </libpart>
+    <libpart lib="Switch" part="SW_Push">
+      <description>Push button switch, generic, two pins</description>
+      <docs>~</docs>
+      <fields>
+        <field name="Reference">SW</field>
+        <field name="Value">SW_Push</field>
+        <field name="Footprint"/>
+        <field name="Datasheet">~</field>
+        <field name="Description">Push button switch, generic, two pins</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Connector">
+      <uri>/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols//Connector.kicad_sym</uri>
+    </library>
+    <library logical="Device">
+      <uri>/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols//Device.kicad_sym</uri>
+    </library>
+    <library logical="MCU_ST_STM32F4">
+      <uri>/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols//MCU_ST_STM32F4.kicad_sym</uri>
+    </library>
+    <library logical="Regulator_Linear">
+      <uri>/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols//Regulator_Linear.kicad_sym</uri>
+    </library>
+    <library logical="Sensor_Motion">
+      <uri>/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols//Sensor_Motion.kicad_sym</uri>
+    </library>
+    <library logical="Switch">
+      <uri>/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols//Switch.kicad_sym</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="/STM32_IMU_USBC_Board/BOOT0" class="Default">
+      <node ref="R2" pin="1" pintype="passive"/>
+      <node ref="U1" pin="94" pinfunction="BOOT0" pintype="input"/>
+    </net>
+    <net code="2" name="/STM32_IMU_USBC_Board/GND" class="Default">
+      <node ref="C1" pin="2" pintype="passive"/>
+      <node ref="C10" pin="2" pintype="passive"/>
+      <node ref="C11" pin="2" pintype="passive"/>
+      <node ref="C12" pin="2" pintype="passive"/>
+      <node ref="C2" pin="2" pintype="passive"/>
+      <node ref="C3" pin="2" pintype="passive"/>
+      <node ref="C4" pin="2" pintype="passive"/>
+      <node ref="C5" pin="2" pintype="passive"/>
+      <node ref="C6" pin="2" pintype="passive"/>
+      <node ref="C7" pin="2" pintype="passive"/>
+      <node ref="C8" pin="2" pintype="passive"/>
+      <node ref="C9" pin="2" pintype="passive"/>
+      <node ref="D1" pin="2" pinfunction="A" pintype="passive"/>
+      <node ref="J1" pin="A1" pinfunction="GND" pintype="passive"/>
+      <node ref="J1" pin="A12" pinfunction="GND" pintype="passive"/>
+      <node ref="J1" pin="B1" pinfunction="GND" pintype="passive"/>
+      <node ref="J1" pin="B12" pinfunction="GND" pintype="passive"/>
+      <node ref="J1" pin="S1" pinfunction="SHIELD" pintype="passive"/>
+      <node ref="R2" pin="2" pintype="passive"/>
+      <node ref="SW1" pin="2" pinfunction="2" pintype="passive"/>
+      <node ref="U1" pin="10" pinfunction="VSS" pintype="power_in"/>
+      <node ref="U1" pin="20" pinfunction="VSSA" pintype="power_in"/>
+      <node ref="U1" pin="27" pinfunction="VSS" pintype="passive"/>
+      <node ref="U1" pin="74" pinfunction="VSS" pintype="passive"/>
+      <node ref="U1" pin="99" pinfunction="VSS" pintype="passive"/>
+      <node ref="U2" pin="1" pinfunction="GND" pintype="power_in"/>
+      <node ref="U3" pin="18" pinfunction="GND" pintype="power_in"/>
+      <node ref="U3" pin="9" pinfunction="AD0" pintype="input"/>
+    </net>
+    <net code="3" name="/STM32_IMU_USBC_Board/I2C_SCL" class="Default">
+      <node ref="R3" pin="2" pintype="passive"/>
+      <node ref="U1" pin="92" pinfunction="PB6" pintype="bidirectional"/>
+      <node ref="U3" pin="23" pinfunction="SCL" pintype="input"/>
+    </net>
+    <net code="4" name="/STM32_IMU_USBC_Board/I2C_SDA" class="Default">
+      <node ref="R4" pin="2" pintype="passive"/>
+      <node ref="U1" pin="93" pinfunction="PB7" pintype="bidirectional"/>
+      <node ref="U3" pin="24" pinfunction="SDA" pintype="bidirectional"/>
+    </net>
+    <net code="5" name="/STM32_IMU_USBC_Board/N$1" class="Default">
+      <node ref="R5" pin="1" pintype="passive"/>
+      <node ref="U1" pin="7" pinfunction="PC13" pintype="bidirectional"/>
+    </net>
+    <net code="6" name="/STM32_IMU_USBC_Board/N$2" class="Default">
+      <node ref="D1" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R5" pin="2" pintype="passive"/>
+    </net>
+    <net code="7" name="/STM32_IMU_USBC_Board/OSC_IN" class="Default">
+      <node ref="C1" pin="1" pintype="passive"/>
+      <node ref="U1" pin="12" pinfunction="PH0" pintype="bidirectional"/>
+      <node ref="Y1" pin="1" pinfunction="1" pintype="passive"/>
+    </net>
+    <net code="8" name="/STM32_IMU_USBC_Board/OSC_OUT" class="Default">
+      <node ref="C2" pin="1" pintype="passive"/>
+      <node ref="U1" pin="13" pinfunction="PH1" pintype="bidirectional"/>
+      <node ref="Y1" pin="2" pinfunction="2" pintype="passive"/>
+    </net>
+    <net code="9" name="/STM32_IMU_USBC_Board/RESET" class="Default">
+      <node ref="R1" pin="2" pintype="passive"/>
+      <node ref="SW1" pin="1" pinfunction="1" pintype="passive"/>
+      <node ref="U1" pin="14" pinfunction="NRST" pintype="input"/>
+    </net>
+    <net code="10" name="/STM32_IMU_USBC_Board/USB_DM" class="Default">
+      <node ref="J1" pin="A7" pinfunction="D-" pintype="bidirectional"/>
+      <node ref="U1" pin="70" pinfunction="PA11" pintype="bidirectional"/>
+    </net>
+    <net code="11" name="/STM32_IMU_USBC_Board/USB_DP" class="Default">
+      <node ref="J1" pin="A6" pinfunction="D+" pintype="bidirectional"/>
+      <node ref="U1" pin="71" pinfunction="PA12" pintype="bidirectional"/>
+    </net>
+    <net code="12" name="/STM32_IMU_USBC_Board/VCC_3V3" class="Default">
+      <node ref="C10" pin="1" pintype="passive"/>
+      <node ref="C11" pin="1" pintype="passive"/>
+      <node ref="C12" pin="1" pintype="passive"/>
+      <node ref="C4" pin="1" pintype="passive"/>
+      <node ref="C5" pin="1" pintype="passive"/>
+      <node ref="C6" pin="1" pintype="passive"/>
+      <node ref="C7" pin="1" pintype="passive"/>
+      <node ref="C8" pin="1" pintype="passive"/>
+      <node ref="C9" pin="1" pintype="passive"/>
+      <node ref="R1" pin="1" pintype="passive"/>
+      <node ref="R3" pin="1" pintype="passive"/>
+      <node ref="R4" pin="1" pintype="passive"/>
+      <node ref="U1" pin="11" pinfunction="VDD" pintype="power_in"/>
+      <node ref="U1" pin="22" pinfunction="VDDA" pintype="power_in"/>
+      <node ref="U1" pin="6" pinfunction="VBAT" pintype="power_in"/>
+      <node ref="U2" pin="2" pinfunction="VO" pintype="power_out"/>
+      <node ref="U3" pin="13" pinfunction="VDD" pintype="power_in"/>
+      <node ref="U3" pin="8" pinfunction="VLOGIC" pintype="power_in"/>
+    </net>
+    <net code="13" name="/STM32_IMU_USBC_Board/VCC_5V" class="Default">
+      <node ref="C3" pin="1" pintype="passive"/>
+      <node ref="J1" pin="A4" pinfunction="VBUS" pintype="passive"/>
+      <node ref="J1" pin="A9" pinfunction="VBUS" pintype="passive"/>
+      <node ref="J1" pin="B4" pinfunction="VBUS" pintype="passive"/>
+      <node ref="J1" pin="B9" pinfunction="VBUS" pintype="passive"/>
+      <node ref="U2" pin="3" pinfunction="VI" pintype="power_in"/>
+    </net>
+    <net code="14" name="unconnected-(J1-CC1-PadA5)" class="Default">
+      <node ref="J1" pin="A5" pinfunction="CC1" pintype="bidirectional"/>
+    </net>
+    <net code="15" name="unconnected-(J1-CC2-PadB5)" class="Default">
+      <node ref="J1" pin="B5" pinfunction="CC2" pintype="bidirectional"/>
+    </net>
+    <net code="16" name="unconnected-(J1-D+-PadB6)" class="Default">
+      <node ref="J1" pin="B6" pinfunction="D+" pintype="bidirectional"/>
+    </net>
+    <net code="17" name="unconnected-(J1-D--PadB7)" class="Default">
+      <node ref="J1" pin="B7" pinfunction="D-" pintype="bidirectional"/>
+    </net>
+    <net code="18" name="unconnected-(J1-SBU1-PadA8)" class="Default">
+      <node ref="J1" pin="A8" pinfunction="SBU1" pintype="bidirectional"/>
+    </net>
+    <net code="19" name="unconnected-(J1-SBU2-PadB8)" class="Default">
+      <node ref="J1" pin="B8" pinfunction="SBU2" pintype="bidirectional"/>
+    </net>
+    <net code="20" name="unconnected-(U1-PA0-Pad23)" class="Default">
+      <node ref="U1" pin="23" pinfunction="PA0" pintype="bidirectional"/>
+    </net>
+    <net code="21" name="unconnected-(U1-PA1-Pad24)" class="Default">
+      <node ref="U1" pin="24" pinfunction="PA1" pintype="bidirectional"/>
+    </net>
+    <net code="22" name="unconnected-(U1-PA2-Pad25)" class="Default">
+      <node ref="U1" pin="25" pinfunction="PA2" pintype="bidirectional"/>
+    </net>
+    <net code="23" name="unconnected-(U1-PA3-Pad26)" class="Default">
+      <node ref="U1" pin="26" pinfunction="PA3" pintype="bidirectional"/>
+    </net>
+    <net code="24" name="unconnected-(U1-PA4-Pad29)" class="Default">
+      <node ref="U1" pin="29" pinfunction="PA4" pintype="bidirectional"/>
+    </net>
+    <net code="25" name="unconnected-(U1-PA5-Pad30)" class="Default">
+      <node ref="U1" pin="30" pinfunction="PA5" pintype="bidirectional"/>
+    </net>
+    <net code="26" name="unconnected-(U1-PA6-Pad31)" class="Default">
+      <node ref="U1" pin="31" pinfunction="PA6" pintype="bidirectional"/>
+    </net>
+    <net code="27" name="unconnected-(U1-PA7-Pad32)" class="Default">
+      <node ref="U1" pin="32" pinfunction="PA7" pintype="bidirectional"/>
+    </net>
+    <net code="28" name="unconnected-(U1-PA8-Pad67)" class="Default">
+      <node ref="U1" pin="67" pinfunction="PA8" pintype="bidirectional"/>
+    </net>
+    <net code="29" name="unconnected-(U1-PA9-Pad68)" class="Default">
+      <node ref="U1" pin="68" pinfunction="PA9" pintype="bidirectional"/>
+    </net>
+    <net code="30" name="unconnected-(U1-PA10-Pad69)" class="Default">
+      <node ref="U1" pin="69" pinfunction="PA10" pintype="bidirectional"/>
+    </net>
+    <net code="31" name="unconnected-(U1-PA13-Pad72)" class="Default">
+      <node ref="U1" pin="72" pinfunction="PA13" pintype="bidirectional"/>
+    </net>
+    <net code="32" name="unconnected-(U1-PA14-Pad76)" class="Default">
+      <node ref="U1" pin="76" pinfunction="PA14" pintype="bidirectional"/>
+    </net>
+    <net code="33" name="unconnected-(U1-PA15-Pad77)" class="Default">
+      <node ref="U1" pin="77" pinfunction="PA15" pintype="bidirectional"/>
+    </net>
+    <net code="34" name="unconnected-(U1-PB0-Pad35)" class="Default">
+      <node ref="U1" pin="35" pinfunction="PB0" pintype="bidirectional"/>
+    </net>
+    <net code="35" name="unconnected-(U1-PB1-Pad36)" class="Default">
+      <node ref="U1" pin="36" pinfunction="PB1" pintype="bidirectional"/>
+    </net>
+    <net code="36" name="unconnected-(U1-PB2-Pad37)" class="Default">
+      <node ref="U1" pin="37" pinfunction="PB2" pintype="bidirectional"/>
+    </net>
+    <net code="37" name="unconnected-(U1-PB3-Pad89)" class="Default">
+      <node ref="U1" pin="89" pinfunction="PB3" pintype="bidirectional"/>
+    </net>
+    <net code="38" name="unconnected-(U1-PB4-Pad90)" class="Default">
+      <node ref="U1" pin="90" pinfunction="PB4" pintype="bidirectional"/>
+    </net>
+    <net code="39" name="unconnected-(U1-PB5-Pad91)" class="Default">
+      <node ref="U1" pin="91" pinfunction="PB5" pintype="bidirectional"/>
+    </net>
+    <net code="40" name="unconnected-(U1-PB8-Pad95)" class="Default">
+      <node ref="U1" pin="95" pinfunction="PB8" pintype="bidirectional"/>
+    </net>
+    <net code="41" name="unconnected-(U1-PB9-Pad96)" class="Default">
+      <node ref="U1" pin="96" pinfunction="PB9" pintype="bidirectional"/>
+    </net>
+    <net code="42" name="unconnected-(U1-PB10-Pad47)" class="Default">
+      <node ref="U1" pin="47" pinfunction="PB10" pintype="bidirectional"/>
+    </net>
+    <net code="43" name="unconnected-(U1-PB11-Pad48)" class="Default">
+      <node ref="U1" pin="48" pinfunction="PB11" pintype="bidirectional"/>
+    </net>
+    <net code="44" name="unconnected-(U1-PB12-Pad51)" class="Default">
+      <node ref="U1" pin="51" pinfunction="PB12" pintype="bidirectional"/>
+    </net>
+    <net code="45" name="unconnected-(U1-PB13-Pad52)" class="Default">
+      <node ref="U1" pin="52" pinfunction="PB13" pintype="bidirectional"/>
+    </net>
+    <net code="46" name="unconnected-(U1-PB14-Pad53)" class="Default">
+      <node ref="U1" pin="53" pinfunction="PB14" pintype="bidirectional"/>
+    </net>
+    <net code="47" name="unconnected-(U1-PB15-Pad54)" class="Default">
+      <node ref="U1" pin="54" pinfunction="PB15" pintype="bidirectional"/>
+    </net>
+    <net code="48" name="unconnected-(U1-PC0-Pad15)" class="Default">
+      <node ref="U1" pin="15" pinfunction="PC0" pintype="bidirectional"/>
+    </net>
+    <net code="49" name="unconnected-(U1-PC1-Pad16)" class="Default">
+      <node ref="U1" pin="16" pinfunction="PC1" pintype="bidirectional"/>
+    </net>
+    <net code="50" name="unconnected-(U1-PC2-Pad17)" class="Default">
+      <node ref="U1" pin="17" pinfunction="PC2" pintype="bidirectional"/>
+    </net>
+    <net code="51" name="unconnected-(U1-PC3-Pad18)" class="Default">
+      <node ref="U1" pin="18" pinfunction="PC3" pintype="bidirectional"/>
+    </net>
+    <net code="52" name="unconnected-(U1-PC4-Pad33)" class="Default">
+      <node ref="U1" pin="33" pinfunction="PC4" pintype="bidirectional"/>
+    </net>
+    <net code="53" name="unconnected-(U1-PC5-Pad34)" class="Default">
+      <node ref="U1" pin="34" pinfunction="PC5" pintype="bidirectional"/>
+    </net>
+    <net code="54" name="unconnected-(U1-PC6-Pad63)" class="Default">
+      <node ref="U1" pin="63" pinfunction="PC6" pintype="bidirectional"/>
+    </net>
+    <net code="55" name="unconnected-(U1-PC7-Pad64)" class="Default">
+      <node ref="U1" pin="64" pinfunction="PC7" pintype="bidirectional"/>
+    </net>
+    <net code="56" name="unconnected-(U1-PC8-Pad65)" class="Default">
+      <node ref="U1" pin="65" pinfunction="PC8" pintype="bidirectional"/>
+    </net>
+    <net code="57" name="unconnected-(U1-PC9-Pad66)" class="Default">
+      <node ref="U1" pin="66" pinfunction="PC9" pintype="bidirectional"/>
+    </net>
+    <net code="58" name="unconnected-(U1-PC10-Pad78)" class="Default">
+      <node ref="U1" pin="78" pinfunction="PC10" pintype="bidirectional"/>
+    </net>
+    <net code="59" name="unconnected-(U1-PC11-Pad79)" class="Default">
+      <node ref="U1" pin="79" pinfunction="PC11" pintype="bidirectional"/>
+    </net>
+    <net code="60" name="unconnected-(U1-PC12-Pad80)" class="Default">
+      <node ref="U1" pin="80" pinfunction="PC12" pintype="bidirectional"/>
+    </net>
+    <net code="61" name="unconnected-(U1-PC14-Pad8)" class="Default">
+      <node ref="U1" pin="8" pinfunction="PC14" pintype="bidirectional"/>
+    </net>
+    <net code="62" name="unconnected-(U1-PC15-Pad9)" class="Default">
+      <node ref="U1" pin="9" pinfunction="PC15" pintype="bidirectional"/>
+    </net>
+    <net code="63" name="unconnected-(U1-PD0-Pad81)" class="Default">
+      <node ref="U1" pin="81" pinfunction="PD0" pintype="bidirectional"/>
+    </net>
+    <net code="64" name="unconnected-(U1-PD1-Pad82)" class="Default">
+      <node ref="U1" pin="82" pinfunction="PD1" pintype="bidirectional"/>
+    </net>
+    <net code="65" name="unconnected-(U1-PD2-Pad83)" class="Default">
+      <node ref="U1" pin="83" pinfunction="PD2" pintype="bidirectional"/>
+    </net>
+    <net code="66" name="unconnected-(U1-PD3-Pad84)" class="Default">
+      <node ref="U1" pin="84" pinfunction="PD3" pintype="bidirectional"/>
+    </net>
+    <net code="67" name="unconnected-(U1-PD4-Pad85)" class="Default">
+      <node ref="U1" pin="85" pinfunction="PD4" pintype="bidirectional"/>
+    </net>
+    <net code="68" name="unconnected-(U1-PD5-Pad86)" class="Default">
+      <node ref="U1" pin="86" pinfunction="PD5" pintype="bidirectional"/>
+    </net>
+    <net code="69" name="unconnected-(U1-PD6-Pad87)" class="Default">
+      <node ref="U1" pin="87" pinfunction="PD6" pintype="bidirectional"/>
+    </net>
+    <net code="70" name="unconnected-(U1-PD7-Pad88)" class="Default">
+      <node ref="U1" pin="88" pinfunction="PD7" pintype="bidirectional"/>
+    </net>
+    <net code="71" name="unconnected-(U1-PD8-Pad55)" class="Default">
+      <node ref="U1" pin="55" pinfunction="PD8" pintype="bidirectional"/>
+    </net>
+    <net code="72" name="unconnected-(U1-PD9-Pad56)" class="Default">
+      <node ref="U1" pin="56" pinfunction="PD9" pintype="bidirectional"/>
+    </net>
+    <net code="73" name="unconnected-(U1-PD10-Pad57)" class="Default">
+      <node ref="U1" pin="57" pinfunction="PD10" pintype="bidirectional"/>
+    </net>
+    <net code="74" name="unconnected-(U1-PD11-Pad58)" class="Default">
+      <node ref="U1" pin="58" pinfunction="PD11" pintype="bidirectional"/>
+    </net>
+    <net code="75" name="unconnected-(U1-PD12-Pad59)" class="Default">
+      <node ref="U1" pin="59" pinfunction="PD12" pintype="bidirectional"/>
+    </net>
+    <net code="76" name="unconnected-(U1-PD13-Pad60)" class="Default">
+      <node ref="U1" pin="60" pinfunction="PD13" pintype="bidirectional"/>
+    </net>
+    <net code="77" name="unconnected-(U1-PD14-Pad61)" class="Default">
+      <node ref="U1" pin="61" pinfunction="PD14" pintype="bidirectional"/>
+    </net>
+    <net code="78" name="unconnected-(U1-PD15-Pad62)" class="Default">
+      <node ref="U1" pin="62" pinfunction="PD15" pintype="bidirectional"/>
+    </net>
+    <net code="79" name="unconnected-(U1-PE0-Pad97)" class="Default">
+      <node ref="U1" pin="97" pinfunction="PE0" pintype="bidirectional"/>
+    </net>
+    <net code="80" name="unconnected-(U1-PE1-Pad98)" class="Default">
+      <node ref="U1" pin="98" pinfunction="PE1" pintype="bidirectional"/>
+    </net>
+    <net code="81" name="unconnected-(U1-PE2-Pad1)" class="Default">
+      <node ref="U1" pin="1" pinfunction="PE2" pintype="bidirectional"/>
+    </net>
+    <net code="82" name="unconnected-(U1-PE3-Pad2)" class="Default">
+      <node ref="U1" pin="2" pinfunction="PE3" pintype="bidirectional"/>
+    </net>
+    <net code="83" name="unconnected-(U1-PE4-Pad3)" class="Default">
+      <node ref="U1" pin="3" pinfunction="PE4" pintype="bidirectional"/>
+    </net>
+    <net code="84" name="unconnected-(U1-PE5-Pad4)" class="Default">
+      <node ref="U1" pin="4" pinfunction="PE5" pintype="bidirectional"/>
+    </net>
+    <net code="85" name="unconnected-(U1-PE6-Pad5)" class="Default">
+      <node ref="U1" pin="5" pinfunction="PE6" pintype="bidirectional"/>
+    </net>
+    <net code="86" name="unconnected-(U1-PE7-Pad38)" class="Default">
+      <node ref="U1" pin="38" pinfunction="PE7" pintype="bidirectional"/>
+    </net>
+    <net code="87" name="unconnected-(U1-PE8-Pad39)" class="Default">
+      <node ref="U1" pin="39" pinfunction="PE8" pintype="bidirectional"/>
+    </net>
+    <net code="88" name="unconnected-(U1-PE9-Pad40)" class="Default">
+      <node ref="U1" pin="40" pinfunction="PE9" pintype="bidirectional"/>
+    </net>
+    <net code="89" name="unconnected-(U1-PE10-Pad41)" class="Default">
+      <node ref="U1" pin="41" pinfunction="PE10" pintype="bidirectional"/>
+    </net>
+    <net code="90" name="unconnected-(U1-PE11-Pad42)" class="Default">
+      <node ref="U1" pin="42" pinfunction="PE11" pintype="bidirectional"/>
+    </net>
+    <net code="91" name="unconnected-(U1-PE12-Pad43)" class="Default">
+      <node ref="U1" pin="43" pinfunction="PE12" pintype="bidirectional"/>
+    </net>
+    <net code="92" name="unconnected-(U1-PE13-Pad44)" class="Default">
+      <node ref="U1" pin="44" pinfunction="PE13" pintype="bidirectional"/>
+    </net>
+    <net code="93" name="unconnected-(U1-PE14-Pad45)" class="Default">
+      <node ref="U1" pin="45" pinfunction="PE14" pintype="bidirectional"/>
+    </net>
+    <net code="94" name="unconnected-(U1-PE15-Pad46)" class="Default">
+      <node ref="U1" pin="46" pinfunction="PE15" pintype="bidirectional"/>
+    </net>
+    <net code="95" name="unconnected-(U1-VCAP_1-Pad49)" class="Default">
+      <node ref="U1" pin="49" pinfunction="VCAP_1" pintype="power_out"/>
+    </net>
+    <net code="96" name="unconnected-(U1-VCAP_2-Pad73)" class="Default">
+      <node ref="U1" pin="73" pinfunction="VCAP_2" pintype="power_out"/>
+    </net>
+    <net code="97" name="unconnected-(U1-VDD-Pad19)" class="Default">
+      <node ref="U1" pin="19" pinfunction="VDD" pintype="power_in"/>
+    </net>
+    <net code="98" name="unconnected-(U1-VDD-Pad28)" class="Default">
+      <node ref="U1" pin="28" pinfunction="VDD" pintype="power_in"/>
+    </net>
+    <net code="99" name="unconnected-(U1-VDD-Pad50)" class="Default">
+      <node ref="U1" pin="50" pinfunction="VDD" pintype="power_in"/>
+    </net>
+    <net code="100" name="unconnected-(U1-VDD-Pad75)" class="Default">
+      <node ref="U1" pin="75" pinfunction="VDD" pintype="power_in"/>
+    </net>
+    <net code="101" name="unconnected-(U1-VDD-Pad100)" class="Default">
+      <node ref="U1" pin="100" pinfunction="VDD" pintype="power_in"/>
+    </net>
+    <net code="102" name="unconnected-(U1-VREF+-Pad21)" class="Default">
+      <node ref="U1" pin="21" pinfunction="VREF+" pintype="input"/>
+    </net>
+    <net code="103" name="unconnected-(U3-AUX_CL-Pad7)" class="Default">
+      <node ref="U3" pin="7" pinfunction="AUX_CL" pintype="output"/>
+    </net>
+    <net code="104" name="unconnected-(U3-AUX_DA-Pad6)" class="Default">
+      <node ref="U3" pin="6" pinfunction="AUX_DA" pintype="bidirectional"/>
+    </net>
+    <net code="105" name="unconnected-(U3-CLKIN-Pad1)" class="Default">
+      <node ref="U3" pin="1" pinfunction="CLKIN" pintype="input"/>
+    </net>
+    <net code="106" name="unconnected-(U3-CPOUT-Pad20)" class="Default">
+      <node ref="U3" pin="20" pinfunction="CPOUT" pintype="passive"/>
+    </net>
+    <net code="107" name="unconnected-(U3-FSYNC-Pad11)" class="Default">
+      <node ref="U3" pin="11" pinfunction="FSYNC" pintype="input"/>
+    </net>
+    <net code="108" name="unconnected-(U3-INT-Pad12)" class="Default">
+      <node ref="U3" pin="12" pinfunction="INT" pintype="output"/>
+    </net>
+    <net code="109" name="unconnected-(U3-NC-Pad2)" class="Default">
+      <node ref="U3" pin="2" pinfunction="NC" pintype="no_connect"/>
+    </net>
+    <net code="110" name="unconnected-(U3-NC-Pad3)" class="Default">
+      <node ref="U3" pin="3" pinfunction="NC" pintype="no_connect"/>
+    </net>
+    <net code="111" name="unconnected-(U3-NC-Pad4)" class="Default">
+      <node ref="U3" pin="4" pinfunction="NC" pintype="no_connect"/>
+    </net>
+    <net code="112" name="unconnected-(U3-NC-Pad5)" class="Default">
+      <node ref="U3" pin="5" pinfunction="NC" pintype="no_connect"/>
+    </net>
+    <net code="113" name="unconnected-(U3-NC-Pad14)" class="Default">
+      <node ref="U3" pin="14" pinfunction="NC" pintype="no_connect"/>
+    </net>
+    <net code="114" name="unconnected-(U3-NC-Pad15)" class="Default">
+      <node ref="U3" pin="15" pinfunction="NC" pintype="no_connect"/>
+    </net>
+    <net code="115" name="unconnected-(U3-NC-Pad16)" class="Default">
+      <node ref="U3" pin="16" pinfunction="NC" pintype="no_connect"/>
+    </net>
+    <net code="116" name="unconnected-(U3-NC-Pad17)" class="Default">
+      <node ref="U3" pin="17" pinfunction="NC" pintype="no_connect"/>
+    </net>
+    <net code="117" name="unconnected-(U3-REGOUT-Pad10)" class="Default">
+      <node ref="U3" pin="10" pinfunction="REGOUT" pintype="passive"/>
+    </net>
+    <net code="118" name="unconnected-(U3-RESV-Pad19)" class="Default">
+      <node ref="U3" pin="19" pinfunction="RESV" pintype="no_connect"/>
+    </net>
+    <net code="119" name="unconnected-(U3-RESV-Pad21)" class="Default">
+      <node ref="U3" pin="21" pinfunction="RESV" pintype="no_connect"/>
+    </net>
+    <net code="120" name="unconnected-(U3-RESV-Pad22)" class="Default">
+      <node ref="U3" pin="22" pinfunction="RESV" pintype="no_connect"/>
+    </net>
+  </nets>
+</export>
