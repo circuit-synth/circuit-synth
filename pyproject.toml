@@ -46,6 +46,7 @@ dependencies = [
     "requests>=2.28.0",
     "beautifulsoup4>=4.11.0",
     "lxml>=6.0.0",
+    "pyspice>=1.5",
 ]
 
 [project.optional-dependencies]
@@ -67,17 +68,15 @@ claude = [
 ]
 test = [
     "pytest>=7.0.0",
-    "pytest-mock>=3.14.0",
+    "pytest-mock>=3.14.0", 
     "memory-profiler>=0.60.0",
+    "hypothesis>=6.0.0",  # Property-based testing
 ]
 
 [project.scripts]
 # Sync scripts
 kicad-to-python = "circuit_synth.scripts.kicad_to_python_sync:main"
 python-to-kicad = "circuit_synth.scripts.python_to_kicad_sync:main"
-# Circuit creation tools
-circuit-creator = "circuit_synth.tools.circuit_creator_cli:main"
-setup-claude-integration = "circuit_synth.tools.setup_claude:main"
 
 # Symbol management scripts  
 preload-symbols = "circuit_synth.scripts.preload_symbols:main"
@@ -87,7 +86,12 @@ preparse-symbols = "circuit_synth.scripts.preparse_kicad_symbols:main"
 netlist-import = "circuit_synth.kicad.netlist_importer:main"
 json-to-python = "circuit_synth.codegen.json_to_python_project:main"
 
-# Circuit validation
+# KiCad Integration
+validate-kicad = "circuit_synth.core.kicad_validator:main"
+
+# Claude Code Integration
+setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
+register-agents = "circuit_synth.claude_integration.agent_registry:main"
 validate-circuit = "circuit_synth.validation.real_time_check:main"
 
 [project.urls]
@@ -103,13 +107,7 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-circuit_synth = [
-    "py.typed",
-    "data/examples/**/*",
-    "data/memory-bank/**/*", 
-    "data/CLAUDE.md",
-    "data/tools/**/*"
-]
+circuit_synth = ["py.typed"]
 
 [tool.black]
 line-length = 88

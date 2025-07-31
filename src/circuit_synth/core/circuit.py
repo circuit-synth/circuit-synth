@@ -452,6 +452,15 @@ class Circuit:
         )
         return CircuitSimulator(self)
 
+    def simulator(self):
+        """
+        Alias for simulate() method for backward compatibility.
+
+        Returns:
+            CircuitSimulator: Simulator object for running analyses
+        """
+        return self.simulate()
+
     @property
     def components(self):
         """

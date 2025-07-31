@@ -44,6 +44,14 @@ from .core.annotations import (
     add_text_box,
 )
 from .core.enhanced_netlist_exporter import EnhancedNetlistExporter
+
+# KiCad integration and validation
+from .core.kicad_validator import (
+    KiCadValidationError,
+    get_kicad_paths,
+    require_kicad,
+    validate_kicad_installation,
+)
 from .core.netlist_exporter import NetlistExporter
 
 # Reference manager and netlist exporters
@@ -62,8 +70,6 @@ from .interfaces import (
     IKiCadIntegration,
     KiCadGenerationConfig,
 )
-
-# KiCad integration
 from .kicad.unified_kicad_integration import create_unified_kicad_integration
 
 
@@ -132,8 +138,12 @@ __all__ = [
     "create_rust_resistor",
     "create_rust_capacitor",
     "get_rust_component_status",
-    # KiCad integration
+    # KiCad integration and validation
     "create_unified_kicad_integration",
+    "validate_kicad_installation",
+    "require_kicad",
+    "get_kicad_paths",
+    "KiCadValidationError",
     # Claude Code integration
     "setup_claude_integration",
 ]
