@@ -130,11 +130,19 @@ def install_plugins():
     pcb_plugins_src = kicad_plugins_dir
     pcb_plugins_dst = kicad_dirs["pcb_plugins"]
     
-    # Install simple PCB plugin
+    # Install enhanced PCB Claude chat plugin
+    pcb_chat_plugin = pcb_plugins_src / "circuit_synth_pcb_claude_chat.py"
+    if pcb_chat_plugin.exists():
+        shutil.copy2(pcb_chat_plugin, pcb_plugins_dst / "circuit_synth_pcb_claude_chat.py")
+        print(f"✅ Installed: circuit_synth_pcb_claude_chat.py")
+    else:
+        print(f"⚠️  Warning: circuit_synth_pcb_claude_chat.py not found")
+    
+    # Install simple PCB plugin as backup
     simple_plugin = pcb_plugins_src / "circuit_synth_simple_ai.py"
     if simple_plugin.exists():
         shutil.copy2(simple_plugin, pcb_plugins_dst / "circuit_synth_simple_ai.py")
-        print(f"✅ Installed: circuit_synth_simple_ai.py")
+        print(f"✅ Installed: circuit_synth_simple_ai.py (backup)")
     else:
         print(f"⚠️  Warning: circuit_synth_simple_ai.py not found")
     
@@ -172,8 +180,8 @@ def install_plugins():
     print(f"")
     print(f"PCB Editor:")
     print(f"  1. Open KiCad PCB Editor")
-    print(f"  2. Look for 'Circuit-Synth AI (Simple)' toolbar button")
-    print(f"  3. Click to analyze your PCB")
+    print(f"  2. Look for 'Circuit-Synth PCB Chat' toolbar button")
+    print(f"  3. Click for full Claude AI chat interface with PCB context")
     print(f"")
     print(f"Schematic Editor:")
     print(f"  1. Open KiCad Schematic Editor")
