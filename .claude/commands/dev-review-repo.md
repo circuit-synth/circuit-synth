@@ -56,6 +56,9 @@ This command analyzes the entire repository and creates structured reports based
 - **Missing API documentation** for public functions
 - **Broken examples** in documentation
 - **Installation instructions** that actually work
+- **README validation** - do claimed features actually exist?
+- **File reference verification** - do linked files exist?
+- **Example accuracy** - do code examples run successfully?
 
 ### 7. Dependencies and Integration
 - **Outdated packages** that need updates
@@ -76,7 +79,8 @@ repo-review/
 ├── 04-performance-analysis.md                   # Slow spots and bottlenecks
 ├── 05-testing-analysis.md                       # Test coverage and quality
 ├── 06-documentation-analysis.md                 # Doc accuracy and gaps
-├── 07-dependencies-analysis.md                  # Package health and issues
+├── 07-documentation-validation-analysis.md      # README validation and accuracy
+├── 08-dependencies-analysis.md                  # Package health and issues
 └── findings/                                    # Raw data and logs
 ```
 
@@ -180,6 +184,15 @@ for name, obj in inspect.getmembers(circuit_synth):
     if inspect.isclass(obj) and not obj.__doc__:
         print(f'Missing docs: {name}')
 "
+
+# README validation - check if examples actually exist
+ls -la stm32_imu_usbc_demo_hierarchical.py 2>/dev/null || echo "Demo file not found"
+find . -name "setup-claude-integration" -o -name "*register-agents*"
+
+# Verify documentation links point to existing files
+find docs/ -name "*.md" | head -10
+find . -name "*SIMULATION*" -o -name "*simulation*" | head -5
+find . -name "*kicad_plugins*" -type d
 ```
 
 ### 7. Dependency Health
@@ -238,7 +251,8 @@ After running, you'll have a `repo-review/` directory with markdown files that t
 5. **Performance bottlenecks** slowing things down
 6. **Test gaps** where coverage is missing
 7. **Documentation problems** where docs are wrong or missing
-8. **Dependency issues** with outdated or vulnerable packages
+8. **README accuracy issues** - features that don't exist, broken examples
+9. **Dependency issues** with outdated or vulnerable packages
 
 Each report is focused on **actionable findings** rather than abstract metrics or grades. The goal is to give you a clear picture of what actually needs work.
 
