@@ -201,7 +201,6 @@ class Component(SimplifiedPinAccess):
         # [ {"function": "passive", "name": "~", "number": "1", ...}, ... ]
         pins_loaded = 0
         for pin_info in symbol_data.get("pins", []):
-            print(f"DEBUG CORE: Pin info for {self.symbol}: {pin_info}")
             pin_num = pin_info.get("number", "")
             if not pin_num:  # Skip pins without numbers
                 context_logger.warning(
@@ -407,6 +406,7 @@ class Component(SimplifiedPinAccess):
         )
         for k, v in self._extra_fields.items():
             setattr(new_c, k, v)
+        # The unified pin access is automatically initialized in __post_init__
         return new_c
 
     def __mul__(self, count: int):

@@ -36,17 +36,15 @@ from .collision_manager import SHEET_MARGIN, CollisionManager
 from .connection_aware_collision_manager import ConnectionAwareCollisionManager
 from .schematic_writer import SchematicWriter, write_schematic_file
 
-# Google ADK LLM placement removed for performance - using optimized fallback placement
+# LLM placement not available - using optimized collision-based placement
 LLM_PLACEMENT_AVAILABLE = False
 
 
 class LLMPlacementManager:
-    """Optimized fallback placement manager (Google ADK removed for 44x performance improvement)."""
+    """Optimized collision-based placement manager for high performance."""
 
     def __init__(self, *args, **kwargs):
-        logging.info(
-            "Using optimized fallback placement (Google ADK removed for performance)"
-        )
+        logging.info("Using optimized collision-based placement for high performance")
 
     def place_components(self, components, nets, existing_placements=None):
         """Fallback to basic grid placement"""

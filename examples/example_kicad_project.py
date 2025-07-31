@@ -7,7 +7,7 @@ import io
 
 # Add detailed import timing to identify bottlenecks
 print("🚀 Starting circuit-synth import timing analysis...")
-print("🔧 PERFORMANCE OPTIMIZATION ACTIVE - Google ADK imports disabled for 44x speedup")
+print("🔧 PERFORMANCE OPTIMIZATION ACTIVE - Rust acceleration enabled")
 print("🆔 Running optimized code version: feabf77-performance-optimized")
 import_start = time.perf_counter()
 

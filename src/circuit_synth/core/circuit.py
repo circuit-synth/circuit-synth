@@ -207,10 +207,6 @@ class Circuit:
             border=True,
             justify="center center",
         )
-
-        print(
-            f"DEBUG: Creating docstring annotation for circuit '{self.name}' at position {docstring_box.position}"
-        )
         self.add_annotation(docstring_box)
         context_logger.debug(
             "Added auto-generated docstring annotation",
@@ -387,9 +383,6 @@ class Circuit:
                     project_name=project_name,
                     output_path=str(output_path),
                 )
-                print(
-                    f"KiCad project '{project_name}' generated successfully in {output_path}/"
-                )
             else:
                 error_msg = result.get(
                     "error", "Unknown error occurred during project generation"
@@ -428,7 +421,6 @@ class Circuit:
             >>> circuit = voltage_divider()
             >>> sim = circuit.simulate()
             >>> result = sim.operating_point()
-            >>> print(f"Output voltage: {result.get_voltage('VOUT'):.3f} V")
 
         Raises:
             ImportError: If simulation dependencies are not installed
@@ -451,6 +443,15 @@ class Circuit:
             circuit_name=self.name,
         )
         return CircuitSimulator(self)
+
+    def simulator(self):
+        """
+        Alias for simulate() method for backward compatibility.
+
+        Returns:
+            CircuitSimulator: Simulator object for running analyses
+        """
+        return self.simulate()
 
     @property
     def components(self):
