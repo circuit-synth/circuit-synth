@@ -45,10 +45,8 @@ dependencies = [
     # Web scraping for JLC integration
     "requests>=2.28.0",
     "beautifulsoup4>=4.11.0",
-    # Google AI and ADK dependencies
-    "google-adk>=0.1.0",
-    "google-genai>=0.1.0",
     "lxml>=6.0.0",
+    "pyspice>=1.5",
 ]
 
 [project.optional-dependencies]
@@ -70,8 +68,9 @@ claude = [
 ]
 test = [
     "pytest>=7.0.0",
-    "pytest-mock>=3.14.0",
+    "pytest-mock>=3.14.0", 
     "memory-profiler>=0.60.0",
+    "hypothesis>=6.0.0",  # Property-based testing
 ]
 
 [project.scripts]
@@ -87,8 +86,12 @@ preparse-symbols = "circuit_synth.scripts.preparse_kicad_symbols:main"
 netlist-import = "circuit_synth.kicad.netlist_importer:main"
 json-to-python = "circuit_synth.codegen.json_to_python_project:main"
 
+# KiCad Integration
+validate-kicad = "circuit_synth.core.kicad_validator:main"
+
 # Claude Code Integration
 setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
+register-agents = "circuit_synth.claude_integration.agent_registry:main"
 validate-circuit = "circuit_synth.validation.real_time_check:main"
 
 # Plugin Management

@@ -4,9 +4,9 @@
 [![PyPI version](https://badge.fury.io/py/circuit-synth.svg)](https://badge.fury.io/py/circuit-synth)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Pythonic circuit design with AI-powered component intelligence**
+**Professional hierarchical circuit design with AI-powered component intelligence**
 
-Generate complete KiCad projects using familiar Python syntax. Integrated AI agents help with component selection, availability checking, and design optimization - while you maintain full control over the circuit implementation.
+Generate complete KiCad projects with professional hierarchical architecture using familiar Python syntax. Each subcircuit follows software engineering principles - single responsibility, clear interfaces, and modular design. Integrated AI agents help with component selection, availability checking, and design optimization.
 
 ### 🔍 **Component Intelligence**
 
@@ -31,15 +31,137 @@ Generate complete KiCad projects using familiar Python syntax. Integrated AI age
 ## Quick Start
 
 ```bash
-# Clone and run example
+# Clone and run hierarchical demo
 git clone https://github.com/circuit-synth/circuit-synth.git
 cd circuit-synth
-uv run python examples/example_kicad_project.py
+uv run python stm32_imu_usbc_demo_hierarchical.py
 ```
 
-Generates a complete KiCad project with schematics, PCB layout, and netlists.
+Generates a complete hierarchical KiCad project with modular subcircuits, professional schematics, PCB layout, and netlists.
 
-## Example Circuit
+## 🏗️ Hierarchical Circuit Design
+
+**Professional modular architecture following software engineering principles**
+
+Circuit-synth now generates circuits as **hierarchical subcircuits** - each subcircuit is like a software function with single responsibility, clear interfaces, and modular design.
+
+### STM32 + IMU + USB-C Hierarchical Demo
+
+```python
+from circuit_synth import circuit, Component, Net
+from circuit_synth.core.decorators import enable_comments
+
+@enable_comments
+@circuit(name="Power_Supply")
+def power_supply_subcircuit():
+    """
+    USB-C Power Supply Subcircuit
+    
+    Converts 5V USB VBUS to regulated 3.3V system power.
+    Single responsibility: Power regulation only.
+    
+    Interface:
+    - VBUS_IN: 5V input from USB-C
+    - VCC_3V3_OUT: Regulated 3.3V output  
+    - GND: System ground
+    """
+    # Define subcircuit interface nets
+    vbus_in = Net('VBUS_IN')
+    vcc_3v3_out = Net('VCC_3V3_OUT')
+    gnd = Net('GND')
+    
+    # USB-C connector and regulation circuit
+    usb_connector = Component(
+        symbol="Connector:USB_C_Receptacle_USB2.0_16P",
+        ref="J", footprint="Connector_USB:USB_C_Receptacle_Palconn_UTC16-G"
+    )
+    
+    regulator = Component(
+        symbol="Regulator_Linear:AMS1117-3.3",
+        ref="U", footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+    )
+    # ... complete power regulation circuit
+
+@enable_comments  
+@circuit(name="MCU_Core")
+def mcu_core_subcircuit():
+    """
+    STM32G431CBU6 Microcontroller Core Subcircuit
+    
+    Single responsibility: MCU with essential support circuits.
+    Clean interfaces for I2C, SWD, and GPIO connections.
+    """
+    # STM32 with oscillator, reset, and decoupling
+    # ... complete MCU support circuit
+
+@enable_comments
+@circuit(name="STM32_IMU_USBC_Hierarchical")  
+def main_circuit():
+    """
+    Main circuit instantiating all hierarchical subcircuits.
+    
+    Professional modular design with 6 subcircuits:
+    • Power Supply (USB-C → 3.3V regulation)
+    • MCU Core (STM32G431CBU6 + support)
+    • IMU Sensor (LSM6DSL I2C interface)
+    • Programming Interface (SWD connector)
+    • Status LEDs (Power + user indicators)
+    • Test Points (Debug access points)
+    """
+    # Create and connect all subcircuits
+    power_supply = power_supply_subcircuit()
+    mcu_core = mcu_core_subcircuit()
+    imu_sensor = imu_sensor_subcircuit()
+    programming_interface = programming_interface_subcircuit()
+    status_leds = status_leds_subcircuit()
+    test_points = test_points_subcircuit()
+
+# Generate hierarchical KiCad project
+circuit = main_circuit()
+circuit.generate_kicad_project(
+    project_name="STM32_IMU_USBC_Hierarchical",
+    placement_algorithm="hierarchical",
+    generate_pcb=True
+)
+```
+
+### Hierarchical Design Benefits
+
+- **🔧 Single Responsibility**: Each subcircuit has one clear purpose
+- **🔗 Clear Interfaces**: Well-defined connections between modules  
+- **🔄 Maintainability**: Modify subcircuits independently
+- **📦 Reusability**: Subcircuits work across multiple projects
+- **📈 Scalability**: Easy to add new functionality as subcircuits
+- **👥 Team Development**: Multiple developers can work on different subcircuits
+- **🏭 Professional Output**: Industry-standard hierarchical KiCad projects
+
+### Professional Workflow
+
+**Requirements** → **Hierarchical Subcircuits** → **SPICE Validation** → **KiCad Hierarchical Project**
+
+1. **Analyze Requirements**: Identify functional blocks and interfaces
+2. **Design Subcircuits**: Each subcircuit = one responsibility (like software functions)
+3. **Validate with SPICE**: Simulate critical subcircuits (power, analog, etc.)
+4. **Generate KiCad Project**: Complete hierarchical project with separate sheets per subcircuit
+
+### Generated KiCad Files
+
+```
+STM32_IMU_USBC_Hierarchical/
+├── STM32_IMU_USBC_Hierarchical.kicad_pro    # Main project
+├── STM32_IMU_USBC_Hierarchical.kicad_sch    # Top-level schematic  
+├── STM32_IMU_USBC_Hierarchical.kicad_pcb    # PCB layout
+├── Power_Supply.kicad_sch                   # Power subcircuit sheet
+├── MCU_Core.kicad_sch                       # MCU subcircuit sheet
+├── IMU_Sensor.kicad_sch                     # IMU subcircuit sheet
+├── Programming_Interface.kicad_sch          # SWD subcircuit sheet
+├── Status_LEDs.kicad_sch                    # LED subcircuit sheet
+└── Test_Points.kicad_sch                    # Debug subcircuit sheet
+```
+
+Each subcircuit appears as a **separate hierarchical sheet** in KiCad - perfect for complex designs and team collaboration.
+
+## Example Circuit (Legacy Flat Design)
 
 ```python
 from circuit_synth import *
@@ -86,15 +208,20 @@ circuit.generate_kicad_project("esp32_dev")
 
 ## Key Features
 
+- **🏗️ Hierarchical Circuit Design**: Professional modular architecture with subcircuits following software engineering principles (single responsibility, clear interfaces, maintainability)
 - **🐍 Pure Python**: Standard Python syntax - no DSL to learn
-- **🔄 Bidirectional KiCad Integration**: Import existing projects, export clean KiCad files
-- **📋 Professional Netlists**: Generate industry-standard KiCad .net files
-- **🏗️ Hierarchical Design**: Multi-sheet projects with proper organization
-- **📝 Smart Annotations**: Automatic docstring extraction + manual text/tables
-- **⚡ Rust-Accelerated**: Fast symbol lookup and placement algorithms
-- **🏭 Manufacturing Integration**: Real-time component availability and pricing from JLCPCB
+- **🔄 Bidirectional KiCad Integration**: Import existing projects, export hierarchical KiCad projects with separate sheets per subcircuit
+- **📋 Professional Netlists**: Generate industry-standard KiCad .net files with hierarchical structure
+- **🏗️ Hierarchical Design**: Multi-sheet projects with proper organization following software engineering principles
+- **📝 Smart Annotations**: Automatic docstring extraction + manual text/tables for comprehensive documentation
+- **⚡ Rust-Accelerated**: Fast symbol lookup and hierarchical placement algorithms
+- **🏭 Manufacturing Integration**: Real-time component availability and pricing from JLCPCB with JLCPCB-compatible component selection
 - **🔍 Smart Component Finder**: AI-powered component recommendations with circuit-synth code generation
 - **🎨 KiCad Plugin Integration**: Native AI-powered plugins for both PCB and schematic editors
+- **🤖 5 Specialized AI Agents**: circuit-architect, power-expert, signal-integrity, component-guru, simulation-expert
+- **⚙️ SPICE Simulation**: Professional-grade circuit simulation with PySpice/ngspice backend for subcircuit validation
+
+> **🏗️ New Professional Standard**: All circuits are now generated as hierarchical subcircuits following software engineering principles. This replaces monolithic circuit design with modular, maintainable architecture that scales to complex designs.
 
 ## 🚀 Claude Code Integration
 
@@ -107,12 +234,18 @@ Circuit-synth works with Claude Code to streamline component selection and circu
 👤 "Design a motor controller with STM32, 3 half-bridges, current sensing, and CAN bus"
 ```
 
-Claude will search components, check availability, and generate circuit-synth code.
+Claude will search components, check availability, and generate hierarchical circuit-synth code with proper subcircuit organization.
 
-#### **2. AI Commands**
+#### **2. AI Commands & Agents**
 
 - `/find-symbol STM32G4` → Locates KiCad symbols
 - `/find-footprint LQFP` → Find footprints
+- **🆕 `simulation-expert` agent** → SPICE simulation and circuit validation specialist
+
+**Setup AI agents:**
+```bash
+uv run register-agents  # Register all 5 specialized circuit design agents
+```
 
 #### **3. Component Search Example**
 
@@ -135,15 +268,78 @@ Claude will search components, check availability, and generate circuit-synth co
 
 1. Describe requirements in natural language
 2. Claude searches components and checks availability  
-3. Generate circuit-synth code with verified components
-4. Export to KiCad for PCB layout
+3. Generate hierarchical circuit-synth code with verified components and proper subcircuit organization
+4. Export to hierarchical KiCad project for professional PCB layout
 
 ### **Benefits**
 
 - **🔍 Component Search**: AI finds suitable components
 - **✅ Availability Check**: Real-time JLCPCB stock verification
-- **🔧 Code Generation**: Ready-to-use circuit-synth code
-- **🧠 Engineering Context**: AI explains component choices
+- **🔧 Hierarchical Code Generation**: Ready-to-use modular circuit-synth code
+- **🏗️ Professional Architecture**: AI organizes circuits into proper subcircuits
+- **🧠 Engineering Context**: AI explains component choices and hierarchical design decisions
+- **🔬 Simulation Expert**: Dedicated AI agent for SPICE simulation and circuit validation
+
+## ⚙️ SPICE Simulation Integration
+
+**Professional-grade circuit simulation with PySpice backend**
+
+Circuit-synth includes complete SPICE simulation capabilities for hierarchical design validation and optimization. Validate individual subcircuits or complete systems:
+
+```python
+from circuit_synth import circuit, Component, Net
+
+@circuit
+def voltage_divider():
+    """Simple resistor divider for simulation"""
+    r1 = Component("Device:R", ref="R", value="4.7k")
+    r2 = Component("Device:R", ref="R", value="10k") 
+    
+    vin = Net('VIN')    # 5V supply (auto-detected)
+    vout = Net('VOUT')  # Output node
+    gnd = Net('GND')    # Ground
+    
+    r1[1] += vin
+    r1[2] += vout
+    r2[1] += vout
+    r2[2] += gnd
+
+# Run simulation
+circuit = voltage_divider()
+sim = circuit.simulator()
+
+# DC analysis
+result = sim.operating_point()
+print(f"Output voltage: {result.get_voltage('VOUT'):.3f}V")  # 3.391V
+
+# AC frequency response
+ac_result = sim.ac_analysis(1, 100000)  # 1Hz to 100kHz
+
+# Transient analysis
+transient = sim.transient_analysis(1e-6, 1e-3)  # 1μs steps, 1ms duration
+```
+
+### **Simulation Features**
+
+- **🔬 Professional Analysis**: DC, AC, and Transient simulation with ngspice engine
+- **🏗️ Hierarchical Validation**: Simulate individual subcircuits or complete hierarchical designs
+- **📊 Accurate Results**: Sub-millivolt precision matching theoretical calculations
+- **🔄 Seamless Integration**: Native `.simulator()` method on all circuits and subcircuits
+- **🖥️ Cross-Platform**: Automatic ngspice detection on macOS, Linux, Windows
+- **📈 Visualization Support**: Built-in plotting with matplotlib integration
+- **⚡ High Performance**: Rust-accelerated circuit conversion and analysis
+
+### **Setup**
+
+```bash
+# Install circuit-synth (simulation included by default)
+pip install circuit-synth
+
+# Or with uv
+uv add circuit-synth
+```
+
+See [`docs/SIMULATION_SETUP.md`](docs/SIMULATION_SETUP.md) for ngspice installation instructions.
 
 ## 🎨 KiCad Plugin Integration
 
@@ -202,10 +398,35 @@ uv run python install_plugin.py
 
 ## Installation
 
+### Prerequisites
+
+**KiCad Installation Required:**
+Circuit-synth requires KiCad 8.0+ to be installed locally for full functionality.
+
+```bash
+# macOS
+brew install kicad
+# or download from: https://www.kicad.org/download/macos/
+
+# Ubuntu/Debian  
+sudo apt install kicad
+
+# Fedora
+sudo dnf install kicad
+
+# Windows
+# Download from: https://www.kicad.org/download/windows/
+```
+
+### Circuit-Synth Installation
+
 **PyPI (Recommended):**
 ```bash
 pip install circuit-synth
 # or: uv pip install circuit-synth
+
+# Verify installation
+python -c "import circuit_synth; circuit_synth.validate_kicad_installation()"
 ```
 
 **Development:**
@@ -213,12 +434,9 @@ pip install circuit-synth
 git clone https://github.com/circuit-synth/circuit-synth.git
 cd circuit-synth
 uv sync  # or: pip install -e ".[dev]"
-```
 
-**Docker:**
-```bash
-./docker/build-docker.sh
-./scripts/circuit-synth-docker python examples/example_kicad_project.py
+# Register AI agents for circuit design assistance
+uv run register-agents
 ```
 
 **CI Setup:**
@@ -238,7 +456,7 @@ For AI-powered circuit design features, see [docs/integration/CLAUDE_INTEGRATION
 git clone https://github.com/yourusername/circuit-synth.git
 cd circuit-synth
 uv sync
-uv run python examples/example_kicad_project.py  # Test your setup
+uv run python stm32_imu_usbc_demo_hierarchical.py  # Test hierarchical design
 ```
 
 ## License

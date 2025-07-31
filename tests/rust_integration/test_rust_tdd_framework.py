@@ -278,27 +278,6 @@ class TestSExpressionGeneration:
         
         self.tdd.complete_tdd_cycle(True)  # Success in RED means expected failure
     
-    @pytest.mark.skip(reason="GREEN phase - implement when Rust module exists")
-    def test_component_sexp_basic_resistor_GREEN(self):
-        """
-        GREEN PHASE: Test should pass with minimal Rust implementation
-        
-        This test will be enabled once we have a minimal Rust implementation
-        """
-        self.tdd.start_tdd_cycle("basic_resistor_sexp", "GREEN")
-        
-        # Enable Rust implementation
-        self.tdd.set_implementations(
-            python_func=self._python_component_sexp,
-            rust_func=self._rust_component_sexp
-        )
-        
-        component = TDDTestFixtures.create_simple_component() 
-        
-        result = self.tdd.assert_rust_python_equivalence(component, "text")
-        assert result, "GREEN phase should pass - Rust implementation works"
-        
-        self.tdd.complete_tdd_cycle(True)
     
     @pytest.mark.skipif(not HYPOTHESIS_AVAILABLE, reason="Hypothesis not available")
     @given(st.dictionaries(

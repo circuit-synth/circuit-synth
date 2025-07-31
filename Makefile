@@ -64,4 +64,3 @@ clean: ## Clean up temporary files
 
 ci-check: format-check lint ## Run all CI checks locally
 	@echo "🚀 All CI checks passed\! Ready to push."
-EOF < /dev/null

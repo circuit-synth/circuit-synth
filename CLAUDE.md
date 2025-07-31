@@ -18,16 +18,13 @@ gh issue list
 gh pr list
 ```
 
-### Docker Operations
+### KiCad Integration
 ```bash
-# Build production image
-docker build -f docker/Dockerfile.kicad-production -t circuit-synth .
+# Ensure KiCad is installed locally (required dependency)
+kicad-cli version
 
-# Run with KiCad integration
-docker-compose -f docker/docker-compose.production.yml up
-
-# Development environment
-docker-compose -f docker/docker-compose.yml run --rm circuit-synth-dev
+# Verify KiCad libraries are accessible
+find /usr/share/kicad/symbols -name "*.kicad_sym" | head -5
 ```
 
 ## Development Commands
@@ -41,12 +38,18 @@ uv pip install -e ".[dev]"
 
 # Install dependencies
 uv sync
+
+# Register Claude Code agents for AI-assisted circuit design
+uv run register-agents
 ```
 
 **Alternative method - using pip:**
 ```bash
 # If uv is not available
 pip install -e ".[dev]"
+
+# Register agents (after installation)
+register-agents
 ```
 
 ### Code Quality and Testing

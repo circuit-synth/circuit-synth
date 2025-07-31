@@ -934,9 +934,6 @@ class SchematicWriter:
                 "position", (184.0, 110.0)
             )  # Double the default coordinates
             text_size = textbox.get("text_size", 1.27)
-            print(
-                f"DEBUG: Processing dict textbox at position {position} with text: {text[:50]}..."
-            )
             rotation = textbox.get("rotation", 0)
             size = textbox.get("size", (40.0, 20.0))
             margins = textbox.get("margins", (1.0, 1.0, 1.0, 1.0))
@@ -949,9 +946,6 @@ class SchematicWriter:
             position = textbox.position
             text_size = textbox.text_size
             rotation = textbox.rotation
-            print(
-                f"DEBUG: Processing object textbox at position {position} with text: {text[:50]}..."
-            )
             size = textbox.size
             margins = textbox.margins
             background = textbox.background
@@ -960,14 +954,12 @@ class SchematicWriter:
             uuid = textbox.uuid
 
         # Create a Text object (we'll handle the box in S-expression generation)
-        print(f"DEBUG: Creating Text element with Point({position[0]}, {position[1]})")
         text_element = Text(
             content=text,
             position=Point(position[0], position[1]),
             size=text_size,
             orientation=rotation,
         )
-        print(f"DEBUG: Text element created with position: {text_element.position}")
 
         # Store additional textbox properties for S-expression generation
         text_element._is_textbox = True
@@ -1121,7 +1113,6 @@ class SchematicWriter:
 
             # Check if graphics data is missing from Rust cache - if so, use Python fallback
             if "graphics" not in lib_data or not lib_data["graphics"]:
-                print(f"🔧 Graphics data missing for {sym_id}, using Python fallback")
                 logger.info(
                     f"Graphics data missing for {sym_id}, using Python fallback"
                 )
@@ -1130,28 +1121,19 @@ class SchematicWriter:
                     if python_lib_data and "graphics" in python_lib_data:
                         # Merge graphics data from Python cache into Rust cache data
                         lib_data["graphics"] = python_lib_data["graphics"]
-                        print(
-                            f"✅ Added {len(python_lib_data['graphics'])} graphics elements from Python cache for {sym_id}"
-                        )
                         logger.info(
                             f"Added {len(python_lib_data['graphics'])} graphics elements from Python cache"
                         )
                     else:
-                        print(f"⚠️  Python fallback also has no graphics for {sym_id}")
                         logger.warning(
                             f"Python fallback also has no graphics for {sym_id}"
                         )
                 except Exception as e:
-                    print(
-                        f"❌ Failed to get graphics from Python fallback for {sym_id}: {e}"
-                    )
                     logger.warning(
                         f"Failed to get graphics from Python fallback for {sym_id}: {e}"
                     )
             else:
-                print(
-                    f"✅ Graphics data already available for {sym_id} ({len(lib_data.get('graphics', []))} elements)"
-                )
+                pass  # Graphics data already available
 
             if isinstance(lib_data, list):
                 # It's already an S-expression block
