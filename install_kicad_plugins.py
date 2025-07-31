@@ -130,11 +130,19 @@ def install_plugins():
     pcb_plugins_src = kicad_plugins_dir
     pcb_plugins_dst = kicad_dirs["pcb_plugins"]
     
-    # Install external PCB Claude chat plugin (most compatible)
+    # Install PCB-BOM bridge plugin (most reliable - uses working BOM plugin)
+    pcb_bom_bridge = pcb_plugins_src / "circuit_synth_pcb_bom_bridge.py"
+    if pcb_bom_bridge.exists():
+        shutil.copy2(pcb_bom_bridge, pcb_plugins_dst / "circuit_synth_pcb_bom_bridge.py")
+        print(f"✅ Installed: circuit_synth_pcb_bom_bridge.py")
+    else:
+        print(f"⚠️  Warning: circuit_synth_pcb_bom_bridge.py not found")
+    
+    # Install external PCB Claude chat plugin
     pcb_external_plugin = pcb_plugins_src / "circuit_synth_pcb_external_chat.py"
     if pcb_external_plugin.exists():
         shutil.copy2(pcb_external_plugin, pcb_plugins_dst / "circuit_synth_pcb_external_chat.py")
-        print(f"✅ Installed: circuit_synth_pcb_external_chat.py")
+        print(f"✅ Installed: circuit_synth_pcb_external_chat.py (external)")
     else:
         print(f"⚠️  Warning: circuit_synth_pcb_external_chat.py not found")
     
@@ -188,9 +196,9 @@ def install_plugins():
     print(f"")
     print(f"PCB Editor:")
     print(f"  1. Open KiCad PCB Editor")
-    print(f"  2. Look for 'Circuit-Synth PCB Chat (External)' toolbar button")
-    print(f"  3. Click to launch external Claude AI chat with PCB context")
-    print(f"  Note: External version avoids tkinter compatibility issues")
+    print(f"  2. Look for 'Circuit-Synth PCB→BOM' toolbar button")
+    print(f"  3. Click to launch the working BOM plugin with PCB context")
+    print(f"  Note: Uses the same reliable BOM plugin that works in schematic editor")
     print(f"")
     print(f"Schematic Editor:")
     print(f"  1. Open KiCad Schematic Editor")
