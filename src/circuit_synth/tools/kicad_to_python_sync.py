@@ -961,16 +961,9 @@ class LLMCodeUpdater:
             # Try different LLM import methods
             llm = None
 
-            # Method 1: Try the unified conversation interface
-            try:
-                from circuit_synth.intelligence.llm_unified_conversation_async import (
-                    LLMUnifiedConversationAsync,
-                )
-
-                llm = LLMUnifiedConversationAsync()
-                logger.info("Using LLMUnifiedConversationAsync")
-            except ImportError:
-                pass
+            # Method 1: LLM features not currently available
+            # Note: Advanced AI features are not implemented in this version
+            pass
 
             # Method 2: Try direct litellm approach
             if llm is None:

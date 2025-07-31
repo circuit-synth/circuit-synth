@@ -122,7 +122,7 @@
 - **Two approaches discovered** - API-based (requires keys) vs pre-processed database (no keys needed)
 - **yaqwsx approach** - Downloads XLS/database files, processes to JSON, uses IndexedDB locally
 - **No API keys needed** - Frontend uses pre-downloaded component database stored locally
-- **Third approach idea** - Use Puppeteer to scrape JLCPCB search results directly
+- **Third approach idea** - Use web scraping to get JLCPCB search results directly
 - **Web scraping option** - Query https://jlcpcb.com/parts/componentSearch?searchTxt=stm32g0 programmatically
 - **Real-time data** - Would get current stock/pricing without API keys
 - **STM32G4 lookup test** - Found STM32G431CBT6 (LQFP-48) with highest stock: 83,737 units

@@ -75,13 +75,14 @@ pip install target/wheels/rust_symbol_search-*.whl
 
 ### Python Interface (Recommended)
 ```python
-from circuit_synth.intelligence.llm_generation.agents.symbol_search import get_symbol_searcher
+# Note: Advanced AI symbol search features not currently available
+# Use basic KiCad symbol cache instead
 
-# Get the production searcher
-searcher = get_symbol_searcher()
+from circuit_synth.kicad.kicad_symbol_cache import KiCadSymbolCache
 
-# Search for symbols
-results = searcher.search("resistor", max_results=10)
+# Basic symbol search
+cache = KiCadSymbolCache()
+results = cache.search_symbols("resistor")
 for result in results:
     print(f"{result['lib_id']}: {result['score']:.3f}")
 
