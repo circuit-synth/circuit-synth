@@ -12,8 +12,8 @@ sudo apt update && sudo apt upgrade -y
 # Install required packages
 sudo apt install -y nginx git net-tools
 
-# Ensure we're in the right directory
-cd /var/www/circuit-synth
+# Ensure we're in the right directory (wherever the script is run from)
+REPO_DIR=$(pwd)
 
 # Preserve existing website if it exists
 echo "💾 Preserving existing website..."
@@ -30,7 +30,7 @@ fi
 
 # Set up systemd service and timer directly (not from repo files)
 echo "⏰ Setting up auto-update timer..."
-cat > /etc/systemd/system/circuit-synth-update.service << 'EOF'
+cat > /etc/systemd/system/circuit-synth-update.service << EOF
 [Unit]
 Description=Update Circuit-Synth website from GitHub
 After=network.target
@@ -38,7 +38,8 @@ After=network.target
 [Service]
 Type=oneshot
 User=root
-WorkingDirectory=/var/www/circuit-synth
+WorkingDirectory=$REPO_DIR
+ExecStartPre=/usr/bin/git config --global --add safe.directory $REPO_DIR
 ExecStart=/usr/bin/git pull origin main
 ExecStartPost=/bin/bash -c 'if [ -f "website/index.html" ]; then cp website/index.html /var/www/html/; fi'
 ExecStartPost=/bin/bash -c 'if [ -f "website/style.css" ]; then cp website/style.css /var/www/html/; fi'
@@ -86,7 +87,7 @@ echo "📊 Status:"
 echo "   Website: https://www.circuit-synth.com (SSL enabled)"
 echo "   Auto-update: Every hour from GitHub"
 echo "   Web root: /var/www/html/ (your existing site)"
-echo "   Repo: /var/www/circuit-synth/ (source files)"
+echo "   Repo: $REPO_DIR (source files)"
 echo ""
 echo "💾 Your existing beautiful website has been:"
 echo "   • Preserved as website/old_website.html in the repo"
