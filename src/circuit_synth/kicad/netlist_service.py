@@ -72,8 +72,8 @@ class CircuitReconstructor:
         from ..core.component import Component
         from ..core.net import Net
         
-        self.logger.info(f"🔄 Reconstructing circuit: {circuit_name}")
-        self.logger.info(f"📊 Input circuit_data keys: {list(circuit_data.keys())}")
+        # self.logger.info(f"🔄 Reconstructing circuit: {circuit_name}")
+        # self.logger.info(f"📊 Input circuit_data keys: {list(circuit_data.keys())}")
         
         # Create temporary circuit with isolated context to avoid reference collisions
         temp_circuit = Circuit(name=f"temp_netlist_{circuit_name}")
@@ -81,22 +81,22 @@ class CircuitReconstructor:
         # Set active circuit context for Net creation using the correct module
         from ..core.decorators import get_current_circuit, set_current_circuit
         original_active_circuit = get_current_circuit()
-        self.logger.debug(f"Original active circuit: {original_active_circuit}")
+        # self.logger.debug(f"Original active circuit: {original_active_circuit}")
         set_current_circuit(temp_circuit)
-        self.logger.debug(f"Set active circuit to: {temp_circuit}")
+        # self.logger.debug(f"Set active circuit to: {temp_circuit}")
         
         try:
             # Reconstruct components
             components_data = circuit_data.get('components', {})
-            self.logger.info(f"📦 Reconstructing {len(components_data)} components...")
-            self.logger.debug(f"📦 Components data structure: {components_data}")
+            # self.logger.info(f"📦 Reconstructing {len(components_data)} components...")
+            # self.logger.debug(f"📦 Components data structure: {components_data}")
             
             for comp_ref, comp_data in components_data.items():
-                self.logger.info(f"🔧 Creating component {comp_ref}:")
-                self.logger.info(f"   - symbol: {comp_data.get('symbol', 'NOT SET')}")
-                self.logger.info(f"   - ref_prefix: {comp_data.get('ref_prefix', 'NOT SET')}")
-                self.logger.info(f"   - value: {comp_data.get('value', 'NOT SET')}")
-                self.logger.info(f"   - footprint: {comp_data.get('footprint', 'NOT SET')}")
+                # self.logger.info(f"🔧 Creating component {comp_ref}:")
+                # self.logger.info(f"   - symbol: {comp_data.get('symbol', 'NOT SET')}")
+                # self.logger.info(f"   - ref_prefix: {comp_data.get('ref_prefix', 'NOT SET')}")
+                # self.logger.info(f"   - value: {comp_data.get('value', 'NOT SET')}")
+                # self.logger.info(f"   - footprint: {comp_data.get('footprint', 'NOT SET')}")
                 
                 # Temporarily disable circuit context to prevent automatic addition
                 original_active_circuit = get_current_circuit()
@@ -112,30 +112,27 @@ class CircuitReconstructor:
                     )
                     # Set the specific reference from JSON
                     comp.ref = comp_ref
-                    self.logger.info(f"✅ Created component with final ref: {comp.ref}")
+                    # self.logger.info(f"✅ Created component with final ref: {comp.ref}")
                     # Store component directly in internal storage without calling add_component
                     temp_circuit._components[comp_ref] = comp
-                    self.logger.info(f"📋 Stored component in circuit._components['{comp_ref}']")
+                    # self.logger.info(f"📋 Stored component in circuit._components['{comp_ref}']")
                 finally:
                     # Restore the original circuit context
                     set_current_circuit(original_active_circuit)
             
-            self.logger.info(f"📋 Final components in circuit: {list(temp_circuit._components.keys())}")
+            # self.logger.info(f"📋 Final components in circuit: {list(temp_circuit._components.keys())}")
             
             # Reconstruct nets - this is where the JSON structure was wrong
             nets_data = circuit_data.get('nets', {})
-            self.logger.info(f"🌐 Reconstructing {len(nets_data)} nets...")
-            self.logger.debug(f"🌐 Nets data structure: {nets_data}")
+            self.logger.info(f"Reconstructing {len(nets_data)} nets")
             
             for net_name, connections in nets_data.items():
-                self.logger.info(f"🔗 Creating net '{net_name}' with {len(connections)} connections:")
-                for i, conn in enumerate(connections):
-                    self.logger.info(f"   Connection {i+1}: {conn}")
+                # Creating net with connections (verbose logging available if needed)
                 
                 net = Net(net_name)
                 # Store net directly in internal storage since add_net may not exist
                 temp_circuit._nets[net_name] = net
-                self.logger.info(f"📝 Created and stored net '{net_name}' in circuit")
+                # Net created successfully
                 
                 # Connect components to this net based on connections list
                 for connection_idx, connection in enumerate(connections):
@@ -143,19 +140,14 @@ class CircuitReconstructor:
                     pin_data = connection.get('pin', {})
                     pin_number = pin_data.get('number', '1')
                     
-                    self.logger.info(f"🔌 Processing connection {connection_idx+1}:")
-                    self.logger.info(f"   - component: '{comp_ref}'")
-                    self.logger.info(f"   - pin: {pin_data}")
-                    self.logger.info(f"   - pin_number: '{pin_number}'")
+                    # Processing connection (verbose logging available if needed)
                     
                     if comp_ref and pin_number:
                         # Access component directly from internal storage
                         if comp_ref in temp_circuit._components:
                             component = temp_circuit._components[comp_ref]
-                            self.logger.info(f"✅ Found component '{comp_ref}' in circuit")
-                            self.logger.info(f"🔗 Connecting {comp_ref}[{pin_number}] to net {net_name}")
+                            # Connect component pin to net
                             component[pin_number] += net
-                            self.logger.info(f"✅ Successfully connected {comp_ref}[{pin_number}] to net {net_name}")
                         else:
                             available_comps = list(temp_circuit._components.keys())
                             self.logger.error(f"❌ Component '{comp_ref}' not found in circuit!")
@@ -164,22 +156,19 @@ class CircuitReconstructor:
                         self.logger.warning(f"⚠️ Skipping connection - missing comp_ref ({comp_ref}) or pin_number ({pin_number})")
             
             self.logger.info(f"✅ Circuit reconstruction complete:")
-            self.logger.info(f"   - Components: {len(temp_circuit._components)} ({list(temp_circuit._components.keys())})")
-            self.logger.info(f"   - Nets: {len(temp_circuit._nets)} ({list(temp_circuit._nets.keys())})")
             
-            # Detailed inspection of nets and their connections
+            # Log any connection issues for debugging
             for net_name, net_obj in temp_circuit._nets.items():
-                self.logger.info(f"🌐 Net '{net_name}' has {len(net_obj._pins)} pins connected:")
-                for pin in net_obj._pins:
-                    component_ref = pin._component.ref if pin._component else "NO_COMPONENT"
-                    pin_num = pin._component_pin_id if hasattr(pin, '_component_pin_id') else pin.num
-                    self.logger.info(f"   - {component_ref}[{pin_num}]")
+                if len(net_obj._pins) < 2:
+                    self.logger.warning(f"Net '{net_name}' has only {len(net_obj._pins)} connection(s) - may indicate connection issue")
+                elif len(net_obj._pins) > 10:
+                    self.logger.info(f"Net '{net_name}' has {len(net_obj._pins)} connections (large net)")
             
             return temp_circuit
             
         finally:
             # Restore original active circuit
-            self.logger.debug(f"Restoring original active circuit: {original_active_circuit}")
+            # self.logger.debug(f"Restoring original active circuit: {original_active_circuit}")
             set_current_circuit(original_active_circuit)
 
 
@@ -292,8 +281,7 @@ class KiCadNetlistService:
                 component_count = len(circuit._components) if hasattr(circuit, '_components') else 0
                 net_count = len(circuit._nets) if hasattr(circuit, '_nets') else 0
                 
-                self.logger.info(f"✅ Netlist generation successful!")
-                self.logger.info(f"📊 Generated netlist with {component_count} components and {net_count} nets")
+                self.logger.info(f"✅ Netlist generation successful: {component_count} components, {net_count} nets")
                 
                 return NetlistGenerationResult(
                     success=True,

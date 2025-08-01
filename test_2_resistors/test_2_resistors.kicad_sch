@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 91ed576f-710f-421f-9a71-245ba0a9f1d6)
+	(uuid dbd73e60-ff92-4355-8165-f941893e1e48)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -421,7 +421,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 341f67ba-dac3-42d6-938a-019dc2df94b5)
+		(uuid 5afbc8a6-be4d-4ce3-8a23-a905ae4dcb87)
 		(property
 			"Reference"
 			"R1"
@@ -465,7 +465,7 @@
 			(project
 				"test_2_resistors"
 				(path
-					"/71fe538d-8dd2-4071-a826-325d8fae5ea7/a7a51cf0-2b61-4c9c-b8cd-37b2e3154546"
+					"/3812b5a9-bc80-41a7-922e-e69b6e41f577/9078d3f4-5fc2-4a71-9408-e07d13eafc0e"
 					(reference R1)
 					(unit 1)
 				)
@@ -478,7 +478,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid c832dc75-877a-4fa7-925e-6cef6e2129e9)
+		(uuid b12b40db-0e1d-40fd-a578-7b7caa8d1108)
 		(property
 			"Reference"
 			"R2"
@@ -522,7 +522,7 @@
 			(project
 				"test_2_resistors"
 				(path
-					"/71fe538d-8dd2-4071-a826-325d8fae5ea7/a7a51cf0-2b61-4c9c-b8cd-37b2e3154546"
+					"/3812b5a9-bc80-41a7-922e-e69b6e41f577/9078d3f4-5fc2-4a71-9408-e07d13eafc0e"
 					(reference R2)
 					(unit 1)
 				)
@@ -535,7 +535,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid b6c53137-feaf-47fb-bd74-dce02c7c6bca)
+		(uuid a23d352d-41eb-4ded-bcf6-0816786723c7)
 		(property
 			"Reference"
 			"#PWR1"
@@ -558,7 +558,7 @@
 			(project
 				"test_2_resistors"
 				(path
-					"/71fe538d-8dd2-4071-a826-325d8fae5ea7/a7a51cf0-2b61-4c9c-b8cd-37b2e3154546"
+					"/3812b5a9-bc80-41a7-922e-e69b6e41f577/9078d3f4-5fc2-4a71-9408-e07d13eafc0e"
 					(reference #PWR1)
 					(unit 1)
 				)
@@ -571,7 +571,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid ef4e9b63-e70c-4ddc-8a39-aebbb2de31fc)
+		(uuid 66c72bd1-c9b1-47f0-9761-ca4004b4d577)
 		(property
 			"Reference"
 			"#PWR2"
@@ -594,7 +594,7 @@
 			(project
 				"test_2_resistors"
 				(path
-					"/71fe538d-8dd2-4071-a826-325d8fae5ea7/a7a51cf0-2b61-4c9c-b8cd-37b2e3154546"
+					"/3812b5a9-bc80-41a7-922e-e69b6e41f577/9078d3f4-5fc2-4a71-9408-e07d13eafc0e"
 					(reference #PWR2)
 					(unit 1)
 				)
@@ -611,7 +611,7 @@
 			)
 			(justify left)
 		)
-		(uuid 97cc5b90-86be-4427-ba70-2ddaaf5abdb3)
+		(uuid 45dd8c14-9b5a-4a9a-8e00-aa81bf8674bd)
 	)
 	(hierarchical_label
 		+3.3V
@@ -623,7 +623,7 @@
 			)
 			(justify right)
 		)
-		(uuid c9facb6b-2820-449f-9d3d-19fedeb6f9e3)
+		(uuid 2d0d421f-7594-44de-b2ed-ceffeb47dee0)
 	)
 	(hierarchical_label
 		Net-(R1-Pad2)
@@ -635,7 +635,7 @@
 			)
 			(justify right)
 		)
-		(uuid 8afa0c9c-6e5b-49a1-a16f-8d819a763b1a)
+		(uuid d1ae81f8-00e0-4627-8c62-a13850768976)
 	)
 	(hierarchical_label
 		Net-(R1-Pad2)
@@ -647,7 +647,7 @@
 			)
 			(justify left)
 		)
-		(uuid aee412b3-cf04-42cd-a81d-91570efe70dd)
+		(uuid cb0630f4-36a6-4c68-9368-e8075b96db3e)
 	)
 	(hierarchical_label
 		GND
@@ -659,7 +659,7 @@
 			)
 			(justify right)
 		)
-		(uuid 115eae75-b2a9-403d-a7e6-f25bed7f2812)
+		(uuid 4e18d0a4-64bc-4b9a-855b-27936aa86421)
 	)
 	(hierarchical_label
 		GND
@@ -671,7 +671,7 @@
 			)
 			(justify left)
 		)
-		(uuid 2d7fb6f8-a921-46dc-95c8-d8509e520b68)
+		(uuid 7af759fc-72bd-4b4f-ba46-6fcbc9d2c9e2)
 	)
 	(text_box
 		"Simple voltage divider with 2x 10k resistors"
@@ -704,7 +704,7 @@
 			)
 			(justify left top)
 		)
-		(uuid 3969277c-00b0-4d6e-8109-814a80c79887)
+		(uuid 97fee761-180e-4566-b76e-b7faf4d88137)
 	)
 	(text_box
 		"Simple voltage divider with 2x 10k resistors"
@@ -737,11 +737,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 3969277c-00b0-4d6e-8109-814a80c79887)
+		(uuid 97fee761-180e-4566-b76e-b7faf4d88137)
 	)
 	(sheet_instances
 		(path
-			"/71fe538d-8dd2-4071-a826-325d8fae5ea7/a7a51cf0-2b61-4c9c-b8cd-37b2e3154546"
+			"/3812b5a9-bc80-41a7-922e-e69b6e41f577/9078d3f4-5fc2-4a71-9408-e07d13eafc0e"
 			(page "1")
 		)
 	)

@@ -1,9 +1,9 @@
 (export (version "E")
     (design
       (source "temp_netlist_test_2_resistors.kicad_sch")
-      (date "2025-08-01T12:50:47-0700")
+      (date "2025-08-01T13:07:01-0700")
       (tool "Circuit-Synth Exporter v0.1.0")
-      (sheet (number "1") (name "root") (tstamps "/0152861f-a003-4e84-9c95-2b0c6219d31a/")
+      (sheet (number "1") (name "root") (tstamps "/30ab49e9-b0ba-4020-b025-c4d706a25c60/")
       (title_block
         (title)
         (company)
@@ -33,7 +33,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "297e4704-c102-4fe7-9ae4-6f2afe6dee57"))
+      (tstamps "892d1373-382e-4e12-b55d-f4e322e04a30"))
     (comp (ref "R2")
       (value "10k")
       (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -47,7 +47,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "25697c17-fb87-4d86-b536-374728bc5db9"))
+      (tstamps "9f7c8af0-abb6-424e-8c58-1911ae062d5f"))
     (comp (ref "#PWR1")
       (description "Power symbol creates a global label with name "+3.3V"")
       (fields
@@ -57,7 +57,7 @@
       (property (name "Sheetname") (value "Root"))
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "c27aa7fa-e6c1-45df-bacf-22efa8a0c26f"))
+      (tstamps "c6b828d4-8862-4bcb-a698-a5079526655a"))
     (comp (ref "#PWR2")
       (description "Power symbol creates a global label with name "GND" , ground")
       (fields
@@ -67,7 +67,7 @@
       (property (name "Sheetname") (value "Root"))
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "eaab8d3d-f194-48a5-8387-da6fcd2781a0")))
+      (tstamps "baa41dba-7e50-496d-b0fd-f172b660d0c0")))
     (libparts
     (libpart (lib "Device") (part "R")
       (description "Resistor")

@@ -522,7 +522,7 @@ def generate_libparts_section(circuit_data: Dict[str, Any]) -> List[Any]:
 
     # Generate libparts for each unique component type
     for ref, comp_data in all_components.items():
-        logger.debug(f"Processing component ref='{ref}', data={comp_data}")
+        # logger.debug(f"Processing component ref='{ref}', data={comp_data}")
 
         # --- Determine Library and Part ---
         lib = None
@@ -575,11 +575,11 @@ def generate_libparts_section(circuit_data: Dict[str, Any]) -> List[Any]:
 
         # Create a unique key for this libpart
         libpart_key = f"{lib}:{part}"
-        logger.debug(f"  Generated libpart_key: '{libpart_key}'")
+        # logger.debug(f"  Generated libpart_key: '{libpart_key}'")
 
         # Skip if we've already processed this libpart
         if libpart_key in unique_libparts:
-            logger.debug(f"  Skipping duplicate libpart_key: '{libpart_key}'")
+            # logger.debug(f"  Skipping duplicate libpart_key: '{libpart_key}'")
             continue
 
         unique_libparts.add(libpart_key)
@@ -839,7 +839,7 @@ def generate_libraries_section(circuit_data: Dict[str, Any]) -> List[Any]:
     # Extract unique libraries
     logger.debug(f"Processing {len(all_components)} components for libraries...")
     for ref, comp_data in all_components.items():
-        logger.debug(f"  Processing component ref='{ref}', data type={type(comp_data)}")
+        # logger.debug(f"  Processing component ref='{ref}', data type={type(comp_data)}")
         if not isinstance(comp_data, dict):
             logger.error(
                 f"  Component data for ref '{ref}' is not a dictionary! Skipping library processing for this component."
@@ -1361,7 +1361,7 @@ def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
 
         # Add nodes to this net
         for node in nodes:
-            logger.debug(f"Processing node connection: {node}")
+            # logger.debug(f"Processing node connection: {node}")
             component_ref = node.get("component")
             pin_info = node.get("pin", {})
             logger.debug(f"  Component ref: {component_ref}, Pin info: {pin_info}")
@@ -1426,9 +1426,9 @@ def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
                     f"  No pin type found in component or libpart for {component_ref}:{pin_num}, defaulting to 'passive'"
                 )
 
-            logger.debug(
-                f"  Pin type for {component_ref}:{pin_num} before mapping: {pin_type}"
-            )
+            # logger.debug(
+            #     f"  Pin type for {component_ref}:{pin_num} before mapping: {pin_type}"
+            # )
 
             # Special handling for unconnected pins - preserve their original type
             if pin_info.get("unconnected", False):
@@ -1538,7 +1538,7 @@ def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
                 node_entry.append(["pinfunction", pin_function])
 
             net_entry.append(node_entry)
-            logger.debug(f"  Added node entry: {node_entry}")
+            # logger.debug(f"  Added node entry: {node_entry}")
 
         # Add the complete net entry to nets section
         nets_section.append(net_entry)
@@ -1854,9 +1854,9 @@ def format_s_expr(expr: Any, indent: int = 0) -> str:
     Returns:
         Formatted S-expression string
     """
-    logger.debug(
-        f"format_s_expr called with type={type(expr)}, value={repr(expr)}, indent={indent}"
-    )
+    # logger.debug(
+    #     f"format_s_expr called with type={type(expr)}, value={repr(expr)}, indent={indent}"
+    # )
     indent_str = "  " * indent
 
     if isinstance(expr, str):

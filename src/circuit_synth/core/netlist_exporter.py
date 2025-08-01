@@ -72,33 +72,33 @@ def convert_python_to_rust_format(circuit_data: dict) -> dict:
     To Rust format:
     "nets": {"net_name": {"name": "net_name", "nodes": [...]}}
     """
-    logger.debug("🔄 DEBUG: convert_python_to_rust_format called")
+    # logger.debug("🔄 DEBUG: convert_python_to_rust_format called")
     rust_data = circuit_data.copy()
 
     # Convert nets format
     python_nets = circuit_data.get("nets", {})
-    logger.debug(f"🔄 DEBUG: Converting {len(python_nets)} nets from Python to Rust format")
+    # logger.debug(f"🔄 DEBUG: Converting {len(python_nets)} nets from Python to Rust format")
     rust_nets = {}
 
     for net_name, connections in python_nets.items():
-        logger.debug(f"🔄 DEBUG: Converting net '{net_name}' with {len(connections)} connections")
+        # logger.debug(f"🔄 DEBUG: Converting net '{net_name}' with {len(connections)} connections")
         # Convert each connection to have proper field names for Rust
         rust_nodes = []
         for i, conn in enumerate(connections):
-            logger.debug(f"🔄 DEBUG: Connection {i}: {conn}")
+            # logger.debug(f"🔄 DEBUG: Connection {i}: {conn}")
             component = conn["component"]
             pin_info = conn["pin"]
             pin_type = pin_info["type"]
-            logger.debug(f"🔄 DEBUG:   Component: {component} (type: {type(component)})")
-            logger.debug(f"🔄 DEBUG:   Pin type: {pin_type} (type: {type(pin_type)})")
+            # logger.debug(f"🔄 DEBUG:   Component: {component} (type: {type(component)})")
+            # logger.debug(f"🔄 DEBUG:   Pin type: {pin_type} (type: {type(pin_type)})")
             
             # Handle PinType enum objects - convert to string
             if hasattr(pin_type, 'value'):
                 pin_type_str = pin_type.value
-                logger.debug(f"🔄 DEBUG:   Converted PinType enum to string: {pin_type_str}")
+                # logger.debug(f"🔄 DEBUG:   Converted PinType enum to string: {pin_type_str}")
             else:
                 pin_type_str = str(pin_type)
-                logger.debug(f"🔄 DEBUG:   Using pin type as string: {pin_type_str}")
+                # logger.debug(f"🔄 DEBUG:   Using pin type as string: {pin_type_str}")
             
             rust_node = {
                 "component": component,
@@ -109,7 +109,7 @@ def convert_python_to_rust_format(circuit_data: dict) -> dict:
                 },
                 "original_path": None,
             }
-            logger.debug(f"🔄 DEBUG:   Created rust_node: {rust_node}")
+            # logger.debug(f"🔄 DEBUG:   Created rust_node: {rust_node}")
             rust_nodes.append(rust_node)
 
         # Create full Net object for Rust
