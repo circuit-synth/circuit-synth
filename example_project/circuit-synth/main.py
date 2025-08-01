@@ -77,15 +77,21 @@ def main_circuit():
 
 
 if __name__ == "__main__":
-    import os
-    
     print("🚀 Starting ESP32-C6 development board generation...")
     
     # Generate the complete hierarchical circuit
     print("📋 Creating circuit...")
     circuit = main_circuit()
     
-    # Create KiCad project with hierarchical sheets (this creates the directory)
+    # Generate KiCad netlist (required for ratsnest display) - save to kicad project folder
+    print("🔌 Generating KiCad netlist...")
+    circuit.generate_kicad_netlist("ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.net")
+    
+    # Generate JSON netlist (for debugging and analysis) - save to circuit-synth folder
+    print("📄 Generating JSON netlist...")
+    circuit.generate_json_netlist("circuit-synth/ESP32_C6_Dev_Board.json")
+    
+    # Create KiCad project with hierarchical sheets
     print("🏗️  Generating KiCad project...")
     circuit.generate_kicad_project(
         project_name="ESP32_C6_Dev_Board",
@@ -93,22 +99,9 @@ if __name__ == "__main__":
         generate_pcb=True
     )
     
-    # Now generate netlist files into the KiCad project directory
-    kicad_dir = "ESP32_C6_Dev_Board"  # Circuit-synth creates this directory
-    
-    # Generate KiCad netlist (required for ratsnest display) - save to KiCad project folder
-    print("🔌 Generating KiCad netlist...")
-    netlist_path = os.path.join(kicad_dir, "ESP32_C6_Dev_Board.net")
-    circuit.generate_kicad_netlist(netlist_path)
-    
-    # Generate JSON netlist (for debugging and analysis) - save to KiCad project folder
-    print("📄 Generating JSON netlist...")
-    json_path = os.path.join(kicad_dir, "ESP32_C6_Dev_Board.json")
-    circuit.generate_json_netlist(json_path)
-    
     print("")
-    print(f"✅ ESP32-C6 Development Board project generated!")
-    print(f"📁 Files saved to: {kicad_dir}")
+    print("✅ ESP32-C6 Development Board project generated!")
+    print("📁 Check the ESP32_C6_Dev_Board/ directory for KiCad files")
     print("")
     print("🏗️ Generated subcircuits:")
     print("   • USB-C port with CC resistors and ESD protection")
@@ -125,4 +118,4 @@ if __name__ == "__main__":
     print("   • ESP32_C6_Dev_Board.json - JSON netlist (for analysis)")
     print("")
     print("🎯 Ready for professional PCB manufacturing!")
-    print("💡 Open the .kicad_pro file in KiCad to see the ratsnest!")
+    print("💡 Open ESP32_C6_Dev_Board.kicad_pcb in KiCad to see the ratsnest!")

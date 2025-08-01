@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid f475bcf2-ba06-4093-b93d-2bc4ccb632d1)
+	(uuid 69fca495-11c0-4722-9a94-c8a981ee771e)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -317,7 +317,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid f9136124-d33f-490a-b957-3d7b122cef68)
+		(uuid cd6ecd4f-eab2-4594-8271-89015750b23e)
 		(property
 			"Reference"
 			"J2"
@@ -351,7 +351,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a18de34b-b93c-4cad-8e70-56e58fc1a436/7810ce5e-0312-4282-8cf4-1deac5fd4836/315cc055-f277-4ed4-897e-ca7503bb57a2"
+					"/16c5ecaf-ffb5-4038-a8cf-925882121a84/07190aa0-3be4-4c4c-87e2-de6e1e67b0a8/92947e00-e442-4d38-aeef-edd297c51f2e"
 					(reference J2)
 					(unit 1)
 				)
@@ -368,7 +368,7 @@
 			)
 			(justify right)
 		)
-		(uuid f6360ba8-4956-46e2-b802-3e702a820739)
+		(uuid a9caa213-da54-4aba-a32f-c8fe44843790)
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -380,7 +380,7 @@
 			)
 			(justify right)
 		)
-		(uuid 5cfb45d6-f451-4c10-8be3-8337a5e64208)
+		(uuid 0f34112f-1f5c-4cd5-8940-9904830219f9)
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -392,7 +392,7 @@
 			)
 			(justify right)
 		)
-		(uuid b741f1b6-f7d2-491d-a795-7f476469437d)
+		(uuid f2f009b6-000e-428b-a6a6-f5146739bba2)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -404,7 +404,7 @@
 			)
 			(justify left)
 		)
-		(uuid 46ef5679-c6b1-44cf-af02-67150e431fb1)
+		(uuid 18ce508c-2d12-4af3-ade5-c93d171e4091)
 	)
 	(hierarchical_label
 		GND
@@ -416,7 +416,7 @@
 			)
 			(justify left)
 		)
-		(uuid 92fa936f-69e3-4a0e-8445-1df49102cac9)
+		(uuid e9284c4c-bf79-4b1a-9dab-92e5d49e3429)
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -428,7 +428,7 @@
 			)
 			(justify left)
 		)
-		(uuid 6ee09c41-54be-4e82-aa3c-a0caed4ea0c4)
+		(uuid 214d1cb8-3e42-4330-97f4-f401e79ff25e)
 	)
 	(text_box
 		"Debug header for programming and debugging"
@@ -461,7 +461,7 @@
 			)
 			(justify left top)
 		)
-		(uuid c14ccd4c-b885-4b1c-a2d2-622968d80c13)
+		(uuid 66048fe4-a5c0-47b4-b1f2-9662e23103d7)
 	)
 	(text_box
 		"Debug header for programming and debugging"
@@ -494,11 +494,11 @@
 			)
 			(justify left top)
 		)
-		(uuid c14ccd4c-b885-4b1c-a2d2-622968d80c13)
+		(uuid 66048fe4-a5c0-47b4-b1f2-9662e23103d7)
 	)
 	(sheet_instances
 		(path
-			"/a18de34b-b93c-4cad-8e70-56e58fc1a436/7810ce5e-0312-4282-8cf4-1deac5fd4836/315cc055-f277-4ed4-897e-ca7503bb57a2"
+			"/16c5ecaf-ffb5-4038-a8cf-925882121a84/07190aa0-3be4-4c4c-87e2-de6e1e67b0a8/92947e00-e442-4d38-aeef-edd297c51f2e"
 			(page "1")
 		)
 	)

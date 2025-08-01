@@ -163,6 +163,7 @@ members = [
     "test-setup",
     "my_kicad_project",
     "my_kicad_proejct",
+    "example_project",
 ]
 
 [dependency-groups]

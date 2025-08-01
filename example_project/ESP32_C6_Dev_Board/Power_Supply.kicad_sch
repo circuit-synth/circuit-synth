@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 6ddbcc04-4dbb-4050-977b-51e1fac0c017)
+	(uuid bdc5153c-1c5a-49cd-abc7-268335c46b85)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -345,7 +345,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid b7c36fd3-6b75-40d8-8677-4da5b7d4c91e)
+		(uuid fb7292fb-6b5a-4e2e-bb21-241e5fa720a7)
 		(property
 			"Reference"
 			"U1"
@@ -379,7 +379,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a18de34b-b93c-4cad-8e70-56e58fc1a436/7810ce5e-0312-4282-8cf4-1deac5fd4836/466dd1f3-58da-4190-90f3-53cadd64442c"
+					"/16c5ecaf-ffb5-4038-a8cf-925882121a84/07190aa0-3be4-4c4c-87e2-de6e1e67b0a8/cda68aaa-b824-4dd8-b420-63a312d5d083"
 					(reference U1)
 					(unit 1)
 				)
@@ -392,7 +392,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 0ecbf0ee-3940-4717-a812-077781193636)
+		(uuid 4021e52e-5a52-414f-b1e6-03530aeb8dee)
 		(property
 			"Reference"
 			"C2"
@@ -436,7 +436,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a18de34b-b93c-4cad-8e70-56e58fc1a436/7810ce5e-0312-4282-8cf4-1deac5fd4836/466dd1f3-58da-4190-90f3-53cadd64442c"
+					"/16c5ecaf-ffb5-4038-a8cf-925882121a84/07190aa0-3be4-4c4c-87e2-de6e1e67b0a8/cda68aaa-b824-4dd8-b420-63a312d5d083"
 					(reference C2)
 					(unit 1)
 				)
@@ -449,7 +449,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid b6e92f5f-0b93-4042-8b9f-d110eeedb983)
+		(uuid d1a8ccf8-bb3c-4fa3-8298-100c378caaae)
 		(property
 			"Reference"
 			"C3"
@@ -493,7 +493,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a18de34b-b93c-4cad-8e70-56e58fc1a436/7810ce5e-0312-4282-8cf4-1deac5fd4836/466dd1f3-58da-4190-90f3-53cadd64442c"
+					"/16c5ecaf-ffb5-4038-a8cf-925882121a84/07190aa0-3be4-4c4c-87e2-de6e1e67b0a8/cda68aaa-b824-4dd8-b420-63a312d5d083"
 					(reference C3)
 					(unit 1)
 				)
@@ -510,7 +510,7 @@
 			)
 			(justify right)
 		)
-		(uuid 8a0ea56d-4084-48a0-9e52-8cbc91c2cac8)
+		(uuid f7d928cb-dfc4-40e3-88bc-296fddcb79a4)
 	)
 	(hierarchical_label
 		VBUS_IN
@@ -522,7 +522,7 @@
 			)
 			(justify right)
 		)
-		(uuid d1be25f1-1b49-495c-b7c9-5dff23f76297)
+		(uuid 49e18d8d-c481-4273-be35-7ef478c895cc)
 	)
 	(hierarchical_label
 		VBUS_IN
@@ -534,7 +534,7 @@
 			)
 			(justify left)
 		)
-		(uuid ed8efc2f-d5bd-457d-b626-9f7a4fbe0cf4)
+		(uuid d94ad6e0-ba28-45be-8eb4-60a86b4cd393)
 	)
 	(hierarchical_label
 		GND
@@ -546,7 +546,7 @@
 			)
 			(justify right)
 		)
-		(uuid 37b5af36-fb9c-4e04-b3cf-6636c660e854)
+		(uuid d4ce5f63-a617-4fa4-a33c-209eeb9b8ca9)
 	)
 	(hierarchical_label
 		GND
@@ -558,7 +558,7 @@
 			)
 			(justify right)
 		)
-		(uuid ac70ede4-4a42-484a-a50a-b5bbaa1a98a0)
+		(uuid 16a2e674-a13a-46ce-a4ec-4f671be89fda)
 	)
 	(hierarchical_label
 		GND
@@ -570,7 +570,7 @@
 			)
 			(justify right)
 		)
-		(uuid 9580e766-50e5-461d-b51b-ef1decee36d1)
+		(uuid b137b1d5-6d42-4279-9337-93718d8b0fff)
 	)
 	(hierarchical_label
 		GND
@@ -582,7 +582,7 @@
 			)
 			(justify right)
 		)
-		(uuid b72cd240-8742-4192-9357-0b8755dd706d)
+		(uuid 7214dea8-bf1b-4a32-a648-f9a1a840b924)
 	)
 	(hierarchical_label
 		VCC_3V3_OUT
@@ -594,7 +594,7 @@
 			)
 			(justify left)
 		)
-		(uuid 18b8de21-e5b0-40a4-a825-b4d5e59c00d4)
+		(uuid 073d7906-6bde-4310-b4b7-b78052798196)
 	)
 	(hierarchical_label
 		VCC_3V3_OUT
@@ -606,7 +606,7 @@
 			)
 			(justify left)
 		)
-		(uuid be37ee8b-fdc8-48ab-8cf6-c35182099e7f)
+		(uuid 6b782e83-7e53-46fb-b502-99fce4362476)
 	)
 	(hierarchical_label
 		VCC_3V3_OUT
@@ -618,7 +618,7 @@
 			)
 			(justify left)
 		)
-		(uuid d8f96408-8352-4798-950f-4268fc400554)
+		(uuid f5a25a2d-28c8-46a9-88aa-f6004db1fe12)
 	)
 	(text_box
 		"5V to 3.3V power regulation subcircuit"
@@ -651,7 +651,7 @@
 			)
 			(justify left top)
 		)
-		(uuid f8cd48d2-0d27-4583-968c-f8af11c5c6dd)
+		(uuid 5049c8f6-8c38-4feb-aa84-0b646d2b213d)
 	)
 	(text_box
 		"5V to 3.3V power regulation subcircuit"
@@ -684,11 +684,11 @@
 			)
 			(justify left top)
 		)
-		(uuid f8cd48d2-0d27-4583-968c-f8af11c5c6dd)
+		(uuid 5049c8f6-8c38-4feb-aa84-0b646d2b213d)
 	)
 	(sheet_instances
 		(path
-			"/a18de34b-b93c-4cad-8e70-56e58fc1a436/7810ce5e-0312-4282-8cf4-1deac5fd4836/466dd1f3-58da-4190-90f3-53cadd64442c"
+			"/16c5ecaf-ffb5-4038-a8cf-925882121a84/07190aa0-3be4-4c4c-87e2-de6e1e67b0a8/cda68aaa-b824-4dd8-b420-63a312d5d083"
 			(page "1")
 		)
 	)
