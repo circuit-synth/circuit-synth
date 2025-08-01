@@ -81,7 +81,7 @@ def get_user_log_directory(username: str, date: Optional[datetime] = None) -> Pa
         date = datetime.now()
 
     date_str = date.strftime("%Y-%m-%d")
-    log_dir = Path("logs") / "users" / username / date_str
+    log_dir = Path.home() / ".circuit-synth" / "logs" / "users" / username / date_str
     return ensure_log_directory(log_dir)
 
 
@@ -99,7 +99,7 @@ def get_system_log_directory(date: Optional[datetime] = None) -> Path:
         date = datetime.now()
 
     date_str = date.strftime("%Y-%m-%d")
-    log_dir = Path("logs") / "system" / date_str
+    log_dir = Path.home() / ".circuit-synth" / "logs" / "system" / date_str
     return ensure_log_directory(log_dir)
 
 
@@ -161,7 +161,7 @@ def compress_old_logs(days_old: int = 7):
         days_old: Number of days after which to compress logs
     """
     cutoff_date = datetime.now() - timedelta(days=days_old)
-    log_base = Path("logs")
+    log_base = Path.home() / ".circuit-synth" / "logs"
 
     for log_type in ["users", "system", "performance", "master"]:
         type_dir = log_base / log_type

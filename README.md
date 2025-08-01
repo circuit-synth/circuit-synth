@@ -40,6 +40,9 @@ uv add circuit-synth
 
 # 4. Setup circuit-synth in current project
 uv run cs-new-project
+
+# 5. Optional: Setup KiCad plugins for AI integration
+uv run cs-setup-kicad-plugins
 ```
 
 ### Option 2: Using pip (Traditional Python)
@@ -54,9 +57,12 @@ pip install circuit-synth
 
 # 3. Setup new project
 cs-new-project
+
+# 4. Optional: Setup KiCad plugins
+cs-setup-kicad-plugins
 ```
 
-**Result:** Complete KiCad project setup with circuit-synth Python files, AI agents, and KiCad plugins ready!
+**Result:** Complete KiCad project setup with circuit-synth Python files and AI agents ready! (KiCad plugins available separately)
 
 ### 🔍 **Component Intelligence**
 
@@ -438,12 +444,17 @@ Circuit-synth includes **native KiCad plugins** that bring AI-powered circuit an
 
 ### **Installation**
 ```bash
-# Install plugins to KiCad
-cd kicad_plugins/
-uv run python install_plugin.py
+# Automatic installation (recommended)
+uv run cs-setup-kicad-plugins
 
-# Or manual installation - see kicad_plugins/INSTALL.md
+# Manual installation instructions
+uv run cs-setup-kicad-plugins --manual
+
+# System-wide installation (requires admin privileges)
+uv run cs-setup-kicad-plugins --system
 ```
+
+**Note**: KiCad plugins are **optional** and installed separately from project creation. Use `cs-new-project` to create minimal projects, then add KiCad integration only when needed.
 
 ### **Example Plugin Output**
 ```

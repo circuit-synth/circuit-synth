@@ -42,8 +42,8 @@ class CircuitSynthLogger:
 
     def _setup_loggers(self):
         """Set up all the different loggers with appropriate handlers."""
-        # Create base log directory structure
-        base_log_dir = Path("logs")
+        # Create base log directory structure in user's home directory to avoid polluting projects
+        base_log_dir = Path.home() / ".circuit-synth" / "logs"
 
         # User-specific logs
         user_log_dir = (

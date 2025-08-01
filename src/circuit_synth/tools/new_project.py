@@ -62,13 +62,13 @@ def copy_complete_claude_setup(project_path: Path) -> None:
         commands_dir = dest_claude_dir / "commands"
         agents_dir = dest_claude_dir / "agents"
         
-        # Remove dev commands (keep only dev-update-and-commit, dev-run-tests)
-        dev_commands_to_remove = ["dev-release-pypi.md", "dev-review-branch.md", "dev-review-repo.md", "setup_circuit_synth.md"]
+        # Remove all dev- commands (not needed for end users)
+        dev_commands_to_remove = ["dev-release-pypi.md", "dev-review-branch.md", "dev-review-repo.md", "dev-run-tests.md", "dev-update-and-commit.md", "setup_circuit_synth.md"]
         for cmd_file in dev_commands_to_remove:
             cmd_path = commands_dir / cmd_file
             if cmd_path.exists():
                 cmd_path.unlink()
-                console.print(f"🗑️  Removed {cmd_file} (not needed for projects)", style="dim")
+                console.print(f"🗑️  Removed {cmd_file} (not needed for end users)", style="dim")
         
         # Remove setup agents (not needed for end users)
         setup_agents_to_remove = ["first_setup_agent.md"]
@@ -474,13 +474,13 @@ if __name__ == "__main__":
     print("📋 Creating circuit...")
     circuit = main_circuit()
     
-    # Generate KiCad netlist (required for ratsnest display)
+    # Generate KiCad netlist (required for ratsnest display) - save to kicad project folder
     print("🔌 Generating KiCad netlist...")
-    circuit.generate_kicad_netlist("ESP32_C6_Dev_Board.net")
+    circuit.generate_kicad_netlist("ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.net")
     
-    # Generate JSON netlist (for debugging and analysis)
+    # Generate JSON netlist (for debugging and analysis) - save to circuit-synth folder
     print("📄 Generating JSON netlist...")
-    circuit.generate_json_netlist("ESP32_C6_Dev_Board.json")
+    circuit.generate_json_netlist("circuit-synth/ESP32_C6_Dev_Board.json")
     
     # Create KiCad project with hierarchical sheets
     print("🏗️  Generating KiCad project...")
@@ -890,7 +890,6 @@ This is a **circuit-synth project** for professional circuit design with AI-powe
 ### **Slash Commands**
 - `/find-symbol STM32` - Search KiCad symbol libraries
 - `/find-footprint LQFP` - Search KiCad footprint libraries  
-- `/dev-run-tests` - Run comprehensive test suite
 - `/analyze-design` - Analyze circuit designs
 - `/find_stm32` - STM32-specific component search
 - `/generate_circuit` - Circuit generation workflows
@@ -942,42 +941,18 @@ uv run python circuit-synth/voltage_divider.py
 
 ## 🔌 KiCad Plugin Setup (Optional AI Integration)
 
-The project includes KiCad plugins for AI-powered circuit analysis. To install:
+Circuit-synth includes optional KiCad plugins for AI-powered circuit analysis:
 
-### **Quick Installation**
 ```bash
-# Run the plugin installer from your project directory
-uv run python kicad_plugins/install_plugin.py
+# Install KiCad plugins (separate command)
+uv run cs-setup-kicad-plugins
 ```
 
-### **Manual Installation**
-If automatic installation doesn't work, copy the plugin files manually:
-
-**macOS:**
-```bash
-cp kicad_plugins/*.py ~/Library/Application Support/kicad/scripting/plugins/
-```
-
-**Windows:**
-```bash
-copy kicad_plugins\\*.py %APPDATA%\\kicad\\scripting\\plugins\\
-```
-
-**Linux:**
-```bash
-cp kicad_plugins/*.py ~/.local/share/kicad/8.0/3rdparty/plugins/
-```
-
-### **Using the Plugins**
 After installation and restarting KiCad:
+- **PCB Editor**: Tools → External Plugins → "Circuit-Synth AI"  
+- **Schematic Editor**: Tools → Generate Bill of Materials → "Circuit-Synth AI"
 
-**PCB Editor:**
-- Tools → External Plugins → "Circuit-Synth AI"
-
-**Schematic Editor:**  
-- Tools → Generate Bill of Materials → "Circuit-Synth AI"
-
-The plugins provide AI-powered analysis of your circuits directly within KiCad!
+The plugins provide AI-powered BOM analysis and component optimization directly within KiCad!
 
 ## 🎯 Best Practices
 
@@ -1100,62 +1075,10 @@ def main(skip_kicad_check: bool, minimal: bool):
     except Exception as e:
         console.print(f"⚠️  Could not copy complete Claude setup: {e}", style="yellow")
 
-    # Step 2b: Create local KiCad plugins directory
-    console.print("\n🔌 Setting up KiCad plugins...", style="yellow")
-    
-    # Create kicad_plugins directory in project
-    plugins_dir = project_path / "kicad_plugins"
-    plugins_dir.mkdir(exist_ok=True)
-    
-    # Copy plugin files from source to project
-    source_plugins_dir = Path(__file__).parent.parent.parent.parent / "kicad_plugins"
-    
-    if source_plugins_dir.exists():
-        try:
-            # Copy key plugin files to project
-            plugin_files = [
-                "circuit_synth_bom_plugin.py",
-                "circuit_synth_pcb_bom_bridge.py", 
-                "install_plugin.py",
-                "README_SIMPLIFIED.md"
-            ]
-            
-            copied_files = []
-            for plugin_file in plugin_files:
-                source_file = source_plugins_dir / plugin_file
-                if source_file.exists():
-                    dest_file = plugins_dir / plugin_file
-                    import shutil
-                    shutil.copy2(source_file, dest_file)
-                    copied_files.append(plugin_file)
-            
-            if copied_files:
-                console.print("✅ KiCad plugin files copied to project", style="green")
-                console.print(f"   📁 Location: {plugins_dir}", style="cyan")
-                console.print(f"   📄 Files: {', '.join(copied_files)}", style="dim")
-                console.print("   📋 See README.md for installation instructions", style="cyan")
-            else:
-                console.print("⚠️  No plugin files found to copy", style="yellow")
-                
-        except Exception as e:
-            console.print(f"⚠️  Could not copy plugin files: {e}", style="yellow")
-    else:
-        console.print("⚠️  Source plugin directory not found", style="yellow")
-        console.print(f"   Expected at: {source_plugins_dir}", style="dim")
-    
-    # Always show manual installation paths for reference
+    # KiCad plugins setup removed - use 'uv run cs-setup-kicad-plugins' if needed
     if not skip_kicad_check and kicad_info.get("kicad_installed", False):
-        import platform
-        import os
-        
-        if platform.system() == "Darwin":  # macOS
-            plugin_install_dir = os.path.expanduser("~/Library/Application Support/kicad/scripting/plugins")
-        elif platform.system() == "Windows":
-            plugin_install_dir = os.path.expanduser("~/AppData/Roaming/kicad/scripting/plugins")
-        else:  # Linux
-            plugin_install_dir = os.path.expanduser("~/.local/share/kicad/8.0/3rdparty/plugins")
-        
-        console.print(f"   🎯 Install to KiCad: {plugin_install_dir}", style="dim")
+        console.print("\n🔌 KiCad plugins available separately", style="cyan")
+        console.print("   Run 'uv run cs-setup-kicad-plugins' to install AI integration plugins", style="dim")
 
     # Step 3: Get library preferences
     additional_libraries = []
