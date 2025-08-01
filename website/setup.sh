@@ -1,6 +1,6 @@
 #!/bin/bash
-# Simple Digital Ocean Setup for Circuit-Synth Website
-# Run this on your Digital Ocean droplet
+# Digital Ocean Setup for Circuit-Synth Website with Existing Website Preservation
+# Run this on your Digital Ocean droplet that already has the circuit-synth repo
 
 set -e
 
@@ -10,75 +10,66 @@ echo "🚀 Setting up Circuit-Synth website with auto-update timer..."
 sudo apt update && sudo apt upgrade -y
 
 # Install required packages
-sudo apt install -y nginx git
+sudo apt install -y nginx git net-tools
 
-# Create web directory
-sudo mkdir -p /var/www/circuit-synth
+# Ensure we're in the right directory
 cd /var/www/circuit-synth
 
-# Clone repository (public repo, no auth needed)
-echo "📥 Cloning Circuit-Synth repository..."
-sudo git clone https://github.com/circuit-synth/circuit-synth.git .
+# Preserve existing website if it exists
+echo "💾 Preserving existing website..."
+if [ -f "/var/www/html/index.html" ]; then
+    cp /var/www/html/index.html website/old_website.html
+    cp /var/www/html/index.html website/index.html
+    echo "✅ Existing website preserved as old_website.html and copied as index.html"
+else
+    echo "ℹ️  No existing website found in /var/www/html/"
+fi
 
-# Copy website files to web root
-echo "🌐 Setting up website files..."
-sudo cp -r website/*.html website/*.css /var/www/circuit-synth/ 2>/dev/null || echo "No HTML/CSS files found"
-
-# Set up systemd service and timer
+# Set up systemd service and timer directly (not from repo files)
 echo "⏰ Setting up auto-update timer..."
-sudo cp website/circuit-synth-update.service /etc/systemd/system/
-sudo cp website/circuit-synth-update.timer /etc/systemd/system/
+cat > /etc/systemd/system/circuit-synth-update.service << 'EOF'
+[Unit]
+Description=Update Circuit-Synth website from GitHub
+After=network.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/var/www/circuit-synth
+ExecStart=/usr/bin/git pull origin main
+ExecStartPost=/bin/bash -c 'if [ -f "website/index.html" ]; then cp website/index.html /var/www/html/; fi'
+ExecStartPost=/bin/bash -c 'if [ -f "website/style.css" ]; then cp website/style.css /var/www/html/; fi'
+ExecStartPost=/bin/bash -c 'chown www-data:www-data /var/www/html/index.html /var/www/html/style.css 2>/dev/null || true'
+ExecStartPost=/usr/bin/systemctl reload nginx
+StandardOutput=journal
+StandardError=journal
+EOF
+
+cat > /etc/systemd/system/circuit-synth-update.timer << 'EOF'
+[Unit]
+Description=Update Circuit-Synth website every hour
+Requires=circuit-synth-update.service
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
 
 # Reload systemd and enable timer
 sudo systemctl daemon-reload
 sudo systemctl enable circuit-synth-update.timer
 sudo systemctl start circuit-synth-update.timer
 
-# Set up Nginx configuration
-echo "🔧 Configuring Nginx..."
-sudo tee /etc/nginx/sites-available/circuit-synth > /dev/null <<EOF
-server {
-    listen 80;
-    server_name _;
-    root /var/www/circuit-synth;
-    index index.html index.htm;
-
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
-
-    # Gzip compression
-    gzip on;
-    gzip_vary on;
-    gzip_min_length 1024;
-    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
-
-    # Cache static assets
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
-
-    # Security headers
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header X-Content-Type-Options "nosniff" always;
-}
-EOF
-
-# Enable the site
-sudo ln -sf /etc/nginx/sites-available/circuit-synth /etc/nginx/sites-enabled/
-sudo rm -f /etc/nginx/sites-enabled/default
-
-# Test nginx configuration
-sudo nginx -t
-
-# Start and enable nginx
-sudo systemctl start nginx
-sudo systemctl enable nginx
-
-# Set proper permissions
+# Ensure /var/www/html exists and has proper permissions
+echo "🔧 Setting up web directory permissions..."
+sudo mkdir -p /var/www/html
+sudo chown -R www-data:www-data /var/www/html
 sudo chown -R www-data:www-data /var/www/circuit-synth
+
+# Note: Nginx is already configured with SSL, so we skip nginx setup
 
 # Test the timer works
 echo "🧪 Testing auto-update service..."
@@ -86,11 +77,18 @@ sudo systemctl start circuit-synth-update.service
 sudo systemctl status circuit-synth-update.service --no-pager -l
 
 echo ""
-echo "✅ Circuit-Synth website setup complete!"
+echo "✅ Circuit-Synth website auto-update setup complete!"
 echo ""
 echo "📊 Status:"
-echo "   Website: http://$(curl -s ipinfo.io/ip 2>/dev/null || echo 'your-droplet-ip')"
-echo "   Auto-update: Every hour"
+echo "   Website: https://www.circuit-synth.com (SSL enabled)"
+echo "   Auto-update: Every hour from GitHub"
+echo "   Web root: /var/www/html/ (your existing site)"
+echo "   Repo: /var/www/circuit-synth/ (source files)"
+echo ""
+echo "💾 Your existing beautiful website has been:"
+echo "   • Preserved as website/old_website.html in the repo"
+echo "   • Copied as website/index.html for version control"
+echo "   • Left running unchanged at /var/www/html/"
 echo ""
 echo "🔍 Useful commands:"
 echo "   Check timer status: sudo systemctl status circuit-synth-update.timer"
@@ -98,5 +96,14 @@ echo "   View update logs: sudo journalctl -u circuit-synth-update.service -f"
 echo "   Manual update: sudo systemctl start circuit-synth-update.service"
 echo "   Next update: systemctl list-timers circuit-synth-update.timer"
 echo ""
-echo "🌐 Your website will automatically update every hour from GitHub!"
-echo "   Just push changes to the main branch and wait up to 1 hour."
+echo "🌐 How it works:"
+echo "   1. Every hour, git pulls latest changes from GitHub"
+echo "   2. If website/index.html exists, copies it to /var/www/html/"
+echo "   3. If website/style.css exists, copies it to /var/www/html/"
+echo "   4. Reloads nginx to serve updated content"
+echo ""
+echo "🚀 To update your website:"
+echo "   1. Edit website/index.html in your GitHub repo"
+echo "   2. Push changes to main branch"
+echo "   3. Wait up to 1 hour for automatic update"
+echo "   4. Or run: sudo systemctl start circuit-synth-update.service"
