@@ -1,0 +1,702 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 4a84c60f-8155-419b-81c9-58a12b5d0217)
+	(paper A4)
+	(paper A4)
+	(lib_symbols
+		(symbol "Device:C"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"C"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"C"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				""
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"~"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"Unpolarized capacitor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"cap capacitor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"C_*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "C_0_1"
+				(polyline
+					(pts
+						(xy -2.032 0.762)
+						(xy 2.032 0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.032 -0.762)
+						(xy 2.032 -0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "C_1_1"
+				(pin
+					passive
+					line
+					(at 0.0 3.81 270)
+					(length 2.794)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 0.0 -3.81 90)
+					(length 2.794)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+		(symbol "Regulator_Linear:AMS1117-3.3"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"U"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"AMS1117-3.3"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				"Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"http://www.advanced-monolithic.com/pdf/ds1117.pdf"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"linear regulator ldo fixed positive"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"SOT?223*TabPin2*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "AMS1117-3.3_0_1"
+				(rectangle
+					(start -5.08 -5.08)
+					(end 5.08 1.905)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "AMS1117-3.3_1_1"
+				(pin
+					power_in
+					line
+					(at -7.62 0.0 0)
+					(length 2.54)
+					(name
+						VI
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					power_in
+					line
+					(at 0.0 -7.62 90)
+					(length 2.54)
+					(name
+						GND
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					power_out
+					line
+					(at 7.62 0.0 180)
+					(length 2.54)
+					(name
+						VO
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+	)
+	(title_block
+		(title Power_Supply)
+		(date 2025-08-01)
+		(company Circuit-Synth)
+	)
+	(symbol
+		(lib_id Regulator_Linear:AMS1117-3.3)
+		(at 45.72 58.42 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid e55f54b3-20aa-4b7d-a8a3-486bc175be1b)
+		(property
+			"Reference"
+			"U1"
+			(at 45.72 53.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+			(at 45.72 68.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference U1)
+					(unit 1)
+				)
+			)
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/a9a1fed8-33aa-427c-8c5b-74c2b8074d04/84a0475c-6a67-4a7b-a1a5-57e64aa99c7f/b8156174-c94d-43b9-9675-8ffd823f995c"
+					(reference U1)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id Device:C)
+		(at 71.12 58.42 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid e6c29361-474f-4d6f-95af-a204d3f66eec)
+		(property
+			"Reference"
+			"C2"
+			(at 71.12 53.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Value"
+			"10uF"
+			(at 71.12 63.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Capacitor_SMD:C_0805_2012Metric"
+			(at 71.12 68.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference C2)
+					(unit 1)
+				)
+			)
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/a9a1fed8-33aa-427c-8c5b-74c2b8074d04/84a0475c-6a67-4a7b-a1a5-57e64aa99c7f/b8156174-c94d-43b9-9675-8ffd823f995c"
+					(reference C2)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id Device:C)
+		(at 91.44 58.42 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid 8bab1ddf-7169-4fcb-acac-c124ec15e959)
+		(property
+			"Reference"
+			"C3"
+			(at 91.44 53.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Value"
+			"22uF"
+			(at 91.44 63.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Capacitor_SMD:C_0805_2012Metric"
+			(at 91.44 68.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference C3)
+					(unit 1)
+				)
+			)
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/a9a1fed8-33aa-427c-8c5b-74c2b8074d04/84a0475c-6a67-4a7b-a1a5-57e64aa99c7f/b8156174-c94d-43b9-9675-8ffd823f995c"
+					(reference C3)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		VBUS
+		(shape input)
+		(at 38.1 58.42 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid edd28ea0-13a6-4b1d-8a91-a6a2ee200e0f)
+	)
+	(hierarchical_label
+		VBUS
+		(shape input)
+		(at 38.1 58.42 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 12a50c28-0ca8-4394-819c-8c29e0697dbf)
+	)
+	(hierarchical_label
+		VBUS
+		(shape input)
+		(at 71.12 54.61 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 99024908-cb33-4dfc-80fe-bdd16c155d15)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 45.72 66.04 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 3a368f34-cb18-45f0-a13a-0f393cb1461d)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 45.72 66.04 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 0a16c578-1439-463e-859a-d390c8f36534)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 71.12 62.230000000000004 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid df6004c2-a740-41e5-a90b-a2842fac147c)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 91.44 62.230000000000004 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 6dbaab77-56d2-4187-a582-b7fc8a84cce4)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 53.339999999999996 58.42 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid bc6b888b-73cf-465c-861e-40fdd69aae5a)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 53.339999999999996 58.42 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 5a80550b-40ee-44eb-8194-36f37ad3e142)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 91.44 54.61 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 5aa0f5c3-c2c6-42a9-ac78-d73a4ddbb783)
+	)
+	(text_box
+		"5V to 3.3V power regulation subcircuit"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 473d5a88-dcbd-47d5-b66d-ca54b68ea9de)
+	)
+	(text_box
+		"5V to 3.3V power regulation subcircuit"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 473d5a88-dcbd-47d5-b66d-ca54b68ea9de)
+	)
+	(sheet_instances
+		(path
+			"/a9a1fed8-33aa-427c-8c5b-74c2b8074d04/84a0475c-6a67-4a7b-a1a5-57e64aa99c7f/b8156174-c94d-43b9-9675-8ffd823f995c"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

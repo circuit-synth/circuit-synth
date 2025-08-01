@@ -788,15 +788,8 @@ class PCBGenerator:
                 # AND handle subcircuit prefixes (e.g., "subcircuit_R1" -> "R1")
                 clean_nodes = []
                 for ref, pin in nodes:
-                    # First handle hierarchical path prefixes
+                    # Handle hierarchical path prefixes (e.g., "regulator/U2" -> "U2")
                     clean_ref = ref.split("/")[-1] if "/" in ref else ref
-                    
-                    # Then handle subcircuit prefixes - map "subcircuit_R1" back to "R1"
-                    if clean_ref.startswith("subcircuit_"):
-                        original_ref = clean_ref[len("subcircuit_"):]
-                        print(f"🔧 SUBCIRCUIT MAPPING: {clean_ref} -> {original_ref}")
-                        logger.info(f"🔧 SUBCIRCUIT MAPPING: {clean_ref} -> {original_ref}")
-                        clean_ref = original_ref
                     
                     clean_nodes.append((clean_ref, pin))
                     logger.info(f"🔍 NODE MAPPING: {ref} -> {clean_ref} (pin {pin})")

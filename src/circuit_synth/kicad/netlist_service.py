@@ -97,8 +97,8 @@ class CircuitDataLoader:
             # Recursively process subcircuits
             subcircuits = circuit.get('subcircuits', [])
             for subcircuit in subcircuits:
-                subcircuit_name = subcircuit.get('name', 'subcircuit')
-                collect_from_circuit(subcircuit, f"{prefix}{subcircuit_name}_")
+                # Remove subcircuit prefixing to get clean references (R1, R2 instead of subcircuit_R1, subcircuit_R2)
+                collect_from_circuit(subcircuit, prefix)
         
         # Start flattening from root circuit
         collect_from_circuit(circuit_data)

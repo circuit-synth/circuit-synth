@@ -7,16 +7,16 @@ Standard ESP32 debug header with UART, reset, and boot control
 from circuit_synth import *
 
 @circuit(name="Debug_Header")
-def debug_header_subcircuit():
+def debug_header_subcircuit(vcc_3v3=None, gnd=None, debug_tx=None, debug_rx=None, debug_en=None, debug_io0=None):
     """Debug header for programming and debugging"""
     
-    # Interface nets
-    vcc_3v3 = Net('VCC_3V3')
-    gnd = Net('GND')
-    debug_tx = Net('DEBUG_TX')
-    debug_rx = Net('DEBUG_RX') 
-    debug_en = Net('DEBUG_EN')
-    debug_io0 = Net('DEBUG_IO0')
+    # Interface nets - use provided nets or create defaults for standalone operation
+    vcc_3v3 = vcc_3v3 or Net('VCC_3V3')
+    gnd = gnd or Net('GND')
+    debug_tx = debug_tx or Net('DEBUG_TX')
+    debug_rx = debug_rx or Net('DEBUG_RX') 
+    debug_en = debug_en or Net('DEBUG_EN')
+    debug_io0 = debug_io0 or Net('DEBUG_IO0')
     
     # 2x3 debug header
     debug_header = Component(

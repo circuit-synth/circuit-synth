@@ -7,14 +7,14 @@ Includes CC resistors, ESD protection, and shield grounding
 from circuit_synth import *
 
 @circuit(name="USB_Port")
-def usb_port_subcircuit():
+def usb_port_subcircuit(vbus_out=None, gnd=None, usb_dp=None, usb_dm=None):
     """USB-C port with CC resistors, ESD protection, and proper grounding"""
     
-    # Interface nets
-    vbus_out = Net('VBUS_OUT')
-    gnd = Net('GND')
-    usb_dp = Net('USB_DP')
-    usb_dm = Net('USB_DM')
+    # Interface nets - use provided nets or create defaults for standalone operation
+    vbus_out = vbus_out or Net('VBUS_OUT')
+    gnd = gnd or Net('GND')
+    usb_dp = usb_dp or Net('USB_DP')
+    usb_dm = usb_dm or Net('USB_DM')
     
     # USB-C connector
     usb_conn = Component(
