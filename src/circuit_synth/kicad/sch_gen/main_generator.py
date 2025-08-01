@@ -828,53 +828,70 @@ class SchematicGenerator(IKiCadIntegration):
         logger.info(f"📁 DEBUG: JSON file path: {json_file}")
         logger.info(f"📁 DEBUG: Project dir: {self.project_dir}")
         logger.info(f"📁 DEBUG: Project name: {self.project_name}")
-        
+
         try:
             # Import the circuit JSON for netlist generation
-            from ...core.circuit import Circuit
             import json
-            
+
+            from ...core.circuit import Circuit
+
             # Load the circuit from the JSON file
             logger.info(f"📖 DEBUG: Loading JSON from: {json_file}")
-            with open(json_file, 'r') as f:
+            with open(json_file, "r") as f:
                 circuit_data = json.load(f)
-            logger.info(f"📖 DEBUG: JSON loaded successfully, keys: {list(circuit_data.keys())}")
-            logger.info(f"📖 DEBUG: Components: {list(circuit_data.get('components', {}).keys())}")
+            logger.info(
+                f"📖 DEBUG: JSON loaded successfully, keys: {list(circuit_data.keys())}"
+            )
+            logger.info(
+                f"📖 DEBUG: Components: {list(circuit_data.get('components', {}).keys())}"
+            )
             logger.info(f"📖 DEBUG: Nets: {list(circuit_data.get('nets', {}).keys())}")
-            
+
             # Create a Circuit object from the JSON data
-            from ...core.netlist_exporter import NetlistExporter
             from ...core.component import Component
             from ...core.net import Net
-            
+            from ...core.netlist_exporter import NetlistExporter
+
             # Skip the temporary circuit creation - let the netlist service handle it
-            logger.info(f"🔧 DEBUG: Skipping temporary circuit creation to avoid reference collisions")
-            logger.info(f"📖 DEBUG: JSON data will be passed directly to netlist service")
-            
+            logger.info(
+                f"🔧 DEBUG: Skipping temporary circuit creation to avoid reference collisions"
+            )
+            logger.info(
+                f"📖 DEBUG: JSON data will be passed directly to netlist service"
+            )
+
             # Generate the netlist using the new modular service
             logger.info(f"🔧 DEBUG: Using new modular netlist service...")
-            
+
             # Call the modular netlist service
             from ..netlist_service import create_netlist_service
+
             netlist_service = create_netlist_service()
-            
+
             result = netlist_service.generate_netlist(
                 json_file_path=json_file,
                 output_path=str(netlist_path),
-                circuit_name=self.project_name
+                circuit_name=self.project_name,
             )
-            
+
             if result.success:
                 logger.info(f"✅ Modular netlist generation succeeded!")
-                logger.info(f"📊 Generated netlist with {result.component_count} components and {result.net_count} nets")
+                logger.info(
+                    f"📊 Generated netlist with {result.component_count} components and {result.net_count} nets"
+                )
                 logger.info(f"📁 Netlist saved to: {result.netlist_path}")
             else:
-                logger.error(f"❌ Modular netlist generation failed: {result.error_message}")
+                logger.error(
+                    f"❌ Modular netlist generation failed: {result.error_message}"
+                )
                 logger.warning("PCB generation will proceed without netlist")
-            
+
         except Exception as e:
             import traceback
-            logger.error(f"❌ Failed to generate KiCad netlist with modular service: {e}")
+
+            logger.error(
+                f"❌ Failed to generate KiCad netlist with modular service: {e}"
+            )
             logger.error(f"❌ Full traceback: {traceback.format_exc()}")
             logger.warning("PCB generation will proceed without netlist")
 
@@ -915,22 +932,24 @@ class SchematicGenerator(IKiCadIntegration):
                 logger.error("❌ PCB generation failed!")
 
         # NOTE: Netlist generation now handled earlier in the method using modular service
-        logger.info("🔍 DEBUG: Netlist generation completed earlier using modular service")
-        
+        logger.info(
+            "🔍 DEBUG: Netlist generation completed earlier using modular service"
+        )
+
         # Return success result
         return {
             "success": True,
             "output_path": str(self.project_dir),
-            "message": "KiCad project generated successfully"
+            "message": "KiCad project generated successfully",
         }
 
     def _generate_netlist(self, json_file: str) -> bool:
         """
         Generate KiCad netlist file using the modular netlist service.
-        
+
         Args:
             json_file: Path to the circuit JSON file
-            
+
         Returns:
             bool: True if netlist generation succeeded, False otherwise
         """
@@ -938,35 +957,41 @@ class SchematicGenerator(IKiCadIntegration):
         logger.info(f"🔍 DEBUG: json_file: {json_file}")
         logger.info(f"🔍 DEBUG: project_dir: {self.project_dir}")
         logger.info(f"🔍 DEBUG: project_name: {self.project_name}")
-        
+
         try:
             logger.info("🔍 DEBUG: About to import netlist_service")
             # Import the modular netlist service
             from ..netlist_service import create_netlist_service
+
             logger.info("🔍 DEBUG: Successfully imported create_netlist_service")
-            
+
             # Create service instance
             netlist_service = create_netlist_service()
-            
+
             # Generate netlist
             netlist_path = str(Path(self.project_dir) / f"{self.project_name}.net")
             result = netlist_service.generate_netlist(
                 json_file_path=json_file,
                 output_path=netlist_path,
-                circuit_name=self.project_name
+                circuit_name=self.project_name,
             )
-            
+
             if result.success:
                 logger.info(f"✅ Modular netlist generation succeeded!")
-                logger.info(f"📊 Generated netlist with {result.component_count} components and {result.net_count} nets")
+                logger.info(
+                    f"📊 Generated netlist with {result.component_count} components and {result.net_count} nets"
+                )
                 logger.info(f"📁 Netlist saved to: {result.netlist_path}")
                 return True
             else:
-                logger.error(f"❌ Modular netlist generation failed: {result.error_message}")
+                logger.error(
+                    f"❌ Modular netlist generation failed: {result.error_message}"
+                )
                 return False
-                
+
         except Exception as e:
             import traceback
+
             logger.error(f"❌ Failed to create netlist service: {e}")
             logger.error(f"❌ Full traceback: {traceback.format_exc()}")
             return False

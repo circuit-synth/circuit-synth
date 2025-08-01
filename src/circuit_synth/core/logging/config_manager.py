@@ -382,7 +382,11 @@ class LoggingConfig:
                     issues.append(f"Invalid level for sink {sink_name}: {level}")
 
         # Validate paths exist for file sinks
-        log_dir = Path(self.get("logging.log_directory", str(Path.home() / ".circuit-synth" / "logs")))
+        log_dir = Path(
+            self.get(
+                "logging.log_directory", str(Path.home() / ".circuit-synth" / "logs")
+            )
+        )
         if not log_dir.exists():
             try:
                 log_dir.mkdir(parents=True, exist_ok=True)

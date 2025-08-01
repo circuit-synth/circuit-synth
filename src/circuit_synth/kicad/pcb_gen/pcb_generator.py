@@ -213,6 +213,12 @@ class PCBGenerator:
 
                 # Only proceed if footprint is specified in component data
                 if footprint:
+                    # ESP32-C6 debugging
+                    if "ESP32-C6" in footprint:
+                        logger.warning(
+                            f"ESP32-C6 PCB DEBUG: Creating footprint {footprint} for reference {comp_info['reference']}"
+                        )
+
                     # Add footprint from library to get full graphics including courtyard
                     fp = pcb.add_footprint_from_library(
                         footprint_id=footprint,
@@ -222,6 +228,25 @@ class PCBGenerator:
                         rotation=0,
                         value=comp_info.get("value", ""),
                     )
+
+                    # ESP32-C6 debugging: log pad count and positions
+                    if "ESP32-C6" in footprint and fp:
+                        logger.warning(
+                            f"ESP32-C6 PCB DEBUG: Created footprint {footprint} with {len(fp.pads)} pads"
+                        )
+                        for pad in fp.pads:
+                            if pad.number in [
+                                "12",
+                                "13",
+                                "14",
+                                "24",
+                                "36",
+                                "37",
+                                "48",
+                            ]:  # Sample pads from top/bottom rows
+                                logger.warning(
+                                    f"ESP32-C6 PCB DEBUG: Sample pad {pad.number} - pos=({pad.position.x}, {pad.position.y}), size={pad.size}"
+                                )
 
                     # Store hierarchical path in footprint
                     if fp and comp_info.get("hierarchical_path"):
@@ -409,10 +434,14 @@ class PCBGenerator:
 
             # Generate ratsnest connections if requested (AFTER PCB save)
             if generate_ratsnest:
-                logger.info("Skipping ratsnest generation - KiCad generates ratsnest dynamically")
+                logger.info(
+                    "Skipping ratsnest generation - KiCad generates ratsnest dynamically"
+                )
                 # KiCad generates ratsnest connections dynamically based on net connectivity
                 # No need to add explicit ratsnest tokens to the PCB file
-                logger.info("✓ PCB nets are properly defined for dynamic ratsnest generation")
+                logger.info(
+                    "✓ PCB nets are properly defined for dynamic ratsnest generation"
+                )
 
             # Update project file to include PCB
             self._update_project_file()
@@ -553,9 +582,13 @@ class PCBGenerator:
                     # Updated pattern to handle hierarchical references
                     node_pattern = r'\(node\s+\(ref\s+"([^"]+)"\)\s+\(pin\s+"[^"]+"\)'
                     nodes = re.findall(node_pattern, net_content)
-                    logger.info(f"🚀 EARLY PARSING: Found {len(nodes)} nodes in net {net_name}: {nodes}")
+                    logger.info(
+                        f"🚀 EARLY PARSING: Found {len(nodes)} nodes in net {net_name}: {nodes}"
+                    )
 
-                    print(f"🔍 NODES CHECK: {len(nodes)} nodes for net {net_name}, condition: {len(nodes) >= 2}")
+                    print(
+                        f"🔍 NODES CHECK: {len(nodes)} nodes for net {net_name}, condition: {len(nodes) >= 2}"
+                    )
                     if len(nodes) >= 2:
                         # Extract just the component reference (last part after /)
                         clean_nodes = []
@@ -563,16 +596,20 @@ class PCBGenerator:
                         for node in nodes:
                             # Handle hierarchical references like "regulator/U2"
                             ref = node.split("/")[-1] if "/" in node else node
-                            
+
                             # Handle subcircuit prefixes - map "subcircuit_R1" back to "R1"
                             print(f"🔍 CHECKING REF: {ref}")
                             if ref.startswith("subcircuit_"):
-                                original_ref = ref[len("subcircuit_"):]
-                                print(f"🔧 SUBCIRCUIT MAPPING (early): {ref} -> {original_ref}")
-                                logger.info(f"🔧 SUBCIRCUIT MAPPING (early): {ref} -> {original_ref}")
+                                original_ref = ref[len("subcircuit_") :]
+                                print(
+                                    f"🔧 SUBCIRCUIT MAPPING (early): {ref} -> {original_ref}"
+                                )
+                                logger.info(
+                                    f"🔧 SUBCIRCUIT MAPPING (early): {ref} -> {original_ref}"
+                                )
                                 ref = original_ref
                             print(f"🔍 FINAL REF: {ref}")
-                            
+
                             clean_nodes.append(ref)
                             logger.info(f"🔍 NODE MAPPING (early): {node} -> {ref}")
 
@@ -582,7 +619,9 @@ class PCBGenerator:
                             nets[net_name].add(ref)
 
                         print(f"🔧 MODIFIED DEBUG - Net {net_name}: {clean_nodes}")
-                        logger.debug(f"🔧 MODIFIED DEBUG - Net {net_name}: {clean_nodes}")
+                        logger.debug(
+                            f"🔧 MODIFIED DEBUG - Net {net_name}: {clean_nodes}"
+                        )
 
                 logger.info(f"Found {len(nets)} nets with connections from netlist")
 
@@ -790,7 +829,7 @@ class PCBGenerator:
                 for ref, pin in nodes:
                     # Handle hierarchical path prefixes (e.g., "regulator/U2" -> "U2")
                     clean_ref = ref.split("/")[-1] if "/" in ref else ref
-                    
+
                     clean_nodes.append((clean_ref, pin))
                     logger.info(f"🔍 NODE MAPPING: {ref} -> {clean_ref} (pin {pin})")
 
@@ -821,8 +860,12 @@ class PCBGenerator:
                             f"Footprint {ref} not found, skipping pad assignment for net '{flattened_net_name}'"
                         )
                         # List available footprints for debugging
-                        available_refs = [fp.reference for fp in pcb.pcb_data["footprints"]]
-                        logger.debug(f"Available footprint references: {available_refs}")
+                        available_refs = [
+                            fp.reference for fp in pcb.pcb_data["footprints"]
+                        ]
+                        logger.debug(
+                            f"Available footprint references: {available_refs}"
+                        )
                         continue
 
                     # Find ALL pads with this number (e.g., SOT-223 has two pads numbered "2")

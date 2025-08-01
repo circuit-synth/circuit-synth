@@ -32,77 +32,106 @@ console = Console()
 
 def copy_complete_claude_setup(project_path: Path) -> None:
     """Copy the complete .claude directory from circuit-synth3 to new project"""
-    
+
     # Find the circuit-synth3 root directory (where we have the complete .claude setup)
     circuit_synth_root = Path(__file__).parent.parent.parent.parent
     source_claude_dir = circuit_synth_root / ".claude"
-    
+
     if not source_claude_dir.exists():
-        console.print("⚠️  Source .claude directory not found - using basic setup", style="yellow")
+        console.print(
+            "⚠️  Source .claude directory not found - using basic setup", style="yellow"
+        )
         register_circuit_agents()
         return
-    
+
     # Destination .claude directory in the new project
     dest_claude_dir = project_path / ".claude"
-    
-    console.print(f"📋 Copying complete Claude setup from {source_claude_dir}", style="blue")
-    
+
+    console.print(
+        f"📋 Copying complete Claude setup from {source_claude_dir}", style="blue"
+    )
+
     try:
         # Copy the entire .claude directory structure
         if dest_claude_dir.exists():
             shutil.rmtree(dest_claude_dir)
         shutil.copytree(source_claude_dir, dest_claude_dir)
-        
+
         # Remove mcp_settings.json as it's not needed
         mcp_settings_file = dest_claude_dir / "mcp_settings.json"
         if mcp_settings_file.exists():
             mcp_settings_file.unlink()
-            
+
         # Remove unnecessary dev commands and setup agents
         commands_dir = dest_claude_dir / "commands"
         agents_dir = dest_claude_dir / "agents"
-        
+
         # Remove all dev- commands (not needed for end users)
-        dev_commands_to_remove = ["dev-release-pypi.md", "dev-review-branch.md", "dev-review-repo.md", "dev-run-tests.md", "dev-update-and-commit.md", "setup_circuit_synth.md"]
+        dev_commands_to_remove = [
+            "dev-release-pypi.md",
+            "dev-review-branch.md",
+            "dev-review-repo.md",
+            "dev-run-tests.md",
+            "dev-update-and-commit.md",
+            "setup_circuit_synth.md",
+        ]
         for cmd_file in dev_commands_to_remove:
             cmd_path = commands_dir / cmd_file
             if cmd_path.exists():
                 cmd_path.unlink()
-                console.print(f"🗑️  Removed {cmd_file} (not needed for end users)", style="dim")
-        
+                console.print(
+                    f"🗑️  Removed {cmd_file} (not needed for end users)", style="dim"
+                )
+
         # Remove setup agents (not needed for end users)
         setup_agents_to_remove = ["first_setup_agent.md"]
         for agent_file in setup_agents_to_remove:
             agent_path = agents_dir / agent_file
             if agent_path.exists():
                 agent_path.unlink()
-                console.print(f"🗑️  Removed {agent_file} (not needed for projects)", style="dim")
-        
+                console.print(
+                    f"🗑️  Removed {agent_file} (not needed for projects)", style="dim"
+                )
+
         console.print("✅ Copied all agents and commands", style="green")
-        
+
         # Count what was copied
         agents_count = len(list((dest_claude_dir / "agents").glob("*.md")))
         commands_count = len(list((dest_claude_dir / "commands").glob("*.md")))
-        
+
         console.print(f"📁 Agents available: {agents_count}", style="green")
         console.print(f"🔧 Commands available: {commands_count}", style="green")
-        
+
         # List some key agents
-        key_agents = ["orchestrator", "circuit-synth", "simulation-expert", "jlc-parts-finder"]
+        key_agents = [
+            "orchestrator",
+            "circuit-synth",
+            "simulation-expert",
+            "jlc-parts-finder",
+        ]
         available_agents = [f.stem for f in (dest_claude_dir / "agents").glob("*.md")]
         found_key_agents = [agent for agent in key_agents if agent in available_agents]
-        
+
         if found_key_agents:
             console.print(f"🤖 Key agents: {', '.join(found_key_agents)}", style="cyan")
-        
-        # List some key commands  
-        key_commands = ["find-symbol", "find-footprint", "dev-run-tests", "analyze-design"]
-        available_commands = [f.stem for f in (dest_claude_dir / "commands").glob("*.md")]
+
+        # List some key commands
+        key_commands = [
+            "find-symbol",
+            "find-footprint",
+            "dev-run-tests",
+            "analyze-design",
+        ]
+        available_commands = [
+            f.stem for f in (dest_claude_dir / "commands").glob("*.md")
+        ]
         found_key_commands = [cmd for cmd in key_commands if cmd in available_commands]
-        
+
         if found_key_commands:
-            console.print(f"⚡ Key commands: /{', /'.join(found_key_commands)}", style="cyan")
-            
+            console.print(
+                f"⚡ Key commands: /{', /'.join(found_key_commands)}", style="cyan"
+            )
+
     except Exception as e:
         console.print(f"⚠️  Could not copy .claude directory: {e}", style="yellow")
         console.print("🔄 Falling back to basic agent registration", style="yellow")
@@ -115,26 +144,32 @@ def check_kicad_installation() -> Dict[str, Any]:
 
     try:
         result = validate_kicad_installation()
-        
+
         # Check if KiCad CLI is available (main requirement)
         if result.get("cli_available", False):
             console.print("✅ KiCad found!", style="green")
             console.print(f"   🔧 CLI Path: {result.get('cli_path', 'Unknown')}")
             console.print(f"   📦 Version: {result.get('cli_version', 'Unknown')}")
-            
+
             # Check libraries
             if result.get("libraries_available", False):
-                console.print(f"   📚 Symbol libraries: {result.get('symbol_path', 'Not found')}")
-                console.print(f"   👟 Footprint libraries: {result.get('footprint_path', 'Not found')}")
+                console.print(
+                    f"   📚 Symbol libraries: {result.get('symbol_path', 'Not found')}"
+                )
+                console.print(
+                    f"   👟 Footprint libraries: {result.get('footprint_path', 'Not found')}"
+                )
             else:
-                console.print("   ⚠️  Libraries not found but CLI available", style="yellow")
-            
+                console.print(
+                    "   ⚠️  Libraries not found but CLI available", style="yellow"
+                )
+
             result["kicad_installed"] = True
             return result
         else:
             console.print("❌ KiCad not found", style="red")
             console.print("📥 Install options:", style="cyan")
-            
+
             # Cross-platform installation suggestions
             if sys.platform == "darwin":  # macOS
                 console.print("   • Download: https://www.kicad.org/download/macos/")
@@ -148,10 +183,10 @@ def check_kicad_installation() -> Dict[str, Any]:
                 console.print("   • Ubuntu/Debian: sudo apt install kicad")
                 console.print("   • Fedora: sudo dnf install kicad")
                 console.print("   • Arch: sudo pacman -S kicad")
-            
+
             result["kicad_installed"] = False
             return result
-            
+
     except Exception as e:
         console.print(f"⚠️  Could not verify KiCad installation: {e}", style="yellow")
         return {"kicad_installed": False, "error": str(e)}
@@ -602,7 +637,7 @@ if __name__ == "__main__":
 
     with open(circuit_synth_dir / "usb_subcircuit.py", "w") as f:
         f.write(usb_subcircuit)
-    
+
     with open(circuit_synth_dir / "power_supply_subcircuit.py", "w") as f:
         f.write(power_supply_subcircuit)
 
@@ -618,13 +653,22 @@ if __name__ == "__main__":
     with open(circuit_synth_dir / "voltage_divider.py", "w") as f:
         f.write(voltage_divider)
 
-    console.print(f"✅ Created hierarchical circuit examples in {circuit_synth_dir}/", style="green")
+    console.print(
+        f"✅ Created hierarchical circuit examples in {circuit_synth_dir}/",
+        style="green",
+    )
     console.print("   • main.py - Main ESP32-C6 development board", style="cyan")
     console.print("   • usb_subcircuit.py - USB-C with CC resistors", style="cyan")
-    console.print("   • power_supply_subcircuit.py - 5V to 3.3V regulation", style="cyan")
-    console.print("   • debug_header_subcircuit.py - Programming interface", style="cyan")
+    console.print(
+        "   • power_supply_subcircuit.py - 5V to 3.3V regulation", style="cyan"
+    )
+    console.print(
+        "   • debug_header_subcircuit.py - Programming interface", style="cyan"
+    )
     console.print("   • led_blinker_subcircuit.py - Status LED", style="cyan")
-    console.print("   • simple_led.py, voltage_divider.py - Basic examples", style="dim")
+    console.print(
+        "   • simple_led.py, voltage_divider.py - Basic examples", style="dim"
+    )
 
 
 def create_project_readme(
@@ -876,7 +920,7 @@ This project uses these KiCad symbol libraries:
 
 def create_claude_md(project_path: Path) -> None:
     """Create project-specific CLAUDE.md file with circuit-synth guidance"""
-    
+
     claude_md_content = f"""# CLAUDE.md
 
 Project-specific guidance for Claude Code when working with this circuit-synth project.
@@ -1019,7 +1063,7 @@ def power_supply():
     claude_md_file = project_path / "CLAUDE.md"
     with open(claude_md_file, "w") as f:
         f.write(claude_md_content)
-    
+
     console.print(f"✅ Created project CLAUDE.md", style="green")
 
 
@@ -1028,9 +1072,9 @@ def power_supply():
 @click.option("--minimal", is_flag=True, help="Create minimal project (no examples)")
 def main(skip_kicad_check: bool, minimal: bool):
     """Setup circuit-synth in the current uv project directory
-    
+
     Run this command from within your uv project directory after:
-    1. uv init my-project  
+    1. uv init my-project
     2. cd my-project
     3. uv add circuit-synth
     4. uv run cs-new-project
@@ -1045,10 +1089,10 @@ def main(skip_kicad_check: bool, minimal: bool):
     # Use current directory as project path
     project_path = Path.cwd()
     project_name = "circuit-synth"  # Always use 'circuit-synth' as project name
-    
+
     console.print(f"📁 Setting up circuit-synth in: {project_path}", style="green")
     console.print(f"🏷️  Project name: {project_name}", style="cyan")
-    
+
     # Remove default main.py created by uv init (we don't need it)
     default_main = project_path / "main.py"
     if default_main.exists():
@@ -1078,7 +1122,10 @@ def main(skip_kicad_check: bool, minimal: bool):
     # KiCad plugins setup removed - use 'uv run cs-setup-kicad-plugins' if needed
     if not skip_kicad_check and kicad_info.get("kicad_installed", False):
         console.print("\n🔌 KiCad plugins available separately", style="cyan")
-        console.print("   Run 'uv run cs-setup-kicad-plugins' to install AI integration plugins", style="dim")
+        console.print(
+            "   Run 'uv run cs-setup-kicad-plugins' to install AI integration plugins",
+            style="dim",
+        )
 
     # Step 3: Get library preferences
     additional_libraries = []
@@ -1101,12 +1148,17 @@ def main(skip_kicad_check: bool, minimal: bool):
     console.print(
         Panel.fit(
             Text(
-                f"✅ Circuit-synth project '{project_name}' setup complete!", style="bold green"
+                f"✅ Circuit-synth project '{project_name}' setup complete!",
+                style="bold green",
             )
             + Text(f"\n\n📁 Location: {project_path}")
             + Text(f"\n🚀 Get started: uv run python circuit-synth/main.py")
-            + Text(f"\n🤖 AI agents: {len(list((project_path / '.claude' / 'agents').glob('*.md')))} agents available in Claude Code")
-            + Text(f"\n⚡ Commands: {len(list((project_path / '.claude' / 'commands').glob('*.md')))} slash commands available")  
+            + Text(
+                f"\n🤖 AI agents: {len(list((project_path / '.claude' / 'agents').glob('*.md')))} agents available in Claude Code"
+            )
+            + Text(
+                f"\n⚡ Commands: {len(list((project_path / '.claude' / 'commands').glob('*.md')))} slash commands available"
+            )
             + Text(f"\n📖 Documentation: See README.md"),
             title="🎉 Success!",
             style="green",

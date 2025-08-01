@@ -91,15 +91,15 @@ def convert_python_to_rust_format(circuit_data: dict) -> dict:
             pin_type = pin_info["type"]
             # logger.debug(f"🔄 DEBUG:   Component: {component} (type: {type(component)})")
             # logger.debug(f"🔄 DEBUG:   Pin type: {pin_type} (type: {type(pin_type)})")
-            
+
             # Handle PinType enum objects - convert to string
-            if hasattr(pin_type, 'value'):
+            if hasattr(pin_type, "value"):
                 pin_type_str = pin_type.value
                 # logger.debug(f"🔄 DEBUG:   Converted PinType enum to string: {pin_type_str}")
             else:
                 pin_type_str = str(pin_type)
                 # logger.debug(f"🔄 DEBUG:   Using pin type as string: {pin_type_str}")
-            
+
             rust_node = {
                 "component": component,
                 "pin": {
@@ -364,8 +364,10 @@ class NetlistExporter:
         for the library's intermediate JSON representation.
         """
         logger.info(f"📋 Starting to_dict() for circuit: {self.circuit.name}")
-        logger.info(f"📋 Circuit has {len(self.circuit._components)} components and {len(self.circuit._nets)} nets")
-        
+        logger.info(
+            f"📋 Circuit has {len(self.circuit._components)} components and {len(self.circuit._nets)} nets"
+        )
+
         # TODO: Implement UUID generation and source file tracking later
         # For now, use placeholders similar to the initial exporter output
         sheet_tstamps = f"/{self.circuit.name.lower().replace(' ', '-')}-{id(self.circuit)}/"  # Simple placeholder tstamp
@@ -385,11 +387,13 @@ class NetlistExporter:
         # 1) Collect all components
         logger.info(f"🔧 Collecting components from circuit._components:")
         for comp in self.circuit._components.values():
-            logger.info(f"   Component ref: {comp.ref}, symbol: {comp.symbol}, value: {comp.value}")
+            logger.info(
+                f"   Component ref: {comp.ref}, symbol: {comp.symbol}, value: {comp.value}"
+            )
             comp_dict = comp.to_dict()
             logger.info(f"   Component to_dict(): {comp_dict}")
             data["components"][comp.ref] = comp_dict  # Add using ref as key
-        
+
         logger.info(f"📦 Final components dict keys: {list(data['components'].keys())}")
 
         # 2) Gather net usage only from our local components
@@ -399,21 +403,25 @@ class NetlistExporter:
 
         for comp in self.circuit._components.values():
             logger.info(f"🔍 Checking component {comp.ref} pins:")
-            logger.info(f"   Component._pins keys: {list(comp._pins.keys()) if hasattr(comp, '_pins') else 'NO _pins ATTR'}")
-            
+            logger.info(
+                f"   Component._pins keys: {list(comp._pins.keys()) if hasattr(comp, '_pins') else 'NO _pins ATTR'}"
+            )
+
             for pin_id, pin_obj in comp._pins.items():
-                logger.info(f"   Pin {pin_id}: num={pin_obj.num}, name={pin_obj.name}, func={pin_obj.func}")
+                logger.info(
+                    f"   Pin {pin_id}: num={pin_obj.num}, name={pin_obj.name}, func={pin_obj.func}"
+                )
                 net_obj = pin_obj.net
                 if net_obj is None:
                     logger.info(f"     ❌ Pin {pin_id} has no net connection")
                     continue
-                
+
                 net_name = net_obj.name
                 logger.info(f"     ✅ Pin {pin_id} connected to net '{net_name}'")
-                
+
                 if net_name not in net_to_pins:
                     net_to_pins[net_name] = []
-                
+
                 # Store full pin details in original Python format
                 pin_connection = {
                     "component": comp.ref,
@@ -435,7 +443,9 @@ class NetlistExporter:
             data["nets"][net_name] = pin_list
 
         logger.info(f"📊 Final data structure:")
-        logger.info(f"   - Components: {len(data['components'])} ({list(data['components'].keys())})")
+        logger.info(
+            f"   - Components: {len(data['components'])} ({list(data['components'].keys())})"
+        )
         logger.info(f"   - Nets: {len(data['nets'])} ({list(data['nets'].keys())})")
 
         # 3) Recursively gather subcircuits
@@ -462,9 +472,10 @@ class NetlistExporter:
         try:
             # Ensure parent directory exists
             from pathlib import Path
+
             output_file = Path(filename)
             output_file.parent.mkdir(parents=True, exist_ok=True)
-            
+
             with open(filename, "w", encoding="utf-8") as f:
                 json.dump(circuit_data, f, indent=2, cls=CircuitSynthJSONEncoder)
             logger.debug(

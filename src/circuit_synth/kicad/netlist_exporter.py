@@ -171,9 +171,10 @@ def convert_json_to_netlist(json_path: Path, output_path: Path) -> None:
 
     # Ensure parent directory exists
     from pathlib import Path
+
     output_file = Path(output_path)
     output_file.parent.mkdir(parents=True, exist_ok=True)
-    
+
     # Write to the output file with binary mode to preserve encoding and line endings
     # No BOM in the UTF-8 encoding to ensure KiCad can read it
     with open(output_path, "wb") as f:
@@ -773,7 +774,9 @@ def generate_libpart_entry(
 
     # Iterate through the sorted list of pin dictionaries
     for pin_info in sorted_pins:
-        pin_num = pin_info.get("number", "?")  # Get pin number string (JSON uses 'number', not 'num')
+        pin_num = pin_info.get(
+            "number", "?"
+        )  # Get pin number string (JSON uses 'number', not 'num')
         pin_name = pin_info.get("name", "~")  # Use ~ for unnamed pins (KiCad standard)
         # Use 'func' field from JSON for pin type, default to passive
         # (Matches Component.to_dict which uses 'func')
@@ -1241,7 +1244,10 @@ def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
                 comp_ref = node_copy.get("component", "")
 
                 # Handle component paths
-                if "original_path" in node_copy and node_copy["original_path"] is not None:
+                if (
+                    "original_path" in node_copy
+                    and node_copy["original_path"] is not None
+                ):
                     # Use original path if available and not None
                     node_copy["component"] = node_copy["original_path"]
                 elif comp_ref:
