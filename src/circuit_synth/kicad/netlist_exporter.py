@@ -742,8 +742,8 @@ def generate_libpart_entry(
 
     # Sort pins numerically by pin number (important for KiCad)
     def sort_key(pin_dict):
-        # Access the 'num' key within the dictionary
-        pin_num_str = pin_dict.get("num", "")
+        # Access the 'number' key within the dictionary (JSON uses 'number', not 'num')
+        pin_num_str = pin_dict.get("number", "")
         try:
             # Handle potential non-numeric pin numbers gracefully
             return int(pin_num_str)
@@ -773,12 +773,12 @@ def generate_libpart_entry(
 
     # Iterate through the sorted list of pin dictionaries
     for pin_info in sorted_pins:
-        pin_num = pin_info.get("num", "?")  # Get pin number string
+        pin_num = pin_info.get("number", "?")  # Get pin number string (JSON uses 'number', not 'num')
         pin_name = pin_info.get("name", "~")  # Use ~ for unnamed pins (KiCad standard)
         # Use 'func' field from JSON for pin type, default to passive
         # (Matches Component.to_dict which uses 'func')
         # Get pin type, preserving the original type from libpart
-        pin_type_str = pin_info.get("type")
+        pin_type_str = pin_info.get("func")
         if not pin_type_str:
             # Only fallback to "passive" if no type is specified
             pin_type_str = "passive"
@@ -1241,8 +1241,8 @@ def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
                 comp_ref = node_copy.get("component", "")
 
                 # Handle component paths
-                if "original_path" in node_copy:
-                    # Use original path if available
+                if "original_path" in node_copy and node_copy["original_path"] is not None:
+                    # Use original path if available and not None
                     node_copy["component"] = node_copy["original_path"]
                 elif comp_ref:
                     # Normalize component path
