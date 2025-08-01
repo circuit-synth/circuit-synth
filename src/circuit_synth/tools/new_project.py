@@ -4,22 +4,23 @@ Circuit-Synth New Project Setup Tool
 
 Creates a complete circuit-synth project with:
 - Claude AI agents registration (.claude/ directory)
-- Example circuits (main.py + simple examples)  
+- Example circuits (main.py + simple examples)
 - Project README with usage guide
 - KiCad installation verification
 - Optional KiCad library setup
 """
 
 import os
-import sys
 import shutil
 import subprocess
+import sys
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
+
 import click
 from rich.console import Console
-from rich.prompt import Prompt, Confirm
 from rich.panel import Panel
+from rich.prompt import Confirm, Prompt
 from rich.text import Text
 
 # Import circuit-synth modules
@@ -32,7 +33,7 @@ console = Console()
 def check_kicad_installation() -> Dict[str, Any]:
     """Check KiCad installation and return path info"""
     console.print("🔍 Checking KiCad installation...", style="yellow")
-    
+
     try:
         result = validate_kicad_installation()
         if result.get("kicad_installed"):
@@ -52,32 +53,34 @@ def check_kicad_installation() -> Dict[str, Any]:
 def get_kicad_library_preferences() -> List[str]:
     """Ask user about additional KiCad libraries they want to include"""
     console.print("\n📚 KiCad Library Setup", style="bold blue")
-    
+
     common_libraries = [
         "Connector_Generic",
-        "Device", 
+        "Device",
         "Diode",
         "LED",
         "Transistor_BJT",
-        "Transistor_FET", 
+        "Transistor_FET",
         "Amplifier_Operational",
         "MCU_ST_STM32F4",
         "MCU_Espressif",
         "RF_Module",
         "Regulator_Linear",
-        "Sensor_Motion"
+        "Sensor_Motion",
     ]
-    
+
     console.print("Common useful libraries are included by default:")
     for lib in common_libraries[:6]:  # Show first 6
         console.print(f"  • {lib}")
     console.print("  • ... and more")
-    
+
     if Confirm.ask("\nWould you like to add any additional KiCad symbol libraries?"):
-        additional = Prompt.ask("Enter library names (comma-separated, or press Enter to skip)")
+        additional = Prompt.ask(
+            "Enter library names (comma-separated, or press Enter to skip)"
+        )
         if additional.strip():
             return [lib.strip() for lib in additional.split(",")]
-    
+
     return []
 
 
@@ -85,7 +88,7 @@ def create_example_circuits(project_path: Path) -> None:
     """Create example circuit files"""
     examples_dir = project_path / "examples"
     examples_dir.mkdir(exist_ok=True)
-    
+
     # Main circuit example
     main_circuit = '''#!/usr/bin/env python3
 """
@@ -283,21 +286,22 @@ if __name__ == "__main__":
     # Write example files
     with open(examples_dir / "main.py", "w") as f:
         f.write(main_circuit)
-    
+
     with open(examples_dir / "simple_led.py", "w") as f:
         f.write(simple_led)
-        
+
     with open(examples_dir / "voltage_divider.py", "w") as f:
         f.write(voltage_divider)
 
     console.print(f"✅ Created example circuits in {examples_dir}/", style="green")
 
 
-def create_project_readme(project_path: Path, project_name: str, 
-                         additional_libraries: List[str]) -> None:
+def create_project_readme(
+    project_path: Path, project_name: str, additional_libraries: List[str]
+) -> None:
     """Create project README with circuit-synth usage guide"""
-    
-    readme_content = f'''# {project_name}
+
+    readme_content = f"""# {project_name}
 
 A circuit-synth project for professional circuit design with hierarchical architecture.
 
@@ -513,29 +517,30 @@ This project uses these KiCad symbol libraries:
 5. Generate production-ready KiCad projects
 
 **Happy circuit designing!** 🎛️
-'''
+"""
 
     with open(project_path / "README.md", "w") as f:
         f.write(readme_content)
-    
+
     console.print(f"✅ Created project README.md", style="green")
 
 
 @click.command()
-@click.argument('project_name', required=True)
-@click.option('--skip-kicad-check', is_flag=True, help="Skip KiCad installation check")
-@click.option('--minimal', is_flag=True, help="Create minimal project (no examples)")
+@click.argument("project_name", required=True)
+@click.option("--skip-kicad-check", is_flag=True, help="Skip KiCad installation check")
+@click.option("--minimal", is_flag=True, help="Create minimal project (no examples)")
 def main(project_name: str, skip_kicad_check: bool, minimal: bool):
     """Create a new circuit-synth project with complete setup
-    
+
     PROJECT_NAME: Name of the new project directory to create
     """
-    
-    console.print(Panel.fit(
-        Text("🚀 Circuit-Synth New Project Setup", style="bold blue"),
-        style="blue"
-    ))
-    
+
+    console.print(
+        Panel.fit(
+            Text("🚀 Circuit-Synth New Project Setup", style="bold blue"), style="blue"
+        )
+    )
+
     # Create project directory
     project_path = Path.cwd() / project_name
     if project_path.exists():
@@ -545,20 +550,22 @@ def main(project_name: str, skip_kicad_check: bool, minimal: bool):
     else:
         project_path.mkdir(parents=True)
         console.print(f"📁 Created project directory: {project_path}", style="green")
-    
+
     # Change to project directory
     os.chdir(project_path)
-    
+
     # Step 1: Check KiCad installation
     if not skip_kicad_check:
         kicad_info = check_kicad_installation()
         if not kicad_info.get("kicad_installed"):
-            if not Confirm.ask("Continue without KiCad? (You'll need it later for opening projects)"):
+            if not Confirm.ask(
+                "Continue without KiCad? (You'll need it later for opening projects)"
+            ):
                 console.print("❌ Aborted - Please install KiCad first", style="red")
                 sys.exit(1)
     else:
         console.print("⏭️  Skipped KiCad check", style="yellow")
-    
+
     # Step 2: Register Claude AI agents
     console.print("\n🤖 Setting up AI agents...", style="yellow")
     try:
@@ -566,33 +573,37 @@ def main(project_name: str, skip_kicad_check: bool, minimal: bool):
         console.print("✅ AI agents registered successfully", style="green")
     except Exception as e:
         console.print(f"⚠️  Could not register AI agents: {e}", style="yellow")
-    
-    # Step 3: Get library preferences  
+
+    # Step 3: Get library preferences
     additional_libraries = []
     if not minimal:
         additional_libraries = get_kicad_library_preferences()
-    
+
     # Step 4: Create example circuits
     if not minimal:
         console.print("\n📝 Creating example circuits...", style="yellow")
         create_example_circuits(project_path)
     else:
         console.print("⏭️  Skipped example circuits (minimal mode)", style="yellow")
-    
+
     # Step 5: Create project README
     console.print("\n📚 Creating project documentation...", style="yellow")
     create_project_readme(project_path, project_name, additional_libraries)
-    
+
     # Success message
-    console.print(Panel.fit(
-        Text(f"✅ Project '{project_name}' created successfully!", style="bold green") +
-        Text(f"\n\n📁 Location: {project_path}") +
-        Text(f"\n🚀 Get started: cd {project_name} && python examples/main.py") +
-        Text(f"\n🤖 AI agents: Available in Claude Code") +
-        Text(f"\n📖 Documentation: See README.md"),
-        title="🎉 Success!",
-        style="green"
-    ))
+    console.print(
+        Panel.fit(
+            Text(
+                f"✅ Project '{project_name}' created successfully!", style="bold green"
+            )
+            + Text(f"\n\n📁 Location: {project_path}")
+            + Text(f"\n🚀 Get started: cd {project_name} && python examples/main.py")
+            + Text(f"\n🤖 AI agents: Available in Claude Code")
+            + Text(f"\n📖 Documentation: See README.md"),
+            title="🎉 Success!",
+            style="green",
+        )
+    )
 
 
 if __name__ == "__main__":

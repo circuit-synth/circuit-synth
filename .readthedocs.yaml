@@ -1,21 +1,20 @@
-# Read the Docs configuration file for Circuit-Synth
+# Read the Docs configuration file for circuit-synth
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 
 version: 2
 
-# Set the OS, Python version and other tools you might need
+# Set the OS, build, and Python version
 build:
   os: ubuntu-22.04
   tools:
-    python: "3.11"
+    python: "3.12"
 
-# Build documentation in the "docs/" directory with Sphinx
+# Build documentation in the docs/ directory with Sphinx
 sphinx:
   configuration: docs/conf.py
   fail_on_warning: false
 
-# Optional but recommended, declare the Python requirements required
-# to build your documentation
+# Optionally declare the Python requirements required to build your docs
 python:
   install:
     - requirements: docs/requirements.txt
@@ -23,3 +22,8 @@ python:
       path: .
       extra_requirements:
         - dev
+
+# Optional but recommended, declare the formats you want to build
+formats:
+  - pdf
+  - epub

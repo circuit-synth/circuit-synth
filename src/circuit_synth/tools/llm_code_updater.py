@@ -129,9 +129,7 @@ class LLMCodeUpdater:
                     )
 
                     # Check if API key is available
-                    api_key = (
-                        openai.api_key or os.environ.get("OPENAI_API_KEY") or None
-                    )
+                    api_key = openai.api_key or os.environ.get("OPENAI_API_KEY") or None
 
                     if api_key:
                         logger.info(
@@ -179,7 +177,9 @@ class LLMCodeUpdater:
             with open(python_file, "r") as f:
                 original_code = f.read()
 
-            logger.info(f"🔄 CODE_UPDATE: Original file size: {len(original_code)} chars")
+            logger.info(
+                f"🔄 CODE_UPDATE: Original file size: {len(original_code)} chars"
+            )
 
             # Determine update strategy based on LLM availability
             if self.llm_available:
@@ -190,7 +190,9 @@ class LLMCodeUpdater:
                 updated_code = self._fallback_update(original_code, circuits)
 
             if updated_code:
-                logger.info(f"🔄 CODE_UPDATE: Generated updated code: {len(updated_code)} chars")
+                logger.info(
+                    f"🔄 CODE_UPDATE: Generated updated code: {len(updated_code)} chars"
+                )
 
                 if preview_only:
                     logger.info("🔄 CODE_UPDATE: Preview mode - not writing to file")
@@ -209,14 +211,16 @@ class LLMCodeUpdater:
             logger.error(f"🔄 CODE_UPDATE: Failed to update Python file: {e}")
             return None
 
-    def _llm_assisted_update(self, original_code: str, circuits: Dict[str, Circuit]) -> Optional[str]:
+    def _llm_assisted_update(
+        self, original_code: str, circuits: Dict[str, Circuit]
+    ) -> Optional[str]:
         """Use LLM to intelligently update the Python code"""
         logger.info("🤖 LLM_UPDATE: Starting LLM-assisted code update")
 
         try:
             # Prepare context for LLM
             context = self._prepare_llm_context(original_code, circuits)
-            
+
             # For now, fall back to the simpler update since LLM integration is complex
             logger.info("🤖 LLM_UPDATE: Using simplified update for now")
             return self._fallback_update(original_code, circuits)
@@ -226,30 +230,38 @@ class LLMCodeUpdater:
             logger.info("🤖 LLM_UPDATE: Falling back to simple update")
             return self._fallback_update(original_code, circuits)
 
-    def _prepare_llm_context(self, original_code: str, circuits: Dict[str, Circuit]) -> str:
+    def _prepare_llm_context(
+        self, original_code: str, circuits: Dict[str, Circuit]
+    ) -> str:
         """Prepare context information for LLM"""
         context_parts = []
-        
+
         context_parts.append("=== ORIGINAL PYTHON CODE ===")
         context_parts.append(original_code)
         context_parts.append("")
-        
+
         context_parts.append("=== CIRCUIT INFORMATION FROM KICAD ===")
         for circuit_name, circuit in circuits.items():
             context_parts.append(f"Circuit: {circuit_name}")
             context_parts.append(f"Components ({len(circuit.components)}):")
             for comp in circuit.components:
-                context_parts.append(f"  - {comp.reference}: {comp.lib_id} = {comp.value}")
-            
+                context_parts.append(
+                    f"  - {comp.reference}: {comp.lib_id} = {comp.value}"
+                )
+
             context_parts.append(f"Nets ({len(circuit.nets)}):")
             for net in circuit.nets:
-                connections = ", ".join([f"{ref}[{pin}]" for ref, pin in net.connections])
+                connections = ", ".join(
+                    [f"{ref}[{pin}]" for ref, pin in net.connections]
+                )
                 context_parts.append(f"  - {net.name}: {connections}")
             context_parts.append("")
-        
+
         return "\n".join(context_parts)
 
-    def _fallback_update(self, original_code: str, circuits: Dict[str, Circuit]) -> Optional[str]:
+    def _fallback_update(
+        self, original_code: str, circuits: Dict[str, Circuit]
+    ) -> Optional[str]:
         """Simple fallback update without LLM"""
         logger.info("📝 FALLBACK_UPDATE: Starting fallback code update")
 
@@ -294,7 +306,9 @@ class LLMCodeUpdater:
 
         for circuit_name, circuit in circuits.items():
             if circuit.is_hierarchical_sheet:
-                logger.info(f"🏗️ HIERARCHICAL_CODE: Generating subcircuit: {circuit_name}")
+                logger.info(
+                    f"🏗️ HIERARCHICAL_CODE: Generating subcircuit: {circuit_name}"
+                )
                 subcircuit_code = self._generate_subcircuit_function(circuit)
                 code_parts.extend(subcircuit_code)
                 code_parts.append("")
@@ -306,22 +320,28 @@ class LLMCodeUpdater:
         # Generate main circuit function
         if main_circuit:
             logger.info("🏗️ HIERARCHICAL_CODE: Generating main circuit")
-            main_code = self._generate_main_circuit_function(main_circuit, hierarchical_tree)
+            main_code = self._generate_main_circuit_function(
+                main_circuit, hierarchical_tree
+            )
             code_parts.extend(main_code)
         else:
             logger.warning("🏗️ HIERARCHICAL_CODE: No main circuit found")
 
         # Add generation code
-        code_parts.extend([
-            "",
-            "# Generate the circuit",
-            "if __name__ == '__main__':",
-            "    circuit = main()",
-            "    circuit.generate_kicad_project()",
-        ])
+        code_parts.extend(
+            [
+                "",
+                "# Generate the circuit",
+                "if __name__ == '__main__':",
+                "    circuit = main()",
+                "    circuit.generate_kicad_project()",
+            ]
+        )
 
         result = "\n".join(code_parts)
-        logger.info(f"🏗️ HIERARCHICAL_CODE: Generated {len(result)} characters of hierarchical code")
+        logger.info(
+            f"🏗️ HIERARCHICAL_CODE: Generated {len(result)} characters of hierarchical code"
+        )
         return result
 
     def _generate_subcircuit_function(self, circuit: Circuit) -> List[str]:
@@ -335,7 +355,7 @@ class LLMCodeUpdater:
         code_lines.append(f"@circuit(name='{circuit.name}')")
         code_lines.append(f"def {function_name}():")
         code_lines.append(f'    """')
-        code_lines.append(f'    {circuit.name} subcircuit')
+        code_lines.append(f"    {circuit.name} subcircuit")
         code_lines.append(f'    """')
 
         # Create nets
@@ -369,10 +389,14 @@ class LLMCodeUpdater:
                         else:
                             code_lines.append(f"    {comp_var}['{pin}'] += {net_var}")
 
-        logger.info(f"🔧 SUBCIRCUIT: Generated {len(code_lines)} lines for {circuit.name}")
+        logger.info(
+            f"🔧 SUBCIRCUIT: Generated {len(code_lines)} lines for {circuit.name}"
+        )
         return code_lines
 
-    def _generate_main_circuit_function(self, circuit: Circuit, hierarchical_tree: Dict[str, List[str]]) -> List[str]:
+    def _generate_main_circuit_function(
+        self, circuit: Circuit, hierarchical_tree: Dict[str, List[str]]
+    ) -> List[str]:
         """Generate the main circuit function"""
         logger.info("🎯 MAIN_CIRCUIT: Generating main circuit function")
 
@@ -382,7 +406,7 @@ class LLMCodeUpdater:
         code_lines.append("@circuit(name='main')")
         code_lines.append("def main():")
         code_lines.append('    """')
-        code_lines.append('    Main circuit with hierarchical subcircuits')
+        code_lines.append("    Main circuit with hierarchical subcircuits")
         code_lines.append('    """')
 
         # Create nets for main circuit
@@ -426,7 +450,9 @@ class LLMCodeUpdater:
                         else:
                             code_lines.append(f"    {comp_var}['{pin}'] += {net_var}")
 
-        logger.info(f"🎯 MAIN_CIRCUIT: Generated {len(code_lines)} lines for main circuit")
+        logger.info(
+            f"🎯 MAIN_CIRCUIT: Generated {len(code_lines)} lines for main circuit"
+        )
         return code_lines
 
     def _generate_flat_code(self, circuit: Circuit) -> str:
@@ -481,36 +507,40 @@ class LLMCodeUpdater:
                             code_parts.append(f"    {comp_var}['{pin}'] += {net_var}")
 
         # Add generation code
-        code_parts.extend([
-            "",
-            "# Generate the circuit",
-            "if __name__ == '__main__':",
-            "    circuit = main()",
-            "    circuit.generate_kicad_project()",
-        ])
+        code_parts.extend(
+            [
+                "",
+                "# Generate the circuit",
+                "if __name__ == '__main__':",
+                "    circuit = main()",
+                "    circuit.generate_kicad_project()",
+            ]
+        )
 
         result = "\n".join(code_parts)
         logger.info(f"📄 FLAT_CODE: Generated {len(result)} characters of flat code")
         return result
 
-    def _generate_component_code(self, component: Component, indent: str = "") -> List[str]:
+    def _generate_component_code(
+        self, component: Component, indent: str = ""
+    ) -> List[str]:
         """Generate Python code for a component"""
         comp_var = self._sanitize_variable_name(component.reference)
-        
+
         code_lines = []
-        
+
         # Build component creation line
         parts = [
             f'symbol="{component.lib_id}"',
             f'ref="{component.reference[0]}"',  # Get the letter part (R, C, U, etc.)
         ]
-        
+
         if component.value:
             parts.append(f'value="{component.value}"')
         if component.footprint:
             parts.append(f'footprint="{component.footprint}"')
-        
+
         component_args = ", ".join(parts)
         code_lines.append(f"{indent}{comp_var} = Component({component_args})")
-        
+
         return code_lines

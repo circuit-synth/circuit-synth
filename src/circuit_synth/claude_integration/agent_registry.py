@@ -170,33 +170,34 @@ def register_circuit_agents():
     # Also create project-local agents in current working directory
     current_dir = Path.cwd()
     project_agents_dir = current_dir / ".claude" / "agents"
-    
+
     # Create the directory structure if it doesn't exist
     project_agents_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Write agents to local project directory
     for agent_name, agent in agents.items():
         agent_file = project_agents_dir / f"{agent_name}.md"
         with open(agent_file, "w") as f:
             f.write(agent.to_markdown())
-    
+
     print(f"📁 Created project-local agents in {project_agents_dir}")
-    
+
     # Also create a .claude/mcp_settings.json for Claude Code integration
     mcp_settings = {
         "mcpServers": {},
         "agents": {
             agent_name: {
                 "description": agent.description,
-                "file": f"agents/{agent_name}.md"
-            } for agent_name, agent in agents.items()
-        }
+                "file": f"agents/{agent_name}.md",
+            }
+            for agent_name, agent in agents.items()
+        },
     }
-    
+
     mcp_settings_file = current_dir / ".claude" / "mcp_settings.json"
     with open(mcp_settings_file, "w") as f:
         json.dump(mcp_settings, f, indent=2)
-    
+
     print(f"📄 Created Claude Code settings in {mcp_settings_file}")
 
 

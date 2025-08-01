@@ -26,10 +26,11 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-# Import refactored modules
-from circuit_synth.tools.models import Circuit, Component, Net
 from circuit_synth.tools.kicad_parser import KiCadParser
 from circuit_synth.tools.llm_code_updater import LLMCodeUpdater
+
+# Import refactored modules
+from circuit_synth.tools.models import Circuit, Component, Net
 
 # Configure logging
 logging.basicConfig(
@@ -123,11 +124,11 @@ class KiCadToPythonSyncer:
             backup_path = self.python_file.with_suffix(
                 f"{self.python_file.suffix}.backup"
             )
-            
+
             # Read and write to create backup
             with open(self.python_file, "r") as source:
                 content = source.read()
-            
+
             with open(backup_path, "w") as backup:
                 backup.write(content)
 
