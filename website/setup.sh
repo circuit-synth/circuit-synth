@@ -17,6 +17,9 @@ cd /var/www/circuit-synth
 
 # Preserve existing website if it exists
 echo "💾 Preserving existing website..."
+# Create website directory if it doesn't exist
+mkdir -p website
+
 if [ -f "/var/www/html/index.html" ]; then
     cp /var/www/html/index.html website/old_website.html
     cp /var/www/html/index.html website/index.html
