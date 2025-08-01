@@ -30,21 +30,117 @@ from circuit_synth.core.kicad_validator import validate_kicad_installation
 console = Console()
 
 
+def copy_complete_claude_setup(project_path: Path) -> None:
+    """Copy the complete .claude directory from circuit-synth3 to new project"""
+    
+    # Find the circuit-synth3 root directory (where we have the complete .claude setup)
+    circuit_synth_root = Path(__file__).parent.parent.parent.parent
+    source_claude_dir = circuit_synth_root / ".claude"
+    
+    if not source_claude_dir.exists():
+        console.print("⚠️  Source .claude directory not found - using basic setup", style="yellow")
+        register_circuit_agents()
+        return
+    
+    # Destination .claude directory in the new project
+    dest_claude_dir = project_path / ".claude"
+    
+    console.print(f"📋 Copying complete Claude setup from {source_claude_dir}", style="blue")
+    
+    try:
+        # Copy the entire .claude directory structure
+        if dest_claude_dir.exists():
+            shutil.rmtree(dest_claude_dir)
+        shutil.copytree(source_claude_dir, dest_claude_dir)
+        
+        # Remove mcp_settings.json as it's not needed
+        mcp_settings_file = dest_claude_dir / "mcp_settings.json"
+        if mcp_settings_file.exists():
+            mcp_settings_file.unlink()
+            
+        # Remove unnecessary dev commands (keep only dev-update-and-commit, dev-run-tests)
+        commands_dir = dest_claude_dir / "commands"
+        dev_commands_to_remove = ["dev-release-pypi.md", "dev-review-branch.md", "dev-review-repo.md"]
+        for cmd_file in dev_commands_to_remove:
+            cmd_path = commands_dir / cmd_file
+            if cmd_path.exists():
+                cmd_path.unlink()
+                console.print(f"🗑️  Removed {cmd_file} (not needed for projects)", style="dim")
+        
+        console.print("✅ Copied all agents and commands", style="green")
+        
+        # Count what was copied
+        agents_count = len(list((dest_claude_dir / "agents").glob("*.md")))
+        commands_count = len(list((dest_claude_dir / "commands").glob("*.md")))
+        
+        console.print(f"📁 Agents available: {agents_count}", style="green")
+        console.print(f"🔧 Commands available: {commands_count}", style="green")
+        
+        # List some key agents
+        key_agents = ["orchestrator", "circuit-synth", "simulation-expert", "jlc-parts-finder"]
+        available_agents = [f.stem for f in (dest_claude_dir / "agents").glob("*.md")]
+        found_key_agents = [agent for agent in key_agents if agent in available_agents]
+        
+        if found_key_agents:
+            console.print(f"🤖 Key agents: {', '.join(found_key_agents)}", style="cyan")
+        
+        # List some key commands  
+        key_commands = ["find-symbol", "find-footprint", "dev-run-tests", "analyze-design"]
+        available_commands = [f.stem for f in (dest_claude_dir / "commands").glob("*.md")]
+        found_key_commands = [cmd for cmd in key_commands if cmd in available_commands]
+        
+        if found_key_commands:
+            console.print(f"⚡ Key commands: /{', /'.join(found_key_commands)}", style="cyan")
+            
+    except Exception as e:
+        console.print(f"⚠️  Could not copy .claude directory: {e}", style="yellow")
+        console.print("🔄 Falling back to basic agent registration", style="yellow")
+        register_circuit_agents()
+
+
 def check_kicad_installation() -> Dict[str, Any]:
-    """Check KiCad installation and return path info"""
+    """Check KiCad installation and return path info (cross-platform)"""
     console.print("🔍 Checking KiCad installation...", style="yellow")
 
     try:
         result = validate_kicad_installation()
-        if result.get("kicad_installed"):
+        
+        # Check if KiCad CLI is available (main requirement)
+        if result.get("cli_available", False):
             console.print("✅ KiCad found!", style="green")
-            console.print(f"   Path: {result.get('kicad_path', 'Unknown')}")
-            console.print(f"   Version: {result.get('version', 'Unknown')}")
+            console.print(f"   Path: {result.get('cli_path', 'Unknown')}")
+            console.print(f"   Version: {result.get('cli_version', 'Unknown')}")
+            
+            # Check libraries
+            if result.get("libraries_available", False):
+                console.print(f"   Symbol libraries: {result.get('symbol_path', 'Not found')}")
+                console.print(f"   Footprint libraries: {result.get('footprint_path', 'Not found')}")
+            else:
+                console.print("   ⚠️  Libraries not found but CLI available", style="yellow")
+            
+            result["kicad_installed"] = True
             return result
         else:
             console.print("❌ KiCad not found", style="red")
-            console.print("Please install KiCad 8.0+ from https://www.kicad.org/")
-            return {"kicad_installed": False}
+            console.print("📥 Install options:", style="cyan")
+            
+            # Cross-platform installation suggestions
+            if sys.platform == "darwin":  # macOS
+                console.print("   • Download: https://www.kicad.org/download/macos/")
+                console.print("   • Homebrew: brew install kicad")
+            elif sys.platform == "win32":  # Windows
+                console.print("   • Download: https://www.kicad.org/download/windows/")
+                console.print("   • Chocolatey: choco install kicad")
+                console.print("   • Winget: winget install KiCad.KiCad")
+            else:  # Linux
+                console.print("   • Download: https://www.kicad.org/download/linux/")
+                console.print("   • Ubuntu/Debian: sudo apt install kicad")
+                console.print("   • Fedora: sudo dnf install kicad")
+                console.print("   • Arch: sudo pacman -S kicad")
+            
+            result["kicad_installed"] = False
+            return result
+            
     except Exception as e:
         console.print(f"⚠️  Could not verify KiCad installation: {e}", style="yellow")
         return {"kicad_installed": False, "error": str(e)}
@@ -85,9 +181,9 @@ def get_kicad_library_preferences() -> List[str]:
 
 
 def create_example_circuits(project_path: Path) -> None:
-    """Create example circuit files"""
-    examples_dir = project_path / "examples"
-    examples_dir.mkdir(exist_ok=True)
+    """Create example circuit files in circuit-synth directory"""
+    circuit_synth_dir = project_path / "circuit-synth"
+    circuit_synth_dir.mkdir(exist_ok=True)
 
     # Main circuit example
     main_circuit = '''#!/usr/bin/env python3
@@ -130,8 +226,8 @@ def power_supply_subcircuit():
     # Connections
     usb_conn["VBUS"] += vbus_in
     usb_conn["GND"] += gnd
-    regulator["VIN"] += vbus_in  
-    regulator["VOUT"] += vcc_3v3_out
+    regulator["VI"] += vbus_in   # Input pin for AMS1117
+    regulator["VO"] += vcc_3v3_out  # Output pin for AMS1117
     regulator["GND"] += gnd
     cap_in[1] += vbus_in
     cap_in[2] += gnd
@@ -284,16 +380,16 @@ if __name__ == "__main__":
 '''
 
     # Write example files
-    with open(examples_dir / "main.py", "w") as f:
+    with open(circuit_synth_dir / "main.py", "w") as f:
         f.write(main_circuit)
 
-    with open(examples_dir / "simple_led.py", "w") as f:
+    with open(circuit_synth_dir / "simple_led.py", "w") as f:
         f.write(simple_led)
 
-    with open(examples_dir / "voltage_divider.py", "w") as f:
+    with open(circuit_synth_dir / "voltage_divider.py", "w") as f:
         f.write(voltage_divider)
 
-    console.print(f"✅ Created example circuits in {examples_dir}/", style="green")
+    console.print(f"✅ Created example circuits in {circuit_synth_dir}/", style="green")
 
 
 def create_project_readme(
@@ -309,25 +405,26 @@ A circuit-synth project for professional circuit design with hierarchical archit
 
 ```bash
 # Run the main hierarchical example
-python examples/main.py
+uv run python circuit-synth/main.py
 
 # Try simple examples
-python examples/simple_led.py
-python examples/voltage_divider.py
+uv run python circuit-synth/simple_led.py
+uv run python circuit-synth/voltage_divider.py
 ```
 
 ## 📁 Project Structure
 
 ```
-{project_name}/
-├── examples/              # Example circuits
+my_kicad_project/
+├── circuit-synth/        # Circuit-synth Python files
 │   ├── main.py           # Main hierarchical STM32 LED blinker
 │   ├── simple_led.py     # Simple LED circuit
 │   └── voltage_divider.py # Voltage divider example
 ├── .claude/              # AI agents for Claude Code
-│   ├── agents/          # Specialized circuit design agents
-│   └── mcp_settings.json # Claude Code configuration
-└── README.md            # This file
+│   ├── agents/           # Specialized circuit design agents
+│   └── commands/         # Slash commands
+├── README.md            # This file
+└── CLAUDE.md            # Project-specific Claude guidance
 ```
 
 ## 🏗️ Circuit-Synth Basics
@@ -525,34 +622,172 @@ This project uses these KiCad symbol libraries:
     console.print(f"✅ Created project README.md", style="green")
 
 
+def create_claude_md(project_path: Path) -> None:
+    """Create project-specific CLAUDE.md file with circuit-synth guidance"""
+    
+    claude_md_content = f"""# CLAUDE.md
+
+Project-specific guidance for Claude Code when working with this circuit-synth project.
+
+## 🚀 Project Overview
+
+This is a **circuit-synth project** for professional circuit design with AI-powered component intelligence.
+
+## ⚡ Available Tools & Commands
+
+### **Slash Commands**
+- `/find-symbol STM32` - Search KiCad symbol libraries
+- `/find-footprint LQFP` - Search KiCad footprint libraries  
+- `/dev-run-tests` - Run comprehensive test suite
+- `/analyze-design` - Analyze circuit designs
+- `/find_stm32` - STM32-specific component search
+- `/generate_circuit` - Circuit generation workflows
+
+### **Specialized Agents** 
+- **orchestrator** - Master coordinator for complex projects
+- **circuit-synth** - Circuit code generation and KiCad integration
+- **simulation-expert** - SPICE simulation and validation
+- **jlc-parts-finder** - JLCPCB component availability and sourcing
+- **general-purpose** - Research and codebase analysis
+- **code** - Software engineering and code quality
+
+## 🏗️ Development Workflow
+
+### **1. Component-First Design**
+Always start with component availability checking:
+```
+👤 "Find STM32 with 3 SPIs available on JLCPCB"
+👤 "Search for low-power op-amps suitable for battery applications"
+```
+
+### **2. Circuit Generation**
+Use agents for code generation:
+```
+👤 @Task(subagent_type="circuit-synth", description="Create power supply", 
+     prompt="Design 3.3V regulator circuit with USB-C input and overcurrent protection")
+```
+
+### **3. Validation & Simulation**
+Validate designs before manufacturing:
+```
+👤 @Task(subagent_type="simulation-expert", description="Validate filter", 
+     prompt="Simulate this low-pass filter and optimize component values")
+```
+
+## 🔧 Essential Commands
+
+```bash
+# Run examples
+uv run python circuit-synth/main.py
+uv run python circuit-synth/simple_led.py
+
+# Test the setup
+uv run python -c "from circuit_synth import *; print('✅ Circuit-synth ready!')"
+
+# Generate circuits
+uv run python circuit-synth/voltage_divider.py
+```
+
+## 🎯 Best Practices
+
+### **Component Selection Priority**
+1. **JLCPCB availability first** - Always check stock levels
+2. **Standard packages** - Prefer common footprints (0603, 0805, LQFP)
+3. **Proven components** - Use established parts with good track records
+
+### **Circuit Organization**
+- **Hierarchical design** - Use subcircuits for complex designs
+- **Clear interfaces** - Define nets and connections explicitly  
+- **Manufacturing focus** - Design for assembly and testing
+
+### **AI Agent Usage**
+- **Start with orchestrator** for complex multi-step projects
+- **Use circuit-synth** for component selection and code generation
+- **Use simulation-expert** for validation and optimization
+- **Use jlc-parts-finder** for sourcing and alternatives
+
+## 📚 Quick Reference
+
+### **Component Creation**
+```python
+mcu = Component(
+    symbol="MCU_ST_STM32G4:STM32G431CBTx",
+    ref="U",
+    footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
+)
+```
+
+### **Net Connections**
+```python
+vcc = Net("VCC_3V3")
+mcu["VDD"] += vcc
+```
+
+### **Circuit Generation**
+```python
+@circuit(name="Power_Supply")
+def power_supply():
+    # Circuit implementation
+    pass
+```
+
+## 🚀 Getting Help
+
+- Use **natural language** to describe what you want to build
+- **Be specific** about requirements (voltage, current, package, etc.)
+- **Ask for alternatives** when components are out of stock
+- **Request validation** for critical circuits before manufacturing
+
+**Example project requests:**
+```
+👤 "Design ESP32 IoT sensor node with LoRaWAN, solar charging, and environmental sensors"
+👤 "Create USB-C PD trigger circuit for 20V output with safety protection" 
+👤 "Build STM32-based motor controller with encoder feedback and CAN bus"
+```
+
+---
+
+**This project is optimized for AI-powered circuit design with Claude Code!** 🎛️
+"""
+
+    claude_md_file = project_path / "CLAUDE.md"
+    with open(claude_md_file, "w") as f:
+        f.write(claude_md_content)
+    
+    console.print(f"✅ Created project CLAUDE.md", style="green")
+
+
 @click.command()
-@click.argument("project_name", required=True)
 @click.option("--skip-kicad-check", is_flag=True, help="Skip KiCad installation check")
 @click.option("--minimal", is_flag=True, help="Create minimal project (no examples)")
-def main(project_name: str, skip_kicad_check: bool, minimal: bool):
-    """Create a new circuit-synth project with complete setup
-
-    PROJECT_NAME: Name of the new project directory to create
+def main(skip_kicad_check: bool, minimal: bool):
+    """Setup circuit-synth in the current uv project directory
+    
+    Run this command from within your uv project directory after:
+    1. uv init my-project  
+    2. cd my-project
+    3. uv add circuit-synth
+    4. uv run cs-new-project
     """
 
     console.print(
         Panel.fit(
-            Text("🚀 Circuit-Synth New Project Setup", style="bold blue"), style="blue"
+            Text("🚀 Circuit-Synth Project Setup", style="bold blue"), style="blue"
         )
     )
 
-    # Create project directory
-    project_path = Path.cwd() / project_name
-    if project_path.exists():
-        if not Confirm.ask(f"Directory '{project_name}' exists. Continue?"):
-            console.print("❌ Aborted", style="red")
-            sys.exit(1)
-    else:
-        project_path.mkdir(parents=True)
-        console.print(f"📁 Created project directory: {project_path}", style="green")
-
-    # Change to project directory
-    os.chdir(project_path)
+    # Use current directory as project path
+    project_path = Path.cwd()
+    project_name = "circuit-synth"  # Always use 'circuit-synth' as project name
+    
+    console.print(f"📁 Setting up circuit-synth in: {project_path}", style="green")
+    console.print(f"🏷️  Project name: {project_name}", style="cyan")
+    
+    # Remove default main.py created by uv init (we don't need it)
+    default_main = project_path / "main.py"
+    if default_main.exists():
+        default_main.unlink()
+        console.print("🗑️  Removed default main.py (not needed)", style="yellow")
 
     # Step 1: Check KiCad installation
     if not skip_kicad_check:
@@ -566,13 +801,39 @@ def main(project_name: str, skip_kicad_check: bool, minimal: bool):
     else:
         console.print("⏭️  Skipped KiCad check", style="yellow")
 
-    # Step 2: Register Claude AI agents
-    console.print("\n🤖 Setting up AI agents...", style="yellow")
+    # Step 2: Setup complete Claude Code integration
+    console.print("\n🤖 Setting up complete Claude Code integration...", style="yellow")
     try:
-        register_circuit_agents()
-        console.print("✅ AI agents registered successfully", style="green")
+        copy_complete_claude_setup(project_path)
+        console.print("✅ Complete Claude setup copied successfully", style="green")
     except Exception as e:
-        console.print(f"⚠️  Could not register AI agents: {e}", style="yellow")
+        console.print(f"⚠️  Could not copy complete Claude setup: {e}", style="yellow")
+
+    # Step 2b: Setup KiCad plugins (if KiCad is available)
+    if not skip_kicad_check and kicad_info.get("kicad_installed", False):
+        console.print("\n🔌 Setting up KiCad plugins...", style="yellow")
+        try:
+            # Run the KiCad plugin installer
+            result = subprocess.run(
+                ["uv", "run", "install-kicad-plugins"],
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+            
+            if result.returncode == 0:
+                console.print("✅ KiCad plugins installed successfully", style="green")
+                console.print("   • PCB Editor Plugin: Circuit-Synth AI available", style="cyan")
+                console.print("   • Schematic Editor Plugin: BOM integration available", style="cyan")
+            else:
+                console.print("⚠️  KiCad plugin installation had issues", style="yellow")
+                console.print(f"   Output: {result.stderr.strip()}", style="dim")
+        except subprocess.TimeoutExpired:
+            console.print("⚠️  KiCad plugin installation timed out - continuing", style="yellow")
+        except Exception as e:
+            console.print(f"⚠️  Could not install KiCad plugins: {e}", style="yellow")
+    else:
+        console.print("⏭️  Skipped KiCad plugin setup (KiCad not available)", style="dim")
 
     # Step 3: Get library preferences
     additional_libraries = []
@@ -586,19 +847,21 @@ def main(project_name: str, skip_kicad_check: bool, minimal: bool):
     else:
         console.print("⏭️  Skipped example circuits (minimal mode)", style="yellow")
 
-    # Step 5: Create project README
+    # Step 5: Create project documentation
     console.print("\n📚 Creating project documentation...", style="yellow")
     create_project_readme(project_path, project_name, additional_libraries)
+    create_claude_md(project_path)
 
     # Success message
     console.print(
         Panel.fit(
             Text(
-                f"✅ Project '{project_name}' created successfully!", style="bold green"
+                f"✅ Circuit-synth project '{project_name}' setup complete!", style="bold green"
             )
             + Text(f"\n\n📁 Location: {project_path}")
-            + Text(f"\n🚀 Get started: cd {project_name} && python examples/main.py")
-            + Text(f"\n🤖 AI agents: Available in Claude Code")
+            + Text(f"\n🚀 Get started: uv run python circuit-synth/main.py")
+            + Text(f"\n🤖 AI agents: {len(list((project_path / '.claude' / 'agents').glob('*.md')))} agents available in Claude Code")
+            + Text(f"\n⚡ Commands: {len(list((project_path / '.claude' / 'commands').glob('*.md')))} slash commands available")  
             + Text(f"\n📖 Documentation: See README.md"),
             title="🎉 Success!",
             style="green",

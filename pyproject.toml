@@ -155,6 +155,12 @@ env = [
 [tool.uv.workspace]
 members = [
     "test-circuit-synth-setup/my-circuit-project-test",
+    "test-circuit",
+    "test-circuit-complete",
+    "my-circuit-project",
+    "test-uv-workflow",
+    "test-setup",
+    "my_kicad_project",
 ]
 
 [dependency-groups]

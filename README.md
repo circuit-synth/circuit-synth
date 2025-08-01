@@ -31,14 +31,14 @@ Circuit-synth excels when used with AI agents that can:
 # 1. Install uv (if not already installed)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# 2. Create new project
-uv init my-circuit-project
-cd my-circuit-project
+# 2. Create new KiCad project
+uv init my_kicad_project
+cd my_kicad_project
 
 # 3. Add circuit-synth
 uv add circuit-synth
 
-# 4. Setup new project
+# 4. Setup circuit-synth in current project
 uv run cs-new-project
 ```
 
@@ -56,7 +56,7 @@ pip install circuit-synth
 cs-new-project
 ```
 
-**Result:** Project setup with AI agents registered and example circuit ready to run!
+**Result:** Complete KiCad project setup with circuit-synth Python files, AI agents, and KiCad plugins ready!
 
 ### 🔍 **Component Intelligence**
 
@@ -81,10 +81,10 @@ cs-new-project
 ## Quick Start
 
 ```bash
-# Clone and run hierarchical demo
-git clone https://github.com/circuit-synth/circuit-synth.git
-cd circuit-synth
-uv run python stm32_imu_usbc_demo_hierarchical.py
+# Create and run a new project  
+uv init my_kicad_project && cd my_kicad_project
+uv add circuit-synth && uv run cs-new-project
+uv run python circuit-synth/main.py
 ```
 
 Generates a complete hierarchical KiCad project with modular subcircuits, professional schematics, PCB layout, and netlists.
@@ -197,16 +197,20 @@ circuit.generate_kicad_project(
 ### Generated KiCad Files
 
 ```
-STM32_IMU_USBC_Hierarchical/
-├── STM32_IMU_USBC_Hierarchical.kicad_pro    # Main project
-├── STM32_IMU_USBC_Hierarchical.kicad_sch    # Top-level schematic  
-├── STM32_IMU_USBC_Hierarchical.kicad_pcb    # PCB layout
-├── Power_Supply.kicad_sch                   # Power subcircuit sheet
-├── MCU_Core.kicad_sch                       # MCU subcircuit sheet
-├── IMU_Sensor.kicad_sch                     # IMU subcircuit sheet
-├── Programming_Interface.kicad_sch          # SWD subcircuit sheet
-├── Status_LEDs.kicad_sch                    # LED subcircuit sheet
-└── Test_Points.kicad_sch                    # Debug subcircuit sheet
+my_kicad_project/
+├── circuit-synth/                          # Circuit-synth Python files  
+│   ├── main.py                             # Hierarchical circuit definition
+│   ├── simple_led.py                       # Simple examples
+│   └── voltage_divider.py                  # More examples
+├── .claude/                                # AI agents and commands
+├── STM32_LED_Blinker/                      # Generated KiCad project
+│   ├── STM32_LED_Blinker.kicad_pro         # Main project
+│   ├── STM32_LED_Blinker.kicad_sch         # Top-level schematic  
+│   ├── STM32_LED_Blinker.kicad_pcb         # PCB layout
+│   ├── Power_Supply.kicad_sch              # Power subcircuit sheet
+│   └── LED_Blinker.kicad_sch               # LED subcircuit sheet
+├── README.md                               # Project documentation
+└── CLAUDE.md                               # Claude Code guidance
 ```
 
 Each subcircuit appears as a **separate hierarchical sheet** in KiCad - perfect for complex designs and team collaboration.
