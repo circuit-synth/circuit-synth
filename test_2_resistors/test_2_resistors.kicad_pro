@@ -220,9 +220,7 @@
     "layer_presets": [],
     "viewports": []
   },
-  "boards": [
-    "test_2_resistors.kicad_pcb"
-  ],
+  "boards": [],
   "cvpcb": {
     "equivalence_files": []
   },
@@ -486,7 +484,7 @@
     "last_paths": {
       "gencad": "",
       "idf": "",
-      "netlist": "test_2_resistors.net",
+      "netlist": "",
       "plot": "",
       "pos_files": "",
       "specctra_dsn": "",
@@ -621,11 +619,11 @@
   },
   "sheets": [
     [
-      "test_2_resistors.kicad_sch",
+      "081d466e-2c82-47ba-9bc2-fd6729266681",
       ""
     ],
     [
-      "test_2_resistors.kicad_sch",
+      "b6c148ed-ac42-4960-acc2-85d0e77ad6d2",
       "test_2_resistors"
     ]
   ],

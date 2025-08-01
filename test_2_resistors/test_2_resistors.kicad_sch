@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid dbd73e60-ff92-4355-8165-f941893e1e48)
+	(uuid 7f5be58a-55c4-42b2-afb7-11ffb55b552e)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -151,264 +151,6 @@
 				)
 			)
 		)
-		(symbol "power:+3.3V"
-			(pin_numbers hide)
-			(pin_names
-				(offset 0.254)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property
-				"Reference"
-				"#PWR"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
-				)
-			)
-			(property
-				"Value"
-				"+3.3V"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
-				)
-			)
-			(property
-				"Footprint"
-				""
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property
-				"Datasheet"
-				""
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property
-				"Description"
-				"Power symbol creates a global label with name "+3.3V""
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property
-				"ki_keywords"
-				"global power"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "+3.3V_0_1"
-				(polyline
-					(pts
-						(xy -0.762 1.27)
-						(xy 0.0 2.54)
-					)
-					(stroke
-						(width 0.0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.0 2.54)
-						(xy 0.762 1.27)
-					)
-					(stroke
-						(width 0.0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.0 0.0)
-						(xy 0.0 2.54)
-					)
-					(stroke
-						(width 0.0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "+3.3V_1_1"
-				(pin
-					power_in
-					line
-					(at 0.0 0.0 90)
-					(length 0.0)
-					(name
-						~
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number
-						"1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-		)
-		(symbol "power:GND"
-			(pin_numbers hide)
-			(pin_names
-				(offset 0.254)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property
-				"Reference"
-				"#PWR"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
-				)
-			)
-			(property
-				"Value"
-				"GND"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
-				)
-			)
-			(property
-				"Footprint"
-				""
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property
-				"Datasheet"
-				""
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property
-				"Description"
-				"Power symbol creates a global label with name "GND" , ground"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property
-				"ki_keywords"
-				"global power"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "GND_0_1"
-				(polyline
-					(pts
-						(xy 0.0 0.0)
-						(xy 0.0 -1.27)
-						(xy 1.27 -1.27)
-						(xy 0.0 -2.54)
-						(xy -1.27 -1.27)
-						(xy 0.0 -1.27)
-					)
-					(stroke
-						(width 0.0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "GND_1_1"
-				(pin
-					power_in
-					line
-					(at 0.0 0.0 270)
-					(length 0.0)
-					(name
-						~
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number
-						"1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-		)
 	)
 	(title_block
 		(title test_2_resistors)
@@ -421,7 +163,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 5afbc8a6-be4d-4ce3-8a23-a905ae4dcb87)
+		(uuid c544087d-7fec-4baf-957b-691921ee9940)
 		(property
 			"Reference"
 			"R1"
@@ -465,7 +207,7 @@
 			(project
 				"test_2_resistors"
 				(path
-					"/3812b5a9-bc80-41a7-922e-e69b6e41f577/9078d3f4-5fc2-4a71-9408-e07d13eafc0e"
+					"/dee4736a-dd48-4647-9e16-c1ce5d507ab9/6577081a-f6d4-46f7-99ca-29f1dee54bdb"
 					(reference R1)
 					(unit 1)
 				)
@@ -474,15 +216,15 @@
 	)
 	(symbol
 		(lib_id Device:R)
-		(at 40.64 86.36 0)
+		(at 58.42 45.72 0)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid b12b40db-0e1d-40fd-a578-7b7caa8d1108)
+		(uuid 93cbf483-74d0-48b8-bf7a-0f1a23353261)
 		(property
 			"Reference"
 			"R2"
-			(at 40.64 81.36 0)
+			(at 58.42 40.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -492,7 +234,7 @@
 		(property
 			"Value"
 			"10k"
-			(at 40.64 91.36 0)
+			(at 58.42 50.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -502,7 +244,7 @@
 		(property
 			"Footprint"
 			"Resistor_SMD:R_0603_1608Metric"
-			(at 40.64 96.36 0)
+			(at 58.42 55.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -522,80 +264,8 @@
 			(project
 				"test_2_resistors"
 				(path
-					"/3812b5a9-bc80-41a7-922e-e69b6e41f577/9078d3f4-5fc2-4a71-9408-e07d13eafc0e"
+					"/dee4736a-dd48-4647-9e16-c1ce5d507ab9/6577081a-f6d4-46f7-99ca-29f1dee54bdb"
 					(reference R2)
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id power:+3.3V)
-		(at 58.42 45.72 0)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid a23d352d-41eb-4ded-bcf6-0816786723c7)
-		(property
-			"Reference"
-			"#PWR1"
-			(at 58.42 40.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(instances
-			(project
-				"circuit"
-				(path
-					"/"
-					(reference #PWR1)
-					(unit 1)
-				)
-			)
-			(project
-				"test_2_resistors"
-				(path
-					"/3812b5a9-bc80-41a7-922e-e69b6e41f577/9078d3f4-5fc2-4a71-9408-e07d13eafc0e"
-					(reference #PWR1)
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id power:GND)
-		(at 78.74 45.72 0)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid 66c72bd1-c9b1-47f0-9761-ca4004b4d577)
-		(property
-			"Reference"
-			"#PWR2"
-			(at 78.74 40.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(instances
-			(project
-				"circuit"
-				(path
-					"/"
-					(reference #PWR2)
-					(unit 1)
-				)
-			)
-			(project
-				"test_2_resistors"
-				(path
-					"/3812b5a9-bc80-41a7-922e-e69b6e41f577/9078d3f4-5fc2-4a71-9408-e07d13eafc0e"
-					(reference #PWR2)
 					(unit 1)
 				)
 			)
@@ -611,22 +281,10 @@
 			)
 			(justify left)
 		)
-		(uuid 45dd8c14-9b5a-4a9a-8e00-aa81bf8674bd)
+		(uuid 4ff0e5c6-e2ec-4ad8-a9d4-a2b067b4a6df)
 	)
 	(hierarchical_label
-		+3.3V
-		(shape input)
-		(at 58.42 45.72 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 2d0d421f-7594-44de-b2ed-ceffeb47dee0)
-	)
-	(hierarchical_label
-		Net-(R1-Pad2)
+		VOUT
 		(shape input)
 		(at 38.1 49.53 270)
 		(effects
@@ -635,43 +293,31 @@
 			)
 			(justify right)
 		)
-		(uuid d1ae81f8-00e0-4627-8c62-a13850768976)
+		(uuid adf2e050-937c-4071-9c12-a3830456bcb2)
 	)
 	(hierarchical_label
-		Net-(R1-Pad2)
+		VOUT
 		(shape input)
-		(at 40.64 82.55 90)
+		(at 58.42 41.91 90)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid cb0630f4-36a6-4c68-9368-e8075b96db3e)
+		(uuid 6b1e3bf2-c067-42be-a7af-3479bce100fd)
 	)
 	(hierarchical_label
 		GND
 		(shape input)
-		(at 40.64 90.17 270)
+		(at 58.42 49.53 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right)
 		)
-		(uuid 4e18d0a4-64bc-4b9a-855b-27936aa86421)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 78.74 45.72 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 7af759fc-72bd-4b4f-ba46-6fcbc9d2c9e2)
+		(uuid b7c6b391-2392-42f7-bdbe-8e9ae9c7cfc3)
 	)
 	(text_box
 		"Simple voltage divider with 2x 10k resistors"
@@ -704,7 +350,7 @@
 			)
 			(justify left top)
 		)
-		(uuid 97fee761-180e-4566-b76e-b7faf4d88137)
+		(uuid f8fd04e7-822b-4280-bdbf-38b61e173248)
 	)
 	(text_box
 		"Simple voltage divider with 2x 10k resistors"
@@ -737,11 +383,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 97fee761-180e-4566-b76e-b7faf4d88137)
+		(uuid f8fd04e7-822b-4280-bdbf-38b61e173248)
 	)
 	(sheet_instances
 		(path
-			"/3812b5a9-bc80-41a7-922e-e69b6e41f577/9078d3f4-5fc2-4a71-9408-e07d13eafc0e"
+			"/dee4736a-dd48-4647-9e16-c1ce5d507ab9/6577081a-f6d4-46f7-99ca-29f1dee54bdb"
 			(page "1")
 		)
 	)

@@ -1,7 +1,7 @@
 (export (version "E")
   (design
     (source "/Users/shanemattner/Desktop/circuit-synth3/reference_project/reference_project.kicad_sch")
-    (date "2025-08-01T11:49:12-0700")
+    (date "2025-08-01T13:12:30-0700")
     (tool "Eeschema 9.0.0")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -69,10 +69,10 @@
     (library (logical "Device")
       (uri "/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols//Device.kicad_sym")))
   (nets
-    (net (code "1") (name "+3.3V") (class "Default")
+    (net (code "1") (name "/+3.3V") (class "Default")
       (node (ref "R1") (pin "1") (pintype "passive")))
-    (net (code "2") (name "GND") (class "Default")
+    (net (code "2") (name "/GND") (class "Default")
       (node (ref "R2") (pin "2") (pintype "passive")))
-    (net (code "3") (name "Net-(R1-Pad2)") (class "Default")
+    (net (code "3") (name "/VOUT") (class "Default")
       (node (ref "R1") (pin "2") (pintype "passive"))
       (node (ref "R2") (pin "1") (pintype "passive")))))

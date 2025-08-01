@@ -17,7 +17,7 @@ def voltage_divider():
     # Create power nets
     VCC_3V3 = Net('+3.3V')
     GND = Net('GND')
-    MID = Net('Net-(R1-Pad2)')  # Intermediate voltage node
+    MID = Net('VOUT')  # Intermediate voltage node
     
     # Create components - exactly like reference
     R1 = Component(
@@ -34,29 +34,14 @@ def voltage_divider():
         footprint="Resistor_SMD:R_0603_1608Metric"
     )
     
-    # Create power symbols
-    pwr_3v3 = Component(
-        symbol="power:+3.3V",
-        ref="#PWR"
-    )
-    
-    pwr_gnd = Component(
-        symbol="power:GND", 
-        ref="#PWR"
-    )
-    
-    # Make connections - voltage divider topology  
-    # R1: +3.3V to MID
+    # Make connections - voltage divider topology (no power symbols, just nets like reference)
+    # R1: +3.3V to VOUT
     R1[1] += VCC_3V3
     R1[2] += MID
     
-    # R2: MID to GND  
+    # R2: VOUT to GND  
     R2[1] += MID
     R2[2] += GND
-    
-    # Connect power symbols
-    pwr_3v3[1] += VCC_3V3
-    pwr_gnd[1] += GND
 
 if __name__ == "__main__":
     print("🚀 Starting simple 2-resistor test circuit generation...")
