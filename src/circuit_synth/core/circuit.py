@@ -290,6 +290,105 @@ class Circuit:
         exporter = NetlistExporter(self)
         return exporter.generate_flattened_json_netlist(filename)
 
+    def _generate_hierarchical_json_netlist(self, filename: str) -> None:
+        """
+        Generate JSON netlist with hierarchical components flattened into single component/net structure.
+        This creates the format expected by the netlist service: {"components": {...}, "nets": {...}}
+        """
+        from .netlist_exporter import NetlistExporter
+        import json
+
+        # Collect all components and nets from this circuit and all subcircuits
+        all_components = {}  # ref -> component_dict
+        all_nets = {}  # net_name -> [connections]
+        all_net_objects = {}  # net_name -> Net object (to collect connections from)
+        
+        context_logger.info(
+            "Collecting hierarchical components and nets",
+            component="CIRCUIT",
+            circuit_name=self.name
+        )
+        
+        # Helper to recursively collect from circuit and subcircuits
+        def collect_from_circuit(circuit, prefix=""):
+            # Collect components
+            for comp_ref, comp in circuit._components.items():
+                if hasattr(comp, 'ref') and comp.ref:
+                    full_ref = f"{prefix}{comp.ref}" if prefix else comp.ref
+                    # Convert component to dict format
+                    all_components[full_ref] = comp.to_dict()
+            
+            # Collect nets (the Net objects themselves, not connections yet)
+            for net_name, net in circuit._nets.items():
+                if net_name not in all_net_objects:
+                    all_net_objects[net_name] = net
+                    all_nets[net_name] = []
+            
+            # Recursively collect from subcircuits
+            for subcircuit in circuit._subcircuits:
+                collect_from_circuit(subcircuit, f"{prefix}{subcircuit.name}_")
+        
+        # Start collection from root circuit
+        collect_from_circuit(self)
+        
+        # Now collect connections from each net's _pins set
+        for net_name, net in all_net_objects.items():
+            if hasattr(net, '_pins'):
+                for pin in net._pins:
+                    if hasattr(pin, '_component') and pin._component:
+                        component_ref = pin._component.ref
+                        
+                        # Find the full reference (with prefix) for this component
+                        full_ref = None
+                        for ref, comp in all_components.items():
+                            if comp.get('ref') == component_ref:
+                                full_ref = ref
+                                break
+                        
+                        if full_ref:
+                            connection = {
+                                "component": full_ref,
+                                "pin": {
+                                    "number": str(pin.num),
+                                    "name": getattr(pin, 'name', '~'),
+                                    "type": str(getattr(pin, 'func', 'passive'))
+                                }
+                            }
+                            all_nets[net_name].append(connection)
+        
+        # Create the expected JSON structure
+        json_data = {
+            "name": self.name,
+            "description": getattr(self, 'description', ''),
+            "tstamps": "",
+            "source_file": f"{self.name}.kicad_sch",
+            "components": all_components,
+            "nets": all_nets,
+            "subcircuits": [],  # Flattened, so no subcircuits
+            "annotations": getattr(self, '_annotations', [])
+        }
+        
+        context_logger.info(
+            "Hierarchical collection complete",
+            component="CIRCUIT",
+            total_components=len(all_components),
+            total_nets=len(all_nets),
+            component_refs=list(all_components.keys()),
+            net_names=list(all_nets.keys())
+        )
+        
+        # Write to file
+        try:
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(json_data, f, indent=2, default=str)
+            context_logger.info(
+                f"Hierarchical JSON netlist written to {filename}",
+                component="CIRCUIT"
+            )
+        except Exception as e:
+            context_logger.error(f"Failed to write hierarchical JSON: {e}")
+            raise
+
     def generate_kicad_netlist(self, filename: str) -> None:
         """
         Generate a KiCad netlist (.net) file for this circuit and its hierarchy.

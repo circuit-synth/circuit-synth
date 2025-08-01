@@ -43,14 +43,17 @@ class CircuitDataLoader:
             if not isinstance(circuit_data, dict):
                 raise ValueError("Circuit data must be a dictionary")
             
-            components = circuit_data.get('components', {})
-            nets = circuit_data.get('nets', {})
+            # Flatten hierarchical circuit data for netlist generation
+            flattened_data = self._flatten_hierarchical_data(circuit_data)
             
-            self.logger.info(f"Loaded {len(components)} components and {len(nets)} nets")
+            components = flattened_data.get('components', {})
+            nets = flattened_data.get('nets', {})
+            
+            self.logger.info(f"Loaded {len(components)} components and {len(nets)} nets from hierarchical circuit")
             # self.logger.debug(f"Components: {list(components.keys())}")
             # self.logger.debug(f"Nets: {list(nets.keys())}")
             
-            return circuit_data
+            return flattened_data
             
         except FileNotFoundError:
             raise FileNotFoundError(f"Circuit JSON file not found: {json_file_path}")
@@ -58,6 +61,55 @@ class CircuitDataLoader:
             raise ValueError(f"Invalid JSON in circuit file: {e}")
         except Exception as e:
             raise RuntimeError(f"Failed to load circuit data: {e}")
+    
+    def _flatten_hierarchical_data(self, circuit_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Flatten hierarchical circuit data into a single-level structure for netlist generation."""
+        flattened_components = {}
+        flattened_nets = {}
+        
+        # Helper function to recursively collect components and nets
+        def collect_from_circuit(circuit, prefix=""):
+            # Collect components from this circuit level
+            components = circuit.get('components', {})
+            for comp_ref, comp_data in components.items():
+                full_ref = f"{prefix}{comp_ref}" if prefix else comp_ref
+                flattened_components[full_ref] = comp_data.copy()
+                # Update the component's ref to include prefix
+                flattened_components[full_ref]['ref'] = full_ref
+            
+            # Collect nets from this circuit level
+            nets = circuit.get('nets', {})
+            for net_name, net_connections in nets.items():
+                if net_name not in flattened_nets:
+                    flattened_nets[net_name] = []
+                
+                # Update component references in net connections to include prefix
+                for connection in net_connections:
+                    if isinstance(connection, dict) and 'component' in connection:
+                        original_ref = connection['component']
+                        full_ref = f"{prefix}{original_ref}" if prefix else original_ref
+                        updated_connection = connection.copy()
+                        updated_connection['component'] = full_ref
+                        flattened_nets[net_name].append(updated_connection)
+                    else:
+                        flattened_nets[net_name].append(connection)
+            
+            # Recursively process subcircuits
+            subcircuits = circuit.get('subcircuits', [])
+            for subcircuit in subcircuits:
+                subcircuit_name = subcircuit.get('name', 'subcircuit')
+                collect_from_circuit(subcircuit, f"{prefix}{subcircuit_name}_")
+        
+        # Start flattening from root circuit
+        collect_from_circuit(circuit_data)
+        
+        # Create flattened circuit data structure
+        flattened_data = circuit_data.copy()
+        flattened_data['components'] = flattened_components
+        flattened_data['nets'] = flattened_nets
+        flattened_data['subcircuits'] = []  # Clear subcircuits since we've flattened them
+        
+        return flattened_data
 
 
 class CircuitReconstructor:
