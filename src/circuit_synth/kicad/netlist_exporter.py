@@ -169,6 +169,11 @@ def convert_json_to_netlist(json_path: Path, output_path: Path) -> None:
     # Clean up any excess spacing in the file - try to match KiCad's exact format
     netlist_content = cleanup_whitespace(netlist_content)
 
+    # Ensure parent directory exists
+    from pathlib import Path
+    output_file = Path(output_path)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    
     # Write to the output file with binary mode to preserve encoding and line endings
     # No BOM in the UTF-8 encoding to ensure KiCad can read it
     with open(output_path, "wb") as f:

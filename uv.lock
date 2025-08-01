@@ -6,6 +6,12 @@ resolution-markers = [
     "python_full_version < '3.13'",
 ]
 
+[manifest]
+members = [
+    "circuit-synth",
+    "my-kicad-project",
+]
+
 [[package]]
 name = "aiofiles"
 version = "24.1.0"
@@ -1184,6 +1190,17 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/f2/40/b68001cba8188dd267590a111f9661b6256debc327137667e832bf5d66e8/multidict-6.6.3-cp313-cp313t-win_arm64.whl", hash = "sha256:ce8b7693da41a3c4fde5871c738a81490cea5496c671d74374c8ab889e1834fb", size = 45254, upload-time = "2025-06-30T15:53:12.421Z" },
     { url = "https://files.pythonhosted.org/packages/d8/30/9aec301e9772b098c1f5c0ca0279237c9766d94b97802e9888010c64b0ed/multidict-6.6.3-py3-none-any.whl", hash = "sha256:8db10f29c7541fc5da4defd8cd697e1ca429db743fa716325f236079b96f775a", size = 12313, upload-time = "2025-06-30T15:53:45.437Z" },
 ]
+
+[[package]]
+name = "my-kicad-project"
+version = "0.1.0"
+source = { virtual = "my_kicad_project" }
+dependencies = [
+    { name = "circuit-synth" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "circuit-synth", editable = "." }]
 
 [[package]]
 name = "mypy"

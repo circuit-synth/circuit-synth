@@ -31,15 +31,18 @@ Circuit-synth excels when used with AI agents that can:
 # 1. Install uv (if not already installed)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# 2. Create new project
-uv init my-circuit-project
-cd my-circuit-project
+# 2. Create new KiCad project
+uv init my_kicad_project
+cd my_kicad_project
 
 # 3. Add circuit-synth
 uv add circuit-synth
 
-# 4. Setup new project
+# 4. Setup circuit-synth in current project
 uv run cs-new-project
+
+# 5. Optional: Setup KiCad plugins for AI integration
+uv run cs-setup-kicad-plugins
 ```
 
 ### Option 2: Using pip (Traditional Python)
@@ -54,9 +57,12 @@ pip install circuit-synth
 
 # 3. Setup new project
 cs-new-project
+
+# 4. Optional: Setup KiCad plugins
+cs-setup-kicad-plugins
 ```
 
-**Result:** Project setup with AI agents registered and example circuit ready to run!
+**Result:** Complete KiCad project setup with circuit-synth Python files and AI agents ready! (KiCad plugins available separately)
 
 ### 🔍 **Component Intelligence**
 
@@ -77,17 +83,6 @@ cs-new-project
        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
    )
 ```
-
-## Quick Start
-
-```bash
-# Clone and run hierarchical demo
-git clone https://github.com/circuit-synth/circuit-synth.git
-cd circuit-synth
-uv run python stm32_imu_usbc_demo_hierarchical.py
-```
-
-Generates a complete hierarchical KiCad project with modular subcircuits, professional schematics, PCB layout, and netlists.
 
 ## 🏗️ Hierarchical Circuit Design
 
@@ -158,16 +153,47 @@ def main_circuit():
     • Status LEDs (Power + user indicators)
     • Test Points (Debug access points)
     """
-    # Create and connect all subcircuits
-    power_supply = power_supply_subcircuit()
-    mcu_core = mcu_core_subcircuit()
-    imu_sensor = imu_sensor_subcircuit()
-    programming_interface = programming_interface_subcircuit()
-    status_leds = status_leds_subcircuit()
-    test_points = test_points_subcircuit()
+    # Create shared nets between subcircuits
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    sda = Net('I2C_SDA')
+    scl = Net('I2C_SCL')
+    swdio = Net('SWDIO')
+    swclk = Net('SWCLK')
+    led_power = Net('LED_POWER')
+    led_status = Net('LED_STATUS')
+    
+    # Create and connect all subcircuits with shared nets
+    power_supply = power_supply_subcircuit(vcc_3v3, gnd)
+    mcu_core = mcu_core_subcircuit(vcc_3v3, gnd, sda, scl, swdio, swclk)
+    imu_sensor = imu_sensor_subcircuit(vcc_3v3, gnd, sda, scl)
+    programming_interface = programming_interface_subcircuit(vcc_3v3, gnd, swdio, swclk)
+    status_leds = status_leds_subcircuit(vcc_3v3, gnd, led_power, led_status)
+    test_points = test_points_subcircuit(vcc_3v3, gnd, sda, scl)
+    
+    # Add main MCU component with connections to shared nets
+    stm32 = Component(
+        symbol="MCU_ST_STM32G4:STM32G431CBTx",
+        ref="U",
+        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
+    )
+    
+    # Connect MCU to shared nets
+    stm32["VDD"] += vcc_3v3
+    stm32["VSS"] += gnd
+    stm32["PB6"] += scl    # I2C SCL
+    stm32["PB7"] += sda    # I2C SDA
+    stm32["PA13"] += swdio # SWD programming
+    stm32["PA14"] += swclk # SWD programming
+    stm32["PA5"] += led_power
+    stm32["PA6"] += led_status
 
 # Generate hierarchical KiCad project
 circuit = main_circuit()
+
+# Generate complete project with netlist
+circuit.generate_kicad_netlist("STM32_IMU_USBC_Hierarchical.net")
+circuit.generate_json_netlist("STM32_IMU_USBC_Hierarchical.json")
 circuit.generate_kicad_project(
     project_name="STM32_IMU_USBC_Hierarchical",
     placement_algorithm="hierarchical",
@@ -197,16 +223,20 @@ circuit.generate_kicad_project(
 ### Generated KiCad Files
 
 ```
-STM32_IMU_USBC_Hierarchical/
-├── STM32_IMU_USBC_Hierarchical.kicad_pro    # Main project
-├── STM32_IMU_USBC_Hierarchical.kicad_sch    # Top-level schematic  
-├── STM32_IMU_USBC_Hierarchical.kicad_pcb    # PCB layout
-├── Power_Supply.kicad_sch                   # Power subcircuit sheet
-├── MCU_Core.kicad_sch                       # MCU subcircuit sheet
-├── IMU_Sensor.kicad_sch                     # IMU subcircuit sheet
-├── Programming_Interface.kicad_sch          # SWD subcircuit sheet
-├── Status_LEDs.kicad_sch                    # LED subcircuit sheet
-└── Test_Points.kicad_sch                    # Debug subcircuit sheet
+my_kicad_project/
+├── circuit-synth/                          # Circuit-synth Python files  
+│   ├── main.py                             # Hierarchical circuit definition
+│   ├── simple_led.py                       # Simple examples
+│   └── voltage_divider.py                  # More examples
+├── .claude/                                # AI agents and commands
+├── STM32_LED_Blinker/                      # Generated KiCad project
+│   ├── STM32_LED_Blinker.kicad_pro         # Main project
+│   ├── STM32_LED_Blinker.kicad_sch         # Top-level schematic  
+│   ├── STM32_LED_Blinker.kicad_pcb         # PCB layout
+│   ├── Power_Supply.kicad_sch              # Power subcircuit sheet
+│   └── LED_Blinker.kicad_sch               # LED subcircuit sheet
+├── README.md                               # Project documentation
+└── CLAUDE.md                               # Claude Code guidance
 ```
 
 Each subcircuit appears as a **separate hierarchical sheet** in KiCad - perfect for complex designs and team collaboration.
@@ -414,12 +444,17 @@ Circuit-synth includes **native KiCad plugins** that bring AI-powered circuit an
 
 ### **Installation**
 ```bash
-# Install plugins to KiCad
-cd kicad_plugins/
-uv run python install_plugin.py
+# Automatic installation (recommended)
+uv run cs-setup-kicad-plugins
 
-# Or manual installation - see kicad_plugins/INSTALL.md
+# Manual installation instructions
+uv run cs-setup-kicad-plugins --manual
+
+# System-wide installation (requires admin privileges)
+uv run cs-setup-kicad-plugins --system
 ```
+
+**Note**: KiCad plugins are **optional** and installed separately from project creation. Use `cs-new-project` to create minimal projects, then add KiCad integration only when needed.
 
 ### **Example Plugin Output**
 ```

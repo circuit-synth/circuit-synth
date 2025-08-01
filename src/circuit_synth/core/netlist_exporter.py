@@ -414,6 +414,11 @@ class NetlistExporter:
         )
         circuit_data = self.to_dict()
         try:
+            # Ensure parent directory exists
+            from pathlib import Path
+            output_file = Path(filename)
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            
             with open(filename, "w", encoding="utf-8") as f:
                 json.dump(circuit_data, f, indent=2, cls=CircuitSynthJSONEncoder)
             logger.debug(

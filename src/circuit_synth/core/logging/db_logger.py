@@ -192,7 +192,7 @@ class DatabaseLogger(CircuitSynthLogger):
 
     def _get_log_file_for_event(self, event_type: str) -> Path:
         """Determine which log file an event type goes to."""
-        base_log_dir = Path("logs")
+        base_log_dir = Path.home() / ".circuit-synth" / "logs"
         date_str = datetime.now().strftime("%Y-%m-%d")
 
         if event_type.startswith("dash_"):
