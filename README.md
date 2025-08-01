@@ -4,9 +4,59 @@
 [![PyPI version](https://badge.fury.io/py/circuit-synth.svg)](https://badge.fury.io/py/circuit-synth)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Professional hierarchical circuit design with AI-powered component intelligence**
+**Agent-first hierarchical circuit design library with AI-powered component intelligence**
 
-Generate complete KiCad projects with professional hierarchical architecture using familiar Python syntax. Each subcircuit follows software engineering principles - single responsibility, clear interfaces, and modular design. Integrated AI agents help with component selection, availability checking, and design optimization.
+Circuit-synth is designed to be used **with and by AI agents** for intelligent circuit design. Generate complete KiCad projects with professional hierarchical architecture using familiar Python syntax. Each subcircuit follows software engineering principles - single responsibility, clear interfaces, and modular design. Specialized AI agents provide component selection, availability checking, SPICE simulation, and design optimization.
+
+## 🤖 Agent-First Design Philosophy
+
+**Natural Language → Working Circuit Code**
+
+Circuit-synth excels when used with AI agents that can:
+- **Understand Requirements**: "Design a motor controller with STM32 and 3 half-bridges"
+- **Search Components**: Find suitable parts with real JLCPCB availability 
+- **Generate Code**: Create production-ready hierarchical circuit-synth code
+- **Validate Designs**: Run SPICE simulation and optimization
+- **Export Projects**: Professional KiCad projects ready for manufacturing
+
+**Built-in AI Agents:**
+- 🎯 **circuit-synth**: Component selection and code generation specialist
+- 🔬 **simulation-expert**: SPICE simulation and circuit validation expert
+
+## 🚀 Getting Started from Scratch
+
+### Option 1: Using uv (Recommended - Modern Python)
+
+```bash
+# 1. Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 2. Create new project
+uv init my-circuit-project
+cd my-circuit-project
+
+# 3. Add circuit-synth
+uv add circuit-synth
+
+# 4. Setup new project
+uv run cs-new-project
+```
+
+### Option 2: Using pip (Traditional Python)
+
+```bash
+# 1. Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# 2. Install circuit-synth
+pip install circuit-synth
+
+# 3. Setup new project
+cs-new-project
+```
+
+**Result:** Project setup with AI agents registered and example circuit ready to run!
 
 ### 🔍 **Component Intelligence**
 

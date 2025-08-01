@@ -60,8 +60,8 @@ uv run python examples/example_kicad_project.py
 # 2. Web Dashboard Smoke Test
 uv run circuit-synth-web  # Verify startup, then terminate
 
-# 3. LLM Analysis Pipeline Test
-uv run python -m circuit_synth.intelligence.scripts.llm_circuit_analysis --help
+# 3. Core Import Test
+uv run python -c "import circuit_synth; print('Core imports working')"
 
 # 4. Unit Tests
 uv run pytest tests/unit/test_core_circuit.py -v
