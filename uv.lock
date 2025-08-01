@@ -9,7 +9,7 @@ resolution-markers = [
 [manifest]
 members = [
     "circuit-synth",
-    "my-kicad-project",
+    "my-kicad-proejct",
 ]
 
 [[package]]
@@ -1192,9 +1192,9 @@ wheels = [
 ]
 
 [[package]]
-name = "my-kicad-project"
+name = "my-kicad-proejct"
 version = "0.1.0"
-source = { virtual = "my_kicad_project" }
+source = { virtual = "my_kicad_proejct" }
 dependencies = [
     { name = "circuit-synth" },
 ]

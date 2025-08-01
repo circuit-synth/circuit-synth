@@ -78,17 +78,6 @@ cs-new-project
    )
 ```
 
-## Quick Start
-
-```bash
-# Create and run a new project  
-uv init my_kicad_project && cd my_kicad_project
-uv add circuit-synth && uv run cs-new-project
-uv run python circuit-synth/main.py
-```
-
-Generates a complete hierarchical KiCad project with modular subcircuits, professional schematics, PCB layout, and netlists.
-
 ## 🏗️ Hierarchical Circuit Design
 
 **Professional modular architecture following software engineering principles**
@@ -158,16 +147,47 @@ def main_circuit():
     • Status LEDs (Power + user indicators)
     • Test Points (Debug access points)
     """
-    # Create and connect all subcircuits
-    power_supply = power_supply_subcircuit()
-    mcu_core = mcu_core_subcircuit()
-    imu_sensor = imu_sensor_subcircuit()
-    programming_interface = programming_interface_subcircuit()
-    status_leds = status_leds_subcircuit()
-    test_points = test_points_subcircuit()
+    # Create shared nets between subcircuits
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    sda = Net('I2C_SDA')
+    scl = Net('I2C_SCL')
+    swdio = Net('SWDIO')
+    swclk = Net('SWCLK')
+    led_power = Net('LED_POWER')
+    led_status = Net('LED_STATUS')
+    
+    # Create and connect all subcircuits with shared nets
+    power_supply = power_supply_subcircuit(vcc_3v3, gnd)
+    mcu_core = mcu_core_subcircuit(vcc_3v3, gnd, sda, scl, swdio, swclk)
+    imu_sensor = imu_sensor_subcircuit(vcc_3v3, gnd, sda, scl)
+    programming_interface = programming_interface_subcircuit(vcc_3v3, gnd, swdio, swclk)
+    status_leds = status_leds_subcircuit(vcc_3v3, gnd, led_power, led_status)
+    test_points = test_points_subcircuit(vcc_3v3, gnd, sda, scl)
+    
+    # Add main MCU component with connections to shared nets
+    stm32 = Component(
+        symbol="MCU_ST_STM32G4:STM32G431CBTx",
+        ref="U",
+        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
+    )
+    
+    # Connect MCU to shared nets
+    stm32["VDD"] += vcc_3v3
+    stm32["VSS"] += gnd
+    stm32["PB6"] += scl    # I2C SCL
+    stm32["PB7"] += sda    # I2C SDA
+    stm32["PA13"] += swdio # SWD programming
+    stm32["PA14"] += swclk # SWD programming
+    stm32["PA5"] += led_power
+    stm32["PA6"] += led_status
 
 # Generate hierarchical KiCad project
 circuit = main_circuit()
+
+# Generate complete project with netlist
+circuit.generate_kicad_netlist("STM32_IMU_USBC_Hierarchical.net")
+circuit.generate_json_netlist("STM32_IMU_USBC_Hierarchical.json")
 circuit.generate_kicad_project(
     project_name="STM32_IMU_USBC_Hierarchical",
     placement_algorithm="hierarchical",

@@ -58,14 +58,25 @@ def copy_complete_claude_setup(project_path: Path) -> None:
         if mcp_settings_file.exists():
             mcp_settings_file.unlink()
             
-        # Remove unnecessary dev commands (keep only dev-update-and-commit, dev-run-tests)
+        # Remove unnecessary dev commands and setup agents
         commands_dir = dest_claude_dir / "commands"
-        dev_commands_to_remove = ["dev-release-pypi.md", "dev-review-branch.md", "dev-review-repo.md"]
+        agents_dir = dest_claude_dir / "agents"
+        
+        # Remove dev commands (keep only dev-update-and-commit, dev-run-tests)
+        dev_commands_to_remove = ["dev-release-pypi.md", "dev-review-branch.md", "dev-review-repo.md", "setup_circuit_synth.md"]
         for cmd_file in dev_commands_to_remove:
             cmd_path = commands_dir / cmd_file
             if cmd_path.exists():
                 cmd_path.unlink()
                 console.print(f"🗑️  Removed {cmd_file} (not needed for projects)", style="dim")
+        
+        # Remove setup agents (not needed for end users)
+        setup_agents_to_remove = ["first_setup_agent.md"]
+        for agent_file in setup_agents_to_remove:
+            agent_path = agents_dir / agent_file
+            if agent_path.exists():
+                agent_path.unlink()
+                console.print(f"🗑️  Removed {agent_file} (not needed for projects)", style="dim")
         
         console.print("✅ Copied all agents and commands", style="green")
         
@@ -108,13 +119,13 @@ def check_kicad_installation() -> Dict[str, Any]:
         # Check if KiCad CLI is available (main requirement)
         if result.get("cli_available", False):
             console.print("✅ KiCad found!", style="green")
-            console.print(f"   Path: {result.get('cli_path', 'Unknown')}")
-            console.print(f"   Version: {result.get('cli_version', 'Unknown')}")
+            console.print(f"   🔧 CLI Path: {result.get('cli_path', 'Unknown')}")
+            console.print(f"   📦 Version: {result.get('cli_version', 'Unknown')}")
             
             # Check libraries
             if result.get("libraries_available", False):
-                console.print(f"   Symbol libraries: {result.get('symbol_path', 'Not found')}")
-                console.print(f"   Footprint libraries: {result.get('footprint_path', 'Not found')}")
+                console.print(f"   📚 Symbol libraries: {result.get('symbol_path', 'Not found')}")
+                console.print(f"   👟 Footprint libraries: {result.get('footprint_path', 'Not found')}")
             else:
                 console.print("   ⚠️  Libraries not found but CLI available", style="yellow")
             
@@ -185,30 +196,92 @@ def create_example_circuits(project_path: Path) -> None:
     circuit_synth_dir = project_path / "circuit-synth"
     circuit_synth_dir.mkdir(exist_ok=True)
 
-    # Main circuit example
-    main_circuit = '''#!/usr/bin/env python3
+    # Main circuit example with USB-C subcircuit
+    usb_subcircuit = '''#!/usr/bin/env python3
 """
-Main Circuit Example - LED Blinker with STM32
-Professional circuit design with hierarchical architecture
+USB-C Subcircuit - Proper USB-C implementation with protection
+Includes CC resistors, ESD protection, and shield grounding
+"""
+
+from circuit_synth import *
+
+@circuit(name="USB_Port")
+def usb_port_subcircuit():
+    """USB-C port with CC resistors, ESD protection, and proper grounding"""
+    
+    # Interface nets
+    vbus_out = Net('VBUS_OUT')
+    gnd = Net('GND')
+    usb_dp = Net('USB_DP')
+    usb_dm = Net('USB_DM')
+    
+    # USB-C connector
+    usb_conn = Component(
+        symbol="Connector:USB_C_Receptacle_USB2.0_16P",
+        ref="J",
+        footprint="Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal"
+    )
+    
+    # CC pull-down resistors (5.1k for UFP device)
+    cc1_resistor = Component(symbol="Device:R", ref="R", value="5.1k",
+                            footprint="Resistor_SMD:R_0603_1608Metric")
+    cc2_resistor = Component(symbol="Device:R", ref="R", value="5.1k", 
+                            footprint="Resistor_SMD:R_0603_1608Metric")
+    
+    # ESD protection diodes for data lines
+    esd_dp = Component(symbol="Diode:ESD5Zxx", ref="D",
+                      footprint="Diode_SMD:D_SOD-523")
+    esd_dm = Component(symbol="Diode:ESD5Zxx", ref="D",
+                      footprint="Diode_SMD:D_SOD-523")
+    
+    # USB-C connections
+    usb_conn["VBUS"] += vbus_out
+    usb_conn["GND"] += gnd
+    usb_conn["SHIELD"] += gnd  # Ground the shield
+    usb_conn["D+"] += usb_dp
+    usb_conn["D-"] += usb_dm
+    
+    # CC resistors to ground
+    usb_conn["CC1"] += cc1_resistor[1]
+    cc1_resistor[2] += gnd
+    usb_conn["CC2"] += cc2_resistor[1] 
+    cc2_resistor[2] += gnd
+    
+    # ESD protection
+    esd_dp[1] += usb_dp
+    esd_dp[2] += gnd
+    esd_dm[1] += usb_dm
+    esd_dm[2] += gnd
+    
+    # USB decoupling capacitor
+    cap_usb = Component(symbol="Device:C", ref="C", value="10uF",
+                       footprint="Capacitor_SMD:C_0805_2012Metric")
+    cap_usb[1] += vbus_out
+    cap_usb[2] += gnd
+
+if __name__ == "__main__":
+    circuit = usb_port_subcircuit()
+    circuit.generate_kicad_project("usb_port")
+    print("✅ USB-C subcircuit generated!")
+'''
+
+    # Power supply subcircuit
+    power_supply_subcircuit = '''#!/usr/bin/env python3
+"""
+Power Supply Subcircuit - 5V to 3.3V regulation
+Clean power regulation from USB-C VBUS to regulated 3.3V
 """
 
 from circuit_synth import *
 
 @circuit(name="Power_Supply")
 def power_supply_subcircuit():
-    """USB-C to 3.3V power regulation subcircuit"""
+    """5V to 3.3V power regulation subcircuit"""
     
     # Interface nets
     vbus_in = Net('VBUS_IN')
     vcc_3v3_out = Net('VCC_3V3_OUT') 
     gnd = Net('GND')
-    
-    # USB-C connector
-    usb_conn = Component(
-        symbol="Connector:USB_C_Receptacle_USB2.0_16P",
-        ref="J",
-        footprint="Connector_USB:USB_C_Receptacle_Palconn_UTC16-G"
-    )
     
     # 3.3V regulator
     regulator = Component(
@@ -224,8 +297,6 @@ def power_supply_subcircuit():
                        footprint="Capacitor_SMD:C_0805_2012Metric")
     
     # Connections
-    usb_conn["VBUS"] += vbus_in
-    usb_conn["GND"] += gnd
     regulator["VI"] += vbus_in   # Input pin for AMS1117
     regulator["VO"] += vcc_3v3_out  # Output pin for AMS1117
     regulator["GND"] += gnd
@@ -233,6 +304,63 @@ def power_supply_subcircuit():
     cap_in[2] += gnd
     cap_out[1] += vcc_3v3_out
     cap_out[2] += gnd
+
+if __name__ == "__main__":
+    circuit = power_supply_subcircuit()
+    circuit.generate_kicad_project("power_supply")
+    print("✅ Power supply subcircuit generated!")
+'''
+
+    # Debug header subcircuit
+    debug_header_subcircuit = '''#!/usr/bin/env python3
+"""
+Debug Header Subcircuit - Programming and debugging interface
+Standard ESP32 debug header with UART, reset, and boot control
+"""
+
+from circuit_synth import *
+
+@circuit(name="Debug_Header")
+def debug_header_subcircuit():
+    """Debug header for programming and debugging"""
+    
+    # Interface nets
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    debug_tx = Net('DEBUG_TX')
+    debug_rx = Net('DEBUG_RX') 
+    debug_en = Net('DEBUG_EN')
+    debug_io0 = Net('DEBUG_IO0')
+    
+    # 2x3 debug header
+    debug_header = Component(
+        symbol="Connector_Generic:Conn_02x03_Odd_Even",
+        ref="J",
+        footprint="Connector_IDC:IDC-Header_2x03_P2.54mm_Vertical"
+    )
+    
+    # Header connections (standard ESP32 debug layout)
+    debug_header[1] += debug_en   # EN/RST
+    debug_header[2] += vcc_3v3    # 3.3V
+    debug_header[3] += debug_tx   # TX
+    debug_header[4] += gnd        # GND
+    debug_header[5] += debug_rx   # RX  
+    debug_header[6] += debug_io0  # IO0/BOOT
+
+if __name__ == "__main__":
+    circuit = debug_header_subcircuit()
+    circuit.generate_kicad_project("debug_header")
+    print("✅ Debug header subcircuit generated!")
+'''
+
+    # LED blinker subcircuit
+    led_blinker_subcircuit = '''#!/usr/bin/env python3
+"""
+LED Blinker Subcircuit - Status LED with current limiting
+Simple LED indicator with proper current limiting resistor
+"""
+
+from circuit_synth import *
 
 @circuit(name="LED_Blinker")  
 def led_blinker_subcircuit():
@@ -254,45 +382,134 @@ def led_blinker_subcircuit():
     resistor[2] += led["A"]  # Anode
     led["K"] += led_control  # Cathode (controlled by MCU)
 
-@circuit(name="STM32_LED_Blinker_Main")
+if __name__ == "__main__":
+    circuit = led_blinker_subcircuit()
+    circuit.generate_kicad_project("led_blinker")
+    print("✅ LED blinker subcircuit generated!")
+'''
+
+    # Main circuit example
+    main_circuit = '''#!/usr/bin/env python3
+"""
+Main Circuit - ESP32-C6 Development Board
+Professional hierarchical circuit design with modular subcircuits
+
+This is the main entry point that orchestrates all subcircuits:
+- USB-C power input with proper CC resistors and protection
+- 5V to 3.3V power regulation  
+- ESP32-C6 microcontroller with USB and debug interfaces
+- Status LED with current limiting
+- Debug header for programming and development
+"""
+
+from circuit_synth import *
+
+# Import all subcircuits
+from usb_subcircuit import usb_port_subcircuit
+from power_supply_subcircuit import power_supply_subcircuit
+from debug_header_subcircuit import debug_header_subcircuit
+from led_blinker_subcircuit import led_blinker_subcircuit
+
+@circuit(name="ESP32_C6_Dev_Board_Main")
 def main_circuit():
-    """Main hierarchical circuit - STM32 LED blinker"""
+    """Main hierarchical circuit - ESP32-C6 development board"""
     
-    # Create subcircuits
+    # Create all subcircuits
+    usb_port = usb_port_subcircuit()
     power_supply = power_supply_subcircuit()
+    debug_header = debug_header_subcircuit()
     led_blinker = led_blinker_subcircuit()
     
-    # Add STM32 MCU (simplified for example)
-    stm32 = Component(
-        symbol="MCU_ST_STM32F4:STM32F401CCUx",
+    # Add ESP32-C6 MCU
+    esp32_c6 = Component(
+        symbol="RF_Module:ESP32-C6-MINI-1",
         ref="U", 
-        footprint="Package_DFN_QFN:QFN-48-1EP_7x7mm_P0.5mm_EP5.6x5.6mm"
+        footprint="RF_Module:ESP32-C6-MINI-1"
     )
     
-    # Connect everything through shared nets
-    power_vcc = Net('VCC_3V3')
-    power_gnd = Net('GND') 
-    gpio_out = Net('LED_CONTROL')
+    # Create shared nets between subcircuits
+    vbus = Net('VBUS')
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    usb_dp = Net('USB_DP')
+    usb_dm = Net('USB_DM')
     
-    # Connect power to MCU
-    stm32["VDD"] += power_vcc
-    stm32["VSS"] += power_gnd
-    stm32["PA5"] += gpio_out  # GPIO output to control LED
+    # Debug signals
+    debug_tx = Net('DEBUG_TX')
+    debug_rx = Net('DEBUG_RX')
+    debug_en = Net('DEBUG_EN')
+    debug_io0 = Net('DEBUG_IO0')
+    
+    # LED control
+    led_control = Net('LED_CONTROL')
+    
+    # Power connections to ESP32-C6
+    esp32_c6["3V3"] += vcc_3v3
+    esp32_c6["GND"] += gnd
+    
+    # USB connections to ESP32-C6
+    esp32_c6["IO18"] += usb_dp  # USB D+
+    esp32_c6["IO19"] += usb_dm  # USB D-
+    
+    # Debug connections
+    esp32_c6["EN"] += debug_en    # Reset/Enable
+    esp32_c6["TXD0"] += debug_tx  # UART TX
+    esp32_c6["RXD0"] += debug_rx  # UART RX
+    esp32_c6["IO0"] += debug_io0  # Boot mode control
+    
+    # LED control GPIO
+    esp32_c6["IO8"] += led_control  # GPIO for LED control
+    
+    # ESP32-C6 decoupling capacitor
+    cap_esp = Component(symbol="Device:C", ref="C", value="100nF",
+                       footprint="Capacitor_SMD:C_0603_1608Metric")
+    cap_esp[1] += vcc_3v3
+    cap_esp[2] += gnd
 
 
 if __name__ == "__main__":
-    # Generate the hierarchical circuit
+    print("🚀 Starting ESP32-C6 development board generation...")
+    
+    # Generate the complete hierarchical circuit
+    print("📋 Creating circuit...")
     circuit = main_circuit()
     
+    # Generate KiCad netlist (required for ratsnest display)
+    print("🔌 Generating KiCad netlist...")
+    circuit.generate_kicad_netlist("ESP32_C6_Dev_Board.net")
+    
+    # Generate JSON netlist (for debugging and analysis)
+    print("📄 Generating JSON netlist...")
+    circuit.generate_json_netlist("ESP32_C6_Dev_Board.json")
+    
     # Create KiCad project with hierarchical sheets
+    print("🏗️  Generating KiCad project...")
     circuit.generate_kicad_project(
-        project_name="STM32_LED_Blinker",
+        project_name="ESP32_C6_Dev_Board",
         placement_algorithm="hierarchical",
         generate_pcb=True
     )
     
-    print("✅ STM32 LED Blinker project generated!")
-    print("📁 Check the STM32_LED_Blinker/ directory for KiCad files")
+    print("")
+    print("✅ ESP32-C6 Development Board project generated!")
+    print("📁 Check the ESP32_C6_Dev_Board/ directory for KiCad files")
+    print("")
+    print("🏗️ Generated subcircuits:")
+    print("   • USB-C port with CC resistors and ESD protection")
+    print("   • 5V to 3.3V power regulation")
+    print("   • ESP32-C6 microcontroller with support circuits")
+    print("   • Debug header for programming")  
+    print("   • Status LED with current limiting")
+    print("")
+    print("📋 Generated files:")
+    print("   • ESP32_C6_Dev_Board.kicad_pro - KiCad project file")
+    print("   • ESP32_C6_Dev_Board.kicad_sch - Hierarchical schematic")
+    print("   • ESP32_C6_Dev_Board.kicad_pcb - PCB layout")
+    print("   • ESP32_C6_Dev_Board.net - Netlist (enables ratsnest)")
+    print("   • ESP32_C6_Dev_Board.json - JSON netlist (for analysis)")
+    print("")
+    print("🎯 Ready for professional PCB manufacturing!")
+    print("💡 Open ESP32_C6_Dev_Board.kicad_pcb in KiCad to see the ratsnest!")
 '''
 
     # Simple LED circuit
@@ -379,9 +596,21 @@ if __name__ == "__main__":
     print("🔬 Expected output: 3.28V (from 5V input)")
 '''
 
-    # Write example files
+    # Write all circuit files
     with open(circuit_synth_dir / "main.py", "w") as f:
         f.write(main_circuit)
+
+    with open(circuit_synth_dir / "usb_subcircuit.py", "w") as f:
+        f.write(usb_subcircuit)
+    
+    with open(circuit_synth_dir / "power_supply_subcircuit.py", "w") as f:
+        f.write(power_supply_subcircuit)
+
+    with open(circuit_synth_dir / "debug_header_subcircuit.py", "w") as f:
+        f.write(debug_header_subcircuit)
+
+    with open(circuit_synth_dir / "led_blinker_subcircuit.py", "w") as f:
+        f.write(led_blinker_subcircuit)
 
     with open(circuit_synth_dir / "simple_led.py", "w") as f:
         f.write(simple_led)
@@ -389,7 +618,13 @@ if __name__ == "__main__":
     with open(circuit_synth_dir / "voltage_divider.py", "w") as f:
         f.write(voltage_divider)
 
-    console.print(f"✅ Created example circuits in {circuit_synth_dir}/", style="green")
+    console.print(f"✅ Created hierarchical circuit examples in {circuit_synth_dir}/", style="green")
+    console.print("   • main.py - Main ESP32-C6 development board", style="cyan")
+    console.print("   • usb_subcircuit.py - USB-C with CC resistors", style="cyan")
+    console.print("   • power_supply_subcircuit.py - 5V to 3.3V regulation", style="cyan")
+    console.print("   • debug_header_subcircuit.py - Programming interface", style="cyan")
+    console.print("   • led_blinker_subcircuit.py - Status LED", style="cyan")
+    console.print("   • simple_led.py, voltage_divider.py - Basic examples", style="dim")
 
 
 def create_project_readme(
@@ -417,9 +652,26 @@ uv run python circuit-synth/voltage_divider.py
 ```
 my_kicad_project/
 ├── circuit-synth/        # Circuit-synth Python files
-│   ├── main.py           # Main hierarchical STM32 LED blinker
-│   ├── simple_led.py     # Simple LED circuit
-│   └── voltage_divider.py # Voltage divider example
+│   ├── main.py           # Main ESP32-C6 development board
+│   ├── usb_subcircuit.py # USB-C with CC resistors and ESD protection
+│   ├── power_supply_subcircuit.py # 5V to 3.3V power regulation
+│   ├── debug_header_subcircuit.py # Programming and debug interface
+│   ├── led_blinker_subcircuit.py  # Status LED with current limiting
+│   ├── simple_led.py     # Simple LED circuit (basic example)
+│   └── voltage_divider.py # Voltage divider example (basic example)
+├── kicad_plugins/        # KiCad plugin files for AI integration
+│   ├── circuit_synth_bom_plugin.py        # Schematic BOM plugin
+│   ├── circuit_synth_pcb_bom_bridge.py   # PCB editor plugin
+│   ├── install_plugin.py                 # Plugin installer script
+│   └── README_SIMPLIFIED.md              # Plugin setup instructions
+├── kicad-project/        # KiCad files (generated when circuits run)
+│   ├── ESP32_C6_Dev_Board.kicad_pro        # Main project file
+│   ├── ESP32_C6_Dev_Board.kicad_sch        # Top-level schematic  
+│   ├── ESP32_C6_Dev_Board.kicad_pcb        # PCB layout
+│   ├── USB_Port.kicad_sch                  # USB-C subcircuit sheet
+│   ├── Power_Supply.kicad_sch              # Power regulation subcircuit sheet
+│   ├── Debug_Header.kicad_sch              # Debug interface subcircuit sheet
+│   └── LED_Blinker.kicad_sch               # Status LED subcircuit sheet
 ├── .claude/              # AI agents for Claude Code
 │   ├── agents/           # Specialized circuit design agents
 │   └── commands/         # Slash commands
@@ -449,9 +701,9 @@ def power_supply_subcircuit():
 ```python
 # Create components with symbol, reference, and footprint
 mcu = Component(
-    symbol="MCU_ST_STM32F4:STM32F401CCUx",    # KiCad symbol
+    symbol="RF_Module:ESP32-C6-MINI-1",       # KiCad symbol
     ref="U",                                   # Reference prefix  
-    footprint="Package_DFN_QFN:QFN-48-1EP_7x7mm_P0.5mm_EP5.6x5.6mm"
+    footprint="RF_Module:ESP32-C6-MINI-1"
 )
 
 # Passive components with values
@@ -688,6 +940,45 @@ uv run python -c "from circuit_synth import *; print('✅ Circuit-synth ready!')
 uv run python circuit-synth/voltage_divider.py
 ```
 
+## 🔌 KiCad Plugin Setup (Optional AI Integration)
+
+The project includes KiCad plugins for AI-powered circuit analysis. To install:
+
+### **Quick Installation**
+```bash
+# Run the plugin installer from your project directory
+uv run python kicad_plugins/install_plugin.py
+```
+
+### **Manual Installation**
+If automatic installation doesn't work, copy the plugin files manually:
+
+**macOS:**
+```bash
+cp kicad_plugins/*.py ~/Library/Application Support/kicad/scripting/plugins/
+```
+
+**Windows:**
+```bash
+copy kicad_plugins\\*.py %APPDATA%\\kicad\\scripting\\plugins\\
+```
+
+**Linux:**
+```bash
+cp kicad_plugins/*.py ~/.local/share/kicad/8.0/3rdparty/plugins/
+```
+
+### **Using the Plugins**
+After installation and restarting KiCad:
+
+**PCB Editor:**
+- Tools → External Plugins → "Circuit-Synth AI"
+
+**Schematic Editor:**  
+- Tools → Generate Bill of Materials → "Circuit-Synth AI"
+
+The plugins provide AI-powered analysis of your circuits directly within KiCad!
+
 ## 🎯 Best Practices
 
 ### **Component Selection Priority**
@@ -711,9 +1002,9 @@ uv run python circuit-synth/voltage_divider.py
 ### **Component Creation**
 ```python
 mcu = Component(
-    symbol="MCU_ST_STM32G4:STM32G431CBTx",
+    symbol="RF_Module:ESP32-C6-MINI-1",
     ref="U",
-    footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
+    footprint="RF_Module:ESP32-C6-MINI-1"
 )
 ```
 
@@ -742,7 +1033,7 @@ def power_supply():
 ```
 👤 "Design ESP32 IoT sensor node with LoRaWAN, solar charging, and environmental sensors"
 👤 "Create USB-C PD trigger circuit for 20V output with safety protection" 
-👤 "Build STM32-based motor controller with encoder feedback and CAN bus"
+👤 "Build ESP32-based IoT sensor node with WiFi, environmental sensors, and battery management"
 ```
 
 ---
@@ -809,31 +1100,62 @@ def main(skip_kicad_check: bool, minimal: bool):
     except Exception as e:
         console.print(f"⚠️  Could not copy complete Claude setup: {e}", style="yellow")
 
-    # Step 2b: Setup KiCad plugins (if KiCad is available)
-    if not skip_kicad_check and kicad_info.get("kicad_installed", False):
-        console.print("\n🔌 Setting up KiCad plugins...", style="yellow")
+    # Step 2b: Create local KiCad plugins directory
+    console.print("\n🔌 Setting up KiCad plugins...", style="yellow")
+    
+    # Create kicad_plugins directory in project
+    plugins_dir = project_path / "kicad_plugins"
+    plugins_dir.mkdir(exist_ok=True)
+    
+    # Copy plugin files from source to project
+    source_plugins_dir = Path(__file__).parent.parent.parent.parent / "kicad_plugins"
+    
+    if source_plugins_dir.exists():
         try:
-            # Run the KiCad plugin installer
-            result = subprocess.run(
-                ["uv", "run", "install-kicad-plugins"],
-                capture_output=True,
-                text=True,
-                timeout=60
-            )
+            # Copy key plugin files to project
+            plugin_files = [
+                "circuit_synth_bom_plugin.py",
+                "circuit_synth_pcb_bom_bridge.py", 
+                "install_plugin.py",
+                "README_SIMPLIFIED.md"
+            ]
             
-            if result.returncode == 0:
-                console.print("✅ KiCad plugins installed successfully", style="green")
-                console.print("   • PCB Editor Plugin: Circuit-Synth AI available", style="cyan")
-                console.print("   • Schematic Editor Plugin: BOM integration available", style="cyan")
+            copied_files = []
+            for plugin_file in plugin_files:
+                source_file = source_plugins_dir / plugin_file
+                if source_file.exists():
+                    dest_file = plugins_dir / plugin_file
+                    import shutil
+                    shutil.copy2(source_file, dest_file)
+                    copied_files.append(plugin_file)
+            
+            if copied_files:
+                console.print("✅ KiCad plugin files copied to project", style="green")
+                console.print(f"   📁 Location: {plugins_dir}", style="cyan")
+                console.print(f"   📄 Files: {', '.join(copied_files)}", style="dim")
+                console.print("   📋 See README.md for installation instructions", style="cyan")
             else:
-                console.print("⚠️  KiCad plugin installation had issues", style="yellow")
-                console.print(f"   Output: {result.stderr.strip()}", style="dim")
-        except subprocess.TimeoutExpired:
-            console.print("⚠️  KiCad plugin installation timed out - continuing", style="yellow")
+                console.print("⚠️  No plugin files found to copy", style="yellow")
+                
         except Exception as e:
-            console.print(f"⚠️  Could not install KiCad plugins: {e}", style="yellow")
+            console.print(f"⚠️  Could not copy plugin files: {e}", style="yellow")
     else:
-        console.print("⏭️  Skipped KiCad plugin setup (KiCad not available)", style="dim")
+        console.print("⚠️  Source plugin directory not found", style="yellow")
+        console.print(f"   Expected at: {source_plugins_dir}", style="dim")
+    
+    # Always show manual installation paths for reference
+    if not skip_kicad_check and kicad_info.get("kicad_installed", False):
+        import platform
+        import os
+        
+        if platform.system() == "Darwin":  # macOS
+            plugin_install_dir = os.path.expanduser("~/Library/Application Support/kicad/scripting/plugins")
+        elif platform.system() == "Windows":
+            plugin_install_dir = os.path.expanduser("~/AppData/Roaming/kicad/scripting/plugins")
+        else:  # Linux
+            plugin_install_dir = os.path.expanduser("~/.local/share/kicad/8.0/3rdparty/plugins")
+        
+        console.print(f"   🎯 Install to KiCad: {plugin_install_dir}", style="dim")
 
     # Step 3: Get library preferences
     additional_libraries = []
