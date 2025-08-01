@@ -74,16 +74,16 @@ class ModmDeviceSearch:
         # Try relative path first (in our repository)
         repo_path = (
             Path(__file__).parent.parent.parent.parent.parent
-            / "src"
-            / "external_repos"
+            / "submodules"
             / "modm-devices"
         )
         if repo_path.exists():
             return repo_path
 
-        # Try alternative path structure
+        # Try alternative path structure (legacy)
         alt_path = (
             Path(__file__).parent.parent.parent.parent.parent
+            / "src"
             / "external_repos"
             / "modm-devices"
         )

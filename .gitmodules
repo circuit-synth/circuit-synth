@@ -16,12 +16,12 @@
 [submodule "submodules/kicad-cli-docker"]
 	path = submodules/kicad-cli-docker
 	url = https://gitlab.com/kicad/packaging/kicad-cli-docker.git
-[submodule "src/external_repos/modm-devices"]
-	path = src/external_repos/modm-devices
-	url = https://github.com/modm-io/modm-devices.git
 [submodule "plugins/smarton-ai"]
 	path = plugins/smarton-ai
 	url = https://github.com/smarton-empower/Smarton-AI.git
 [submodule "submodules/kicad-mcp"]
 	path = submodules/kicad-mcp
 	url = https://github.com/lamaalrajih/kicad-mcp.git
+[submodule "submodules/modm-devices"]
+	path = submodules/modm-devices
+	url = https://github.com/modm-io/modm-devices.git

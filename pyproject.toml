@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "circuit_synth"
-version = "0.1.1"
+version = "0.2.0"
 description = "Pythonic circuit design for production-ready KiCad projects"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -93,6 +93,7 @@ validate-kicad = "circuit_synth.core.kicad_validator:main"
 setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
 register-agents = "circuit_synth.claude_integration.agent_registry:main"
 validate-circuit = "circuit_synth.validation.real_time_check:main"
+cs-new-project = "circuit_synth.tools.new_project:main"
 
 # Plugin Management
 smarton-ai = "circuit_synth.tools.smarton_ai_manager:main"
@@ -151,12 +152,18 @@ env = [
     "KICAD_SYMBOL_DIR=tests/test_data/kicad_symbols",
 ]
 
+[tool.uv.workspace]
+members = [
+    "test-circuit-synth-setup/my-circuit-project-test",
+]
+
 [dependency-groups]
 dev = [
     "black>=25.1.0",
     "build>=1.2.2.post1",
     "flake8>=7.3.0",
     "isort>=6.0.1",
+    "linkify-it-py>=2.0.3",
     "myst-parser>=3.0.1",
     "pytest-env>=1.1.5",
     "sphinx>=7.4.7",
