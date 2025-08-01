@@ -40,7 +40,9 @@ Type=oneshot
 User=root
 WorkingDirectory=$REPO_DIR
 ExecStartPre=/usr/bin/git config --global --add safe.directory $REPO_DIR
-ExecStart=/usr/bin/git pull origin main
+ExecStartPre=/bin/bash -c 'cd $REPO_DIR && git stash push -m "Auto-stash before update" || true'
+ExecStart=/bin/bash -c 'cd $REPO_DIR && CURRENT_BRANCH=\$(git branch --show-current) && git pull origin \$CURRENT_BRANCH'
+ExecStartPost=/bin/bash -c 'cd $REPO_DIR && git stash pop || true'
 ExecStartPost=/bin/bash -c 'if [ -f "website/index.html" ]; then cp website/index.html /var/www/html/; fi'
 ExecStartPost=/bin/bash -c 'if [ -f "website/style.css" ]; then cp website/style.css /var/www/html/; fi'
 ExecStartPost=/bin/bash -c 'chown www-data:www-data /var/www/html/index.html /var/www/html/style.css 2>/dev/null || true'
