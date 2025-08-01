@@ -1,0 +1,117 @@
+/* Custom styling for Circuit-Synth documentation */
+
+/* Add visual appeal to the main page */
+.wy-nav-content-wrap .wy-nav-content {
+    max-width: 1200px;
+}
+
+/* Style for circuit diagrams and code blocks */
+.highlight-python {
+    border-left: 4px solid #00a8cc;
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 6px;
+}
+
+/* Circuit component styling */
+.circuit-component {
+    background: #e3f2fd;
+    border: 2px solid #2196f3;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 8px 0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* Net connection styling */
+.net-connection {
+    color: #d32f2f;
+    font-weight: bold;
+}
+
+/* Add icons for different sections */
+.wy-menu-vertical li.toctree-l1 > a {
+    position: relative;
+}
+
+.wy-menu-vertical li.toctree-l1 > a[href*="installation"]:before {
+    content: "⚙️ ";
+}
+
+.wy-menu-vertical li.toctree-l1 > a[href*="quickstart"]:before {
+    content: "🚀 ";
+}
+
+.wy-menu-vertical li.toctree-l1 > a[href*="examples"]:before {
+    content: "💡 ";
+}
+
+.wy-menu-vertical li.toctree-l1 > a[href*="api"]:before {
+    content: "📚 ";
+}
+
+.wy-menu-vertical li.toctree-l1 > a[href*="contributing"]:before {
+    content: "🤝 ";
+}
+
+/* Style admonitions for better visual appeal */
+.admonition {
+    border-radius: 8px;
+    margin: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admonition.note {
+    border-left: 4px solid #2196f3;
+    background: linear-gradient(to right, #e3f2fd, #ffffff);
+}
+
+.admonition.tip {
+    border-left: 4px solid #4caf50;
+    background: linear-gradient(to right, #e8f5e8, #ffffff);
+}
+
+.admonition.warning {
+    border-left: 4px solid #ff9800;
+    background: linear-gradient(to right, #fff3e0, #ffffff);
+}
+
+/* Circuit schematic styling */
+.circuit-schematic {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+    font-family: monospace;
+}
+
+/* Component pin diagrams */
+.pin-diagram {
+    background: #ffffff;
+    border: 2px solid #333;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+    font-family: monospace;
+    text-align: center;
+}
+
+/* Make code examples more visually appealing */
+.highlight {
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Add breathing room to content */
+.rst-content p {
+    line-height: 1.6;
+}
+
+.rst-content h1, .rst-content h2, .rst-content h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}

@@ -86,8 +86,6 @@ circuit-synth/
   - `kicad-cli-docker/` - KiCad CLI tools
   - `pcb/` - PCB processing utilities
   - `skidl/`, `tscircuit/` - Competitive analysis
-
-- **`external_repos/`** - External repositories
   - `modm-devices/` - STM32 pin mapping data
 
 ### AI Integration

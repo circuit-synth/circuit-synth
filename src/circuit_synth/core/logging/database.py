@@ -23,7 +23,9 @@ class LogDatabase:
         Args:
             db_path: Path to the database file. Defaults to logs/circuit_synth_logs.db
         """
-        self.db_path = db_path or Path("logs/circuit_synth_logs.db")
+        self.db_path = db_path or (
+            Path.home() / ".circuit-synth" / "logs" / "circuit_synth_logs.db"
+        )
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_database()
 

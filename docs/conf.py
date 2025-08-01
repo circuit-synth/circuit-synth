@@ -29,6 +29,12 @@ MOCK_MODULES = [
     'rust_reference_manager',
     'rust_symbol_cache',
     'rust_symbol_search',
+    'kicad_cli',
+    'pcbnew',
+    'matplotlib',
+    'numpy',
+    'scipy',
+    'networkx',
 ]
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
@@ -66,6 +72,24 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+
+# Custom CSS
+html_css_files = [
+    'custom.css',
+]
+
+# Theme options (RTD theme compatible)
+html_theme_options = {
+    'logo_only': False,
+    'prev_next_buttons_location': 'bottom',
+    'style_external_links': False,
+    'style_nav_header_background': '#2980b9',
+    'collapse_navigation': False,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+    'includehidden': True,
+    'titles_only': False
+}
 
 # -- Extension configuration -------------------------------------------------
 
@@ -112,6 +136,12 @@ autodoc_mock_imports = [
     'rust_reference_manager',
     'rust_symbol_cache',
     'rust_symbol_search',
+    'kicad_cli',
+    'pcbnew',
+    'matplotlib',
+    'numpy',
+    'scipy',
+    'networkx',
 ]
 
 # Suppress warnings that cause build failures

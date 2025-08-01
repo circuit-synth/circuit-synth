@@ -1,0 +1,358 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 47cfda46-99de-42a2-9f1d-2dff5c3e7f91)
+	(paper A4)
+	(lib_symbols)
+	(paper A4)
+	(title_block
+		(title ESP32_C6_Dev_Board_Main)
+		(date 2025-08-01)
+		(company Circuit-Synth)
+	)
+	(hierarchical_label
+		DEBUG_EN
+		(shape input)
+		(at 82.39 43.18 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 05e8677d-e558-4f69-b097-80cfe71bbc89)
+	)
+	(hierarchical_label
+		DEBUG_IO0
+		(shape input)
+		(at 82.39 45.72 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 5eb1bc8b-8065-4db7-bd02-aa2b69cad97b)
+	)
+	(hierarchical_label
+		DEBUG_RX
+		(shape input)
+		(at 82.39 48.26 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 70b197ec-95ed-4923-ad32-b670298631ff)
+	)
+	(hierarchical_label
+		DEBUG_TX
+		(shape input)
+		(at 82.39 50.8 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid b3899372-4610-4470-b349-51a8b19ef1ea)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 82.39 53.34 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 8da11326-f7eb-4bb3-b9fe-105692a8c5e2)
+	)
+	(hierarchical_label
+		LED_CONTROL
+		(shape input)
+		(at 82.39 55.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid c3be7ef6-2bb0-4ba8-8946-6506f817aa89)
+	)
+	(hierarchical_label
+		USB_DM
+		(shape input)
+		(at 82.39 58.42 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid f6662ca8-c0a3-4e37-80e2-0d55f33b27c7)
+	)
+	(hierarchical_label
+		USB_DP
+		(shape input)
+		(at 82.39 60.96 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 207c8479-5025-40d8-b283-4df98993d9c5)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 82.39 63.5 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid ca718570-5133-4da1-9e46-e788cbdee1b0)
+	)
+	(sheet
+		(at 33.02 40.64)
+		(size 49.37 33.019999999999996)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 308c1328-7046-4baa-b2c1-ec7fe67d0447)
+		(property
+			"Sheetname"
+			"ESP32_C6_MCU"
+			(at 33.02 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"ESP32_C6_MCU.kicad_sch"
+			(at 33.02 74.92999999999999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			DEBUG_EN
+			passive
+			(at 81.12 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 893fb1b6-b03f-41ea-bc1f-632509cd9544)
+		)
+		(pin
+			DEBUG_IO0
+			passive
+			(at 81.12 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 4eb20beb-1dd7-44c3-aa06-7376844a2147)
+		)
+		(pin
+			DEBUG_RX
+			passive
+			(at 81.12 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 928ef023-625f-433b-a4ea-cc0b165425ac)
+		)
+		(pin
+			DEBUG_TX
+			passive
+			(at 81.12 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 3539a691-3a00-4c77-aedb-de39f30fb6b7)
+		)
+		(pin
+			GND
+			passive
+			(at 81.12 53.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid d4743894-9602-4962-aba9-27a7112d0a2a)
+		)
+		(pin
+			LED_CONTROL
+			passive
+			(at 81.12 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 5d418fab-d020-4bbf-b5d8-e6f95cde2220)
+		)
+		(pin
+			USB_DM
+			passive
+			(at 81.12 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 76d82c51-d0a3-4e94-bfe6-a2ce15d83172)
+		)
+		(pin
+			USB_DP
+			passive
+			(at 81.12 60.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 2459406f-d7ba-4c6d-9c63-1c193fc6072e)
+		)
+		(pin
+			VCC_3V3
+			passive
+			(at 81.12 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 419d94b0-da68-4562-a23b-f8303f446392)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Main hierarchical circuit - ESP32-C6 development board"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid ea229f7f-fe4b-4b7c-a61f-561756b6f0a9)
+	)
+	(text_box
+		"Main hierarchical circuit - ESP32-C6 development board"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid ea229f7f-fe4b-4b7c-a61f-561756b6f0a9)
+	)
+	(sheet_instances
+		(path
+			"/7371f490-2331-46bb-a27d-b85d9ef8078d/fee02363-2018-429d-a594-40358a01b379"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

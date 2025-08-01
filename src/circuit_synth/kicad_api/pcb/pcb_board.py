@@ -2422,6 +2422,14 @@ class PCBBoard:
             pad_type = str(pad_data[1]) if len(pad_data) > 1 else "smd"
             pad_shape = str(pad_data[2]) if len(pad_data) > 2 else "rect"
 
+            # Debug logging for pad parsing (can be enabled when needed)
+            debug_pad_parsing = False
+            if debug_pad_parsing:
+                logger.debug(
+                    f"DEBUG: Parsing pad {pad_num}, type={pad_type}, shape={pad_shape}"
+                )
+                logger.debug(f"DEBUG: Full pad_data: {pad_data}")
+
             # Find position and size in the list
             x = y = rotation = 0
             width = height = 1.0
@@ -2441,9 +2449,17 @@ class PCBBoard:
                         x = float(item[1])
                         y = float(item[2])
                         rotation = float(item[3]) if len(item) > 3 else 0
+                        if debug_pad_parsing:
+                            logger.debug(
+                                f"DEBUG: Pad {pad_num} position: x={x}, y={y}, rotation={rotation}"
+                            )
                     elif cmd == "size" and len(item) >= 3:
                         width = float(item[1])
                         height = float(item[2])
+                        if debug_pad_parsing:
+                            logger.debug(
+                                f"DEBUG: Pad {pad_num} size: width={width}, height={height}"
+                            )
                     elif cmd == "layers":
                         # Layers are the remaining items in the list
                         for layer in item[1:]:
@@ -2511,7 +2527,21 @@ class PCBBoard:
             }
             pad_shape_enum = shape_map.get(pad_shape, "rect")
 
-            # Create pad
+            # Apply rotation fix for pads that are rotated 90 degrees
+            # This handles footprints where pads are rotated but dimensions need to be swapped
+            if (
+                abs(rotation - 90.0) < 0.01
+            ):  # Check if rotation is 90 degrees (with float tolerance)
+                if debug_pad_parsing:
+                    logger.debug(
+                        f"ROTATION FIX: Swapping dimensions for rotated pad {pad_num}: ({width}, {height}) -> ({height}, {width})"
+                    )
+                width, height = (
+                    height,
+                    width,
+                )  # Swap width and height for 90-degree rotated pads
+
+            # Create pad with potentially swapped dimensions
             pad = Pad(
                 number=pad_num,
                 type=pad_type_enum,

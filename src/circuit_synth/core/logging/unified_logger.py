@@ -54,7 +54,7 @@ class LoggingFailsafe:
 
     def __init__(self):
         self.fallback_enabled = True
-        self.fallback_file = Path("logs/fallback.log")
+        self.fallback_file = Path.home() / ".circuit-synth" / "logs" / "fallback.log"
         self.fallback_file.parent.mkdir(exist_ok=True)
         self._lock = threading.Lock()
 

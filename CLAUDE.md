@@ -205,8 +205,11 @@ if response:
 - User gets exactly what they asked for quickly
 
 **Debugging Strategy:**
+- **Always use uv for running Python scripts**: Use `uv run python script.py` instead of just `python script.py`
+- **Development flow pattern**: Add lots of debug logs → run script → observe output → change code → repeat
 - **Add extensive logging during development**: Use Python's `logging` module liberally when troubleshooting or implementing new features
 - **Log key data points**: Component creation, net connections, file operations, API calls
+- **Redirect logs to files for analysis**: When logs grow too large for terminal, use `uv run python script.py > debug_output.log 2>&1` to capture all output
 - **Remove non-essential logs when feature is complete**: Keep only critical error logs and high-level status messages
 - **Example**: `logging.debug(f"Creating component {ref} with symbol {symbol}")` during development, remove when stable
 

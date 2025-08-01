@@ -72,25 +72,44 @@ def convert_python_to_rust_format(circuit_data: dict) -> dict:
     To Rust format:
     "nets": {"net_name": {"name": "net_name", "nodes": [...]}}
     """
+    # logger.debug("🔄 DEBUG: convert_python_to_rust_format called")
     rust_data = circuit_data.copy()
 
     # Convert nets format
     python_nets = circuit_data.get("nets", {})
+    # logger.debug(f"🔄 DEBUG: Converting {len(python_nets)} nets from Python to Rust format")
     rust_nets = {}
 
     for net_name, connections in python_nets.items():
+        # logger.debug(f"🔄 DEBUG: Converting net '{net_name}' with {len(connections)} connections")
         # Convert each connection to have proper field names for Rust
         rust_nodes = []
-        for conn in connections:
+        for i, conn in enumerate(connections):
+            # logger.debug(f"🔄 DEBUG: Connection {i}: {conn}")
+            component = conn["component"]
+            pin_info = conn["pin"]
+            pin_type = pin_info["type"]
+            # logger.debug(f"🔄 DEBUG:   Component: {component} (type: {type(component)})")
+            # logger.debug(f"🔄 DEBUG:   Pin type: {pin_type} (type: {type(pin_type)})")
+
+            # Handle PinType enum objects - convert to string
+            if hasattr(pin_type, "value"):
+                pin_type_str = pin_type.value
+                # logger.debug(f"🔄 DEBUG:   Converted PinType enum to string: {pin_type_str}")
+            else:
+                pin_type_str = str(pin_type)
+                # logger.debug(f"🔄 DEBUG:   Using pin type as string: {pin_type_str}")
+
             rust_node = {
-                "component": conn["component"],
+                "component": component,
                 "pin": {
-                    "number": conn["pin"]["number"],
-                    "name": conn["pin"]["name"],
-                    "pin_type": conn["pin"]["type"],  # Convert "type" to "pin_type"
+                    "number": pin_info["number"],
+                    "name": pin_info["name"],
+                    "pin_type": pin_type_str,  # Convert "type" to "pin_type" and ensure it's a string
                 },
                 "original_path": None,
             }
+            # logger.debug(f"🔄 DEBUG:   Created rust_node: {rust_node}")
             rust_nodes.append(rust_node)
 
         # Create full Net object for Rust
@@ -344,6 +363,11 @@ class NetlistExporter:
         are uniquely identified in a schematic. This is the standardized format
         for the library's intermediate JSON representation.
         """
+        logger.info(f"📋 Starting to_dict() for circuit: {self.circuit.name}")
+        logger.info(
+            f"📋 Circuit has {len(self.circuit._components)} components and {len(self.circuit._nets)} nets"
+        )
+
         # TODO: Implement UUID generation and source file tracking later
         # For now, use placeholders similar to the initial exporter output
         sheet_tstamps = f"/{self.circuit.name.lower().replace(' ', '-')}-{id(self.circuit)}/"  # Simple placeholder tstamp
@@ -361,36 +385,68 @@ class NetlistExporter:
         }
 
         # 1) Collect all components
+        logger.info(f"🔧 Collecting components from circuit._components:")
         for comp in self.circuit._components.values():
-            data["components"][comp.ref] = comp.to_dict()  # Add using ref as key
+            logger.info(
+                f"   Component ref: {comp.ref}, symbol: {comp.symbol}, value: {comp.value}"
+            )
+            comp_dict = comp.to_dict()
+            logger.info(f"   Component to_dict(): {comp_dict}")
+            data["components"][comp.ref] = comp_dict  # Add using ref as key
+
+        logger.info(f"📦 Final components dict keys: {list(data['components'].keys())}")
 
         # 2) Gather net usage only from our local components
         #    (including any net that actually comes from a parent)
         net_to_pins = {}
+        logger.info(f"🌐 Gathering net connections from components:")
 
         for comp in self.circuit._components.values():
-            for pin_obj in comp._pins.values():
+            logger.info(f"🔍 Checking component {comp.ref} pins:")
+            logger.info(
+                f"   Component._pins keys: {list(comp._pins.keys()) if hasattr(comp, '_pins') else 'NO _pins ATTR'}"
+            )
+
+            for pin_id, pin_obj in comp._pins.items():
+                logger.info(
+                    f"   Pin {pin_id}: num={pin_obj.num}, name={pin_obj.name}, func={pin_obj.func}"
+                )
                 net_obj = pin_obj.net
                 if net_obj is None:
+                    logger.info(f"     ❌ Pin {pin_id} has no net connection")
                     continue
+
                 net_name = net_obj.name
+                logger.info(f"     ✅ Pin {pin_id} connected to net '{net_name}'")
+
                 if net_name not in net_to_pins:
                     net_to_pins[net_name] = []
+
                 # Store full pin details in original Python format
-                net_to_pins[net_name].append(
-                    {
-                        "component": comp.ref,
-                        "pin": {
-                            "number": pin_obj.num,  # Keep "number" for consistency
-                            "name": pin_obj.name,
-                            "type": pin_obj.func,  # Use original "type" field name
-                        },
-                    }
-                )
+                pin_connection = {
+                    "component": comp.ref,
+                    "pin": {
+                        "number": pin_obj.num,  # Keep "number" for consistency
+                        "name": pin_obj.name,
+                        "type": pin_obj.func,  # Use original "type" field name
+                    },
+                }
+                logger.info(f"     📝 Adding connection: {pin_connection}")
+                net_to_pins[net_name].append(pin_connection)
 
         # Store them in data["nets"] - keep original Python format for compatibility
+        logger.info(f"🌐 Final net connections:")
         for net_name, pin_list in net_to_pins.items():
+            logger.info(f"   Net '{net_name}': {len(pin_list)} connections")
+            for i, pin_conn in enumerate(pin_list):
+                logger.info(f"     Connection {i+1}: {pin_conn}")
             data["nets"][net_name] = pin_list
+
+        logger.info(f"📊 Final data structure:")
+        logger.info(
+            f"   - Components: {len(data['components'])} ({list(data['components'].keys())})"
+        )
+        logger.info(f"   - Nets: {len(data['nets'])} ({list(data['nets'].keys())})")
 
         # 3) Recursively gather subcircuits
         for sc in self.circuit._subcircuits:
@@ -414,6 +470,12 @@ class NetlistExporter:
         )
         circuit_data = self.to_dict()
         try:
+            # Ensure parent directory exists
+            from pathlib import Path
+
+            output_file = Path(filename)
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+
             with open(filename, "w", encoding="utf-8") as f:
                 json.dump(circuit_data, f, indent=2, cls=CircuitSynthJSONEncoder)
             logger.debug(
