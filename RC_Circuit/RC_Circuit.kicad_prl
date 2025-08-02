@@ -58,7 +58,7 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "Single_Resistor_Circuit.kicad_prl",
+    "filename": "RC_Circuit.kicad_prl",
     "version": 5
   },
   "net_inspector_panel": {
