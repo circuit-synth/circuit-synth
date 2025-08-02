@@ -6,6 +6,7 @@ This module handles parsing of KiCad project files (.kicad_pro) and
 associated schematic files to extract circuit structure and components.
 """
 
+import json
 import logging
 import re
 import subprocess
@@ -36,17 +37,58 @@ class KiCadParser:
 
         self.project_dir = self.kicad_project.parent
         self.netlist_parser = KiCadNetlistParser()
+        self.root_schematic = self._find_root_schematic()
+
+    def _find_root_schematic(self) -> Optional[Path]:
+        """Parse .kicad_pro file to find the root schematic file"""
+        try:
+            with open(self.kicad_project, 'r') as f:
+                project_data = json.load(f)
+            
+            # Look for sheets array in the project file
+            sheets = project_data.get("sheets", [])
+            if not sheets:
+                logger.warning("No sheets found in .kicad_pro file")
+                # Fallback to assumption that schematic has same name as project
+                fallback_sch = self.project_dir / f"{self.kicad_project.stem}.kicad_sch"
+                if fallback_sch.exists():
+                    logger.info(f"Using fallback root schematic: {fallback_sch}")
+                    return fallback_sch
+                return None
+            
+            # Find the root schematic (the one with empty sheet name)
+            for sheet_info in sheets:
+                if isinstance(sheet_info, list) and len(sheet_info) >= 2:
+                    schematic_file, sheet_name = sheet_info[0], sheet_info[1]
+                    if sheet_name == "":  # Root sheet has empty name
+                        root_sch_path = self.project_dir / schematic_file
+                        if root_sch_path.exists():
+                            logger.info(f"Found root schematic: {root_sch_path}")
+                            return root_sch_path
+                        else:
+                            logger.error(f"Root schematic file not found: {root_sch_path}")
+            
+            logger.error("Could not find root schematic in .kicad_pro sheets")
+            return None
+            
+        except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+            logger.error(f"Error parsing .kicad_pro file: {e}")
+            return None
 
     def generate_netlist(self) -> Optional[Path]:
         """Generate KiCad netlist from schematic using kicad-cli"""
         logger.info("Generating KiCad netlist from schematic")
+
+        if not self.root_schematic:
+            logger.error("No root schematic found - cannot generate netlist")
+            return None
 
         try:
             # Create temporary directory for netlist
             temp_dir = Path(tempfile.mkdtemp())
             netlist_path = temp_dir / f"{self.kicad_project.stem}.net"
 
-            # Run kicad-cli to generate netlist
+            # Run kicad-cli to generate netlist from the root schematic file
             cmd = [
                 "kicad-cli",
                 "sch",
@@ -54,10 +96,11 @@ class KiCadParser:
                 "netlist",
                 "--output",
                 str(netlist_path),
-                str(self.kicad_project.parent / f"{self.kicad_project.stem}.kicad_sch"),
+                str(self.root_schematic),
             ]
 
             logger.info(f"Running: {' '.join(cmd)}")
+            logger.info(f"Target schematic: {self.root_schematic}")
             result = subprocess.run(cmd, capture_output=True, text=True, check=True)
 
             if netlist_path.exists():

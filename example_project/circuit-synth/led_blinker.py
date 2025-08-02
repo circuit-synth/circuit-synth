@@ -21,7 +21,3 @@ def led_blinker(vcc_3v3, gnd, led_control):
     resistor[2] += led["A"]  # Anode
     led["K"] += led_control  # Cathode (controlled by MCU)
 
-if __name__ == "__main__":
-    circuit = led_blinker()
-    circuit.generate_kicad_project("led_blinker")
-    print("✅ LED blinker circuit generated!")

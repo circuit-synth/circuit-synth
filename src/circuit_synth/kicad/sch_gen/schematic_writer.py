@@ -357,12 +357,6 @@ class SchematicWriter:
             "⚡ STEP 7/8: Adding additional sections (paper, lib_symbols, sheet_instances)..."
         )
 
-        # Add text annotations (TextBox, TextProperty, etc.)
-        self._add_annotations()
-
-        # Convert to S-expression format using the parser
-        schematic_sexpr = self.parser.from_schematic(self.schematic)
-
         # Add paper size (not in the API types yet)
         paper_start = time.perf_counter()
         self._add_paper_size(schematic_sexpr)

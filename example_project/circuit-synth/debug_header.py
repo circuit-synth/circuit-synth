@@ -25,7 +25,3 @@ def debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0):
     debug_header[5] += debug_rx   # RX  
     debug_header[6] += debug_io0  # IO0/BOOT
 
-if __name__ == "__main__":
-    circuit = debug_header()
-    circuit.generate_kicad_project("debug_header")
-    print("✅ Debug header circuit generated!")

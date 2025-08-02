@@ -16,8 +16,6 @@ from circuit_synth import *
 # Import all circuits
 from usb import usb_port
 from power_supply import power_supply
-from debug_header import debug_header
-from led_blinker import led_blinker
 from esp32c6 import esp32c6
 
 @circuit(name="ESP32_C6_Dev_Board_Main")
@@ -30,22 +28,12 @@ def main_circuit():
     gnd = Net('GND')
     usb_dp = Net('USB_DP')
     usb_dm = Net('USB_DM')
-    
-    # Debug signals
-    debug_tx = Net('DEBUG_TX')
-    debug_rx = Net('DEBUG_RX')
-    debug_en = Net('DEBUG_EN')
-    debug_io0 = Net('DEBUG_IO0')
-    
-    # LED control
-    led_control = Net('LED_CONTROL')
+
     
     # Create all circuits with shared nets
     usb_port_circuit = usb_port(vbus, gnd, usb_dp, usb_dm)
     power_supply_circuit = power_supply(vbus, vcc_3v3, gnd)
-    debug_header_circuit = debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0)
-    led_blinker_circuit = led_blinker(vcc_3v3, gnd, led_control)
-    esp32_circuit = esp32c6(vcc_3v3, gnd, usb_dp, usb_dm, debug_tx, debug_rx, debug_en, debug_io0, led_control)
+    esp32_circuit = esp32c6(vcc_3v3, gnd, usb_dp, usb_dm)
 
 
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ Circuit-synth eliminates tedious component placement, symbol hunting, and manual
 
 ### Quick Setup (uv - Recommended)
 
+#### New Projects
 ```bash
 # 1. Install uv (if not already installed)
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -27,6 +28,19 @@ uv add circuit-synth
 uv run cs-new-project
 
 # 5. Run the ESP32-C6 example
+uv run python circuit-synth/main.py
+```
+
+#### Existing KiCad Projects
+```bash
+# Convert existing KiCad project to circuit-synth
+uv add circuit-synth
+uv run cs-init-existing-project /path/to/my_board.kicad_pro
+
+# Or from directory containing KiCad files
+uv run cs-init-existing-project /path/to/project_directory/
+
+# Test the converted circuit
 uv run python circuit-synth/main.py
 ```
 
@@ -215,6 +229,43 @@ uv sync
 # Explore the generated project template
 ls example_project/
 uv run python example_project/circuit-synth/main.py
+```
+
+## 🔄 Converting Existing Projects
+
+The `cs-init-existing-project` command adds circuit-synth functionality to your existing KiCad projects:
+
+### What it does:
+- **Organizes KiCad files** into a clean subdirectory structure
+- **Generates Python code** from your existing schematic
+- **Adds AI agents** for Claude Code integration
+- **Creates documentation** and development setup
+- **Preserves your original design** - no data loss
+
+### Usage Examples:
+```bash
+# Direct KiCad project file
+uv run cs-init-existing-project ~/projects/my_board.kicad_pro
+
+# Directory containing KiCad files (auto-detects .kicad_pro)
+uv run cs-init-existing-project ~/projects/esp32_project/
+
+# Skip automatic conversion (create template only)
+uv run cs-init-existing-project --skip-conversion ~/projects/my_board.kicad_pro
+```
+
+### Resulting Structure:
+```
+my_existing_project/
+├── my_board/                    # Organized KiCad files
+│   ├── my_board.kicad_pro      # Original project file
+│   ├── my_board.kicad_sch      # Original schematic
+│   └── my_board.kicad_pcb      # Original PCB (if present)
+├── circuit-synth/              # Generated Python code
+│   └── main.py                 # Converted circuit
+├── .claude/                    # AI agents & commands
+├── README.md                   # Project documentation
+└── CLAUDE.md                   # AI assistant instructions
 ```
 
 ## 🤝 Contributing

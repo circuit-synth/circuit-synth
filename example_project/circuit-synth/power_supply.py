@@ -32,7 +32,3 @@ def power_supply(vbus_in, vcc_3v3_out, gnd):
     cap_out[1] += vcc_3v3_out
     cap_out[2] += gnd
 
-if __name__ == "__main__":
-    circuit = power_supply()
-    circuit.generate_kicad_project("power_supply")
-    print("✅ Power supply circuit generated!")

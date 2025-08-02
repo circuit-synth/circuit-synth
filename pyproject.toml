@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "circuit_synth"
-version = "0.2.1"
+version = "0.2.2"
 description = "Pythonic circuit design for production-ready KiCad projects"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -47,6 +47,7 @@ dependencies = [
     "beautifulsoup4>=4.11.0",
     "lxml>=6.0.0",
     "pyspice>=1.5",
+    "twine>=6.1.0",
 ]
 
 [project.optional-dependencies]
@@ -94,6 +95,7 @@ setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
 register-agents = "circuit_synth.claude_integration.agent_registry:main"
 validate-circuit = "circuit_synth.validation.real_time_check:main"
 cs-new-project = "circuit_synth.tools.new_project:main"
+cs-init-existing-project = "circuit_synth.tools.init_existing_project:main"
 cs-setup-kicad-plugins = "circuit_synth.tools.setup_kicad_plugins:main"
 
 # Plugin Management
