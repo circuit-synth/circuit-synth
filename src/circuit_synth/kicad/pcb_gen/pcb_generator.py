@@ -213,11 +213,7 @@ class PCBGenerator:
 
                 # Only proceed if footprint is specified in component data
                 if footprint:
-                    # ESP32-C6 debugging
-                    if "ESP32-C6" in footprint:
-                        logger.warning(
-                            f"ESP32-C6 PCB DEBUG: Creating footprint {footprint} for reference {comp_info['reference']}"
-                        )
+                    # Component-specific debugging removed
 
                     # Add footprint from library to get full graphics including courtyard
                     fp = pcb.add_footprint_from_library(
@@ -229,24 +225,7 @@ class PCBGenerator:
                         value=comp_info.get("value", ""),
                     )
 
-                    # ESP32-C6 debugging: log pad count and positions
-                    if "ESP32-C6" in footprint and fp:
-                        logger.warning(
-                            f"ESP32-C6 PCB DEBUG: Created footprint {footprint} with {len(fp.pads)} pads"
-                        )
-                        for pad in fp.pads:
-                            if pad.number in [
-                                "12",
-                                "13",
-                                "14",
-                                "24",
-                                "36",
-                                "37",
-                                "48",
-                            ]:  # Sample pads from top/bottom rows
-                                logger.warning(
-                                    f"ESP32-C6 PCB DEBUG: Sample pad {pad.number} - pos=({pad.position.x}, {pad.position.y}), size={pad.size}"
-                                )
+                    # Component-specific debugging removed
 
                     # Store hierarchical path in footprint
                     if fp and comp_info.get("hierarchical_path"):

@@ -281,58 +281,48 @@ class SchematicWriter:
         PERFORMANCE MONITORING: Times each major operation and reports Rust acceleration status.
         """
         start_time = time.perf_counter()
-        logger.info(
-            f"🚀 GENERATE_S_EXPR: Starting schematic generation for circuit '{self.circuit.name}'"
-        )
-        logger.info(
-            f"📊 GENERATE_S_EXPR: Components: {len(self.circuit.components)}, Nets: {len(self.circuit.nets)}"
-        )
-        logger.info(
-            f"🦀 GENERATE_S_EXPR: Rust acceleration available: {_RUST_COMPONENT_ACCELERATION}"
-        )
+        # Schematic generation details removed for clean output
 
         # Add components using the new API - time this critical operation
         comp_start = time.perf_counter()
-        logger.info(f"⚡ STEP 1/8: Adding {len(self.circuit.components)} components...")
+        # Step logging removed for performance
         self._add_components()
         comp_time = time.perf_counter() - comp_start
-        logger.info(f"✅ STEP 1/8: Components added in {comp_time*1000:.2f}ms")
+        # Timing details removed for performance
 
         # Place components using the placement engine
         place_start = time.perf_counter()
-        logger.info("⚡ STEP 2/8: Placing components...")
+        # Step logging removed for performance
         self._place_components()
         place_time = time.perf_counter() - place_start
-        logger.info(f"✅ STEP 2/8: Components placed in {place_time*1000:.2f}ms")
+        # Timing details removed for performance
 
         # Add pin-level net labels
         labels_start = time.perf_counter()
         logger.info(
-            f"⚡ STEP 3/8: Adding pin-level net labels for {len(self.circuit.nets)} nets..."
-        )
+        # Step logging removed for performance
         self._add_pin_level_net_labels()
         labels_time = time.perf_counter() - labels_start
-        logger.info(f"✅ STEP 3/8: Net labels added in {labels_time*1000:.2f}ms")
+        # Timing details removed for performance
 
         # Add subcircuit sheets if needed
         sheets_start = time.perf_counter()
         subcircuit_count = (
             len(self.circuit.child_instances) if self.circuit.child_instances else 0
         )
-        logger.info(f"⚡ STEP 4/8: Adding {subcircuit_count} subcircuit sheets...")
+        # Step logging removed for performance
         self._add_subcircuit_sheets()
         sheets_time = time.perf_counter() - sheets_start
-        logger.info(f"✅ STEP 4/8: Subcircuit sheets added in {sheets_time*1000:.2f}ms")
+        # Timing details removed for performance
 
         # Add bounding boxes if enabled
         bbox_start = time.perf_counter()
         if self.draw_bounding_boxes:
             logger.info(
-                f"⚡ STEP 5/8: Adding bounding boxes for {len(self.circuit.components)} components..."
-            )
+            # Step logging removed for performance
             self._add_component_bounding_boxes()
             bbox_time = time.perf_counter() - bbox_start
-            logger.info(f"✅ STEP 5/8: Bounding boxes added in {bbox_time*1000:.2f}ms")
+            # Timing details removed for performance
         else:
             logger.info("⏭️  STEP 5/8: Bounding boxes disabled, skipping")
             bbox_time = 0
@@ -343,19 +333,16 @@ class SchematicWriter:
         # Convert to S-expression format using the parser - CRITICAL RUST ACCELERATION POINT
         sexpr_start = time.perf_counter()
         logger.info(
-            "⚡ STEP 6/8: Converting to S-expression format (RUST ACCELERATION POINT)..."
-        )
+        # Step logging removed for performance
         schematic_sexpr = self.parser.from_schematic(self.schematic)
         sexpr_time = time.perf_counter() - sexpr_start
         logger.info(
-            f"✅ STEP 6/8: S-expression conversion completed in {sexpr_time*1000:.2f}ms"
-        )
+        # Timing details removed for performance
 
         # Add additional sections
         sections_start = time.perf_counter()
         logger.info(
-            "⚡ STEP 7/8: Adding additional sections (paper, lib_symbols, sheet_instances)..."
-        )
+        # Step logging removed for performance
 
         # Add paper size (not in the API types yet)
         paper_start = time.perf_counter()
@@ -374,8 +361,7 @@ class SchematicWriter:
 
         sections_time = time.perf_counter() - sections_start
         logger.info(
-            f"✅ STEP 7/8: Additional sections added in {sections_time*1000:.2f}ms"
-        )
+        # Timing details removed for performance
         # Timing details removed for performance
 
         # Add symbol_instances section - DISABLED for new KiCad format (20250114+)
@@ -385,33 +371,9 @@ class SchematicWriter:
         total_time = time.perf_counter() - start_time
         expr_size = len(str(schematic_sexpr)) if schematic_sexpr else 0
 
-        logger.info("🏁 STEP 8/8: Schematic generation complete!")
-        logger.info(f"✅ GENERATE_S_EXPR: ✅ TOTAL TIME: {total_time*1000:.2f}ms")
-        logger.info(
-            f"📊 GENERATE_S_EXPR: Generated S-expression: {expr_size:,} characters"
-        )
-        logger.info(
-            f"⚡ GENERATE_S_EXPR: Throughput: {expr_size/(total_time*1000):.1f} chars/ms"
-        )
+        # Generation completion details removed for clean output
 
-        # Performance breakdown
-        logger.info("📈 PERFORMANCE_BREAKDOWN:")
-        logger.info(
-            f"  🔧 Components: {comp_time*1000:.2f}ms ({comp_time/total_time*100:.1f}%)"
-        )
-        logger.info(
-            f"  📍 Placement: {place_time*1000:.2f}ms ({place_time/total_time*100:.1f}%)"
-        )
-        logger.info(
-            f"  🏷️  Labels: {labels_time*1000:.2f}ms ({labels_time/total_time*100:.1f}%)"
-        )
-        logger.info(
-            f"  📄 Sheets: {sheets_time*1000:.2f}ms ({sheets_time/total_time*100:.1f}%)"
-        )
-        if bbox_time > 0:
-            logger.info(
-                f"  📦 Bounding boxes: {bbox_time*1000:.2f}ms ({bbox_time/total_time*100:.1f}%)"
-            )
+        # Performance breakdown removed for clean output
         logger.info(
             f"  🔄 S-expression: {sexpr_time*1000:.2f}ms ({sexpr_time/total_time*100:.1f}%)"
         )

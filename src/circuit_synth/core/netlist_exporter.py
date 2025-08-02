@@ -364,9 +364,9 @@ class NetlistExporter:
         for the library's intermediate JSON representation.
         """
             
-        logger.info(f"📋 Starting to_dict() for circuit: {self.circuit.name}")
-        logger.info(
-            f"📋 Circuit has {len(self.circuit._components)} components and {len(self.circuit._nets)} nets"
+        logger.debug(f"Starting to_dict() for circuit: {self.circuit.name}")
+        logger.debug(
+            f"Circuit has {len(self.circuit._components)} components and {len(self.circuit._nets)} nets"
         )
 
         # TODO: Implement UUID generation and source file tracking later
@@ -872,7 +872,7 @@ class NetlistExporter:
                 ):
                     removed = len(components_to_preserve)
 
-                print("\n📋 Summary:")
+                print("\nSummary:")
                 print(f"   - Matched: {matched}")
                 if modified > 0:
                     print(f"   - Modified: {modified}")
