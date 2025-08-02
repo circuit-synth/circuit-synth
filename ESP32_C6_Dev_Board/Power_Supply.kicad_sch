@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid eb3982bf-7666-46a0-959f-9965322d5efa)
+	(uuid b6a4cd2b-6a0d-46c0-8c6b-7e46375e8078)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -345,10 +345,10 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid cb4468cb-fbd7-4f54-9efd-54cb8b53889f)
+		(uuid 819b7da8-793a-43d1-8c55-d6abc054e5b5)
 		(property
 			"Reference"
-			"C2"
+			"C3"
 			(at 38.1 40.72 0)
 			(effects
 				(font
@@ -382,15 +382,15 @@
 				"circuit"
 				(path
 					"/"
-					(reference C2)
+					(reference C3)
 					(unit 1)
 				)
 			)
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/2304830d-0895-4879-8ecd-2b9a8cdeb73f"
-					(reference C2)
+					"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/97e1bd86-1eb3-42f2-af99-9f8f7c8fa4ea"
+					(reference C3)
 					(unit 1)
 				)
 			)
@@ -402,10 +402,10 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid ea587a5d-e1df-443e-9e2f-f8652a3e1d99)
+		(uuid 4380b209-2845-41bc-b4a7-7facec5356bc)
 		(property
 			"Reference"
-			"C3"
+			"C4"
 			(at 58.42 40.72 0)
 			(effects
 				(font
@@ -439,15 +439,15 @@
 				"circuit"
 				(path
 					"/"
-					(reference C3)
+					(reference C4)
 					(unit 1)
 				)
 			)
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/2304830d-0895-4879-8ecd-2b9a8cdeb73f"
-					(reference C3)
+					"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/97e1bd86-1eb3-42f2-af99-9f8f7c8fa4ea"
+					(reference C4)
 					(unit 1)
 				)
 			)
@@ -459,10 +459,10 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 1e14c0e1-2b57-4a2b-bfe5-9c6480ce2017)
+		(uuid 25c66820-4ad0-47b4-9463-3e2f4e2a6515)
 		(property
 			"Reference"
-			"U1"
+			"U2"
 			(at 45.72 86.44 0)
 			(effects
 				(font
@@ -496,15 +496,15 @@
 				"circuit"
 				(path
 					"/"
-					(reference U1)
+					(reference U2)
 					(unit 1)
 				)
 			)
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/2304830d-0895-4879-8ecd-2b9a8cdeb73f"
-					(reference U1)
+					"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/97e1bd86-1eb3-42f2-af99-9f8f7c8fa4ea"
+					(reference U2)
 					(unit 1)
 				)
 			)
@@ -541,7 +541,7 @@
 			)
 			(justify left top)
 		)
-		(uuid 25b331d8-31e5-48d2-896e-8ae4c14baafe)
+		(uuid 1738eba0-eb07-4ddc-b02c-bc34b1412658)
 	)
 	(text_box
 		"Power supply with input/output interface"
@@ -574,11 +574,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 25b331d8-31e5-48d2-896e-8ae4c14baafe)
+		(uuid 1738eba0-eb07-4ddc-b02c-bc34b1412658)
 	)
 	(sheet_instances
 		(path
-			"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/2304830d-0895-4879-8ecd-2b9a8cdeb73f"
+			"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/97e1bd86-1eb3-42f2-af99-9f8f7c8fa4ea"
 			(page "1")
 		)
 	)

@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 92b4aea1-6216-49a4-9ad5-440dfa64549b)
+	(uuid 9ec9f529-f5a6-4d73-a100-702d60f8715e)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -381,7 +381,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid e85099de-a456-4039-9c13-66f94c9d14bc)
+		(uuid b05d5966-c718-4aaf-835b-ea376b0c9aae)
 		(property
 			"Reference"
 			"D1"
@@ -425,7 +425,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/bd09edbc-d300-4297-a5c0-e244c1318db2"
+					"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/643e6043-e842-48f3-a39f-d5f7919056b1"
 					(reference D1)
 					(unit 1)
 				)
@@ -438,7 +438,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 2baf14b1-adff-42bc-96a7-b6f437cbb9ea)
+		(uuid 502fa6b7-6c6f-467d-aba9-e5cb78a1d8bc)
 		(property
 			"Reference"
 			"R1"
@@ -482,7 +482,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/bd09edbc-d300-4297-a5c0-e244c1318db2"
+					"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/643e6043-e842-48f3-a39f-d5f7919056b1"
 					(reference R1)
 					(unit 1)
 				)
@@ -520,7 +520,7 @@
 			)
 			(justify left top)
 		)
-		(uuid 8c522377-6684-46eb-ba5b-e5942b8fb10e)
+		(uuid d1c665ab-c170-44f5-9354-48ff812c98a7)
 	)
 	(text_box
 		"Basic subcircuit with power interface"
@@ -553,11 +553,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 8c522377-6684-46eb-ba5b-e5942b8fb10e)
+		(uuid d1c665ab-c170-44f5-9354-48ff812c98a7)
 	)
 	(sheet_instances
 		(path
-			"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/bd09edbc-d300-4297-a5c0-e244c1318db2"
+			"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/643e6043-e842-48f3-a39f-d5f7919056b1"
 			(page "1")
 		)
 	)

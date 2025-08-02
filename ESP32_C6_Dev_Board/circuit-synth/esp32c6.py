@@ -5,6 +5,8 @@ ESP32 MCU with power and USB interface
 """
 
 from circuit_synth import *
+from debug_header import debug_header
+from led_blinker import led_blinker
 
 @circuit(name="ESP32_C6_MCU")
 def esp32c6(vcc_3v3, gnd, usb_dp, usb_dm):
@@ -74,6 +76,10 @@ def esp32c6(vcc_3v3, gnd, usb_dp, usb_dm):
     unconnected__u2_nc_pad33_ = Net("unconnected-(U2-NC-Pad33)")
     unconnected__u2_nc_pad34_ = Net("unconnected-(U2-NC-Pad34)")
     unconnected__u2_nc_pad35_ = Net("unconnected-(U2-NC-Pad35)")
+
+    debug_header_circuit = debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0)
+    led_blinker_circuit = led_blinker(vcc_3v3, gnd, led_control)
+
 
     # Connections
     # TODO: Add component connections based on netlist

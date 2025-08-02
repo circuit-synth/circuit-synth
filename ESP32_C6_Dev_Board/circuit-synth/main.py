@@ -10,9 +10,7 @@ Converted from KiCad hierarchical design.
 from circuit_synth import *
 
 # Import all subcircuits
-from led_blinker import led_blinker
-from usb import usb
-from debug_header import debug_header
+from usb import usb_port
 from power_supply import power_supply
 from esp32c6 import esp32c6
 
@@ -29,23 +27,51 @@ def main_circuit():
 
     
     # Create all circuits with shared nets
-    led_blinker_circuit = led_blinker(vcc_3v3, gnd)
-    usb_circuit = usb(vbus, gnd, usb_dp, usb_dm)
-    debug_header_circuit = debug_header(vcc_3v3, gnd)
+    usb_port_circuit = usb_port(vbus, gnd, usb_dp, usb_dm)
     power_supply_circuit = power_supply(vbus, vcc_3v3, gnd)
     esp32_circuit = esp32c6(vcc_3v3, gnd, usb_dp, usb_dm)
 
 
 if __name__ == "__main__":
-    print("🚀 Generating KiCad project from circuit-synth...")
+    print("🚀 Starting ESP32_C6_Dev_Board generation...")
+    
+    # Generate the complete hierarchical circuit
+    print("📋 Creating circuit...")
     circuit = main_circuit()
     
-    # Generate KiCad project
+    # Generate KiCad netlist (required for ratsnest display) - save to kicad project folder
+    print("🔌 Generating KiCad netlist...")
+    circuit.generate_kicad_netlist("ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.net")
+    
+    # Generate JSON netlist (for debugging and analysis) - save to circuit-synth folder
+    print("📄 Generating JSON netlist...")
+    circuit.generate_json_netlist("circuit-synth/ESP32_C6_Dev_Board.json")
+    
+    # Create KiCad project with hierarchical sheets
+    print("🏗️  Generating KiCad project...")
     circuit.generate_kicad_project(
         project_name="ESP32_C6_Dev_Board",
         placement_algorithm="hierarchical",
         generate_pcb=True
     )
     
-    print("✅ KiCad project generated successfully!")
-    print("📁 Check the generated KiCad files for your circuit")
+    print("")
+    print("✅ ESP32_C6_Dev_Board project generated!")
+    print("📁 Check the ESP32_C6_Dev_Board/ directory for KiCad files")
+    print("")
+    print("🏗️ Generated circuits:")
+    print("   • USB-C port with CC resistors and ESD protection")
+    print("   • 5V to 3.3V power regulation")
+    print("   • ESP32-C6 microcontroller with support circuits")
+    print("   • Debug header for programming")  
+    print("   • Status LED with current limiting")
+    print("")
+    print("📋 Generated files:")
+    print("   • ESP32_C6_Dev_Board.kicad_pro - KiCad project file")
+    print("   • ESP32_C6_Dev_Board.kicad_sch - Hierarchical schematic")
+    print("   • ESP32_C6_Dev_Board.kicad_pcb - PCB layout")
+    print("   • ESP32_C6_Dev_Board.net - Netlist (enables ratsnest)")
+    print("   • ESP32_C6_Dev_Board.json - JSON netlist (for analysis)")
+    print("")
+    print("🎯 Ready for professional PCB manufacturing!")
+    print("💡 Open ESP32_C6_Dev_Board.kicad_pcb in KiCad to see the ratsnest!")

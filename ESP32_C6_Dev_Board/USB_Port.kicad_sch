@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 882cc2df-5f32-4db1-ae49-1961c048764e)
+	(uuid b115b117-9932-44f0-a9c3-ad9204fbbff9)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -1264,7 +1264,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 1d2e0177-1c81-42dd-8c3b-877fcc3eb6ba)
+		(uuid 35019423-25ec-4b9d-b42c-b55581501dbd)
 		(property
 			"Reference"
 			"C1"
@@ -1308,7 +1308,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
+					"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/655da157-128a-4e3e-97b4-c0105b2080d7"
 					(reference C1)
 					(unit 1)
 				)
@@ -1321,7 +1321,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 47648a80-532c-48d3-a8c5-fe653bed6840)
+		(uuid 9c049d1e-6a28-4d72-8ed3-f3fdbf9f09c4)
 		(property
 			"Reference"
 			"D2"
@@ -1365,7 +1365,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
+					"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/655da157-128a-4e3e-97b4-c0105b2080d7"
 					(reference D2)
 					(unit 1)
 				)
@@ -1378,7 +1378,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 7d3d2b86-ec49-4c13-b22d-948a5392cd90)
+		(uuid 5cd1b0d6-7857-47ee-89cd-08648629b070)
 		(property
 			"Reference"
 			"D3"
@@ -1422,7 +1422,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
+					"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/655da157-128a-4e3e-97b4-c0105b2080d7"
 					(reference D3)
 					(unit 1)
 				)
@@ -1435,10 +1435,10 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 5afc6711-c8cc-4086-9fa0-ceba13afcc6b)
+		(uuid 75da7020-071b-465b-b2df-2f658b3bc55e)
 		(property
 			"Reference"
-			"J1"
+			"J2"
 			(at 106.68 86.44 0)
 			(effects
 				(font
@@ -1472,15 +1472,15 @@
 				"circuit"
 				(path
 					"/"
-					(reference J1)
+					(reference J2)
 					(unit 1)
 				)
 			)
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
-					(reference J1)
+					"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/655da157-128a-4e3e-97b4-c0105b2080d7"
+					(reference J2)
 					(unit 1)
 				)
 			)
@@ -1492,7 +1492,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid aeabef87-d73a-41a4-ba31-4a5f56ec1f7e)
+		(uuid faf39294-57f6-45e6-a268-6d38e7abc26e)
 		(property
 			"Reference"
 			"R2"
@@ -1536,7 +1536,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
+					"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/655da157-128a-4e3e-97b4-c0105b2080d7"
 					(reference R2)
 					(unit 1)
 				)
@@ -1549,7 +1549,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 19849209-d204-479c-96d4-0cf52a2f9311)
+		(uuid 14e53dec-6222-4adc-a081-ca084a540e6d)
 		(property
 			"Reference"
 			"R3"
@@ -1593,7 +1593,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
+					"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/655da157-128a-4e3e-97b4-c0105b2080d7"
 					(reference R3)
 					(unit 1)
 				)
@@ -1631,7 +1631,7 @@
 			)
 			(justify left top)
 		)
-		(uuid cd422144-1695-4478-8b5f-e3300276dea8)
+		(uuid 6a668971-7b93-4e86-ba58-001e0aa10281)
 	)
 	(text_box
 		"USB-C port with proper parameter interface"
@@ -1664,11 +1664,11 @@
 			)
 			(justify left top)
 		)
-		(uuid cd422144-1695-4478-8b5f-e3300276dea8)
+		(uuid 6a668971-7b93-4e86-ba58-001e0aa10281)
 	)
 	(sheet_instances
 		(path
-			"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
+			"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/655da157-128a-4e3e-97b4-c0105b2080d7"
 			(page "1")
 		)
 	)

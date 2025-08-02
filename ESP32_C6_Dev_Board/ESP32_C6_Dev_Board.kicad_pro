@@ -67,6 +67,10 @@
       "ESP32_C6_Dev_Board_Main"
     ],
     [
+      "Debug_Header.kicad_sch",
+      "Debug_Header"
+    ],
+    [
       "LED_Blinker.kicad_sch",
       "LED_Blinker"
     ],
@@ -75,16 +79,12 @@
       "USB_Port"
     ],
     [
-      "Debug_Header.kicad_sch",
-      "Debug_Header"
+      "ESP32_C6_MCU.kicad_sch",
+      "ESP32_C6_MCU"
     ],
     [
       "Power_Supply.kicad_sch",
       "Power_Supply"
-    ],
-    [
-      "ESP32_C6_MCU.kicad_sch",
-      "ESP32_C6_MCU"
     ]
   ],
   "text_variables": {}

@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid d8c624e8-600a-4e00-a94c-4f174381bf52)
+	(uuid 3db9e720-a322-46b4-a9c0-ac8ddf3b1de2)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -317,10 +317,10 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid ed23d5e1-7c18-4f55-adc5-a8a6c3a4ffda)
+		(uuid 7d7cf1b5-fca6-4502-8bb6-6ea79ef444e6)
 		(property
 			"Reference"
-			"J2"
+			"J1"
 			(at 58.42 40.72 0)
 			(effects
 				(font
@@ -354,15 +354,15 @@
 				"circuit"
 				(path
 					"/"
-					(reference J2)
+					(reference J1)
 					(unit 1)
 				)
 			)
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/6ce5422f-2015-4357-8a2b-739ec2542dda"
-					(reference J2)
+					"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/e8f61efa-95ca-4d90-be97-4851a8acf4e6"
+					(reference J1)
 					(unit 1)
 				)
 			)
@@ -399,7 +399,7 @@
 			)
 			(justify left top)
 		)
-		(uuid ee477cbd-07eb-4933-80d8-f59334be2d9d)
+		(uuid f92fdd36-4ef8-4ba1-b3c4-75e5791cdbc7)
 	)
 	(text_box
 		"Basic subcircuit with power interface"
@@ -432,11 +432,11 @@
 			)
 			(justify left top)
 		)
-		(uuid ee477cbd-07eb-4933-80d8-f59334be2d9d)
+		(uuid f92fdd36-4ef8-4ba1-b3c4-75e5791cdbc7)
 	)
 	(sheet_instances
 		(path
-			"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/6ce5422f-2015-4357-8a2b-739ec2542dda"
+			"/e88ec0b2-6800-48af-8d38-4d552e5d6b9d/ddc395dd-3470-4004-9ae7-6748ca06d6f2/e8f61efa-95ca-4d90-be97-4851a8acf4e6"
 			(page "1")
 		)
 	)

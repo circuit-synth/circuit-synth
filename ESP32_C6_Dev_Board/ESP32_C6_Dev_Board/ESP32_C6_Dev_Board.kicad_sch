@@ -1,6 +1,6 @@
 (kicad_sch (version 20250114) (generator "kicad_api")
 
-  (uuid 3760c8d0-fa33-40f6-91c6-71213551185b)
+  (uuid 403bb03a-9f01-4e46-90e6-b88b2110fc4e)
 
   (paper "A4")
 
@@ -10,7 +10,7 @@
   (sheet (at 25.4 25.4) (size 50.8 25.4)
     (stroke (width 0.1524) (type solid) (color 0 0 0 0))
     (fill (color 0 0 0 0.0000))
-    (uuid 09880448-53b4-4ae3-816d-a2e627f96930)
+    (uuid c820aab4-fcd3-4616-bdd4-60b8a04ba702)
     (property "Sheet name" "ESP32_C6_Dev_Board_Main" (id 0) (at 25.4 24.6884 0)
       (effects (font (size 1.27 1.27)) (justify left bottom))
     )
@@ -21,7 +21,7 @@
 
   (sheet_instances
     (path "/" (page "1"))
-    (path "/09880448-53b4-4ae3-816d-a2e627f96930" (page "2"))
+    (path "/c820aab4-fcd3-4616-bdd4-60b8a04ba702" (page "2"))
   )
 
   (symbol_instances

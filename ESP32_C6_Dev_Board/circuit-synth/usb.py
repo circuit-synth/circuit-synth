@@ -7,7 +7,7 @@ USB-C port with proper parameter interface
 from circuit_synth import *
 
 @circuit(name="USB_Port")
-def usb(vbus_out, gnd, usb_dp, usb_dm):
+def usb_port(vbus_out, gnd, usb_dp, usb_dm):
     """USB-C port with proper parameter interface"""
     
     # Components
