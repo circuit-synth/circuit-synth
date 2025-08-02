@@ -1,0 +1,109 @@
+{
+  "name": "netlist1",
+  "components": {
+    "C1": {
+      "reference": "C1",
+      "value": "0.1uF",
+      "symbol": "",
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "description": "Unpolarized capacitor",
+      "pins": {},
+      "properties": {
+        "Sheetname": "Root",
+        "Sheetfile": "test_project.kicad_sch",
+        "ki_keywords": "cap capacitor",
+        "ki_fp_filters": "C_*"
+      }
+    },
+    "R1": {
+      "reference": "R1",
+      "value": "10k",
+      "symbol": "",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "description": "Resistor",
+      "pins": {},
+      "properties": {
+        "Sheetname": "Root",
+        "Sheetfile": "test_project.kicad_sch",
+        "ki_keywords": "R res resistor",
+        "ki_fp_filters": "R_*"
+      }
+    },
+    "R2": {
+      "reference": "R2",
+      "value": "1k",
+      "symbol": "",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "description": "Resistor",
+      "pins": {},
+      "properties": {
+        "Sheetname": "Root",
+        "Sheetfile": "test_project.kicad_sch",
+        "ki_keywords": "R res resistor",
+        "ki_fp_filters": "R_*"
+      }
+    }
+  },
+  "nets": {
+    "+3V3": [
+      {
+        "component": "R1",
+        "pin": {
+          "number": "1",
+          "name": "",
+          "type": "passive"
+        }
+      }
+    ],
+    "OUTPUT": [
+      {
+        "component": "C1",
+        "pin": {
+          "number": "1",
+          "name": "",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "R1",
+        "pin": {
+          "number": "2",
+          "name": "",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "R2",
+        "pin": {
+          "number": "1",
+          "name": "",
+          "type": "passive"
+        }
+      }
+    ],
+    "GND": [
+      {
+        "component": "C1",
+        "pin": {
+          "number": "2",
+          "name": "",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "R2",
+        "pin": {
+          "number": "2",
+          "name": "",
+          "type": "passive"
+        }
+      }
+    ]
+  },
+  "subcircuits": [],
+  "properties": {
+    "source": "/Users/shanemattner/Desktop/test_project/test_project.kicad_sch",
+    "date": "2025-02-24T22:45:38-0800",
+    "tool": "Eeschema 8.0.8"
+  }
+}

@@ -126,15 +126,25 @@ class CircuitReconstructor:
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
     def reconstruct_circuit(self, circuit_data: Dict[str, Any], circuit_name: str):
-        """Reconstruct a Circuit object from JSON data."""
+        """Reconstruct a Circuit object from JSON data, preserving hierarchical structure."""
         from ..core.circuit import Circuit
         from ..core.component import Component
         from ..core.net import Net
 
-        # self.logger.info(f"🔄 Reconstructing circuit: {circuit_name}")
-        # self.logger.info(f"📊 Input circuit_data keys: {list(circuit_data.keys())}")
-        # Create temporary circuit with isolated context to avoid reference collisions
-        temp_circuit = Circuit(name=f"temp_netlist_{circuit_name}")
+        
+        # CRITICAL FIX: Preserve the original circuit name and structure instead of flattening
+        main_circuit = Circuit(name=circuit_name)
+        
+        # Preserve hierarchical structure by reconstructing subcircuits first
+        for subcircuit_data in circuit_data.get('subcircuits', []):
+            subcircuit_name = subcircuit_data.get('name', 'UnknownSubcircuit')
+            
+            # Recursively reconstruct subcircuit
+            subcircuit = self.reconstruct_circuit(subcircuit_data, subcircuit_name)
+            main_circuit.add_subcircuit(subcircuit)
+        
+        # Now create the circuit with proper hierarchical structure preserved
+        temp_circuit = main_circuit
 
         # Set active circuit context for Net creation using the correct module
         from ..core.decorators import get_current_circuit, set_current_circuit
@@ -145,10 +155,8 @@ class CircuitReconstructor:
         # self.logger.debug(f"Set active circuit to: {temp_circuit}")
 
         try:
-            # Reconstruct components
+            # Reconstruct components - ONLY for this circuit level (not subcircuits)
             components_data = circuit_data.get("components", {})
-            # self.logger.info(f"📦 Reconstructing {len(components_data)} components...")
-            # self.logger.debug(f"📦 Components data structure: {components_data}")
 
             for comp_ref, comp_data in components_data.items():
                 # self.logger.info(f"🔧 Creating component {comp_ref}:")
@@ -181,9 +189,8 @@ class CircuitReconstructor:
 
             # self.logger.info(f"📋 Final components in circuit: {list(temp_circuit._components.keys())}")
 
-            # Reconstruct nets - this is where the JSON structure was wrong
+            # Reconstruct nets - ONLY for this circuit level (not subcircuits)
             nets_data = circuit_data.get("nets", {})
-            # self.logger.info(f"Reconstructing {len(nets_data)} nets")
 
             for net_name, connections in nets_data.items():
                 # Creating net with connections (verbose logging available if needed)
@@ -220,7 +227,6 @@ class CircuitReconstructor:
                             f"⚠️ Skipping connection - missing comp_ref ({comp_ref}) or pin_number ({pin_number})"
                         )
 
-            # self.logger.info(f"✅ Circuit reconstruction complete:")
 
             # Log any connection issues for debugging
             for net_name, net_obj in temp_circuit._nets.items():

@@ -235,6 +235,7 @@ def generate_netlist(circuit_data: Dict[str, Any]) -> str:
     Returns:
         String containing the KiCad netlist content
     """
+    
     logger.debug("Starting generate_netlist...")
     # Build the netlist structure
     # The version needs to be formatted as (export (version "E")) to match KiCad's format
@@ -455,6 +456,7 @@ def generate_components_section(circuit_data: Dict[str, Any]) -> List[Any]:
     def process_components(circ_data: Dict[str, Any], current_path: str):
         """Process components in the current circuit and its subcircuits."""
         components = circ_data.get("components", {})
+        
         for ref, comp_data in components.items():
             # Get sheet name from path
             sheet_name = current_path.split("/")[-1] if current_path != "/" else "Root"
@@ -463,6 +465,7 @@ def generate_components_section(circuit_data: Dict[str, Any]) -> List[Any]:
             sheet_file = (
                 "circuit.kicad_sch"  # Use generic name since we don't need actual files
             )
+
 
             # Generate component entry with sheet info
             comp_entry = generate_component_entry(
@@ -1030,6 +1033,7 @@ def normalize_hierarchical_path(path: str, name: str) -> str:
 def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
     nets_section = ["nets"]
     net_code = 1
+
 
     # Add debug logging
     logger.debug("=== Analyzing net connectivity patterns ===")
@@ -1749,6 +1753,7 @@ def generate_component_entry(
     sheet_names = sheet_path
     # TODO: Use actual sheet UUID tstamps when available
     sheet_tstamps = sheet_path  # Placeholder
+
 
     comp_entry.append(["sheetpath", ["names", sheet_names], ["tstamps", sheet_tstamps]])
 

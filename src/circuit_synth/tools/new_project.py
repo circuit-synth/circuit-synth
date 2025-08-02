@@ -79,9 +79,6 @@ def copy_complete_claude_setup(project_path: Path) -> None:
             cmd_path = commands_dir / cmd_file
             if cmd_path.exists():
                 cmd_path.unlink()
-                console.print(
-                    f"🗑️  Removed {cmd_file} (not needed for end users)", style="dim"
-                )
 
         # Remove setup agents (not needed for end users)
         setup_agents_to_remove = ["first_setup_agent.md"]
@@ -89,9 +86,6 @@ def copy_complete_claude_setup(project_path: Path) -> None:
             agent_path = agents_dir / agent_file
             if agent_path.exists():
                 agent_path.unlink()
-                console.print(
-                    f"🗑️  Removed {agent_file} (not needed for projects)", style="dim"
-                )
 
         console.print("✅ Copied all agents and commands", style="green")
 
@@ -199,24 +193,18 @@ def create_example_circuits(project_path: Path) -> None:
     circuit_synth_dir = project_path / "circuit-synth"
     circuit_synth_dir.mkdir(exist_ok=True)
 
-    # Main circuit example with USB-C subcircuit
-    usb_subcircuit = '''#!/usr/bin/env python3
+    # USB-C implementation with protection
+    usb_circuit = '''#!/usr/bin/env python3
 """
-USB-C Subcircuit - Proper USB-C implementation with protection
+USB-C Circuit - Proper USB-C implementation with protection
 Includes CC resistors, ESD protection, and shield grounding
 """
 
 from circuit_synth import *
 
 @circuit(name="USB_Port")
-def usb_port_subcircuit():
+def usb_port(vbus_out, gnd, usb_dp, usb_dm):
     """USB-C port with CC resistors, ESD protection, and proper grounding"""
-    
-    # Interface nets
-    vbus_out = Net('VBUS_OUT')
-    gnd = Net('GND')
-    usb_dp = Net('USB_DP')
-    usb_dm = Net('USB_DM')
     
     # USB-C connector
     usb_conn = Component(
@@ -263,28 +251,23 @@ def usb_port_subcircuit():
     cap_usb[2] += gnd
 
 if __name__ == "__main__":
-    circuit = usb_port_subcircuit()
+    circuit = usb_port()
     circuit.generate_kicad_project("usb_port")
-    print("✅ USB-C subcircuit generated!")
+    print("✅ USB-C circuit generated!")
 '''
 
-    # Power supply subcircuit
-    power_supply_subcircuit = '''#!/usr/bin/env python3
+    # Power supply circuit
+    power_supply_circuit = '''#!/usr/bin/env python3
 """
-Power Supply Subcircuit - 5V to 3.3V regulation
+Power Supply Circuit - 5V to 3.3V regulation
 Clean power regulation from USB-C VBUS to regulated 3.3V
 """
 
 from circuit_synth import *
 
 @circuit(name="Power_Supply")
-def power_supply_subcircuit():
+def power_supply(vbus_in, vcc_3v3_out, gnd):
     """5V to 3.3V power regulation subcircuit"""
-    
-    # Interface nets
-    vbus_in = Net('VBUS_IN')
-    vcc_3v3_out = Net('VCC_3V3_OUT') 
-    gnd = Net('GND')
     
     # 3.3V regulator
     regulator = Component(
@@ -309,31 +292,23 @@ def power_supply_subcircuit():
     cap_out[2] += gnd
 
 if __name__ == "__main__":
-    circuit = power_supply_subcircuit()
+    circuit = power_supply()
     circuit.generate_kicad_project("power_supply")
-    print("✅ Power supply subcircuit generated!")
+    print("✅ Power supply circuit generated!")
 '''
 
-    # Debug header subcircuit
-    debug_header_subcircuit = '''#!/usr/bin/env python3
+    # Debug header circuit
+    debug_header_circuit = '''#!/usr/bin/env python3
 """
-Debug Header Subcircuit - Programming and debugging interface
+Debug Header Circuit - Programming and debugging interface
 Standard ESP32 debug header with UART, reset, and boot control
 """
 
 from circuit_synth import *
 
 @circuit(name="Debug_Header")
-def debug_header_subcircuit():
+def debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0):
     """Debug header for programming and debugging"""
-    
-    # Interface nets
-    vcc_3v3 = Net('VCC_3V3')
-    gnd = Net('GND')
-    debug_tx = Net('DEBUG_TX')
-    debug_rx = Net('DEBUG_RX') 
-    debug_en = Net('DEBUG_EN')
-    debug_io0 = Net('DEBUG_IO0')
     
     # 2x3 debug header
     debug_header = Component(
@@ -351,28 +326,23 @@ def debug_header_subcircuit():
     debug_header[6] += debug_io0  # IO0/BOOT
 
 if __name__ == "__main__":
-    circuit = debug_header_subcircuit()
+    circuit = debug_header()
     circuit.generate_kicad_project("debug_header")
-    print("✅ Debug header subcircuit generated!")
+    print("✅ Debug header circuit generated!")
 '''
 
-    # LED blinker subcircuit
-    led_blinker_subcircuit = '''#!/usr/bin/env python3
+    # LED blinker circuit
+    led_blinker_circuit = '''#!/usr/bin/env python3
 """
-LED Blinker Subcircuit - Status LED with current limiting
+LED Blinker Circuit - Status LED with current limiting
 Simple LED indicator with proper current limiting resistor
 """
 
 from circuit_synth import *
 
 @circuit(name="LED_Blinker")  
-def led_blinker_subcircuit():
+def led_blinker(vcc_3v3, gnd, led_control):
     """LED with current limiting resistor"""
-    
-    # Interface nets
-    vcc_3v3 = Net('VCC_3V3')
-    gnd = Net('GND')
-    led_control = Net('LED_CONTROL')
     
     # LED and resistor
     led = Component(symbol="Device:LED", ref="D", 
@@ -386,9 +356,70 @@ def led_blinker_subcircuit():
     led["K"] += led_control  # Cathode (controlled by MCU)
 
 if __name__ == "__main__":
-    circuit = led_blinker_subcircuit()
+    circuit = led_blinker()
     circuit.generate_kicad_project("led_blinker")
-    print("✅ LED blinker subcircuit generated!")
+    print("✅ LED blinker circuit generated!")
+'''
+
+    # ESP32-C6 circuit (separate from main)
+    esp32c6_circuit = '''#!/usr/bin/env python3
+"""
+ESP32-C6 Circuit
+Professional ESP32-C6 microcontroller with support circuitry
+"""
+
+from circuit_synth import *
+
+@circuit(name="ESP32_C6_MCU")
+def esp32c6(vcc_3v3, gnd, usb_dp, usb_dm, debug_tx, debug_rx, debug_en, debug_io0, led_control):
+    """
+    ESP32-C6 microcontroller subcircuit with decoupling and connections
+    
+    Args:
+        vcc_3v3: 3.3V power supply net
+        gnd: Ground net
+        usb_dp: USB Data+ net
+        usb_dm: USB Data- net
+        debug_tx: Debug UART TX net
+        debug_rx: Debug UART RX net
+        debug_en: Reset/Enable net
+        debug_io0: Boot mode control net
+        led_control: LED control GPIO net
+    """
+    
+    # ESP32-C6 MCU
+    esp32_c6 = Component(
+        symbol="RF_Module:ESP32-C6-MINI-1",
+        ref="U", 
+        footprint="RF_Module:ESP32-C6-MINI-1"
+    )
+    
+    # Power connections
+    esp32_c6["3V3"] += vcc_3v3
+    esp32_c6["GND"] += gnd
+    
+    # USB connections
+    esp32_c6["IO18"] += usb_dp  # USB D+
+    esp32_c6["IO19"] += usb_dm  # USB D-
+    
+    # Debug connections
+    esp32_c6["EN"] += debug_en    # Reset/Enable
+    esp32_c6["TXD0"] += debug_tx  # UART TX
+    esp32_c6["RXD0"] += debug_rx  # UART RX
+    esp32_c6["IO0"] += debug_io0  # Boot mode control
+    
+    # LED control GPIO
+    esp32_c6["IO8"] += led_control  # GPIO for LED control
+    
+    # ESP32-C6 decoupling capacitor
+    cap_esp = Component(
+        symbol="Device:C", 
+        ref="C", 
+        value="100nF",
+        footprint="Capacitor_SMD:C_0603_1608Metric"
+    )
+    cap_esp[1] += vcc_3v3
+    cap_esp[2] += gnd
 '''
 
     # Main circuit example
@@ -407,30 +438,18 @@ This is the main entry point that orchestrates all subcircuits:
 
 from circuit_synth import *
 
-# Import all subcircuits
-from usb_subcircuit import usb_port_subcircuit
-from power_supply_subcircuit import power_supply_subcircuit
-from debug_header_subcircuit import debug_header_subcircuit
-from led_blinker_subcircuit import led_blinker_subcircuit
+# Import all circuits
+from usb import usb_port
+from power_supply import power_supply
+from debug_header import debug_header
+from led_blinker import led_blinker
+from esp32c6 import esp32c6
 
 @circuit(name="ESP32_C6_Dev_Board_Main")
 def main_circuit():
     """Main hierarchical circuit - ESP32-C6 development board"""
     
-    # Create all subcircuits
-    usb_port = usb_port_subcircuit()
-    power_supply = power_supply_subcircuit()
-    debug_header = debug_header_subcircuit()
-    led_blinker = led_blinker_subcircuit()
-    
-    # Add ESP32-C6 MCU
-    esp32_c6 = Component(
-        symbol="RF_Module:ESP32-C6-MINI-1",
-        ref="U", 
-        footprint="RF_Module:ESP32-C6-MINI-1"
-    )
-    
-    # Create shared nets between subcircuits
+    # Create shared nets between subcircuits (ONLY nets - no components here)
     vbus = Net('VBUS')
     vcc_3v3 = Net('VCC_3V3')
     gnd = Net('GND')
@@ -446,28 +465,12 @@ def main_circuit():
     # LED control
     led_control = Net('LED_CONTROL')
     
-    # Power connections to ESP32-C6
-    esp32_c6["3V3"] += vcc_3v3
-    esp32_c6["GND"] += gnd
-    
-    # USB connections to ESP32-C6
-    esp32_c6["IO18"] += usb_dp  # USB D+
-    esp32_c6["IO19"] += usb_dm  # USB D-
-    
-    # Debug connections
-    esp32_c6["EN"] += debug_en    # Reset/Enable
-    esp32_c6["TXD0"] += debug_tx  # UART TX
-    esp32_c6["RXD0"] += debug_rx  # UART RX
-    esp32_c6["IO0"] += debug_io0  # Boot mode control
-    
-    # LED control GPIO
-    esp32_c6["IO8"] += led_control  # GPIO for LED control
-    
-    # ESP32-C6 decoupling capacitor
-    cap_esp = Component(symbol="Device:C", ref="C", value="100nF",
-                       footprint="Capacitor_SMD:C_0603_1608Metric")
-    cap_esp[1] += vcc_3v3
-    cap_esp[2] += gnd
+    # Create all circuits with shared nets
+    usb_port_circuit = usb_port(vbus, gnd, usb_dp, usb_dm)
+    power_supply_circuit = power_supply(vbus, vcc_3v3, gnd)
+    debug_header_circuit = debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0)
+    led_blinker_circuit = led_blinker(vcc_3v3, gnd, led_control)
+    esp32_circuit = esp32c6(vcc_3v3, gnd, usb_dp, usb_dm, debug_tx, debug_rx, debug_en, debug_io0, led_control)
 
 
 if __name__ == "__main__":
@@ -497,7 +500,7 @@ if __name__ == "__main__":
     print("✅ ESP32-C6 Development Board project generated!")
     print("📁 Check the ESP32_C6_Dev_Board/ directory for KiCad files")
     print("")
-    print("🏗️ Generated subcircuits:")
+    print("🏗️ Generated circuits:")
     print("   • USB-C port with CC resistors and ESD protection")
     print("   • 5V to 3.3V power regulation")
     print("   • ESP32-C6 microcontroller with support circuits")
@@ -515,128 +518,39 @@ if __name__ == "__main__":
     print("💡 Open ESP32_C6_Dev_Board.kicad_pcb in KiCad to see the ratsnest!")
 '''
 
-    # Simple LED circuit
-    simple_led = '''#!/usr/bin/env python3
-"""
-Simple LED Circuit - Hello World of Electronics
-Basic LED with current limiting resistor
-"""
-
-from circuit_synth import *
-
-@circuit
-def hello_led():
-    """Simple LED circuit with current limiting resistor"""
-    
-    # Components
-    led = Component(
-        symbol="Device:LED", 
-        ref="D",
-        footprint="LED_THT:LED_D5.0mm"
-    )
-    
-    resistor = Component(
-        symbol="Device:R",
-        ref="R", 
-        value="330",
-        footprint="Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
-    )
-    
-    # Nets
-    vcc = Net("VCC")
-    gnd = Net("GND")
-    led_anode = Net("LED_ANODE")
-    
-    # Connections
-    resistor[1] += vcc
-    resistor[2] += led_anode
-    led["A"] += led_anode  # Anode
-    led["K"] += gnd        # Cathode
-
-if __name__ == "__main__":
-    circuit = hello_led()
-    circuit.generate_kicad_project("hello_led")
-    print("✅ Hello LED circuit generated!")
-'''
-
-    # Voltage divider circuit
-    voltage_divider = '''#!/usr/bin/env python3
-"""
-Voltage Divider Circuit - Basic Analog Design
-Simple resistor voltage divider with optional simulation
-"""
-
-from circuit_synth import *
-
-@circuit
-def voltage_divider():
-    """Voltage divider: 5V → 3.3V using resistors"""
-    
-    # Components - precision resistors for accurate division
-    r1 = Component(symbol="Device:R", ref="R", value="1.7k", 
-                  footprint="Resistor_SMD:R_0603_1608Metric")
-    r2 = Component(symbol="Device:R", ref="R", value="3.3k",
-                  footprint="Resistor_SMD:R_0603_1608Metric") 
-    
-    # Nets
-    vin = Net("VIN")      # 5V input
-    vout = Net("VOUT")    # 3.3V output  
-    gnd = Net("GND")      # Ground
-    
-    # Connections
-    r1[1] += vin
-    r1[2] += vout
-    r2[1] += vout
-    r2[2] += gnd
-    
-    # Optional: Add simulation analysis
-    # To run simulation: circuit.simulator().operating_point()
-
-if __name__ == "__main__":
-    circuit = voltage_divider()
-    circuit.generate_kicad_project("voltage_divider")
-    print("✅ Voltage divider circuit generated!")
-    print("🔬 Expected output: 3.28V (from 5V input)")
-'''
 
     # Write all circuit files
     with open(circuit_synth_dir / "main.py", "w") as f:
         f.write(main_circuit)
 
-    with open(circuit_synth_dir / "usb_subcircuit.py", "w") as f:
-        f.write(usb_subcircuit)
+    with open(circuit_synth_dir / "usb.py", "w") as f:
+        f.write(usb_circuit)
 
-    with open(circuit_synth_dir / "power_supply_subcircuit.py", "w") as f:
-        f.write(power_supply_subcircuit)
+    with open(circuit_synth_dir / "power_supply.py", "w") as f:
+        f.write(power_supply_circuit)
 
-    with open(circuit_synth_dir / "debug_header_subcircuit.py", "w") as f:
-        f.write(debug_header_subcircuit)
+    with open(circuit_synth_dir / "debug_header.py", "w") as f:
+        f.write(debug_header_circuit)
 
-    with open(circuit_synth_dir / "led_blinker_subcircuit.py", "w") as f:
-        f.write(led_blinker_subcircuit)
+    with open(circuit_synth_dir / "led_blinker.py", "w") as f:
+        f.write(led_blinker_circuit)
 
-    with open(circuit_synth_dir / "simple_led.py", "w") as f:
-        f.write(simple_led)
-
-    with open(circuit_synth_dir / "voltage_divider.py", "w") as f:
-        f.write(voltage_divider)
+    with open(circuit_synth_dir / "esp32c6.py", "w") as f:
+        f.write(esp32c6_circuit)
 
     console.print(
         f"✅ Created hierarchical circuit examples in {circuit_synth_dir}/",
         style="green",
     )
     console.print("   • main.py - Main ESP32-C6 development board", style="cyan")
-    console.print("   • usb_subcircuit.py - USB-C with CC resistors", style="cyan")
-    console.print(
-        "   • power_supply_subcircuit.py - 5V to 3.3V regulation", style="cyan"
-    )
-    console.print(
-        "   • debug_header_subcircuit.py - Programming interface", style="cyan"
-    )
-    console.print("   • led_blinker_subcircuit.py - Status LED", style="cyan")
-    console.print(
-        "   • simple_led.py, voltage_divider.py - Basic examples", style="dim"
-    )
+    console.print("   • main.py - Main ESP32-C6 development board", style="cyan")
+    console.print("   • usb.py - USB-C with CC resistors", style="cyan")
+    console.print("   • power_supply.py - 5V to 3.3V regulation", style="cyan")
+    console.print("   • debug_header.py - Programming interface", style="cyan")
+    console.print("   • led_blinker.py - Status LED", style="cyan")
+    console.print("   • esp32c6.py - ESP32-C6 microcontroller", style="cyan")
+    console.print("   🎯 All files are used by main.py - clean working example!", style="green")
+    console.print("   🎯 All files are used by main.py - clean working example!", style="green")
 
 
 def create_project_readme(
@@ -651,12 +565,8 @@ A circuit-synth project for professional circuit design with hierarchical archit
 ## 🚀 Quick Start
 
 ```bash
-# Run the main hierarchical example
+# Run the ESP32-C6 development board example
 uv run python circuit-synth/main.py
-
-# Try simple examples
-uv run python circuit-synth/simple_led.py
-uv run python circuit-synth/voltage_divider.py
 ```
 
 ## 📁 Project Structure
@@ -664,13 +574,12 @@ uv run python circuit-synth/voltage_divider.py
 ```
 my_kicad_project/
 ├── circuit-synth/        # Circuit-synth Python files
-│   ├── main.py           # Main ESP32-C6 development board
+│   ├── main.py           # Main ESP32-C6 development board (nets only)
 │   ├── usb_subcircuit.py # USB-C with CC resistors and ESD protection
 │   ├── power_supply_subcircuit.py # 5V to 3.3V power regulation
 │   ├── debug_header_subcircuit.py # Programming and debug interface
 │   ├── led_blinker_subcircuit.py  # Status LED with current limiting
-│   ├── simple_led.py     # Simple LED circuit (basic example)
-│   └── voltage_divider.py # Voltage divider example (basic example)
+│   └── esp32_subcircuit.py        # ESP32-C6 microcontroller subcircuit
 ├── kicad_plugins/        # KiCad plugin files for AI integration
 │   ├── circuit_synth_bom_plugin.py        # Schematic BOM plugin
 │   ├── circuit_synth_pcb_bom_bridge.py   # PCB editor plugin
@@ -680,10 +589,10 @@ my_kicad_project/
 │   ├── ESP32_C6_Dev_Board.kicad_pro        # Main project file
 │   ├── ESP32_C6_Dev_Board.kicad_sch        # Top-level schematic  
 │   ├── ESP32_C6_Dev_Board.kicad_pcb        # PCB layout
-│   ├── USB_Port.kicad_sch                  # USB-C subcircuit sheet
-│   ├── Power_Supply.kicad_sch              # Power regulation subcircuit sheet
-│   ├── Debug_Header.kicad_sch              # Debug interface subcircuit sheet
-│   └── LED_Blinker.kicad_sch               # Status LED subcircuit sheet
+│   ├── USB_Port.kicad_sch                  # USB-C circuit sheet
+│   ├── Power_Supply.kicad_sch              # Power regulation circuit sheet
+│   ├── Debug_Header.kicad_sch              # Debug interface circuit sheet
+│   └── LED_Blinker.kicad_sch               # Status LED circuit sheet
 ├── .claude/              # AI agents for Claude Code
 │   ├── agents/           # Specialized circuit design agents
 │   └── commands/         # Slash commands
@@ -695,17 +604,20 @@ my_kicad_project/
 
 ### **Hierarchical Design Philosophy**
 
-Circuit-synth uses **hierarchical subcircuits** - each subcircuit is like a software function with single responsibility and clear interfaces:
+Circuit-synth uses **hierarchical subcircuits** - each subcircuit is like a software function with single responsibility and clear interfaces. **The main circuit only defines nets and passes them to subcircuits:**
 
 ```python
-@circuit(name="Power_Supply")
-def power_supply_subcircuit():
-    \"\"\"Single responsibility: USB-C to 3.3V regulation\"\"\"
-    # Define interface nets
-    vbus_in = Net('VBUS_IN') 
-    vcc_3v3_out = Net('VCC_3V3_OUT')
+@circuit(name="ESP32_C6_Dev_Board_Main")
+def main_circuit():
+    \"\"\"Main circuit - ONLY nets and subcircuit connections\"\"\"
+    # Define shared nets (no components here!)
+    vcc_3v3 = Net('VCC_3V3')
     gnd = Net('GND')
-    # ... implement power regulation circuit
+    usb_dp = Net('USB_DP')
+    
+    # Pass nets to subcircuits
+    esp32 = esp32_subcircuit(vcc_3v3, gnd, usb_dp, ...)
+    power_supply = power_supply_subcircuit()
 ```
 
 ### **Basic Component Creation**
@@ -858,7 +770,7 @@ This project uses these KiCad symbol libraries:
 
 ## 🛠️ Development Workflow
 
-1. **Design**: Create hierarchical subcircuits in Python
+1. **Design**: Create hierarchical circuits in Python
 2. **Validate**: Use SPICE simulation for critical circuits  
 3. **Generate**: Export to KiCad with proper hierarchical structure
 4. **Manufacture**: Components verified for JLCPCB availability
@@ -873,7 +785,7 @@ This project uses these KiCad symbol libraries:
 
 1. Run the example circuits to familiarize yourself
 2. Use Claude Code for AI-assisted circuit design
-3. Create your own hierarchical subcircuits
+3. Create your own hierarchical circuits
 4. Validate designs with SPICE simulation
 5. Generate production-ready KiCad projects
 
@@ -940,15 +852,11 @@ Validate designs before manufacturing:
 ## 🔧 Essential Commands
 
 ```bash
-# Run examples
+# Run the main example
 uv run python circuit-synth/main.py
-uv run python circuit-synth/simple_led.py
 
 # Test the setup
 uv run python -c "from circuit_synth import *; print('✅ Circuit-synth ready!')"
-
-# Generate circuits
-uv run python circuit-synth/voltage_divider.py
 ```
 
 ## 🔌 KiCad Plugin Setup (Optional AI Integration)
@@ -974,7 +882,7 @@ The plugins provide AI-powered BOM analysis and component optimization directly 
 3. **Proven components** - Use established parts with good track records
 
 ### **Circuit Organization**
-- **Hierarchical design** - Use subcircuits for complex designs
+- **Hierarchical design** - Use circuits for complex designs
 - **Clear interfaces** - Define nets and connections explicitly  
 - **Manufacturing focus** - Design for assembly and testing
 

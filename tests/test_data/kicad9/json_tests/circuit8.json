@@ -1,0 +1,396 @@
+{
+  "name": "netlist8",
+  "components": {
+    "R1": {
+      "reference": "R1",
+      "value": "10k",
+      "symbol": "",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "description": "Resistor",
+      "pins": {},
+      "properties": {
+        "Sheetname": "Root",
+        "Sheetfile": "test_project.kicad_sch",
+        "ki_keywords": "R res resistor",
+        "ki_fp_filters": "R_*"
+      }
+    },
+    "R2": {
+      "reference": "R2",
+      "value": "3k",
+      "symbol": "",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "description": "Resistor",
+      "pins": {},
+      "properties": {
+        "Sheetname": "Root",
+        "Sheetfile": "test_project.kicad_sch",
+        "ki_keywords": "R res resistor",
+        "ki_fp_filters": "R_*"
+      }
+    }
+  },
+  "nets": {
+    "+3V3": [
+      {
+        "component": "R1",
+        "pin": {
+          "number": "1",
+          "name": "",
+          "type": "passive"
+        }
+      }
+    ],
+    "vout1": [
+      {
+        "component": "R1",
+        "pin": {
+          "number": "2",
+          "name": "",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "R2",
+        "pin": {
+          "number": "1",
+          "name": "",
+          "type": "passive"
+        }
+      }
+    ],
+    "GND": [
+      {
+        "component": "R2",
+        "pin": {
+          "number": "2",
+          "name": "",
+          "type": "passive"
+        }
+      }
+    ]
+  },
+  "subcircuits": [
+    {
+      "name": "div2",
+      "components": {
+        "R6": {
+          "reference": "R6",
+          "value": "0R",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "div2",
+            "Sheetfile": "div2.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        },
+        "R7": {
+          "reference": "R7",
+          "value": "10k",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "div2",
+            "Sheetfile": "div2.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        },
+        "R8": {
+          "reference": "R8",
+          "value": "3k",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "div2",
+            "Sheetfile": "div2.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        }
+      },
+      "nets": {
+        "+1V8": [
+          {
+            "component": "R6",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R6",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R7",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          }
+        ],
+        "vout1v8": [
+          {
+            "component": "R7",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R8",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          }
+        ],
+        "GND": [
+          {
+            "component": "R8",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          }
+        ]
+      },
+      "subcircuits": []
+    },
+    {
+      "name": "div3",
+      "components": {
+        "R9": {
+          "reference": "R9",
+          "value": "0R",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "div3",
+            "Sheetfile": "div3.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        },
+        "R10": {
+          "reference": "R10",
+          "value": "10k",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "div3",
+            "Sheetfile": "div3.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        },
+        "R11": {
+          "reference": "R11",
+          "value": "3k",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "div3",
+            "Sheetfile": "div3.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        }
+      },
+      "nets": {
+        "+12LF": [
+          {
+            "component": "R9",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          }
+        ],
+        "+12_out": [
+          {
+            "component": "R10",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R9",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          }
+        ],
+        "vout12v": [
+          {
+            "component": "R10",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R11",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          }
+        ],
+        "GND": [
+          {
+            "component": "R11",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          }
+        ]
+      },
+      "subcircuits": []
+    },
+    {
+      "name": "divider",
+      "components": {
+        "R3": {
+          "reference": "R3",
+          "value": "10k",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "divider",
+            "Sheetfile": "resistor_divider.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        },
+        "R4": {
+          "reference": "R4",
+          "value": "3k",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "divider",
+            "Sheetfile": "resistor_divider.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        },
+        "R5": {
+          "reference": "R5",
+          "value": "0R",
+          "symbol": "",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "description": "Resistor",
+          "pins": {},
+          "properties": {
+            "Sheetname": "divider",
+            "Sheetfile": "resistor_divider.kicad_sch",
+            "ki_keywords": "R res resistor",
+            "ki_fp_filters": "R_*"
+          }
+        }
+      },
+      "nets": {
+        "+5V": [
+          {
+            "component": "R5",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          }
+        ],
+        "+5V_div1": [
+          {
+            "component": "R3",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R5",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          }
+        ],
+        "vout5v": [
+          {
+            "component": "R3",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R4",
+            "pin": {
+              "number": "1",
+              "name": "",
+              "type": "passive"
+            }
+          }
+        ],
+        "GND": [
+          {
+            "component": "R4",
+            "pin": {
+              "number": "2",
+              "name": "",
+              "type": "passive"
+            }
+          }
+        ]
+      },
+      "subcircuits": []
+    }
+  ],
+  "properties": {
+    "source": "/Users/shanemattner/Desktop/test_project/test_project.kicad_sch",
+    "date": "2025-02-26T06:43:34-0800",
+    "tool": "Eeschema 8.0.8"
+  }
+}

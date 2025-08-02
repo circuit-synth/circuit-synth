@@ -1,0 +1,56 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "5b37051a-fda5-41ce-8ba2-2d45ec98b413")
+	(paper "A4")
+	(lib_symbols)
+	(sheet
+		(at 135.89 66.04)
+		(size 25.4 25.4)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "52d8602f-1738-4e0c-9e15-97f02bbe16de")
+		(property "Sheetname" "resistor_divider"
+			(at 135.89 65.3284 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "resistor_divider.kicad_sch"
+			(at 135.89 92.0246 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "reference_resistor_divider"
+				(path "/5b37051a-fda5-41ce-8ba2-2d45ec98b413"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
