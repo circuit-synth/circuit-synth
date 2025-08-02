@@ -260,6 +260,140 @@ header {
     font-weight: 500;
 }
 
+/* AI Integration Styles */
+.ai-integration-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin: 3rem 0;
+}
+
+.ai-feature {
+    background: var(--bg-color);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.ai-feature h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.ai-feature p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
+/* KiCad Plugin Section */
+.kicad-plugin-section {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.kicad-plugin-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+    text-align: center;
+}
+
+.plugin-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+.plugin-description p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.plugin-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.plugin-features li {
+    margin-bottom: 1rem;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+.plugin-image {
+    text-align: center;
+}
+
+.kicad-screenshot {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Advanced Features Grid */
+.advanced-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.advanced-feature {
+    background: var(--bg-color);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.advanced-feature:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.advanced-feature h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.advanced-feature p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    text-align: left;
+    line-height: 1.6;
+}
+
+.feature-example {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 0.25rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.85rem;
+    text-align: left;
+    border: 1px solid var(--border-color);
+}
+
+.feature-example code {
+    color: var(--text-color);
+    line-height: 1.4;
+}
+
 /* Features Grid */
 .features-grid {
     display: grid;
@@ -517,6 +651,21 @@ footer {
     .example-content {
         grid-template-columns: 1fr;
         gap: 2rem;
+    }
+    
+    .ai-integration-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .plugin-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .advanced-features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
 }
 

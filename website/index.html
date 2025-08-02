@@ -129,28 +129,60 @@ circuit.generate_kicad_project("voltage_regulator")</code></pre>
 
         <section class="section">
             <div class="container">
-                <h2>Ready for Professional Use</h2>
-                <p class="section-subtitle">Circuit Synth is production-ready with comprehensive capabilities for real engineering projects</p>
-                <div class="checklist-grid">
-                    <div class="checklist-item">
-                        <span class="check">✅</span>
-                        <div>
-                            <h4>KiCad Integration</h4>
-                            <p>Complete project generation with schematics, PCB layouts, and netlists</p>
+                <h2>Advanced Features</h2>
+                <p class="section-subtitle">Professional-grade capabilities that transform your circuit design workflow</p>
+                <div class="advanced-features-grid">
+                    <div class="advanced-feature">
+                        <div class="feature-icon">🏗️</div>
+                        <h3>Hierarchical Design</h3>
+                        <p>Modular subcircuits with clear interfaces. Each function lives in its own file like software modules - USB ports, power supplies, and debug interfaces work across projects.</p>
+                        <div class="feature-example">
+                            <code>usb_subcircuit.py → power_supply_subcircuit.py → main.py</code>
                         </div>
                     </div>
-                    <div class="checklist-item">
-                        <span class="check">✅</span>
-                        <div>
-                            <h4>Component Management</h4>
-                            <p>Professional footprint, symbol, and library integration with support for custom libraries</p>
+                    
+                    <div class="advanced-feature">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Automated SPICE Simulation</h3>
+                        <p>One-click simulation setup with automatic netlist generation. Get operating points, AC analysis, and transient response without manual SPICE file creation.</p>
+                        <div class="feature-example">
+                            <code>sim = circuit.simulator()<br>result = sim.operating_point()</code>
                         </div>
                     </div>
-                    <div class="checklist-item">
-                        <span class="check">✅</span>
-                        <div>
-                            <h4>Netlist Export</h4>
-                            <p>Industry-standard KiCad netlist files for seamless PCB workflow</p>
+                    
+                    <div class="advanced-feature">
+                        <div class="feature-icon">🏭</div>
+                        <h3>Manufacturing Integration</h3>
+                        <p>Real-time JLCPCB component availability and pricing. Components are pre-verified for automated assembly, eliminating manufacturing surprises.</p>
+                        <div class="feature-example">
+                            <code>📊 Stock: 83,737 units | Price: $2.50@100pcs</code>
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-feature">
+                        <div class="feature-icon">📝</div>
+                        <h3>Documentation as Code</h3>
+                        <p>Docstrings automatically become schematic annotations. Keep documentation synchronized with your design - no more outdated comments or missing specs.</p>
+                        <div class="feature-example">
+                            <code>"""3.3V regulator with 2.5mA bias current"""</code>
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-feature">
+                        <div class="feature-icon">🔄</div>
+                        <h3>Bidirectional KiCad Sync</h3>
+                        <p>Import existing KiCad projects into Python, modify with code, then export back to clean KiCad files. KiCad remains the source of truth.</p>
+                        <div class="feature-example">
+                            <code>KiCad → Python → Enhanced → KiCad</code>
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-feature">
+                        <div class="feature-icon">📊</div>
+                        <h3>Version Control Ready</h3>
+                        <p>Git-friendly Python files instead of binary KiCad files. Track changes, collaborate with teams, and maintain design history with standard development tools.</p>
+                        <div class="feature-example">
+                            <code>git diff circuit.py → Clear design changes</code>
                         </div>
                     </div>
                 </div>
@@ -160,25 +192,46 @@ circuit.generate_kicad_project("voltage_regulator")</code></pre>
         <section id="get-started" class="section">
             <div class="container">
                 <h2>Get Started in Minutes</h2>
-                <p class="section-subtitle">Try Circuit Synth immediately without installation, or set up your development environment</p>
+                <p class="section-subtitle">Create a complete ESP32-C6 development board project with hierarchical design in under 2 minutes</p>
                 <div class="steps-grid">
                     <div class="step">
                         <div class="step-number">1</div>
-                        <h3>Quick Trial</h3>
-                        <p>Test Circuit Synth immediately without any setup:</p>
+                        <h3>Quick Setup</h3>
+                        <p>Install uv and create your project:</p>
                         <div class="code-block">
-                            <pre><code>git clone https://github.com/circuit-synth/circuit-synth.git
-cd circuit-synth
-uv run python examples/example_kicad_project.py</code></pre>
+                            <pre><code># Install uv (Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create new project
+uv init my_circuit_project
+cd my_circuit_project</code></pre>
                         </div>
                     </div>
                     <div class="step">
                         <div class="step-number">2</div>
-                        <h3>Install for Development</h3>
-                        <p>Set up your local development environment:</p>
+                        <h3>Add Circuit-Synth</h3>
+                        <p>Install and setup project template:</p>
                         <div class="code-block">
-                            <pre><code>curl -LsSf https://astral.sh/uv/install.sh | sh
-uv pip install -e ".[dev]"</code></pre>
+                            <pre><code># Add circuit-synth
+uv add circuit-synth
+
+# Setup complete project template
+uv run cs-new-project</code></pre>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Generate Your Circuit</h3>
+                        <p>Run the ESP32-C6 example with modular subcircuits:</p>
+                        <div class="code-block">
+                            <pre><code># Generate complete KiCad project  
+uv run python circuit-synth/main.py
+
+# Result: ESP32-C6 dev board with:
+# - USB-C with CC resistors
+# - 5V→3.3V power regulation  
+# - Programming interface
+# - Status LED control</code></pre>
                         </div>
                     </div>
                 </div>
@@ -187,17 +240,59 @@ uv pip install -e ".[dev]"</code></pre>
 
         <section id="component-intelligence" class="section">
             <div class="container">
-                <h2>🔍 Component Intelligence</h2>
-                <p class="section-subtitle">Ask for components naturally and get instant results with availability and pricing</p>
-                <div class="code-example">
-                    <div class="example-query">
-                        <span class="user">👤</span> "find a stm32 mcu that has 3 spi's and is available on jlcpcb"
+                <h2>🔍 Component Intelligence & AI Integration</h2>
+                <p class="section-subtitle">Tightly integrated with Claude Code for natural language circuit design and component search</p>
+                
+                <div class="ai-integration-grid">
+                    <div class="ai-feature">
+                        <h3>Natural Component Search</h3>
+                        <div class="code-example">
+                            <div class="example-query">
+                                <span class="user">👤</span> "find a stm32 mcu that has 3 spi's and is available on jlcpcb"
+                            </div>
+                            <div class="example-response">
+                                <span class="bot">🤖</span> <strong>STM32G431CBT6</strong> - Found matching component<br>
+                                📊 Stock: 83,737 units | Price: $2.50@100pcs | LCSC: C529092<br>
+                                ✅ 3 SPIs: SPI1, SPI2, SPI3<br>
+                                📦 LQFP-48 package | 128KB Flash, 32KB RAM
+                            </div>
+                        </div>
                     </div>
-                    <div class="example-response">
-                        <span class="bot">🤖</span> <strong>STM32G431CBT6</strong> - Found matching component<br>
-                        📊 Stock: 83,737 units | Price: $2.50@100pcs | LCSC: C529092<br>
-                        ✅ 3 SPIs: SPI1, SPI2, SPI3<br>
-                        📦 LQFP-48 package | 128KB Flash, 32KB RAM
+                    
+                    <div class="ai-feature">
+                        <h3>Claude Code Integration</h3>
+                        <p>Circuit-synth is purpose-built for <strong>Claude Code</strong> - Anthropic's AI coding assistant. Get production-ready circuits from natural language:</p>
+                        <div class="code-example">
+                            <div class="example-query">
+                                <span class="user">👤</span> "Design an ESP32 IoT sensor with LoRaWAN and solar charging"
+                            </div>
+                            <div class="example-response">
+                                <span class="bot">🤖</span> <strong>Claude Code</strong> automatically:<br>
+                                ✅ Searches JLCPCB for available components<br>
+                                ✅ Generates hierarchical Python circuits<br>
+                                ✅ Creates complete KiCad project files<br>
+                                ✅ Validates design with simulation
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="kicad-plugin-section">
+                    <h3>KiCad Plugin Integration</h3>
+                    <div class="plugin-content">
+                        <div class="plugin-description">
+                            <p>Our KiCad plugin brings AI circuit analysis directly into your schematic editor. Connect back to Claude Code for intelligent design feedback and optimization suggestions.</p>
+                            <ul class="plugin-features">
+                                <li>🔍 <strong>Smart Analysis:</strong> Right-click any component or net for AI insights</li>
+                                <li>🤖 <strong>Claude Code Integration:</strong> Send schematics directly to Claude for enhancement</li>
+                                <li>⚡ <strong>Real-time Feedback:</strong> Get component suggestions and design improvements</li>
+                                <li>📊 <strong>BOM Intelligence:</strong> Automated bill-of-materials with availability checking</li>
+                            </ul>
+                        </div>
+                        <div class="plugin-image">
+                            <img src="kicad_plugin_sch.png" alt="KiCad Plugin in Action" class="kicad-screenshot">
+                            <p class="image-caption">KiCad plugin providing AI-powered circuit analysis</p>
+                        </div>
                     </div>
                 </div>
             </div>
