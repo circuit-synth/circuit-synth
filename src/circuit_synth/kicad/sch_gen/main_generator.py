@@ -573,7 +573,7 @@ class SchematicGenerator(IKiCadIntegration):
 
         if project_exists and not force_regenerate:
             # Auto-switch to update mode
-            logger.info(f"🔍 Existing KiCad project detected at: {self.project_dir}")
+            logger.info(f"Existing KiCad project detected at: {self.project_dir}")
             logger.info(
                 "🔄 Automatically switching to update mode to preserve your work"
             )
@@ -825,9 +825,9 @@ class SchematicGenerator(IKiCadIntegration):
         # Generate KiCad netlist (.net file) after schematic generation
         netlist_path = Path(self.project_dir) / f"{self.project_name}.net"
         logger.info(f"🔌 Generating KiCad netlist at: {netlist_path}")
-        logger.info(f"📁 DEBUG: JSON file path: {json_file}")
-        logger.info(f"📁 DEBUG: Project dir: {self.project_dir}")
-        logger.info(f"📁 DEBUG: Project name: {self.project_name}")
+        logger.debug(f"JSON file path: {json_file}")
+        logger.debug(f"Project dir: {self.project_dir}")
+        logger.debug(f"Project name: {self.project_name}")
 
         try:
             # Import the circuit JSON for netlist generation
@@ -836,16 +836,16 @@ class SchematicGenerator(IKiCadIntegration):
             from ...core.circuit import Circuit
 
             # Load the circuit from the JSON file
-            logger.info(f"📖 DEBUG: Loading JSON from: {json_file}")
+            logger.debug(f"Loading JSON from: {json_file}")
             with open(json_file, "r") as f:
                 circuit_data = json.load(f)
-            logger.info(
-                f"📖 DEBUG: JSON loaded successfully, keys: {list(circuit_data.keys())}"
+            logger.debug(
+                f"JSON loaded successfully, keys: {list(circuit_data.keys())}"
             )
-            logger.info(
-                f"📖 DEBUG: Components: {list(circuit_data.get('components', {}).keys())}"
+            logger.debug(
+                f"Components: {list(circuit_data.get('components', {}).keys())}"
             )
-            logger.info(f"📖 DEBUG: Nets: {list(circuit_data.get('nets', {}).keys())}")
+            logger.debug(f"Nets: {list(circuit_data.get('nets', {}).keys())}")
 
             # Create a Circuit object from the JSON data
             from ...core.component import Component
@@ -853,22 +853,22 @@ class SchematicGenerator(IKiCadIntegration):
             from ...core.netlist_exporter import NetlistExporter
 
             # Skip the temporary circuit creation - let the netlist service handle it
-            logger.info(
-                f"🔧 DEBUG: Skipping temporary circuit creation to avoid reference collisions"
+            logger.debug(
+                f"Skipping temporary circuit creation to avoid reference collisions"
             )
-            logger.info(
-                f"📖 DEBUG: JSON data will be passed directly to netlist service"
+            logger.debug(
+                f"JSON data will be passed directly to netlist service"
             )
 
             # Generate the netlist using the modular service approach
-            logger.info(f"🔧 DEBUG: Using netlist service to generate hierarchical netlist...")
+            logger.debug(f"Using netlist service to generate hierarchical netlist...")
             from ..netlist_service import NetlistService
             
             netlist_service = NetlistService()
             try:
                 netlist_service.generate_netlist_from_json(json_file, netlist_path)
                 logger.info(f"✅ Netlist generation succeeded!")
-                logger.info(f"📁 Netlist saved to: {netlist_path}")
+                logger.info(f"Netlist saved to: {netlist_path}")
             except Exception as netlist_error:
                 logger.error(f"❌ Netlist generation failed: {netlist_error}")
                 logger.warning("PCB generation will proceed without netlist")
@@ -884,7 +884,7 @@ class SchematicGenerator(IKiCadIntegration):
 
         # Generate PCB (default behavior)
         if generate_pcb:
-            logger.info("🔧 Generating PCB with hierarchical placement...")
+            logger.info("Generating PCB with hierarchical placement...")
             # Import locally to avoid circular import
             from circuit_synth.kicad.pcb_gen import PCBGenerator
 
@@ -920,7 +920,7 @@ class SchematicGenerator(IKiCadIntegration):
 
         # NOTE: Netlist generation now handled earlier in the method using modular service
         logger.info(
-            "🔍 DEBUG: Netlist generation completed earlier using modular service"
+            "Netlist generation completed earlier using modular service"
         )
 
         # Return success result
@@ -940,13 +940,13 @@ class SchematicGenerator(IKiCadIntegration):
         Returns:
             bool: True if netlist generation succeeded, False otherwise
         """
-        logger.info("🔍 DEBUG: _generate_netlist method STARTED")
-        logger.info(f"🔍 DEBUG: json_file: {json_file}")
-        logger.info(f"🔍 DEBUG: project_dir: {self.project_dir}")
-        logger.info(f"🔍 DEBUG: project_name: {self.project_name}")
+        logger.debug("_generate_netlist method STARTED")
+        logger.debug(f"json_file: {json_file}")
+        logger.debug(f"project_dir: {self.project_dir}")
+        logger.debug(f"project_name: {self.project_name}")
 
         try:
-            logger.info("🔍 DEBUG: Using netlist service to generate netlist")
+            logger.debug("Using netlist service to generate netlist")
             # Use the modular service approach that handles hierarchical connections properly
             from ..netlist_service import NetlistService
             
@@ -956,7 +956,7 @@ class SchematicGenerator(IKiCadIntegration):
             netlist_service.generate_netlist_from_json(json_file, netlist_path)
             
             logger.info(f"✅ Netlist service generation succeeded!")
-            logger.info(f"📁 Netlist saved to: {netlist_path}")
+            logger.info(f"Netlist saved to: {netlist_path}")
             return True
 
         except Exception as e:

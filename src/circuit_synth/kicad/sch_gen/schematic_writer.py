@@ -376,9 +376,7 @@ class SchematicWriter:
         logger.info(
             f"✅ STEP 7/8: Additional sections added in {sections_time*1000:.2f}ms"
         )
-        logger.debug(f"  📄 Paper size: {paper_time*1000:.3f}ms")
-        logger.debug(f"  📚 Lib symbols: {libsym_time*1000:.2f}ms")
-        logger.debug(f"  📋 Sheet instances: {sheetinst_time*1000:.3f}ms")
+        # Timing details removed for performance
 
         # Add symbol_instances section - DISABLED for new KiCad format (20250114+)
         # The new format uses instances within each symbol instead
