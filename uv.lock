@@ -292,7 +292,7 @@ wheels = [
 
 [[package]]
 name = "circuit-synth"
-version = "0.2.1"
+version = "0.2.2"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
@@ -313,6 +313,7 @@ dependencies = [
     { name = "rich" },
     { name = "scipy" },
     { name = "sexpdata" },
+    { name = "twine" },
 ]
 
 [package.optional-dependencies]
@@ -387,6 +388,7 @@ requires-dist = [
     { name = "rich", specifier = ">=10.0.0" },
     { name = "scipy", specifier = ">=1.7.0" },
     { name = "sexpdata", specifier = ">=0.0.3" },
+    { name = "twine", specifier = ">=6.1.0" },
     { name = "types-pyyaml", marker = "extra == 'dev'", specifier = ">=6.0.0" },
 ]
 provides-extras = ["dev", "claude", "test"]
