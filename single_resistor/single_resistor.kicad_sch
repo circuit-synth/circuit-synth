@@ -1,0 +1,29 @@
+(kicad_sch (version 20250114) (generator "kicad_api")
+
+  (uuid cd187732-a44d-4687-9acf-b3d859a3de95)
+
+  (paper "A4")
+
+  (lib_symbols
+  )
+
+  (sheet (at 25.4 25.4) (size 50.8 25.4)
+    (stroke (width 0.1524) (type solid) (color 0 0 0 0))
+    (fill (color 0 0 0 0.0000))
+    (uuid b8b2647d-1ba4-4835-b21c-457d8a68d758)
+    (property "Sheet name" "rc_circuit" (id 0) (at 25.4 24.6884 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheet file" "rc_circuit.kicad_sch" (id 1) (at 25.4 51.2846 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+  )
+
+  (sheet_instances
+    (path "/" (page "1"))
+    (path "/b8b2647d-1ba4-4835-b21c-457d8a68d758" (page "2"))
+  )
+
+  (symbol_instances
+  )
+)
