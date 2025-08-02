@@ -2,19 +2,19 @@
 """
 KiCad to Python Synchronization Tool
 
-This tool updates existing Python circuit definitions from modified KiCad schematics,
-preserving manual Python code modifications while applying changes from the KiCad schematic.
+This tool converts KiCad schematics to Python circuit definitions,
+automatically creating the necessary files and directories.
 
 Features:
 - Parses KiCad schematics to extract components and nets
 - Uses LLM-assisted code generation for intelligent merging
-- Preserves existing Python code structure and comments
-- Creates backups before making changes
-- Supports preview mode for safe testing
+- Creates directories and files automatically if they don't exist
+- Creates backups before overwriting existing files
+- Preserves exact component references from KiCad
 
 Usage:
-    kicad-to-python <kicad_project> <python_file> --preview
-    kicad-to-python <kicad_project> <python_file> --apply --backup
+    kicad-to-python <kicad_project> <python_file_or_directory>
+    kicad-to-python <kicad_project> <python_file_or_directory> --backup
 """
 
 import argparse
@@ -58,9 +58,23 @@ class KiCadToPythonSyncer:
         if self.python_file_or_dir.exists() and self.python_file_or_dir.is_dir():
             self.is_directory_mode = True
             self.python_file = self.python_file_or_dir / "main.py"
-        elif str(python_file).endswith(('.py',)) or not self.python_file_or_dir.exists():
+        elif str(python_file).endswith(('.py',)):
+            # Explicitly ends with .py, so it's a file
             self.is_directory_mode = False
             self.python_file = self.python_file_or_dir
+        elif str(python_file).endswith('/') or str(python_file).endswith('\\'):
+            # Ends with path separator, so it's intended as a directory
+            self.is_directory_mode = True
+            self.python_file = self.python_file_or_dir / "main.py"
+        elif not self.python_file_or_dir.exists():
+            # Doesn't exist - guess based on whether it looks like a file or directory
+            # If it has no extension and doesn't end with separator, assume directory
+            if '.' not in self.python_file_or_dir.name:
+                self.is_directory_mode = True
+                self.python_file = self.python_file_or_dir / "main.py"
+            else:
+                self.is_directory_mode = False
+                self.python_file = self.python_file_or_dir
         else:
             # If path exists but is not a directory and doesn't end in .py, assume directory mode
             self.is_directory_mode = True
@@ -99,9 +113,13 @@ class KiCadToPythonSyncer:
                 )
 
             # Step 2: Ensure output directory exists in directory mode
-            if self.is_directory_mode and not self.preview_only:
+            if self.is_directory_mode:
                 logger.info("Step 2: Ensuring output directory exists")
-                self.python_file_or_dir.mkdir(parents=True, exist_ok=True)
+                if not self.preview_only:
+                    self.python_file_or_dir.mkdir(parents=True, exist_ok=True)
+                    logger.info(f"Created directory: {self.python_file_or_dir}")
+                else:
+                    logger.info(f"Preview mode - would create directory: {self.python_file_or_dir}")
 
             # Step 3: Create backup if requested
             if self.create_backup and not self.preview_only:
@@ -215,13 +233,7 @@ def main():
     parser.add_argument(
         "kicad_project", help="Path to KiCad project (.kicad_pro) or directory"
     )
-    parser.add_argument("python_file", help="Path to Python file to update")
-    parser.add_argument(
-        "--preview", action="store_true", help="Preview changes without applying"
-    )
-    parser.add_argument(
-        "--apply", action="store_true", help="Apply changes to the Python file"
-    )
+    parser.add_argument("python_file", help="Path to Python file or directory to create")
     parser.add_argument(
         "--backup", action="store_true", help="Create backup before applying changes"
     )
@@ -235,31 +247,28 @@ def main():
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    # Validate arguments
-    if not args.preview and not args.apply:
-        logger.error("Must specify either --preview or --apply")
-        return 1
-
-    if args.apply and args.preview:
-        logger.error("Cannot specify both --preview and --apply")
-        return 1
-
     # Resolve KiCad project path
     kicad_project = _resolve_kicad_project_path(args.kicad_project)
     if not kicad_project:
         return 1
 
-    # Validate Python file
+    # Validate Python file path - allow non-existent directories to be created
     python_file = Path(args.python_file)
-    if not python_file.exists() and args.apply:
-        logger.error(f"Python file does not exist: {python_file}")
-        return 1
+    if python_file.exists() and python_file.is_file():
+        # If it's an existing file, that's fine
+        pass
+    elif not python_file.exists():
+        # If it doesn't exist, we'll create it (file or directory)
+        logger.info(f"Python target doesn't exist, will be created: {python_file}")
+    elif python_file.exists() and python_file.is_dir():
+        # If it's an existing directory, that's fine too
+        pass
 
     # Create syncer and run
     syncer = KiCadToPythonSyncer(
         kicad_project=str(kicad_project),
         python_file=str(python_file),
-        preview_only=args.preview,
+        preview_only=False,  # Always apply changes
         create_backup=args.backup,
     )
 

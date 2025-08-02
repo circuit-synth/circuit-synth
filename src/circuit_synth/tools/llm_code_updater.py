@@ -540,7 +540,7 @@ class LLMCodeUpdater:
         # Build component creation line
         parts = [
             f'symbol="{component.lib_id}"',
-            f'ref="{component.reference[0]}"',  # Get the letter part (R, C, U, etc.)
+            f'ref="{component.reference}"',  # Use the full reference (R1, C2, U3, etc.)
         ]
 
         if component.value:
