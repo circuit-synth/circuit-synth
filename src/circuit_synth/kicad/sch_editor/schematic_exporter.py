@@ -277,7 +277,7 @@ class SchematicExporter:
         # Create hierarchical_label entry matching KiCad format
         hlabel = [
             sexpdata.Symbol("hierarchical_label"),
-            label.name,
+            label.name,  # Let the formatter handle quoting
             [sexpdata.Symbol("shape"), sexpdata.Symbol(label.shape)],
             [
                 sexpdata.Symbol("at"),

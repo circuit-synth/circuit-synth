@@ -368,10 +368,13 @@ class LLMCodeUpdater:
 
         # Create nets
         if circuit.nets:
-            code_lines.append("    # Create nets")
-            for net in circuit.nets:
-                net_var = self._sanitize_variable_name(net.name)
-                code_lines.append(f"    {net_var} = Net('{net.name}')")
+            # Filter out unconnected nets - they don't need to be created
+            connected_nets = [net for net in circuit.nets if not net.name.startswith('unconnected-')]
+            if connected_nets:
+                code_lines.append("    # Create nets")
+                for net in connected_nets:
+                    net_var = self._sanitize_variable_name(net.name)
+                    code_lines.append(f"    {net_var} = Net('{net.name}')")
 
         code_lines.append("")
 
@@ -384,18 +387,20 @@ class LLMCodeUpdater:
 
         code_lines.append("")
 
-        # Add connections
+        # Add connections (skip unconnected nets)
         if circuit.nets:
-            code_lines.append("    # Connections")
-            for net in circuit.nets:
-                if net.connections:
-                    net_var = self._sanitize_variable_name(net.name)
-                    for ref, pin in net.connections:
-                        comp_var = self._sanitize_variable_name(ref)
-                        if pin.isdigit():
-                            code_lines.append(f"    {comp_var}[{pin}] += {net_var}")
-                        else:
-                            code_lines.append(f"    {comp_var}['{pin}'] += {net_var}")
+            connected_nets = [net for net in circuit.nets if not net.name.startswith('unconnected-')]
+            if any(net.connections for net in connected_nets):
+                code_lines.append("    # Connections")
+                for net in connected_nets:
+                    if net.connections:
+                        net_var = self._sanitize_variable_name(net.name)
+                        for ref, pin in net.connections:
+                            comp_var = self._sanitize_variable_name(ref)
+                            if pin.isdigit():
+                                code_lines.append(f"    {comp_var}[{pin}] += {net_var}")
+                            else:
+                                code_lines.append(f"    {comp_var}['{pin}'] += {net_var}")
 
         logger.info(
             f"🔧 SUBCIRCUIT: Generated {len(code_lines)} lines for {circuit.name}"
@@ -419,10 +424,13 @@ class LLMCodeUpdater:
 
         # Create nets for main circuit
         if circuit.nets:
-            code_lines.append("    # Main circuit nets")
-            for net in circuit.nets:
-                net_var = self._sanitize_variable_name(net.name)
-                code_lines.append(f"    {net_var} = Net('{net.name}')")
+            # Filter out unconnected nets - they don't need to be created
+            connected_nets = [net for net in circuit.nets if not net.name.startswith('unconnected-')]
+            if connected_nets:
+                code_lines.append("    # Main circuit nets")
+                for net in connected_nets:
+                    net_var = self._sanitize_variable_name(net.name)
+                    code_lines.append(f"    {net_var} = Net('{net.name}')")
 
         code_lines.append("")
 
@@ -445,18 +453,20 @@ class LLMCodeUpdater:
 
         code_lines.append("")
 
-        # Add main circuit connections
+        # Add main circuit connections (skip unconnected nets)
         if circuit.nets:
-            code_lines.append("    # Main circuit connections")
-            for net in circuit.nets:
-                if net.connections:
-                    net_var = self._sanitize_variable_name(net.name)
-                    for ref, pin in net.connections:
-                        comp_var = self._sanitize_variable_name(ref)
-                        if pin.isdigit():
-                            code_lines.append(f"    {comp_var}[{pin}] += {net_var}")
-                        else:
-                            code_lines.append(f"    {comp_var}['{pin}'] += {net_var}")
+            connected_nets = [net for net in circuit.nets if not net.name.startswith('unconnected-')]
+            if any(net.connections for net in connected_nets):
+                code_lines.append("    # Main circuit connections")
+                for net in connected_nets:
+                    if net.connections:
+                        net_var = self._sanitize_variable_name(net.name)
+                        for ref, pin in net.connections:
+                            comp_var = self._sanitize_variable_name(ref)
+                            if pin.isdigit():
+                                code_lines.append(f"    {comp_var}[{pin}] += {net_var}")
+                            else:
+                                code_lines.append(f"    {comp_var}['{pin}'] += {net_var}")
 
         logger.info(
             f"🎯 MAIN_CIRCUIT: Generated {len(code_lines)} lines for main circuit"
@@ -485,10 +495,13 @@ class LLMCodeUpdater:
 
         # Create nets
         if circuit.nets:
-            code_parts.append("    # Create nets")
-            for net in circuit.nets:
-                net_var = self._sanitize_variable_name(net.name)
-                code_parts.append(f"    {net_var} = Net('{net.name}')")
+            # Filter out unconnected nets - they don't need to be created
+            connected_nets = [net for net in circuit.nets if not net.name.startswith('unconnected-')]
+            if connected_nets:
+                code_parts.append("    # Create nets")
+                for net in connected_nets:
+                    net_var = self._sanitize_variable_name(net.name)
+                    code_parts.append(f"    {net_var} = Net('{net.name}')")
 
         code_parts.append("")
 
@@ -501,18 +514,20 @@ class LLMCodeUpdater:
 
         code_parts.append("")
 
-        # Add connections
+        # Add connections (skip unconnected nets)
         if circuit.nets:
-            code_parts.append("    # Connections")
-            for net in circuit.nets:
-                if net.connections:
-                    net_var = self._sanitize_variable_name(net.name)
-                    for ref, pin in net.connections:
-                        comp_var = self._sanitize_variable_name(ref)
-                        if pin.isdigit():
-                            code_parts.append(f"    {comp_var}[{pin}] += {net_var}")
-                        else:
-                            code_parts.append(f"    {comp_var}['{pin}'] += {net_var}")
+            connected_nets = [net for net in circuit.nets if not net.name.startswith('unconnected-')]
+            if any(net.connections for net in connected_nets):
+                code_parts.append("    # Connections")
+                for net in connected_nets:
+                    if net.connections:
+                        net_var = self._sanitize_variable_name(net.name)
+                        for ref, pin in net.connections:
+                            comp_var = self._sanitize_variable_name(ref)
+                            if pin.isdigit():
+                                code_parts.append(f"    {comp_var}[{pin}] += {net_var}")
+                            else:
+                                code_parts.append(f"    {comp_var}['{pin}'] += {net_var}")
 
         # Add generation code
         code_parts.extend(
