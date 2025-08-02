@@ -268,9 +268,83 @@ my_existing_project/
 └── CLAUDE.md                   # AI assistant instructions
 ```
 
-## 🤝 Contributing
+## 🤝 Contributing - Designed for Maximum Developer Productivity
 
-We welcome contributions! See [CLAUDE.md](CLAUDE.md) for development setup and coding standards.
+**Circuit-synth is the most contributor-friendly EE design tool ever built!** We've designed every aspect to make development as smooth as possible.
+
+### 🤖 Recommended Development Experience (Claude Code + GitHub MCP)
+
+**Use [Claude Code](https://claude.ai/code) for the best development experience:**
+
+```bash
+# 1. Setup Claude Code (if not installed)
+# Visit: https://claude.ai/code
+
+# 2. Setup GitHub MCP Server (ultimate workflow)
+# Follow: https://github.com/anthropics/mcp-servers/tree/main/src/github
+
+# 3. Register our specialized agents
+uv run register-agents
+```
+
+**Why Claude Code + GitHub MCP?**
+- **Specialized Agents**: Deep circuit-synth knowledge built-in
+- **Automated Development**: `/dev-review-branch`, `/find-symbol`, `/jlc-search` commands
+- **GitHub Integration**: Create issues, review PRs, check CI status seamlessly
+- **Architecture Guidance**: Understand our Python+Rust hybrid approach instantly
+- **Test-Driven Development**: Built-in TDD workflow assistance
+
+### 🚀 5-Minute Contributor Setup
+
+```bash
+# Clone and setup
+git clone https://github.com/circuit-synth/circuit-synth.git
+cd circuit-synth
+uv sync
+
+# Register AI agents (if using Claude Code)
+uv run register-agents
+
+# Verify everything works
+uv run python example_project/circuit-synth/main.py
+./scripts/run_all_tests.sh --python-only
+```
+
+### 📚 Comprehensive Contributor Resources
+
+We've built extensive infrastructure to help you contribute effectively:
+
+- **[Contributors/README.md](Contributors/README.md)** - Start here! Complete onboarding guide
+- **[Contributors/Architecture-Overview.md](Contributors/Architecture-Overview.md)** - How everything fits together
+- **[Contributors/Development-Setup.md](Contributors/Development-Setup.md)** - Detailed setup instructions
+- **[CLAUDE.md](CLAUDE.md)** - Development commands and coding standards
+
+### 🎯 High-Impact Contribution Opportunities
+
+**Rust Integration (Perfect for Major Impact):**
+- **[Issue #36](https://github.com/circuit-synth/circuit-synth/issues/36)**: Netlist processor (HIGH PRIORITY)
+- **[Issue #37](https://github.com/circuit-synth/circuit-synth/issues/37)**: KiCad integration compilation (HIGH PRIORITY)
+- **[Issue #40](https://github.com/circuit-synth/circuit-synth/issues/40)**: Component processing (97% performance impact!)
+
+**Easy Entry Points:**
+- Examples and tutorials for other EEs
+- Component library expansion  
+- Test coverage improvements
+- Documentation enhancements
+
+### 🤖 Alternative AI Tools Welcome
+
+While we optimize for Claude Code, other AI tools work great too:
+- **ChatGPT/GPT-4**: Read our `Contributors/` docs for context
+- **Cursor/GitHub Copilot**: Excellent code completion with our patterns
+- **Any LLM**: Extensive documentation designed for AI agent consumption
+
+### 💡 Our Development Philosophy
+
+- **Infrastructure for AI/LLM development** - Make this library easy for agents to use
+- **Test-driven everything** - Every feature has comprehensive tests
+- **Simple Python + Fast Rust** - Best of both worlds
+- **EE workflow integration** - Enhance existing processes, don't replace them
 
 **Traditional Python Installation:**
 For pip-based workflows, see [installation docs](https://circuit-synth.readthedocs.io/en/latest/installation.html).
