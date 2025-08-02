@@ -16,8 +16,9 @@
                 </div>
                 <ul class="nav-links">
                     <li><a href="#features">Features</a></li>
-                    <li><a href="#quickstart">Quick Start</a></li>
-                    <li><a href="#examples">Examples</a></li>
+                    <li><a href="#get-started">Get Started</a></li>
+                    <li><a href="#community">Community</a></li>
+                    <li><a href="https://circuit-synth.readthedocs.io">Docs</a></li>
                     <li><a href="https://github.com/circuit-synth/circuit-synth">GitHub</a></li>
                 </ul>
             </div>
@@ -27,8 +28,8 @@
     <main>
         <section class="hero">
             <div class="container">
-                <h1>Professional Hierarchical Circuit Design</h1>
-                <p class="hero-subtitle">Generate complete KiCad projects with professional hierarchical architecture using familiar Python syntax</p>
+                <h1>Pythonic Circuit Design</h1>
+                <p class="hero-subtitle">Open-source Python library that seamlessly integrates into your professional KiCad workflow. Design circuits with clean, readable, and verifiable code.</p>
                 <div class="hero-badges">
                     <img src="https://readthedocs.org/projects/circuit-synth/badge/?version=latest" alt="Documentation">
                     <img src="https://badge.fury.io/py/circuit-synth.svg" alt="PyPI version">
@@ -59,46 +60,52 @@
             </div>
         </section>
 
-        <section id="quickstart" class="section">
+        <section id="component-intelligence" class="section">
             <div class="container">
-                <h2>Quick Start</h2>
-                <div class="code-block">
-                    <pre><code># Clone and run hierarchical demo
-git clone https://github.com/circuit-synth/circuit-synth.git
-cd circuit-synth
-uv run python stm32_imu_usbc_demo_hierarchical.py</code></pre>
+                <h2>🔍 Component Intelligence</h2>
+                <p class="section-subtitle">Ask for components naturally and get instant results with availability and pricing</p>
+                <div class="code-example">
+                    <div class="example-query">
+                        <span class="user">👤</span> "find a stm32 mcu that has 3 spi's and is available on jlcpcb"
+                    </div>
+                    <div class="example-response">
+                        <span class="bot">🤖</span> <strong>STM32G431CBT6</strong> - Found matching component<br>
+                        📊 Stock: 83,737 units | Price: $2.50@100pcs | LCSC: C529092<br>
+                        ✅ 3 SPIs: SPI1, SPI2, SPI3<br>
+                        📦 LQFP-48 package | 128KB Flash, 32KB RAM
+                    </div>
                 </div>
-                <p>Generates a complete hierarchical KiCad project with modular subcircuits, professional schematics, PCB layout, and netlists.</p>
             </div>
         </section>
 
         <section id="features" class="section">
             <div class="container">
-                <h2>Key Features</h2>
+                <h2>Why Circuit Synth?</h2>
+                <p class="section-subtitle">Built for real engineering teams who need professional, production-ready circuit design tools</p>
                 <div class="features-grid">
                     <div class="feature">
-                        <h3>🏗️ Hierarchical Design</h3>
-                        <p>Professional modular architecture with subcircuits following software engineering principles</p>
-                    </div>
-                    <div class="feature">
                         <h3>🐍 Pure Python</h3>
-                        <p>Standard Python syntax - no DSL to learn</p>
+                        <p>No domain-specific language to learn. Uses the same KiCad parts you're already familiar with. Just clean, readable Python code that any engineer can understand and modify.</p>
                     </div>
                     <div class="feature">
-                        <h3>🔄 KiCad Integration</h3>
-                        <p>Bidirectional integration - import existing projects, export hierarchical KiCad projects</p>
+                        <h3>↔️ Bidirectional Sync</h3>
+                        <p>KiCad remains the source of truth. Import existing projects, modify in Python, and export back to clean KiCad files.</p>
                     </div>
                     <div class="feature">
-                        <h3>⚡ Rust-Accelerated</h3>
-                        <p>Fast symbol lookup and hierarchical placement algorithms</p>
+                        <h3>🏗️ Professional Workflow</h3>
+                        <p>Integrates seamlessly with existing KiCad-based development processes. Generate industry-standard netlists and projects.</p>
                     </div>
                     <div class="feature">
-                        <h3>🏭 Manufacturing Integration</h3>
-                        <p>Real-time component availability and pricing from JLCPCB</p>
+                        <h3>📊 Hierarchical Design</h3>
+                        <p>Multi-sheet projects with proper organization. Supports arbitrary depth circuit nesting with clean parameter passing.</p>
                     </div>
                     <div class="feature">
-                        <h3>🤖 AI-Powered</h3>
-                        <p>5 specialized AI agents for circuit design assistance</p>
+                        <h3>📝 Smart Annotations</h3>
+                        <p>Automatic docstring extraction, text boxes, and component tables. Documentation that stays synchronized with your code.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🔧 Production Ready</h3>
+                        <p>Generates clean, human-readable KiCad files suitable for professional development. Not machine-generated gibberish.</p>
                     </div>
                 </div>
             </div>
@@ -106,54 +113,136 @@ uv run python stm32_imu_usbc_demo_hierarchical.py</code></pre>
 
         <section id="examples" class="section">
             <div class="container">
-                <h2>Example: ESP32 Development Board</h2>
                 <div class="code-block">
                     <pre><code>from circuit_synth import *
 
-@circuit(name="esp32_dev_board")
-def esp32_dev_board():
-    """ESP32 development board with USB-C and power regulation"""
+# Define a professional ESP32 circuit with Python
+@circuit(name="esp32c6_simple")
+def esp32c6_simple():
+    """Simple ESP32-C6 circuit with decoupling capacitor"""
     
     # Create power nets
-    VCC_5V = Net('VCC_5V')
-    VCC_3V3 = Net('VCC_3V3') 
+    _3V3 = Net('3V3')
     GND = Net('GND')
     
-    # ESP32 module
-    esp32 = Component(
-        symbol="RF_Module:ESP32-S3-MINI-1",
-        ref="U1",
-        footprint="RF_Module:ESP32-S3-MINI-1"
+    # ESP32-C6 module
+    esp32c6 = Component(
+        symbol="RF_Module:ESP32-C6-MINI-1",
+        ref="U",
+        footprint="RF_Module:ESP32-C6-MINI-1"
     )
     
-    # Voltage regulator
-    vreg = Component(
-        symbol="Regulator_Linear:AMS1117-3.3",
-        ref="U2", 
-        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
-    )
+    # Power connections
+    esp32c6["3V3"] += _3V3
+    esp32c6["GND"] += GND
 
-# Generate KiCad project
-circuit = esp32_dev_board()
-circuit.generate_kicad_project("esp32_dev")</code></pre>
+# Generate professional KiCad project
+circuit = esp32c6_simple()
+circuit.generate_kicad_project("esp32c6_simple")</code></pre>
                 </div>
             </div>
         </section>
 
         <section class="section">
             <div class="container">
-                <h2>Installation</h2>
-                <div class="code-block">
-                    <pre><code># PyPI (Recommended)
-pip install circuit-synth
+                <h2>Ready for Professional Use</h2>
+                <p class="section-subtitle">Circuit Synth is production-ready with comprehensive capabilities for real engineering projects</p>
+                <div class="checklist-grid">
+                    <div class="checklist-item">
+                        <span class="check">✅</span>
+                        <div>
+                            <h4>KiCad Integration</h4>
+                            <p>Complete project generation with schematics, PCB layouts, and netlists</p>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="check">✅</span>
+                        <div>
+                            <h4>Component Management</h4>
+                            <p>Professional footprint, symbol, and library integration with support for custom libraries</p>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="check">✅</span>
+                        <div>
+                            <h4>Netlist Export</h4>
+                            <p>Industry-standard KiCad netlist files for seamless PCB workflow</p>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <span class="check">✅</span>
+                        <div>
+                            <h4>Docker Support</h4>
+                            <p>Pre-configured environment with official KiCad libraries included</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-# Development
-git clone https://github.com/circuit-synth/circuit-synth.git
+        <section id="get-started" class="section">
+            <div class="container">
+                <h2>Get Started in Minutes</h2>
+                <p class="section-subtitle">Try Circuit Synth immediately without installation, or set up your development environment</p>
+                <div class="steps-grid">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Quick Trial</h3>
+                        <p>Test Circuit Synth immediately without any setup:</p>
+                        <div class="code-block">
+                            <pre><code>git clone https://github.com/circuit-synth/circuit-synth.git
 cd circuit-synth
-uv sync
+uv run python examples/example_kicad_project.py</code></pre>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Install for Development</h3>
+                        <p>Set up your local development environment:</p>
+                        <div class="code-block">
+                            <pre><code>curl -LsSf https://astral.sh/uv/install.sh | sh
+uv pip install -e ".[dev]"</code></pre>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Run with Docker</h3>
+                        <p>Use the pre-configured Docker environment:</p>
+                        <div class="code-block">
+                            <pre><code>./docker/build-docker.sh
+./scripts/circuit-synth-docker python examples/example_kicad_project.py</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
-# Register AI agents for circuit design assistance
-uv run register-agents</code></pre>
+        <section id="community" class="section">
+            <div class="container">
+                <h2>Join the Community</h2>
+                <p class="section-subtitle">Connect with engineers building the future of circuit design automation</p>
+                <div class="community-grid">
+                    <div class="community-item">
+                        <h3>📦 GitHub Repository</h3>
+                        <p>Source code, issues, and contributions</p>
+                        <a href="https://github.com/circuit-synth/circuit-synth" class="btn btn-secondary">View Repository</a>
+                    </div>
+                    <div class="community-item">
+                        <h3>📚 Documentation</h3>
+                        <p>Complete guides and API reference</p>
+                        <a href="https://circuit-synth.readthedocs.io" class="btn btn-secondary">Read Docs</a>
+                    </div>
+                    <div class="community-item">
+                        <h3>💬 Discussions</h3>
+                        <p>Community support and feature requests</p>
+                        <a href="https://github.com/circuit-synth/circuit-synth/discussions" class="btn btn-secondary">Join Discussion</a>
+                    </div>
+                    <div class="community-item">
+                        <h3>🐛 Issues</h3>
+                        <p>Bug reports and feature tracking</p>
+                        <a href="https://github.com/circuit-synth/circuit-synth/issues" class="btn btn-secondary">Report Issues</a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -161,11 +250,43 @@ uv run register-agents</code></pre>
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Circuit-Synth. Licensed under MIT License.</p>
-            <div class="footer-links">
-                <a href="https://circuit-synth.readthedocs.io">Documentation</a>
-                <a href="https://github.com/circuit-synth/circuit-synth/issues">Issues</a>
-                <a href="https://github.com/circuit-synth/circuit-synth/discussions">Discussions</a>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Project</h4>
+                    <ul>
+                        <li><a href="https://github.com/circuit-synth/circuit-synth">GitHub Repository</a></li>
+                        <li><a href="https://github.com/circuit-synth/circuit-synth/blob/main/LICENSE">MIT License</a></li>
+                        <li><a href="https://github.com/circuit-synth/circuit-synth/releases">Releases</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="https://circuit-synth.readthedocs.io">Full Documentation</a></li>
+                        <li><a href="https://circuit-synth.readthedocs.io/en/latest/quickstart.html">Getting Started</a></li>
+                        <li><a href="https://circuit-synth.readthedocs.io/en/latest/api.html">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://github.com/circuit-synth/circuit-synth/discussions">Discussions</a></li>
+                        <li><a href="https://github.com/circuit-synth/circuit-synth/issues">Issues</a></li>
+                        <li><a href="https://github.com/circuit-synth/circuit-synth/blob/main/CONTRIBUTING.md">Contributing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Tools</h4>
+                    <ul>
+                        <li><a href="https://www.kicad.org/">KiCad</a></li>
+                        <li><a href="https://github.com/astral-sh/uv">uv Package Manager</a></li>
+                        <li><a href="https://www.docker.com/">Docker</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Circuit Synth. Open source project under MIT License.</p>
+                <p>Empowering engineers to design circuits with Python.</p>
             </div>
         </div>
     </footer>
