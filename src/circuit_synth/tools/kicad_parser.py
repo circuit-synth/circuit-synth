@@ -612,8 +612,10 @@ class KiCadParser:
                 r"\(hierarchical_label\s+([^\s\)]+)", content
             )
             for label in hierarchical_labels:
-                # Clean up the label (remove quotes)
+                # Clean up the label (remove quotes and leading slash)
                 clean_label = label.strip('"')
+                if clean_label.startswith('/'):
+                    clean_label = clean_label[1:]  # Remove leading slash from hierarchical labels
                 if clean_label and not clean_label.startswith(
                     "N$"
                 ):  # Skip auto-generated nets

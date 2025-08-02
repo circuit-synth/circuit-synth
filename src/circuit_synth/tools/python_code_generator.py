@@ -25,11 +25,12 @@ class PythonCodeGenerator:
         self.project_name = project_name
         
     def _generate_project_call(self) -> str:
-        """Generate the circuit.generate_kicad_project() call with optional project name"""
+        """Generate the circuit.generate_kicad_netlist() and circuit.generate_kicad_project() calls"""
         if self.project_name:
-            return f'    circuit.generate_kicad_project(project_name="{self.project_name}_generated")'
+            project_name = f"{self.project_name}_generated"
+            return f'    # Generate KiCad netlist (required for ratsnest display)\n    circuit.generate_kicad_netlist("{project_name}/{project_name}.net")\n    circuit.generate_kicad_project(project_name="{project_name}")'
         else:
-            return "    circuit.generate_kicad_project()"
+            return "    # Generate KiCad netlist (required for ratsnest display)\n    circuit.generate_kicad_netlist()\n    circuit.generate_kicad_project()"
 
     def _sanitize_variable_name(self, name: str) -> str:
         """
