@@ -38,38 +38,34 @@
             </div>
         </section>
 
-        <section id="component-intelligence" class="section">
+        <section id="examples" class="section">
             <div class="container">
-                <h2>🔍 Component Intelligence</h2>
-                <p><strong>Ask for components naturally:</strong></p>
-                <div class="code-example">
-                    <div class="example-query">
-                        <span class="user">👤</span> "find a stm32 mcu that has 3 spi's and is available on jlcpcb"
-                    </div>
-                    <div class="example-response">
-                        <span class="bot">🤖</span> <strong>STM32G431CBT6</strong> - Found matching component<br>
-                        📊 Stock: 83,737 units | Price: $2.50@100pcs | LCSC: C529092<br>
-                        ✅ 3 SPIs: SPI1, SPI2, SPI3<br>
-                        📦 LQFP-48 package | 128KB Flash, 32KB RAM
-                    </div>
-                </div>
-            </div>
-        </section>
+                <div class="code-block">
+                    <pre><code>from circuit_synth import *
 
-        <section id="component-intelligence" class="section">
-            <div class="container">
-                <h2>🔍 Component Intelligence</h2>
-                <p class="section-subtitle">Ask for components naturally and get instant results with availability and pricing</p>
-                <div class="code-example">
-                    <div class="example-query">
-                        <span class="user">👤</span> "find a stm32 mcu that has 3 spi's and is available on jlcpcb"
-                    </div>
-                    <div class="example-response">
-                        <span class="bot">🤖</span> <strong>STM32G431CBT6</strong> - Found matching component<br>
-                        📊 Stock: 83,737 units | Price: $2.50@100pcs | LCSC: C529092<br>
-                        ✅ 3 SPIs: SPI1, SPI2, SPI3<br>
-                        📦 LQFP-48 package | 128KB Flash, 32KB RAM
-                    </div>
+# Define a professional ESP32 circuit with Python
+@circuit(name="esp32c6_simple")
+def esp32c6_simple():
+    """Simple ESP32-C6 circuit with decoupling capacitor"""
+    
+    # Create power nets
+    _3V3 = Net('3V3')
+    GND = Net('GND')
+    
+    # ESP32-C6 module
+    esp32c6 = Component(
+        symbol="RF_Module:ESP32-C6-MINI-1",
+        ref="U",
+        footprint="RF_Module:ESP32-C6-MINI-1"
+    )
+    
+    # Power connections
+    esp32c6["3V3"] += _3V3
+    esp32c6["GND"] += GND
+
+# Generate professional KiCad project
+circuit = esp32c6_simple()
+circuit.generate_kicad_project("esp32c6_simple")</code></pre>
                 </div>
             </div>
         </section>
@@ -107,37 +103,6 @@
             </div>
         </section>
 
-        <section id="examples" class="section">
-            <div class="container">
-                <div class="code-block">
-                    <pre><code>from circuit_synth import *
-
-# Define a professional ESP32 circuit with Python
-@circuit(name="esp32c6_simple")
-def esp32c6_simple():
-    """Simple ESP32-C6 circuit with decoupling capacitor"""
-    
-    # Create power nets
-    _3V3 = Net('3V3')
-    GND = Net('GND')
-    
-    # ESP32-C6 module
-    esp32c6 = Component(
-        symbol="RF_Module:ESP32-C6-MINI-1",
-        ref="U",
-        footprint="RF_Module:ESP32-C6-MINI-1"
-    )
-    
-    # Power connections
-    esp32c6["3V3"] += _3V3
-    esp32c6["GND"] += GND
-
-# Generate professional KiCad project
-circuit = esp32c6_simple()
-circuit.generate_kicad_project("esp32c6_simple")</code></pre>
-                </div>
-            </div>
-        </section>
 
         <section class="section">
             <div class="container">
@@ -163,13 +128,6 @@ circuit.generate_kicad_project("esp32c6_simple")</code></pre>
                         <div>
                             <h4>Netlist Export</h4>
                             <p>Industry-standard KiCad netlist files for seamless PCB workflow</p>
-                        </div>
-                    </div>
-                    <div class="checklist-item">
-                        <span class="check">✅</span>
-                        <div>
-                            <h4>Docker Support</h4>
-                            <p>Pre-configured environment with official KiCad libraries included</p>
                         </div>
                     </div>
                 </div>
@@ -200,14 +158,23 @@ uv run python examples/example_kicad_project.py</code></pre>
 uv pip install -e ".[dev]"</code></pre>
                         </div>
                     </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
-                        <h3>Run with Docker</h3>
-                        <p>Use the pre-configured Docker environment:</p>
-                        <div class="code-block">
-                            <pre><code>./docker/build-docker.sh
-./scripts/circuit-synth-docker python examples/example_kicad_project.py</code></pre>
-                        </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="component-intelligence" class="section">
+            <div class="container">
+                <h2>🔍 Component Intelligence</h2>
+                <p class="section-subtitle">Ask for components naturally and get instant results with availability and pricing</p>
+                <div class="code-example">
+                    <div class="example-query">
+                        <span class="user">👤</span> "find a stm32 mcu that has 3 spi's and is available on jlcpcb"
+                    </div>
+                    <div class="example-response">
+                        <span class="bot">🤖</span> <strong>STM32G431CBT6</strong> - Found matching component<br>
+                        📊 Stock: 83,737 units | Price: $2.50@100pcs | LCSC: C529092<br>
+                        ✅ 3 SPIs: SPI1, SPI2, SPI3<br>
+                        📦 LQFP-48 package | 128KB Flash, 32KB RAM
                     </div>
                 </div>
             </div>
