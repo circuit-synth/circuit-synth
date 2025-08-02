@@ -12,7 +12,7 @@
         <nav>
             <div class="nav-container">
                 <div class="logo">
-                    <h1>circuit-synth</h1>
+                    <a href="https://www.circuit-synth.com"><h1>circuit-synth</h1></a>
                 </div>
                 <ul class="nav-links">
                     <li><a href="#features">Features</a></li>
@@ -29,7 +29,7 @@
         <section class="hero">
             <div class="container">
                 <h1>Pythonic Circuit Design</h1>
-                <p class="hero-subtitle">Open-source Python library that seamlessly integrates into your professional KiCad workflow. Design circuits with clean, readable, and verifiable code.</p>
+                <p class="hero-subtitle">Open-source Python library that seamlessly integrates into your professional KiCad workflow. Design new circuits or enhance existing projects with clean, readable, and verifiable code.</p>
                 <div class="hero-badges">
                     <img src="https://readthedocs.org/projects/circuit-synth/badge/?version=latest" alt="Documentation">
                     <img src="https://badge.fury.io/py/circuit-synth.svg" alt="PyPI version">
@@ -40,32 +40,55 @@
 
         <section id="examples" class="section">
             <div class="container">
-                <div class="code-block">
-                    <pre><code>from circuit_synth import *
+                <div class="example-content">
+                    <div class="code-block">
+                        <pre><code>from circuit_synth import *
 
-# Define a professional ESP32 circuit with Python
-@circuit(name="esp32c6_simple")
-def esp32c6_simple():
-    """Simple ESP32-C6 circuit with decoupling capacitor"""
+# Simple 3.3V voltage regulator
+@circuit(name="voltage_regulator")
+def voltage_regulator():
+    """3.3V voltage regulator with input/output caps"""
     
     # Create power nets
-    _3V3 = Net('3V3')
+    VIN = Net('VIN')
+    VOUT = Net('VOUT')
     GND = Net('GND')
     
-    # ESP32-C6 module
-    esp32c6 = Component(
-        symbol="RF_Module:ESP32-C6-MINI-1",
+    # Voltage regulator
+    reg = Component(
+        symbol="Regulator_Linear:AMS1117-3.3",
         ref="U",
-        footprint="RF_Module:ESP32-C6-MINI-1"
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
     )
     
-    # Power connections
-    esp32c6["3V3"] += _3V3
-    esp32c6["GND"] += GND
+    # Input and output capacitors
+    c_in = Component(symbol="Device:C", ref="C", value="10uF")
+    c_out = Component(symbol="Device:C", ref="C", value="22uF")
+    
+    # Connect the circuit
+    reg["VIN"] += VIN
+    reg["VOUT"] += VOUT
+    reg["GND"] += GND
+    
+    c_in[1] += VIN
+    c_in[2] += GND
+    c_out[1] += VOUT
+    c_out[2] += GND
 
-# Generate professional KiCad project
-circuit = esp32c6_simple()
-circuit.generate_kicad_project("esp32c6_simple")</code></pre>
+# Generate KiCad project
+circuit = voltage_regulator()
+circuit.generate_kicad_project("voltage_regulator")</code></pre>
+                    </div>
+                    <div class="example-images">
+                        <div class="image-container">
+                            <img src="regulator_sch.png" alt="Generated KiCad Schematic" class="example-image">
+                            <p class="image-caption">Generated KiCad Schematic</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="regulator_pcb.png" alt="Generated PCB Layout" class="example-image">
+                            <p class="image-caption">Generated PCB Layout</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -80,8 +103,8 @@ circuit.generate_kicad_project("esp32c6_simple")</code></pre>
                         <p>No domain-specific language to learn. Uses the same KiCad parts you're already familiar with. Just clean, readable Python code that any engineer can understand and modify.</p>
                     </div>
                     <div class="feature">
-                        <h3>↔️ Bidirectional Sync</h3>
-                        <p>KiCad remains the source of truth. Import existing projects, modify in Python, and export back to clean KiCad files.</p>
+                        <h3>↔️ Works With Existing Projects</h3>
+                        <p>KiCad remains the source of truth. Import existing projects, modify in Python, and export back to clean KiCad files. No need to start from scratch.</p>
                     </div>
                     <div class="feature">
                         <h3>🏗️ Professional Workflow</h3>

@@ -49,10 +49,19 @@ header {
     margin: 0 auto;
 }
 
+.logo a {
+    text-decoration: none;
+}
+
 .logo h1 {
     color: var(--primary-color);
     font-size: 1.5rem;
     font-weight: 700;
+    transition: color 0.2s;
+}
+
+.logo a:hover h1 {
+    color: var(--secondary-color);
 }
 
 .nav-links {
@@ -214,6 +223,41 @@ header {
 
 .code-block code {
     color: var(--text-color);
+}
+
+/* Example Content Layout */
+.example-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin: 2rem 0;
+}
+
+.example-images {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.image-container {
+    text-align: center;
+}
+
+.example-image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.image-caption {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-weight: 500;
 }
 
 /* Features Grid */
@@ -468,6 +512,11 @@ footer {
         width: 25px;
         height: 25px;
         font-size: 0.8rem;
+    }
+    
+    .example-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
     }
 }
 
