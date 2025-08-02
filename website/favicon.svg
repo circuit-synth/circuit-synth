@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <!-- Android robot head -->
+  <rect x="8" y="16" width="32" height="20" rx="16" ry="16" fill="#9CCC65"/>
+  
+  <!-- Robot eyes -->
+  <circle cx="18" cy="24" r="2" fill="#ffffff"/>
+  <circle cx="30" cy="24" r="2" fill="#ffffff"/>
+  
+  <!-- Robot antennas -->
+  <line x1="16" y1="12" x2="14" y2="8" stroke="#9CCC65" stroke-width="2" stroke-linecap="round"/>
+  <line x1="32" y1="12" x2="34" y2="8" stroke="#9CCC65" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Robot body -->
+  <rect x="12" y="32" width="24" height="12" rx="2" ry="2" fill="#689F38"/>
+  
+  <!-- Robot arms -->
+  <rect x="4" y="20" width="4" height="16" rx="2" ry="2" fill="#689F38"/>
+  <rect x="40" y="20" width="4" height="16" rx="2" ry="2" fill="#689F38"/>
+</svg>
