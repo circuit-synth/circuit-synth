@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional
 import click
 from rich.console import Console
 from rich.panel import Panel
-from rich.prompt import Confirm, Prompt
+from rich.prompt import Confirm
 from rich.text import Text
 
 # Import circuit-synth modules
@@ -192,38 +192,6 @@ def check_kicad_installation() -> Dict[str, Any]:
         return {"kicad_installed": False, "error": str(e)}
 
 
-def get_kicad_library_preferences() -> List[str]:
-    """Ask user about additional KiCad libraries they want to include"""
-    console.print("\n📚 KiCad Library Setup", style="bold blue")
-
-    common_libraries = [
-        "Connector_Generic",
-        "Device",
-        "Diode",
-        "LED",
-        "Transistor_BJT",
-        "Transistor_FET",
-        "Amplifier_Operational",
-        "MCU_ST_STM32F4",
-        "MCU_Espressif",
-        "RF_Module",
-        "Regulator_Linear",
-        "Sensor_Motion",
-    ]
-
-    console.print("Common useful libraries are included by default:")
-    for lib in common_libraries[:6]:  # Show first 6
-        console.print(f"  • {lib}")
-    console.print("  • ... and more")
-
-    if Confirm.ask("\nWould you like to add any additional KiCad symbol libraries?"):
-        additional = Prompt.ask(
-            "Enter library names (comma-separated, or press Enter to skip)"
-        )
-        if additional.strip():
-            return [lib.strip() for lib in additional.split(",")]
-
-    return []
 
 
 def create_example_circuits(project_path: Path) -> None:
@@ -1127,10 +1095,8 @@ def main(skip_kicad_check: bool, minimal: bool):
             style="dim",
         )
 
-    # Step 3: Get library preferences
+    # Step 3: Skip library preferences (no user prompt needed)
     additional_libraries = []
-    if not minimal:
-        additional_libraries = get_kicad_library_preferences()
 
     # Step 4: Create example circuits
     if not minimal:
