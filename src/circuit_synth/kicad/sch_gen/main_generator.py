@@ -862,13 +862,19 @@ class SchematicGenerator(IKiCadIntegration):
 
             # Generate the netlist using the modular service approach
             logger.info(f"🔧 DEBUG: Using netlist service to generate hierarchical netlist...")
-            from ..netlist_service import NetlistService
+            from ..netlist_service import KiCadNetlistService
             
-            netlist_service = NetlistService()
+            netlist_service = KiCadNetlistService()
             try:
-                netlist_service.generate_netlist_from_json(json_file, netlist_path)
-                logger.info(f"✅ Netlist generation succeeded!")
-                logger.info(f"📁 Netlist saved to: {netlist_path}")
+                # Use the correct method name and parameters
+                result = netlist_service.generate_netlist(json_file, str(netlist_path), self.project_name)
+                if result.success:
+                    logger.info(f"✅ Netlist generation succeeded!")
+                    logger.info(f"📁 Netlist saved to: {netlist_path}")
+                    logger.info(f"📊 Generated netlist with {result.component_count} components and {result.net_count} nets")
+                else:
+                    logger.error(f"❌ Netlist generation failed: {result.error_message}")
+                    logger.warning("PCB generation will proceed without netlist")
             except Exception as netlist_error:
                 logger.error(f"❌ Netlist generation failed: {netlist_error}")
                 logger.warning("PCB generation will proceed without netlist")
@@ -948,16 +954,20 @@ class SchematicGenerator(IKiCadIntegration):
         try:
             logger.info("🔍 DEBUG: Using netlist service to generate netlist")
             # Use the modular service approach that handles hierarchical connections properly
-            from ..netlist_service import NetlistService
+            from ..netlist_service import KiCadNetlistService
             
-            netlist_service = NetlistService()
+            netlist_service = KiCadNetlistService()
             netlist_path = str(Path(self.project_dir) / f"{self.project_name}.net")
             
-            netlist_service.generate_netlist_from_json(json_file, netlist_path)
-            
-            logger.info(f"✅ Netlist service generation succeeded!")
-            logger.info(f"📁 Netlist saved to: {netlist_path}")
-            return True
+            # Use the correct method name and parameters
+            result = netlist_service.generate_netlist(json_file, netlist_path, self.project_name)
+            if result.success:
+                logger.info(f"✅ Netlist service generation succeeded!")
+                logger.info(f"📁 Netlist saved to: {netlist_path}")
+                logger.info(f"📊 Generated netlist with {result.component_count} components and {result.net_count} nets")
+                return True
+            else:
+                raise RuntimeError(f"Netlist generation failed: {result.error_message}")
 
         except Exception as e:
             import traceback
