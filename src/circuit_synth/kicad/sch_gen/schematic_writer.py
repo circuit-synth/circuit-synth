@@ -19,7 +19,7 @@ from typing import Dict, List, Optional, Tuple
 
 # Configure logging for this module
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 )
 
 from sexpdata import Symbol, dumps
@@ -683,17 +683,44 @@ class SchematicWriter:
     def _add_pin_level_net_labels(self):
         """
         Add local net labels at component pins for all nets.
+        
+        Creates one label per unique physical pin position for each net. For USB-C
+        connectors with duplicate D+/D- pins, this ensures each physical pin gets
+        its own label.
         """
-        logger.debug(f"Adding pin-level net labels for circuit '{self.circuit.name}'.")
+        # logger.info(f"🔍 DEBUG: Adding pin-level net labels for circuit '{self.circuit.name}'.")
+        # logger.info(f"🔍 DEBUG: Circuit has {len(self.circuit.nets)} nets total")
+        
+        # Log all net names for debugging
+        all_net_names = [net.name for net in self.circuit.nets]
+        # logger.info(f"🔍 DEBUG: All net names: {all_net_names}")
+        
+        # Count USB differential pair nets for focused debugging
+        usb_nets = [name for name in all_net_names if name in ["USB_DP", "USB_DM"]]
+        if usb_nets:
+            logger.debug(f"🔍 USB DEBUG: Found USB differential pair nets: {usb_nets}")
 
         # Get component lookup from the API
         for net in self.circuit.nets:
             net_name = net.name
-            logger.debug(
-                f"Processing net '{net_name}' with {len(net.connections)} connections"
-            )
+            # Only log processing for USB differential pairs
+            if net_name in ["USB_DP", "USB_DM"]:
+                logger.info(
+                    f"🔍 USB DEBUG: Processing net '{net_name}' with {len(net.connections)} connections"
+                )
+            
+            # Debug logging disabled by default
+            # if net_name in ["USB_DP", "USB_DM"]:
+            #     logger.debug(f"🔍 DEBUG USB NET CONNECTIONS: Net={net_name}, Connections={net.connections}")
 
+            # Collect all unique positions for this net
+            net_positions = set()
+            labels_to_create = []
+
+            # Track connection index to ensure each circuit connection gets its own label
+            connection_index = 0
             for comp_ref, pin_identifier in net.connections:
+                connection_index += 1
                 # Don't use reference mapping here - net connections have already been updated
                 actual_ref = comp_ref
 
@@ -711,6 +738,13 @@ class SchematicWriter:
                         f"No pin data found for component {comp_ref} ({comp.lib_id})"
                     )
                     continue
+                
+                # DEBUG: Log all pins for USB-C connector to understand available pins
+                if net_name in ["USB_DP", "USB_DM"] and comp.lib_id == "Connector:USB_C_Receptacle_USB2.0_16P":
+                    d_plus_pins = [p for p in lib_data["pins"] if p.get("name") == "D+"]
+                    d_minus_pins = [p for p in lib_data["pins"] if p.get("name") == "D-"]
+                    logger.info(f"🔍 DEBUG USB-C SYMBOL: D+ pins: {[(p.get('number'), p.get('name')) for p in d_plus_pins]}")
+                    logger.info(f"🔍 DEBUG USB-C SYMBOL: D- pins: {[(p.get('number'), p.get('name')) for p in d_minus_pins]}")
 
                 # Find the pin
                 pin_dict = find_pin_by_identifier(lib_data["pins"], pin_identifier)
@@ -720,6 +754,10 @@ class SchematicWriter:
                         f"Pin {pin_identifier} not found for component {comp_ref} in net {net_name}"
                     )
                     continue
+
+                # DEBUG: Log pin details for USB differential pairs
+                if net_name in ["USB_DP", "USB_DM"]:
+                    logger.info(f"🔍 DEBUG USB PIN: Net={net_name}, Pin={pin_identifier}, Name={pin_dict.get('name')}, Number={pin_dict.get('number')}")
 
                 # Calculate pin position
                 anchor_x = float(pin_dict.get("x", 0.0))
@@ -736,21 +774,53 @@ class SchematicWriter:
                 global_x = comp.position.x + rx
                 global_y = comp.position.y + ry
 
-                # Calculate label angle
-                label_angle = (pin_angle + 180) % 360
-                global_angle = (label_angle + comp.rotation) % 360
-
-                # Create hierarchical label using the API
+                # Create a unique key based on component reference, pin number, and position
+                # This ensures each physical pin gets its own label, even if they have the same name
+                pin_number = pin_dict.get('number', pin_identifier)
+                
+                # Each circuit connection should get its own hierarchical label, regardless of 
+                # whether they map to the same symbol position. This handles cases like USB-C 
+                # where multiple circuit pins (A6, B6) map to the same symbol pin ("D+")
+                unique_pin_key = (actual_ref, pin_identifier, connection_index)
+                
+                # Only add if this unique pin hasn't been processed for this net
+                if unique_pin_key not in net_positions:
+                    net_positions.add(unique_pin_key)
+                    
+                    # Calculate label angle
+                    label_angle = (pin_angle + 180) % 360
+                    global_angle = (label_angle + comp.rotation) % 360
+                    
+                    # Store label info for creation
+                    labels_to_create.append({
+                        'position': (global_x, global_y),
+                        'angle': int(global_angle),
+                        'pin_identifier': pin_identifier,
+                        'actual_ref': actual_ref,
+                        'pin_number': pin_number
+                    })
+                    
+                    # DEBUG: Log label creation for USB differential pairs (disabled by default)
+                    # if net_name in ["USB_DP", "USB_DM"]:
+                    #     logger.debug(f"✅ DEBUG USB LABEL: Net={net_name}, Pin={pin_identifier}, PinNumber={pin_number}, Label will be created at ({global_x:.2f}, {global_y:.2f})")
+                else:
+                    # DEBUG: Log when label is skipped due to pin duplication (disabled by default)
+                    # if net_name in ["USB_DP", "USB_DM"]:
+                    #     logger.debug(f"❌ DEBUG USB SKIP: Net={net_name}, Pin={pin_identifier}, PinNumber={pin_number}, Label SKIPPED due to duplicate pin {unique_pin_key}")
+                    pass
+            
+            # Create labels for all unique positions for this net
+            for label_info in labels_to_create:
                 label = Label(
                     text=net_name,
-                    position=Point(global_x, global_y),
+                    position=Point(label_info['position'][0], label_info['position'][1]),
                     label_type=LabelType.HIERARCHICAL,
-                    orientation=int(global_angle),
+                    orientation=label_info['angle'],
                 )
 
                 self.schematic.add_label(label)
                 logger.debug(
-                    f"Added hierarchical label for net {net_name} at component {actual_ref}.{pin_identifier}"
+                    f"Added hierarchical label for net {net_name} at component {label_info['actual_ref']}.{label_info['pin_identifier']} at position ({label_info['position'][0]:.2f}, {label_info['position'][1]:.2f})"
                 )
 
     def _add_subcircuit_sheets(self):

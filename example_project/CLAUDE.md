@@ -49,15 +49,11 @@ Validate designs before manufacturing:
 ## 🔧 Essential Commands
 
 ```bash
-# Run examples
+# Run the main example
 uv run python circuit-synth/main.py
-uv run python circuit-synth/simple_led.py
 
 # Test the setup
 uv run python -c "from circuit_synth import *; print('✅ Circuit-synth ready!')"
-
-# Generate circuits
-uv run python circuit-synth/voltage_divider.py
 ```
 
 ## 🔌 KiCad Plugin Setup (Optional AI Integration)
@@ -83,7 +79,7 @@ The plugins provide AI-powered BOM analysis and component optimization directly 
 3. **Proven components** - Use established parts with good track records
 
 ### **Circuit Organization**
-- **Hierarchical design** - Use subcircuits for complex designs
+- **Hierarchical design** - Use circuits for complex designs
 - **Clear interfaces** - Define nets and connections explicitly  
 - **Manufacturing focus** - Design for assembly and testing
 

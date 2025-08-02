@@ -5,12 +5,8 @@ A circuit-synth project for professional circuit design with hierarchical archit
 ## 🚀 Quick Start
 
 ```bash
-# Run the main hierarchical example
+# Run the ESP32-C6 development board example
 uv run python circuit-synth/main.py
-
-# Try simple examples
-uv run python circuit-synth/simple_led.py
-uv run python circuit-synth/voltage_divider.py
 ```
 
 ## 📁 Project Structure
@@ -18,13 +14,12 @@ uv run python circuit-synth/voltage_divider.py
 ```
 my_kicad_project/
 ├── circuit-synth/        # Circuit-synth Python files
-│   ├── main.py           # Main ESP32-C6 development board
+│   ├── main.py           # Main ESP32-C6 development board (nets only)
 │   ├── usb_subcircuit.py # USB-C with CC resistors and ESD protection
 │   ├── power_supply_subcircuit.py # 5V to 3.3V power regulation
 │   ├── debug_header_subcircuit.py # Programming and debug interface
 │   ├── led_blinker_subcircuit.py  # Status LED with current limiting
-│   ├── simple_led.py     # Simple LED circuit (basic example)
-│   └── voltage_divider.py # Voltage divider example (basic example)
+│   └── esp32_subcircuit.py        # ESP32-C6 microcontroller subcircuit
 ├── kicad_plugins/        # KiCad plugin files for AI integration
 │   ├── circuit_synth_bom_plugin.py        # Schematic BOM plugin
 │   ├── circuit_synth_pcb_bom_bridge.py   # PCB editor plugin
@@ -34,10 +29,10 @@ my_kicad_project/
 │   ├── ESP32_C6_Dev_Board.kicad_pro        # Main project file
 │   ├── ESP32_C6_Dev_Board.kicad_sch        # Top-level schematic  
 │   ├── ESP32_C6_Dev_Board.kicad_pcb        # PCB layout
-│   ├── USB_Port.kicad_sch                  # USB-C subcircuit sheet
-│   ├── Power_Supply.kicad_sch              # Power regulation subcircuit sheet
-│   ├── Debug_Header.kicad_sch              # Debug interface subcircuit sheet
-│   └── LED_Blinker.kicad_sch               # Status LED subcircuit sheet
+│   ├── USB_Port.kicad_sch                  # USB-C circuit sheet
+│   ├── Power_Supply.kicad_sch              # Power regulation circuit sheet
+│   ├── Debug_Header.kicad_sch              # Debug interface circuit sheet
+│   └── LED_Blinker.kicad_sch               # Status LED circuit sheet
 ├── .claude/              # AI agents for Claude Code
 │   ├── agents/           # Specialized circuit design agents
 │   └── commands/         # Slash commands
@@ -49,17 +44,20 @@ my_kicad_project/
 
 ### **Hierarchical Design Philosophy**
 
-Circuit-synth uses **hierarchical subcircuits** - each subcircuit is like a software function with single responsibility and clear interfaces:
+Circuit-synth uses **hierarchical subcircuits** - each subcircuit is like a software function with single responsibility and clear interfaces. **The main circuit only defines nets and passes them to subcircuits:**
 
 ```python
-@circuit(name="Power_Supply")
-def power_supply_subcircuit():
-    """Single responsibility: USB-C to 3.3V regulation"""
-    # Define interface nets
-    vbus_in = Net('VBUS_IN') 
-    vcc_3v3_out = Net('VCC_3V3_OUT')
+@circuit(name="ESP32_C6_Dev_Board_Main")
+def main_circuit():
+    """Main circuit - ONLY nets and subcircuit connections"""
+    # Define shared nets (no components here!)
+    vcc_3v3 = Net('VCC_3V3')
     gnd = Net('GND')
-    # ... implement power regulation circuit
+    usb_dp = Net('USB_DP')
+    
+    # Pass nets to subcircuits
+    esp32 = esp32_subcircuit(vcc_3v3, gnd, usb_dp, ...)
+    power_supply = power_supply_subcircuit()
 ```
 
 ### **Basic Component Creation**
@@ -209,7 +207,7 @@ This project uses these KiCad symbol libraries:
 
 ## 🛠️ Development Workflow
 
-1. **Design**: Create hierarchical subcircuits in Python
+1. **Design**: Create hierarchical circuits in Python
 2. **Validate**: Use SPICE simulation for critical circuits  
 3. **Generate**: Export to KiCad with proper hierarchical structure
 4. **Manufacture**: Components verified for JLCPCB availability
@@ -224,7 +222,7 @@ This project uses these KiCad symbol libraries:
 
 1. Run the example circuits to familiarize yourself
 2. Use Claude Code for AI-assisted circuit design
-3. Create your own hierarchical subcircuits
+3. Create your own hierarchical circuits
 4. Validate designs with SPICE simulation
 5. Generate production-ready KiCad projects
 
