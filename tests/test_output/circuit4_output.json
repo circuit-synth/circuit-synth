@@ -1788,8 +1788,8 @@
   "duplicate_detection": {
     "templates": {},
     "unique_circuits": [
-      "regulator",
       "usb",
+      "regulator",
       "led",
       "light_sensor"
     ],
