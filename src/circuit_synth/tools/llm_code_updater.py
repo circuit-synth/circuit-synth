@@ -7,6 +7,7 @@ using LLM assistance when available, with fallback to simpler updates.
 """
 
 import logging
+import os
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -167,19 +168,18 @@ class LLMCodeUpdater:
         logger.info(f"🔄 CODE_UPDATE: Preview mode: {preview_only}")
         logger.info(f"🔄 CODE_UPDATE: Circuits to update: {list(circuits.keys())}")
 
-        if not python_file.exists():
-            logger.error(f"🔄 CODE_UPDATE: Python file not found: {python_file}")
-            return None
-
         try:
-            # Read existing Python file
-            logger.info("🔄 CODE_UPDATE: Reading existing Python file")
-            with open(python_file, "r") as f:
-                original_code = f.read()
-
-            logger.info(
-                f"🔄 CODE_UPDATE: Original file size: {len(original_code)} chars"
-            )
+            # Read existing Python file or create empty one if it doesn't exist
+            if python_file.exists():
+                logger.info("🔄 CODE_UPDATE: Reading existing Python file")
+                with open(python_file, "r") as f:
+                    original_code = f.read()
+                logger.info(
+                    f"🔄 CODE_UPDATE: Original file size: {len(original_code)} chars"
+                )
+            else:
+                logger.info("🔄 CODE_UPDATE: Python file doesn't exist, creating new one")
+                original_code = ""
 
             # Determine update strategy based on LLM availability
             if self.llm_available:
