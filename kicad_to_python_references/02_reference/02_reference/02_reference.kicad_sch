@@ -1,0 +1,161 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "61465b84-ff10-49c1-a220-fc3a5ca7df35")
+	(paper "A4")
+	(title_block
+		(title "02_reference")
+		(date "2025-08-02")
+		(company "Circuit-Synth")
+	)
+	(lib_symbols)
+	(text_box "Main circuit with hierarchical sheet containing resistor divider"
+		(exclude_from_sim yes)
+		(at 184 110 0)
+		(size 80 30)
+		(margins 1 1 1 1)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color 255 255 224 1)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid "11efe6fe-634d-441d-be56-47ec87c1ff9f")
+	)
+	(text_box "Main circuit with hierarchical sheet containing resistor divider"
+		(exclude_from_sim yes)
+		(at 184 110 0)
+		(size 80 30)
+		(margins 1 1 1 1)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color 255 255 224 1)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid "11efe6fe-634d-441d-be56-47ec87c1ff9f")
+	)
+	(hierarchical_label "GND"
+		(shape input)
+		(at 77.31 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "28e811d2-1d03-4f3a-8d7f-5809715ea412")
+	)
+	(hierarchical_label "VCC"
+		(shape input)
+		(at 77.31 41.91 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "701a9cc1-2596-4087-9fe6-4863373c05ad")
+	)
+	(hierarchical_label "VOUT"
+		(shape input)
+		(at 77.31 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e411180b-abab-403d-b453-c401fb06f58e")
+	)
+	(sheet
+		(at 36.83 36.83)
+		(size 40.48 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "62c7c1c5-83d9-4674-884c-81e74e30b743")
+		(property "Sheetname" "resistor_divider"
+			(at 36.83 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "resistor_divider.kicad_sch"
+			(at 36.83 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "GND" passive
+			(at 77.31 39.37 0)
+			(uuid "02720496-f591-4ecd-b798-4993aa727ff7")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "VCC" passive
+			(at 77.31 41.91 0)
+			(uuid "2056182c-67b5-4406-a072-a22b794a2627")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "VOUT" passive
+			(at 77.31 44.45 0)
+			(uuid "86c23381-5e86-46bb-a4c2-99f5d3630de0")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

@@ -260,11 +260,21 @@ class SExpressionParser:
         is_lib_symbols_expr = tag_name == "lib_symbols"
         # Check if this is a text expression
         is_text_expr = tag_name == "text"
+        # Check if this is a reference expression
+        is_reference_expr = tag_name == "reference"
 
         if is_simple:
             # Format on one line
             parts = []
             for i, item in enumerate(sexp):
+                # For property expressions, format property name and value on same line
+                if is_property_expr and i <= 2:
+                    if i == 0:
+                        parts.append(self._format_sexp(item, indent, tag_name, in_instances=in_instances))
+                    elif i == 1:
+                        parts.append(self._format_sexp(item, indent, tag_name, in_property_name=True, in_instances=in_instances))
+                    elif i == 2:
+                        parts.append(self._format_sexp(item, indent, tag_name, in_property_value=True, in_instances=in_instances))
                 # For number expressions, pass in_number=True for the value at index 1
                 if is_number_expr and i == 1:
                     parts.append(
@@ -368,6 +378,9 @@ class SExpressionParser:
                             in_instances=in_instances,
                         )
                     )
+                elif is_reference_expr and i == 1:
+                    # For reference expressions, the reference value at index 1 should be quoted
+                    parts.append('"' + str(item) + '"')
                 else:
                     parts.append(
                         self._format_sexp(
@@ -396,6 +409,30 @@ class SExpressionParser:
                         )
                     )
                 result += "\n" + "\t" * indent + ")"
+                return result
+
+            # Special handling for property expressions - keep first 3 elements on same line
+            if is_property_expr:
+                result = "("
+                # Format property tag, name, and value on same line
+                for i in range(min(3, len(sexp))):
+                    if i > 0:
+                        result += " "
+                    if i == 0:
+                        result += self._format_sexp(sexp[i], indent, tag_name, in_instances=in_instances)
+                    elif i == 1:
+                        result += self._format_sexp(sexp[i], indent, tag_name, in_property_name=True, in_instances=in_instances)
+                    elif i == 2:
+                        result += self._format_sexp(sexp[i], indent, tag_name, in_property_value=True, in_instances=in_instances)
+                
+                # Format remaining elements (like (at ...) and (effects ...)) on new lines
+                for i in range(3, len(sexp)):
+                    result += (
+                        "\n"
+                        + "\t" * (indent + 1)
+                        + self._format_sexp(sexp[i], indent + 1, tag_name, in_instances=in_instances)
+                    )
+                result += ")"
                 return result
 
             # Format with indentation
@@ -551,6 +588,13 @@ class SExpressionParser:
                                 in_text=True,
                                 in_instances=in_instances,
                             )
+                        )
+                    elif is_reference_expr and i == 1:
+                        # For reference expressions, the reference value at index 1 should be quoted
+                        result += (
+                            "\n"
+                            + "\t" * (indent + 1)
+                            + '"' + str(item) + '"'
                         )
                     else:
                         result += (
@@ -1016,9 +1060,8 @@ class SExpressionParser:
         ]
         sexp.append(at_expr)
 
-        # Add unit
-        if symbol.unit != 1:
-            sexp.append([sexpdata.Symbol("unit"), symbol.unit])
+        # Add unit - always include for KiCad annotation compatibility
+        sexp.append([sexpdata.Symbol("unit"), symbol.unit])
 
         # Add flags - use symbols not strings for KiCad compatibility
         sexp.append(
@@ -1128,6 +1171,9 @@ class SExpressionParser:
         # Add mirror if present
         if symbol.mirror:
             sexp.append([sexpdata.Symbol("mirror"), symbol.mirror])
+
+        # Individual pin UUIDs are not needed for component instances in KiCad schematics
+        # Component references are handled by the instances section below
 
         # Add instances section for new KiCad format (version 20250114+)
         # This replaces the old symbol_instances table

@@ -1,0 +1,335 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 90f028ed-7205-4731-aa59-91e0ef9a516e)
+	(paper A4)
+	(lib_symbols)
+	(paper A4)
+	(title_block
+		(title 04_reference)
+		(date 2025-08-02)
+		(company Circuit-Synth)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 78.58 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 6b742233-1c16-4d7d-b173-be0d9a592bf8)
+	)
+	(hierarchical_label
+		VCC
+		(shape input)
+		(at 78.58 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 5a5c48f9-3364-425a-bdd1-f4bc5de4dc0c)
+	)
+	(hierarchical_label
+		VOUT_A
+		(shape input)
+		(at 78.58 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 0a9307dc-f81a-46e4-93d8-207f6b7937f3)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 137.0 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 5713c34f-703d-48b7-b7fe-b29754558d75)
+	)
+	(hierarchical_label
+		VCC
+		(shape input)
+		(at 137.0 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 68869304-215d-499c-9978-870daca5864b)
+	)
+	(hierarchical_label
+		VOUT_B
+		(shape input)
+		(at 137.0 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 5802c977-db56-4dc0-a5d2-257cc3f20a70)
+	)
+	(sheet
+		(at 35.56 36.83)
+		(size 43.019999999999996 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid d98b1f0c-a2b3-42e4-8264-f232326f898c)
+		(property
+			"Sheetname"
+			"resistor_divider_a"
+			(at 35.56 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"resistor_divider_a.kicad_sch"
+			(at 35.56 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 77.31 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid c158ce21-4125-446c-b230-288f1bfc65b2)
+		)
+		(pin
+			VCC
+			passive
+			(at 77.31 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid e76a8177-8f9d-45c5-b1f2-2e775a177a7a)
+		)
+		(pin
+			VOUT_A
+			passive
+			(at 77.31 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid ade51ba9-1101-451d-a342-ec57f5d99d25)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 93.98 36.83)
+		(size 43.019999999999996 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 5b34c1a2-8dbf-49d4-ac0a-02595b906e20)
+		(property
+			"Sheetname"
+			"resistor_divider_b"
+			(at 93.98 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"resistor_divider_b.kicad_sch"
+			(at 93.98 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 135.73 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid a493542c-c2a3-4ff9-8aba-29e77ce1688e)
+		)
+		(pin
+			VCC
+			passive
+			(at 135.73 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid ccfd9723-eef8-48f2-98e6-18ef79984511)
+		)
+		(pin
+			VOUT_B
+			passive
+			(at 135.73 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 05387099-da3b-4ccb-afc6-d09dc70c2e9f)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Main circuit with two parallel hierarchical sheets, each with resistor dividers"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid ca808217-a10d-46a9-9b89-685b4f143142)
+	)
+	(text_box
+		"Main circuit with two parallel hierarchical sheets, each with resistor dividers"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid ca808217-a10d-46a9-9b89-685b4f143142)
+	)
+	(sheet_instances
+		(path
+			"/016f68b5-28b0-4239-ba8d-9ab64e39b16d/035f146e-0f76-456c-9433-699368aa8279"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

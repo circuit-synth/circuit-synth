@@ -25,3 +25,6 @@
 [submodule "submodules/modm-devices"]
 	path = submodules/modm-devices
 	url = https://github.com/modm-io/modm-devices.git
+[submodule "submodules/kicad-skip"]
+	path = submodules/kicad-skip
+	url = https://github.com/psychogenic/kicad-skip.git

@@ -1,0 +1,238 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 1feb4a06-ad90-4f32-aba5-96482a96cd7f)
+	(paper A4)
+	(lib_symbols)
+	(paper A4)
+	(title_block
+		(title 07_reference)
+		(date 2025-08-02)
+		(company Circuit-Synth)
+	)
+	(hierarchical_label
+		FILTERED_VCC
+		(shape input)
+		(at 82.39 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid acb6ea67-b054-4b0c-81cb-c73992dfef32)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 82.39 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 55382b38-0997-43a2-9951-b75489254031)
+	)
+	(hierarchical_label
+		LED_ANODE
+		(shape input)
+		(at 82.39 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 7245dbe4-27a1-4e51-b27f-a80575aa7c96)
+	)
+	(hierarchical_label
+		VCC
+		(shape input)
+		(at 82.39 46.99 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 24010c07-6e38-470a-b760-19e81e138d7b)
+	)
+	(sheet
+		(at 31.75 36.83)
+		(size 50.64 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 0c0437f4-e3be-46c0-84ab-bf7e5247c673)
+		(property
+			"Sheetname"
+			"mixed_components"
+			(at 31.75 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"mixed_components.kicad_sch"
+			(at 31.75 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			FILTERED_VCC
+			passive
+			(at 81.12 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 19451ff2-f4be-42a6-806c-3c2ced7f0f32)
+		)
+		(pin
+			GND
+			passive
+			(at 81.12 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 20fb71d6-5871-4c3d-bec9-e0c70ca8d4fe)
+		)
+		(pin
+			LED_ANODE
+			passive
+			(at 81.12 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid d6fa38ed-c81b-4365-8391-a34d7e3cc1b4)
+		)
+		(pin
+			VCC
+			passive
+			(at 81.12 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid b6b1e135-c421-4d40-8f0d-8b7226c0d93a)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Main circuit with mixed component types in subcircuit"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 23892e14-8ab7-467e-8f9e-940d398fac57)
+	)
+	(text_box
+		"Main circuit with mixed component types in subcircuit"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 23892e14-8ab7-467e-8f9e-940d398fac57)
+	)
+	(sheet_instances
+		(path
+			"/69a89807-c7d2-4f57-b2a4-9f8f5415b409/154e3c76-8b03-450e-a45e-9453e7e25fd8"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

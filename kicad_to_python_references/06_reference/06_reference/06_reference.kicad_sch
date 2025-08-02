@@ -1,0 +1,191 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 6e4adadb-10c9-44db-8ce2-c3a060d6a38b)
+	(paper A4)
+	(lib_symbols)
+	(paper A4)
+	(title_block
+		(title 06_reference)
+		(date 2025-08-02)
+		(company Circuit-Synth)
+	)
+	(sheet
+		(at 39.37 36.83)
+		(size 35.4 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid ba8a9d52-db09-4faa-aabd-285f75474e71)
+		(property
+			"Sheetname"
+			"branch_a"
+			(at 39.37 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"branch_a.kicad_sch"
+			(at 39.37 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 82.55 36.83)
+		(size 35.4 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 70f6789a-f5f7-4080-a680-ffacb11400bd)
+		(property
+			"Sheetname"
+			"branch_b"
+			(at 82.55 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"branch_b.kicad_sch"
+			(at 82.55 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Main circuit with 2 branches, each having 3-level nested hierarchy"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 4bd929fe-e9a0-4833-8862-31832d7d8a56)
+	)
+	(text_box
+		"Main circuit with 2 branches, each having 3-level nested hierarchy"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 4bd929fe-e9a0-4833-8862-31832d7d8a56)
+	)
+	(sheet_instances
+		(path
+			"/57033948-831e-44ba-8ed3-e6bf6cbc214a/7abfc020-61e0-4ce8-a973-1d263fa0107b"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

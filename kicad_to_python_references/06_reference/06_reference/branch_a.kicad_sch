@@ -1,0 +1,214 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 58793559-57bf-4782-bd19-02db7698ecf4)
+	(paper A4)
+	(lib_symbols)
+	(paper A4)
+	(title_block
+		(title branch_a)
+		(date 2025-08-02)
+		(company Circuit-Synth)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 78.58 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 335c94f5-b773-4faa-b6d2-9d44f7a14049)
+	)
+	(hierarchical_label
+		VCC
+		(shape input)
+		(at 78.58 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 416ed45f-ab7b-445d-99d8-7e2ad636046d)
+	)
+	(hierarchical_label
+		VOUT_A
+		(shape input)
+		(at 78.58 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid dd298aec-b7b9-4b5e-a4cb-80c355215043)
+	)
+	(sheet
+		(at 35.56 36.83)
+		(size 43.019999999999996 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 9a2d353e-b844-420b-8b55-27af6a5b33c7)
+		(property
+			"Sheetname"
+			"divider_a"
+			(at 35.56 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"divider_a.kicad_sch"
+			(at 35.56 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 77.31 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 5e96bed1-a40d-4afd-a61c-6a9293f1398a)
+		)
+		(pin
+			VCC
+			passive
+			(at 77.31 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid d04a05ee-4539-44f6-ace1-cb2cbe0802c1)
+		)
+		(pin
+			VOUT_A
+			passive
+			(at 77.31 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid d47db97b-0f02-4734-b68f-e6ef7b070bdc)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Branch A: contains nested divider A"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 2eaade03-ae0a-44d5-bcf2-a16dd52d232e)
+	)
+	(text_box
+		"Branch A: contains nested divider A"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 2eaade03-ae0a-44d5-bcf2-a16dd52d232e)
+	)
+	(sheet_instances
+		(path
+			"/57033948-831e-44ba-8ed3-e6bf6cbc214a/7abfc020-61e0-4ce8-a973-1d263fa0107b/ba8a9d52-db09-4faa-aabd-285f75474e71"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

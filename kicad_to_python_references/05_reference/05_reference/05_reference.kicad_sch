@@ -1,0 +1,142 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 625b498e-b544-4600-894d-5663b72f5ea8)
+	(paper A4)
+	(lib_symbols)
+	(paper A4)
+	(title_block
+		(title 05_reference)
+		(date 2025-08-02)
+		(company Circuit-Synth)
+	)
+	(sheet
+		(at 39.37 36.83)
+		(size 35.4 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid e0156457-01d7-4918-9879-9cf54c616d1c)
+		(property
+			"Sheetname"
+			"level1"
+			(at 39.37 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"level1.kicad_sch"
+			(at 39.37 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Main circuit with 3-level nested hierarchy"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 9b1a3510-6837-41c8-8c86-c64ebedbdf90)
+	)
+	(text_box
+		"Main circuit with 3-level nested hierarchy"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 9b1a3510-6837-41c8-8c86-c64ebedbdf90)
+	)
+	(sheet_instances
+		(path
+			"/d39b1434-3824-40af-91d5-d6dad399a115/485978c8-bd79-4f56-8578-06e2ef8f6e22"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

@@ -1,0 +1,408 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 0bc519f1-bbeb-472c-991f-3bcbafc78033)
+	(paper A4)
+	(lib_symbols)
+	(paper A4)
+	(title_block
+		(title 09_reference)
+		(date 2025-08-02)
+		(company Circuit-Synth)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 79.85 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid bdb0c1d3-d3f3-44ec-8103-51a697338a77)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 79.85 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid eed9189e-4fd2-4c65-b711-ff4a09741713)
+	)
+	(hierarchical_label
+		VCC_5V
+		(shape input)
+		(at 79.85 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 64df2711-3ac3-460d-a655-4779d3157e7b)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 138.27 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 920062c4-49bb-4d0a-a414-53e0fa80a2aa)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 138.27 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid b396c77b-231e-4c43-8641-c124fb807524)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 79.85 69.85 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 90321cb6-ae2b-4020-a38e-4c72fcbff1cd)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 79.85 72.39 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid e4bca4fa-e667-4bee-8245-497e42b113c7)
+	)
+	(sheet
+		(at 35.56 36.83)
+		(size 44.29 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 7f8b87ef-cd65-4803-9c8f-c46fa71f46fc)
+		(property
+			"Sheetname"
+			"power_distribution"
+			(at 35.56 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"power_distribution.kicad_sch"
+			(at 35.56 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 78.58 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid a1a3f06f-c7c6-47d3-a8b8-6ca2bfc95c0e)
+		)
+		(pin
+			VCC_3V3
+			passive
+			(at 78.58 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 58bb982f-dc0f-4a49-ad9c-2fb35c9e70e7)
+		)
+		(pin
+			VCC_5V
+			passive
+			(at 78.58 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 754285c5-a9e8-4039-810d-15dddee9e320)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 93.98 36.83)
+		(size 44.29 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid a4d6814a-0dcf-4cfe-a336-5e369b79abac)
+		(property
+			"Sheetname"
+			"load_a"
+			(at 93.98 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"load_a.kicad_sch"
+			(at 93.98 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 137.0 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid f9e6f040-29cd-4f71-8451-f6482f89690b)
+		)
+		(pin
+			VCC_3V3
+			passive
+			(at 137.0 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid f76c0824-4e8f-4832-8cf4-f03c3644ad42)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 35.56 67.31)
+		(size 44.29 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid d7d9d105-acbe-4f6f-9df4-26292bd427d7)
+		(property
+			"Sheetname"
+			"load_b"
+			(at 35.56 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"load_b.kicad_sch"
+			(at 35.56 88.89999999999999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 78.58 69.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 1415a933-9db0-4a8c-91d6-a1c1a6b84306)
+		)
+		(pin
+			VCC_3V3
+			passive
+			(at 78.58 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid d0c7134f-6515-4290-b481-25b01a963ea2)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Main circuit testing power distribution across hierarchy"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid a9751585-23a0-422d-9e1a-12eeb920185e)
+	)
+	(text_box
+		"Main circuit testing power distribution across hierarchy"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid a9751585-23a0-422d-9e1a-12eeb920185e)
+	)
+	(sheet_instances
+		(path
+			"/cdb3a57f-27cb-4638-8de6-01842ae2feff/dfd5efaa-23b2-4237-84dc-9c8af682b126"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

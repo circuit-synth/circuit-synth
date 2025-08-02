@@ -1,0 +1,359 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 72b9cab0-41c8-4019-a8c7-05223484f783)
+	(paper A4)
+	(lib_symbols)
+	(paper A4)
+	(title_block
+		(title 08_reference)
+		(date 2025-08-02)
+		(company Circuit-Synth)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 79.85 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid bd6ccf95-8c5f-409d-9fef-eae0cd17f256)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 79.85 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 0a2aa82d-c1a0-401e-8a70-ec145300117d)
+	)
+	(hierarchical_label
+		VCC_5V
+		(shape input)
+		(at 79.85 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid be965a94-3cee-4fcb-9c41-a04c29494fc8)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 138.27 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 17f11dab-d99d-4afb-aa84-c5a38d87cf63)
+	)
+	(hierarchical_label
+		USB_DM
+		(shape input)
+		(at 138.27 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 63859f74-c72b-4037-a76b-5107cdba9723)
+	)
+	(hierarchical_label
+		USB_DP
+		(shape input)
+		(at 138.27 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 96e655fa-71c1-4e42-8f7c-d65d47880a16)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 138.27 46.99 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid d8e4cef4-588d-4e87-abad-0ac0f9fde42a)
+	)
+	(sheet
+		(at 35.56 36.83)
+		(size 44.29 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 46fa445b-3c1c-490e-a99b-62ddf3d55da9)
+		(property
+			"Sheetname"
+			"power_section"
+			(at 35.56 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"power_section.kicad_sch"
+			(at 35.56 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 78.58 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 7addcd10-5e36-48b2-a668-4af05688dfd8)
+		)
+		(pin
+			VCC_3V3
+			passive
+			(at 78.58 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 58fff7ee-7b93-4bd5-a7be-1750a12fa82c)
+		)
+		(pin
+			VCC_5V
+			passive
+			(at 78.58 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid e9c40ca5-449c-4b77-9c04-3b183259ccce)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 93.98 36.83)
+		(size 44.29 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 289ed974-3f3c-48ad-b963-434ef0c2b489)
+		(property
+			"Sheetname"
+			"mcu_section"
+			(at 93.98 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"mcu_section.kicad_sch"
+			(at 93.98 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 137.0 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 18e07a0e-e6c5-42da-8478-15ac69efba34)
+		)
+		(pin
+			USB_DM
+			passive
+			(at 137.0 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 558f9b61-5b13-41b1-b16e-3210855e8566)
+		)
+		(pin
+			USB_DP
+			passive
+			(at 137.0 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 1ae08910-bd45-45cb-a246-a0359cd0752b)
+		)
+		(pin
+			VCC_3V3
+			passive
+			(at 137.0 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid e0d2757a-0900-42ce-82fc-b2bb48201fba)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Main circuit with ESP32 and power management"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 425d0797-c63d-4f32-aa74-c2ff65974017)
+	)
+	(text_box
+		"Main circuit with ESP32 and power management"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 425d0797-c63d-4f32-aa74-c2ff65974017)
+	)
+	(sheet_instances
+		(path
+			"/b0785010-2f6a-43d2-bafb-95b140172c8b/23b15503-97b5-4e4b-97ac-66cd3656b136"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

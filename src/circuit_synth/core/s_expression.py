@@ -1123,7 +1123,7 @@ class SExpressionParser:
                         [
                             sexpdata.Symbol("path"),
                             inst.path,  # Path will be quoted by formatter
-                            [sexpdata.Symbol("reference"), inst.reference],
+                            [sexpdata.Symbol("reference"), str(inst.reference)],
                             [sexpdata.Symbol("unit"), inst.unit],
                         ],
                     ]

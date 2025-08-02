@@ -1,0 +1,214 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 12b4ed42-20d4-4b20-afe8-c52321915d82)
+	(paper A4)
+	(lib_symbols)
+	(paper A4)
+	(title_block
+		(title level1)
+		(date 2025-08-02)
+		(company Circuit-Synth)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 77.31 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid a42b5d47-8f54-4988-9dee-c931ee3bf1fb)
+	)
+	(hierarchical_label
+		VCC
+		(shape input)
+		(at 77.31 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 2b4e1d9f-da61-4b3a-a9f1-f22ff2ad35d5)
+	)
+	(hierarchical_label
+		VOUT
+		(shape input)
+		(at 77.31 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 7d0adb2d-2622-4b24-aa3a-70131a6cb94f)
+	)
+	(sheet
+		(at 36.83 36.83)
+		(size 40.48 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid aabfb65e-d655-4319-97a3-28c1aedcb57a)
+		(property
+			"Sheetname"
+			"level2"
+			(at 36.83 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"level2.kicad_sch"
+			(at 36.83 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 76.04 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid bcc3c9a9-e18b-499c-a293-9aad71a0f1bc)
+		)
+		(pin
+			VCC
+			passive
+			(at 76.04 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid e9a805da-d696-4bd5-aeaa-e4d23bc5fc17)
+		)
+		(pin
+			VOUT
+			passive
+			(at 76.04 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid df66b5cb-0244-4c1d-afbe-4951580cd790)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Level 1: passes signals to level 2"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 6ca7a484-5a4a-4c3b-9bfc-8fdce72efceb)
+	)
+	(text_box
+		"Level 1: passes signals to level 2"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 6ca7a484-5a4a-4c3b-9bfc-8fdce72efceb)
+	)
+	(sheet_instances
+		(path
+			"/d39b1434-3824-40af-91d5-d6dad399a115/485978c8-bd79-4f56-8578-06e2ef8f6e22/e0156457-01d7-4918-9879-9cf54c616d1c"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)
