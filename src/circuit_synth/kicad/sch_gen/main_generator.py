@@ -631,17 +631,15 @@ class SchematicGenerator(IKiCadIntegration):
             sub_dict, placement_algorithm=schematic_placement
         )
 
-        # 5) Write a top "cover sheet" schematic and get both UUIDs
-        #    This references the project-named schematic as a sub-sheet
-        cover_uuid, sheet_uuid = self._write_cover_sheet(top_name)
+        # 5) NATURAL HIERARCHY: Top circuit goes on root schematic, subcircuits become child sheets
+        logger.info("🔧 NATURAL HIERARCHY: Top circuit on root, subcircuits as child sheets")
+        root_uuid = str(uuid.uuid4())  # UUID for root schematic (project_name.kicad_sch)
+        hierarchical_path = [root_uuid]  # Top circuit gets just root level path
 
-        logger.info(f"Cover sheet created with UUIDs:")
-        logger.info(f"  - Cover sheet UUID: {cover_uuid}")
-        logger.info(f"  - Sheet symbol UUID: {sheet_uuid}")
+        logger.info(f"Root schematic UUID: {root_uuid}")
 
         # 6) Generate .kicad_sch for each circuit
-        # Store sheet UUIDs and writers for all circuits
-        sheet_uuids = {}
+        # Store sheet writers for all circuits  
         sheet_writers = {}
 
         # Pre-scan the project to collect all assigned references
@@ -667,13 +665,9 @@ class SchematicGenerator(IKiCadIntegration):
         # shared_ref_manager.enable_reassignment_mode()
         logger.info("Reference manager will preserve all pre-assigned references")
 
-        # First, generate the main circuit with the full hierarchical path
-        # Build hierarchical path: [cover_uuid, sheet_uuid]
-        hierarchical_path = [cover_uuid, sheet_uuid]
-
-        logger.info(f"=== BUILDING MAIN CIRCUIT HIERARCHY ===")
-        logger.info(f"  Cover UUID: {cover_uuid}")
-        logger.info(f"  Sheet symbol UUID (in cover): {sheet_uuid}")
+        # Generate the main circuit directly on root schematic
+        logger.info(f"=== BUILDING ROOT CIRCUIT ===")
+        logger.info(f"  Root UUID: {root_uuid}")
         logger.info(f"  Main circuit name: {top_name}")
         logger.info(f"  Hierarchical path: {hierarchical_path}")
 
@@ -683,7 +677,7 @@ class SchematicGenerator(IKiCadIntegration):
             instance_naming_map=None,
             paper_size=self.paper_size,
             project_name=self.project_name,
-            hierarchical_path=hierarchical_path,  # Pass the full hierarchical path
+            hierarchical_path=hierarchical_path,  # Just root level path
             reference_manager=shared_ref_manager,  # Pass shared reference manager
             draw_bounding_boxes=draw_bounding_boxes,  # Pass bounding box flag
         )
@@ -691,12 +685,13 @@ class SchematicGenerator(IKiCadIntegration):
         sheet_uuids[top_name] = main_writer.uuid_top
         sheet_writers[top_name] = main_writer  # Store main writer for reference
 
-        logger.debug(f"  Main schematic UUID: {main_writer.uuid_top}")
+        logger.debug(f"  Root schematic UUID: {main_writer.uuid_top}")
         logger.debug(f"  Sheet symbols in main circuit:")
-        for name, uuid in main_writer.sheet_symbol_map.items():
-            logger.debug(f"    {name} -> {uuid}")
+        for name, sheet_uuid in main_writer.sheet_symbol_map.items():
+            logger.debug(f"    {name} -> {sheet_uuid}")
 
-        out_path = self.project_dir / f"{top_name}.kicad_sch"
+        # Write main circuit to root schematic (project_name.kicad_sch)
+        out_path = self.project_dir / f"{self.project_name}.kicad_sch"
         write_schematic_file(main_sch_expr, str(out_path))
 
         # Now generate other subcircuits recursively

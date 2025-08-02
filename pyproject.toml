@@ -75,8 +75,8 @@ test = [
 
 [project.scripts]
 # Sync scripts
-kicad-to-python = "circuit_synth.scripts.kicad_to_python_sync:main"
-python-to-kicad = "circuit_synth.scripts.python_to_kicad_sync:main"
+kicad-to-python = "circuit_synth.tools.kicad_to_python_sync:main"
+python-to-kicad = "circuit_synth.tools.python_to_kicad_sync:main"
 
 # Symbol management scripts  
 preload-symbols = "circuit_synth.scripts.preload_symbols:main"

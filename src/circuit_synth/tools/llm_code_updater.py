@@ -20,9 +20,17 @@ logger = logging.getLogger(__name__)
 class LLMCodeUpdater:
     """Update Python code using LLM assistance"""
 
-    def __init__(self):
+    def __init__(self, project_name: Optional[str] = None):
         """Initialize the LLM code updater"""
         self.llm_available = self._check_llm_availability()
+        self.project_name = project_name
+        
+    def _generate_project_call(self) -> str:
+        """Generate the circuit.generate_kicad_project() call with optional project name"""
+        if self.project_name:
+            return f'    circuit.generate_kicad_project(project_name="{self.project_name}_generated")'
+        else:
+            return "    circuit.generate_kicad_project()"
 
     def _sanitize_variable_name(self, name: str) -> str:
         """
@@ -334,7 +342,7 @@ class LLMCodeUpdater:
                 "# Generate the circuit",
                 "if __name__ == '__main__':",
                 "    circuit = main()",
-                "    circuit.generate_kicad_project()",
+                self._generate_project_call(),
             ]
         )
 
@@ -513,7 +521,7 @@ class LLMCodeUpdater:
                 "# Generate the circuit",
                 "if __name__ == '__main__':",
                 "    circuit = main()",
-                "    circuit.generate_kicad_project()",
+                self._generate_project_call(),
             ]
         )
 

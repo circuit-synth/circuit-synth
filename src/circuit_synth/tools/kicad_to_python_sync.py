@@ -68,7 +68,10 @@ class KiCadToPythonSyncer:
 
         # Initialize components
         self.parser = KiCadParser(str(self.kicad_project))
-        self.updater = LLMCodeUpdater()
+        
+        # Extract project name from KiCad project path for code generation
+        project_name = self.kicad_project.stem if self.kicad_project.suffix == '.kicad_pro' else self.kicad_project.name
+        self.updater = LLMCodeUpdater(project_name=project_name)
 
         logger.info(f"KiCadToPythonSyncer initialized")
         logger.info(f"KiCad project: {self.kicad_project}")
