@@ -322,16 +322,23 @@ def convert_kicad_to_circuit_synth(kicad_project_path: Path, target_dir: Path) -
                     if main_circuit is None or len(children) > len(main_circuit.hierarchical_tree.get(main_circuit.name, [])):
                         main_circuit = circuit
         
-        # Collect all subcircuits recursively from hierarchical tree
+        # Collect ONLY direct children of main circuit for separate files
+        # Nested subcircuits (like debug_header, led_blinker) will be embedded within their parents
         subcircuits = {}
         if main_circuit and hasattr(main_circuit, 'hierarchical_tree') and main_circuit.hierarchical_tree:
-            # Get all subcircuits recursively
+            # Get ONLY direct children of main circuit
+            direct_children = main_circuit.hierarchical_tree.get(main_circuit.name, [])
+            console.print(f"🔍 Found {len(direct_children)} direct subcircuits for separate files: {direct_children}")
+            
+            # Also get nested subcircuits for reference (won't be separate files)
             all_subcircuit_names = _collect_all_subcircuits_recursive(
                 main_circuit.hierarchical_tree, main_circuit.name
             )
-            console.print(f"🔍 Found {len(all_subcircuit_names)} subcircuits (including nested): {all_subcircuit_names}")
+            nested_subcircuits = all_subcircuit_names - set(direct_children)
+            if nested_subcircuits:
+                console.print(f"🔍 Found {len(nested_subcircuits)} nested subcircuits (will be embedded): {nested_subcircuits}")
             
-            for subcircuit_name in all_subcircuit_names:
+            for subcircuit_name in direct_children:
                 if subcircuit_name in all_circuits:
                     subcircuits[subcircuit_name] = all_circuits[subcircuit_name]
         

@@ -31,50 +31,69 @@ The 2 directories should match exactly. We need to keep debugging the code until
 3. **Test hierarchical detection** - ensure main circuit with subcircuits is found correctly
 4. **Verify file generation** - check all subcircuit files are created with proper imports
 
-## Current State Assessment - UPDATED ✅
+## Current State Assessment - UPDATED 🚧
 
-### ✅ **Conversion Pipeline Status (FIXED)**
+### ✅ **Major Progress Made:**
 
-The conversion pipeline is **WORKING**! The `'Component' object has no attribute 'ref'` error was resolved.
-
-### ✅ **What We Have Working:**
-
-1. **Main Conversion Pipeline** (`/src/circuit_synth/tools/init_existing_project.py`)
-   - ✅ `convert_kicad_to_circuit_synth()` function works
-   - ✅ `generate_hierarchical_circuit_synth_code()` generates multiple files
-   - ✅ KiCad netlist parsing and component extraction
-   - ✅ Hierarchical sheet detection (with debug warnings, but functional)
+1. **Recursive Subcircuit Detection (FIXED)**:
+   - ✅ All 6 subcircuits now generated (usb_port, power_supply, esp32_c6_mcu, debug_header, led_blinker)
+   - ✅ Hierarchical parsing works for nested subcircuits
+   - ✅ No hardcoded logic - handles arbitrary circuit structures
 
 2. **Generated Structure** (Current):
    ```
    ESP32_C6_Dev_Board/circuit-synth/
-   ├── main.py
-   ├── usb_port.py         # Generated
-   ├── power_supply.py     # Generated  
-   └── esp32_c6_mcu.py     # Generated
+   ├── main.py              # ✅ All imports and calls
+   ├── usb_port.py          # ✅ Generated
+   ├── power_supply.py      # ✅ Generated  
+   ├── esp32_c6_mcu.py      # ✅ Generated
+   ├── debug_header.py      # ✅ Now working!
+   └── led_blinker.py       # ✅ Now working!
    ```
 
-### ❌ **Current Gaps vs Target:**
+### 🚧 **Current Issues Identified:**
 
-1. **File Naming Mismatch**:
-   - Generated: `usb_port.py`, `esp32_c6_mcu.py`
-   - Target: `usb.py`, `esp32c6.py`, `debug_header.py`, `led_blinker.py`
+1. **Incorrect Hierarchical Structure**:
+   - ❌ `debug_header` and `led_blinker` should be **subcircuits of esp32**, not top-level
+   - ❌ Currently treating all as top-level subcircuits in main.py
+   - ❌ Need to nest them inside esp32_c6_mcu.py instead
 
-2. **Function Signature Mismatch**:
-   - Generated: `def usb_port_circuit()` (no parameters)
-   - Target: `def usb_port(vbus_out, gnd, usb_dp, usb_dm)` (with net parameters)
+2. **Component Reference Issues**:
+   - ❌ Components created as `c4 = Component(...)` but missing `ref="C4"`
+   - ❌ We know the reference from parsing but not setting it properly
+   - ❌ Need to map parsed component reference to ref parameter
 
-3. **Import Pattern Mismatch**:
-   - Generated: `from usb_port import usb_port_circuit`
-   - Target: `from usb import usb_port`
+3. **Net Naming Problems**:
+   - ❌ Illegal net names like `_esp32_c6_dev_board_main_esp32_c6_mcu_n$3`
+   - ❌ Creating unconnected nets that serve no purpose
+   - ❌ Need to clean up net names and only create connected nets
 
-4. **Missing Subcircuits**:
-   - Generated: Only 3 subcircuits
-   - Target: 6 subcircuits (debug_header, led_blinker missing)
+4. **Implementation Quality**:
+   - ❌ Still TODO placeholders instead of actual component connections
+   - ❌ Missing actual netlist connections between components
 
-5. **Implementation Quality**:
-   - Generated: Placeholder TODOs for connections
-   - Target: Actual working circuit implementations
+## 🎯 **Next Action Plan (Priority Order):**
+
+### **Phase 1: Fix Hierarchical Structure** 
+- **Issue**: debug_header and led_blinker should be subcircuits **within** esp32_c6_mcu, not top-level
+- **Action**: Modify hierarchy detection to only generate top-level sheets as separate files
+- **Expected**: Only 3 files (main.py, usb_port.py, power_supply.py, esp32_c6_mcu.py)
+- **Expected**: esp32_c6_mcu.py internally calls debug_header and led_blinker functions
+
+### **Phase 2: Fix Component References**
+- **Issue**: Components like `c4 = Component(...)` missing `ref="C4"`
+- **Action**: Extract component reference from parsed data and set ref parameter
+- **Expected**: `c4 = Component(..., ref="C4")`
+
+### **Phase 3: Clean Up Net Names**
+- **Issue**: Illegal names like `_esp32_c6_dev_board_main_esp32_c6_mcu_n$3`
+- **Action**: Sanitize net names, remove invalid characters, only create connected nets
+- **Expected**: Clean names like `vcc_3v3`, `gnd`, `usb_dp`
+
+### **Phase 4: Add Real Connections**
+- **Issue**: TODO placeholders instead of actual connections
+- **Action**: Parse netlist connections and generate actual pin assignments
+- **Expected**: `component["pin"] += net` instead of TODO comments
 
 ## Target: Match Example Project Structure
 
