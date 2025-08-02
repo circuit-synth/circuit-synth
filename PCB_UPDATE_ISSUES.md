@@ -35,24 +35,62 @@ When updating a PCB from a circuit-synth generated schematic in KiCad, all compo
 
 ## Technical Analysis
 
-### Root Cause: Flat vs Hierarchical Structure Mismatch
+### Root Cause: Architectural Inconsistency Between Generation Components
 
-The issue stems from a fundamental mismatch between how components are initially generated and how they're organized in the final schematic:
+**DETAILED ROOT CAUSE ANALYSIS (2025-08-01 Investigation):**
 
-1. **Initial PCB Generation**: Components created with flat structure
-   - Nets: `VCC_3V3`, `GND`, `USB_DP`, etc.
-   - Components reference flat sheet structure
+The issue is a **fundamental architectural inconsistency** within circuit-synth's generation pipeline. The problem occurs because different components of the generation system create incompatible organizational structures:
 
-2. **Schematic Structure**: Circuit-synth generates hierarchical schematics
-   - Subcircuits in separate sheets: `USB_Port.kicad_sch`, `Power_Supply.kicad_sch`
-   - Hierarchical net naming: `/ESP32_C6_Dev_Board_Main/VCC_3V3`
-   - Components belong to specific hierarchical sheets
+#### **The Problem Flow:**
 
-3. **Update Conflict**: When F8 updates PCB from schematic
-   - KiCad sees completely different component organization
-   - Forces complete replacement to match hierarchical structure
-   - All nets get hierarchical prefixes
-   - All components get new sheet associations
+1. **Circuit-Synth Python Code**: Defines hierarchical subcircuits (`usb_port_subcircuit()`, `power_supply_subcircuit()`, etc.)
+
+2. **JSON Generation**: Creates hierarchical circuit structure in temporary JSON file
+
+3. **Schematic Generation**: `SchematicGenerator.generate_project()` creates hierarchical KiCad schematics with:
+   - `/ESP32_C6_Dev_Board_Main/` (main sheet)
+   - `/ESP32_C6_Dev_Board_Main/USB_Port/` (USB subcircuit sheet) 
+   - `/ESP32_C6_Dev_Board_Main/Power_Supply/` (power subcircuit sheet)
+   - Components properly assigned to hierarchical sheets
+
+4. **Netlist Generation**: `circuit.generate_kicad_netlist()` creates **FLAT** netlist with:
+   - Net names: `VCC_3V3`, `GND`, `USB_DP` (no hierarchy prefixes)
+   - Component sheet paths: `(sheetpath (names "/") (tstamps "/"))` (flat structure)
+
+5. **PCB Generation**: `PCBGenerator._apply_netlist_to_pcb()` reads the flat netlist and creates PCB with flat structure
+
+6. **F8 Update Conflict**: When user presses F8 in KiCad:
+   - KiCad reads the hierarchical schematic structure
+   - Expects hierarchical nets: `/ESP32_C6_Dev_Board_Main/VCC_3V3`
+   - PCB has flat nets: `VCC_3V3`
+   - **Complete mismatch → Replace all components**
+
+#### **Critical Code Locations:**
+
+**The fundamental flaw is in `src/circuit_synth/core/netlist_exporter.py`:**
+- Line 34: `(sheetpath (names "/") (tstamps "/"))` - **Forces flat structure**
+- Netlist always generates flat sheet paths regardless of hierarchical circuit definition
+
+**Secondary issue in `src/circuit_synth/kicad/pcb_gen/pcb_generator.py`:**
+- Lines 766-813: Attempts to "flatten" hierarchical nets from schematic
+- Lines 772-813: Dynamic net merging logic that tries to reconcile hierarchical/flat mismatch
+- This flattening logic creates the inconsistency that causes F8 conflicts
+
+#### **Evidence Comparison:**
+
+**Circuit-Synth Generated Netlist (Flat):**
+```
+(net (code "4") (name "VCC_3V3")
+(sheetpath (names "/") (tstamps "/"))
+```
+
+**KiCad Hierarchical Reference Netlist (After F8):**
+```
+(net (code "5") (name "/ESP32_C6_Dev_Board_Main/VCC_3V3")
+(sheetpath (names "/ESP32_C6_Dev_Board_Main/") (tstamps "/57232bfa-1bd4-40ca-b3b3-06d16c6c299c/"))
+```
+
+The netlist exporter generates flat structures while the schematic generator creates hierarchical structures, causing the F8 update to see completely different organizational structures.
 
 ### Evidence from KiCad Report
 
@@ -83,20 +121,74 @@ Add net /ESP32_C6_Dev_Board_Main/GND.
 - **Trace Routing Reset**: Manual routing work needs to be redone
 - **Design Review Overhead**: Need to re-verify entire PCB layout
 
-## Potential Solutions
+## Solution Architecture
 
-### 1. Consistent Structure Generation
-Ensure PCB and schematic use the same organizational structure from initial generation:
-- Generate PCB with hierarchical component references from start
-- Match net naming conventions between PCB and schematic generation
+### **Primary Solution: Hierarchical Consistency**
 
-### 2. Improved Netlist Handling
+**PROGRESS UPDATE (2025-08-01): Partially Fixed - Multi-Stage Pipeline Issue Identified**
+
+The fix requires ensuring both netlist and PCB generation preserve the same hierarchical structure that schematic generation creates.
+
+#### **Required Code Changes:**
+
+**✅ COMPLETED:**
+1. **`src/circuit_synth/kicad/netlist_service.py`**:
+   - **FIXED**: `CircuitReconstructor.reconstruct_circuit()` now preserves hierarchical structure
+   - **Previously**: Created single `temp_netlist_` circuit flattening all components
+   - **Now**: Maintains hierarchical subcircuits and proper circuit structure
+   - **Verification**: First stage now shows components getting correct sheet paths (`/USB_Port/`, `/Power_Supply/`, etc.)
+
+**🚧 IN PROGRESS:**
+2. **Multi-Stage Pipeline Issue Discovered**:
+   - **Problem**: Additional flattening step occurs during KiCad project generation
+   - **Evidence**: Second circuit `ESP32_C6_Dev_Board` created with 0 subcircuits and 14 flattened components
+   - **Root Cause Identified**: `PCBGenerator._extract_components_from_schematics()` in `src/circuit_synth/kicad/pcb_gen/pcb_generator.py:455`
+   - **Issue**: PCB generator bypasses hierarchical Circuit structure and reads components directly from `.kicad_sch` files
+   - **Impact**: Our CircuitReconstructor fix works for netlist generation, but PCB generation uses a completely different code path
+   - **Current Behavior**: Creates flat hierarchical paths like `/USB_Port` instead of proper `/ESP32_C6_Dev_Board_Main/USB_Port/`
+
+**🔄 REMAINING FIXES:**
+3. **`src/circuit_synth/core/netlist_exporter.py`**:
+   - **CRITICAL**: Replace flat sheet path generation with hierarchical sheet path extraction
+   - Extract actual sheet hierarchy from circuit JSON structure
+   - Generate proper `(sheetpath (names "/ESP32_C6_Dev_Board_Main/Power_Supply/") (tstamps "..."))` entries
+
+4. **`src/circuit_synth/kicad/pcb_gen/pcb_generator.py`**:
+   - **Remove flattening logic** (lines 766-813) that tries to merge hierarchical nets
+   - Preserve hierarchical net names from netlist as-is
+   - Update net assignment to match hierarchical component references
+
+5. **`src/circuit_synth/kicad/sch_gen/main_generator.py`**:
+   - Identify and fix the secondary flattening step that occurs during KiCad project generation
+   - Ensure UUID consistency between schematic and netlist generation
+   - Pass hierarchical structure information to netlist generation
+
+#### **Implementation Strategy:**
+
+**Phase 1: Fix Netlist Generation**
+- Modify netlist exporter to extract hierarchical sheet information from circuit JSON
+- Generate netlist with proper hierarchical sheet paths and net names
+- Ensure component UUIDs and sheet references match schematic structure
+
+**Phase 2: Update PCB Generation**  
+- Remove net flattening logic from PCB generator
+- Update PCB to use hierarchical net names directly from netlist
+- Test F8 updates show minimal changes
+
+**Phase 3: Validation**
+- Test with stock cs-new-project workflow
+- Verify F8 updates are minimal with hierarchical consistency
+- Validate manual PCB layout preservation
+
+### **Alternative Solutions (Lower Priority)**
+
+#### **1. Migration Utilities**
 - Detect hierarchical vs flat structure mismatches
-- Provide warnings before major component replacements
+- Provide warnings before major component replacements  
 - Offer migration options for existing flat PCBs
 
-### 3. Documentation Improvements
-- Clear warnings about F8 behavior with circuit-synth projects
+#### **2. Documentation Improvements**
+- Clear warnings about F8 behavior with current circuit-synth projects
 - Recommended workflows for PCB updates
 - Migration guides for existing projects
 

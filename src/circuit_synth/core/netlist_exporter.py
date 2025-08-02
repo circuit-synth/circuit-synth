@@ -363,6 +363,18 @@ class NetlistExporter:
         are uniquely identified in a schematic. This is the standardized format
         for the library's intermediate JSON representation.
         """
+        print(f"\n🔍 HIERARCHICAL STRUCTURE DEBUG - Starting to_dict() for circuit: {self.circuit.name}")
+        print(f"🔍 Circuit has {len(self.circuit._components)} components and {len(self.circuit._nets)} nets")
+        print(f"🔍 Circuit has {len(self.circuit._subcircuits)} subcircuits")
+        
+        # Log subcircuit hierarchy
+        if self.circuit._subcircuits:
+            print(f"🔍 Subcircuits found:")
+            for i, subcirc in enumerate(self.circuit._subcircuits):
+                print(f"🔍   {i+1}. {subcirc.name} (components: {len(subcirc._components)}, nets: {len(subcirc._nets)})")
+        else:
+            print(f"🔍 No subcircuits in this circuit")
+            
         logger.info(f"📋 Starting to_dict() for circuit: {self.circuit.name}")
         logger.info(
             f"📋 Circuit has {len(self.circuit._components)} components and {len(self.circuit._nets)} nets"
@@ -372,6 +384,10 @@ class NetlistExporter:
         # For now, use placeholders similar to the initial exporter output
         sheet_tstamps = f"/{self.circuit.name.lower().replace(' ', '-')}-{id(self.circuit)}/"  # Simple placeholder tstamp
         source_file = f"{self.circuit.name}.kicad_sch"  # Placeholder source file name
+
+        print(f"🔍 HIERARCHICAL STRUCTURE - Creating sheet structure:")
+        print(f"🔍   Sheet tstamps: {sheet_tstamps}")
+        print(f"🔍   Source file: {source_file}")
 
         data = {
             "name": self.circuit.name,
@@ -385,39 +401,39 @@ class NetlistExporter:
         }
 
         # 1) Collect all components
-        logger.info(f"🔧 Collecting components from circuit._components:")
+        # logger.info(f"🔧 Collecting components from circuit._components:")
         for comp in self.circuit._components.values():
-            logger.info(
-                f"   Component ref: {comp.ref}, symbol: {comp.symbol}, value: {comp.value}"
-            )
+            # logger.info(
+            #     f"   Component ref: {comp.ref}, symbol: {comp.symbol}, value: {comp.value}"
+            # )
             comp_dict = comp.to_dict()
-            logger.info(f"   Component to_dict(): {comp_dict}")
+            # logger.info(f"   Component to_dict(): {comp_dict}")
             data["components"][comp.ref] = comp_dict  # Add using ref as key
 
-        logger.info(f"📦 Final components dict keys: {list(data['components'].keys())}")
+        # logger.info(f"📦 Final components dict keys: {list(data['components'].keys())}")
 
         # 2) Gather net usage only from our local components
         #    (including any net that actually comes from a parent)
         net_to_pins = {}
-        logger.info(f"🌐 Gathering net connections from components:")
+        # logger.info(f"🌐 Gathering net connections from components:")
 
         for comp in self.circuit._components.values():
-            logger.info(f"🔍 Checking component {comp.ref} pins:")
-            logger.info(
-                f"   Component._pins keys: {list(comp._pins.keys()) if hasattr(comp, '_pins') else 'NO _pins ATTR'}"
-            )
+            # logger.info(f"🔍 Checking component {comp.ref} pins:")
+            # logger.info(
+            #     f"   Component._pins keys: {list(comp._pins.keys()) if hasattr(comp, '_pins') else 'NO _pins ATTR'}"
+            # )
 
             for pin_id, pin_obj in comp._pins.items():
-                logger.info(
-                    f"   Pin {pin_id}: num={pin_obj.num}, name={pin_obj.name}, func={pin_obj.func}"
-                )
+                # logger.info(
+                #     f"   Pin {pin_id}: num={pin_obj.num}, name={pin_obj.name}, func={pin_obj.func}"
+                # )
                 net_obj = pin_obj.net
                 if net_obj is None:
-                    logger.info(f"     ❌ Pin {pin_id} has no net connection")
+                    # logger.info(f"     ❌ Pin {pin_id} has no net connection")
                     continue
 
                 net_name = net_obj.name
-                logger.info(f"     ✅ Pin {pin_id} connected to net '{net_name}'")
+                # logger.info(f"     ✅ Pin {pin_id} connected to net '{net_name}'")
 
                 if net_name not in net_to_pins:
                     net_to_pins[net_name] = []
@@ -431,27 +447,38 @@ class NetlistExporter:
                         "type": pin_obj.func,  # Use original "type" field name
                     },
                 }
-                logger.info(f"     📝 Adding connection: {pin_connection}")
+                # logger.info(f"     📝 Adding connection: {pin_connection}")
                 net_to_pins[net_name].append(pin_connection)
 
         # Store them in data["nets"] - keep original Python format for compatibility
-        logger.info(f"🌐 Final net connections:")
+        # logger.info(f"🌐 Final net connections:")
         for net_name, pin_list in net_to_pins.items():
-            logger.info(f"   Net '{net_name}': {len(pin_list)} connections")
-            for i, pin_conn in enumerate(pin_list):
-                logger.info(f"     Connection {i+1}: {pin_conn}")
+            # logger.info(f"   Net '{net_name}': {len(pin_list)} connections")
+            # for i, pin_conn in enumerate(pin_list):
+            #     logger.info(f"     Connection {i+1}: {pin_conn}")
             data["nets"][net_name] = pin_list
 
-        logger.info(f"📊 Final data structure:")
-        logger.info(
-            f"   - Components: {len(data['components'])} ({list(data['components'].keys())})"
-        )
-        logger.info(f"   - Nets: {len(data['nets'])} ({list(data['nets'].keys())})")
+        # logger.info(f"📊 Final data structure:")
+        # logger.info(
+        #     f"   - Components: {len(data['components'])} ({list(data['components'].keys())})"
+        # )
+        # logger.info(f"   - Nets: {len(data['nets'])} ({list(data['nets'].keys())})")
 
         # 3) Recursively gather subcircuits
-        for sc in self.circuit._subcircuits:
+        print(f"🔍 HIERARCHICAL STRUCTURE - Processing {len(self.circuit._subcircuits)} subcircuits:")
+        for i, sc in enumerate(self.circuit._subcircuits):
+            print(f"🔍   Processing subcircuit {i+1}: {sc.name}")
             exporter = NetlistExporter(sc)
-            data["subcircuits"].append(exporter.to_dict())
+            subcircuit_data = exporter.to_dict()
+            data["subcircuits"].append(subcircuit_data)
+            print(f"🔍   Subcircuit {sc.name} added to hierarchy")
+            
+        print(f"🔍 HIERARCHICAL STRUCTURE - Final data structure for {self.circuit.name}:")
+        print(f"🔍   Components: {len(data['components'])} - {list(data['components'].keys())}")
+        print(f"🔍   Nets: {len(data['nets'])} - {list(data['nets'].keys())}")
+        print(f"🔍   Subcircuits: {len(data['subcircuits'])} - {[sub['name'] for sub in data['subcircuits']]}")
+        print(f"🔍   Sheet info: {data['tstamps']} -> {data['source_file']}")
+        print(f"🔍 HIERARCHICAL STRUCTURE DEBUG COMPLETE for {self.circuit.name}\n")
 
         # 4) Add annotations to JSON data
         for annotation in self.circuit._annotations:
