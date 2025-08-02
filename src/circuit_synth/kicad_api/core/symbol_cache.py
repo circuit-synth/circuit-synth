@@ -734,9 +734,15 @@ class SymbolLibraryCache:
         Convert parsed symbol data from kicad_symbol_parser to SymbolDefinition.
         """
         try:
-            # Extract basic properties - they are stored as strings, not dicts
+            # Extract basic properties - they can be strings or dicts with enhanced info
             properties = symbol_data.get("properties", {})
-            reference = properties.get("Reference", "U")
+            reference_prop = properties.get("Reference", "U")
+            
+            # Handle both old format (strings) and new format (dicts with "value" key)
+            if isinstance(reference_prop, dict):
+                reference = reference_prop.get("value", "U")
+            else:
+                reference = str(reference_prop)
 
             # Convert pins
             pins = []
@@ -772,9 +778,22 @@ class SymbolLibraryCache:
                 pins.append(pin)
 
             # Get description, keywords, datasheet from direct fields or properties
-            description = symbol_data.get("description") or properties.get("Value", "")
-            keywords = symbol_data.get("keywords") or properties.get("Keywords", "")
-            datasheet = symbol_data.get("datasheet") or properties.get("Datasheet", "")
+            # Handle both old format (strings) and new format (dicts with "value" key)
+            def extract_property_value(prop_name, fallback=""):
+                # Try direct field first
+                direct_value = symbol_data.get(prop_name.lower())
+                if direct_value:
+                    return direct_value
+                
+                # Try properties
+                prop_data = properties.get(prop_name, fallback)
+                if isinstance(prop_data, dict):
+                    return prop_data.get("value", fallback)
+                return str(prop_data) if prop_data else fallback
+            
+            description = extract_property_value("Description") or extract_property_value("Value")
+            keywords = extract_property_value("Keywords") or extract_property_value("ki_keywords")
+            datasheet = extract_property_value("Datasheet")
 
             # Extract graphic elements from parsed data
             # The parser stores them in the "graphics" field
