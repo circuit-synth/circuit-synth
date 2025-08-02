@@ -299,7 +299,6 @@ class SchematicWriter:
 
         # Add pin-level net labels
         labels_start = time.perf_counter()
-        logger.info(
         # Step logging removed for performance
         self._add_pin_level_net_labels()
         labels_time = time.perf_counter() - labels_start
@@ -318,7 +317,6 @@ class SchematicWriter:
         # Add bounding boxes if enabled
         bbox_start = time.perf_counter()
         if self.draw_bounding_boxes:
-            logger.info(
             # Step logging removed for performance
             self._add_component_bounding_boxes()
             bbox_time = time.perf_counter() - bbox_start
@@ -332,16 +330,13 @@ class SchematicWriter:
 
         # Convert to S-expression format using the parser - CRITICAL RUST ACCELERATION POINT
         sexpr_start = time.perf_counter()
-        logger.info(
         # Step logging removed for performance
         schematic_sexpr = self.parser.from_schematic(self.schematic)
         sexpr_time = time.perf_counter() - sexpr_start
-        logger.info(
         # Timing details removed for performance
 
         # Add additional sections
         sections_start = time.perf_counter()
-        logger.info(
         # Step logging removed for performance
 
         # Add paper size (not in the API types yet)
@@ -360,8 +355,6 @@ class SchematicWriter:
         sheetinst_time = time.perf_counter() - sheetinst_start
 
         sections_time = time.perf_counter() - sections_start
-        logger.info(
-        # Timing details removed for performance
         # Timing details removed for performance
 
         # Add symbol_instances section - DISABLED for new KiCad format (20250114+)
