@@ -37,22 +37,22 @@ def main_circuit():
 
 
 if __name__ == "__main__":
-    print("🚀 Starting ESP32-C6 development board generation...")
+    print("Starting ESP32-C6 development board generation...")
     
     # Generate the complete hierarchical circuit
-    print("📋 Creating circuit...")
+    print("Creating circuit...")
     circuit = main_circuit()
     
     # Generate KiCad netlist (required for ratsnest display) - save to kicad project folder
-    print("🔌 Generating KiCad netlist...")
+    print("Generating KiCad netlist...")
     circuit.generate_kicad_netlist("ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.net")
     
     # Generate JSON netlist (for debugging and analysis) - save to circuit-synth folder
-    print("📄 Generating JSON netlist...")
+    print("Generating JSON netlist...")
     circuit.generate_json_netlist("circuit-synth/ESP32_C6_Dev_Board.json")
     
     # Create KiCad project with hierarchical sheets
-    print("🏗️  Generating KiCad project...")
+    print("Generating KiCad project...")
     circuit.generate_kicad_project(
         project_name="ESP32_C6_Dev_Board",
         placement_algorithm="hierarchical",
@@ -60,22 +60,22 @@ if __name__ == "__main__":
     )
     
     print("")
-    print("✅ ESP32-C6 Development Board project generated!")
-    print("📁 Check the ESP32_C6_Dev_Board/ directory for KiCad files")
+    print("ESP32-C6 Development Board project generated!")
+    print("Check the ESP32_C6_Dev_Board/ directory for KiCad files")
     print("")
-    print("🏗️ Generated circuits:")
+    print("Generated circuits:")
     print("   • USB-C port with CC resistors and ESD protection")
     print("   • 5V to 3.3V power regulation")
     print("   • ESP32-C6 microcontroller with support circuits")
     print("   • Debug header for programming")  
     print("   • Status LED with current limiting")
     print("")
-    print("📋 Generated files:")
+    print("Generated files:")
     print("   • ESP32_C6_Dev_Board.kicad_pro - KiCad project file")
     print("   • ESP32_C6_Dev_Board.kicad_sch - Hierarchical schematic")
     print("   • ESP32_C6_Dev_Board.kicad_pcb - PCB layout")
     print("   • ESP32_C6_Dev_Board.net - Netlist (enables ratsnest)")
     print("   • ESP32_C6_Dev_Board.json - JSON netlist (for analysis)")
     print("")
-    print("🎯 Ready for professional PCB manufacturing!")
-    print("💡 Open ESP32_C6_Dev_Board.kicad_pcb in KiCad to see the ratsnest!")
+    print("Ready for professional PCB manufacturing!")
+    print("Open ESP32_C6_Dev_Board.kicad_pcb in KiCad to see the ratsnest!")
