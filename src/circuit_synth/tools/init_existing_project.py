@@ -457,7 +457,7 @@ def generate_hierarchical_circuit_synth_code(main_circuit: Any, subcircuits: dic
             # Track imports and calls for ESP32 subcircuit
             esp32_embedded_imports.append(f"from {filename} import {function_name}")
             
-            # Generate the proper function call for embedded circuits
+            # Generate the proper function call for embedded circuits with correct net names
             if 'debug' in function_name.lower():
                 esp32_embedded_calls.append(f"    debug_header_circuit = {function_name}(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0)")
             elif 'led' in function_name.lower():
@@ -543,6 +543,12 @@ def generate_subcircuit_code(circuit: Any, subcircuit_name: str, function_name: 
     elif 'esp32' in function_name.lower():
         params = "vcc_3v3, gnd, usb_dp, usb_dm"
         param_doc = "ESP32 MCU with power and USB interface"
+    elif 'debug' in function_name.lower():
+        params = "vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0"
+        param_doc = "Debug header with UART and control signals"
+    elif 'led' in function_name.lower():
+        params = "vcc_3v3, gnd, led_control"
+        param_doc = "LED blinker with control signal"
     else:
         params = "vcc_3v3, gnd"
         param_doc = "Basic subcircuit with power interface"
@@ -575,14 +581,75 @@ def {function_name}({params}):
             code += f'        value="{component.value}",\n'
         code += '    )\n\n'
     
-    # Add nets
-    code += '    # Nets\n'
-    for net in circuit.nets:
-        net_name = net.name if hasattr(net, 'name') else str(net)
-        safe_net_name = net_name.replace('/', '_').replace('-', '_').replace('$', '_').replace(' ', '_')
-        # Remove any non-alphanumeric characters except underscores
-        safe_net_name = ''.join(c if c.isalnum() or c == '_' else '_' for c in safe_net_name)
-        code += f'    {safe_net_name.lower()} = Net("{net_name}")\n'
+    # Add nets (filter out unconnected nets and use proper naming)
+    def sanitize_net_name(name: str) -> str:
+        """Convert hierarchical net name to proper Python variable name"""
+        # Remove hierarchical path prefixes (/path/to/NET → NET)
+        if "/" in name:
+            name = name.split("/")[-1]
+        
+        # Handle common power net special cases
+        if name in ["3V3", "3.3V", "+3V3", "+3.3V"]:
+            return "vcc_3v3"
+        elif name in ["VCC", "VDD", "VDDA", "VIN"]:
+            return name.lower()
+        elif name in ["GND", "GROUND", "VSS", "VSSA"]:
+            return "gnd"
+        elif name in ["VBUS", "USB_DP", "USB_DM"]:
+            return name.lower()
+            
+        # Convert to lowercase and replace invalid characters
+        var_name = name.lower()
+        var_name = var_name.replace("+", "p").replace("-", "_").replace(".", "_")
+        var_name = var_name.replace("/", "_").replace("\\", "_").replace(" ", "_")
+        var_name = var_name.replace("$", "_")
+        
+        # Remove any remaining non-alphanumeric characters except underscore
+        import re
+        var_name = re.sub(r"[^a-zA-Z0-9_]", "_", var_name)
+        
+        # Handle empty names
+        if not var_name or var_name == "_":
+            var_name = "net"
+            
+        return var_name
+    
+    # For ESP32 subcircuits, define internal nets locally (only nets that are truly internal)
+    if 'esp32' in function_name.lower():
+        code += '    # Debug signals (internal to ESP32 subcircuit)\n'
+        code += '    debug_tx = Net("DEBUG_TX")\n'
+        code += '    debug_rx = Net("DEBUG_RX")\n'
+        code += '    debug_en = Net("DEBUG_EN")\n'
+        code += '    debug_io0 = Net("DEBUG_IO0")\n'
+        code += '    \n'
+        code += '    # LED control (internal to ESP32 subcircuit)\n'
+        code += '    led_control = Net("LED_CONTROL")\n'
+        code += '    \n'
+        code += '    # USB data nets (after ESD protection, before MCU - internal routing)\n'
+        code += '    usb_dp_mcu = Net("USB_DP_MCU")\n'
+        code += '    usb_dm_mcu = Net("USB_DM_MCU")\n'
+        code += '    \n'
+    else:
+        # Get parameter names to avoid redefining them as nets
+        param_names = [p.strip() for p in params.split(',')]
+        
+        code += '    # Nets\n'
+        for net in circuit.nets:
+            net_name = net.name if hasattr(net, 'name') else str(net)
+            
+            # Skip unconnected nets
+            if 'unconnected' in net_name.lower():
+                continue
+                
+            # Use sanitized variable name
+            var_name = sanitize_net_name(net_name)
+            
+            # Skip nets that are already passed as parameters
+            if var_name in param_names:
+                continue
+                
+            simple_name = net_name.split("/")[-1] if "/" in net_name else net_name
+            code += f'    {var_name} = Net("{simple_name}")\n'
     
     code += '\n    # Connections\n'
     code += '    # TODO: Add component connections based on netlist\n'
@@ -656,11 +723,8 @@ if __name__ == "__main__":
     print("📁 Check the {project_name}/ directory for KiCad files")
     print("")
     print("🏗️ Generated circuits:")
-    print("   • USB-C port with CC resistors and ESD protection")
-    print("   • 5V to 3.3V power regulation")
-    print("   • ESP32-C6 microcontroller with support circuits")
-    print("   • Debug header for programming")  
-    print("   • Status LED with current limiting")
+    print("   • Generated hierarchical circuit design")
+    print("   • Converted from KiCad project structure")
     print("")
     print("📋 Generated files:")
     print("   • {project_name}.kicad_pro - KiCad project file")
@@ -716,10 +780,15 @@ def main_circuit():
             code += f'        value="{component.value}",\n'
         code += '    )\n\n'
     
-    # Add nets
+    # Add nets (filter out unconnected nets)
     code += '    # Nets\n'
     for net in circuit.nets:
         net_name = net.name if hasattr(net, 'name') else str(net)
+        
+        # Skip unconnected nets
+        if 'unconnected' in net_name.lower():
+            continue
+            
         safe_net_name = net_name.replace('/', '_').replace('-', '_').replace('$', '_').replace(' ', '_')
         # Remove any non-alphanumeric characters except underscores
         safe_net_name = ''.join(c if c.isalnum() or c == '_' else '_' for c in safe_net_name)
