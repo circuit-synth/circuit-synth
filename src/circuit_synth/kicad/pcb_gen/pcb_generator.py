@@ -193,7 +193,7 @@ class PCBGenerator:
         pcb = None
 
         try:
-            logger.info(f"Starting PCB generation for project: {self.project_name}")
+            logger.debug(f"Starting PCB generation for project: {self.project_name}")
 
             # Create PCB board
             pcb = PCBBoard()
@@ -389,7 +389,7 @@ class PCBGenerator:
                 return False
 
             # Apply netlist to PCB
-            logger.info("Applying netlist to PCB...")
+            logger.debug("Applying netlist to PCB...")
             netlist_applied = self._apply_netlist_to_pcb(pcb)
             if netlist_applied:
                 logger.info("✓ Netlist successfully applied to PCB")
@@ -409,7 +409,7 @@ class PCBGenerator:
 
             # Save PCB file
             pcb.save(self.pcb_path)
-            logger.info(f"PCB file saved to: {self.pcb_path}")
+            logger.debug(f"PCB file saved to: {self.pcb_path}")
 
             # Generate ratsnest connections if requested (AFTER PCB save)
             if generate_ratsnest:
@@ -442,7 +442,7 @@ class PCBGenerator:
 
         # Read all schematic files
         sch_files = list(self.project_dir.glob("*.kicad_sch"))
-        logger.info(f"Found {len(sch_files)} schematic files")
+        logger.debug(f"Found {len(sch_files)} schematic files")
 
         # Track component references to detect duplicates
         seen_references = set()
@@ -585,10 +585,10 @@ class PCBGenerator:
                             nets[net_name].add(ref)
 
                         logger.debug(
-                            f"🔧 MODIFIED DEBUG - Net {net_name}: {clean_nodes}"
+                            f"Net {net_name}: {clean_nodes}"
                         )
 
-                logger.info(f"Found {len(nets)} nets with connections from netlist")
+                logger.debug(f"Extracted {len(nets)} nets from netlist")
 
             except Exception as e:
                 logger.error(f"Error reading netlist: {e}")
