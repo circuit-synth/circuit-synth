@@ -196,7 +196,7 @@ def create_example_circuits(project_path: Path) -> None:
     # USB-C implementation with protection
     usb_circuit = '''#!/usr/bin/env python3
 """
-USB-C Circuit - Proper USB-C implementation with protection
+USB-C Circuit - Professional USB-C implementation with ESD protection
 Includes CC resistors, ESD protection, and shield grounding
 """
 
@@ -219,11 +219,16 @@ def usb_port(vbus_out, gnd, usb_dp, usb_dm):
     cc2_resistor = Component(symbol="Device:R", ref="R", value="5.1k", 
                             footprint="Resistor_SMD:R_0603_1608Metric")
     
+    
     # ESD protection diodes for data lines
     esd_dp = Component(symbol="Diode:ESD5Zxx", ref="D",
                       footprint="Diode_SMD:D_SOD-523")
     esd_dm = Component(symbol="Diode:ESD5Zxx", ref="D",
                       footprint="Diode_SMD:D_SOD-523")
+    
+    # USB decoupling capacitor
+    cap_usb = Component(symbol="Device:C", ref="C", value="10uF",
+                       footprint="Capacitor_SMD:C_0805_2012Metric")
     
     # USB-C connections
     usb_conn["VBUS"] += vbus_out
@@ -238,22 +243,16 @@ def usb_port(vbus_out, gnd, usb_dp, usb_dm):
     usb_conn["CC2"] += cc2_resistor[1] 
     cc2_resistor[2] += gnd
     
-    # ESD protection
+    # ESD protection (connector side)
     esd_dp[1] += usb_dp
     esd_dp[2] += gnd
     esd_dm[1] += usb_dm
     esd_dm[2] += gnd
     
-    # USB decoupling capacitor
-    cap_usb = Component(symbol="Device:C", ref="C", value="10uF",
-                       footprint="Capacitor_SMD:C_0805_2012Metric")
+    # USB decoupling capacitor connections
     cap_usb[1] += vbus_out
     cap_usb[2] += gnd
 
-if __name__ == "__main__":
-    circuit = usb_port()
-    circuit.generate_kicad_project("usb_port")
-    print("✅ USB-C circuit generated!")
 '''
 
     # Power supply circuit
@@ -291,10 +290,6 @@ def power_supply(vbus_in, vcc_3v3_out, gnd):
     cap_out[1] += vcc_3v3_out
     cap_out[2] += gnd
 
-if __name__ == "__main__":
-    circuit = power_supply()
-    circuit.generate_kicad_project("power_supply")
-    print("✅ Power supply circuit generated!")
 '''
 
     # Debug header circuit
@@ -325,10 +320,6 @@ def debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0):
     debug_header[5] += debug_rx   # RX  
     debug_header[6] += debug_io0  # IO0/BOOT
 
-if __name__ == "__main__":
-    circuit = debug_header()
-    circuit.generate_kicad_project("debug_header")
-    print("✅ Debug header circuit generated!")
 '''
 
     # LED blinker circuit
@@ -355,23 +346,21 @@ def led_blinker(vcc_3v3, gnd, led_control):
     resistor[2] += led["A"]  # Anode
     led["K"] += led_control  # Cathode (controlled by MCU)
 
-if __name__ == "__main__":
-    circuit = led_blinker()
-    circuit.generate_kicad_project("led_blinker")
-    print("✅ LED blinker circuit generated!")
 '''
 
-    # ESP32-C6 circuit (separate from main)
+    # ESP32-C6 circuit (includes debug and LED as subcircuits)
     esp32c6_circuit = '''#!/usr/bin/env python3
 """
 ESP32-C6 Circuit
-Professional ESP32-C6 microcontroller with support circuitry
+Professional ESP32-C6 microcontroller with USB signal integrity and support circuitry
 """
 
 from circuit_synth import *
+from debug_header import debug_header
+from led_blinker import led_blinker
 
 @circuit(name="ESP32_C6_MCU")
-def esp32c6(vcc_3v3, gnd, usb_dp, usb_dm, debug_tx, debug_rx, debug_en, debug_io0, led_control):
+def esp32c6(vcc_3v3, gnd, usb_dp, usb_dm):
     """
     ESP32-C6 microcontroller subcircuit with decoupling and connections
     
@@ -380,11 +369,6 @@ def esp32c6(vcc_3v3, gnd, usb_dp, usb_dm, debug_tx, debug_rx, debug_en, debug_io
         gnd: Ground net
         usb_dp: USB Data+ net
         usb_dm: USB Data- net
-        debug_tx: Debug UART TX net
-        debug_rx: Debug UART RX net
-        debug_en: Reset/Enable net
-        debug_io0: Boot mode control net
-        led_control: LED control GPIO net
     """
     
     # ESP32-C6 MCU
@@ -393,14 +377,47 @@ def esp32c6(vcc_3v3, gnd, usb_dp, usb_dm, debug_tx, debug_rx, debug_en, debug_io
         ref="U", 
         footprint="RF_Module:ESP32-C6-MINI-1"
     )
+
+    # ESP32-C6 decoupling capacitor
+    cap_esp = Component(
+        symbol="Device:C", 
+        ref="C", 
+        value="100nF",
+        footprint="Capacitor_SMD:C_0603_1608Metric"
+    )
+
+    # USB D+/D- inline resistors (22R for signal integrity)
+    usb_dp_resistor = Component(symbol="Device:R", ref="R", value="22",
+                               footprint="Resistor_SMD:R_0603_1608Metric")
+    usb_dm_resistor = Component(symbol="Device:R", ref="R", value="22",
+                               footprint="Resistor_SMD:R_0603_1608Metric")
+
+    # Internal USB data nets (after ESD, before MCU)
+    usb_dp_mcu = Net('USB_DP_MCU')
+    usb_dm_mcu = Net('USB_DM_MCU')
+
+    # Debug signals
+    debug_tx = Net('DEBUG_TX')
+    debug_rx = Net('DEBUG_RX')
+    debug_en = Net('DEBUG_EN')
+    debug_io0 = Net('DEBUG_IO0')
+    
+    # LED control
+    led_control = Net('LED_CONTROL')
     
     # Power connections
     esp32_c6["3V3"] += vcc_3v3
     esp32_c6["GND"] += gnd
     
-    # USB connections
-    esp32_c6["IO18"] += usb_dp  # USB D+
-    esp32_c6["IO19"] += usb_dm  # USB D-
+    # USB D+/D- inline resistors (ESD protected signal -> 22R -> MCU)
+    usb_dp_resistor[1] += usb_dp
+    usb_dp_resistor[2] += usb_dp_mcu
+    usb_dm_resistor[1] += usb_dm
+    usb_dm_resistor[2] += usb_dm_mcu
+    
+    # USB connections to MCU
+    esp32_c6["IO18"] += usb_dp_mcu  # USB D+
+    esp32_c6["IO19"] += usb_dm_mcu  # USB D-
     
     # Debug connections
     esp32_c6["EN"] += debug_en    # Reset/Enable
@@ -411,15 +428,15 @@ def esp32c6(vcc_3v3, gnd, usb_dp, usb_dm, debug_tx, debug_rx, debug_en, debug_io
     # LED control GPIO
     esp32_c6["IO8"] += led_control  # GPIO for LED control
     
-    # ESP32-C6 decoupling capacitor
-    cap_esp = Component(
-        symbol="Device:C", 
-        ref="C", 
-        value="100nF",
-        footprint="Capacitor_SMD:C_0603_1608Metric"
-    )
+
     cap_esp[1] += vcc_3v3
     cap_esp[2] += gnd
+
+
+    debug_header_circuit = debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0)
+    led_blinker_circuit = led_blinker(vcc_3v3, gnd, led_control)
+
+
 '''
 
     # Main circuit example
@@ -441,8 +458,6 @@ from circuit_synth import *
 # Import all circuits
 from usb import usb_port
 from power_supply import power_supply
-from debug_header import debug_header
-from led_blinker import led_blinker
 from esp32c6 import esp32c6
 
 @circuit(name="ESP32_C6_Dev_Board_Main")
@@ -455,22 +470,12 @@ def main_circuit():
     gnd = Net('GND')
     usb_dp = Net('USB_DP')
     usb_dm = Net('USB_DM')
-    
-    # Debug signals
-    debug_tx = Net('DEBUG_TX')
-    debug_rx = Net('DEBUG_RX')
-    debug_en = Net('DEBUG_EN')
-    debug_io0 = Net('DEBUG_IO0')
-    
-    # LED control
-    led_control = Net('LED_CONTROL')
+
     
     # Create all circuits with shared nets
     usb_port_circuit = usb_port(vbus, gnd, usb_dp, usb_dm)
     power_supply_circuit = power_supply(vbus, vcc_3v3, gnd)
-    debug_header_circuit = debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0)
-    led_blinker_circuit = led_blinker(vcc_3v3, gnd, led_control)
-    esp32_circuit = esp32c6(vcc_3v3, gnd, usb_dp, usb_dm, debug_tx, debug_rx, debug_en, debug_io0, led_control)
+    esp32_circuit = esp32c6(vcc_3v3, gnd, usb_dp, usb_dm)
 
 
 if __name__ == "__main__":
@@ -543,13 +548,11 @@ if __name__ == "__main__":
         style="green",
     )
     console.print("   • main.py - Main ESP32-C6 development board", style="cyan")
-    console.print("   • main.py - Main ESP32-C6 development board", style="cyan")
     console.print("   • usb.py - USB-C with CC resistors", style="cyan")
     console.print("   • power_supply.py - 5V to 3.3V regulation", style="cyan")
     console.print("   • debug_header.py - Programming interface", style="cyan")
     console.print("   • led_blinker.py - Status LED", style="cyan")
     console.print("   • esp32c6.py - ESP32-C6 microcontroller", style="cyan")
-    console.print("   🎯 All files are used by main.py - clean working example!", style="green")
     console.print("   🎯 All files are used by main.py - clean working example!", style="green")
 
 

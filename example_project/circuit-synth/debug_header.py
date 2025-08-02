@@ -1,22 +1,14 @@
 #!/usr/bin/env python3
 """
-Debug Header Subcircuit - Programming and debugging interface
+Debug Header Circuit - Programming and debugging interface
 Standard ESP32 debug header with UART, reset, and boot control
 """
 
 from circuit_synth import *
 
 @circuit(name="Debug_Header")
-def debug_header_subcircuit():
+def debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0):
     """Debug header for programming and debugging"""
-    
-    # Interface nets
-    vcc_3v3 = Net('VCC_3V3')
-    gnd = Net('GND')
-    debug_tx = Net('DEBUG_TX')
-    debug_rx = Net('DEBUG_RX') 
-    debug_en = Net('DEBUG_EN')
-    debug_io0 = Net('DEBUG_IO0')
     
     # 2x3 debug header
     debug_header = Component(
@@ -33,7 +25,3 @@ def debug_header_subcircuit():
     debug_header[5] += debug_rx   # RX  
     debug_header[6] += debug_io0  # IO0/BOOT
 
-if __name__ == "__main__":
-    circuit = debug_header_subcircuit()
-    circuit.generate_kicad_project("debug_header")
-    print("✅ Debug header subcircuit generated!")

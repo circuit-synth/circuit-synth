@@ -308,22 +308,52 @@ def convert_kicad_to_circuit_synth(kicad_project_path: Path, target_dir: Path) -
             console.print("   You'll need to create circuit-synth code manually", style="dim")
             return
         
-        # Get the main circuit (first one found)
-        circuit = list(circuits.values())[0] if circuits else None
-        if not circuit:
+        # Find the main hierarchical circuit
+        main_circuit = None
+        all_circuits = {}
+        
+        for name, circuit in circuits.items():
+            all_circuits[name] = circuit
+            
+            if hasattr(circuit, 'hierarchical_tree') and circuit.hierarchical_tree:
+                # Find circuit with the most children (main circuit)
+                children = circuit.hierarchical_tree.get(name, [])
+                if children and len(children) > 0:
+                    if main_circuit is None or len(children) > len(main_circuit.hierarchical_tree.get(main_circuit.name, [])):
+                        main_circuit = circuit
+        
+        # Only collect subcircuits that are actually used by the main circuit
+        subcircuits = {}
+        if main_circuit and hasattr(main_circuit, 'hierarchical_tree') and main_circuit.hierarchical_tree:
+            used_subcircuit_names = main_circuit.hierarchical_tree.get(main_circuit.name, [])
+            for subcircuit_name in used_subcircuit_names:
+                if subcircuit_name in all_circuits:
+                    subcircuits[subcircuit_name] = all_circuits[subcircuit_name]
+        
+        if not main_circuit:
+            # Fall back to first circuit if no hierarchical structure found
+            # console.print("🔍 CONVERSION DEBUG: No hierarchical circuit found, using first circuit", style="yellow")
+            main_circuit = list(circuits.values())[0] if circuits else None
+            
+        if not main_circuit:
             console.print("⚠️  No circuits found in netlist", style="yellow")
             console.print("   You'll need to create circuit-synth code manually", style="dim")
             return
         
-        # Generate Python code
-        python_code = generate_circuit_synth_code(circuit, kicad_project_path.stem)
+        # console.print(f"🔍 CONVERSION DEBUG: Using main circuit: {main_circuit.name}")
+        # console.print(f"🔍 CONVERSION DEBUG: Found {len(subcircuits)} subcircuits: {list(subcircuits.keys())}")
         
-        # Write to main.py in circuit-synth directory
-        main_py_path = target_dir / "circuit-synth" / "main.py"
-        with open(main_py_path, "w") as f:
-            f.write(python_code)
+        # Generate hierarchical Python code
+        if len(subcircuits) > 0:
+            generate_hierarchical_circuit_synth_code(main_circuit, subcircuits, target_dir, kicad_project_path.stem)
+        else:
+            # Generate single file for non-hierarchical circuits
+            python_code = generate_circuit_synth_code(main_circuit, kicad_project_path.stem)
+            main_py_path = target_dir / "circuit-synth" / "main.py"
+            with open(main_py_path, "w") as f:
+                f.write(python_code)
         
-        console.print(f"✅ Generated circuit-synth code: {main_py_path}", style="green")
+        console.print(f"✅ Generated circuit-synth code in circuit-synth/", style="green")
         
     except Exception as e:
         console.print(f"⚠️  Error converting KiCad to circuit-synth: {e}", style="yellow")
@@ -331,8 +361,175 @@ def convert_kicad_to_circuit_synth(kicad_project_path: Path, target_dir: Path) -
         create_basic_template(target_dir, kicad_project_path.stem)
 
 
+def generate_hierarchical_circuit_synth_code(main_circuit: Any, subcircuits: dict, target_dir: Path, project_name: str) -> None:
+    """Generate hierarchical circuit-synth Python code with separate subcircuit files"""
+    
+    console.print(f"🏗️ Generating hierarchical circuit with {len(subcircuits)} subcircuits", style="blue")
+    
+    # Generate subcircuit files
+    subcircuit_imports = []
+    subcircuit_calls = []
+    
+    for name, subcircuit in subcircuits.items():
+        # Remove "_subcircuit" suffix from filename - use clean names
+        subcircuit_filename = f"{name.lower()}.py"
+        subcircuit_path = target_dir / "circuit-synth" / subcircuit_filename
+        
+        # Generate subcircuit Python code
+        subcircuit_code = generate_subcircuit_code(subcircuit, name)
+        with open(subcircuit_path, "w") as f:
+            f.write(subcircuit_code)
+        
+        # Track imports and calls for main file (use clean names)
+        import_name = f"{name.lower()}"
+        function_name = f"{name.lower()}_circuit"
+        subcircuit_imports.append(f"from {import_name} import {function_name}")
+        subcircuit_calls.append(f"    {name.lower()} = {function_name}()")
+        
+        console.print(f"   ✅ Generated {subcircuit_filename}")
+    
+    # Generate main.py that orchestrates all subcircuits
+    main_code = generate_hierarchical_main_code(main_circuit, project_name, subcircuit_imports, subcircuit_calls)
+    main_py_path = target_dir / "circuit-synth" / "main.py"
+    with open(main_py_path, "w") as f:
+        f.write(main_code)
+    
+    console.print(f"   ✅ Generated main.py with hierarchical structure")
+
+
+def generate_subcircuit_code(circuit: Any, subcircuit_name: str) -> str:
+    """Generate Python code for a single subcircuit"""
+    
+    function_name = f"{subcircuit_name.lower()}_circuit"
+    
+    code = f'''#!/usr/bin/env python3
+"""
+{subcircuit_name} Subcircuit - Converted from KiCad hierarchical sheet
+
+This subcircuit was automatically generated from a KiCad hierarchical sheet.
+You may need to adjust component symbols, footprints, and net connections.
+"""
+
+from circuit_synth import *
+
+@circuit(name="{subcircuit_name}")
+def {function_name}():
+    """{subcircuit_name} circuit converted from KiCad hierarchical sheet"""
+    
+    # Components
+'''
+    
+    # Add components
+    for component in circuit.components:
+        safe_var_name = component.reference.lower().replace('-', '_').replace('.', '_')
+        ref_prefix = component.reference[0] if component.reference else "U"
+        code += f'''    {safe_var_name} = Component(
+        symbol="{component.lib_id}",
+        ref="{ref_prefix}",
+        footprint="{component.footprint}",
+'''
+        if hasattr(component, 'value') and component.value:
+            code += f'        value="{component.value}",\n'
+        code += '    )\n\n'
+    
+    # Add nets
+    code += '    # Nets\n'
+    for net in circuit.nets:
+        net_name = net.name if hasattr(net, 'name') else str(net)
+        safe_net_name = net_name.replace('/', '_').replace('-', '_')
+        code += f'    {safe_net_name.lower()} = Net("{net_name}")\n'
+    
+    code += '\n    # Connections\n'
+    code += '    # TODO: Add component connections based on netlist\n'
+    code += '    # Example: component1["pin1"] += net_name\n\n'
+    
+    return code
+
+
+def generate_hierarchical_main_code(main_circuit: Any, project_name: str, subcircuit_imports: list, subcircuit_calls: list) -> str:
+    """Generate main.py code that orchestrates all subcircuits"""
+    
+    imports_section = "\n".join(subcircuit_imports)
+    calls_section = "\n".join(subcircuit_calls)
+    
+    code = f'''#!/usr/bin/env python3
+"""
+Main Circuit - {project_name}
+Hierarchical circuit design with modular subcircuits
+
+This is the main entry point that orchestrates all subcircuits.
+Converted from KiCad hierarchical design.
+"""
+
+from circuit_synth import *
+
+# Import all subcircuits
+{imports_section}
+
+@circuit(name="{project_name}_Main")
+def main_circuit():
+    """Main hierarchical circuit - {project_name}"""
+    
+    # Create all subcircuits
+{calls_section}
+    
+    # Add main circuit components
+'''
+    
+    # Add main circuit components
+    for component in main_circuit.components:
+        safe_var_name = component.reference.lower().replace('-', '_').replace('.', '_')
+        ref_prefix = component.reference[0] if component.reference else "U"
+        code += f'''    {safe_var_name} = Component(
+        symbol="{component.lib_id}",
+        ref="{ref_prefix}",
+        footprint="{component.footprint}",
+'''
+        if hasattr(component, 'value') and component.value:
+            code += f'        value="{component.value}",\n'
+        code += '    )\n\n'
+    
+    # Add shared nets
+    code += '''    # Create shared nets between subcircuits
+    # Power nets
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    
+    # Signal nets (customize based on your design)
+    # usb_dp = Net('USB_DP')
+    # usb_dm = Net('USB_DM')
+    
+    # TODO: Add connections between main components and subcircuits
+    # Example: main_component["VCC"] += vcc_3v3
+
+
+if __name__ == "__main__":
+    print("🚀 Generating KiCad project from circuit-synth...")
+    circuit = main_circuit()
+    
+    # Generate KiCad project
+    circuit.generate_kicad_project(
+        project_name="{project_name}",
+        placement_algorithm="hierarchical",
+        generate_pcb=True
+    )
+    
+    print("✅ KiCad project generated successfully!")
+    print("📁 Check the generated KiCad files for your circuit")
+'''
+    
+    return code
+
+
 def generate_circuit_synth_code(circuit: Any, project_name: str) -> str:
     """Generate circuit-synth Python code from parsed circuit"""
+    
+    # Check if this is a hierarchical circuit
+    # console.print(f"🔍 CONVERSION DEBUG: Circuit name: {circuit.name}")
+    # console.print(f"🔍 CONVERSION DEBUG: Circuit components count: {len(circuit.components)}")
+    # console.print(f"🔍 CONVERSION DEBUG: Circuit nets count: {len(circuit.nets)}")
+    # console.print(f"🔍 CONVERSION DEBUG: Circuit hierarchical tree: {getattr(circuit, 'hierarchical_tree', None)}")
+    # console.print(f"🔍 CONVERSION DEBUG: Circuit is_hierarchical_sheet: {getattr(circuit, 'is_hierarchical_sheet', None)}")
     
     code = f'''#!/usr/bin/env python3
 """
@@ -353,9 +550,11 @@ def main_circuit():
     
     # Add components
     for component in circuit.components:
-        code += f'''    {component.ref.lower()} = Component(
-        symbol="{component.symbol}",
-        ref="{component.ref[0]}",
+        safe_var_name = component.reference.lower().replace('-', '_').replace('.', '_')
+        ref_prefix = component.reference[0] if component.reference else "U"
+        code += f'''    {safe_var_name} = Component(
+        symbol="{component.lib_id}",
+        ref="{ref_prefix}",
         footprint="{component.footprint}",
 '''
         if hasattr(component, 'value') and component.value:
@@ -364,7 +563,8 @@ def main_circuit():
     
     # Add nets
     code += '    # Nets\n'
-    for net_name in circuit.nets:
+    for net in circuit.nets:
+        net_name = net.name if hasattr(net, 'name') else str(net)
         safe_net_name = net_name.replace('/', '_').replace('-', '_')
         code += f'    {safe_net_name.lower()} = Net("{net_name}")\n'
     
