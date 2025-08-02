@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid f79a9e17-bb6a-464c-913f-548a3ee31f3e)
+	(uuid d8c624e8-600a-4e00-a94c-4f174381bf52)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -317,11 +317,21 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid cfa6ce23-7548-401c-858f-0bdad1558a0a)
+		(uuid ed23d5e1-7c18-4f55-adc5-a8a6c3a4ffda)
 		(property
 			"Reference"
 			"J2"
 			(at 58.42 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Value"
+			"~"
+			(at 58.42 50.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -351,87 +361,15 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/cf7122c2-770c-42f7-b524-f3d16e29c93f/31400722-9956-4c59-a352-3cc6fb8c4263"
+					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/6ce5422f-2015-4357-8a2b-739ec2542dda"
 					(reference J2)
 					(unit 1)
 				)
 			)
 		)
 	)
-	(hierarchical_label
-		DEBUG_EN
-		(shape input)
-		(at 53.34 43.18 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 99cb6191-c207-4de4-98ef-536b9d583535)
-	)
-	(hierarchical_label
-		DEBUG_TX
-		(shape input)
-		(at 53.34 45.72 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 886b063d-e36c-4201-8d4f-3b541f6aa735)
-	)
-	(hierarchical_label
-		DEBUG_RX
-		(shape input)
-		(at 53.34 48.26 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 6ed350b7-8dd8-442d-aac0-879949fde4d3)
-	)
-	(hierarchical_label
-		VCC_3V3
-		(shape input)
-		(at 66.04 43.18 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 5ed8bf31-94a7-4c51-999c-4d121e169bf4)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 66.04 45.72 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 80783488-bf9b-42f0-8cfb-362c6903f367)
-	)
-	(hierarchical_label
-		DEBUG_IO0
-		(shape input)
-		(at 66.04 48.26 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 270770ac-494d-4999-8880-e191c8d9c1f5)
-	)
 	(text_box
-		"Debug header for programming and debugging"
+		"Basic subcircuit with power interface"
 		(exclude_from_sim yes)
 		(at 184.0 110.0 0)
 		(size 80.0 30.0)
@@ -461,10 +399,10 @@
 			)
 			(justify left top)
 		)
-		(uuid 57629011-e288-4f0f-82f8-3f4d97ab9c29)
+		(uuid ee477cbd-07eb-4933-80d8-f59334be2d9d)
 	)
 	(text_box
-		"Debug header for programming and debugging"
+		"Basic subcircuit with power interface"
 		(exclude_from_sim yes)
 		(at 184.0 110.0 0)
 		(size 80.0 30.0)
@@ -494,11 +432,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 57629011-e288-4f0f-82f8-3f4d97ab9c29)
+		(uuid ee477cbd-07eb-4933-80d8-f59334be2d9d)
 	)
 	(sheet_instances
 		(path
-			"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/cf7122c2-770c-42f7-b524-f3d16e29c93f/31400722-9956-4c59-a352-3cc6fb8c4263"
+			"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/6ce5422f-2015-4357-8a2b-739ec2542dda"
 			(page "1")
 		)
 	)

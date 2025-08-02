@@ -10,9 +10,11 @@ Converted from KiCad hierarchical design.
 from circuit_synth import *
 
 # Import all subcircuits
-from usb_port import usb_port
+from led_blinker import led_blinker
+from usb import usb
+from debug_header import debug_header
 from power_supply import power_supply
-from esp32_c6_mcu import esp32_c6_mcu
+from esp32c6 import esp32c6
 
 @circuit(name="ESP32_C6_Dev_Board_Main")
 def main_circuit():
@@ -27,9 +29,11 @@ def main_circuit():
 
     
     # Create all circuits with shared nets
-    usb_port_circuit = usb_port(vbus, gnd, usb_dp, usb_dm)
+    led_blinker_circuit = led_blinker(vcc_3v3, gnd)
+    usb_circuit = usb(vbus, gnd, usb_dp, usb_dm)
+    debug_header_circuit = debug_header(vcc_3v3, gnd)
     power_supply_circuit = power_supply(vbus, vcc_3v3, gnd)
-    esp32_circuit = esp32_c6_mcu(vcc_3v3, gnd, usb_dp, usb_dm)
+    esp32_circuit = esp32c6(vcc_3v3, gnd, usb_dp, usb_dm)
 
 
 if __name__ == "__main__":

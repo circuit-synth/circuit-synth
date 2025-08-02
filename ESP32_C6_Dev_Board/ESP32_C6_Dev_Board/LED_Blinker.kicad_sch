@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 88b3e47e-4c3d-4ef7-b76a-cd76e6ef0817)
+	(uuid b22104d7-e154-467c-85fb-dd80dcecea6d)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -381,7 +381,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 8d119ab1-18fd-4fd1-9b37-fc11108f1495)
+		(uuid d1ed8e5e-3d1f-4b14-a1fb-c456357127bd)
 		(property
 			"Reference"
 			"D3"
@@ -415,7 +415,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/cf7122c2-770c-42f7-b524-f3d16e29c93f/0f88165c-ae83-43c5-8e0a-04b978c4ce4f"
+					"/3760c8d0-fa33-40f6-91c6-71213551185b/09880448-53b4-4ae3-816d-a2e627f96930/c7e1ff1e-c260-4394-99c5-7c550d774dfb/c8cef972-890e-40f5-91fc-ea0b5f082b7d"
 					(reference D3)
 					(unit 1)
 				)
@@ -428,7 +428,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 908a4b3f-5947-4d38-a318-16b7ef59ccd9)
+		(uuid 8d4872df-9a05-49bc-b60e-365ec5141e1a)
 		(property
 			"Reference"
 			"R3"
@@ -472,7 +472,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/cf7122c2-770c-42f7-b524-f3d16e29c93f/0f88165c-ae83-43c5-8e0a-04b978c4ce4f"
+					"/3760c8d0-fa33-40f6-91c6-71213551185b/09880448-53b4-4ae3-816d-a2e627f96930/c7e1ff1e-c260-4394-99c5-7c550d774dfb/c8cef972-890e-40f5-91fc-ea0b5f082b7d"
 					(reference R3)
 					(unit 1)
 				)
@@ -489,7 +489,7 @@
 			)
 			(justify right)
 		)
-		(uuid ab3d4116-7802-4bd6-ae1b-477299c40198)
+		(uuid 1e4c8012-2258-4734-bc4a-e7e2cc591864)
 	)
 	(hierarchical_label
 		LED_CONTROL
@@ -501,7 +501,7 @@
 			)
 			(justify right)
 		)
-		(uuid c264f0b8-474c-49ca-a880-3b904ac3afa7)
+		(uuid 6e06c016-0351-4c5f-ada3-6037e6f5f311)
 	)
 	(hierarchical_label
 		N$3
@@ -513,7 +513,7 @@
 			)
 			(justify left)
 		)
-		(uuid 6538d377-75c8-459a-8676-6233fc54d963)
+		(uuid a0e76eec-a467-45c3-a030-28269639bc89)
 	)
 	(hierarchical_label
 		N$3
@@ -525,7 +525,7 @@
 			)
 			(justify right)
 		)
-		(uuid e3d3e3f3-193e-4ca4-8bde-82363dbdc76f)
+		(uuid e9e5aca0-8824-41eb-867f-7084072c8ed9)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -537,7 +537,7 @@
 			)
 			(justify left)
 		)
-		(uuid 2224827e-bc95-4d78-b07d-632c95777041)
+		(uuid 4759b72b-9bcd-4588-a31a-6ac14a42b3a3)
 	)
 	(text_box
 		"LED with current limiting resistor"
@@ -570,7 +570,7 @@
 			)
 			(justify left top)
 		)
-		(uuid f1ee7912-2165-4f43-b8b0-01522b77fa16)
+		(uuid f16fb4f5-3a68-4f6d-8e02-78a806d4fca9)
 	)
 	(text_box
 		"LED with current limiting resistor"
@@ -603,11 +603,11 @@
 			)
 			(justify left top)
 		)
-		(uuid f1ee7912-2165-4f43-b8b0-01522b77fa16)
+		(uuid f16fb4f5-3a68-4f6d-8e02-78a806d4fca9)
 	)
 	(sheet_instances
 		(path
-			"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/cf7122c2-770c-42f7-b524-f3d16e29c93f/0f88165c-ae83-43c5-8e0a-04b978c4ce4f"
+			"/3760c8d0-fa33-40f6-91c6-71213551185b/09880448-53b4-4ae3-816d-a2e627f96930/c7e1ff1e-c260-4394-99c5-7c550d774dfb/c8cef972-890e-40f5-91fc-ea0b5f082b7d"
 			(page "1")
 		)
 	)

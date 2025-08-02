@@ -7,7 +7,7 @@ USB-C port with proper parameter interface
 from circuit_synth import *
 
 @circuit(name="USB_Port")
-def usb_port(vbus_out, gnd, usb_dp, usb_dm):
+def usb(vbus_out, gnd, usb_dp, usb_dm):
     """USB-C port with proper parameter interface"""
     
     # Components
@@ -55,15 +55,15 @@ def usb_port(vbus_out, gnd, usb_dp, usb_dm):
 
     # Nets
     _esp32_c6_dev_board_main_gnd = Net("/ESP32_C6_Dev_Board_Main/GND")
-    _esp32_c6_dev_board_main_n$1 = Net("/ESP32_C6_Dev_Board_Main/N$1")
-    _esp32_c6_dev_board_main_n$2 = Net("/ESP32_C6_Dev_Board_Main/N$2")
+    _esp32_c6_dev_board_main_n_1 = Net("/ESP32_C6_Dev_Board_Main/N$1")
+    _esp32_c6_dev_board_main_n_2 = Net("/ESP32_C6_Dev_Board_Main/N$2")
     _esp32_c6_dev_board_main_usb_dm = Net("/ESP32_C6_Dev_Board_Main/USB_DM")
     _esp32_c6_dev_board_main_usb_dp = Net("/ESP32_C6_Dev_Board_Main/USB_DP")
     _esp32_c6_dev_board_main_vbus = Net("/ESP32_C6_Dev_Board_Main/VBUS")
-    unconnected_(j1_d+_padb6) = Net("unconnected-(J1-D+-PadB6)")
-    unconnected_(j1_d__padb7) = Net("unconnected-(J1-D--PadB7)")
-    unconnected_(j1_sbu1_pada8) = Net("unconnected-(J1-SBU1-PadA8)")
-    unconnected_(j1_sbu2_padb8) = Net("unconnected-(J1-SBU2-PadB8)")
+    unconnected__j1_d__padb6_ = Net("unconnected-(J1-D+-PadB6)")
+    unconnected__j1_d__padb7_ = Net("unconnected-(J1-D--PadB7)")
+    unconnected__j1_sbu1_pada8_ = Net("unconnected-(J1-SBU1-PadA8)")
+    unconnected__j1_sbu2_padb8_ = Net("unconnected-(J1-SBU2-PadB8)")
 
     # Connections
     # TODO: Add component connections based on netlist

@@ -1,0 +1,338 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 75be905e-8d6b-4b9a-bd18-ff423f4d4f92)
+	(paper A4)
+	(lib_symbols)
+	(paper A4)
+	(title_block
+		(title ESP32_C6_Dev_Board_Main)
+		(date 2025-08-01)
+		(company Circuit-Synth)
+	)
+	(sheet
+		(at 39.37 36.83)
+		(size 35.4 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid bd09edbc-d300-4297-a5c0-e244c1318db2)
+		(property
+			"Sheetname"
+			"LED_Blinker"
+			(at 39.37 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"LED_Blinker.kicad_sch"
+			(at 39.37 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 82.55 36.83)
+		(size 35.4 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 09705b13-d77b-4435-980e-de3aa18c116a)
+		(property
+			"Sheetname"
+			"USB_Port"
+			(at 82.55 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"USB_Port.kicad_sch"
+			(at 82.55 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 125.73 36.83)
+		(size 35.4 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 6ce5422f-2015-4357-8a2b-739ec2542dda)
+		(property
+			"Sheetname"
+			"Debug_Header"
+			(at 125.73 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"Debug_Header.kicad_sch"
+			(at 125.73 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 39.37 67.31)
+		(size 35.4 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 2304830d-0895-4879-8ecd-2b9a8cdeb73f)
+		(property
+			"Sheetname"
+			"Power_Supply"
+			(at 39.37 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"Power_Supply.kicad_sch"
+			(at 39.37 88.89999999999999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 82.55 67.31)
+		(size 35.4 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 0881bee1-36d2-4a08-84e5-b1064d16f791)
+		(property
+			"Sheetname"
+			"ESP32_C6_MCU"
+			(at 82.55 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"ESP32_C6_MCU.kicad_sch"
+			(at 82.55 88.89999999999999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Main hierarchical circuit - ESP32_C6_Dev_Board"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 3ac21404-5c15-4388-ac4b-c6fea177ac5b)
+	)
+	(text_box
+		"Main hierarchical circuit - ESP32_C6_Dev_Board"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 3ac21404-5c15-4388-ac4b-c6fea177ac5b)
+	)
+	(sheet_instances
+		(path
+			"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

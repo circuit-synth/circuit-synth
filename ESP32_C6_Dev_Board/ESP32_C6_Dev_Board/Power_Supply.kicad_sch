@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 156e7c2d-f116-4ec8-b0ae-1b9e54c5b14d)
+	(uuid e92ad8e3-aea5-4c80-a196-b67001b21975)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -345,7 +345,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 711642de-b868-49c7-9611-2100f317d86d)
+		(uuid 02d82bcb-d586-40ee-9e29-fb3787096b66)
 		(property
 			"Reference"
 			"U1"
@@ -379,7 +379,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/7dfab93b-ad82-4ee3-829d-d360f88c46af"
+					"/3760c8d0-fa33-40f6-91c6-71213551185b/09880448-53b4-4ae3-816d-a2e627f96930/0cd77699-632e-4226-8ce8-cc7094f8cc5e"
 					(reference U1)
 					(unit 1)
 				)
@@ -392,7 +392,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 5d9b9b8e-39cc-4bd4-ae2e-935e5f24c5be)
+		(uuid d4552cf6-bed0-4125-9258-f82282ced929)
 		(property
 			"Reference"
 			"C2"
@@ -436,7 +436,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/7dfab93b-ad82-4ee3-829d-d360f88c46af"
+					"/3760c8d0-fa33-40f6-91c6-71213551185b/09880448-53b4-4ae3-816d-a2e627f96930/0cd77699-632e-4226-8ce8-cc7094f8cc5e"
 					(reference C2)
 					(unit 1)
 				)
@@ -449,7 +449,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 75de0244-a4ae-447a-a599-129e0c2a1bcc)
+		(uuid f840cc9d-4b15-4663-bb36-075dc7103376)
 		(property
 			"Reference"
 			"C3"
@@ -493,7 +493,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/7dfab93b-ad82-4ee3-829d-d360f88c46af"
+					"/3760c8d0-fa33-40f6-91c6-71213551185b/09880448-53b4-4ae3-816d-a2e627f96930/0cd77699-632e-4226-8ce8-cc7094f8cc5e"
 					(reference C3)
 					(unit 1)
 				)
@@ -510,7 +510,7 @@
 			)
 			(justify right)
 		)
-		(uuid dd1275b9-2c84-4cac-963c-42278f158077)
+		(uuid 9197e562-025b-4763-b7cf-556013e08674)
 	)
 	(hierarchical_label
 		VBUS
@@ -522,7 +522,7 @@
 			)
 			(justify right)
 		)
-		(uuid 4a062ad8-f0b1-4b05-8d26-c3b7d9503a68)
+		(uuid a66677e3-621d-4129-90fd-ed3393613658)
 	)
 	(hierarchical_label
 		VBUS
@@ -534,7 +534,7 @@
 			)
 			(justify left)
 		)
-		(uuid c9a05dd5-1e06-4233-9dc9-d3e71a9e60e6)
+		(uuid 3bac7028-e9c4-4a94-80b4-8e70cbb912d0)
 	)
 	(hierarchical_label
 		GND
@@ -546,7 +546,7 @@
 			)
 			(justify right)
 		)
-		(uuid cda75f93-7eb3-43bc-a841-deea6e8b9570)
+		(uuid 65285718-e445-425c-9d66-a74c04402d35)
 	)
 	(hierarchical_label
 		GND
@@ -558,7 +558,7 @@
 			)
 			(justify right)
 		)
-		(uuid 7aac4dea-1d60-445d-b2a0-85c993f321db)
+		(uuid d84e3908-0708-4303-9f4d-732c9a43befe)
 	)
 	(hierarchical_label
 		GND
@@ -570,7 +570,7 @@
 			)
 			(justify right)
 		)
-		(uuid f0ce027e-40ae-4b81-a73d-2249ff38bc68)
+		(uuid e9df3551-7805-432f-b35d-6d4de6e18a7c)
 	)
 	(hierarchical_label
 		GND
@@ -582,7 +582,7 @@
 			)
 			(justify right)
 		)
-		(uuid 3120f778-5846-45aa-941a-db4aa170f367)
+		(uuid c3bf485e-bc19-457b-bd1c-a4d5bd0e8402)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -594,7 +594,7 @@
 			)
 			(justify left)
 		)
-		(uuid ff6fab71-fe5b-491b-bb5a-0782d8f4d637)
+		(uuid ba0718e4-5574-4863-b088-603be31f2216)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -606,7 +606,7 @@
 			)
 			(justify left)
 		)
-		(uuid 1ab39221-98c3-4de6-908f-c2eee65758de)
+		(uuid 8e3ec185-615b-43aa-8964-a4f1bca208a9)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -618,7 +618,7 @@
 			)
 			(justify left)
 		)
-		(uuid ec434ed7-93fb-4133-b130-ecad0839e33b)
+		(uuid cd141c9c-8848-4c33-9574-4733071cb6ea)
 	)
 	(text_box
 		"5V to 3.3V power regulation subcircuit"
@@ -651,7 +651,7 @@
 			)
 			(justify left top)
 		)
-		(uuid 15748abe-71bd-4265-b96a-9d44e1e28ade)
+		(uuid e7882dcc-cec4-44b1-a5a6-24fe333ef5c1)
 	)
 	(text_box
 		"5V to 3.3V power regulation subcircuit"
@@ -684,11 +684,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 15748abe-71bd-4265-b96a-9d44e1e28ade)
+		(uuid e7882dcc-cec4-44b1-a5a6-24fe333ef5c1)
 	)
 	(sheet_instances
 		(path
-			"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/7dfab93b-ad82-4ee3-829d-d360f88c46af"
+			"/3760c8d0-fa33-40f6-91c6-71213551185b/09880448-53b4-4ae3-816d-a2e627f96930/0cd77699-632e-4226-8ce8-cc7094f8cc5e"
 			(page "1")
 		)
 	)

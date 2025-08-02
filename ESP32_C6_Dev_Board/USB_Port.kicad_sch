@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 678645fa-11d1-4854-9b4c-8f3118d9e484)
+	(uuid 882cc2df-5f32-4db1-ae49-1961c048764e)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -1259,271 +1259,16 @@
 		(company Circuit-Synth)
 	)
 	(symbol
-		(lib_id Connector:USB_C_Receptacle_USB2.0_16P)
-		(at 45.72 66.04 0)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid 890f17e7-e014-45ea-acbb-886104a2f000)
-		(property
-			"Reference"
-			"J1"
-			(at 45.72 61.040000000000006 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property
-			"Footprint"
-			"Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal"
-			(at 45.72 76.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project
-				"circuit"
-				(path
-					"/"
-					(reference J1)
-					(unit 1)
-				)
-			)
-			(project
-				"ESP32_C6_Dev_Board"
-				(path
-					"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/a5d74e8e-635b-4da0-a0e3-01c51abd2251"
-					(reference J1)
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id Device:R)
-		(at 76.2 66.04 0)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid 65263558-8d25-42ef-8574-f444734e8e0c)
-		(property
-			"Reference"
-			"R1"
-			(at 76.2 61.040000000000006 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property
-			"Value"
-			"5.1k"
-			(at 76.2 71.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property
-			"Footprint"
-			"Resistor_SMD:R_0603_1608Metric"
-			(at 76.2 76.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project
-				"circuit"
-				(path
-					"/"
-					(reference R1)
-					(unit 1)
-				)
-			)
-			(project
-				"ESP32_C6_Dev_Board"
-				(path
-					"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/a5d74e8e-635b-4da0-a0e3-01c51abd2251"
-					(reference R1)
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id Device:R)
-		(at 96.52 66.04 0)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid bda6396e-eea8-43b1-92a7-2858d34ba912)
-		(property
-			"Reference"
-			"R2"
-			(at 96.52 61.040000000000006 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property
-			"Value"
-			"5.1k"
-			(at 96.52 71.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property
-			"Footprint"
-			"Resistor_SMD:R_0603_1608Metric"
-			(at 96.52 76.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project
-				"circuit"
-				(path
-					"/"
-					(reference R2)
-					(unit 1)
-				)
-			)
-			(project
-				"ESP32_C6_Dev_Board"
-				(path
-					"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/a5d74e8e-635b-4da0-a0e3-01c51abd2251"
-					(reference R2)
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id Diode:ESD5Zxx)
-		(at 116.84 66.04 0)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid 9a4a66be-c890-4c2c-b74e-0da92e3870d2)
-		(property
-			"Reference"
-			"D1"
-			(at 116.84 61.040000000000006 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property
-			"Footprint"
-			"Diode_SMD:D_SOD-523"
-			(at 116.84 76.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project
-				"circuit"
-				(path
-					"/"
-					(reference D1)
-					(unit 1)
-				)
-			)
-			(project
-				"ESP32_C6_Dev_Board"
-				(path
-					"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/a5d74e8e-635b-4da0-a0e3-01c51abd2251"
-					(reference D1)
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id Diode:ESD5Zxx)
-		(at 142.24 66.04 0)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid ae9545b2-4759-47b8-91d9-9cafae147352)
-		(property
-			"Reference"
-			"D2"
-			(at 142.24 61.040000000000006 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property
-			"Footprint"
-			"Diode_SMD:D_SOD-523"
-			(at 142.24 76.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project
-				"circuit"
-				(path
-					"/"
-					(reference D2)
-					(unit 1)
-				)
-			)
-			(project
-				"ESP32_C6_Dev_Board"
-				(path
-					"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/a5d74e8e-635b-4da0-a0e3-01c51abd2251"
-					(reference D2)
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id Device:C)
-		(at 162.56 66.04 0)
+		(at 38.1 45.72 0)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 9df3cfce-4ce1-4609-993a-cb3e8baf7891)
+		(uuid 1d2e0177-1c81-42dd-8c3b-877fcc3eb6ba)
 		(property
 			"Reference"
 			"C1"
-			(at 162.56 61.040000000000006 0)
+			(at 38.1 40.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1533,7 +1278,7 @@
 		(property
 			"Value"
 			"10uF"
-			(at 162.56 71.04 0)
+			(at 38.1 50.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1543,7 +1288,7 @@
 		(property
 			"Footprint"
 			"Capacitor_SMD:C_0805_2012Metric"
-			(at 162.56 76.04 0)
+			(at 38.1 55.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1563,351 +1308,300 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/a5d74e8e-635b-4da0-a0e3-01c51abd2251"
+					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
 					(reference C1)
 					(unit 1)
 				)
 			)
 		)
 	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 38.1 88.9 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+	(symbol
+		(lib_id Diode:ESD5Zxx)
+		(at 58.42 45.72 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid 47648a80-532c-48d3-a8c5-fe653bed6840)
+		(property
+			"Reference"
+			"D2"
+			(at 58.42 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
-			(justify right)
 		)
-		(uuid 91ab67e6-f685-4031-8b78-5b2640e49c3f)
+		(property
+			"Value"
+			"~"
+			(at 58.42 50.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Diode_SMD:D_SOD-523"
+			(at 58.42 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference D2)
+					(unit 1)
+				)
+			)
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
+					(reference D2)
+					(unit 1)
+				)
+			)
+		)
 	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 45.72 88.9 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+	(symbol
+		(lib_id Diode:ESD5Zxx)
+		(at 78.74 45.72 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid 7d3d2b86-ec49-4c13-b22d-948a5392cd90)
+		(property
+			"Reference"
+			"D3"
+			(at 78.74 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
-			(justify right)
 		)
-		(uuid 28fdb746-f1d6-484c-a249-519a23b8aae7)
+		(property
+			"Value"
+			"~"
+			(at 78.74 50.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Diode_SMD:D_SOD-523"
+			(at 78.74 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference D3)
+					(unit 1)
+				)
+			)
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
+					(reference D3)
+					(unit 1)
+				)
+			)
+		)
 	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 45.72 88.9 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+	(symbol
+		(lib_id Connector:USB_C_Receptacle_USB2.0_16P)
+		(at 106.68 91.44 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid 5afc6711-c8cc-4086-9fa0-ceba13afcc6b)
+		(property
+			"Reference"
+			"J1"
+			(at 106.68 86.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
-			(justify right)
 		)
-		(uuid 51a0d996-6043-4bde-9ced-54fe098f15d9)
+		(property
+			"Value"
+			"~"
+			(at 106.68 96.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal"
+			(at 106.68 101.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference J1)
+					(unit 1)
+				)
+			)
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
+					(reference J1)
+					(unit 1)
+				)
+			)
+		)
 	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 45.72 88.9 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+	(symbol
+		(lib_id Device:R)
+		(at 137.16 91.44 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid aeabef87-d73a-41a4-ba31-4a5f56ec1f7e)
+		(property
+			"Reference"
+			"R2"
+			(at 137.16 86.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
-			(justify right)
 		)
-		(uuid 7973310b-9dfc-4807-b339-3447e72c0aea)
+		(property
+			"Value"
+			"5.1k"
+			(at 137.16 96.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Resistor_SMD:R_0603_1608Metric"
+			(at 137.16 101.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference R2)
+					(unit 1)
+				)
+			)
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
+					(reference R2)
+					(unit 1)
+				)
+			)
+		)
 	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 45.72 88.9 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+	(symbol
+		(lib_id Device:R)
+		(at 157.48 91.44 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid 19849209-d204-479c-96d4-0cf52a2f9311)
+		(property
+			"Reference"
+			"R3"
+			(at 157.48 86.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
-			(justify right)
 		)
-		(uuid 0e5e6cb7-e24b-41f5-8f0c-f5735a6fbcbd)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 38.1 88.9 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+		(property
+			"Value"
+			"5.1k"
+			(at 157.48 96.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
-			(justify right)
 		)
-		(uuid b1862f89-c680-4c4b-bbdf-c8fd59eccec0)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 76.2 69.85000000000001 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+		(property
+			"Footprint"
+			"Resistor_SMD:R_0603_1608Metric"
+			(at 157.48 101.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
 			)
-			(justify right)
 		)
-		(uuid 1257b01e-29fc-4397-9974-1d4b0a33796b)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 96.52 69.85000000000001 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference R3)
+					(unit 1)
+				)
 			)
-			(justify right)
-		)
-		(uuid 620f3157-37d2-42ef-8765-2505c935f8a9)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 120.65 66.04 0)
-		(effects
-			(font
-				(size 1.27 1.27)
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
+					(reference R3)
+					(unit 1)
+				)
 			)
-			(justify left)
 		)
-		(uuid f3a75273-7152-48de-9af9-182fc6070f2f)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 146.05 66.04 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 27959474-321a-495b-8288-e0719e48ee88)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 162.56 69.85000000000001 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 1488a198-01c0-4412-9a84-92cb864c70d2)
-	)
-	(hierarchical_label
-		VBUS
-		(shape input)
-		(at 60.96 50.800000000000004 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 185ec4d0-aaae-43d4-8b1a-b679ddc40ed6)
-	)
-	(hierarchical_label
-		VBUS
-		(shape input)
-		(at 60.96 50.800000000000004 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 6db1dc32-6fa8-4cdf-ad32-abe8973c63dc)
-	)
-	(hierarchical_label
-		VBUS
-		(shape input)
-		(at 60.96 50.800000000000004 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 2ef21f8b-c05d-4edb-873a-2b891696d940)
-	)
-	(hierarchical_label
-		VBUS
-		(shape input)
-		(at 60.96 50.800000000000004 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 6d01adcc-2e8f-4aac-b6f0-36ec2a6e97a5)
-	)
-	(hierarchical_label
-		VBUS
-		(shape input)
-		(at 162.56 62.230000000000004 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 9d275f92-f3a3-401b-b26c-49a844c79268)
-	)
-	(hierarchical_label
-		N$1
-		(shape input)
-		(at 60.96 55.88000000000001 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid e47c3725-a382-42da-970e-278e3f96df14)
-	)
-	(hierarchical_label
-		N$1
-		(shape input)
-		(at 60.96 55.88000000000001 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 245726af-3d6d-4137-9e68-cfc3d8777262)
-	)
-	(hierarchical_label
-		N$1
-		(shape input)
-		(at 76.2 62.230000000000004 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 2ff8ada4-3d1e-41ba-9088-a7e8c9082da7)
-	)
-	(hierarchical_label
-		N$2
-		(shape input)
-		(at 60.96 58.42000000000001 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 4b693a63-9c9e-4110-8194-090cfc9e2811)
-	)
-	(hierarchical_label
-		N$2
-		(shape input)
-		(at 60.96 58.42000000000001 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 6bdffc33-2219-4cf3-838c-77313f34bd71)
-	)
-	(hierarchical_label
-		N$2
-		(shape input)
-		(at 96.52 62.230000000000004 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 70a1abda-ffcd-4164-a33d-ff939ec85d9b)
-	)
-	(hierarchical_label
-		USB_DM
-		(shape input)
-		(at 60.96 63.50000000000001 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid ce646ccc-8fff-4c5e-845c-56e367236055)
-	)
-	(hierarchical_label
-		USB_DM
-		(shape input)
-		(at 60.96 63.50000000000001 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 50beb962-49e4-47d9-9efc-335595b2bc4f)
-	)
-	(hierarchical_label
-		USB_DM
-		(shape input)
-		(at 138.43 66.04 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 29312e2e-f413-422e-b0e8-8d79c3b0321a)
-	)
-	(hierarchical_label
-		USB_DP
-		(shape input)
-		(at 60.96 68.58000000000001 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 6d7d3c9b-3227-42da-a577-20112199fbbc)
-	)
-	(hierarchical_label
-		USB_DP
-		(shape input)
-		(at 60.96 68.58000000000001 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 0f263466-ef10-4291-ad37-22ac437f05e6)
-	)
-	(hierarchical_label
-		USB_DP
-		(shape input)
-		(at 113.03 66.04 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 99211eb0-313e-437e-bb7b-344553f18ba2)
 	)
 	(text_box
-		"USB-C port with CC resistors, ESD protection, and proper grounding"
+		"USB-C port with proper parameter interface"
 		(exclude_from_sim yes)
 		(at 184.0 110.0 0)
 		(size 80.0 30.0)
@@ -1937,10 +1631,10 @@
 			)
 			(justify left top)
 		)
-		(uuid c034ab91-14af-48b2-869e-ad399e78ade1)
+		(uuid cd422144-1695-4478-8b5f-e3300276dea8)
 	)
 	(text_box
-		"USB-C port with CC resistors, ESD protection, and proper grounding"
+		"USB-C port with proper parameter interface"
 		(exclude_from_sim yes)
 		(at 184.0 110.0 0)
 		(size 80.0 30.0)
@@ -1970,11 +1664,11 @@
 			)
 			(justify left top)
 		)
-		(uuid c034ab91-14af-48b2-869e-ad399e78ade1)
+		(uuid cd422144-1695-4478-8b5f-e3300276dea8)
 	)
 	(sheet_instances
 		(path
-			"/7715780c-7d94-4450-92fc-9edac692c0ce/92bc85ae-a350-41f3-a5d9-b03833873f98/a5d74e8e-635b-4da0-a0e3-01c51abd2251"
+			"/746b507a-dfa0-490e-90be-1c10d392893b/17e1de12-f32a-473e-9e15-de9a6a746f8b/09705b13-d77b-4435-980e-de3aa18c116a"
 			(page "1")
 		)
 	)
