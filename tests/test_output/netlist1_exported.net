@@ -1,9 +1,9 @@
 (export (version "E")
     (design
       (source "test_schematic.kicad_sch")
-      (date "2025-07-30T16:09:39-0700")
+      (date "2025-08-01T21:23:30-0700")
       (tool "Circuit-Synth Exporter v0.1.0")
-      (sheet (number "1") (name "root") (tstamps "/e6eecec9-4e1e-4e48-af81-60cd7ab7025c/")
+      (sheet (number "1") (name "root") (tstamps "/7fcf12ea-bbc0-4609-81c1-085483e0dde5/")
       (title_block
         (title)
         (company)
@@ -34,7 +34,7 @@
       (property (name "ki_keywords") (value "cap capacitor"))
       (property (name "ki_fp_filters") (value "C_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "2b8dc9c7-4985-4863-8c2d-25f2d49a9d5f"))
+      (tstamps "dcd92974-07cd-4482-8efa-f3cb58e2080a"))
     (comp (ref "R1")
       (value "10k")
       (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -49,7 +49,7 @@
       (property (name "ki_keywords") (value "R res resistor"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "cfb44fdf-fd12-4637-a1ed-4d7e9959262e"))
+      (tstamps "6a86e856-1373-4e52-9adf-867430a0842c"))
     (comp (ref "R2")
       (value "1k")
       (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -64,7 +64,7 @@
       (property (name "ki_keywords") (value "R res resistor"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "217429f2-9a7f-4e34-add3-981e2ffd7ba9")))
+      (tstamps "c792a98d-d45d-4be0-9275-0771ce68cf8f")))
     (libparts
     (libpart (lib "Device") (part "C")
       (description "Unpolarized capacitor")
@@ -78,8 +78,8 @@
         (field (name "Datasheet") "")
         (field (name "Keywords") "cap capacitor"))
       (pins
-        (pin (num "?") (name "") (type "passive"))
-        (pin (num "?") (name "") (type "passive"))))
+        (pin (num "1") (name "") (type "passive"))
+        (pin (num "2") (name "") (type "passive"))))
     (libpart (lib "Device") (part "R")
       (description "Resistor")
       (docs "~")
@@ -92,8 +92,8 @@
         (field (name "Datasheet") "")
         (field (name "Keywords") "R res resistor"))
       (pins
-        (pin (num "?") (name "") (type "passive"))
-        (pin (num "?") (name "") (type "passive")))))
+        (pin (num "1") (name "") (type "passive"))
+        (pin (num "2") (name "") (type "passive")))))
     (libraries
     (library (logical "Device")
       (uri "/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols//Device.kicad_sym")))

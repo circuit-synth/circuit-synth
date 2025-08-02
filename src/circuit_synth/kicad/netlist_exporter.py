@@ -169,6 +169,12 @@ def convert_json_to_netlist(json_path: Path, output_path: Path) -> None:
     # Clean up any excess spacing in the file - try to match KiCad's exact format
     netlist_content = cleanup_whitespace(netlist_content)
 
+    # Ensure parent directory exists
+    from pathlib import Path
+
+    output_file = Path(output_path)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+
     # Write to the output file with binary mode to preserve encoding and line endings
     # No BOM in the UTF-8 encoding to ensure KiCad can read it
     with open(output_path, "wb") as f:
@@ -229,6 +235,7 @@ def generate_netlist(circuit_data: Dict[str, Any]) -> str:
     Returns:
         String containing the KiCad netlist content
     """
+    
     logger.debug("Starting generate_netlist...")
     # Build the netlist structure
     # The version needs to be formatted as (export (version "E")) to match KiCad's format
@@ -449,6 +456,7 @@ def generate_components_section(circuit_data: Dict[str, Any]) -> List[Any]:
     def process_components(circ_data: Dict[str, Any], current_path: str):
         """Process components in the current circuit and its subcircuits."""
         components = circ_data.get("components", {})
+        
         for ref, comp_data in components.items():
             # Get sheet name from path
             sheet_name = current_path.split("/")[-1] if current_path != "/" else "Root"
@@ -457,6 +465,7 @@ def generate_components_section(circuit_data: Dict[str, Any]) -> List[Any]:
             sheet_file = (
                 "circuit.kicad_sch"  # Use generic name since we don't need actual files
             )
+
 
             # Generate component entry with sheet info
             comp_entry = generate_component_entry(
@@ -517,7 +526,7 @@ def generate_libparts_section(circuit_data: Dict[str, Any]) -> List[Any]:
 
     # Generate libparts for each unique component type
     for ref, comp_data in all_components.items():
-        logger.debug(f"Processing component ref='{ref}', data={comp_data}")
+        # logger.debug(f"Processing component ref='{ref}', data={comp_data}")
 
         # --- Determine Library and Part ---
         lib = None
@@ -570,11 +579,11 @@ def generate_libparts_section(circuit_data: Dict[str, Any]) -> List[Any]:
 
         # Create a unique key for this libpart
         libpart_key = f"{lib}:{part}"
-        logger.debug(f"  Generated libpart_key: '{libpart_key}'")
+        # logger.debug(f"  Generated libpart_key: '{libpart_key}'")
 
         # Skip if we've already processed this libpart
         if libpart_key in unique_libparts:
-            logger.debug(f"  Skipping duplicate libpart_key: '{libpart_key}'")
+            # logger.debug(f"  Skipping duplicate libpart_key: '{libpart_key}'")
             continue
 
         unique_libparts.add(libpart_key)
@@ -737,8 +746,8 @@ def generate_libpart_entry(
 
     # Sort pins numerically by pin number (important for KiCad)
     def sort_key(pin_dict):
-        # Access the 'num' key within the dictionary
-        pin_num_str = pin_dict.get("num", "")
+        # Access the 'number' key within the dictionary (JSON uses 'number', not 'num')
+        pin_num_str = pin_dict.get("number", "")
         try:
             # Handle potential non-numeric pin numbers gracefully
             return int(pin_num_str)
@@ -768,12 +777,14 @@ def generate_libpart_entry(
 
     # Iterate through the sorted list of pin dictionaries
     for pin_info in sorted_pins:
-        pin_num = pin_info.get("num", "?")  # Get pin number string
+        pin_num = pin_info.get(
+            "number", "?"
+        )  # Get pin number string (JSON uses 'number', not 'num')
         pin_name = pin_info.get("name", "~")  # Use ~ for unnamed pins (KiCad standard)
         # Use 'func' field from JSON for pin type, default to passive
         # (Matches Component.to_dict which uses 'func')
         # Get pin type, preserving the original type from libpart
-        pin_type_str = pin_info.get("type")
+        pin_type_str = pin_info.get("func")
         if not pin_type_str:
             # Only fallback to "passive" if no type is specified
             pin_type_str = "passive"
@@ -834,7 +845,7 @@ def generate_libraries_section(circuit_data: Dict[str, Any]) -> List[Any]:
     # Extract unique libraries
     logger.debug(f"Processing {len(all_components)} components for libraries...")
     for ref, comp_data in all_components.items():
-        logger.debug(f"  Processing component ref='{ref}', data type={type(comp_data)}")
+        # logger.debug(f"  Processing component ref='{ref}', data type={type(comp_data)}")
         if not isinstance(comp_data, dict):
             logger.error(
                 f"  Component data for ref '{ref}' is not a dictionary! Skipping library processing for this component."
@@ -1022,6 +1033,7 @@ def normalize_hierarchical_path(path: str, name: str) -> str:
 def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
     nets_section = ["nets"]
     net_code = 1
+
 
     # Add debug logging
     logger.debug("=== Analyzing net connectivity patterns ===")
@@ -1236,8 +1248,11 @@ def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
                 comp_ref = node_copy.get("component", "")
 
                 # Handle component paths
-                if "original_path" in node_copy:
-                    # Use original path if available
+                if (
+                    "original_path" in node_copy
+                    and node_copy["original_path"] is not None
+                ):
+                    # Use original path if available and not None
                     node_copy["component"] = node_copy["original_path"]
                 elif comp_ref:
                     # Normalize component path
@@ -1356,7 +1371,7 @@ def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
 
         # Add nodes to this net
         for node in nodes:
-            logger.debug(f"Processing node connection: {node}")
+            # logger.debug(f"Processing node connection: {node}")
             component_ref = node.get("component")
             pin_info = node.get("pin", {})
             logger.debug(f"  Component ref: {component_ref}, Pin info: {pin_info}")
@@ -1421,9 +1436,9 @@ def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
                     f"  No pin type found in component or libpart for {component_ref}:{pin_num}, defaulting to 'passive'"
                 )
 
-            logger.debug(
-                f"  Pin type for {component_ref}:{pin_num} before mapping: {pin_type}"
-            )
+            # logger.debug(
+            #     f"  Pin type for {component_ref}:{pin_num} before mapping: {pin_type}"
+            # )
 
             # Special handling for unconnected pins - preserve their original type
             if pin_info.get("unconnected", False):
@@ -1533,7 +1548,7 @@ def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
                 node_entry.append(["pinfunction", pin_function])
 
             net_entry.append(node_entry)
-            logger.debug(f"  Added node entry: {node_entry}")
+            # logger.debug(f"  Added node entry: {node_entry}")
 
         # Add the complete net entry to nets section
         nets_section.append(net_entry)
@@ -1739,6 +1754,7 @@ def generate_component_entry(
     # TODO: Use actual sheet UUID tstamps when available
     sheet_tstamps = sheet_path  # Placeholder
 
+
     comp_entry.append(["sheetpath", ["names", sheet_names], ["tstamps", sheet_tstamps]])
 
     # Use component tstamp from comp_data if available, otherwise generate UUID
@@ -1849,9 +1865,9 @@ def format_s_expr(expr: Any, indent: int = 0) -> str:
     Returns:
         Formatted S-expression string
     """
-    logger.debug(
-        f"format_s_expr called with type={type(expr)}, value={repr(expr)}, indent={indent}"
-    )
+    # logger.debug(
+    #     f"format_s_expr called with type={type(expr)}, value={repr(expr)}, indent={indent}"
+    # )
     indent_str = "  " * indent
 
     if isinstance(expr, str):

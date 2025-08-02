@@ -394,15 +394,23 @@ if __name__ == "__main__":
     print("\n🔌 Generating KiCad netlist...")
     logger.warning("Generating KiCad netlist...")
     with profile("kicad_netlist_generation"):
-        circuit.generate_kicad_netlist("example_kicad_project.net")
-    logger.warning("KiCad netlist generated: example_kicad_project.net")
+        circuit.generate_kicad_netlist(
+            "example_kicad_project/example_kicad_project.net"
+        )
+    logger.warning(
+        "KiCad netlist generated: example_kicad_project/example_kicad_project.net"
+    )
 
     # JSON netlist generation with detailed profiling
     print("\n📄 Generating JSON netlist...")
     logger.warning("Generating JSON netlist...")
     with profile("json_netlist_generation"):
-        circuit.generate_json_netlist("example_kicad_project.json")
-    logger.warning("JSON netlist generated: example_kicad_project.json")
+        circuit.generate_json_netlist(
+            "example_kicad_project/example_kicad_project.json"
+        )
+    logger.warning(
+        "JSON netlist generated: example_kicad_project/example_kicad_project.json"
+    )
 
     # KiCad project generation with detailed profiling
     print("\n🏗️  Generating KiCad project...")

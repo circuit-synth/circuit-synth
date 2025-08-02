@@ -302,11 +302,13 @@ def test_kicad_to_python_import():
         if len(gen_connections) == 0:
             pytest.fail("No connections found in generated code - KiCad import failed")
         
-        # Check that we have R1 and R2 components being created
-        if 'r1.ref = "R1"' not in generated_code:
-            pytest.fail("R1 component not found in generated code")
-        if 'r2.ref = "R2"' not in generated_code:
-            pytest.fail("R2 component not found in generated code")
+        # Check that we have R1 and R2 components being created (modern format)
+        if 'Component(symbol="Device:R"' not in generated_code:
+            pytest.fail("Device:R components not found in generated code")
+        if 'r1 = Component(' not in generated_code:
+            pytest.fail("R1 component creation not found in generated code")
+        if 'r2 = Component(' not in generated_code:
+            pytest.fail("R2 component creation not found in generated code")
         
         # Check that we have the resistor_divider function definition
         if 'def resistor_divider(' not in generated_code:

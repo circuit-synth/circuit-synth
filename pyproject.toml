@@ -94,6 +94,8 @@ setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
 register-agents = "circuit_synth.claude_integration.agent_registry:main"
 validate-circuit = "circuit_synth.validation.real_time_check:main"
 cs-new-project = "circuit_synth.tools.new_project:main"
+cs-init-existing-project = "circuit_synth.tools.init_existing_project:main"
+cs-setup-kicad-plugins = "circuit_synth.tools.setup_kicad_plugins:main"
 
 # Plugin Management
 smarton-ai = "circuit_synth.tools.smarton_ai_manager:main"
@@ -155,6 +157,14 @@ env = [
 [tool.uv.workspace]
 members = [
     "test-circuit-synth-setup/my-circuit-project-test",
+    "test-circuit",
+    "test-circuit-complete",
+    "my-circuit-project",
+    "test-uv-workflow",
+    "test-setup",
+    "my_kicad_project",
+    "my_kicad_proejct",
+    "example_project",
 ]
 
 [dependency-groups]
