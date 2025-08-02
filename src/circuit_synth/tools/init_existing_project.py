@@ -322,11 +322,16 @@ def convert_kicad_to_circuit_synth(kicad_project_path: Path, target_dir: Path) -
                     if main_circuit is None or len(children) > len(main_circuit.hierarchical_tree.get(main_circuit.name, [])):
                         main_circuit = circuit
         
-        # Only collect subcircuits that are actually used by the main circuit
+        # Collect all subcircuits recursively from hierarchical tree
         subcircuits = {}
         if main_circuit and hasattr(main_circuit, 'hierarchical_tree') and main_circuit.hierarchical_tree:
-            used_subcircuit_names = main_circuit.hierarchical_tree.get(main_circuit.name, [])
-            for subcircuit_name in used_subcircuit_names:
+            # Get all subcircuits recursively
+            all_subcircuit_names = _collect_all_subcircuits_recursive(
+                main_circuit.hierarchical_tree, main_circuit.name
+            )
+            console.print(f"🔍 Found {len(all_subcircuit_names)} subcircuits (including nested): {all_subcircuit_names}")
+            
+            for subcircuit_name in all_subcircuit_names:
                 if subcircuit_name in all_circuits:
                     subcircuits[subcircuit_name] = all_circuits[subcircuit_name]
         
@@ -361,6 +366,29 @@ def convert_kicad_to_circuit_synth(kicad_project_path: Path, target_dir: Path) -
         create_basic_template(target_dir, kicad_project_path.stem)
 
 
+def _collect_all_subcircuits_recursive(hierarchical_tree: dict, start_circuit: str) -> set:
+    """Recursively collect all subcircuits from hierarchical tree"""
+    all_subcircuits = set()
+    
+    def _recursive_collect(circuit_name: str):
+        children = hierarchical_tree.get(circuit_name, [])
+        for child in children:
+            all_subcircuits.add(child)
+            # Recursively collect children of this child
+            _recursive_collect(child)
+    
+    _recursive_collect(start_circuit)
+    return all_subcircuits
+
+
+def map_subcircuit_to_target_name(kicad_name: str) -> tuple[str, str]:
+    """Convert KiCad subcircuit names to lowercase file and function names"""
+    # Convert KiCad sheet names directly to lowercase with underscores
+    filename = kicad_name.lower()
+    function_name = kicad_name.lower()
+    return (filename, function_name)
+
+
 def generate_hierarchical_circuit_synth_code(main_circuit: Any, subcircuits: dict, target_dir: Path, project_name: str) -> None:
     """Generate hierarchical circuit-synth Python code with separate subcircuit files"""
     
@@ -371,20 +399,28 @@ def generate_hierarchical_circuit_synth_code(main_circuit: Any, subcircuits: dic
     subcircuit_calls = []
     
     for name, subcircuit in subcircuits.items():
-        # Remove "_subcircuit" suffix from filename - use clean names
-        subcircuit_filename = f"{name.lower()}.py"
+        # Map to target file and function names
+        filename, function_name = map_subcircuit_to_target_name(name)
+        subcircuit_filename = f"{filename}.py"
         subcircuit_path = target_dir / "circuit-synth" / subcircuit_filename
         
-        # Generate subcircuit Python code
-        subcircuit_code = generate_subcircuit_code(subcircuit, name)
+        # Generate subcircuit Python code with mapped names
+        subcircuit_code = generate_subcircuit_code(subcircuit, name, function_name)
         with open(subcircuit_path, "w") as f:
             f.write(subcircuit_code)
         
-        # Track imports and calls for main file (use clean names)
-        import_name = f"{name.lower()}"
-        function_name = f"{name.lower()}_circuit"
-        subcircuit_imports.append(f"from {import_name} import {function_name}")
-        subcircuit_calls.append(f"    {name.lower()} = {function_name}()")
+        # Track imports and calls for main file (use target names)
+        subcircuit_imports.append(f"from {filename} import {function_name}")
+        
+        # Generate the proper function call based on subcircuit type
+        if 'usb' in function_name.lower():
+            subcircuit_calls.append(f"    {function_name}_circuit = {function_name}(vbus, gnd, usb_dp, usb_dm)")
+        elif 'power' in function_name.lower():
+            subcircuit_calls.append(f"    {function_name}_circuit = {function_name}(vbus, vcc_3v3, gnd)")
+        elif 'esp32' in function_name.lower():
+            subcircuit_calls.append(f"    esp32_circuit = {function_name}(vcc_3v3, gnd, usb_dp, usb_dm)")
+        else:
+            subcircuit_calls.append(f"    {function_name}_circuit = {function_name}(vcc_3v3, gnd)")
         
         console.print(f"   ✅ Generated {subcircuit_filename}")
     
@@ -397,24 +433,37 @@ def generate_hierarchical_circuit_synth_code(main_circuit: Any, subcircuits: dic
     console.print(f"   ✅ Generated main.py with hierarchical structure")
 
 
-def generate_subcircuit_code(circuit: Any, subcircuit_name: str) -> str:
+def generate_subcircuit_code(circuit: Any, subcircuit_name: str, function_name: str = None) -> str:
     """Generate Python code for a single subcircuit"""
     
-    function_name = f"{subcircuit_name.lower()}_circuit"
+    if function_name is None:
+        function_name = f"{subcircuit_name.lower()}_circuit"
+    
+    # Determine function parameters based on subcircuit type
+    if 'usb' in function_name.lower():
+        params = "vbus_out, gnd, usb_dp, usb_dm"
+        param_doc = "USB-C port with proper parameter interface"
+    elif 'power' in function_name.lower():
+        params = "vbus_in, vcc_3v3_out, gnd"
+        param_doc = "Power supply with input/output interface"
+    elif 'esp32' in function_name.lower():
+        params = "vcc_3v3, gnd, usb_dp, usb_dm"
+        param_doc = "ESP32 MCU with power and USB interface"
+    else:
+        params = "vcc_3v3, gnd"
+        param_doc = "Basic subcircuit with power interface"
     
     code = f'''#!/usr/bin/env python3
 """
-{subcircuit_name} Subcircuit - Converted from KiCad hierarchical sheet
-
-This subcircuit was automatically generated from a KiCad hierarchical sheet.
-You may need to adjust component symbols, footprints, and net connections.
+{subcircuit_name} Circuit - Converted from KiCad hierarchical sheet
+{param_doc}
 """
 
 from circuit_synth import *
 
 @circuit(name="{subcircuit_name}")
-def {function_name}():
-    """{subcircuit_name} circuit converted from KiCad hierarchical sheet"""
+def {function_name}({params}):
+    """{param_doc}"""
     
     # Components
 '''
@@ -470,37 +519,16 @@ from circuit_synth import *
 def main_circuit():
     """Main hierarchical circuit - {project_name}"""
     
-    # Create all subcircuits
-{calls_section}
-    
-    # Add main circuit components
-'''
-    
-    # Add main circuit components
-    for component in main_circuit.components:
-        safe_var_name = component.reference.lower().replace('-', '_').replace('.', '_')
-        ref_prefix = component.reference[0] if component.reference else "U"
-        code += f'''    {safe_var_name} = Component(
-        symbol="{component.lib_id}",
-        ref="{ref_prefix}",
-        footprint="{component.footprint}",
-'''
-        if hasattr(component, 'value') and component.value:
-            code += f'        value="{component.value}",\n'
-        code += '    )\n\n'
-    
-    # Add shared nets
-    code += '''    # Create shared nets between subcircuits
-    # Power nets
+    # Create shared nets between subcircuits (ONLY nets - no components here)
+    vbus = Net('VBUS')
     vcc_3v3 = Net('VCC_3V3')
     gnd = Net('GND')
+    usb_dp = Net('USB_DP')
+    usb_dm = Net('USB_DM')
+
     
-    # Signal nets (customize based on your design)
-    # usb_dp = Net('USB_DP')
-    # usb_dm = Net('USB_DM')
-    
-    # TODO: Add connections between main components and subcircuits
-    # Example: main_component["VCC"] += vcc_3v3
+    # Create all circuits with shared nets
+{calls_section}
 
 
 if __name__ == "__main__":
