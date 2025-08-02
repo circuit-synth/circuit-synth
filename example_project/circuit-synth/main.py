@@ -13,39 +13,27 @@ This is the main entry point that orchestrates all subcircuits:
 
 from circuit_synth import *
 
-# Import all subcircuits
-from usb_subcircuit import usb_port_subcircuit
-from power_supply_subcircuit import power_supply_subcircuit
-from debug_header_subcircuit import debug_header_subcircuit
-from led_blinker_subcircuit import led_blinker_subcircuit
-from esp32_c6_subcircuit import esp32_c6_subcircuit
+# Import all circuits
+from usb import usb_port
+from power_supply import power_supply
+from esp32c6 import esp32c6
 
 @circuit(name="ESP32_C6_Dev_Board_Main")
 def main_circuit():
     """Main hierarchical circuit - ESP32-C6 development board"""
     
-    # Create shared nets between subcircuits
+    # Create shared nets between subcircuits (ONLY nets - no components here)
     vbus = Net('VBUS')
     vcc_3v3 = Net('VCC_3V3')
     gnd = Net('GND')
     usb_dp = Net('USB_DP')
     usb_dm = Net('USB_DM')
+
     
-    # Debug signals
-    debug_tx = Net('DEBUG_TX')
-    debug_rx = Net('DEBUG_RX')
-    debug_en = Net('DEBUG_EN')
-    debug_io0 = Net('DEBUG_IO0')
-    
-    # LED control
-    led_control = Net('LED_CONTROL')
-    
-    # Create all subcircuits with shared nets for proper interconnection
-    # usb_port = usb_port_subcircuit(vbus, gnd, usb_dp, usb_dm)
-    # power_supply = power_supply_subcircuit(vbus, vcc_3v3, gnd)
-    esp32_c6_mcu = esp32_c6_subcircuit(vcc_3v3, gnd, usb_dp, usb_dm, debug_tx, debug_rx, debug_en, debug_io0, led_control)
-    # debug_header = debug_header_subcircuit(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0)
-    # led_blinker = led_blinker_subcircuit(vcc_3v3, gnd, led_control)
+    # Create all circuits with shared nets
+    usb_port_circuit = usb_port(vbus, gnd, usb_dp, usb_dm)
+    power_supply_circuit = power_supply(vbus, vcc_3v3, gnd)
+    esp32_circuit = esp32c6(vcc_3v3, gnd, usb_dp, usb_dm)
 
 
 if __name__ == "__main__":
@@ -75,7 +63,7 @@ if __name__ == "__main__":
     print("✅ ESP32-C6 Development Board project generated!")
     print("📁 Check the ESP32_C6_Dev_Board/ directory for KiCad files")
     print("")
-    print("🏗️ Generated subcircuits:")
+    print("🏗️ Generated circuits:")
     print("   • USB-C port with CC resistors and ESD protection")
     print("   • 5V to 3.3V power regulation")
     print("   • ESP32-C6 microcontroller with support circuits")

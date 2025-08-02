@@ -1,19 +1,14 @@
 #!/usr/bin/env python3
 """
-Power Supply Subcircuit - 5V to 3.3V regulation
+Power Supply Circuit - 5V to 3.3V regulation
 Clean power regulation from USB-C VBUS to regulated 3.3V
 """
 
 from circuit_synth import *
 
 @circuit(name="Power_Supply")
-def power_supply_subcircuit(vbus_in=None, vcc_3v3_out=None, gnd=None):
+def power_supply(vbus_in, vcc_3v3_out, gnd):
     """5V to 3.3V power regulation subcircuit"""
-    
-    # Interface nets - use provided nets or create defaults for standalone operation
-    vbus_in = vbus_in or Net('VBUS_IN')
-    vcc_3v3_out = vcc_3v3_out or Net('VCC_3V3_OUT') 
-    gnd = gnd or Net('GND')
     
     # 3.3V regulator
     regulator = Component(
@@ -37,7 +32,3 @@ def power_supply_subcircuit(vbus_in=None, vcc_3v3_out=None, gnd=None):
     cap_out[1] += vcc_3v3_out
     cap_out[2] += gnd
 
-if __name__ == "__main__":
-    circuit = power_supply_subcircuit()
-    circuit.generate_kicad_project("power_supply")
-    print("✅ Power supply subcircuit generated!")
