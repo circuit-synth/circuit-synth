@@ -99,7 +99,6 @@ cs-init-existing-project = "circuit_synth.tools.init_existing_project:main"
 cs-setup-kicad-plugins = "circuit_synth.tools.setup_kicad_plugins:main"
 
 # Plugin Management
-smarton-ai = "circuit_synth.tools.smarton_ai_manager:main"
 install-kicad-plugins = "install_kicad_plugins:main"
 
 [project.urls]
