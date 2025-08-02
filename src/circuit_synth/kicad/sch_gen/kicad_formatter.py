@@ -51,19 +51,19 @@ try:
     if is_rust_available():
         _RUST_SEXP_AVAILABLE = True
         _rust_sexp_module = True
-        logging.getLogger(__name__).info(
-            f"🦀 RUST_INTEGRATION: ✅ RUST S-EXPRESSION MODULE LOADED in {import_time*1000:.2f}ms for KiCad formatter"
+        logging.getLogger(__name__).debug(
+            f"Rust S-expression module loaded in {import_time*1000:.2f}ms for KiCad formatter"
         )
-        logging.getLogger(__name__).info(
-            f"🚀 RUST_INTEGRATION: Expected 6x performance improvement for S-expression generation"
+        logging.getLogger(__name__).debug(
+            f"Expected 6x performance improvement for S-expression generation"
         )
     else:
         logging.getLogger(__name__).info(
-            f"🐍 RUST_INTEGRATION: Rust module found but not compiled (loaded in {import_time*1000:.2f}ms), using Python fallback"
+            f"Rust module found but not compiled (loaded in {import_time*1000:.2f}ms), using Python fallback"
         )
 except ImportError as e:
     logging.getLogger(__name__).info(
-        f"🐍 RUST_INTEGRATION: Rust S-expression module not available ({e}), using Python fallback"
+        f"Rust S-expression module not available ({e}), using Python fallback"
     )
 except Exception as e:
     logging.getLogger(__name__).warning(
@@ -418,16 +418,16 @@ def format_kicad_schematic(schematic_expr: Any) -> str:
     logger.info(
         f"🚀 FORMAT_KICAD_SCHEMATIC: Starting formatting of {expr_type} ({expr_size} chars)"
     )
-    logger.info(
-        f"🔍 FORMAT_KICAD_SCHEMATIC: Rust acceleration available: {_RUST_SEXP_AVAILABLE}"
+    logger.debug(
+        f"Rust acceleration available: {_RUST_SEXP_AVAILABLE}"
     )
 
     # Try Rust implementation first for maximum performance
     if _RUST_SEXP_AVAILABLE:
         rust_start = time.perf_counter()
         try:
-            logger.info(
-                "🦀 RUST_ACCELERATION: ⚡ ATTEMPTING RUST S-EXPRESSION FORMATTING"
+            logger.debug(
+                "Attempting Rust S-expression formatting"
             )
 
             # Convert schematic_expr to format compatible with Rust module
@@ -446,24 +446,24 @@ def format_kicad_schematic(schematic_expr: Any) -> str:
                 f"❌ RUST_ACCELERATION: RUST FORMATTING FAILED after {rust_time*1000:.2f}ms: {e}"
             )
             logger.warning(
-                "🔄 RUST_ACCELERATION: 🐍 FALLING BACK TO PYTHON IMPLEMENTATION"
+                "Falling back to Python implementation"
             )
             # Fall through to Python implementation
     else:
         logger.info(
-            "🐍 FORMAT_KICAD_SCHEMATIC: Rust not available, using Python implementation"
+            "Rust not available, using Python implementation"
         )
 
     # Use Python implementation (current and fallback)
     python_start = time.perf_counter()
-    logger.info("🐍 PYTHON_FORMATTING: ⚡ STARTING PYTHON S-EXPRESSION FORMATTING")
+    logger.debug("Starting Python S-expression formatting")
 
     # Create formatter instance - time this critical step
     formatter_creation_start = time.perf_counter()
     formatter = KiCadFormatterNew()
     formatter_creation_time = time.perf_counter() - formatter_creation_start
     logger.debug(
-        f"🔧 PYTHON_FORMATTING: KiCadFormatterNew created in {formatter_creation_time*1000:.3f}ms"
+        f"KiCadFormatterNew created in {formatter_creation_time*1000:.3f}ms"
     )
 
     # Format the expression with proper multi-line formatting - time the core operation
