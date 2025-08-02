@@ -325,6 +325,16 @@ header {
     line-height: 1.5;
 }
 
+.plugin-note {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--code-bg);
+    border-radius: 0.25rem;
+    border-left: 3px solid var(--primary-color);
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
 .plugin-image {
     text-align: center;
 }

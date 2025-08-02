@@ -245,13 +245,14 @@ uv run python circuit-synth/main.py
                 
                 <div class="ai-integration-grid">
                     <div class="ai-feature">
-                        <h3>Natural Component Search</h3>
+                        <h3>Natural Component Search via Claude Code</h3>
                         <div class="code-example">
                             <div class="example-query">
                                 <span class="user">👤</span> "find a stm32 mcu that has 3 spi's and is available on jlcpcb"
                             </div>
                             <div class="example-response">
-                                <span class="bot">🤖</span> <strong>STM32G431CBT6</strong> - Found matching component<br>
+                                <span class="bot">🤖</span> <strong>Claude Code</strong> searches and finds:<br>
+                                <strong>STM32G431CBT6</strong> - Found matching component<br>
                                 📊 Stock: 83,737 units | Price: $2.50@100pcs | LCSC: C529092<br>
                                 ✅ 3 SPIs: SPI1, SPI2, SPI3<br>
                                 📦 LQFP-48 package | 128KB Flash, 32KB RAM
@@ -278,20 +279,21 @@ uv run python circuit-synth/main.py
                 </div>
                 
                 <div class="kicad-plugin-section">
-                    <h3>KiCad Plugin Integration</h3>
+                    <h3>KiCad Plugin - Direct Claude Code Access</h3>
                     <div class="plugin-content">
                         <div class="plugin-description">
-                            <p>Our KiCad plugin brings AI circuit analysis directly into your schematic editor. Connect back to Claude Code for intelligent design feedback and optimization suggestions.</p>
+                            <p>Our KiCad schematic plugin connects directly to Claude Code through KiCad's legacy BOM system. Ask questions about your circuit design right from the schematic editor.</p>
                             <ul class="plugin-features">
-                                <li>🔍 <strong>Smart Analysis:</strong> Right-click any component or net for AI insights</li>
-                                <li>🤖 <strong>Claude Code Integration:</strong> Send schematics directly to Claude for enhancement</li>
-                                <li>⚡ <strong>Real-time Feedback:</strong> Get component suggestions and design improvements</li>
-                                <li>📊 <strong>BOM Intelligence:</strong> Automated bill-of-materials with availability checking</li>
+                                <li>💬 <strong>Ask About Circuits:</strong> "How can I improve this power supply?" or "What's wrong with this amplifier?"</li>
+                                <li>🤖 <strong>Claude Code Bridge:</strong> Uses KiCad's BOM script system as a backdoor to Claude Code</li>
+                                <li>⚡ <strong>Schematic Context:</strong> Claude Code sees your complete circuit for intelligent analysis</li>
+                                <li>🔧 <strong>Design Suggestions:</strong> Get optimization tips, component alternatives, and troubleshooting help</li>
                             </ul>
+                            <p class="plugin-note"><em>Leverages KiCad's existing BOM generation system for seamless AI integration</em></p>
                         </div>
                         <div class="plugin-image">
                             <img src="kicad_plugin_sch.png" alt="KiCad Plugin in Action" class="kicad-screenshot">
-                            <p class="image-caption">KiCad plugin providing AI-powered circuit analysis</p>
+                            <p class="image-caption">KiCad plugin providing direct Claude Code access for circuit analysis</p>
                         </div>
                     </div>
                 </div>
