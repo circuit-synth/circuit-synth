@@ -354,7 +354,7 @@ class SchematicGenerator(IKiCadIntegration):
         Returns:
             Set of all assigned references in the project
         """
-        logger.info("Pre-scanning project to collect all assigned references...")
+        logger.debug("Pre-scanning project to collect all assigned references...")
 
         # Load the JSON data
         with open(json_file, "r") as f:
@@ -380,7 +380,7 @@ class SchematicGenerator(IKiCadIntegration):
             return references
 
         all_refs = collect_from_circuit(json_data)
-        logger.info(
+        logger.debug(
             f"Found {len(all_refs)} pre-assigned references: {sorted(all_refs)}"
         )
         return all_refs
@@ -403,13 +403,13 @@ class SchematicGenerator(IKiCadIntegration):
             # Only warn if truly incomplete (no schematic files at all)
             if project_exists and not schematic_exists:
                 logger.warning(
-                    "⚠️  Incomplete project detected - .kicad_pro exists but no schematic files found"
+                    "WARNING: Incomplete project detected - .kicad_pro exists but no schematic files found"
                 )
                 logger.warning("    Treating as new project creation")
                 return False
             elif not project_exists and schematic_exists:
                 logger.warning(
-                    "⚠️  Incomplete project detected - schematic files exist but .kicad_pro is missing"
+                    "WARNING: Incomplete project detected - schematic files exist but .kicad_pro is missing"
                 )
                 logger.warning("    Treating as new project creation")
                 return False
@@ -573,7 +573,7 @@ class SchematicGenerator(IKiCadIntegration):
 
         if project_exists and not force_regenerate:
             # Auto-switch to update mode
-            logger.info(f"🔍 Existing KiCad project detected at: {self.project_dir}")
+            logger.info(f"Existing KiCad project detected at: {self.project_dir}")
             logger.info(
                 "🔄 Automatically switching to update mode to preserve your work"
             )
@@ -591,7 +591,7 @@ class SchematicGenerator(IKiCadIntegration):
         elif project_exists and force_regenerate:
             # User explicitly wants to regenerate
             logger.warning(
-                f"⚠️  WARNING: Force regenerating project at: {self.project_dir}"
+                f"WARNING: Force regenerating project at: {self.project_dir}"
             )
             logger.warning(
                 "   This will LOSE all manual work (component positions, wires, etc.)"
@@ -635,9 +635,9 @@ class SchematicGenerator(IKiCadIntegration):
         #    This references the project-named schematic as a sub-sheet
         cover_uuid, sheet_uuid = self._write_cover_sheet(top_name)
 
-        logger.info(f"Cover sheet created with UUIDs:")
-        logger.info(f"  - Cover sheet UUID: {cover_uuid}")
-        logger.info(f"  - Sheet symbol UUID: {sheet_uuid}")
+        logger.debug(f"Cover sheet created with UUIDs:")
+        logger.debug(f"  - Cover sheet UUID: {cover_uuid}")
+        logger.debug(f"  - Sheet symbol UUID: {sheet_uuid}")
 
         # 6) Generate .kicad_sch for each circuit
         # Store sheet UUIDs and writers for all circuits
@@ -651,7 +651,7 @@ class SchematicGenerator(IKiCadIntegration):
         from .integrated_reference_manager import IntegratedReferenceManager
 
         shared_ref_manager = IntegratedReferenceManager()
-        logger.info("Created shared reference manager for global uniqueness")
+        logger.debug("Created shared reference manager for global uniqueness")
 
         # Pre-populate the reference manager with all assigned references
         # This ensures we respect existing references and don't create conflicts
@@ -659,23 +659,23 @@ class SchematicGenerator(IKiCadIntegration):
             shared_ref_manager.api_ref_manager.add_existing_references(
                 list(all_assigned_refs)
             )
-            logger.info(
+            logger.debug(
                 f"Pre-populated reference manager with {len(all_assigned_refs)} existing references"
             )
 
         # REMOVED: Enable reassignment mode - we want to preserve existing references
         # shared_ref_manager.enable_reassignment_mode()
-        logger.info("Reference manager will preserve all pre-assigned references")
+        logger.debug("Reference manager will preserve all pre-assigned references")
 
         # First, generate the main circuit with the full hierarchical path
         # Build hierarchical path: [cover_uuid, sheet_uuid]
         hierarchical_path = [cover_uuid, sheet_uuid]
 
-        logger.info(f"=== BUILDING MAIN CIRCUIT HIERARCHY ===")
-        logger.info(f"  Cover UUID: {cover_uuid}")
-        logger.info(f"  Sheet symbol UUID (in cover): {sheet_uuid}")
-        logger.info(f"  Main circuit name: {top_name}")
-        logger.info(f"  Hierarchical path: {hierarchical_path}")
+        logger.debug(f"=== BUILDING MAIN CIRCUIT HIERARCHY ===")
+        logger.debug(f"  Cover UUID: {cover_uuid}")
+        logger.debug(f"  Sheet symbol UUID (in cover): {sheet_uuid}")
+        logger.debug(f"  Main circuit name: {top_name}")
+        logger.debug(f"  Hierarchical path: {hierarchical_path}")
 
         main_writer = SchematicWriter(
             sub_dict[top_name],
@@ -800,7 +800,7 @@ class SchematicGenerator(IKiCadIntegration):
                             "full_path": hierarchical_path,
                         }
 
-                        logger.info(f"  Subcircuit schematic UUID: {writer.uuid_top}")
+                        logger.debug(f"  Subcircuit schematic UUID: {writer.uuid_top}")
 
                         out_path = self.project_dir / f"{c_name}.kicad_sch"
                         write_schematic_file(sch_expr, str(out_path))
@@ -824,10 +824,10 @@ class SchematicGenerator(IKiCadIntegration):
 
         # Generate KiCad netlist (.net file) after schematic generation
         netlist_path = Path(self.project_dir) / f"{self.project_name}.net"
-        logger.info(f"🔌 Generating KiCad netlist at: {netlist_path}")
-        logger.info(f"📁 DEBUG: JSON file path: {json_file}")
-        logger.info(f"📁 DEBUG: Project dir: {self.project_dir}")
-        logger.info(f"📁 DEBUG: Project name: {self.project_name}")
+        logger.debug(f"Generating KiCad netlist at: {netlist_path}")
+        logger.debug(f"JSON file path: {json_file}")
+        logger.debug(f"Project dir: {self.project_dir}")
+        logger.debug(f"Project name: {self.project_name}")
 
         try:
             # Import the circuit JSON for netlist generation
@@ -836,16 +836,16 @@ class SchematicGenerator(IKiCadIntegration):
             from ...core.circuit import Circuit
 
             # Load the circuit from the JSON file
-            logger.info(f"📖 DEBUG: Loading JSON from: {json_file}")
+            logger.debug(f"Loading JSON from: {json_file}")
             with open(json_file, "r") as f:
                 circuit_data = json.load(f)
-            logger.info(
-                f"📖 DEBUG: JSON loaded successfully, keys: {list(circuit_data.keys())}"
+            logger.debug(
+                f"JSON loaded successfully, keys: {list(circuit_data.keys())}"
             )
-            logger.info(
-                f"📖 DEBUG: Components: {list(circuit_data.get('components', {}).keys())}"
+            logger.debug(
+                f"Components: {list(circuit_data.get('components', {}).keys())}"
             )
-            logger.info(f"📖 DEBUG: Nets: {list(circuit_data.get('nets', {}).keys())}")
+            logger.debug(f"Nets: {list(circuit_data.get('nets', {}).keys())}")
 
             # Create a Circuit object from the JSON data
             from ...core.component import Component
@@ -853,15 +853,15 @@ class SchematicGenerator(IKiCadIntegration):
             from ...core.netlist_exporter import NetlistExporter
 
             # Skip the temporary circuit creation - let the netlist service handle it
-            logger.info(
-                f"🔧 DEBUG: Skipping temporary circuit creation to avoid reference collisions"
+            logger.debug(
+                f"Skipping temporary circuit creation to avoid reference collisions"
             )
-            logger.info(
-                f"📖 DEBUG: JSON data will be passed directly to netlist service"
+            logger.debug(
+                f"JSON data will be passed directly to netlist service"
             )
 
             # Generate the netlist using the modular service approach
-            logger.info(f"🔧 DEBUG: Using netlist service to generate hierarchical netlist...")
+            logger.debug(f"Using netlist service to generate hierarchical netlist...")
             from ..netlist_service import KiCadNetlistService
             
             netlist_service = KiCadNetlistService()
@@ -869,9 +869,9 @@ class SchematicGenerator(IKiCadIntegration):
                 # Use the correct method name and parameters
                 result = netlist_service.generate_netlist(json_file, str(netlist_path), self.project_name)
                 if result.success:
-                    logger.info(f"✅ Netlist generation succeeded!")
-                    logger.info(f"📁 Netlist saved to: {netlist_path}")
-                    logger.info(f"📊 Generated netlist with {result.component_count} components and {result.net_count} nets")
+                    logger.debug(f"Netlist generation succeeded!")
+                    logger.debug(f"Netlist saved to: {netlist_path}")
+                    logger.debug(f"Generated netlist with {result.component_count} components and {result.net_count} nets")
                 else:
                     logger.error(f"❌ Netlist generation failed: {result.error_message}")
                     logger.warning("PCB generation will proceed without netlist")
@@ -883,14 +883,14 @@ class SchematicGenerator(IKiCadIntegration):
             import traceback
 
             logger.error(
-                f"❌ Failed to generate KiCad netlist with modular service: {e}"
+                f"Failed to generate KiCad netlist with modular service: {e}"
             )
             logger.error(f"❌ Full traceback: {traceback.format_exc()}")
             logger.warning("PCB generation will proceed without netlist")
 
         # Generate PCB (default behavior)
         if generate_pcb:
-            logger.info("🔧 Generating PCB with hierarchical placement...")
+            logger.debug("Generating PCB with hierarchical placement...")
             # Import locally to avoid circular import
             from circuit_synth.kicad.pcb_gen import PCBGenerator
 
@@ -920,13 +920,13 @@ class SchematicGenerator(IKiCadIntegration):
             )
 
             if success:
-                logger.info("✅ PCB generation complete!")
+                logger.info("PCB generation complete!")
             else:
                 logger.error("❌ PCB generation failed!")
 
         # NOTE: Netlist generation now handled earlier in the method using modular service
-        logger.info(
-            "🔍 DEBUG: Netlist generation completed earlier using modular service"
+        logger.debug(
+            "Netlist generation completed earlier using modular service"
         )
 
         # Return success result
@@ -946,13 +946,13 @@ class SchematicGenerator(IKiCadIntegration):
         Returns:
             bool: True if netlist generation succeeded, False otherwise
         """
-        logger.info("🔍 DEBUG: _generate_netlist method STARTED")
-        logger.info(f"🔍 DEBUG: json_file: {json_file}")
-        logger.info(f"🔍 DEBUG: project_dir: {self.project_dir}")
-        logger.info(f"🔍 DEBUG: project_name: {self.project_name}")
+        logger.debug("_generate_netlist method STARTED")
+        logger.debug(f"json_file: {json_file}")
+        logger.debug(f"project_dir: {self.project_dir}")
+        logger.debug(f"project_name: {self.project_name}")
 
         try:
-            logger.info("🔍 DEBUG: Using netlist service to generate netlist")
+            logger.debug("Using netlist service to generate netlist")
             # Use the modular service approach that handles hierarchical connections properly
             from ..netlist_service import KiCadNetlistService
             
@@ -962,9 +962,9 @@ class SchematicGenerator(IKiCadIntegration):
             # Use the correct method name and parameters
             result = netlist_service.generate_netlist(json_file, netlist_path, self.project_name)
             if result.success:
-                logger.info(f"✅ Netlist service generation succeeded!")
-                logger.info(f"📁 Netlist saved to: {netlist_path}")
-                logger.info(f"📊 Generated netlist with {result.component_count} components and {result.net_count} nets")
+                logger.debug(f"Netlist service generation succeeded!")
+                logger.debug(f"Netlist saved to: {netlist_path}")
+                logger.debug(f"Generated netlist with {result.component_count} components and {result.net_count} nets")
                 return True
             else:
                 raise RuntimeError(f"Netlist generation failed: {result.error_message}")
@@ -1030,15 +1030,11 @@ class SchematicGenerator(IKiCadIntegration):
             sub_dict: Dictionary of circuits to place
             placement_algorithm: Algorithm to use - "sequential" or "connection_aware"
         """
-        logger.info("=" * 80)
-        logger.info("Starting _collision_place_all_circuits")
-        logger.info(f"Processing {len(sub_dict)} circuits")
-        logger.info("=" * 80)
+        logger.debug("Starting collision placement for all circuits")
+        logger.debug(f"Processing {len(sub_dict)} circuits")
 
         for c_name, circ in sub_dict.items():
-            logger.info(f"\n--- Processing circuit: '{c_name}' ---")
-            logger.info(f"Circuit has {len(circ.components)} components")
-            logger.info(f"Circuit has {len(circ.child_instances)} child instances")
+            logger.debug(f"Processing circuit: '{c_name}' with {len(circ.components)} components, {len(circ.child_instances)} child instances")
 
             # Log component details
             logger.debug("Components in circuit:")
@@ -1155,14 +1151,14 @@ class SchematicGenerator(IKiCadIntegration):
                     logger.warning(f"Could not read existing schematic: {e}")
                     logger.warning("Will use default placement for all components")
             else:
-                logger.info("No existing schematic found - will use default placement")
+                logger.debug("No existing schematic found - will use default placement")
 
             # Place components
-            logger.info("Placing components...")
+            logger.debug("Placing components...")
 
             # Handle LLM placement separately
             if placement_algorithm == "llm":
-                logger.info("Using LLM for component placement...")
+                logger.debug("Using LLM for component placement...")
                 llm_manager = LLMPlacementManager(sheet_size=sheet_size)
 
                 # Try LLM placement
@@ -1173,7 +1169,7 @@ class SchematicGenerator(IKiCadIntegration):
                         llm_manager.apply_llm_placement(circ, circ.components)
                     )
                     if success:
-                        logger.info("LLM placement completed successfully")
+                        logger.debug("LLM placement completed successfully")
                         # Skip the normal placement loop
                         continue
                     else:
@@ -1194,7 +1190,7 @@ class SchematicGenerator(IKiCadIntegration):
                 placement_order = cm.connection_analyzer.get_placement_order(
                     circ.components
                 )
-                logger.info(
+                logger.debug(
                     f"Connection-based placement order: {placement_order[:10]}..."
                 )  # Show first 10
 
@@ -1257,7 +1253,7 @@ class SchematicGenerator(IKiCadIntegration):
                     )
 
             # Place sheet symbols
-            logger.info(f"Placing {len(circ.child_instances)} sheet symbols...")
+            logger.debug(f"Placing {len(circ.child_instances)} sheet symbols...")
             for child in circ.child_instances:
                 # Calculate sheet dimensions based on pin count
                 sub_name = child["sub_name"]
@@ -1321,28 +1317,28 @@ class SchematicGenerator(IKiCadIntegration):
             self.paper_size = self._determine_paper_size(
                 circ.components, circ.child_instances
             )
-            logger.info(f"Selected paper size: {self.paper_size}")
+            logger.debug(f"Selected paper size: {self.paper_size}")
 
             # Log placement metrics if using connection-aware algorithm
             if placement_algorithm == "connection_aware" and isinstance(
                 cm, ConnectionAwareCollisionManager
             ):
                 metrics = cm.get_placement_metrics()
-                logger.info(f"Placement metrics for '{c_name}':")
-                logger.info(
+                logger.debug(f"Placement metrics for '{c_name}':")
+                logger.debug(
                     f"  Total wire length: {metrics['total_wire_length']:.2f}mm"
                 )
-                logger.info(
+                logger.debug(
                     f"  Average wire length: {metrics['average_wire_length']:.2f}mm"
                 )
-                logger.info(f"  Max wire length: {metrics['max_wire_length']:.2f}mm")
-                logger.info(f"  Placement density: {metrics['placement_density']:.2%}")
+                logger.debug(f"  Max wire length: {metrics['max_wire_length']:.2f}mm")
+                logger.debug(f"  Placement density: {metrics['placement_density']:.2%}")
 
-            logger.info(f"Completed placement for circuit '{c_name}'")
+            logger.debug(f"Completed placement for circuit '{c_name}'")
 
-        logger.info("=" * 80)
-        logger.info("Completed _collision_place_all_circuits")
-        logger.info("=" * 80)
+        logger.debug("=" * 80)
+        logger.debug("Completed _collision_place_all_circuits")
+        logger.debug("=" * 80)
 
     def _prepare_blank_project(self):
         """
@@ -1354,7 +1350,7 @@ class SchematicGenerator(IKiCadIntegration):
         # Create blank .kicad_pro if it doesn't exist
         kicad_pro_path = self.project_dir / f"{self.project_name}.kicad_pro"
         if not kicad_pro_path.exists():
-            logger.info(f"Creating blank .kicad_pro at {kicad_pro_path}")
+            logger.debug(f"Creating blank .kicad_pro at {kicad_pro_path}")
             blank_pro = {
                 "board": {"design_settings": {"defaults": {}}},
                 "boards": [],
@@ -1405,7 +1401,7 @@ class SchematicGenerator(IKiCadIntegration):
             with open(kicad_pro_path, "w") as f:
                 json.dump(blank_pro, f, indent=2)
         else:
-            logger.info(f".kicad_pro already exists at {kicad_pro_path}")
+            logger.debug(f".kicad_pro already exists at {kicad_pro_path}")
 
     def _write_cover_sheet(self, main_circuit_name: str) -> Tuple[str, str]:
         """
@@ -1413,7 +1409,7 @@ class SchematicGenerator(IKiCadIntegration):
         Returns a tuple of (cover_sheet_uuid, sheet_symbol_uuid).
         """
         cover_path = self.project_dir / f"{self.project_name}.kicad_sch"
-        logger.info(f"Writing cover sheet to {cover_path}")
+        logger.debug(f"Writing cover sheet to {cover_path}")
 
         # Generate UUIDs for the cover sheet and the sheet symbol
         cover_uuid = str(uuid.uuid4())
@@ -1454,8 +1450,8 @@ class SchematicGenerator(IKiCadIntegration):
         with open(cover_path, "w") as f:
             f.write(cover_content)
 
-        logger.info(f"Cover sheet written with UUID: {cover_uuid}")
-        logger.info(f"Sheet symbol UUID: {sheet_symbol_uuid}")
+        logger.debug(f"Cover sheet written with UUID: {cover_uuid}")
+        logger.debug(f"Sheet symbol UUID: {sheet_symbol_uuid}")
 
         return cover_uuid, sheet_symbol_uuid
 
@@ -1464,7 +1460,7 @@ class SchematicGenerator(IKiCadIntegration):
         Update the .kicad_pro file to reference all generated .kicad_sch files.
         """
         kicad_pro_path = self.project_dir / f"{self.project_name}.kicad_pro"
-        logger.info(f"Updating .kicad_pro at {kicad_pro_path}")
+        logger.debug(f"Updating .kicad_pro at {kicad_pro_path}")
 
         # Read existing .kicad_pro
         with open(kicad_pro_path, "r") as f:
@@ -1490,7 +1486,7 @@ class SchematicGenerator(IKiCadIntegration):
         with open(kicad_pro_path, "w") as f:
             json.dump(pro_data, f, indent=2)
 
-        logger.info(f"Updated .kicad_pro with {len(sheets)} schematic entries.")
+        logger.debug(f"Updated .kicad_pro with {len(sheets)} schematic entries.")
 
     def generate_pcb_from_schematics(
         self,
@@ -1528,7 +1524,7 @@ class SchematicGenerator(IKiCadIntegration):
         pcb_gen = PCBGenerator(self.project_dir, self.project_name)
 
         # Generate PCB
-        logger.info(f"Generating PCB with {placement_algorithm} placement...")
+        logger.debug(f"Generating PCB with {placement_algorithm} placement...")
         success = pcb_gen.generate_pcb(
             circuit_dict=None,  # Will extract from schematics
             placement_algorithm=placement_algorithm,
