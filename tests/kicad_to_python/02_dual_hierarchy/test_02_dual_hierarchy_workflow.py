@@ -15,7 +15,7 @@ from pathlib import Path
 from textwrap import dedent
 
 from circuit_synth.tools.kicad_to_python_sync import KiCadToPythonSyncer
-from circuit_synth.tools.llm_code_updater import LLMCodeUpdater
+from circuit_synth.tools.python_code_generator import PythonCodeGenerator
 
 
 class Test02DualHierarchyWorkflow(unittest.TestCase):
