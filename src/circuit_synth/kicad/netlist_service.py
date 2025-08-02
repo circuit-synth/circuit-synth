@@ -131,25 +131,17 @@ class CircuitReconstructor:
         from ..core.component import Component
         from ..core.net import Net
 
-        print(f"\n🔧 HIERARCHICAL FIX - Reconstructing circuit: {circuit_name}")
-        print(f"🔧 Input circuit_data keys: {list(circuit_data.keys())}")
-        print(f"🔧 Subcircuits: {len(circuit_data.get('subcircuits', []))}")
-        if circuit_data.get('subcircuits'):
-            print(f"🔧 Subcircuit names: {[sub.get('name', 'Unknown') for sub in circuit_data['subcircuits']]}")
         
         # CRITICAL FIX: Preserve the original circuit name and structure instead of flattening
         main_circuit = Circuit(name=circuit_name)
-        print(f"🔧 Created main circuit: {circuit_name}")
         
         # Preserve hierarchical structure by reconstructing subcircuits first
         for subcircuit_data in circuit_data.get('subcircuits', []):
             subcircuit_name = subcircuit_data.get('name', 'UnknownSubcircuit')
-            print(f"🔧 Reconstructing subcircuit: {subcircuit_name}")
             
             # Recursively reconstruct subcircuit
             subcircuit = self.reconstruct_circuit(subcircuit_data, subcircuit_name)
             main_circuit.add_subcircuit(subcircuit)
-            print(f"🔧 Added subcircuit {subcircuit_name} to main circuit")
         
         # Now create the circuit with proper hierarchical structure preserved
         temp_circuit = main_circuit
@@ -165,8 +157,6 @@ class CircuitReconstructor:
         try:
             # Reconstruct components - ONLY for this circuit level (not subcircuits)
             components_data = circuit_data.get("components", {})
-            print(f"🔧 Reconstructing {len(components_data)} components for circuit {circuit_name}")
-            print(f"🔧 Component refs: {list(components_data.keys())}")
 
             for comp_ref, comp_data in components_data.items():
                 # self.logger.info(f"🔧 Creating component {comp_ref}:")
@@ -201,8 +191,6 @@ class CircuitReconstructor:
 
             # Reconstruct nets - ONLY for this circuit level (not subcircuits)
             nets_data = circuit_data.get("nets", {})
-            print(f"🔧 Reconstructing {len(nets_data)} nets for circuit {circuit_name}")
-            print(f"🔧 Net names: {list(nets_data.keys())}")
 
             for net_name, connections in nets_data.items():
                 # Creating net with connections (verbose logging available if needed)
@@ -239,11 +227,6 @@ class CircuitReconstructor:
                             f"⚠️ Skipping connection - missing comp_ref ({comp_ref}) or pin_number ({pin_number})"
                         )
 
-            print(f"🔧 ✅ Circuit reconstruction complete for {circuit_name}:")
-            print(f"🔧   Components: {len(temp_circuit._components)} - {list(temp_circuit._components.keys())}")
-            print(f"🔧   Nets: {len(temp_circuit._nets)} - {list(temp_circuit._nets.keys())}")
-            print(f"🔧   Subcircuits: {len(temp_circuit._subcircuits)} - {[sc.name for sc in temp_circuit._subcircuits]}")
-            print(f"🔧 HIERARCHICAL FIX COMPLETE for {circuit_name}\n")
 
             # Log any connection issues for debugging
             for net_name, net_obj in temp_circuit._nets.items():

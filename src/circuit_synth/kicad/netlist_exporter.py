@@ -235,13 +235,6 @@ def generate_netlist(circuit_data: Dict[str, Any]) -> str:
     Returns:
         String containing the KiCad netlist content
     """
-    print(f"\n🔧 NETLIST GENERATION DEBUG - Starting generate_netlist for: {circuit_data.get('name', 'Unknown')}")
-    print(f"🔧 Circuit data keys: {list(circuit_data.keys())}")
-    print(f"🔧 Main circuit components: {len(circuit_data.get('components', {}))}")
-    print(f"🔧 Main circuit nets: {len(circuit_data.get('nets', {}))}")
-    print(f"🔧 Subcircuits: {len(circuit_data.get('subcircuits', []))}")
-    if circuit_data.get('subcircuits'):
-        print(f"🔧 Subcircuit names: {[sub.get('name', 'Unknown') for sub in circuit_data['subcircuits']]}")
     
     logger.debug("Starting generate_netlist...")
     # Build the netlist structure
@@ -442,8 +435,6 @@ def generate_components_section(circuit_data: Dict[str, Any]) -> List[Any]:
     Returns:
         List representing the components section S-expression.
     """
-    print(f"\n🔧 COMPONENTS SECTION DEBUG - Starting generation")
-    print(f"🔧 Top-level circuit: {circuit_data.get('name', 'Unknown')}")
     components_section = ["components"]
 
     # Create sheet hierarchy manager in test mode
@@ -464,10 +455,7 @@ def generate_components_section(circuit_data: Dict[str, Any]) -> List[Any]:
 
     def process_components(circ_data: Dict[str, Any], current_path: str):
         """Process components in the current circuit and its subcircuits."""
-        circuit_name = circ_data.get("name", "Unknown")
         components = circ_data.get("components", {})
-        print(f"🔧   Processing circuit '{circuit_name}' at path '{current_path}'")
-        print(f"🔧     Found {len(components)} components: {list(components.keys())}")
         
         for ref, comp_data in components.items():
             # Get sheet name from path
@@ -478,7 +466,6 @@ def generate_components_section(circuit_data: Dict[str, Any]) -> List[Any]:
                 "circuit.kicad_sch"  # Use generic name since we don't need actual files
             )
 
-            print(f"🔧     Component {ref}: sheet_name='{sheet_name}', sheet_path='{current_path}'")
 
             # Generate component entry with sheet info
             comp_entry = generate_component_entry(
@@ -489,17 +476,13 @@ def generate_components_section(circuit_data: Dict[str, Any]) -> List[Any]:
             )
             if comp_entry:
                 components_section.append(comp_entry)
-                print(f"🔧     ✅ Added component {ref} to netlist")
 
         # Process subcircuits
-        subcircuits = circ_data.get("subcircuits", [])
-        print(f"🔧     Processing {len(subcircuits)} subcircuits from '{circuit_name}'")
-        for subcircuit in subcircuits:
+        for subcircuit in circ_data.get("subcircuits", []):
             subname = subcircuit.get("name", "UnnamedSheet")
             new_path = (
                 f"{current_path}{subname}/" if current_path != "/" else f"/{subname}/"
             )
-            print(f"🔧     Recursing into subcircuit '{subname}' with path '{new_path}'")
             process_components(subcircuit, new_path)
 
     # Start processing from root
@@ -1051,10 +1034,6 @@ def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
     nets_section = ["nets"]
     net_code = 1
 
-    print(f"\n🔧 NETS SECTION DEBUG - Starting generation")
-    print(f"🔧 Circuit: {circuit_data.get('name', 'Unknown')}")
-    print(f"🔧 Top-level nets: {len(circuit_data.get('nets', {}))}")
-    print(f"🔧 Net names: {list(circuit_data.get('nets', {}).keys())}")
 
     # Add debug logging
     logger.debug("=== Analyzing net connectivity patterns ===")
@@ -1103,13 +1082,7 @@ def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
 
     # First collect all nodes and determine net types
     def process_net_nodes(circ, path="/"):
-        circuit_name = circ.get("name", "Unknown")
-        print(f"🔧   Processing nets for circuit '{circuit_name}' at path '{path}'")
-        nets = circ.get("nets", {})
-        print(f"🔧     Found {len(nets)} nets: {list(nets.keys())}")
-        
-        for net_name, net_data in nets.items():
-            print(f"🔧     Processing net '{net_name}' at path '{path}'")
+        for net_name, net_data in circ.get("nets", {}).items():
             # Skip invalid nets
             if not validate_net_data(net_name, net_data):
                 logger.warning(
@@ -1781,11 +1754,6 @@ def generate_component_entry(
     # TODO: Use actual sheet UUID tstamps when available
     sheet_tstamps = sheet_path  # Placeholder
 
-    print(f"🔧 CRITICAL - Component {ref} sheet path generation:")
-    print(f"🔧   Input sheet_path: '{sheet_path}'")
-    print(f"🔧   Final sheet_names: '{sheet_names}'")
-    print(f"🔧   Final sheet_tstamps: '{sheet_tstamps}'")
-    print(f"🔧   ⚠️  THIS IS WHERE HIERARCHICAL PATHS SHOULD BE PRESERVED")
 
     comp_entry.append(["sheetpath", ["names", sheet_names], ["tstamps", sheet_tstamps]])
 
