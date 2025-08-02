@@ -41,11 +41,11 @@ def main_circuit():
     led_control = Net('LED_CONTROL')
     
     # Create all subcircuits with shared nets for proper interconnection
-    # usb_port = usb_port_subcircuit(vbus, gnd, usb_dp, usb_dm)
-    # power_supply = power_supply_subcircuit(vbus, vcc_3v3, gnd)
+    usb_port = usb_port_subcircuit(vbus, gnd, usb_dp, usb_dm)
+    power_supply = power_supply_subcircuit(vbus, vcc_3v3, gnd)
     esp32_c6_mcu = esp32_c6_subcircuit(vcc_3v3, gnd, usb_dp, usb_dm, debug_tx, debug_rx, debug_en, debug_io0, led_control)
-    # debug_header = debug_header_subcircuit(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0)
-    # led_blinker = led_blinker_subcircuit(vcc_3v3, gnd, led_control)
+    debug_header = debug_header_subcircuit(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0)
+    led_blinker = led_blinker_subcircuit(vcc_3v3, gnd, led_control)
 
 
 if __name__ == "__main__":

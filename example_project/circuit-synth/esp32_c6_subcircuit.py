@@ -48,10 +48,10 @@ def esp32_c6_subcircuit(vcc_3v3=None, gnd=None, usb_dp=None, usb_dm=None,
     esp32_c6["IO8"] += led_control  # GPIO for LED control
     
     # ESP32-C6 decoupling capacitor
-    # cap_esp = Component(symbol="Device:C", ref="C", value="100nF",
-    #                    footprint="Capacitor_SMD:C_0603_1608Metric")
-    # cap_esp[1] += vcc_3v3
-    # cap_esp[2] += gnd
+    cap_esp = Component(symbol="Device:C", ref="C", value="100nF",
+                       footprint="Capacitor_SMD:C_0603_1608Metric")
+    cap_esp[1] += vcc_3v3
+    cap_esp[2] += gnd
 
 if __name__ == "__main__":
     circuit = esp32_c6_subcircuit()
