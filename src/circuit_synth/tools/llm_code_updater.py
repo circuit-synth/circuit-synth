@@ -439,7 +439,7 @@ class LLMCodeUpdater:
         if hierarchical_tree and "main" in hierarchical_tree:
             code_lines.append("    # Instantiate subcircuits")
             for child_circuit in hierarchical_tree["main"]:
-                child_var = self._sanitize_variable_name(child_circuit)
+                child_var = f"{self._sanitize_variable_name(child_circuit)}_instance"
                 child_func = self._sanitize_variable_name(child_circuit)
                 code_lines.append(f"    {child_var} = {child_func}()")
 

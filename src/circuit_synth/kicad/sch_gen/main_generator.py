@@ -706,7 +706,7 @@ class SchematicGenerator(IKiCadIntegration):
             c_name = child_info["sub_name"]
             if c_name in main_writer.sheet_symbol_map:
                 circuit_parent_info[c_name] = {
-                    "parent_path": [cover_uuid, sheet_uuid],
+                    "parent_path": [root_uuid, sheet_uuids[top_name]],
                     "sheet_uuid": main_writer.sheet_symbol_map[c_name],
                 }
 
@@ -735,8 +735,8 @@ class SchematicGenerator(IKiCadIntegration):
                             if c_name in main_writer.sheet_symbol_map:
                                 sheet_symbol_uuid = main_writer.sheet_symbol_map[c_name]
                                 hierarchical_path = [
-                                    cover_uuid,
-                                    sheet_uuid,
+                                    root_uuid,
+                                    sheet_uuids[top_name],
                                     sheet_symbol_uuid,
                                 ]
                             else:
@@ -1458,15 +1458,12 @@ class SchematicGenerator(IKiCadIntegration):
         # Update sheets list
         sheets = []
 
-        # Add the cover sheet (always first)
+        # Add the root sheet (main circuit is in the root schematic)
         sheets.append([f"{self.project_name}.kicad_sch", ""])
 
-        # Add the main circuit sheet
-        sheets.append([f"{top_name}.kicad_sch", top_name])
-
-        # Add all subcircuit sheets
+        # Add all subcircuit sheets (excluding the main circuit since it's in the root)
         for c_name in sub_dict:
-            if c_name != top_name:  # Skip the main circuit as we already added it
+            if c_name != top_name:  # Skip the main circuit as it's in the root schematic
                 sheets.append([f"{c_name}.kicad_sch", c_name])
 
         pro_data["sheets"] = sheets
