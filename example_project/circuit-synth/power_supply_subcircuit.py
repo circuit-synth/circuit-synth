@@ -7,13 +7,13 @@ Clean power regulation from USB-C VBUS to regulated 3.3V
 from circuit_synth import *
 
 @circuit(name="Power_Supply")
-def power_supply_subcircuit(vbus_in=None, vcc_3v3_out=None, gnd=None):
+def power_supply_subcircuit():
     """5V to 3.3V power regulation subcircuit"""
     
-    # Interface nets - use provided nets or create defaults for standalone operation
-    vbus_in = vbus_in or Net('VBUS_IN')
-    vcc_3v3_out = vcc_3v3_out or Net('VCC_3V3_OUT') 
-    gnd = gnd or Net('GND')
+    # Interface nets
+    vbus_in = Net('VBUS_IN')
+    vcc_3v3_out = Net('VCC_3V3_OUT') 
+    gnd = Net('GND')
     
     # 3.3V regulator
     regulator = Component(
