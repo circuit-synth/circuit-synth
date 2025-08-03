@@ -491,6 +491,20 @@ uv run register-agents  # Register all agents including contributor
 
 ## 🎯 Our Philosophy
 
+### Core Design Principle: KiCad as Source of Truth
+
+**A fundamental principle of circuit-synth is that the EDA tool (KiCad in our case) is the ultimate source of truth** because it is the most respected by users. Python code and everything else exists just to make it easier to interact with the EDA.
+
+This means:
+- **KiCad projects define the "real" circuit** - component references, net names, project structure
+- **Python code adapts to match KiCad** - not the other way around
+- **Bidirectional sync preserves KiCad decisions** - if KiCad says the project is called "my_board", Python updates to match
+- **Users trust KiCad files more than generated code** - and rightfully so
+
+This principle guides all our design decisions around bidirectional synchronization, file naming, reference designators, and project structure.
+
+### What Circuit-synth is For
+
 **Circuit-synth is for electrical engineers who want to:**
 - Write Python instead of clicking through GUIs
 - Generate professional KiCad projects programmatically  

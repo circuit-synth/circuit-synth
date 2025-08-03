@@ -48,6 +48,10 @@ _config = None
 _initialized = False
 _failsafe_enabled = True
 
+# Add custom DEVELOP logging level (between INFO and WARNING)
+DEVELOP_LEVEL = 25
+logger.level("DEVELOP", no=DEVELOP_LEVEL, color="<blue>")
+
 
 class LoggingFailsafe:
     """Failsafe logging when primary system fails."""
