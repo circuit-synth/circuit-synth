@@ -3,833 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circuit Synth - Pythonic Circuit Design for Professional KiCad Projects</title>
-    <meta name="description" content="Open-source Python library that seamlessly integrates into your professional KiCad workflow. Design circuits with clean, readable, and verifiable code.">
-    
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
-    
-    <!-- Open Graph / Social Media -->
-    <meta property="og:title" content="Circuit Synth - Pythonic Circuit Design">
-    <meta property="og:description" content="Design professional circuits with Python. Generate KiCad projects with clean, readable code.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.circuit-synth.com">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        :root {
-            --primary: #667eea;
-            --primary-dark: #5a6fd8;
-            --secondary: #764ba2;
-            --accent: #f093fb;
-            --dark: #1a1a2e;
-            --light: #f8fafc;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --code-bg: #1e293b;
-            --text-dark: #334155;
-            --text-light: #64748b;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--text-dark);
-            overflow-x: hidden;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-        
-        /* Header */
-        header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-        }
-        
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .logo::before {
-            content: "⚡";
-            font-size: 1.8rem;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-        
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: opacity 0.3s;
-        }
-        
-        .nav-links a:hover {
-            opacity: 0.8;
-        }
-        
-        .cta-button {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .cta-button:hover {
-            background: white;
-            color: var(--primary);
-        }
-        
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            padding: 6rem 0;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
-            opacity: 0.1;
-        }
-        
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-        
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, #ffffff 0%, #f093fb 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .hero-subtitle {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 4rem;
-        }
-        
-        .btn-primary {
-            background: white;
-            color: var(--primary);
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        /* Code Demo */
-        .code-demo {
-            background: var(--code-bg);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem auto;
-            max-width: 800px;
-            overflow-x: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-        
-        .code-demo pre {
-            color: #e2e8f0;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            margin: 0;
-            text-align: left;
-        }
-        
-        .code-demo .keyword { color: #f472b6; }
-        .code-demo .string { color: #34d399; }
-        .code-demo .comment { color: #64748b; }
-        .code-demo .function { color: #60a5fa; }
-        
-        /* Features Section */
-        .features {
-            padding: 6rem 0;
-            background: var(--light);
-        }
-        
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--dark);
-        }
-        
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.2rem;
-            color: var(--text-light);
-            margin-bottom: 4rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-        
-        .feature-card {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-            border: 1px solid rgba(102, 126, 234, 0.1);
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-        }
-        
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-        
-        .feature-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--dark);
-        }
-        
-        .feature-description {
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-        
-        /* Status Section */
-        .status {
-            padding: 6rem 0;
-            background: white;
-        }
-        
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-        
-        .status-item {
-            text-align: center;
-            padding: 2rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            border-radius: 15px;
-            transition: transform 0.3s;
-        }
-        
-        .status-item:hover {
-            transform: scale(1.05);
-        }
-        
-        .status-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .status-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        
-        .status-description {
-            opacity: 0.9;
-            font-size: 0.9rem;
-        }
-        
-        /* Getting Started */
-        .getting-started {
-            padding: 6rem 0;
-            background: var(--light);
-        }
-        
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 3rem;
-            margin-top: 4rem;
-        }
-        
-        .step {
-            background: white;
-            padding: 3rem 2.5rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            position: relative;
-            transition: transform 0.3s;
-        }
-        
-        .step:hover {
-            transform: translateY(-5px);
-        }
-        
-        .step-number {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .step h3 {
-            margin-top: 2rem;
-            margin-bottom: 1.5rem;
-            color: var(--dark);
-            font-size: 1.4rem;
-            text-align: center;
-        }
-        
-        .step p {
-            margin-bottom: 2rem;
-            color: var(--text-light);
-            text-align: center;
-            line-height: 1.6;
-        }
-        
-        .step-code {
-            background: var(--code-bg);
-            color: #e2e8f0;
-            padding: 1.5rem;
-            border-radius: 10px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 0.9rem;
-            margin-top: 1.5rem;
-            overflow-x: auto;
-            line-height: 1.6;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        
-        /* Community Section */
-        .community {
-            padding: 6rem 0;
-            background: white;
-        }
-        
-        .community-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-        
-        .community-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 15px;
-            text-align: center;
-            text-decoration: none;
-            transition: transform 0.3s;
-        }
-        
-        .community-card:hover {
-            transform: translateY(-5px);
-            color: white;
-        }
-        
-        .community-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        /* Footer */
-        footer {
-            background: var(--dark);
-            color: white;
-            padding: 3rem 0 2rem;
-            text-align: center;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .footer-section h3 {
-            margin-bottom: 1rem;
-            color: var(--accent);
-        }
-        
-        .footer-section a {
-            color: #cbd5e1;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-section a:hover {
-            color: var(--accent);
-        }
-        
-        .footer-bottom {
-            border-top: 1px solid #374151;
-            padding-top: 2rem;
-            margin-top: 2rem;
-            color: #9ca3af;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero-subtitle {
-                font-size: 1.1rem;
-            }
-            
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .nav-links {
-                display: none;
-            }
-            
-            .container {
-                padding: 0 1rem;
-            }
-        }
-        
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .fade-in {
-            animation: fadeInUp 0.8s ease-out;
-        }
-        
-        /* Smooth scroll */
-        html {
-            scroll-behavior: smooth;
-        }
-    </style>
+    <title>Circuit-Synth - Professional Hierarchical Circuit Design</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
-    <!-- Header -->
     <header>
-        <nav class="container">
-            <div class="logo">Circuit Synth</div>
-            <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#getting-started">Get Started</a></li>
-                <li><a href="#community">Community</a></li>
-                <li><a href="https://circuit-synth.readthedocs.io" target="_blank">Docs</a></li>
-            </ul>
-            <a href="https://github.com/circuit-synth/circuit-synth" class="cta-button" target="_blank">
-                GitHub
-            </a>
+        <nav>
+            <div class="nav-container">
+                <div class="logo">
+                    <h1>circuit-synth</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#quickstart">Quick Start</a></li>
+                    <li><a href="#examples">Examples</a></li>
+                    <li><a href="https://github.com/circuit-synth/circuit-synth">GitHub</a></li>
+                </ul>
+            </div>
         </nav>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content fade-in">
-                <h1>Pythonic Circuit Design</h1>
-                <p class="hero-subtitle">
-                    Open-source Python library that seamlessly integrates into your professional KiCad workflow. 
-                    Design circuits with clean, readable, and verifiable code.
-                </p>
-                <div class="hero-buttons">
-                    <a href="#getting-started" class="btn-primary">Get Started</a>
-                    <a href="https://github.com/circuit-synth/circuit-synth" class="btn-secondary" target="_blank">
-                        View on GitHub
-                    </a>
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Professional Hierarchical Circuit Design</h1>
+                <p class="hero-subtitle">Generate complete KiCad projects with professional hierarchical architecture using familiar Python syntax</p>
+                <div class="hero-badges">
+                    <img src="https://readthedocs.org/projects/circuit-synth/badge/?version=latest" alt="Documentation">
+                    <img src="https://badge.fury.io/py/circuit-synth.svg" alt="PyPI version">
+                    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
                 </div>
-                
-                <!-- Code Demo -->
-                <div class="code-demo">
-                    <pre><code><span class="keyword">from</span> circuit_synth <span class="keyword">import</span> *
+                <div class="hero-actions">
+                    <a href="#quickstart" class="btn btn-primary">Get Started</a>
+                    <a href="https://github.com/circuit-synth/circuit-synth" class="btn btn-secondary">View on GitHub</a>
+                </div>
+            </div>
+        </section>
 
-<span class="comment"># Define a professional ESP32 circuit with Python</span>
-<span class="keyword">@circuit</span>(name=<span class="string">"esp32c6_simple"</span>)
-<span class="keyword">def</span> <span class="function">esp32c6_simple</span>():
-    <span class="string">"""Simple ESP32-C6 circuit with decoupling capacitor"""</span>
+        <section id="component-intelligence" class="section">
+            <div class="container">
+                <h2>🔍 Component Intelligence</h2>
+                <p><strong>Ask for components naturally:</strong></p>
+                <div class="code-example">
+                    <div class="example-query">
+                        <span class="user">👤</span> "find a stm32 mcu that has 3 spi's and is available on jlcpcb"
+                    </div>
+                    <div class="example-response">
+                        <span class="bot">🤖</span> <strong>STM32G431CBT6</strong> - Found matching component<br>
+                        📊 Stock: 83,737 units | Price: $2.50@100pcs | LCSC: C529092<br>
+                        ✅ 3 SPIs: SPI1, SPI2, SPI3<br>
+                        📦 LQFP-48 package | 128KB Flash, 32KB RAM
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quickstart" class="section">
+            <div class="container">
+                <h2>Quick Start</h2>
+                <div class="code-block">
+                    <pre><code># Clone and run hierarchical demo
+git clone https://github.com/circuit-synth/circuit-synth.git
+cd circuit-synth
+uv run python stm32_imu_usbc_demo_hierarchical.py</code></pre>
+                </div>
+                <p>Generates a complete hierarchical KiCad project with modular subcircuits, professional schematics, PCB layout, and netlists.</p>
+            </div>
+        </section>
+
+        <section id="features" class="section">
+            <div class="container">
+                <h2>Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature">
+                        <h3>🏗️ Hierarchical Design</h3>
+                        <p>Professional modular architecture with subcircuits following software engineering principles</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🐍 Pure Python</h3>
+                        <p>Standard Python syntax - no DSL to learn</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🔄 KiCad Integration</h3>
+                        <p>Bidirectional integration - import existing projects, export hierarchical KiCad projects</p>
+                    </div>
+                    <div class="feature">
+                        <h3>⚡ Rust-Accelerated</h3>
+                        <p>Fast symbol lookup and hierarchical placement algorithms</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🏭 Manufacturing Integration</h3>
+                        <p>Real-time component availability and pricing from JLCPCB</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🤖 AI-Powered</h3>
+                        <p>5 specialized AI agents for circuit design assistance</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="examples" class="section">
+            <div class="container">
+                <h2>Example: ESP32 Development Board</h2>
+                <div class="code-block">
+                    <pre><code>from circuit_synth import *
+
+@circuit(name="esp32_dev_board")
+def esp32_dev_board():
+    """ESP32 development board with USB-C and power regulation"""
     
-    <span class="comment"># Create power nets</span>
-    _3V3 = Net(<span class="string">'3V3'</span>)
-    GND = Net(<span class="string">'GND'</span>)
+    # Create power nets
+    VCC_5V = Net('VCC_5V')
+    VCC_3V3 = Net('VCC_3V3') 
+    GND = Net('GND')
     
-    <span class="comment"># ESP32-C6 module</span>
-    esp32c6 = Component(
-        symbol=<span class="string">"RF_Module:ESP32-C6-MINI-1"</span>,
-        ref=<span class="string">"U"</span>,
-        footprint=<span class="string">"RF_Module:ESP32-C6-MINI-1"</span>
+    # ESP32 module
+    esp32 = Component(
+        symbol="RF_Module:ESP32-S3-MINI-1",
+        ref="U1",
+        footprint="RF_Module:ESP32-S3-MINI-1"
     )
     
-    <span class="comment"># Power connections</span>
-    esp32c6[<span class="string">"3V3"</span>] += _3V3
-    esp32c6[<span class="string">"GND"</span>] += GND
+    # Voltage regulator
+    vreg = Component(
+        symbol="Regulator_Linear:AMS1117-3.3",
+        ref="U2", 
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+    )
 
-<span class="comment"># Generate professional KiCad project</span>
-circuit = esp32c6_simple()
-circuit.generate_kicad_project(<span class="string">"esp32c6_simple"</span>)</code></pre>
+# Generate KiCad project
+circuit = esp32_dev_board()
+circuit.generate_kicad_project("esp32_dev")</code></pre>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features">
-        <div class="container">
-            <h2 class="section-title">Why Circuit Synth?</h2>
-            <p class="section-subtitle">
-                Built for real engineering teams who need professional, production-ready circuit design tools
-            </p>
-            
-            <div class="features-grid">
-                <div class="feature-card fade-in">
-                    <span class="feature-icon">🐍</span>
-                    <h3 class="feature-title">Pure Python</h3>
-                    <p class="feature-description">
-                        No domain-specific language to learn. Uses the same KiCad parts you're already familiar with. Just clean, readable Python code that any engineer can understand and modify.
-                    </p>
-                </div>
-                
-                <div class="feature-card fade-in">
-                    <span class="feature-icon">↔️</span>
-                    <h3 class="feature-title">Bidirectional Sync</h3>
-                    <p class="feature-description">
-                        KiCad remains the source of truth. Import existing projects, modify in Python, and export back to clean KiCad files.
-                    </p>
-                </div>
-                
-                <div class="feature-card fade-in">
-                    <span class="feature-icon">🏗️</span>
-                    <h3 class="feature-title">Professional Workflow</h3>
-                    <p class="feature-description">
-                        Integrates seamlessly with existing KiCad-based development processes. Generate industry-standard netlists and projects.
-                    </p>
-                </div>
-                
-                <div class="feature-card fade-in">
-                    <span class="feature-icon">📊</span>
-                    <h3 class="feature-title">Hierarchical Design</h3>
-                    <p class="feature-description">
-                        Multi-sheet projects with proper organization. Supports arbitrary depth circuit nesting with clean parameter passing.
-                    </p>
-                </div>
-                
-                <div class="feature-card fade-in">
-                    <span class="feature-icon">📝</span>
-                    <h3 class="feature-title">Smart Annotations</h3>
-                    <p class="feature-description">
-                        Automatic docstring extraction, text boxes, and component tables. Documentation that stays synchronized with your code.
-                    </p>
-                </div>
-                
-                <div class="feature-card fade-in">
-                    <span class="feature-icon">🔧</span>
-                    <h3 class="feature-title">Production Ready</h3>
-                    <p class="feature-description">
-                        Generates clean, human-readable KiCad files suitable for professional development. Not machine-generated gibberish.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
+        <section class="section">
+            <div class="container">
+                <h2>Installation</h2>
+                <div class="code-block">
+                    <pre><code># PyPI (Recommended)
+pip install circuit-synth
 
-    <!-- Status Section -->
-    <section class="status">
-        <div class="container">
-            <h2 class="section-title">Ready for Professional Use</h2>
-            <p class="section-subtitle">
-                Circuit Synth is production-ready with comprehensive capabilities for real engineering projects
-            </p>
-            
-            <div class="status-grid">
-                <div class="status-item">
-                    <div class="status-icon">✅</div>
-                    <div class="status-title">KiCad Integration</div>
-                    <div class="status-description">Complete project generation with schematics, PCB layouts, and netlists</div>
-                </div>
-                
-                <div class="status-item">
-                    <div class="status-icon">✅</div>
-                    <div class="status-title">Component Management</div>
-                    <div class="status-description">Professional footprint, symbol, and library integration with support for custom libraries</div>
-                </div>
-                
-                <div class="status-item">
-                    <div class="status-icon">✅</div>
-                    <div class="status-title">Netlist Export</div>
-                    <div class="status-description">Industry-standard KiCad netlist files for seamless PCB workflow</div>
-                </div>
-                
-                <div class="status-item">
-                    <div class="status-icon">✅</div>
-                    <div class="status-title">Docker Support</div>
-                    <div class="status-description">Pre-configured environment with official KiCad libraries included</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Getting Started Section -->
-    <section id="getting-started" class="getting-started">
-        <div class="container">
-            <h2 class="section-title">Get Started in Minutes</h2>
-            <p class="section-subtitle">
-                Try Circuit Synth immediately without installation, or set up your development environment
-            </p>
-            
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3>Quick Trial</h3>
-                    <p>Test Circuit Synth immediately without any setup:</p>
-                    <div class="step-code">git clone https://github.com/circuit-synth/circuit-synth.git
+# Development
+git clone https://github.com/circuit-synth/circuit-synth.git
 cd circuit-synth
-uv run python examples/example_kicad_project.py</div>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3>Install for Development</h3>
-                    <p>Set up your local development environment:</p>
-                    <div class="step-code">curl -LsSf https://astral.sh/uv/install.sh | sh
-uv pip install -e ".[dev]"</div>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3>Run with Docker</h3>
-                    <p>Use the pre-configured Docker environment:</p>
-                    <div class="step-code">./docker/build-docker.sh
-./scripts/circuit-synth-docker python examples/example_kicad_project.py</div>
+uv sync
+
+# Register AI agents for circuit design assistance
+uv run register-agents</code></pre>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
-    <!-- Community Section -->
-    <section id="community" class="community">
-        <div class="container">
-            <h2 class="section-title">Join the Community</h2>
-            <p class="section-subtitle">
-                Connect with engineers building the future of circuit design automation
-            </p>
-            
-            <div class="community-cards">
-                <a href="https://github.com/circuit-synth/circuit-synth" class="community-card" target="_blank">
-                    <div class="community-icon">📦</div>
-                    <h3>GitHub Repository</h3>
-                    <p>Source code, issues, and contributions</p>
-                </a>
-                
-                <a href="https://circuit-synth.readthedocs.io" class="community-card" target="_blank">
-                    <div class="community-icon">📚</div>
-                    <h3>Documentation</h3>
-                    <p>Complete guides and API reference</p>
-                </a>
-                
-                <a href="https://github.com/circuit-synth/circuit-synth/discussions" class="community-card" target="_blank">
-                    <div class="community-icon">💬</div>
-                    <h3>Discussions</h3>
-                    <p>Community support and feature requests</p>
-                </a>
-                
-                <a href="https://github.com/circuit-synth/circuit-synth/issues" class="community-card" target="_blank">
-                    <div class="community-icon">🐛</div>
-                    <h3>Issues</h3>
-                    <p>Bug reports and feature tracking</p>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
     <footer>
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>Project</h3>
-                    <p><a href="https://github.com/circuit-synth/circuit-synth">GitHub Repository</a></p>
-                    <p><a href="https://github.com/circuit-synth/circuit-synth/blob/main/LICENSE">MIT License</a></p>
-                    <p><a href="https://github.com/circuit-synth/circuit-synth/releases">Releases</a></p>
-                </div>
-                
-                <div class="footer-section">
-                    <h3>Documentation</h3>
-                    <p><a href="https://circuit-synth.readthedocs.io">Full Documentation</a></p>
-                    <p><a href="https://circuit-synth.readthedocs.io/en/latest/getting-started.html">Getting Started</a></p>
-                    <p><a href="https://circuit-synth.readthedocs.io/en/latest/api.html">API Reference</a></p>
-                </div>
-                
-                <div class="footer-section">
-                    <h3>Community</h3>
-                    <p><a href="https://github.com/circuit-synth/circuit-synth/discussions">Discussions</a></p>
-                    <p><a href="https://github.com/circuit-synth/circuit-synth/issues">Issues</a></p>
-                    <p><a href="https://github.com/circuit-synth/circuit-synth/blob/main/CONTRIBUTING.md">Contributing</a></p>
-                </div>
-                
-                <div class="footer-section">
-                    <h3>Tools</h3>
-                    <p><a href="https://www.kicad.org/">KiCad</a></p>
-                    <p><a href="https://docs.astral.sh/uv/">uv Package Manager</a></p>
-                    <p><a href="https://www.docker.com/">Docker</a></p>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2025 Circuit Synth. Open source project under MIT License.</p>
-                <p>Empowering engineers to design circuits with Python.</p>
+            <p>&copy; 2025 Circuit-Synth. Licensed under MIT License.</p>
+            <div class="footer-links">
+                <a href="https://circuit-synth.readthedocs.io">Documentation</a>
+                <a href="https://github.com/circuit-synth/circuit-synth/issues">Issues</a>
+                <a href="https://github.com/circuit-synth/circuit-synth/discussions">Discussions</a>
             </div>
         </div>
     </footer>
-
-    <script>
-        // Simple fade-in animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Observe all feature cards and steps
-        document.querySelectorAll('.feature-card, .step, .status-item').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
-            observer.observe(el);
-        });
-
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-    </script>
 </body>
 </html>
