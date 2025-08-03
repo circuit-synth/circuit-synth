@@ -147,8 +147,6 @@ __all__ = [
     "require_kicad",
     "get_kicad_paths",
     "KiCadValidationError",
-    # Plugin integration
-    "SmartonAIBridge",
     # Claude Code integration
     "setup_claude_integration",
 ]
