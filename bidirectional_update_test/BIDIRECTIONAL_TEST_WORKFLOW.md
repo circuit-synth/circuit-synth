@@ -134,32 +134,54 @@ step3_manual_kicad_edits/
     └── after.png
 ```
 
-### Step 4: Re-import Modified KiCad 🔄 PENDING
+### Step 4: Re-import Modified KiCad ⚠️ CRITICAL FINDING
 
 **Goal:** Import manually modified KiCad back to Python
-**Location:** `step4_reimported_python/`
+**Location:** `step4_reimporteed_python/`
+**Status:** REVEALS MAJOR GAP
 
-**Expected Output:**
-```
-step4_reimported_python/
-├── reimported_circuit.py     # Python circuit with manual changes
-├── change_detection.json    # What changes were detected
-└── analysis/
-    ├── diff_vs_step1.md     # Comparison with original import
-    └── preservation_test.md  # What user changes were preserved
-```
-
-**Test Questions:**
-- [ ] Are manual component moves preserved?
-- [ ] Are value changes detected and imported?
-- [ ] Are new components correctly imported?
-- [ ] Are manual routing changes preserved?
-
-**Command to run:**
+**Actual Command Used:**
 ```bash
-uv run kicad-to-python step3_manual_kicad_edits/modified_project/circuit.kicad_sch \
-  --output step4_reimported_python/reimported_circuit.py \
-  --compare-with step1_imported_python/imported_circuit.py
+uv run kicad-to-python step3_manual_kicad_edits/initial_kicad_generated/ step4_reimporteed_python/main_test.py --backup --verbose
+```
+
+**Critical Discovery:**
+The system **claims** to do "synchronization" and "updating" but actually does **full regeneration**:
+
+**Evidence:**
+- ✅ Creates backup: `main_test.py.backup`
+- ✅ Logs show "CODE_UPDATE: Updating Python file" 
+- ❌ **Completely overwrites** existing Python file
+- ❌ **No preservation** of user modifications
+- ❌ **Generates broken references**: `C?`, `U?` instead of `C1`, `U1`
+
+**Files Created:**
+```
+step4_reimporteed_python/
+├── main.py                   # Original generated file
+├── main_reference.py         # "Ideal" file with correct refs
+├── main_test.py             # OVERWRITTEN by regeneration
+└── main_test.py.backup      # Backup of original good file
+```
+
+**Test Results:**
+- ❌ Manual component moves: NOT TESTED (overwrites everything)
+- ❌ Value changes: NOT PRESERVED (full regeneration)
+- ❌ New components: NOT PRESERVED (full regeneration)  
+- ❌ User modifications: **COMPLETELY LOST**
+
+**Key Issue Found:**
+Reference designators `C1`, `U1` exist in KiCad files but parser outputs `C?`, `U?`
+
+**Comparison:**
+```diff
+# What we want (main_reference.py):
+c1 = Component(symbol="Device:C", ref="C1", ...)
+u1 = Component(symbol="RF_Module:ESP32-C6-MINI-1", ref="U1", ...)
+
+# What we get (main_test.py after "update"):
+c_ = Component(symbol="Device:C", ref="C?", ...)  
+u_ = Component(symbol="RF_Module:ESP32-C6-MINI-1", ref="U?", ...)
 ```
 
 ### Step 5: Python Circuit Additions 🔄 PENDING
@@ -316,10 +338,24 @@ chmod -R 755 bidirectional_update_test/
 - [ ] Step 5: Python circuit additions
 - [ ] Step 6: Final bidirectional sync
 
-**Current Status:** Ready for Step 2 - Python → KiCad generation
+**Current Status:** Step 4 revealed critical gaps - need to fix before proceeding
 
-**Step 1 Results:**
-- Import successfully parsed ESP32-C6-MINI-1 + capacitor
-- Generated clean Python code with @circuit decorator
-- All connections properly mapped (+3V3, GND)
-- Ready to test round-trip generation
+**Key Findings:**
+- ✅ Step 1: KiCad → Python import works
+- ✅ Steps 2-3: Python → KiCad → Manual edits work
+- ❌ **Step 4: MAJOR GAP** - "Update" mode does full regeneration, loses all user changes
+- ⚠️ **Reference designator bug**: `C1`/`U1` become `C?`/`U?`
+
+## Critical Problems Identified
+
+### Problem 1: False "Update" Mode ⚠️
+**Current behavior**: `kicad-to-python` claims to update but completely overwrites files
+**Required**: True selective update that preserves user modifications
+
+### Problem 2: Reference Designator Parsing Bug 🐛
+**Current behavior**: `C1`, `U1` in KiCad become `C?`, `U?` in Python
+**Required**: Fix parser to extract actual reference designators
+
+### Problem 3: Missing Canonical Analysis 🚫
+**Current behavior**: No comparison between KiCad and Python versions
+**Required**: Implement canonical circuit matching for selective updates
