@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid cff127fd-4a01-4985-b153-be85d2b6a051)
+	(uuid ea010f41-2f77-4b12-9763-c22b4493c626)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -16,7 +16,7 @@
 			(on_board yes)
 			(property
 				"Reference"
-				"J"
+				"{'value': 'J', 'position': {'x': 1.27, 'y': 5.08, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -27,7 +27,7 @@
 			)
 			(property
 				"Value"
-				"Conn_02x03_Odd_Even"
+				"{'value': 'Conn_02x03_Odd_Even', 'position': {'x': 1.27, 'y': -5.08, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -38,7 +38,7 @@
 			)
 			(property
 				"Footprint"
-				""
+				"{'value': '', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -49,7 +49,7 @@
 			)
 			(property
 				"Datasheet"
-				"~"
+				"{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -60,7 +60,7 @@
 			)
 			(property
 				"Description"
-				"Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"
+				"{'value': 'Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -71,7 +71,7 @@
 			)
 			(property
 				"ki_keywords"
-				"connector"
+				"{'value': 'connector', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -82,7 +82,7 @@
 			)
 			(property
 				"ki_fp_filters"
-				"Connector*:*_2x??_*"
+				"{'value': 'Connector*:*_2x??_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -317,15 +317,16 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 2e917278-73e1-481b-8b7d-c1203f406c27)
+		(uuid bb10bc33-de8a-48d0-a5ec-b4c9731ab031)
 		(property
 			"Reference"
 			"J2"
-			(at 58.42 40.72 0)
+			(at 60.96 44.449999999999996 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property
@@ -351,7 +352,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/9315ba25-0627-4d43-9d13-3e249a0987d0/dec770bf-4c1f-4f76-8774-5a7ebb631ae6/0db8b549-1693-48b6-bf7a-52f9e255c796/8bd8696d-c937-44fe-b5e1-605ff88bda1f"
+					"/534f599a-2a8a-42a4-9578-e14c7cee6bf0/9a550f99-9a56-44ce-b43a-c3a46f1dbf89/96fd079f-8a8c-4127-8678-2167a87900cb/e0c296fe-914f-4553-9b49-5eb4f9098f94"
 					(reference J2)
 					(unit 1)
 				)
@@ -368,7 +369,7 @@
 			)
 			(justify right)
 		)
-		(uuid b3d8f000-4c87-4ffb-925f-5c2053cfe076)
+		(uuid 850600d5-d3d7-445c-a62a-a6db1a1d81be)
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -380,7 +381,7 @@
 			)
 			(justify right)
 		)
-		(uuid d54f3613-f0f4-44c1-b59e-4a783eb4be58)
+		(uuid 6070bded-a738-4c9a-bc37-e52bd141f677)
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -392,7 +393,7 @@
 			)
 			(justify right)
 		)
-		(uuid 02539db1-3777-472d-a20c-00a12cf0fc4d)
+		(uuid e63037f1-fe7e-4cac-b944-ac3586848c75)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -404,7 +405,7 @@
 			)
 			(justify left)
 		)
-		(uuid 997783e4-3f50-4324-83a3-1bbb7a5a2cfb)
+		(uuid efcb37b8-e920-4f65-95c6-6deb6e0347b9)
 	)
 	(hierarchical_label
 		GND
@@ -416,7 +417,7 @@
 			)
 			(justify left)
 		)
-		(uuid f6bbe66c-aca7-407e-9559-3ab89cf2a8a9)
+		(uuid 93a0a7e5-ce26-4d55-b9a2-b916099d3bbb)
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -428,7 +429,7 @@
 			)
 			(justify left)
 		)
-		(uuid 673d73b5-3e54-489f-ba07-137e2f2b3f44)
+		(uuid bc9aa4d6-694d-4532-9a90-020ef2f3e096)
 	)
 	(text_box
 		"Debug header for programming and debugging"
@@ -461,44 +462,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 992c9575-4186-4bb7-89bf-8a0af061aa1b)
-	)
-	(text_box
-		"Debug header for programming and debugging"
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid 992c9575-4186-4bb7-89bf-8a0af061aa1b)
+		(uuid f3594900-8979-4b5f-baeb-aa095120133d)
 	)
 	(sheet_instances
 		(path
-			"/9315ba25-0627-4d43-9d13-3e249a0987d0/dec770bf-4c1f-4f76-8774-5a7ebb631ae6/0db8b549-1693-48b6-bf7a-52f9e255c796/8bd8696d-c937-44fe-b5e1-605ff88bda1f"
+			"/534f599a-2a8a-42a4-9578-e14c7cee6bf0/9a550f99-9a56-44ce-b43a-c3a46f1dbf89/96fd079f-8a8c-4127-8678-2167a87900cb/e0c296fe-914f-4553-9b49-5eb4f9098f94"
 			(page "1")
 		)
 	)

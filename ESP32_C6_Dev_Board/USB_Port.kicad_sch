@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 884c8040-bb5c-4e21-8b74-e87bb9a18da4)
+	(uuid 493d3a36-50ff-4c33-84c9-85ca8b13e63e)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -16,7 +16,7 @@
 			(on_board yes)
 			(property
 				"Reference"
-				"J"
+				"{'value': 'J', 'position': {'x': 0.0, 'y': 22.225, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -27,7 +27,7 @@
 			)
 			(property
 				"Value"
-				"USB_C_Receptacle_USB2.0_16P"
+				"{'value': 'USB_C_Receptacle_USB2.0_16P', 'position': {'x': 0.0, 'y': 19.685, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -38,7 +38,7 @@
 			)
 			(property
 				"Footprint"
-				""
+				"{'value': '', 'position': {'x': 3.81, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -49,7 +49,7 @@
 			)
 			(property
 				"Datasheet"
-				"https://www.usb.org/sites/default/files/documents/usb_type-c.zip"
+				"{'value': 'https://www.usb.org/sites/default/files/documents/usb_type-c.zip', 'position': {'x': 3.81, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -60,7 +60,7 @@
 			)
 			(property
 				"Description"
-				"USB 2.0-only 16P Type-C Receptacle connector"
+				"{'value': 'USB 2.0-only 16P Type-C Receptacle connector', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -71,7 +71,7 @@
 			)
 			(property
 				"ki_keywords"
-				"usb universal serial bus type-C USB2.0"
+				"{'value': 'usb universal serial bus type-C USB2.0', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -82,7 +82,7 @@
 			)
 			(property
 				"ki_fp_filters"
-				"USB*C*Receptacle*"
+				"{'value': 'USB*C*Receptacle*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -781,7 +781,7 @@
 			(on_board yes)
 			(property
 				"Reference"
-				"C"
+				"{'value': 'C', 'position': {'x': 0.635, 'y': 2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -792,7 +792,7 @@
 			)
 			(property
 				"Value"
-				"C"
+				"{'value': 'C', 'position': {'x': 0.635, 'y': -2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -803,7 +803,7 @@
 			)
 			(property
 				"Footprint"
-				""
+				"{'value': '', 'position': {'x': 0.9652, 'y': -3.81, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -814,7 +814,7 @@
 			)
 			(property
 				"Datasheet"
-				"~"
+				"{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -825,7 +825,7 @@
 			)
 			(property
 				"Description"
-				"Unpolarized capacitor"
+				"{'value': 'Unpolarized capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -836,7 +836,7 @@
 			)
 			(property
 				"ki_keywords"
-				"cap capacitor"
+				"{'value': 'cap capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -847,7 +847,7 @@
 			)
 			(property
 				"ki_fp_filters"
-				"C_*"
+				"{'value': 'C_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -941,7 +941,7 @@
 			(on_board yes)
 			(property
 				"Reference"
-				"R"
+				"{'value': 'R', 'position': {'x': 2.032, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -952,7 +952,7 @@
 			)
 			(property
 				"Value"
-				"R"
+				"{'value': 'R', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -963,7 +963,7 @@
 			)
 			(property
 				"Footprint"
-				""
+				"{'value': '', 'position': {'x': -1.778, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -974,7 +974,7 @@
 			)
 			(property
 				"Datasheet"
-				"~"
+				"{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -985,7 +985,7 @@
 			)
 			(property
 				"Description"
-				"Resistor"
+				"{'value': 'Resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -996,7 +996,7 @@
 			)
 			(property
 				"ki_keywords"
-				"R res resistor"
+				"{'value': 'R res resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1007,7 +1007,7 @@
 			)
 			(property
 				"ki_fp_filters"
-				"R_*"
+				"{'value': 'R_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1086,7 +1086,7 @@
 			(on_board yes)
 			(property
 				"Reference"
-				"D"
+				"{'value': 'D', 'position': {'x': 0.0, 'y': 2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1097,7 +1097,7 @@
 			)
 			(property
 				"Value"
-				"ESD5Zxx"
+				"{'value': 'ESD5Zxx', 'position': {'x': 0.0, 'y': -2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1108,7 +1108,7 @@
 			)
 			(property
 				"Footprint"
-				"Diode_SMD:D_SOD-523"
+				"{'value': 'Diode_SMD:D_SOD-523', 'position': {'x': 0.0, 'y': -4.445, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1119,7 +1119,7 @@
 			)
 			(property
 				"Datasheet"
-				"https://www.onsemi.com/pdf/datasheet/esd5z2.5t1-d.pdf"
+				"{'value': 'https://www.onsemi.com/pdf/datasheet/esd5z2.5t1-d.pdf', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1130,7 +1130,7 @@
 			)
 			(property
 				"Description"
-				"ESD Protection Diode, SOD-523"
+				"{'value': 'ESD Protection Diode, SOD-523', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1141,7 +1141,7 @@
 			)
 			(property
 				"ki_keywords"
-				"esd tvs unidirectional diode"
+				"{'value': 'esd tvs unidirectional diode', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1152,7 +1152,7 @@
 			)
 			(property
 				"ki_fp_filters"
-				"D?SOD?523*"
+				"{'value': 'D?SOD?523*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1264,15 +1264,16 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid a49d3300-6740-4b11-b260-0d108f68efc4)
+		(uuid e911fcbf-1a06-41be-9555-d9872ab5364c)
 		(property
 			"Reference"
 			"J1"
-			(at 45.72 61.040000000000006 0)
+			(at 48.26 64.77000000000001 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property
@@ -1298,7 +1299,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/9315ba25-0627-4d43-9d13-3e249a0987d0/dec770bf-4c1f-4f76-8774-5a7ebb631ae6/01c20846-296c-4ff3-b668-60a5e723e764"
+					"/534f599a-2a8a-42a4-9578-e14c7cee6bf0/9a550f99-9a56-44ce-b43a-c3a46f1dbf89/35c01d1b-db5a-4c40-b9b4-c24d94ce4349"
 					(reference J1)
 					(unit 1)
 				)
@@ -1311,25 +1312,27 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 07940d98-3e41-4da9-91b3-d22905c103a7)
+		(uuid c9a3850c-4b8d-4339-95ee-dc48ccac5ae7)
 		(property
 			"Reference"
 			"R1"
-			(at 76.2 61.040000000000006 0)
+			(at 78.74000000000001 64.77000000000001 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property
 			"Value"
 			"5.1k"
-			(at 76.2 71.04 0)
+			(at 78.74000000000001 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property
@@ -1355,7 +1358,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/9315ba25-0627-4d43-9d13-3e249a0987d0/dec770bf-4c1f-4f76-8774-5a7ebb631ae6/01c20846-296c-4ff3-b668-60a5e723e764"
+					"/534f599a-2a8a-42a4-9578-e14c7cee6bf0/9a550f99-9a56-44ce-b43a-c3a46f1dbf89/35c01d1b-db5a-4c40-b9b4-c24d94ce4349"
 					(reference R1)
 					(unit 1)
 				)
@@ -1368,25 +1371,27 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 2355a718-12e5-4cd5-a54c-378acced137c)
+		(uuid ee705deb-45b5-481d-afff-5c4bc022d063)
 		(property
 			"Reference"
 			"R2"
-			(at 96.52 61.040000000000006 0)
+			(at 99.06 64.77000000000001 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property
 			"Value"
 			"5.1k"
-			(at 96.52 71.04 0)
+			(at 99.06 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property
@@ -1412,7 +1417,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/9315ba25-0627-4d43-9d13-3e249a0987d0/dec770bf-4c1f-4f76-8774-5a7ebb631ae6/01c20846-296c-4ff3-b668-60a5e723e764"
+					"/534f599a-2a8a-42a4-9578-e14c7cee6bf0/9a550f99-9a56-44ce-b43a-c3a46f1dbf89/35c01d1b-db5a-4c40-b9b4-c24d94ce4349"
 					(reference R2)
 					(unit 1)
 				)
@@ -1425,15 +1430,16 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 3e4c53e0-8d33-4b04-beab-606e1f0010fe)
+		(uuid 7097f95c-9afe-4b71-aaa0-6001c658e2c6)
 		(property
 			"Reference"
 			"D1"
-			(at 116.84 61.040000000000006 0)
+			(at 119.38000000000001 64.77000000000001 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property
@@ -1459,7 +1465,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/9315ba25-0627-4d43-9d13-3e249a0987d0/dec770bf-4c1f-4f76-8774-5a7ebb631ae6/01c20846-296c-4ff3-b668-60a5e723e764"
+					"/534f599a-2a8a-42a4-9578-e14c7cee6bf0/9a550f99-9a56-44ce-b43a-c3a46f1dbf89/35c01d1b-db5a-4c40-b9b4-c24d94ce4349"
 					(reference D1)
 					(unit 1)
 				)
@@ -1472,15 +1478,16 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 7cb14c21-72dd-4f45-9e12-0b4eaea1f12d)
+		(uuid d86d580f-602b-4b31-85d6-f370553253ea)
 		(property
 			"Reference"
 			"D2"
-			(at 142.24 61.040000000000006 0)
+			(at 144.78 64.77000000000001 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property
@@ -1506,7 +1513,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/9315ba25-0627-4d43-9d13-3e249a0987d0/dec770bf-4c1f-4f76-8774-5a7ebb631ae6/01c20846-296c-4ff3-b668-60a5e723e764"
+					"/534f599a-2a8a-42a4-9578-e14c7cee6bf0/9a550f99-9a56-44ce-b43a-c3a46f1dbf89/35c01d1b-db5a-4c40-b9b4-c24d94ce4349"
 					(reference D2)
 					(unit 1)
 				)
@@ -1519,25 +1526,27 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 2c86f515-84f9-4889-8bd3-13c78655fb3a)
+		(uuid 00e1239f-29e4-4711-b22d-aa70bda3ab00)
 		(property
 			"Reference"
 			"C1"
-			(at 162.56 61.040000000000006 0)
+			(at 165.1 64.77000000000001 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property
 			"Value"
 			"10uF"
-			(at 162.56 71.04 0)
+			(at 165.1 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property
@@ -1563,7 +1572,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/9315ba25-0627-4d43-9d13-3e249a0987d0/dec770bf-4c1f-4f76-8774-5a7ebb631ae6/01c20846-296c-4ff3-b668-60a5e723e764"
+					"/534f599a-2a8a-42a4-9578-e14c7cee6bf0/9a550f99-9a56-44ce-b43a-c3a46f1dbf89/35c01d1b-db5a-4c40-b9b4-c24d94ce4349"
 					(reference C1)
 					(unit 1)
 				)
@@ -1580,7 +1589,7 @@
 			)
 			(justify right)
 		)
-		(uuid ed7dad05-3c91-4537-897c-c17e9fa65106)
+		(uuid 2473cffa-bb3b-40a9-b0c5-84aa4af54d63)
 	)
 	(hierarchical_label
 		GND
@@ -1592,7 +1601,7 @@
 			)
 			(justify right)
 		)
-		(uuid 62fe6f11-7dc1-4020-ac6d-918ed7c94a42)
+		(uuid 46b8bc02-bdc7-45a0-882f-d863d85eb226)
 	)
 	(hierarchical_label
 		GND
@@ -1604,7 +1613,7 @@
 			)
 			(justify right)
 		)
-		(uuid e4cc32e9-ed1e-4e61-a6a6-8c8b85c524a0)
+		(uuid 3f1adbf8-d280-4cdb-8325-3f36cbcd8860)
 	)
 	(hierarchical_label
 		GND
@@ -1616,7 +1625,7 @@
 			)
 			(justify right)
 		)
-		(uuid 4c944bb2-9ef7-4f5f-94b0-558dba7da1b7)
+		(uuid 57a68f78-1ccf-4df0-8cf5-0b1a7cab9cae)
 	)
 	(hierarchical_label
 		GND
@@ -1628,7 +1637,7 @@
 			)
 			(justify right)
 		)
-		(uuid 0ed54b30-7ab1-46cb-ae7f-44842567cf4f)
+		(uuid 96978ecd-91ef-4535-b48b-d830862b4f5c)
 	)
 	(hierarchical_label
 		GND
@@ -1640,7 +1649,7 @@
 			)
 			(justify right)
 		)
-		(uuid 2899caf1-d984-45b5-94d8-dd36fe3fcbb4)
+		(uuid 939bb709-5506-43f6-8514-4a6e8be77f54)
 	)
 	(hierarchical_label
 		GND
@@ -1652,7 +1661,7 @@
 			)
 			(justify right)
 		)
-		(uuid 83dd15b7-c80c-4fc9-b11b-11c869d3198a)
+		(uuid 8214d23b-e596-4a96-9ed7-8914b0a1ceb4)
 	)
 	(hierarchical_label
 		GND
@@ -1664,7 +1673,7 @@
 			)
 			(justify right)
 		)
-		(uuid 2590b04c-fe66-45be-8474-a0bd867bdf97)
+		(uuid 1f324c27-749b-4c15-8a05-0a833913bb27)
 	)
 	(hierarchical_label
 		GND
@@ -1676,7 +1685,7 @@
 			)
 			(justify left)
 		)
-		(uuid 32a8de15-912b-4cbe-8cac-2a77dcb59218)
+		(uuid b63b8562-c8b7-4dde-8649-c2ad15b6de66)
 	)
 	(hierarchical_label
 		GND
@@ -1688,7 +1697,7 @@
 			)
 			(justify left)
 		)
-		(uuid 2cf757b9-3f9b-4dff-bf27-279f4d6d51ab)
+		(uuid ddcdae6c-d8fe-4808-9cba-8e4eb1a3c1cb)
 	)
 	(hierarchical_label
 		GND
@@ -1700,7 +1709,7 @@
 			)
 			(justify right)
 		)
-		(uuid 8071a386-6348-4e5b-a1b9-6b086ca0483e)
+		(uuid f369ca8c-5414-4605-8ef0-95a26cf8efd9)
 	)
 	(hierarchical_label
 		VBUS
@@ -1712,7 +1721,7 @@
 			)
 			(justify left)
 		)
-		(uuid bc89b995-e6a5-4478-acd7-48ef493d4e87)
+		(uuid 9260e2d8-01de-4d42-8616-19b7ec92fd9f)
 	)
 	(hierarchical_label
 		VBUS
@@ -1724,7 +1733,7 @@
 			)
 			(justify left)
 		)
-		(uuid 1877d000-0bfb-4e31-9d4d-294deebe56b4)
+		(uuid 3ac09971-e8f2-4993-a84c-4ecb77c6883e)
 	)
 	(hierarchical_label
 		VBUS
@@ -1736,7 +1745,7 @@
 			)
 			(justify left)
 		)
-		(uuid da812904-1c1c-4e8a-a7fd-23905cd82126)
+		(uuid 05e82cdd-dd2c-47dd-8106-52a61cacd29f)
 	)
 	(hierarchical_label
 		VBUS
@@ -1748,7 +1757,7 @@
 			)
 			(justify left)
 		)
-		(uuid 28e71138-d9f5-4868-9eb0-6c3df5b76eb6)
+		(uuid 24f779e1-cfa3-4d97-a692-72586c31cb7e)
 	)
 	(hierarchical_label
 		VBUS
@@ -1760,7 +1769,7 @@
 			)
 			(justify left)
 		)
-		(uuid 7f474888-ce00-4945-a054-d02462f744d5)
+		(uuid 1c0f4525-3c5d-4040-8b3a-ddfe763a4418)
 	)
 	(hierarchical_label
 		N$1
@@ -1772,7 +1781,7 @@
 			)
 			(justify left)
 		)
-		(uuid cbfd04bf-5201-4d66-b594-4850ae5d83b1)
+		(uuid eebc05ee-9fe2-48bd-b3db-e0c25d84da09)
 	)
 	(hierarchical_label
 		N$1
@@ -1784,7 +1793,7 @@
 			)
 			(justify left)
 		)
-		(uuid df925f85-09d2-4b8c-9d96-48ce347690c3)
+		(uuid 3874c7a7-9b96-4ac0-9a4e-7f6653915c08)
 	)
 	(hierarchical_label
 		N$1
@@ -1796,7 +1805,7 @@
 			)
 			(justify left)
 		)
-		(uuid 71acac01-cdc1-47bb-bf0c-2f98c4a09ba0)
+		(uuid 147aef4e-c1a7-4cba-bb39-bfdea3ddb5d0)
 	)
 	(hierarchical_label
 		N$2
@@ -1808,7 +1817,7 @@
 			)
 			(justify left)
 		)
-		(uuid a9250fb0-73df-4730-8134-f3cc60af6121)
+		(uuid 66a37fd1-404d-440c-9a52-58216223dd80)
 	)
 	(hierarchical_label
 		N$2
@@ -1820,7 +1829,7 @@
 			)
 			(justify left)
 		)
-		(uuid 313a3bbf-62dd-4b26-a9d4-2bee74b621c2)
+		(uuid fe7a413e-1c3c-4b8b-ad4a-8b72dc0fa231)
 	)
 	(hierarchical_label
 		N$2
@@ -1832,7 +1841,7 @@
 			)
 			(justify left)
 		)
-		(uuid 063b3188-84de-451d-9546-cc9f4d213d7b)
+		(uuid 8952bb17-9a18-40c9-b33a-d396ed460b27)
 	)
 	(hierarchical_label
 		USB_DM
@@ -1844,7 +1853,7 @@
 			)
 			(justify left)
 		)
-		(uuid f2fd2a95-df39-4723-9a27-eb7e69a103e6)
+		(uuid c2ac0b20-ba4c-4b8d-91d5-9569fbe18476)
 	)
 	(hierarchical_label
 		USB_DM
@@ -1856,7 +1865,7 @@
 			)
 			(justify left)
 		)
-		(uuid 449bf797-f298-4271-8885-bcb2cf954c7a)
+		(uuid 83367ee5-d93d-41b5-b4aa-8e4ddd9ebd8d)
 	)
 	(hierarchical_label
 		USB_DM
@@ -1868,7 +1877,7 @@
 			)
 			(justify right)
 		)
-		(uuid cba438f0-d2df-441c-84b1-280e1b467481)
+		(uuid 0fd23acb-cbf2-4ce8-aea9-70330fefa100)
 	)
 	(hierarchical_label
 		USB_DP
@@ -1880,7 +1889,7 @@
 			)
 			(justify left)
 		)
-		(uuid 95f2c14d-6962-4e5c-8bc1-ab60a90c4007)
+		(uuid c04965f5-5533-4bea-ae28-f4e4f97754ff)
 	)
 	(hierarchical_label
 		USB_DP
@@ -1892,7 +1901,7 @@
 			)
 			(justify left)
 		)
-		(uuid 68006527-870d-46cb-89fc-be1da4809218)
+		(uuid 250e31e8-d71e-4948-b421-75607c5182dc)
 	)
 	(hierarchical_label
 		USB_DP
@@ -1904,7 +1913,7 @@
 			)
 			(justify right)
 		)
-		(uuid 70c4ec58-1db5-488d-b749-d4912aa4f39a)
+		(uuid 0db40a83-5ed5-431b-a0c0-491b1da2b78c)
 	)
 	(text_box
 		"USB-C port with CC resistors, ESD protection, and proper grounding"
@@ -1937,44 +1946,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 0092bd75-e1b9-4b5f-b764-2a339131ca69)
-	)
-	(text_box
-		"USB-C port with CC resistors, ESD protection, and proper grounding"
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid 0092bd75-e1b9-4b5f-b764-2a339131ca69)
+		(uuid 36b6745d-0d87-402d-a785-224d8dc971c4)
 	)
 	(sheet_instances
 		(path
-			"/9315ba25-0627-4d43-9d13-3e249a0987d0/dec770bf-4c1f-4f76-8774-5a7ebb631ae6/01c20846-296c-4ff3-b668-60a5e723e764"
+			"/534f599a-2a8a-42a4-9578-e14c7cee6bf0/9a550f99-9a56-44ce-b43a-c3a46f1dbf89/35c01d1b-db5a-4c40-b9b4-c24d94ce4349"
 			(page "1")
 		)
 	)
