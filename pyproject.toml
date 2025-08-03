@@ -94,7 +94,8 @@ validate-kicad = "circuit_synth.core.kicad_validator:main"
 setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
 register-agents = "circuit_synth.claude_integration.agent_registry:main"
 validate-circuit = "circuit_synth.validation.real_time_check:main"
-cs-new-project = "circuit_synth.tools.new_project:main"
+cs-new-pcb = "circuit_synth.tools.new_pcb:main"
+cs-init-pcb = "circuit_synth.tools.init_pcb:main"
 cs-init-existing-project = "circuit_synth.tools.init_existing_project:main"
 cs-setup-kicad-plugins = "circuit_synth.tools.setup_kicad_plugins:main"
 
@@ -172,6 +173,7 @@ members = [
     "my_kicad_project",
     "my_kicad_proejct",
     "example_project",
+    "my_circuit_project",
 ]
 
 [dependency-groups]

@@ -12,58 +12,53 @@ Circuit-synth eliminates tedious component placement, symbol hunting, and manual
 
 ### Quick Setup (uv - Recommended)
 
-#### New Projects
+#### New PCB Projects
 ```bash
-# 1. Install uv (if not already installed)
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# 1. Install circuit-synth
+uv tool install circuit-synth
 
-# 2. Create new project
-uv init my_circuit_project
-cd my_circuit_project
+# 2. Create a new PCB project
+uv run cs-new-pcb "ESP32 Sensor Board"
+cd esp32-sensor-board
 
-# 3. Add circuit-synth
-uv add circuit-synth
-
-# 4. Setup project template
-uv run cs-new-project
-
-# 5. Run the ESP32-C6 example
-uv run python circuit-synth/main.py
+# 3. Generate KiCad files
+cd circuit-synth && uv run python main.py
 ```
 
 #### Existing KiCad Projects
 ```bash
-# Convert existing KiCad project to circuit-synth
-uv add circuit-synth
-uv run cs-init-existing-project /path/to/my_board.kicad_pro
+# Add circuit-synth to existing KiCad project
+uv tool install circuit-synth
+cd /path/to/existing-kicad-project
+cs-init-pcb
 
-# Or from directory containing KiCad files
-uv run cs-init-existing-project /path/to/project_directory/
-
-# Test the converted circuit
-uv run python circuit-synth/main.py
+# Generate circuit-synth integration
+cd circuit-synth && uv run python main.py
 ```
 
-**Result:** Complete project template with modular ESP32-C6 example, hierarchical subcircuits, and AI agents ready!
+**Result:** Self-contained PCB project with memory-bank documentation, AI assistant, and ready-to-use circuit examples!
 
-### 📋 **Generated Project Structure**
+### 📋 **Generated PCB Structure**
 
-The `cs-new-project` command creates a complete working template:
+The `cs-new-pcb` command creates a self-contained PCB project:
 
 ```
-my_circuit_project/
-├── circuit-synth/              # Modular Python circuits
-│   ├── main.py                 # ESP32-C6 dev board (hierarchical)
-│   ├── usb_subcircuit.py       # USB-C with CC resistors
-│   ├── power_supply_subcircuit.py  # 5V→3.3V regulation  
-│   ├── debug_header_subcircuit.py  # Programming interface
-│   ├── led_blinker_subcircuit.py   # Status LED control
-│   ├── simple_led.py           # Basic LED example
-│   └── voltage_divider.py      # Tutorial circuit
-├── .claude/                    # AI agents & commands (optional)
-├── README.md                   # Project guide
-└── CLAUDE.md                   # AI assistant instructions
+esp32-sensor-board/
+├── circuit-synth/              # Python circuit files
+│   └── main.py                 # LED blinker example (ready to modify)
+├── kicad/                      # Generated KiCad files (.kicad_pro, .kicad_sch, .kicad_pcb)
+├── memory-bank/                # Automatic documentation system
+│   ├── decisions.md            # Design decisions tracking
+│   ├── fabrication.md          # PCB orders and assembly notes
+│   ├── testing.md              # Test results and measurements
+│   ├── timeline.md             # Project milestones
+│   └── issues.md               # Problems and solutions
+├── .claude/                    # PCB-specific AI assistant
+│   └── instructions.md         # Agent configuration
+└── README.md                   # PCB project guide
 ```
+
+The `cs-init-pcb` command adds this structure to existing KiCad projects without modifying your original files.
 
 ## 💡 Quick Example
 
@@ -166,6 +161,32 @@ result = sim.operating_point()
 print(f"Output voltage: {result.get_voltage('VOUT'):.3f}V")
 ```
 
+## 🧠 Memory-Bank Documentation System
+
+Every PCB project includes an **automatic documentation system** that tracks your engineering decisions:
+
+```bash
+# Every git commit updates documentation automatically
+git commit -m "Add voltage regulator with input protection"
+# → Updates decisions.md, timeline.md automatically
+
+# Switch between PCB projects seamlessly
+cs-switch-board my-sensor-board
+cs-switch-board my-power-supply
+```
+
+### 📚 **What Gets Documented**
+- **decisions.md**: Component choices, design rationale, alternatives considered
+- **fabrication.md**: PCB orders, delivery tracking, assembly notes
+- **testing.md**: Measurements, validation results, performance data
+- **timeline.md**: Project milestones, deadlines, progress tracking
+- **issues.md**: Problems encountered, root causes, solutions
+
+### 🤖 **AI-Powered Updates**
+- **Git Integration**: Automatically analyzes commits and updates relevant files
+- **Intelligent Classification**: Understands whether changes are design decisions, bug fixes, or milestones
+- **Claude AI Agent**: Each PCB has a specialized assistant that maintains documentation
+
 ## 🏭 Professional Workflow Benefits
 
 | Traditional EE Workflow | With Circuit-Synth |
@@ -176,6 +197,8 @@ print(f"Output voltage: {result.get_voltage('VOUT'):.3f}V")
 | Difficult design versioning | Git-friendly Python files |
 | Manual SPICE netlist creation | One-line simulation setup |
 | Copy-paste circuit blocks | Reusable subcircuit modules |
+| Lost design knowledge | Automatic memory-bank documentation |
+| Context switching overhead | `cs-switch-board` instant project switching |
 
 ## 🎨 Advanced Features
 
@@ -226,46 +249,95 @@ git clone https://github.com/circuit-synth/circuit-synth.git
 cd circuit-synth
 uv sync
 
-# Explore the generated project template
-ls example_project/
-uv run python example_project/circuit-synth/main.py
+# Test the PCB workflow
+cs-new-pcb "Development Test"
+cd development-test/circuit-synth && uv run python main.py
 ```
 
-## 🔄 Converting Existing Projects
+## 🔄 Adding Circuit-Synth to Existing Projects
 
-The `cs-init-existing-project` command adds circuit-synth functionality to your existing KiCad projects:
+The `cs-init-pcb` command integrates circuit-synth into your existing KiCad projects:
 
 ### What it does:
-- **Organizes KiCad files** into a clean subdirectory structure
-- **Generates Python code** from your existing schematic
-- **Adds AI agents** for Claude Code integration
-- **Creates documentation** and development setup
-- **Preserves your original design** - no data loss
+- **Non-destructive integration** - your original KiCad files remain unchanged
+- **Creates circuit-synth structure** alongside existing files
+- **Generates template Python code** ready for implementation
+- **Adds memory-bank documentation** system
+- **Sets up PCB-specific AI assistant** for migration guidance
+- **Provides multiple integration strategies** (conversion, hybrid, gradual)
 
 ### Usage Examples:
 ```bash
-# Direct KiCad project file
-uv run cs-init-existing-project ~/projects/my_board.kicad_pro
+# Initialize in current directory (containing KiCad files)
+cs-init-pcb
 
-# Directory containing KiCad files (auto-detects .kicad_pro)
-uv run cs-init-existing-project ~/projects/esp32_project/
+# Initialize in specific directory  
+cs-init-pcb /path/to/existing-kicad-project
 
-# Skip automatic conversion (create template only)
-uv run cs-init-existing-project --skip-conversion ~/projects/my_board.kicad_pro
+# Create minimal structure (no examples)
+cs-init-pcb --minimal
 ```
 
 ### Resulting Structure:
 ```
-my_existing_project/
-├── my_board/                    # Organized KiCad files
-│   ├── my_board.kicad_pro      # Original project file
-│   ├── my_board.kicad_sch      # Original schematic
-│   └── my_board.kicad_pcb      # Original PCB (if present)
-├── circuit-synth/              # Generated Python code
-│   └── main.py                 # Converted circuit
-├── .claude/                    # AI agents & commands
-├── README.md                   # Project documentation
-└── CLAUDE.md                   # AI assistant instructions
+existing-project/
+├── my_board.kicad_pro          # ← Original KiCad files (unchanged)
+├── my_board.kicad_sch          # ← 
+├── my_board.kicad_pcb          # ← 
+├── circuit-synth/              # ← New circuit-synth integration
+│   └── main.py                 #   Template ready for implementation
+├── memory-bank/                # ← Automatic documentation system
+│   ├── decisions.md            #   Design decisions tracking
+│   ├── fabrication.md          #   PCB orders and assembly notes
+│   ├── testing.md              #   Test results and measurements
+│   ├── timeline.md             #   Project milestones
+│   └── issues.md               #   Problems and solutions
+├── .claude/                    # ← AI assistant for migration help
+│   └── instructions.md         #   PCB-specific agent configuration
+└── README.md                   # ← Integration strategies guide
+```
+
+### Integration Strategies:
+1. **KiCad → Circuit-Synth Conversion**: Migrate completely to circuit-synth
+2. **Hybrid Workflow**: Use both tools for different tasks
+3. **Gradual Migration**: Incrementally move sections to circuit-synth
+
+## 🚀 Quick Command Reference
+
+### PCB Project Commands
+```bash
+# Create new PCB project
+cs-new-pcb "My Sensor Board"           # With LED example
+cs-new-pcb "Power Supply" --minimal    # Minimal structure
+
+# Add circuit-synth to existing KiCad project
+cs-init-pcb                            # Current directory
+cs-init-pcb /path/to/project           # Specific directory
+```
+
+### Memory-Bank Commands
+```bash
+# Switch between PCB projects
+cs-switch-board my-sensor-board
+
+# Memory-bank management
+cs-memory-bank-status                  # Show current status
+cs-memory-bank-search "voltage"       # Search documentation
+cs-memory-bank-init                    # Initialize if needed
+cs-memory-bank-remove                  # Disable system
+```
+
+### Development Commands
+```bash
+# Generate KiCad files from Python
+cd circuit-synth && uv run python main.py
+
+# Find KiCad components
+/find-symbol STM32                     # Search symbols
+/find-footprint LQFP                   # Search footprints
+
+# Component sourcing
+/jlc-search "voltage regulator"        # Find JLCPCB parts
 ```
 
 ## 🤝 Contributing - Designed for Maximum Developer Productivity
@@ -306,8 +378,11 @@ uv sync
 uv run register-agents
 # Now you have access to the 'contributor' agent for development help!
 
-# Verify everything works
-uv run python example_project/circuit-synth/main.py
+# Test the new PCB workflow
+cs-new-pcb "Test Board"
+cd test-board/circuit-synth && uv run python main.py
+
+# Run comprehensive tests
 ./scripts/run_all_tests.sh --python-only
 ```
 
