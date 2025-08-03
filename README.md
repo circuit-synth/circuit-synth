@@ -78,16 +78,15 @@ circuit.generate_kicad_project("power_supply")
 - **AI Acceleration**: Claude Code integration for automated design
 - **Version Control**: Git-friendly Python files vs binary KiCad
 
-## 🧠 Memory-Bank System - AI Documentation
+## 🔧 Advanced Features
 
-<<<<<<< HEAD
 ### **🏗️ Hierarchical Design**
 - **Modular Subcircuits**: Each function in its own file (like software modules)
 - **Clear Interfaces**: Explicit net definitions - no hidden dependencies
 - **Reusable Circuits**: USB ports, power supplies, debug interfaces work across projects
 - **Version Control**: Git-friendly Python files vs binary KiCad files
 
-### **🤖 Optional AI Acceleration with Built-in Quality Assurance**
+### **🤖 AI Acceleration with Built-in Quality Assurance**
 **Work with Claude Code to describe circuits and get production-ready, validated results:**
 
 ```
@@ -102,19 +101,11 @@ circuit.generate_kicad_project("power_supply")
    ✅ Includes simulation validation and alternatives
 ```
 
-**AI agents with built-in validation double-check everything and eliminate manual work - but it's completely optional.**
-
 ### **🔍 Component Intelligence**
 - **Smart Search**: Find components by function, package, availability
 - **JLCPCB Integration**: Real-time stock levels and pricing
 - **Symbol/Footprint Verification**: No more "symbol not found" errors
 - **Manufacturing Ready**: Components verified for automated assembly
-
-### **✅ Built-in Circuit Validation**
-- **Automatic Quality Assurance**: Validates syntax, imports, and runtime execution
-- **Intelligent Auto-Fixing**: Automatically corrects common circuit code issues
-- **Context-Aware Generation**: Provides design patterns and best practices
-- **Professional Quality Reports**: Clear validation status and improvement suggestions
 
 ### **✅ Circuit Validation & Quality Assurance**
 ```python
@@ -126,7 +117,6 @@ print(f"Validation: {status}")  # ✅ Circuit code validated successfully
 
 # Context-aware generation assistance
 context = get_circuit_design_context("esp32")  # Power, USB, analog contexts available
-# Use context for better AI-generated circuits
 ```
 
 **Claude Code Integration:**
@@ -149,10 +139,7 @@ print(f"Output voltage: {result.get_voltage('VOUT'):.3f}V")
 
 ## 🧠 Memory-Bank Documentation System
 
-Every PCB project includes an **automatic documentation system** that tracks your engineering decisions:
-=======
 Automatic engineering documentation that tracks decisions across sessions:
->>>>>>> 5e00046 (Remove non-existent commands and clean up configuration)
 
 ```bash
 # AI agent automatically documents design decisions
@@ -167,7 +154,17 @@ git commit -m "Add voltage regulator"  # → Updates decisions.md, timeline.md
 
 ## 🚀 Commands
 
-<<<<<<< HEAD
+```bash
+# PCB Projects
+cs-new-pcb "My Sensor Board"           # Create new PCB project
+cs-init-pcb /path/to/project           # Add to existing KiCad project
+
+# Development
+cd circuit-synth && uv run python main.py  # Generate KiCad files
+/find-symbol STM32                         # Search symbols (Claude Code)
+/jlc-search "voltage regulator"            # Find JLCPCB parts (Claude Code)
+```
+
 ## 🏭 Professional Workflow Benefits
 
 | Traditional EE Workflow | With Circuit-Synth |
@@ -180,27 +177,21 @@ git commit -m "Add voltage regulator"  # → Updates decisions.md, timeline.md
 | Manual SPICE netlist creation | One-line simulation setup |
 | Copy-paste circuit blocks | Reusable subcircuit modules |
 | Lost design knowledge | Automatic memory-bank documentation |
-| Context switching overhead | `cs-switch-board` instant project switching |
 
-## 🎨 Advanced Features
+## 🤖 Organized AI Agent System
 
-### **KiCad Plugin Integration**
-Optional AI-powered plugins for KiCad integration:
-=======
->>>>>>> 5e00046 (Remove non-existent commands and clean up configuration)
-```bash
-# PCB Projects
-cs-new-pcb "My Sensor Board"           # Create new PCB project
-cs-init-pcb /path/to/project           # Add to existing KiCad project
+Each generated project includes a complete organized AI assistant environment:
 
-# Memory-Bank (AI agent uses extensively)
-cs-memory-bank-init "My Project"      # Initialize if needed
+### **Agent Categories:**
+- **Circuit Design**: circuit-architect, circuit-synth, simulation-expert
+- **Development**: circuit_generation_agent, contributor, first_setup_agent  
+- **Manufacturing**: component-guru, jlc-parts-finder, stm32-mcu-finder
 
-# Development
-cd circuit-synth && uv run python main.py  # Generate KiCad files
-/find-symbol STM32                         # Search symbols (Claude Code)
-/jlc-search "voltage regulator"            # Find JLCPCB parts (Claude Code)
-```
+### **Command Categories:**
+- **Circuit Design**: analyze-design, find-footprint, find-symbol, validate-existing-circuit
+- **Development**: dev-run-tests, dev-update-and-commit, dev-review-branch
+- **Manufacturing**: find-mcu, find_stm32
+- **Setup**: setup-kicad-plugins, setup_circuit_synth
 
 ### 🧠 Critical: AI Agent Memory-Bank Usage
 
