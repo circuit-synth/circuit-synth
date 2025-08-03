@@ -514,6 +514,125 @@ header {
     margin-bottom: 0;
 }
 
+/* Claude Code Section */
+.claude-code-grid {
+    margin-top: 3rem;
+}
+
+.claude-code-feature {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-bottom: 3rem;
+}
+
+.claude-code-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.claude-code-content p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.claude-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.claude-features li {
+    margin-bottom: 1rem;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+.claude-code-image {
+    text-align: center;
+}
+
+.claude-integration-image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.contribution-workflow {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.contribution-workflow h3 {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+    text-align: center;
+}
+
+.workflow-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.workflow-step {
+    display: flex;
+    align-items: start;
+    gap: 1rem;
+    background: var(--bg-color);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.step-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+    width: 3rem;
+    text-align: center;
+}
+
+.step-content h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.step-content p {
+    color: var(--text-light);
+    margin: 0;
+    font-style: italic;
+}
+
+.claude-code-cta {
+    background: var(--code-bg);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.claude-code-cta h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.claude-code-cta p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
 /* Community Grid */
 .community-grid {
     display: grid;
@@ -674,6 +793,16 @@ footer {
     }
     
     .advanced-features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .claude-code-feature {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .workflow-steps {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
