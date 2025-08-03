@@ -500,8 +500,8 @@
   "duplicate_detection": {
     "templates": {},
     "unique_circuits": [
-      "op-amp1",
-      "op-amp"
+      "op-amp",
+      "op-amp1"
     ],
     "duplicate_groups": {}
   }

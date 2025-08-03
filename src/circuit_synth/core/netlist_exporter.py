@@ -363,7 +363,7 @@ class NetlistExporter:
         are uniquely identified in a schematic. This is the standardized format
         for the library's intermediate JSON representation.
         """
-            
+
         logger.info(f"📋 Starting to_dict() for circuit: {self.circuit.name}")
         logger.info(
             f"📋 Circuit has {len(self.circuit._components)} components and {len(self.circuit._nets)} nets"
@@ -373,7 +373,6 @@ class NetlistExporter:
         # For now, use placeholders similar to the initial exporter output
         sheet_tstamps = f"/{self.circuit.name.lower().replace(' ', '-')}-{id(self.circuit)}/"  # Simple placeholder tstamp
         source_file = f"{self.circuit.name}.kicad_sch"  # Placeholder source file name
-
 
         data = {
             "name": self.circuit.name,

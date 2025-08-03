@@ -129,22 +129,24 @@ def _parse_symbol_body(name: str, body: List[Any]) -> Dict[str, Any]:
             if len(elem) >= 3:
                 prop_name = str(elem[1])
                 prop_value = str(elem[2])
-                
+
                 # Parse positioning and effects information
                 prop_info = {"value": prop_value}
-                
+
                 # Look for (at x y rotation) and (effects ...) in remaining elements
                 for sub_elem in elem[3:]:
                     if not isinstance(sub_elem, list) or not sub_elem:
                         continue
                     sub_k = _key(sub_elem[0])
-                    
+
                     if sub_k == "at" and len(sub_elem) >= 3:
                         # (at x y [rotation])
                         prop_info["position"] = {
                             "x": float(sub_elem[1]),
                             "y": float(sub_elem[2]),
-                            "rotation": float(sub_elem[3]) if len(sub_elem) > 3 else 0.0
+                            "rotation": (
+                                float(sub_elem[3]) if len(sub_elem) > 3 else 0.0
+                            ),
                         }
                     elif sub_k == "effects":
                         # Parse effects block for justification
@@ -155,17 +157,26 @@ def _parse_symbol_body(name: str, body: List[Any]) -> Dict[str, Any]:
                             effect_k = _key(effect_elem[0])
                             if effect_k == "justify" and len(effect_elem) > 1:
                                 # (justify left) or (justify left top)
-                                effects_info["justify"] = [str(j) for j in effect_elem[1:]]
+                                effects_info["justify"] = [
+                                    str(j) for j in effect_elem[1:]
+                                ]
                             elif effect_k == "font":
                                 # Extract font size if needed
                                 for font_elem in effect_elem[1:]:
-                                    if isinstance(font_elem, list) and len(font_elem) > 2 and _key(font_elem[0]) == "size":
-                                        effects_info["font_size"] = [float(font_elem[1]), float(font_elem[2])]
+                                    if (
+                                        isinstance(font_elem, list)
+                                        and len(font_elem) > 2
+                                        and _key(font_elem[0]) == "size"
+                                    ):
+                                        effects_info["font_size"] = [
+                                            float(font_elem[1]),
+                                            float(font_elem[2]),
+                                        ]
                         prop_info["effects"] = effects_info
-                
+
                 # Store enhanced property information
                 result["properties"][prop_name] = prop_info
-                
+
                 # Also store specific standard properties directly (for backward compatibility)
                 prop_name_lower = prop_name.lower()
                 if prop_name_lower == "description":

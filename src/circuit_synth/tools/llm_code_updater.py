@@ -178,7 +178,9 @@ class LLMCodeUpdater:
                     f"🔄 CODE_UPDATE: Original file size: {len(original_code)} chars"
                 )
             else:
-                logger.info("🔄 CODE_UPDATE: Python file doesn't exist, creating new one")
+                logger.info(
+                    "🔄 CODE_UPDATE: Python file doesn't exist, creating new one"
+                )
                 original_code = ""
 
             # Determine update strategy based on LLM availability

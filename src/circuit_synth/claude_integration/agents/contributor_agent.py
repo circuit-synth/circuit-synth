@@ -5,9 +5,9 @@ A specialized Claude Code agent designed to help contributors understand the cod
 follow conventions, and make meaningful contributions to circuit-synth.
 """
 
-from typing import Dict, List, Any, Optional
 import logging
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from ..agent_registry import register_agent
 
@@ -16,7 +16,7 @@ from ..agent_registry import register_agent
 class ContributorAgent:
     """
     Specialized Claude Code agent for circuit-synth contributors.
-    
+
     This agent helps new and existing contributors:
     - Understand the project architecture and codebase
     - Follow coding conventions and best practices
@@ -24,30 +24,32 @@ class ContributorAgent:
     - Write proper tests using TDD approach
     - Use development tools and commands effectively
     """
-    
+
     def __init__(self):
         self.name = "contributor"
-        self.description = "Circuit-synth contributor onboarding and development assistant"
+        self.description = (
+            "Circuit-synth contributor onboarding and development assistant"
+        )
         self.version = "1.0.0"
-        
+
     def get_capabilities(self) -> List[str]:
         """Return list of capabilities this agent provides."""
         return [
             "codebase_navigation",
-            "architecture_explanation", 
+            "architecture_explanation",
             "coding_conventions",
             "testing_guidance",
             "rust_integration_help",
             "development_workflow",
             "code_review_preparation",
             "issue_analysis",
-            "contribution_planning"
+            "contribution_planning",
         ]
-    
+
     def get_system_prompt(self) -> str:
         """
         Return the system prompt that defines this agent's behavior.
-        
+
         This prompt instructs Claude Code how to act as a contributor assistant.
         """
         return """You are a specialized contributor agent for the circuit-synth project. Your role is to help developers contribute effectively to this EE design tool that combines Python simplicity with Rust performance.
@@ -66,11 +68,13 @@ Circuit-synth is designed to make PCB design easier for electrical engineers by 
 Always guide contributors to read these key documents (in order of importance):
 
 1. **Contributors/README.md** - Main contributor guide with setup and overview
-2. **Contributors/Architecture-Overview.md** - How everything fits together technically  
+2. **Contributors/Getting-Started.md** - First contribution walkthrough
 3. **CLAUDE.md** - Development commands, conventions, and workflows
-4. **Contributors/Development-Setup.md** - Detailed environment configuration
-5. **Contributors/Rust-Integration-Guide.md** - Working with our Rust modules
-6. **Contributors/Testing-Guidelines.md** - TDD approach and test patterns
+4. **Contributors/detailed/** - In-depth technical documentation folder
+   - **Architecture-Overview.md** - How everything fits together technically
+   - **Development-Setup.md** - Detailed environment configuration
+   - **Rust-Integration-Guide.md** - Working with our Rust modules
+   - **Testing-Guidelines.md** - TDD approach and test patterns
 
 ### Current High-Priority Areas
 
@@ -98,6 +102,13 @@ Always guide contributors to read these key documents (in order of importance):
 ./scripts/test_rust_modules.sh       # Rust module testing
 ```
 
+**Special Tools Available:**
+- **run_tests**: Execute tests directly with proper options
+- **check_branch_status**: Get git status and recent changes
+- **find_examples**: Locate relevant code examples for any topic
+- **rust_module_status**: Check which Rust modules need work
+- **documentation_lookup**: Find specific documentation sections
+
 **STM32 Integration Example:**
 ```python
 from circuit_synth.component_info.microcontrollers.modm_device_search import search_stm32
@@ -105,14 +116,23 @@ from circuit_synth.component_info.microcontrollers.modm_device_search import sea
 mcus = search_stm32("3 spi's and 2 uarts available on jlcpcb")
 ```
 
+**Memory Bank System:**
+The `src/circuit_synth/data/memory-bank/` directory contains project context:
+- **progress/**: Development milestones and completed features
+- **decisions/**: Technical decisions and architectural choices
+- **patterns/**: Reusable code patterns and solutions
+- **issues/**: Known issues with workarounds
+- **knowledge/**: Domain-specific insights (like STM32 search workflows)
+
 ## How to Help Contributors
 
 ### For New Contributors:
 1. **Start with setup verification**: Guide them through the 5-minute setup in Contributors/README.md
-2. **Explain the mission**: Help them understand we're making EE life easier through Python
-3. **Show the architecture**: Point them to Architecture-Overview.md for the big picture
-4. **Find good first issues**: Help identify appropriate starting points
-5. **Explain our tooling**: Show them our automated development commands
+2. **Walk through first contribution**: Point them to Contributors/Getting-Started.md for practical guidance
+3. **Explain the mission**: Help them understand we're making EE life easier through Python
+4. **Show the architecture**: Point them to Contributors/detailed/Architecture-Overview.md for the big picture
+5. **Find good first issues**: Help identify appropriate starting points
+6. **Explain our tooling**: Show them our automated development commands
 
 ### For Experienced Contributors:
 1. **Dive into Rust integration**: These are our highest-impact opportunities
@@ -122,9 +142,13 @@ mcus = search_stm32("3 spi's and 2 uarts available on jlcpcb")
 
 ### For Any Contributor Questions:
 1. **Always reference documentation first**: Point them to the specific doc that answers their question
-2. **Explain the "why"**: Help them understand design decisions and trade-offs
-3. **Show examples**: Point to existing code patterns and successful implementations
-4. **Connect to mission**: Relate technical work back to helping EE workflows
+2. **Use your tools proactively**: 
+   - Use `find_examples` to show relevant code patterns
+   - Use `run_tests` to help verify their changes
+   - Use `check_branch_status` to understand their current work
+3. **Explain the "why"**: Help them understand design decisions and trade-offs
+4. **Show examples**: Point to existing code patterns and successful implementations
+5. **Connect to mission**: Relate technical work back to helping EE workflows
 
 ### Code Review Preparation:
 1. **Run automated tools**: Ensure they use our testing and linting infrastructure
@@ -156,88 +180,269 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
             "codebase_search": {
                 "description": "Search the circuit-synth codebase for specific patterns or files",
                 "parameters": {
-                    "query": {"type": "string", "description": "Search query or pattern"},
-                    "file_type": {"type": "string", "description": "File extension to filter by"}
-                }
+                    "query": {
+                        "type": "string",
+                        "description": "Search query or pattern",
+                    },
+                    "file_type": {
+                        "type": "string",
+                        "description": "File extension to filter by",
+                    },
+                },
             },
             "documentation_lookup": {
                 "description": "Look up specific documentation sections",
                 "parameters": {
-                    "doc_path": {"type": "string", "description": "Path to documentation file"},
-                    "section": {"type": "string", "description": "Optional section to focus on"}
-                }
+                    "doc_path": {
+                        "type": "string",
+                        "description": "Path to documentation file",
+                    },
+                    "section": {
+                        "type": "string",
+                        "description": "Optional section to focus on",
+                    },
+                },
             },
             "rust_module_status": {
                 "description": "Check status of Rust modules and compilation",
                 "parameters": {
-                    "module_name": {"type": "string", "description": "Specific Rust module to check"}
-                }
-            }
+                    "module_name": {
+                        "type": "string",
+                        "description": "Specific Rust module to check",
+                    }
+                },
+            },
+            "run_tests": {
+                "description": "Run circuit-synth tests with specific options",
+                "parameters": {
+                    "test_type": {
+                        "type": "string",
+                        "description": "Type of tests: 'all', 'python-only', 'rust', 'specific-file'",
+                    },
+                    "file_path": {
+                        "type": "string",
+                        "description": "Specific test file path (for specific-file type)",
+                    },
+                    "verbose": {
+                        "type": "boolean",
+                        "description": "Run with verbose output",
+                        "default": False,
+                    },
+                },
+            },
+            "check_branch_status": {
+                "description": "Check current git branch status and recent changes",
+                "parameters": {
+                    "show_diff": {
+                        "type": "boolean",
+                        "description": "Show git diff output",
+                        "default": False,
+                    }
+                },
+            },
+            "find_examples": {
+                "description": "Find relevant code examples in the circuit-synth codebase",
+                "parameters": {
+                    "topic": {
+                        "type": "string",
+                        "description": "What to find examples of (e.g., 'component creation', 'net connections', 'rust integration')",
+                    }
+                },
+            },
         }
-    
-    def execute_tool(self, tool_name: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
+
+    def execute_tool(
+        self, tool_name: str, parameters: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Execute a tool and return results."""
         if tool_name == "codebase_search":
-            return self._search_codebase(parameters.get("query", ""), parameters.get("file_type"))
+            return self._search_codebase(
+                parameters.get("query", ""), parameters.get("file_type")
+            )
         elif tool_name == "documentation_lookup":
-            return self._lookup_documentation(parameters.get("doc_path", ""), parameters.get("section"))
+            return self._lookup_documentation(
+                parameters.get("doc_path", ""), parameters.get("section")
+            )
         elif tool_name == "rust_module_status":
             return self._check_rust_module_status(parameters.get("module_name"))
+        elif tool_name == "run_tests":
+            return self._run_tests(
+                parameters.get("test_type", "python-only"),
+                parameters.get("file_path"),
+                parameters.get("verbose", False),
+            )
+        elif tool_name == "check_branch_status":
+            return self._check_branch_status(parameters.get("show_diff", False))
+        elif tool_name == "find_examples":
+            return self._find_examples(parameters.get("topic", ""))
         else:
             return {"error": f"Unknown tool: {tool_name}"}
-    
-    def _search_codebase(self, query: str, file_type: Optional[str] = None) -> Dict[str, Any]:
+
+    def _search_codebase(
+        self, query: str, file_type: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Search the codebase for specific patterns."""
         # Implementation would use ripgrep or similar for fast searching
         return {
             "results": f"Searching codebase for: {query}",
             "file_type_filter": file_type,
-            "suggestion": "Use the Grep tool for actual file searching"
+            "suggestion": "Use the Grep tool for actual file searching",
         }
-    
-    def _lookup_documentation(self, doc_path: str, section: Optional[str] = None) -> Dict[str, Any]:
+
+    def _lookup_documentation(
+        self, doc_path: str, section: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Look up documentation content."""
         doc_suggestions = {
             "architecture": "Contributors/Architecture-Overview.md",
-            "setup": "Contributors/Development-Setup.md", 
+            "setup": "Contributors/Development-Setup.md",
             "testing": "Contributors/Testing-Guidelines.md",
             "rust": "Contributors/Rust-Integration-Guide.md",
-            "conventions": "CLAUDE.md"
+            "conventions": "CLAUDE.md",
         }
-        
+
         if not doc_path and not section:
             return {
                 "available_docs": doc_suggestions,
-                "suggestion": "Specify a document path or use a key like 'architecture', 'setup', etc."
+                "suggestion": "Specify a document path or use a key like 'architecture', 'setup', etc.",
             }
-        
+
         return {
             "doc_path": doc_path or doc_suggestions.get(section, ""),
             "section": section,
-            "suggestion": "Use the Read tool to access the actual documentation content"
+            "suggestion": "Use the Read tool to access the actual documentation content",
         }
-    
-    def _check_rust_module_status(self, module_name: Optional[str] = None) -> Dict[str, Any]:
+
+    def _check_rust_module_status(
+        self, module_name: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Check the status of Rust modules."""
         rust_modules = [
             "rust_core_circuit_engine",
-            "rust_kicad_integration", 
+            "rust_kicad_integration",
             "rust_netlist_processor",
             "rust_force_directed_placement",
-            "rust_symbol_cache"
+            "rust_symbol_cache",
         ]
-        
+
         return {
             "available_modules": rust_modules,
             "module_requested": module_name,
             "high_priority_issues": [
                 "Issue #36: rust_netlist_processor module missing",
                 "Issue #37: rust_kicad_integration not compiled",
-                "Issue #40: rust component acceleration (97% performance impact)"
+                "Issue #40: rust component acceleration (97% performance impact)",
             ],
-            "suggestion": "Use 'uv run python example_project/circuit-synth/main.py' to see current fallback status"
+            "suggestion": "Use 'uv run python example_project/circuit-synth/main.py' to see current fallback status",
         }
-    
+
+    def _run_tests(
+        self,
+        test_type: str = "python-only",
+        file_path: Optional[str] = None,
+        verbose: bool = False,
+    ) -> Dict[str, Any]:
+        """Run circuit-synth tests with specific options."""
+        commands = {
+            "all": "./scripts/run_all_tests.sh",
+            "python-only": "./scripts/run_all_tests.sh --python-only",
+            "rust": "./scripts/test_rust_modules.sh",
+            "specific-file": (
+                f"uv run pytest {file_path} -v" if file_path else "uv run pytest -v"
+            ),
+        }
+
+        base_command = commands.get(test_type, commands["python-only"])
+        if verbose and test_type in ["all", "python-only", "rust"]:
+            base_command += " --verbose"
+
+        return {
+            "test_type": test_type,
+            "command": base_command,
+            "file_path": file_path,
+            "suggestion": f"Run this command: {base_command}",
+            "note": "Use the Bash tool to actually execute the command",
+        }
+
+    def _check_branch_status(self, show_diff: bool = False) -> Dict[str, Any]:
+        """Check current git branch status and recent changes."""
+        commands = [
+            "git branch --show-current",
+            "git status --porcelain",
+            "git log --oneline -5",
+        ]
+
+        if show_diff:
+            commands.append("git diff --stat")
+
+        return {
+            "commands": commands,
+            "show_diff": show_diff,
+            "suggestion": "Use the Bash tool to run these git commands",
+            "helpful_commands": [
+                "git status",
+                "git log --oneline -10",
+                "git diff HEAD~1",
+                "git branch -a",
+            ],
+        }
+
+    def _find_examples(self, topic: str) -> Dict[str, Any]:
+        """Find relevant code examples in the circuit-synth codebase."""
+        example_locations = {
+            "component creation": [
+                "src/circuit_synth/data/examples/example_kicad_project.py",
+                "src/circuit_synth/data/examples/agent-training/",
+                "examples/ directory",
+            ],
+            "net connections": [
+                "src/circuit_synth/data/examples/example_kicad_project.py",
+                "src/circuit_synth/core/circuit.py",
+            ],
+            "rust integration": [
+                "rust_modules/ directory",
+                "src/circuit_synth/core/rust_integration.py",
+                "src/circuit_synth/core/rust_components.py",
+            ],
+            "testing patterns": [
+                "tests/unit/test_core_circuit.py",
+                "tests/rust_integration/",
+                "./scripts/run_all_tests.sh",
+            ],
+            "agent training": [
+                "src/circuit_synth/data/examples/agent-training/",
+                "src/circuit_synth/data/examples/agent-training/microcontrollers/",
+                "src/circuit_synth/data/examples/agent-training/power/",
+            ],
+            "jlcpcb integration": [
+                "src/circuit_synth/manufacturing/jlcpcb/",
+                "src/circuit_synth/stm32_search_helper.py",
+            ],
+        }
+
+        # Find matches for the topic
+        matches = []
+        topic_lower = topic.lower()
+        for key, locations in example_locations.items():
+            if any(word in topic_lower for word in key.split()):
+                matches.extend(locations)
+
+        if not matches:
+            # Default suggestions
+            matches = [
+                "src/circuit_synth/data/examples/example_kicad_project.py",
+                "src/circuit_synth/data/examples/agent-training/",
+                "examples/ directory",
+            ]
+
+        return {
+            "topic": topic,
+            "suggested_locations": matches,
+            "all_example_categories": list(example_locations.keys()),
+            "suggestion": "Use the Read or Glob tool to explore these example locations",
+            "quick_start": "Start with: src/circuit_synth/data/examples/example_kicad_project.py",
+        }
+
     def get_metadata(self) -> Dict[str, Any]:
         """Return agent metadata."""
         return {
@@ -249,12 +454,13 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
             "usage_context": "contributor_onboarding",
             "documentation_dependencies": [
                 "Contributors/README.md",
-                "Contributors/Architecture-Overview.md", 
+                "Contributors/Getting-Started.md",
                 "CLAUDE.md",
-                "Contributors/Development-Setup.md",
-                "Contributors/Rust-Integration-Guide.md",
-                "Contributors/Testing-Guidelines.md"
-            ]
+                "Contributors/detailed/Architecture-Overview.md",
+                "Contributors/detailed/Development-Setup.md",
+                "Contributors/detailed/Rust-Integration-Guide.md",
+                "Contributors/detailed/Testing-Guidelines.md",
+            ],
         }
 
 

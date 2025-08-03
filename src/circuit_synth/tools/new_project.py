@@ -30,10 +30,17 @@ from circuit_synth.core.kicad_validator import validate_kicad_installation
 console = Console()
 
 
-def copy_complete_claude_setup(project_path: Path) -> None:
-    """Copy the complete .claude directory from circuit-synth3 to new project"""
+def copy_complete_claude_setup(
+    project_path: Path, developer_mode: bool = False
+) -> None:
+    """Copy the complete .claude directory from circuit-synth to new project
 
-    # Find the circuit-synth3 root directory (where we have the complete .claude setup)
+    Args:
+        project_path: Target project directory
+        developer_mode: If True, includes contributor agents and dev commands
+    """
+
+    # Find the circuit-synth root directory (where we have the complete .claude setup)
     circuit_synth_root = Path(__file__).parent.parent.parent.parent
     source_claude_dir = circuit_synth_root / ".claude"
 
@@ -47,9 +54,12 @@ def copy_complete_claude_setup(project_path: Path) -> None:
     # Destination .claude directory in the new project
     dest_claude_dir = project_path / ".claude"
 
-    console.print(
-        f"📋 Copying complete Claude setup from {source_claude_dir}", style="blue"
-    )
+    console.print(f"📋 Copying Claude setup from {source_claude_dir}", style="blue")
+    if developer_mode:
+        console.print(
+            "🔧 Developer mode: Including contributor agents and dev tools",
+            style="cyan",
+        )
 
     try:
         # Copy the entire .claude directory structure
@@ -57,67 +67,92 @@ def copy_complete_claude_setup(project_path: Path) -> None:
             shutil.rmtree(dest_claude_dir)
         shutil.copytree(source_claude_dir, dest_claude_dir)
 
-        # Remove mcp_settings.json as it's not needed
+        # Remove mcp_settings.json as it's not needed for user projects
         mcp_settings_file = dest_claude_dir / "mcp_settings.json"
         if mcp_settings_file.exists():
             mcp_settings_file.unlink()
 
-        # Remove unnecessary dev commands and setup agents
+        # Handle commands and agents based on mode
         commands_dir = dest_claude_dir / "commands"
         agents_dir = dest_claude_dir / "agents"
 
-        # Remove all dev- commands (not needed for end users)
-        dev_commands_to_remove = [
-            "dev-release-pypi.md",
-            "dev-review-branch.md",
-            "dev-review-repo.md",
-            "dev-run-tests.md",
-            "dev-update-and-commit.md",
-            "setup_circuit_synth.md",
-        ]
-        for cmd_file in dev_commands_to_remove:
-            cmd_path = commands_dir / cmd_file
-            if cmd_path.exists():
-                cmd_path.unlink()
+        if not developer_mode:
+            # Remove dev commands (not needed for end users)
+            dev_commands_to_remove = [
+                "dev-release-pypi.md",
+                "dev-review-branch.md",
+                "dev-review-repo.md",
+                "dev-run-tests.md",
+                "dev-update-and-commit.md",
+            ]
+            # Remove setup commands directory entirely for end users
+            setup_dir = commands_dir / "setup"
+            if setup_dir.exists():
+                shutil.rmtree(setup_dir)
 
-        # Remove setup agents (not needed for end users)
-        setup_agents_to_remove = ["first_setup_agent.md"]
-        for agent_file in setup_agents_to_remove:
-            agent_path = agents_dir / agent_file
-            if agent_path.exists():
-                agent_path.unlink()
+            for cmd_file in dev_commands_to_remove:
+                cmd_path = commands_dir / cmd_file
+                if cmd_path.exists():
+                    cmd_path.unlink()
+
+            # Remove development agents (not needed for end users)
+            dev_agents_to_remove = [
+                "development/contributor.md",
+                "development/first_setup_agent.md",
+                "development/circuit_generation_agent.md",
+            ]
+            for agent_file in dev_agents_to_remove:
+                agent_path = agents_dir / agent_file
+                if agent_path.exists():
+                    agent_path.unlink()
+
+        else:
+            console.print("✅ Keeping all developer tools and agents", style="green")
 
         console.print("✅ Copied all agents and commands", style="green")
 
-        # Count what was copied
-        agents_count = len(list((dest_claude_dir / "agents").glob("*.md")))
-        commands_count = len(list((dest_claude_dir / "commands").glob("*.md")))
+        # Count what was copied (now includes subdirectories)
+        agents_count = len(list((dest_claude_dir / "agents").rglob("*.md")))
+        commands_count = len(list((dest_claude_dir / "commands").rglob("*.md")))
 
         console.print(f"📁 Agents available: {agents_count}", style="green")
         console.print(f"🔧 Commands available: {commands_count}", style="green")
 
-        # List some key agents
-        key_agents = [
-            "orchestrator",
-            "circuit-synth",
-            "simulation-expert",
-            "jlc-parts-finder",
-        ]
-        available_agents = [f.stem for f in (dest_claude_dir / "agents").glob("*.md")]
-        found_key_agents = [agent for agent in key_agents if agent in available_agents]
+        # List key agents by category
+        circuit_agents = []
+        manufacturing_agents = []
+        development_agents = []
 
-        if found_key_agents:
-            console.print(f"🤖 Key agents: {', '.join(found_key_agents)}", style="cyan")
+        for agent_file in (dest_claude_dir / "agents").rglob("*.md"):
+            agent_name = agent_file.stem
+            if "circuit" in agent_file.parent.name:
+                circuit_agents.append(agent_name)
+            elif "manufacturing" in agent_file.parent.name:
+                manufacturing_agents.append(agent_name)
+            elif "development" in agent_file.parent.name:
+                development_agents.append(agent_name)
+
+        if circuit_agents:
+            console.print(
+                f"🔌 Circuit agents: {', '.join(circuit_agents)}", style="cyan"
+            )
+        if manufacturing_agents:
+            console.print(
+                f"🏭 Manufacturing agents: {', '.join(manufacturing_agents)}",
+                style="cyan",
+            )
+        if development_agents and developer_mode:
+            console.print(
+                f"🔧 Development agents: {', '.join(development_agents)}", style="cyan"
+            )
 
         # List some key commands
-        key_commands = [
-            "find-symbol",
-            "find-footprint",
-            "dev-run-tests",
-            "analyze-design",
-        ]
+        key_commands = ["find-symbol", "find-footprint", "jlc-search"]
+        if developer_mode:
+            key_commands.extend(["dev-run-tests", "dev-review-branch"])
+
         available_commands = [
-            f.stem for f in (dest_claude_dir / "commands").glob("*.md")
+            f.stem for f in (dest_claude_dir / "commands").rglob("*.md")
         ]
         found_key_commands = [cmd for cmd in key_commands if cmd in available_commands]
 
@@ -184,8 +219,6 @@ def check_kicad_installation() -> Dict[str, Any]:
     except Exception as e:
         console.print(f"⚠️  Could not verify KiCad installation: {e}", style="yellow")
         return {"kicad_installed": False, "error": str(e)}
-
-
 
 
 def create_example_circuits(project_path: Path) -> None:
@@ -523,7 +556,6 @@ if __name__ == "__main__":
     print("💡 Open ESP32_C6_Dev_Board.kicad_pcb in KiCad to see the ratsnest!")
 '''
 
-
     # Write all circuit files
     with open(circuit_synth_dir / "main.py", "w") as f:
         f.write(main_circuit)
@@ -553,7 +585,9 @@ if __name__ == "__main__":
     console.print("   • debug_header.py - Programming interface", style="cyan")
     console.print("   • led_blinker.py - Status LED", style="cyan")
     console.print("   • esp32c6.py - ESP32-C6 microcontroller", style="cyan")
-    console.print("   🎯 All files are used by main.py - clean working example!", style="green")
+    console.print(
+        "   🎯 All files are used by main.py - clean working example!", style="green"
+    )
 
 
 def create_project_readme(
@@ -949,7 +983,12 @@ def power_supply():
 @click.command()
 @click.option("--skip-kicad-check", is_flag=True, help="Skip KiCad installation check")
 @click.option("--minimal", is_flag=True, help="Create minimal project (no examples)")
-def main(skip_kicad_check: bool, minimal: bool):
+@click.option(
+    "--developer",
+    is_flag=True,
+    help="Include contributor agents and dev tools for circuit-synth development",
+)
+def main(skip_kicad_check: bool, minimal: bool, developer: bool):
     """Setup circuit-synth in the current uv project directory
 
     Run this command from within your uv project directory after:
@@ -991,12 +1030,23 @@ def main(skip_kicad_check: bool, minimal: bool):
         console.print("⏭️  Skipped KiCad check", style="yellow")
 
     # Step 2: Setup complete Claude Code integration
-    console.print("\n🤖 Setting up complete Claude Code integration...", style="yellow")
+    if developer:
+        console.print(
+            "\n🤖 Setting up Claude Code integration (developer mode)...",
+            style="yellow",
+        )
+    else:
+        console.print("\n🤖 Setting up Claude Code integration...", style="yellow")
     try:
-        copy_complete_claude_setup(project_path)
-        console.print("✅ Complete Claude setup copied successfully", style="green")
+        copy_complete_claude_setup(project_path, developer_mode=developer)
+        if developer:
+            console.print(
+                "✅ Developer Claude setup copied successfully", style="green"
+            )
+        else:
+            console.print("✅ Claude setup copied successfully", style="green")
     except Exception as e:
-        console.print(f"⚠️  Could not copy complete Claude setup: {e}", style="yellow")
+        console.print(f"⚠️  Could not copy Claude setup: {e}", style="yellow")
 
     # KiCad plugins setup removed - use 'uv run cs-setup-kicad-plugins' if needed
     if not skip_kicad_check and kicad_info.get("kicad_installed", False):

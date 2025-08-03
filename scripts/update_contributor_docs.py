@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 # Project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
 CONTRIBUTORS_DIR = PROJECT_ROOT / "Contributors"
+DETAILED_DIR = CONTRIBUTORS_DIR / "detailed"
 AGENTS_DIR = PROJECT_ROOT / "src" / "circuit_synth" / "claude_integration" / "agents"
 COMMANDS_DIR = PROJECT_ROOT / "src" / "circuit_synth" / "claude_integration" / "commands"
 CLAUDE_DIR = PROJECT_ROOT / ".claude"
@@ -427,7 +428,7 @@ class ContributorDocsUpdater:
     
     def _update_agents_and_commands_doc(self):
         """Update the Claude Code Agents and Commands documentation."""
-        doc_path = CONTRIBUTORS_DIR / "Claude-Code-Agents-and-Commands.md"
+        doc_path = DETAILED_DIR / "Claude-Code-Agents-and-Commands.md"
         
         if self.dry_run:
             logger.info(f"[DRY RUN] Would update {doc_path}")
@@ -578,7 +579,7 @@ Circuit-synth is **built from the ground up** for Claude Code integration:
     
     def _update_development_setup_doc(self):
         """Update development setup documentation with current agent info."""
-        doc_path = CONTRIBUTORS_DIR / "Development-Setup.md"
+        doc_path = DETAILED_DIR / "Development-Setup.md"
         
         if not doc_path.exists():
             logger.warning(f"Development setup doc not found: {doc_path}")
@@ -651,7 +652,7 @@ Circuit-synth is **built from the ground up** for Claude Code integration:
     
     def _update_claude_workflow_doc(self):
         """Update Claude Code workflow documentation."""
-        doc_path = CONTRIBUTORS_DIR / "Claude-Code-Workflow.md"
+        doc_path = DETAILED_DIR / "Claude-Code-Workflow.md"
         
         if not doc_path.exists():
             logger.warning(f"Claude workflow doc not found: {doc_path}")

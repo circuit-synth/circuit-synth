@@ -861,9 +861,11 @@ class SchematicGenerator(IKiCadIntegration):
             )
 
             # Generate the netlist using the modular service approach
-            logger.info(f"🔧 DEBUG: Using netlist service to generate hierarchical netlist...")
+            logger.info(
+                f"🔧 DEBUG: Using netlist service to generate hierarchical netlist..."
+            )
             from ..netlist_service import NetlistService
-            
+
             netlist_service = NetlistService()
             try:
                 netlist_service.generate_netlist_from_json(json_file, netlist_path)
@@ -949,12 +951,12 @@ class SchematicGenerator(IKiCadIntegration):
             logger.info("🔍 DEBUG: Using netlist service to generate netlist")
             # Use the modular service approach that handles hierarchical connections properly
             from ..netlist_service import NetlistService
-            
+
             netlist_service = NetlistService()
             netlist_path = str(Path(self.project_dir) / f"{self.project_name}.net")
-            
+
             netlist_service.generate_netlist_from_json(json_file, netlist_path)
-            
+
             logger.info(f"✅ Netlist service generation succeeded!")
             logger.info(f"📁 Netlist saved to: {netlist_path}")
             return True

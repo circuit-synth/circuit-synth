@@ -304,20 +304,21 @@ uv sync
 
 # Register AI agents (if using Claude Code)
 uv run register-agents
+# Now you have access to the 'contributor' agent for development help!
 
 # Verify everything works
 uv run python example_project/circuit-synth/main.py
 ./scripts/run_all_tests.sh --python-only
 ```
 
-### 📚 Comprehensive Contributor Resources
+### 📚 Contributor Resources
 
-We've built extensive infrastructure to help you contribute effectively:
+**Start here for a great contribution experience:**
 
-- **[Contributors/README.md](Contributors/README.md)** - Start here! Complete onboarding guide
-- **[Contributors/Architecture-Overview.md](Contributors/Architecture-Overview.md)** - How everything fits together
-- **[Contributors/Development-Setup.md](Contributors/Development-Setup.md)** - Detailed setup instructions
-- **[CLAUDE.md](CLAUDE.md)** - Development commands and coding standards
+- **[Contributors/README.md](Contributors/README.md)** - Welcoming 5-minute setup guide
+- **[Contributors/Getting-Started.md](Contributors/Getting-Started.md)** - Your first contribution walkthrough
+- **[Contributors/detailed/](Contributors/detailed/)** - In-depth technical documentation
+- **[CLAUDE.md](CLAUDE.md)** - Development commands and AI assistance
 
 ### 🎯 High-Impact Contribution Opportunities
 

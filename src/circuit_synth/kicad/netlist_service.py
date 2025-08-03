@@ -131,18 +131,17 @@ class CircuitReconstructor:
         from ..core.component import Component
         from ..core.net import Net
 
-        
         # CRITICAL FIX: Preserve the original circuit name and structure instead of flattening
         main_circuit = Circuit(name=circuit_name)
-        
+
         # Preserve hierarchical structure by reconstructing subcircuits first
-        for subcircuit_data in circuit_data.get('subcircuits', []):
-            subcircuit_name = subcircuit_data.get('name', 'UnknownSubcircuit')
-            
+        for subcircuit_data in circuit_data.get("subcircuits", []):
+            subcircuit_name = subcircuit_data.get("name", "UnknownSubcircuit")
+
             # Recursively reconstruct subcircuit
             subcircuit = self.reconstruct_circuit(subcircuit_data, subcircuit_name)
             main_circuit.add_subcircuit(subcircuit)
-        
+
         # Now create the circuit with proper hierarchical structure preserved
         temp_circuit = main_circuit
 
@@ -226,7 +225,6 @@ class CircuitReconstructor:
                         self.logger.warning(
                             f"⚠️ Skipping connection - missing comp_ref ({comp_ref}) or pin_number ({pin_number})"
                         )
-
 
             # Log any connection issues for debugging
             for net_name, net_obj in temp_circuit._nets.items():

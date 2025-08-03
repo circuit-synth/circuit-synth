@@ -494,7 +494,6 @@ class PCBGenerator:
                         "schematic": sch_file.stem,
                     }
 
-
                     # Only add components with valid references
                     if comp_info["reference"] and not comp_info["reference"].startswith(
                         "#"
