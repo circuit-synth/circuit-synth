@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid df37d547-ba63-4a31-b192-4a9c30f04664)
+	(uuid ab203ed3-134f-47e9-880d-37f628e82570)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -163,7 +163,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid d6341f38-b791-4bed-ae37-c592f4b930db)
+		(uuid d9dda015-c20c-4b7e-be12-30d92c55c610)
 		(property
 			"Reference"
 			"R3"
@@ -209,7 +209,7 @@
 			(project
 				"03_dual_hierarchy_connected_generated"
 				(path
-					"/1a01bfd2-50a0-43d4-a3b2-c177f30ae91a"
+					"/8d6015ca-7df9-48d5-b783-169efd3b2bf3"
 					(reference R3)
 					(unit 1)
 				)
@@ -226,7 +226,7 @@
 			)
 			(justify left)
 		)
-		(uuid 855e3cc6-31f6-43fb-9746-173c5f99572c)
+		(uuid 21bea516-7704-4f52-b7e2-57f353769d4a)
 	)
 	(hierarchical_label
 		GND
@@ -238,7 +238,7 @@
 			)
 			(justify right)
 		)
-		(uuid ef42cf76-c802-4fc3-a6ae-988c3b540a9c)
+		(uuid b960237c-c41a-44d9-a570-e67e41e1b763)
 	)
 	(hierarchical_label
 		GND
@@ -250,7 +250,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9505d474-c0fc-40df-8d98-2150f3c36e59)
+		(uuid 6cb2e6e2-71da-4594-a7b1-7616f5c83785)
 	)
 	(hierarchical_label
 		VIN
@@ -262,7 +262,7 @@
 			)
 			(justify left)
 		)
-		(uuid cedd4216-c201-47df-96de-0d85395418cf)
+		(uuid e4337e4e-0cc4-4215-983f-98e1e91a100d)
 	)
 	(sheet
 		(at 58.42 36.83)
@@ -279,7 +279,7 @@
 				0.0
 			)
 		)
-		(uuid bba911a4-8e43-4c7c-a570-6af66e3e142d)
+		(uuid 744d19a2-f42a-41fb-99ae-32071e58c473)
 		(property
 			"Sheetname"
 			"child1"
@@ -313,7 +313,7 @@
 				)
 				(justify right)
 			)
-			(uuid c254f0a3-b23c-439f-8aad-ce5ad860f75b)
+			(uuid 6f227c1d-a1c4-4abd-a2f6-902d6ce32eb7)
 		)
 		(pin
 			VIN
@@ -325,7 +325,7 @@
 				)
 				(justify right)
 			)
-			(uuid 1f46a853-ddb5-4379-a331-2592355f28f8)
+			(uuid eac41c5d-7f9c-4e99-a99e-43f2dd3e832f)
 		)
 		(instances
 			(project
@@ -368,11 +368,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 140eda6d-c22c-46a7-b03d-f5253f533c4f)
+		(uuid 35079e90-2136-4846-9047-b23c8f2299a2)
 	)
 	(sheet_instances
 		(path
-			"/1a01bfd2-50a0-43d4-a3b2-c177f30ae91a"
+			"/8d6015ca-7df9-48d5-b783-169efd3b2bf3"
 			(page "1")
 		)
 	)

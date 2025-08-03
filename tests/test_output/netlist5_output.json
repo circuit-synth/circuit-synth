@@ -1994,8 +1994,8 @@
     "templates": {},
     "unique_circuits": [
       "uSD_Card",
-      "usb",
       "power_filter",
+      "usb",
       "regulator",
       "led",
       "light_sensor"

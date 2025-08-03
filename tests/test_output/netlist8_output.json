@@ -561,9 +561,9 @@
   "duplicate_detection": {
     "templates": {},
     "unique_circuits": [
-      "divider",
+      "div2",
       "div3",
-      "div2"
+      "divider"
     ],
     "duplicate_groups": {}
   }

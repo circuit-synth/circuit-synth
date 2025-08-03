@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 59798624-12d7-4dcf-8855-04920334a724)
+	(uuid 57eab194-faff-4d4d-9e1e-30e14805283d)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -163,7 +163,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid d5c8abe8-2a9d-47d5-a99c-60f2ac5e891d)
+		(uuid 2fa5426c-1cf3-459b-b6da-59da11935cb7)
 		(property
 			"Reference"
 			"R2"
@@ -209,7 +209,7 @@
 			(project
 				"03_dual_hierarchy_connected_generated"
 				(path
-					"/1a01bfd2-50a0-43d4-a3b2-c177f30ae91a/df37d547-ba63-4a31-b192-4a9c30f04664/bba911a4-8e43-4c7c-a570-6af66e3e142d"
+					"/8d6015ca-7df9-48d5-b783-169efd3b2bf3/ab203ed3-134f-47e9-880d-37f628e82570/744d19a2-f42a-41fb-99ae-32071e58c473"
 					(reference R2)
 					(unit 1)
 				)
@@ -226,7 +226,7 @@
 			)
 			(justify left)
 		)
-		(uuid 69e92e0f-b687-4739-a85c-3e383c9e5314)
+		(uuid e90f3391-3637-44cd-b86b-2073e857e881)
 	)
 	(hierarchical_label
 		GND
@@ -238,10 +238,10 @@
 			)
 			(justify right)
 		)
-		(uuid 094f119e-5865-4a4a-8b56-450e30ae01ef)
+		(uuid ae182b10-f39d-4ab8-9db1-4b04f7a1e085)
 	)
 	(text_box
-		"child1 subcircuit"
+		"child1 subcircuit\n    Parameters: GND, VIN"
 		(exclude_from_sim yes)
 		(at 184.0 110.0 0)
 		(size 80.0 30.0)
@@ -271,11 +271,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 5e96c947-8929-4600-96b0-5ea308fdf307)
+		(uuid 11f7996e-74b8-4a98-8ad1-a3454cbcf259)
 	)
 	(sheet_instances
 		(path
-			"/1a01bfd2-50a0-43d4-a3b2-c177f30ae91a/df37d547-ba63-4a31-b192-4a9c30f04664/bba911a4-8e43-4c7c-a570-6af66e3e142d"
+			"/8d6015ca-7df9-48d5-b783-169efd3b2bf3/ab203ed3-134f-47e9-880d-37f628e82570/744d19a2-f42a-41fb-99ae-32071e58c473"
 			(page "1")
 		)
 	)
