@@ -1,25 +1,12 @@
 #!/usr/bin/env python3
 """
-Hierarchical Circuit Generated from KiCad
+Main circuit generated from KiCad
 """
 
 from circuit_synth import *
 
-@circuit(name='child1')
-def child1():
-    """
-    child1 subcircuit
-    """
-    # Create nets
-    gnd = Net('GND')
-    vin = Net('VIN')
-
-    # Create components
-    r2 = Component(symbol="Device:R", ref="R2", value="10k", footprint="Resistor_SMD:R_0603_1608Metric")
-
-    # Connections
-    r2[2] += gnd
-    r2[1] += vin
+# Import subcircuit functions
+from child1 import child1
 
 @circuit(name='main')
 def main():
@@ -34,7 +21,7 @@ def main():
     r3 = Component(symbol="Device:R", ref="R3", value="10k", footprint="Resistor_SMD:R_0603_1608Metric")
 
     # Instantiate subcircuits
-    child1_instance = child1()
+    child1_instance = child1(gnd, vin)
 
     # Main circuit connections
     r3[2] += gnd

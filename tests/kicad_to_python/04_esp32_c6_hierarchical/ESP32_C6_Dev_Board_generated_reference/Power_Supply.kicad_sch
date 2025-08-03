@@ -1,0 +1,649 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid ad7cf497-43d0-4ea2-821f-a954a75dbd60)
+	(paper A4)
+	(paper A4)
+	(lib_symbols
+		(symbol "Device:C"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"{'value': 'C', 'position': {'x': 0.635, 'y': 2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"{'value': 'C', 'position': {'x': 0.635, 'y': -2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				"{'value': '', 'position': {'x': 0.9652, 'y': -3.81, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"{'value': 'Unpolarized capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"{'value': 'cap capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"{'value': 'C_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "C_0_1"
+				(polyline
+					(pts
+						(xy -2.032 0.762)
+						(xy 2.032 0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.032 -0.762)
+						(xy 2.032 -0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "C_1_1"
+				(pin
+					passive
+					line
+					(at 0.0 3.81 270)
+					(length 2.794)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 0.0 -3.81 90)
+					(length 2.794)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+		(symbol "Regulator_Linear:AMS1117-3.3"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"{'value': 'U', 'position': {'x': -3.81, 'y': 3.175, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"{'value': 'AMS1117-3.3', 'position': {'x': 0.0, 'y': 3.175, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				"{'value': 'Package_TO_SOT_SMD:SOT-223-3_TabPin2', 'position': {'x': 0.0, 'y': 5.08, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"{'value': 'http://www.advanced-monolithic.com/pdf/ds1117.pdf', 'position': {'x': 2.54, 'y': -6.35, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"{'value': '1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"{'value': 'linear regulator ldo fixed positive', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"{'value': 'SOT?223*TabPin2*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "AMS1117-3.3_0_1"
+				(rectangle
+					(start -5.08 -5.08)
+					(end 5.08 1.905)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "AMS1117-3.3_1_1"
+				(pin
+					power_in
+					line
+					(at -7.62 0.0 0)
+					(length 2.54)
+					(name
+						VI
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					power_in
+					line
+					(at 0.0 -7.62 90)
+					(length 2.54)
+					(name
+						GND
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					power_out
+					line
+					(at 7.62 0.0 180)
+					(length 2.54)
+					(name
+						VO
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+	)
+	(title_block
+		(title Power_Supply)
+		(date 2025-08-02)
+		(company Circuit-Synth)
+	)
+	(symbol
+		(lib_id Device:C)
+		(at 38.1 45.72 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid 25dff09b-345c-4044-836f-ece9b4218b87)
+		(property
+			"Reference"
+			"C2"
+			(at 40.64 44.449999999999996 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Value"
+			"10uF"
+			(at 40.64 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"Capacitor_SMD:C_0805_2012Metric"
+			(at 38.1 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference C2)
+					(unit 1)
+				)
+			)
+			(project
+				"ESP32_C6_Dev_Board_generated"
+				(path
+					"/afc0aca2-1236-4053-adf3-ae442faa931a/291f3ff0-93f6-43b0-82cf-03761c7f55fa/f7f16cc0-fcc6-4419-9e6d-8985f47a4e06"
+					(reference C2)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id Device:C)
+		(at 58.42 45.72 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid 67dcead2-bbd5-40cf-a21f-4f3f25a40239)
+		(property
+			"Reference"
+			"C3"
+			(at 60.96 44.449999999999996 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Value"
+			"22uF"
+			(at 60.96 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"Capacitor_SMD:C_0805_2012Metric"
+			(at 58.42 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference C3)
+					(unit 1)
+				)
+			)
+			(project
+				"ESP32_C6_Dev_Board_generated"
+				(path
+					"/afc0aca2-1236-4053-adf3-ae442faa931a/291f3ff0-93f6-43b0-82cf-03761c7f55fa/f7f16cc0-fcc6-4419-9e6d-8985f47a4e06"
+					(reference C3)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id Regulator_Linear:AMS1117-3.3)
+		(at 45.72 91.44 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid f1b6fed6-c703-47fc-a272-e24696d84185)
+		(property
+			"Reference"
+			"U1"
+			(at 48.26 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Value"
+			"~"
+			(at 48.26 92.71 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+			(at 45.72 101.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference U1)
+					(unit 1)
+				)
+			)
+			(project
+				"ESP32_C6_Dev_Board_generated"
+				(path
+					"/afc0aca2-1236-4053-adf3-ae442faa931a/291f3ff0-93f6-43b0-82cf-03761c7f55fa/f7f16cc0-fcc6-4419-9e6d-8985f47a4e06"
+					(reference U1)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		VBUS
+		(shape input)
+		(at 38.1 41.91 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 563050d5-0d6b-499c-abb8-6f7404b12aac)
+	)
+	(hierarchical_label
+		VBUS
+		(shape input)
+		(at 38.1 91.44 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid e80de53e-ce72-46c5-a266-12854cfed092)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 38.1 49.53 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 32ca984f-e715-4974-acbd-4606a235d4a7)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 49.53 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 0d42edcf-dc45-4e04-b711-cda2a1063409)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 45.72 99.06 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 084c62f2-df67-4b68-9e3c-a2b3d2a4a31d)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 58.42 41.91 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 26ac395b-efad-4335-ac00-c4f419008c7a)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 53.339999999999996 91.44 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid e34ce634-e450-45b0-9887-3f4330ba80ce)
+	)
+	(text_box
+		"Power_Supply subcircuit\n    Parameters: GND, VBUS, VCC_3V3"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 2836a06e-8e01-4666-8938-61bb33413386)
+	)
+	(sheet_instances
+		(path
+			"/afc0aca2-1236-4053-adf3-ae442faa931a/291f3ff0-93f6-43b0-82cf-03761c7f55fa/f7f16cc0-fcc6-4419-9e6d-8985f47a4e06"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)
