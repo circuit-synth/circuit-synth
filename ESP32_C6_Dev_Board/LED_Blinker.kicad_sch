@@ -1,0 +1,621 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 3278dd0e-d0fd-48f0-b935-f4c19c0ad588)
+	(paper A4)
+	(paper A4)
+	(lib_symbols
+		(symbol "Device:LED"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"D"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"LED"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				""
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"~"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"Light emitting diode"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Sim.Pins"
+				"1=K 2=A"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"ki_keywords"
+				"LED diode"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"LED* LED_SMD:* LED_THT:*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "LED_0_1"
+				(polyline
+					(pts
+						(xy -3.048 -0.762)
+						(xy -4.572 -2.286)
+						(xy -3.81 -2.286)
+						(xy -4.572 -2.286)
+						(xy -4.572 -1.524)
+					)
+					(stroke
+						(width 0.0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.778 -0.762)
+						(xy -3.302 -2.286)
+						(xy -2.54 -2.286)
+						(xy -3.302 -2.286)
+						(xy -3.302 -1.524)
+					)
+					(stroke
+						(width 0.0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 0.0)
+						(xy 1.27 0.0)
+					)
+					(stroke
+						(width 0.0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 -1.27)
+						(xy -1.27 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -1.27)
+						(xy 1.27 1.27)
+						(xy -1.27 0.0)
+						(xy 1.27 -1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "LED_1_1"
+				(pin
+					passive
+					line
+					(at -3.81 0.0 0)
+					(length 2.54)
+					(name
+						K
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 3.81 0.0 180)
+					(length 2.54)
+					(name
+						A
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+		(symbol "Device:R"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"R"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"R"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				""
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"~"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"Resistor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"R res resistor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"R_*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
+				(pin
+					passive
+					line
+					(at 0.0 3.81 270)
+					(length 1.27)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 0.0 -3.81 90)
+					(length 1.27)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+	)
+	(title_block
+		(title LED_Blinker)
+		(date 2025-08-02)
+		(company Circuit-Synth)
+	)
+	(symbol
+		(lib_id Device:LED)
+		(at 45.72 45.72 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid 6a96ddcb-3405-4303-bf86-973dc5f45a6d)
+		(property
+			"Reference"
+			"D3"
+			(at 45.72 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"LED_SMD:LED_0805_2012Metric"
+			(at 45.72 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference D3)
+					(unit 1)
+				)
+			)
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/9315ba25-0627-4d43-9d13-3e249a0987d0/dec770bf-4c1f-4f76-8774-5a7ebb631ae6/0db8b549-1693-48b6-bf7a-52f9e255c796/9477a108-46b9-4d0f-850f-29b4a4cf958d"
+					(reference D3)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id Device:R)
+		(at 68.58 45.72 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid 23658df6-eb5e-40d7-8f22-8d46e2fb05f0)
+		(property
+			"Reference"
+			"R3"
+			(at 68.58 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Value"
+			"330"
+			(at 68.58 50.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Resistor_SMD:R_0805_2012Metric"
+			(at 68.58 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference R3)
+					(unit 1)
+				)
+			)
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/9315ba25-0627-4d43-9d13-3e249a0987d0/dec770bf-4c1f-4f76-8774-5a7ebb631ae6/0db8b549-1693-48b6-bf7a-52f9e255c796/9477a108-46b9-4d0f-850f-29b4a4cf958d"
+					(reference R3)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		LED_CONTROL
+		(shape input)
+		(at 41.91 45.72 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid db5bf1a0-12e8-47eb-aade-cb513bbaf878)
+	)
+	(hierarchical_label
+		LED_CONTROL
+		(shape input)
+		(at 41.91 45.72 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 9a200000-728b-4cc4-b821-804dd428a2fc)
+	)
+	(hierarchical_label
+		N$3
+		(shape input)
+		(at 49.53 45.72 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid af16993b-6371-4176-9e07-2a35f5254f94)
+	)
+	(hierarchical_label
+		N$3
+		(shape input)
+		(at 68.58 49.53 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid d6a39ef0-ed78-4ba9-a59f-386f2f9444ca)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 68.58 41.91 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 8683d90f-86c6-47ea-95ce-24c8bc3d4f27)
+	)
+	(text_box
+		"LED with current limiting resistor"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid a893ff62-7e28-4cf1-bc32-dc6eb131b99d)
+	)
+	(text_box
+		"LED with current limiting resistor"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid a893ff62-7e28-4cf1-bc32-dc6eb131b99d)
+	)
+	(sheet_instances
+		(path
+			"/9315ba25-0627-4d43-9d13-3e249a0987d0/dec770bf-4c1f-4f76-8774-5a7ebb631ae6/0db8b549-1693-48b6-bf7a-52f9e255c796/9477a108-46b9-4d0f-850f-29b4a4cf958d"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

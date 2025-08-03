@@ -1,0 +1,222 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "78e0d661-09ef-4226-aba3-2252276a75be")
+	(paper "A4")
+	(lib_symbols
+		(symbol "Device:R"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "{'value': 'R', 'position': {'x': 2.032, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "{'value': 'R', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "{'value': '', 'position': {'x': -1.778, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "{'value': 'Resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "{'value': 'R res resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "{'value': 'R_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(hierarchical_label "VIN"
+		(shape input)
+		(at 118.11 83.82 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "7ce13579-4944-4d01-8ec1-21b8a44bd10c")
+	)
+	(hierarchical_label "GND"
+		(shape input)
+		(at 118.11 91.44 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "a35e3d39-0210-463c-9671-96e811ac6ae5")
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 118.11 87.63 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "8ea0f078-d759-40e4-9f8d-cda26df40681")
+		(property "Reference" "R2"
+			(at 120.65 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10k"
+			(at 120.65 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 118.11 97.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 118.11 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 118.11 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "3e6f3641-032e-479a-834f-81aa47565a51")
+		)
+		(pin "2"
+			(uuid "53b6a5b3-f276-4c00-85a3-a9f4bab62fc9")
+		)
+		(instances
+			(project "03_dual_hierarchy_connected"
+				(path "/c6cb6da4-e155-4b6c-b4e1-4f995d87049c/e22f91b2-9a94-41e4-b2b2-7ca491090338"
+					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+)

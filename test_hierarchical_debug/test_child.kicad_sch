@@ -1,0 +1,242 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 06135540-6982-4426-a260-0253be9cdffc)
+	(paper A4)
+	(paper A4)
+	(lib_symbols
+		(symbol "Device:R"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"R"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"R"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				""
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"~"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"Resistor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"R res resistor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"R_*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
+				(pin
+					passive
+					line
+					(at 0.0 3.81 270)
+					(length 1.27)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 0.0 -3.81 90)
+					(length 1.27)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+	)
+	(title_block
+		(title test_child)
+		(date 2025-08-02)
+		(company Circuit-Synth)
+	)
+	(symbol
+		(lib_id Device:R)
+		(at 38.1 45.72 0)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid 4da4fbd2-6608-4a3c-bec4-9f3cf7412224)
+		(property
+			"Reference"
+			"R1"
+			(at 38.1 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Value"
+			"10k"
+			(at 38.1 50.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property
+			"Footprint"
+			"Resistor_SMD:R_0603_1608Metric"
+			(at 38.1 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"circuit"
+				(path
+					"/"
+					(reference R1)
+					(unit 1)
+				)
+			)
+			(project
+				"test_hierarchical_debug"
+				(path
+					"/ffa623be-2355-4ac3-9e22-6e96cce2304d/2e11fa04-87b9-4b77-8ba2-99a84b189706/2e54ae9d-1ce8-42ca-8abe-65838db00cde"
+					(reference R1)
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		"test_net"
+		(shape input)
+		(at 38.1 41.91 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 48a0baea-d4cc-455c-ab93-8df076f2a73f)
+	)
+	(sheet_instances
+		(path
+			"/ffa623be-2355-4ac3-9e22-6e96cce2304d/2e11fa04-87b9-4b77-8ba2-99a84b189706/2e54ae9d-1ce8-42ca-8abe-65838db00cde"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)

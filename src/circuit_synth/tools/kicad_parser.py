@@ -55,21 +55,38 @@ class KiCadParser:
                     logger.info(f"Using fallback root schematic: {fallback_sch}")
                     return fallback_sch
                 return None
-
-            # Find the root schematic (the one with empty sheet name)
+            
+            # Find the root schematic 
+            # First try to find a sheet with empty name (traditional root sheet)
             for sheet_info in sheets:
                 if isinstance(sheet_info, list) and len(sheet_info) >= 2:
                     schematic_file, sheet_name = sheet_info[0], sheet_info[1]
-                    if sheet_name == "":  # Root sheet has empty name
+                    if sheet_name == "":  # Traditional root sheet has empty name
                         root_sch_path = self.project_dir / schematic_file
                         if root_sch_path.exists():
-                            logger.info(f"Found root schematic: {root_sch_path}")
+                            logger.info(f"Found traditional root schematic: {root_sch_path}")
                             return root_sch_path
                         else:
-                            logger.error(
-                                f"Root schematic file not found: {root_sch_path}"
-                            )
-
+                            logger.error(f"Root schematic file not found: {root_sch_path}")
+            
+            # If no empty-name sheet found, use the first sheet as root (hierarchical projects)
+            if sheets and len(sheets) > 0:
+                first_sheet = sheets[0]
+                if isinstance(first_sheet, list) and len(first_sheet) >= 2:
+                    schematic_file, sheet_name = first_sheet[0], first_sheet[1]
+                    
+                    # Try to construct schematic path from UUID
+                    root_sch_path = self.project_dir / f"{self.kicad_project.stem}.kicad_sch"
+                    if root_sch_path.exists():
+                        logger.info(f"Found hierarchical root schematic: {root_sch_path} (sheet: {sheet_name})")
+                        return root_sch_path
+                    
+                    # Alternative: try schematic_file directly
+                    alt_root_sch_path = self.project_dir / schematic_file
+                    if alt_root_sch_path.exists():
+                        logger.info(f"Found alternative root schematic: {alt_root_sch_path}")
+                        return alt_root_sch_path
+            
             logger.error("Could not find root schematic in .kicad_pro sheets")
             return None
 
@@ -595,8 +612,10 @@ class KiCadParser:
                 r"\(hierarchical_label\s+([^\s\)]+)", content
             )
             for label in hierarchical_labels:
-                # Clean up the label (remove quotes)
+                # Clean up the label (remove quotes and leading slash)
                 clean_label = label.strip('"')
+                if clean_label.startswith('/'):
+                    clean_label = clean_label[1:]  # Remove leading slash from hierarchical labels
                 if clean_label and not clean_label.startswith(
                     "N$"
                 ):  # Skip auto-generated nets
