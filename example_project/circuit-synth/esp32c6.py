@@ -83,6 +83,6 @@ def esp32c6(vcc_3v3, gnd, usb_dp, usb_dm):
 
 
     debug_header_circuit = debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0)
-    led_blinker_circuit = led_blinker(vcc_3v3, gnd, led_control)
+    led_blinker_circuit = led_blinker(led_control, gnd)
 
 

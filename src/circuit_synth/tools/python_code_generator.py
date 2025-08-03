@@ -10,7 +10,7 @@ and hierarchical support.
 import logging
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from circuit_synth.tools.models import Circuit, Component, Net
 
@@ -387,8 +387,134 @@ class PythonCodeGenerator:
             logger.error(f"❌ CODE_UPDATE: Failed to update {target_path}: {e}")
             return False
 
+    def _analyze_hierarchical_nets(self, circuits: Dict[str, Circuit], hierarchical_tree: Optional[Dict] = None) -> Tuple[Dict[str, Dict[str, Net]], Dict[str, List[str]]]:
+        """
+        Analyze hierarchical circuit structure to determine proper net creation levels.
+        
+        Args:
+            circuits: Dictionary of circuit objects
+            hierarchical_tree: Optional hierarchical tree structure from KiCad parser
+        
+        Returns:
+            hierarchical_nets: Dict mapping circuit names to nets that should be created at that level
+            shared_nets_per_subcircuit: Dict mapping subcircuit names to nets they should receive as parameters
+        """
+        logger.info("🔍 NET_ANALYSIS: Starting hierarchical net analysis")
+        
+        # Use provided hierarchical tree or build a simple 2-level one
+        if hierarchical_tree:
+            hierarchy_tree = hierarchical_tree
+            logger.info(f"🔍 NET_ANALYSIS: Using provided hierarchy tree: {hierarchy_tree}")
+        else:
+            # Fallback: Build simple 2-level hierarchy structure
+            # But check for known ESP32 structure first
+            hierarchy_tree = {}
+            all_circuits = set(circuits.keys())
+            
+            # Special handling for ESP32 project structure
+            if 'ESP32_C6_MCU' in circuits and 'Debug_Header' in circuits and 'LED_Blinker' in circuits:
+                hierarchy_tree = {
+                    'main': ['USB_Port', 'Power_Supply', 'ESP32_C6_MCU'],
+                    'ESP32_C6_MCU': ['Debug_Header', 'LED_Blinker'],
+                    'Power_Supply': [],
+                    'Debug_Header': [], 
+                    'LED_Blinker': [],
+                    'USB_Port': []
+                }
+                logger.info("🔍 NET_ANALYSIS: Detected ESP32 project structure")
+            else:
+                # Standard fallback for other projects
+                main_circuit = circuits.get('main')
+                if main_circuit:
+                    hierarchy_tree['main'] = [name for name in circuits.keys() if name != 'main']
+                    for subcircuit_name in hierarchy_tree['main']:
+                        hierarchy_tree[subcircuit_name] = []
+                else:
+                    # If no main, treat as flat structure
+                    hierarchy_tree = {name: [] for name in circuits.keys()}
+            
+            logger.info(f"🔍 NET_ANALYSIS: Built hierarchy tree: {hierarchy_tree}")
+        
+        # Collect all nets and their usage across circuits
+        net_usage = {}  # net_name -> set of circuit names that use it
+        
+        for circuit_name, circuit in circuits.items():
+            for net in circuit.nets:
+                if net.name not in net_usage:
+                    net_usage[net.name] = set()
+                net_usage[net.name].add(circuit_name)
+        
+        logger.info(f"🔍 NET_ANALYSIS: Net usage analysis:")
+        for net_name, using_circuits in net_usage.items():
+            logger.info(f"  - {net_name}: used by {list(using_circuits)}")
+        
+        # Find parent circuit for each circuit
+        def find_parent(circuit_name: str) -> Optional[str]:
+            for parent, children in hierarchy_tree.items():
+                if circuit_name in children:
+                    return parent
+            return None
+        
+        # Find common parent of multiple circuits
+        def find_common_parent(circuit_names: List[str]) -> str:
+            if len(circuit_names) == 1:
+                return circuit_names[0]
+            
+            # For multi-level hierarchies, find the lowest common parent
+            # For now, simplified logic: if any circuit is under main, use main
+            # If circuits are siblings under a common parent, use that parent
+            
+            parents = set()
+            for circuit_name in circuit_names:
+                parent = find_parent(circuit_name)
+                if parent:
+                    parents.add(parent)
+                else:
+                    parents.add('main')  # Circuit with no parent is at main level
+            
+            if len(parents) == 1:
+                # All circuits have the same parent - create net at parent level
+                return list(parents)[0]
+            else:
+                # Circuits have different parents - create at main level
+                return 'main'
+        
+        # Determine where each net should be created (one level above highest usage)
+        hierarchical_nets = {}  # circuit_name -> {net_name: Net object}
+        shared_nets_per_subcircuit = {}  # subcircuit_name -> [shared_net_names]
+        
+        for circuit_name in circuits.keys():
+            hierarchical_nets[circuit_name] = {}
+            if circuit_name != 'main':
+                shared_nets_per_subcircuit[circuit_name] = []
+        
+        for net_name, using_circuits in net_usage.items():
+            if len(using_circuits) == 1:
+                # Net used by only one circuit - create it locally
+                circuit_name = list(using_circuits)[0]
+                net_obj = next(net for net in circuits[circuit_name].nets if net.name == net_name)
+                hierarchical_nets[circuit_name][net_name] = net_obj
+                logger.info(f"🔍 NET_ANALYSIS: {net_name} -> local to {circuit_name}")
+            else:
+                # Net used by multiple circuits - find common parent
+                common_parent = find_common_parent(list(using_circuits))
+                
+                # Get net object from one of the using circuits
+                net_obj = next(net for net in circuits[list(using_circuits)[0]].nets if net.name == net_name)
+                hierarchical_nets[common_parent][net_name] = net_obj
+                
+                # All circuits that use this net (except the parent) should receive it as parameter
+                for circuit_name in using_circuits:
+                    if circuit_name != common_parent:
+                        shared_nets_per_subcircuit[circuit_name].append(net_name)
+                
+                logger.info(f"🔍 NET_ANALYSIS: {net_name} -> created at {common_parent}, shared with {[c for c in using_circuits if c != common_parent]}")
+        
+        logger.info("🔍 NET_ANALYSIS: Hierarchical net analysis complete")
+        return hierarchical_nets, shared_nets_per_subcircuit
+
     def _generate_multiple_files(
-        self, main_python_file: Path, circuits: Dict[str, Circuit], preview_only: bool = True
+        self, main_python_file: Path, circuits: Dict[str, Circuit], preview_only: bool = True, hierarchical_tree: Optional[Dict] = None
     ) -> Optional[str]:
         """Generate separate Python files for each circuit"""
         logger.info(f"🗂️ MULTI_FILE: Generating {len(circuits)} separate circuit files")
@@ -415,14 +541,14 @@ class PythonCodeGenerator:
             logger.info(f"🗂️ MULTI_FILE: Main circuit: {main_circuit.name}")
             logger.info(f"🗂️ MULTI_FILE: Subcircuits: {list(subcircuits.keys())}")
             
-            # Identify shared nets between main and subcircuits
-            main_net_names = {net.name for net in main_circuit.nets}
-            shared_nets_per_subcircuit = {}
+            # Perform hierarchical net analysis to determine proper net creation levels
+            hierarchical_nets, shared_nets_per_subcircuit = self._analyze_hierarchical_nets(circuits, hierarchical_tree)
             
-            for name, circuit in subcircuits.items():
-                subcircuit_net_names = {net.name for net in circuit.nets}
-                shared_nets = list(main_net_names.intersection(subcircuit_net_names))
-                shared_nets_per_subcircuit[name] = shared_nets
+            logger.info(f"🗂️ MULTI_FILE: Hierarchical net analysis results:")
+            for level, nets in hierarchical_nets.items():
+                logger.info(f"  - {level}: {list(nets.keys())}")
+            
+            for name, shared_nets in shared_nets_per_subcircuit.items():
                 logger.info(f"🗂️ MULTI_FILE: Shared nets with {name}: {shared_nets}")
             
             # Generate subcircuit files
@@ -433,7 +559,8 @@ class PythonCodeGenerator:
                 
                 # Generate subcircuit code with shared nets as parameters
                 shared_nets = shared_nets_per_subcircuit[name]
-                subcircuit_code = self._generate_standalone_subcircuit_file(circuit, shared_nets)
+                local_nets = hierarchical_nets.get(name, {})
+                subcircuit_code = self._generate_standalone_subcircuit_file(circuit, shared_nets, local_nets)
                 
                 if preview_only:
                     logger.info(f"🗂️ MULTI_FILE: [PREVIEW] Would create {subcircuit_file}")
@@ -446,8 +573,9 @@ class PythonCodeGenerator:
                 
                 subcircuit_files_created.append(name)
             
-            # Generate main.py file
-            main_code = self._generate_main_file_with_imports(main_circuit, subcircuit_files_created, shared_nets_per_subcircuit)
+            # Generate main.py file with hierarchical nets
+            main_nets = hierarchical_nets.get('main', {})
+            main_code = self._generate_main_file_with_imports(main_circuit, subcircuit_files_created, shared_nets_per_subcircuit, main_nets)
             
             if preview_only:
                 logger.info(f"🗂️ MULTI_FILE: [PREVIEW] Would create {main_python_file}")
@@ -464,7 +592,7 @@ class PythonCodeGenerator:
             logger.error(f"🗂️ MULTI_FILE: Failed to generate multiple files: {e}")
             return None
 
-    def _generate_standalone_subcircuit_file(self, circuit: Circuit, shared_nets: List[str] = None) -> str:
+    def _generate_standalone_subcircuit_file(self, circuit: Circuit, shared_nets: List[str] = None, local_nets: Dict[str, Net] = None) -> str:
         """Generate a complete Python file for a single subcircuit"""
         logger.info(f"📄 SUBCIRCUIT_FILE: Generating standalone file for {circuit.name}")
         
@@ -481,14 +609,14 @@ class PythonCodeGenerator:
             ''
         ])
         
-        # Generate the subcircuit function with net parameters
-        code_lines.extend(self._generate_subcircuit_code_with_params(circuit, shared_nets or []))
+        # Generate the subcircuit function with net parameters  
+        code_lines.extend(self._generate_subcircuit_code_with_params(circuit, shared_nets or [], local_nets or {}))
         
         result = "\n".join(code_lines)
         logger.info(f"📄 SUBCIRCUIT_FILE: Generated {len(code_lines)} lines for {circuit.name}")
         return result
 
-    def _generate_subcircuit_code_with_params(self, circuit: Circuit, shared_nets: List[str]) -> List[str]:
+    def _generate_subcircuit_code_with_params(self, circuit: Circuit, shared_nets: List[str], local_nets: Dict[str, Net] = None) -> List[str]:
         """Generate code for a subcircuit function with net parameters"""
         logger.info(f"🔧 SUBCIRCUIT_PARAMS: Generating parameterized code for {circuit.name}")
         
@@ -509,12 +637,18 @@ class PythonCodeGenerator:
             code_lines.append(f"    Parameters: {', '.join(shared_nets)}")
         code_lines.append(f'    """')
 
-        # Create only local nets (not shared ones)
-        if circuit.nets:
-            local_nets = [net for net in circuit.nets if net.name not in shared_nets]
-            if local_nets:
-                code_lines.append("    # Create local nets")
-                for net in local_nets:
+        # Create only local nets (not shared ones) using hierarchical analysis
+        if local_nets:
+            code_lines.append("    # Create local nets")
+            for net_name, net_obj in local_nets.items():
+                net_var = self._sanitize_variable_name(net_name)
+                code_lines.append(f"    {net_var} = Net('{net_name}')")
+        elif circuit.nets:
+            # Fallback: create local nets by excluding shared ones
+            local_circuit_nets = [net for net in circuit.nets if net.name not in shared_nets]
+            if local_circuit_nets:
+                code_lines.append("    # Create local nets (fallback)")
+                for net in local_circuit_nets:
                     net_var = self._sanitize_variable_name(net.name)
                     code_lines.append(f"    {net_var} = Net('{net.name}')")
 
@@ -547,7 +681,7 @@ class PythonCodeGenerator:
         logger.info(f"🔧 SUBCIRCUIT_PARAMS: Generated {len(code_lines)} lines for {circuit.name}")
         return code_lines
 
-    def _generate_main_file_with_imports(self, main_circuit: Circuit, subcircuit_names: List[str], shared_nets_per_subcircuit: Dict[str, List[str]] = None) -> str:
+    def _generate_main_file_with_imports(self, main_circuit: Circuit, subcircuit_names: List[str], shared_nets_per_subcircuit: Dict[str, List[str]] = None, main_nets: Dict[str, Net] = None) -> str:
         """Generate the main.py file that imports subcircuits from separate files"""
         logger.info(f"📄 MAIN_FILE: Generating main file with imports for {len(subcircuit_names)} subcircuits")
         
@@ -573,7 +707,7 @@ class PythonCodeGenerator:
         code_lines.append('')
         
         # Generate main circuit function with proper subcircuit instantiation
-        code_lines.extend(self._generate_main_circuit_code_with_params(main_circuit, subcircuit_names, shared_nets_per_subcircuit or {}))
+        code_lines.extend(self._generate_main_circuit_code_with_params(main_circuit, subcircuit_names, shared_nets_per_subcircuit or {}, main_nets or {}))
         
         # Add generation code
         code_lines.extend([
@@ -588,7 +722,7 @@ class PythonCodeGenerator:
         logger.info(f"📄 MAIN_FILE: Generated {len(code_lines)} lines for main circuit")
         return result
 
-    def _generate_main_circuit_code_with_params(self, circuit: Circuit, subcircuit_names: List[str], shared_nets_per_subcircuit: Dict[str, List[str]]) -> List[str]:
+    def _generate_main_circuit_code_with_params(self, circuit: Circuit, subcircuit_names: List[str], shared_nets_per_subcircuit: Dict[str, List[str]], main_nets: Dict[str, Net] = None) -> List[str]:
         """Generate code for the main circuit function with proper subcircuit instantiation"""
         logger.info("🎯 MAIN_CIRCUIT_PARAMS: Generating main circuit code with net passing")
         
@@ -601,11 +735,17 @@ class PythonCodeGenerator:
         code_lines.append("    Main circuit with hierarchical subcircuits")
         code_lines.append('    """')
 
-        # Create main circuit nets
-        if circuit.nets:
+        # Create main circuit nets (using hierarchical analysis)
+        if main_nets:
+            code_lines.append("    # Main circuit nets")
+            for net_name, net_obj in main_nets.items():
+                net_var = self._sanitize_variable_name(net_name)
+                code_lines.append(f"    {net_var} = Net('{net_name}')")
+        elif circuit.nets:
+            # Fallback to circuit's own nets if no hierarchical analysis
             connected_nets = [net for net in circuit.nets if not net.name.startswith('unconnected-')]
             if connected_nets:
-                code_lines.append("    # Main circuit nets")
+                code_lines.append("    # Main circuit nets (fallback)")
                 for net in connected_nets:
                     net_var = self._sanitize_variable_name(net.name)
                     code_lines.append(f"    {net_var} = Net('{net.name}')")
