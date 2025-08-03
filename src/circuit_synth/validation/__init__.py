@@ -1,10 +1,14 @@
 """
-Real-time Circuit Design Validation
+Simple circuit validation for Claude Code integration.
 
-Provides validation functions called by Claude Code hooks for
-immediate feedback on circuit design quality and correctness.
+Provides two main functions:
+- validate_and_improve_circuit: Validate and auto-fix circuit code
+- get_circuit_design_context: Get comprehensive design context
 """
 
-from .real_time_check import validate_circuit_file
+from .simple_validator import validate_and_improve_circuit, get_circuit_design_context
 
-__all__ = ["validate_circuit_file"]
+__all__ = [
+    "validate_and_improve_circuit",
+    "get_circuit_design_context"
+]

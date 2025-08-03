@@ -132,6 +132,10 @@ pip install -e .
 # /find-symbol STM32 - Search for STM32 symbols
 # /find-footprint LQFP - Search for LQFP footprints
 
+# Circuit validation commands (NEW!)
+# /generate-validated-circuit "ESP32 development board" - Generate circuit with quality assurance
+# /validate-existing-circuit - Validate and improve existing circuit code
+
 # Development slash commands (for contributors)
 # /dev-run-tests - Run comprehensive test suite
 # /dev-update-and-commit "description" - Update docs and commit changes
@@ -139,6 +143,42 @@ pip install -e .
 # Manual search in KiCad libraries (if needed)
 find /usr/share/kicad/symbols -name "*.kicad_sym" | xargs grep -l "STM32"
 find /usr/share/kicad/footprints -name "*.kicad_mod" | grep -i lqfp
+```
+
+## Circuit Validation System
+
+**NEW FEATURE: Circuit Quality Assurance**
+
+The validation system provides automatic quality checking and improvement for circuit code:
+
+### Core Functions
+```python
+from circuit_synth.validation import validate_and_improve_circuit, get_circuit_design_context
+
+# Validate and fix circuit code automatically
+code, is_valid, status = validate_and_improve_circuit(circuit_code)
+
+# Get comprehensive design context for better generation
+context = get_circuit_design_context("esp32")  # or "power", "analog", etc.
+```
+
+### Available Commands
+- `/generate-validated-circuit <description> [type]` - Generate circuit with quality assurance
+- `/validate-existing-circuit` - Check and improve existing circuit code
+
+### What It Validates
+1. **Syntax errors** - Catches Python syntax issues
+2. **Missing imports** - Automatically fixes circuit_synth imports
+3. **Runtime execution** - Ensures code actually runs
+4. **Circuit structure** - Validates @circuit decorator usage
+
+### Example Usage
+```bash
+# Generate validated ESP32 circuit
+/generate-validated-circuit "ESP32 with USB-C power" mcu
+
+# Validate code you wrote manually
+/validate-existing-circuit
 ```
 
 ## Code Style Guidelines

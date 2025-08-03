@@ -136,8 +136,8 @@ circuit.generate_kicad_project("power_supply")
 - **Reusable Circuits**: USB ports, power supplies, debug interfaces work across projects
 - **Version Control**: Git-friendly Python files vs binary KiCad files
 
-### **🤖 Optional AI Acceleration**
-**Work with Claude Code to describe circuits and get production-ready results:**
+### **🤖 Optional AI Acceleration with Built-in Quality Assurance**
+**Work with Claude Code to describe circuits and get production-ready, validated results:**
 
 ```
 👤 "Design ESP32 IoT sensor with LoRaWAN, solar charging, and environmental sensors"
@@ -145,17 +145,47 @@ circuit.generate_kicad_project("power_supply")
 🤖 Claude (using circuit-synth):
    ✅ Searches components with JLCPCB availability
    ✅ Generates hierarchical Python circuits
+   ✅ Validates syntax, imports, and runtime execution
+   ✅ Auto-fixes common issues and provides quality reports
    ✅ Creates complete KiCad project with proper sheets
    ✅ Includes simulation validation and alternatives
 ```
 
-**AI agents double-check everything and eliminate manual work - but it's completely optional.**
+**AI agents with built-in validation double-check everything and eliminate manual work - but it's completely optional.**
 
 ### **🔍 Component Intelligence**
 - **Smart Search**: Find components by function, package, availability
 - **JLCPCB Integration**: Real-time stock levels and pricing
 - **Symbol/Footprint Verification**: No more "symbol not found" errors
 - **Manufacturing Ready**: Components verified for automated assembly
+
+### **✅ Built-in Circuit Validation**
+- **Automatic Quality Assurance**: Validates syntax, imports, and runtime execution
+- **Intelligent Auto-Fixing**: Automatically corrects common circuit code issues
+- **Context-Aware Generation**: Provides design patterns and best practices
+- **Professional Quality Reports**: Clear validation status and improvement suggestions
+
+### **✅ Circuit Validation & Quality Assurance**
+```python
+from circuit_synth.validation import validate_and_improve_circuit, get_circuit_design_context
+
+# Automatic validation and fixing
+code, is_valid, status = validate_and_improve_circuit(circuit_code)
+print(f"Validation: {status}")  # ✅ Circuit code validated successfully
+
+# Context-aware generation assistance
+context = get_circuit_design_context("esp32")  # Power, USB, analog contexts available
+# Use context for better AI-generated circuits
+```
+
+**Claude Code Integration:**
+```bash
+# Generate validated circuits directly
+/generate-validated-circuit "ESP32 with USB-C power" mcu
+
+# Validate existing code
+/validate-existing-circuit
+```
 
 ### **⚙️ Automated SPICE Simulation**
 ```python
@@ -173,6 +203,7 @@ print(f"Output voltage: {result.get_voltage('VOUT'):.3f}V")
 | Manual component placement | `python main.py` → Complete project |
 | Hunt through symbol libraries | Verified components with availability |
 | Visual net verification | Explicit Python connections |
+| Manual syntax/import checking | Automatic validation and fixing |
 | Difficult design versioning | Git-friendly Python files |
 | Manual SPICE netlist creation | One-line simulation setup |
 | Copy-paste circuit blocks | Reusable subcircuit modules |
