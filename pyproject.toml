@@ -100,11 +100,8 @@ cs-init-existing-project = "circuit_synth.tools.init_existing_project:main"
 cs-setup-kicad-plugins = "circuit_synth.tools.setup_kicad_plugins:main"
 
 # Memory-Bank System
-cs-switch-board = "circuit_synth.memory_bank.cli:switch_board_cli"
 cs-memory-bank-init = "circuit_synth.memory_bank.cli:init_cli"
-cs-memory-bank-status = "circuit_synth.memory_bank.cli:status_cli"
 cs-memory-bank-remove = "circuit_synth.memory_bank.cli:remove_cli"
-cs-memory-bank-search = "circuit_synth.memory_bank.cli:search_cli"
 
 # Plugin Management
 install-kicad-plugins = "install_kicad_plugins:main"
