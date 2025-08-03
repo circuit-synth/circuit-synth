@@ -368,12 +368,37 @@ def create_memory_bank(project_path: Path, project_name: str) -> None:
 
 
 def create_claude_agent(project_path: Path, project_name: str) -> None:
-    """Create PCB-specific Claude agent configuration."""
+    """Create PCB-specific Claude agent configuration with complete agent system."""
     
     claude_dir = project_path / ".claude"
     claude_dir.mkdir(exist_ok=True)
     
-    # Agent instructions
+    # Find the example_project .claude directory (relative to this script)
+    current_file = Path(__file__)
+    repo_root = current_file.parent.parent.parent.parent  # Go up to circuit-synth4/
+    example_claude_dir = repo_root / "example_project" / ".claude"
+    
+    if example_claude_dir.exists():
+        # Copy agents directory
+        agents_source = example_claude_dir / "agents"
+        agents_dest = claude_dir / "agents"
+        if agents_source.exists():
+            shutil.copytree(str(agents_source), str(agents_dest), dirs_exist_ok=True)
+        
+        # Copy commands directory  
+        commands_source = example_claude_dir / "commands"
+        commands_dest = claude_dir / "commands"
+        if commands_source.exists():
+            shutil.copytree(str(commands_source), str(commands_dest), dirs_exist_ok=True)
+        
+        # Copy README.md and settings.json
+        for filename in ["README.md", "settings.json"]:
+            source_file = example_claude_dir / filename
+            if source_file.exists():
+                dest_file = claude_dir / filename
+                shutil.copy2(str(source_file), str(dest_file))
+    
+    # Create customized instructions.md for this specific project
     instructions_content = f"""# {project_name} PCB Agent
 
 You are a specialized circuit design assistant working on the {project_name} PCB.
@@ -418,12 +443,34 @@ Update memory-bank when:
 - Manufacturing considerations (JLCPCB focus)
 - PCB design best practices
 - Incremental migration from pure KiCad to circuit-synth hybrid workflow
+
+## Available Agents
+
+Use the specialized agents in ./agents/ for specific tasks:
+- **circuit-architect**: Master circuit design coordinator
+- **circuit-synth**: Circuit-synth code generation specialist  
+- **component-guru**: Manufacturing and sourcing specialist
+- **jlc-parts-finder**: JLCPCB component search and verification
+- **simulation-expert**: SPICE simulation and validation
+- **stm32-mcu-finder**: STM32 microcontroller selection
+
+## Available Commands
+
+Use the slash commands in ./commands/ for quick tasks:
+- **/find-symbol**: Search KiCad symbol libraries
+- **/find-footprint**: Search KiCad footprint libraries
+- **/find-mcu**: Find microcontrollers with specific features
+- **/generate-circuit**: Generate circuit-synth code from description
+- **/analyze-design**: Analyze circuit design and suggest improvements
 """
     
     with open(claude_dir / "instructions.md", "w") as f:
         f.write(instructions_content)
     
-    console.print("✅ Created Claude agent configuration", style="green")
+    if example_claude_dir.exists():
+        console.print("✅ Created complete Claude agent system with all agents and commands", style="green")
+    else:
+        console.print("✅ Created Claude agent configuration (example agents not found)", style="green")
 
 
 def create_readme(project_path: Path, project_name: str, kicad_files: dict) -> None:
