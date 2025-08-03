@@ -78,18 +78,18 @@ def cmd_generate(args):
         print("\nAI Design Recommendations:")
         print("-" * 40)
         recommendations = result["ai_recommendations"]
-        
+
         if recommendations.get("design_recommendations"):
             print("\n🎯 Design Recommendations:")
             for rec in recommendations["design_recommendations"]:
                 print(f"  • {rec}")
-        
+
         if recommendations.get("suggested_components"):
             print("\n🔧 Suggested Components:")
             for comp in recommendations["suggested_components"]:
                 print(f"  • {comp['type']}: {comp['suggestion']}")
                 print(f"    Reasoning: {comp['reasoning']}")
-        
+
         if recommendations.get("optimization_tips"):
             print("\n⚡ Optimization Tips:")
             for tip in recommendations["optimization_tips"]:
@@ -147,7 +147,7 @@ Examples:
   %(prog)s generate "LED blinker circuit"  # Generate circuit template
   %(prog)s analyze circuit.py        # Analyze existing circuit
         """,
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -175,22 +175,24 @@ Examples:
         "-o", "--output", help="Output file for generated circuit template"
     )
     generate_parser.add_argument(
-        "--show-recommendations", action="store_true", 
-        help="Show detailed AI recommendations"
+        "--show-recommendations",
+        action="store_true",
+        help="Show detailed AI recommendations",
     )
-    
+
     # Design constraints
     generate_parser.add_argument(
-        "--low-power", action="store_true",
-        help="Optimize for low power consumption"
+        "--low-power", action="store_true", help="Optimize for low power consumption"
     )
     generate_parser.add_argument(
-        "--cost-sensitive", action="store_true",
-        help="Optimize for cost (use JLCPCB parts)"
+        "--cost-sensitive",
+        action="store_true",
+        help="Optimize for cost (use JLCPCB parts)",
     )
     generate_parser.add_argument(
-        "--high-frequency", action="store_true",
-        help="Design for high frequency applications"
+        "--high-frequency",
+        action="store_true",
+        help="Design for high frequency applications",
     )
 
     # Analyze command

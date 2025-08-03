@@ -623,9 +623,7 @@ class SchematicWriter:
                 # Leave components at their current positions
 
         total_time = time.perf_counter() - start_time
-        logger.debug(
-            f"Component placement complete in {total_time*1000:.2f}ms"
-        )
+        logger.debug(f"Component placement complete in {total_time*1000:.2f}ms")
 
     def _add_pin_level_net_labels(self):
         """
@@ -1329,12 +1327,8 @@ def write_schematic_file(schematic_expr: list, out_path: str):
     expr_size = len(str(schematic_expr)) if schematic_expr else 0
 
     logger.debug(f"Starting file write to {out_path}")
-    logger.debug(
-        f"Input S-expression size: {expr_size:,} characters"
-    )
-    logger.debug(
-        f"Rust formatting available: {_RUST_COMPONENT_ACCELERATION}"
-    )
+    logger.debug(f"Input S-expression size: {expr_size:,} characters")
+    logger.debug(f"Rust formatting available: {_RUST_COMPONENT_ACCELERATION}")
 
     # Debug: Check for sheet pins with orientation - time this analysis
     debug_start = time.perf_counter()
@@ -1383,9 +1377,7 @@ def write_schematic_file(schematic_expr: list, out_path: str):
     # Use the kicad_api's S-expression parser to write the file
     # This now uses the Rust-accelerated format_kicad_schematic function internally
     parser_start = time.perf_counter()
-    logger.debug(
-        "Starting S-expression parsing and formatting"
-    )
+    logger.debug("Starting S-expression parsing and formatting")
 
     from circuit_synth.kicad_api.core.s_expression import SExpressionParser
 
@@ -1408,9 +1400,7 @@ def write_schematic_file(schematic_expr: list, out_path: str):
 
     logger.debug(f"File write complete")
     logger.debug(f"WRITE_SCHEMATIC_FILE: Total time: {total_time*1000:.2f}ms")
-    logger.debug(
-        f"Output file size: {len(content):,} characters"
-    )
+    logger.debug(f"Output file size: {len(content):,} characters")
     logger.debug(f"WRITE_SCHEMATIC_FILE: Output file: {out_path}")
     logger.debug(
         f"Write throughput: {throughput:.1f} chars/ms ({throughput*1000:.0f} chars/sec)"
@@ -1443,9 +1433,7 @@ def write_schematic_file(schematic_expr: list, out_path: str):
             f"RUST_PROJECTION: Potential time saved: {(total_time - estimated_rust_time)*1000:.2f}ms"
         )
 
-    logger.debug(
-        f"Successfully wrote {len(content):,} characters to {out_path}"
-    )
+    logger.debug(f"Successfully wrote {len(content):,} characters to {out_path}")
 
     # Log the file size
     with open(out_path, "r", encoding="utf-8") as f:

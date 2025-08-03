@@ -69,8 +69,11 @@ class LoggingFailsafe:
             # Try to log to stderr as last resort
             try:
                 import sys
-                print(f"Warning: Could not create circuit-synth logging directory: {e}", 
-                      file=sys.stderr)
+
+                print(
+                    f"Warning: Could not create circuit-synth logging directory: {e}",
+                    file=sys.stderr,
+                )
             except:
                 pass  # Even stderr failed, just disable logging
 

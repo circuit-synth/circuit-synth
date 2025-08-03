@@ -6,63 +6,62 @@ circuit code issues while integrating seamlessly with Claude Code agents.
 """
 
 import ast
+import logging
+import os
 import subprocess
 import tempfile
-import os
-import logging
-from typing import Tuple, List, Optional
+from typing import List, Optional, Tuple
 
 # Set up logging for debugging
 logger = logging.getLogger(__name__)
 
+
 def validate_and_improve_circuit(
-    code: str, 
-    max_attempts: int = 2,
-    timeout_seconds: int = 10
+    code: str, max_attempts: int = 2, timeout_seconds: int = 10
 ) -> Tuple[str, bool, str]:
     """
     Validate circuit code and return improved version.
-    
+
     This function performs basic validation checks and can attempt automatic
     improvements. It's designed to catch the most common issues:
     - Syntax errors
-    - Missing imports  
+    - Missing imports
     - Basic runtime failures
-    
+
     Args:
         code: Circuit code to validate
         max_attempts: Maximum improvement attempts (default: 2)
         timeout_seconds: Execution timeout (default: 10)
-        
+
     Returns:
         Tuple of (improved_code, is_valid, status_message)
-        
+
     Example:
         >>> code = "from circuit_synth import Component\\nComponent('Device:R', 'R')"
         >>> improved, valid, status = validate_and_improve_circuit(code)
         >>> print(f"Valid: {valid}, Status: {status}")
     """
-    
+
     logger.info(f"Starting validation with {max_attempts} max attempts")
-    
+
     current_code = code
     original_code = code  # Keep original for comparison
-    
+
     for attempt in range(max_attempts):
         logger.debug(f"Validation attempt {attempt + 1}")
-        
+
         # Check for issues
         issues = _check_circuit_code(current_code, timeout_seconds)
-        
+
         if not issues:
             success_msg = f"✅ Circuit code validated successfully"
             if attempt > 0:
                 success_msg += f" (fixed in {attempt} attempts)"
             logger.info(success_msg)
             return current_code, True, success_msg
-            
+
         logger.warning(f"Found {len(issues)} issues: {issues}")
-        
+
         # For first attempt, try basic auto-fixes
         if attempt == 0:
             current_code = _apply_basic_fixes(current_code, issues)
@@ -74,25 +73,26 @@ def validate_and_improve_circuit(
 # Original code:
 
 {original_code}"""
-            
+
     # Max attempts reached
     final_status = f"⚠️ Still has {len(issues)} issues after {max_attempts} attempts"
     logger.warning(final_status)
     return current_code, False, final_status
 
+
 def _check_circuit_code(code: str, timeout_seconds: int = 10) -> List[str]:
     """
     Perform comprehensive but lightweight circuit code checking.
-    
+
     Args:
         code: Code to check
         timeout_seconds: Execution timeout
-        
+
     Returns:
         List of issue descriptions (empty if no issues)
     """
     issues = []
-    
+
     # 1. Syntax validation using AST
     try:
         ast.parse(code)
@@ -102,47 +102,49 @@ def _check_circuit_code(code: str, timeout_seconds: int = 10) -> List[str]:
         issues.append(syntax_issue)
         logger.error(f"Syntax error: {e}")
         return issues  # Can't continue with broken syntax
-    
+
     # 2. Import validation
     import_issues = _check_imports(code)
     issues.extend(import_issues)
-    
+
     # 3. Basic circuit structure validation
     structure_issues = _check_circuit_structure(code)
     issues.extend(structure_issues)
-    
+
     # 4. Runtime validation (only if no critical issues)
     if not issues:
         runtime_issues = _check_runtime_execution(code, timeout_seconds)
         issues.extend(runtime_issues)
-    
+
     return issues
+
 
 def _check_imports(code: str) -> List[str]:
     """Check for essential circuit_synth imports."""
     issues = []
-    
+
     # Check for essential circuit_synth import
     if "from circuit_synth import" not in code and "import circuit_synth" not in code:
         issues.append("Missing circuit_synth framework import")
-    
+
     # Check for common component usage without import
     if "Component(" in code and "Component" not in _extract_imports(code):
         issues.append("Component class used but not imported")
-    
+
     if "Net(" in code and "Net" not in _extract_imports(code):
         issues.append("Net class used but not imported")
-    
+
     if "@circuit" in code and "circuit" not in _extract_imports(code):
         issues.append("@circuit decorator used but not imported")
-    
+
     logger.debug(f"Import check found {len(issues)} issues")
     return issues
+
 
 def _extract_imports(code: str) -> List[str]:
     """Extract imported names from code."""
     imports = []
-    
+
     for line in code.split("\n"):
         line = line.strip()
         if line.startswith("from circuit_synth import"):
@@ -152,13 +154,14 @@ def _extract_imports(code: str) -> List[str]:
             imports.extend(name.strip() for name in import_part.split(","))
         elif line.startswith("import circuit_synth"):
             imports.append("circuit_synth")
-    
+
     return imports
+
 
 def _check_circuit_structure(code: str) -> List[str]:
     """Check for basic circuit structure issues."""
     issues = []
-    
+
     # Check for @circuit decorator usage
     if "@circuit" in code:
         # Ensure function definition follows
@@ -170,58 +173,64 @@ def _check_circuit_structure(code: str) -> List[str]:
                     next_line = lines[j].strip()
                     if next_line:
                         if not next_line.startswith("def "):
-                            issues.append("@circuit decorator not followed by function definition")
+                            issues.append(
+                                "@circuit decorator not followed by function definition"
+                            )
                         break
-    
+
     # Check for basic component patterns
     if "Component(" in code:
         # Basic component syntax check (very lightweight)
-        if code.count('Component(') != code.count('"'):
+        if code.count("Component(") != code.count('"'):
             # This is a heuristic - not perfect but catches common issues
             pass  # Skip for now to avoid false positives
-    
+
     logger.debug(f"Structure check found {len(issues)} issues")
     return issues
+
 
 def _check_runtime_execution(code: str, timeout_seconds: int) -> List[str]:
     """Test code execution in isolated environment."""
     issues = []
-    
+
     # Create temporary file for execution
     try:
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
             f.write(code)
             temp_file = f.name
-            
+
         logger.debug(f"Executing code in {temp_file}")
-        
+
         # Execute with timeout - try python3 first, then python
-        python_cmd = 'python3'  # Use python3 as default
+        python_cmd = "python3"  # Use python3 as default
         try:
             result = subprocess.run(
-                [python_cmd, temp_file], 
-                capture_output=True, 
-                text=True, 
-                timeout=timeout_seconds
+                [python_cmd, temp_file],
+                capture_output=True,
+                text=True,
+                timeout=timeout_seconds,
             )
         except FileNotFoundError:
             # Fallback to python if python3 not found
             result = subprocess.run(
-                ['python', temp_file], 
-                capture_output=True, 
-                text=True, 
-                timeout=timeout_seconds
+                ["python", temp_file],
+                capture_output=True,
+                text=True,
+                timeout=timeout_seconds,
             )
-        
+
         if result.returncode != 0:
             # Extract meaningful error from stderr
             error_lines = result.stderr.strip().split("\n")
             # Get the last non-empty line (usually the actual error)
-            meaningful_error = next((line for line in reversed(error_lines) if line.strip()), "Unknown error")
+            meaningful_error = next(
+                (line for line in reversed(error_lines) if line.strip()),
+                "Unknown error",
+            )
             issues.append(f"Runtime error: {meaningful_error}")
-            
+
         logger.debug(f"Execution completed with return code {result.returncode}")
-        
+
     except subprocess.TimeoutExpired:
         issues.append(f"Code execution timed out (>{timeout_seconds}s)")
         logger.warning(f"Execution timeout after {timeout_seconds}s")
@@ -231,23 +240,29 @@ def _check_runtime_execution(code: str, timeout_seconds: int) -> List[str]:
     finally:
         # Clean up temporary file
         try:
-            if 'temp_file' in locals():
+            if "temp_file" in locals():
                 os.unlink(temp_file)
         except Exception as e:
             logger.warning(f"Failed to clean up temp file: {e}")
-    
+
     return issues
+
 
 def _apply_basic_fixes(code: str, issues: List[str]) -> str:
     """Apply basic automatic fixes to common issues."""
     fixed_code = code
-    
+
     # Fix missing circuit_synth import - add at the beginning
     if any("Missing circuit_synth framework import" in issue for issue in issues):
-        if "from circuit_synth import" not in fixed_code and "import circuit_synth" not in fixed_code:
-            fixed_code = "from circuit_synth import Component, Net, circuit\n\n" + fixed_code
+        if (
+            "from circuit_synth import" not in fixed_code
+            and "import circuit_synth" not in fixed_code
+        ):
+            fixed_code = (
+                "from circuit_synth import Component, Net, circuit\n\n" + fixed_code
+            )
             logger.debug("Applied fix: Added circuit_synth import")
-    
+
     # Fix specific missing imports by ensuring they are in the import line
     imports_to_add = []
     if any("Component class used but not imported" in issue for issue in issues):
@@ -256,7 +271,7 @@ def _apply_basic_fixes(code: str, issues: List[str]) -> str:
         imports_to_add.append("Net")
     if any("@circuit decorator used but not imported" in issue for issue in issues):
         imports_to_add.append("circuit")
-    
+
     if imports_to_add:
         # Check if there's already a circuit_synth import line to extend
         lines = fixed_code.split("\n")
@@ -278,33 +293,36 @@ def _apply_basic_fixes(code: str, issues: List[str]) -> str:
             if imports_to_add:
                 import_line = f"from circuit_synth import {', '.join(imports_to_add)}\n"
                 fixed_code = import_line + "\n" + fixed_code
-                logger.debug(f"Applied fix: Added new import line with {imports_to_add}")
-    
+                logger.debug(
+                    f"Applied fix: Added new import line with {imports_to_add}"
+                )
+
     return fixed_code
+
 
 # Context provision function
 def get_circuit_design_context(circuit_type: str = "general") -> str:
     """
     Get comprehensive circuit design context for Claude Code.
-    
+
     This function provides all the context Claude needs in a single call,
     avoiding multiple document reads and tool calls.
-    
+
     Args:
         circuit_type: Type of circuit context needed
                      (general, power, microcontroller, analog, digital)
-                     
+
     Returns:
         Comprehensive context string with examples, patterns, and best practices
-        
+
     Example:
         >>> context = get_circuit_design_context("esp32")
         >>> # Use context in Claude prompt for better generation
     """
-    
+
     circuit_type = circuit_type.lower()
     logger.info(f"Generating context for circuit type: {circuit_type}")
-    
+
     # Base context that applies to all circuits
     context = f"""# Circuit Design Context for {circuit_type.upper()}
 
@@ -375,7 +393,10 @@ GND += regulator["GND"], cap_in[2], cap_out[2]
 - Add fuse/polyfuse protection for safety
 """
 
-    if any(keyword in circuit_type for keyword in ["stm32", "mcu", "microcontroller", "esp32"]):
+    if any(
+        keyword in circuit_type
+        for keyword in ["stm32", "mcu", "microcontroller", "esp32"]
+    ):
         context += """
 ## Microcontroller Design Specifics
 ```python

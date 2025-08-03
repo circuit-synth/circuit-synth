@@ -161,16 +161,24 @@ class AIDesignBridge:
         # for circuit generation based on the description and constraints
 
         design_constraints = design_constraints or {}
-        
+
         ai_recommendations = {
-            "suggested_components": self._get_component_suggestions(circuit_description),
-            "design_recommendations": self._get_design_recommendations(circuit_description, design_constraints),
+            "suggested_components": self._get_component_suggestions(
+                circuit_description
+            ),
+            "design_recommendations": self._get_design_recommendations(
+                circuit_description, design_constraints
+            ),
             "optimization_tips": self._get_optimization_tips(circuit_description),
-            "alternative_approaches": self._get_alternative_approaches(circuit_description),
+            "alternative_approaches": self._get_alternative_approaches(
+                circuit_description
+            ),
         }
 
         # Generate template circuit code with AI guidance
-        circuit_code = self._generate_ai_guided_template(circuit_description, ai_recommendations)
+        circuit_code = self._generate_ai_guided_template(
+            circuit_description, ai_recommendations
+        )
 
         return {
             "circuit_code": circuit_code,
@@ -187,41 +195,45 @@ class AIDesignBridge:
             {
                 "type": "microcontroller",
                 "suggestion": "ESP32-C6 for wireless connectivity",
-                "reasoning": "Based on description mentioning IoT/wireless features"
+                "reasoning": "Based on description mentioning IoT/wireless features",
             },
             {
-                "type": "power_management", 
+                "type": "power_management",
                 "suggestion": "AMS1117-3.3 voltage regulator",
-                "reasoning": "Standard 3.3V rail for digital circuits"
-            }
+                "reasoning": "Standard 3.3V rail for digital circuits",
+            },
         ]
 
-    def _get_design_recommendations(self, description: str, constraints: Dict) -> List[str]:
+    def _get_design_recommendations(
+        self, description: str, constraints: Dict
+    ) -> List[str]:
         """Get AI design recommendations based on description and constraints."""
         recommendations = [
             "Consider using hierarchical design for complex circuits",
             "Add proper decoupling capacitors near power pins",
             "Include test points for debugging",
-            "Use proper grounding techniques"
+            "Use proper grounding techniques",
         ]
-        
+
         # Add constraint-specific recommendations
         if constraints.get("low_power"):
             recommendations.append("Consider low-power components and sleep modes")
         if constraints.get("cost_sensitive"):
             recommendations.append("Use standard components available on JLCPCB")
         if constraints.get("high_frequency"):
-            recommendations.append("Pay attention to trace impedance and length matching")
-            
+            recommendations.append(
+                "Pay attention to trace impedance and length matching"
+            )
+
         return recommendations
 
     def _get_optimization_tips(self, description: str) -> List[str]:
         """Get AI optimization tips for the circuit."""
         return [
             "Group related components to minimize trace lengths",
-            "Use proper component placement for thermal management", 
+            "Use proper component placement for thermal management",
             "Consider EMI/EMC requirements early in design",
-            "Plan for manufacturing and assembly constraints"
+            "Plan for manufacturing and assembly constraints",
         ]
 
     def _get_alternative_approaches(self, description: str) -> List[str]:
@@ -229,10 +241,12 @@ class AIDesignBridge:
         return [
             "Consider using integrated solutions vs discrete components",
             "Evaluate digital vs analog implementation approaches",
-            "Consider modular design for better testability"
+            "Consider modular design for better testability",
         ]
 
-    def _generate_ai_guided_template(self, description: str, recommendations: Dict) -> str:
+    def _generate_ai_guided_template(
+        self, description: str, recommendations: Dict
+    ) -> str:
         """Generate a circuit-synth template with AI guidance."""
         template = f'''"""
 AI-Assisted Circuit Design Template
@@ -315,26 +329,26 @@ if __name__ == "__main__":
                 "suggestions": [],
                 "warnings": [],
                 "optimizations": [],
-                "compliance_check": {}
+                "compliance_check": {},
             }
 
             # Placeholder for circuit analysis logic
             # This would analyze the circuit and provide intelligent feedback
-            
+
             analysis["suggestions"] = [
                 "Consider adding more decoupling capacitors",
                 "Review component placement for thermal considerations",
-                "Add test points for critical signals"
+                "Add test points for critical signals",
             ]
 
             analysis["warnings"] = [
                 "High-speed signals may need impedance control",
-                "Power routing could be improved"
+                "Power routing could be improved",
             ]
 
             analysis["optimizations"] = [
                 "Group digital and analog sections",
-                "Optimize trace routing for signal integrity"
+                "Optimize trace routing for signal integrity",
             ]
 
             return analysis
@@ -348,14 +362,16 @@ def get_ai_design_bridge() -> AIDesignBridge:
     return AIDesignBridge()
 
 
-def create_ai_assisted_circuit(description: str, constraints: Optional[Dict] = None) -> str:
+def create_ai_assisted_circuit(
+    description: str, constraints: Optional[Dict] = None
+) -> str:
     """
     Convenience function to create an AI-assisted circuit template.
-    
+
     Args:
         description: Natural language description of the desired circuit
         constraints: Optional design constraints dictionary
-        
+
     Returns:
         Generated circuit template code
     """
