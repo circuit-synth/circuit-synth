@@ -161,7 +161,33 @@ This command performs a comprehensive analysis of the current branch against the
 - Caching strategy effectiveness
 - Concurrent processing optimization
 
-### 6. Testing Coverage Analysis
+### 6. Documentation Impact Assessment
+
+**CRITICAL: Always review if core documentation needs updates based on changes:**
+
+- **@README.md** - Check if new features, installation steps, usage examples, or architecture changes need documentation
+- **@Contributors.md** - Review if new development processes, tools, contribution paths, or setup procedures were added  
+- **@docs/** directory - Assess if API docs, technical guides, tutorials, or reference documentation requires updates
+- **Agent files** in `.claude/agents/` - Verify if agent knowledge, capabilities, prompts, or tools need updates
+- **Command files** in `.claude/commands/` - Check if new commands, workflows, or development processes were added
+
+**Key documentation review questions:**
+- Does this change introduce new user-facing features? → Update @README.md features section
+- Does this change affect how contributors set up or work? → Update @Contributors.md
+- Does this change add/modify APIs, commands, or workflows? → Update relevant @docs/ files
+- Does this change affect what agents can help with or know about? → Update relevant agent knowledge
+- Does this change add new development tools, commands, or processes? → Update command documentation
+- Does this change modify project structure or architecture? → Update architecture documentation
+
+**Documentation review checklist:**
+- [ ] @README.md reflects new features and capabilities
+- [ ] @Contributors.md includes any new development workflows  
+- [ ] @docs/ API/technical documentation is current
+- [ ] Agent knowledge in `.claude/agents/` is up-to-date
+- [ ] Command documentation in `.claude/commands/` is accurate
+- [ ] Architecture diagrams and explanations are current
+
+### 7. Testing Coverage Analysis
 **Circuit-Synth Testing Requirements:**
 - Circuit generation validation (netlists, KiCad files)
 - Component symbol/footprint verification
@@ -185,7 +211,7 @@ This command performs a comprehensive analysis of the current branch against the
 - KiCad file generation validation
 - Component database integrity tests
 
-### 7. Circuit-Synth Domain Analysis
+### 8. Circuit-Synth Domain Analysis
 **Core Circuit Logic:**
 - Circuit/Component/Net class modifications
 - Pin connection validation
@@ -214,7 +240,7 @@ This command performs a comprehensive analysis of the current branch against the
 - Memory bank integration changes
 - Example-driven training modifications
 
-### 8. Dependency Analysis
+### 9. Dependency Analysis
 **Python Dependencies:**
 - New packages in pyproject.toml
 - Version constraint changes
@@ -233,7 +259,7 @@ This command performs a comprehensive analysis of the current branch against the
 - System library requirements
 - Plugin ecosystem dependencies
 
-### 9. Memory Bank and Knowledge Management
+### 10. Memory Bank and Knowledge Management
 **Memory Bank Changes:**
 - Knowledge base additions/modifications
 - Technical decision documentation
@@ -246,7 +272,7 @@ This command performs a comprehensive analysis of the current branch against the
 - Success pattern documentation
 - Failure case documentation
 
-### 10. Automated Fix Suggestions
+### 11. Automated Fix Suggestions
 **Common Issues:**
 - Missing type hints → Generate type annotations
 - Hardcoded values → Extract to constants
@@ -283,6 +309,7 @@ The command generates a comprehensive markdown report with:
 ### 🔒 Security Analysis  
 ### ⚡ Performance Impact
 ### 🧪 Testing Coverage
+### 📚 Documentation Impact Assessment
 ### ⚙️ Circuit-Synth Domain Analysis
 ### 📦 Dependency Analysis
 ### 🧠 Memory Bank Analysis

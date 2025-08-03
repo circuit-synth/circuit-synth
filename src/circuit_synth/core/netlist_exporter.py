@@ -374,7 +374,6 @@ class NetlistExporter:
         sheet_tstamps = f"/{self.circuit.name.lower().replace(' ', '-')}-{id(self.circuit)}/"  # Simple placeholder tstamp
         source_file = f"{self.circuit.name}.kicad_sch"  # Placeholder source file name
 
-
         data = {
             "name": self.circuit.name,
             "description": self.circuit.description or "",

@@ -1,8 +1,62 @@
 # Contributing to Circuit-Synth
 
-Thank you for your interest in contributing to Circuit-Synth! This document provides guidelines for contributing to the project.
+**🚀 NEW: We've built the most contributor-friendly EE design tool ever!**
 
-## Getting Started
+Circuit-synth is specifically designed to work with **Claude Code** for maximum developer productivity. We've created comprehensive onboarding resources and specialized AI agents to help you contribute effectively.
+
+## 🤖 Quick Start (Recommended)
+
+**For the best experience, use [Claude Code](https://claude.ai/code) with our specialized agents:**
+
+```bash
+# 1. Clone and setup
+git clone https://github.com/circuit-synth/circuit-synth.git
+cd circuit-synth
+uv sync
+
+# 2. Register our specialized Claude Code agents
+uv run register-agents
+
+# 3. Start with our comprehensive contributor guides
+# Read: Contributors/README.md
+```
+
+**Why Claude Code?** We've built specialized agents that understand circuit-synth architecture, guide you through Rust integration, help with TDD workflows, and automate code reviews.
+
+## 📚 Comprehensive Contributor Resources
+
+**Start here for the complete experience:**
+- **[Contributors/README.md](../Contributors/README.md)** - Main onboarding guide (START HERE!)
+- **[Contributors/Architecture-Overview.md](../Contributors/Architecture-Overview.md)** - Technical architecture
+- **[Contributors/Development-Setup.md](../Contributors/Development-Setup.md)** - Detailed setup
+- **[Contributors/Claude-Code-Workflow.md](../Contributors/Claude-Code-Workflow.md)** - Our actual development workflow
+- **[Contributors/Rust-Integration-Guide.md](../Contributors/Rust-Integration-Guide.md)** - High-impact Rust contributions
+- **[Contributors/Testing-Guidelines.md](../Contributors/Testing-Guidelines.md)** - TDD approach
+- **[Contributors/Claude-Code-Agents-and-Commands.md](../Contributors/Claude-Code-Agents-and-Commands.md)** - All agents and commands
+
+## 🎯 High-Impact Opportunities
+
+**Rust Integration (Perfect for Major Impact):**
+- **[Issue #36](https://github.com/circuit-synth/circuit-synth/issues/36)**: Netlist processor (HIGH PRIORITY)
+- **[Issue #37](https://github.com/circuit-synth/circuit-synth/issues/37)**: KiCad integration compilation (HIGH PRIORITY)
+- **[Issue #40](https://github.com/circuit-synth/circuit-synth/issues/40)**: Component processing (97% performance impact!)
+
+**Easy Entry Points:**
+- Examples and tutorials for other EEs
+- Component library expansion
+- Test coverage improvements
+- Documentation enhancements
+
+## 🤖 Alternative AI Tools
+
+While optimized for Claude Code, other tools work too:
+- **ChatGPT/GPT-4**: Read our `Contributors/` docs for context
+- **Cursor/GitHub Copilot**: Good code completion with our patterns  
+- **Any LLM**: Extensive documentation designed for AI agent consumption
+
+---
+
+## Traditional Contributing Guide
 
 ### Development Environment Setup
 

@@ -42,9 +42,9 @@ class KiCadParser:
     def _find_root_schematic(self) -> Optional[Path]:
         """Parse .kicad_pro file to find the root schematic file"""
         try:
-            with open(self.kicad_project, 'r') as f:
+            with open(self.kicad_project, "r") as f:
                 project_data = json.load(f)
-            
+
             # Look for sheets array in the project file
             sheets = project_data.get("sheets", [])
             if not sheets:
@@ -55,7 +55,7 @@ class KiCadParser:
                     logger.info(f"Using fallback root schematic: {fallback_sch}")
                     return fallback_sch
                 return None
-            
+
             # Find the root schematic (the one with empty sheet name)
             for sheet_info in sheets:
                 if isinstance(sheet_info, list) and len(sheet_info) >= 2:
@@ -66,11 +66,13 @@ class KiCadParser:
                             logger.info(f"Found root schematic: {root_sch_path}")
                             return root_sch_path
                         else:
-                            logger.error(f"Root schematic file not found: {root_sch_path}")
-            
+                            logger.error(
+                                f"Root schematic file not found: {root_sch_path}"
+                            )
+
             logger.error("Could not find root schematic in .kicad_pro sheets")
             return None
-            
+
         except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
             logger.error(f"Error parsing .kicad_pro file: {e}")
             return None
