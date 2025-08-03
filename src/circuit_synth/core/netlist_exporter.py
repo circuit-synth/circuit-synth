@@ -29,20 +29,20 @@ try:
 
     RUST_NETLIST_PROCESSOR = RustNetlistProcessor()
     RUST_NETLIST_AVAILABLE = True
-    defensive_logger.info(
-        "🦀 RUST DEFENSIVE SUCCESS: rust_netlist_processor loaded successfully"
+    defensive_logger.debug(
+        "RUST DEFENSIVE SUCCESS: rust_netlist_processor loaded successfully"
     )
-    defensive_logger.info("🦀 RUST DEFENSIVE: RustNetlistProcessor instance created")
+    defensive_logger.debug("RUST DEFENSIVE: RustNetlistProcessor instance created")
 except ImportError as e:
     defensive_logger.warning(
-        f"🦀 RUST DEFENSIVE FALLBACK: rust_netlist_processor not available: {e}"
+        f"RUST DEFENSIVE FALLBACK: rust_netlist_processor not available: {e}"
     )
     # Use the proper KiCad netlist exporter instead of simple fallback
     try:
         from ..kicad.netlist_exporter import convert_json_to_netlist
 
         RUST_NETLIST_AVAILABLE = False
-        defensive_logger.info("🛡️ RUST DEFENSIVE: Using KiCad netlist exporter fallback")
+        defensive_logger.debug("RUST DEFENSIVE: Using KiCad netlist exporter fallback")
 
     except ImportError:
         # Final fallback to simple implementation
@@ -158,20 +158,20 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
     start_time = time.perf_counter()
 
     # Log the attempt
-    defensive_logger.info("🔧 RUST DEFENSIVE START: Attempting netlist generation")
-    defensive_logger.info(
-        f"🔧 RUST DEFENSIVE: Circuit name: {circuit_data.get('name', 'Unknown')}"
+    defensive_logger.debug("RUST DEFENSIVE START: Attempting netlist generation")
+    defensive_logger.debug(
+        f"RUST DEFENSIVE: Circuit name: {circuit_data.get('name', 'Unknown')}"
     )
-    defensive_logger.info(
-        f"🔧 RUST DEFENSIVE: Components count: {len(circuit_data.get('components', {}))}"
+    defensive_logger.debug(
+        f"RUST DEFENSIVE: Components count: {len(circuit_data.get('components', {}))}"
     )
-    defensive_logger.info(
-        f"🔧 RUST DEFENSIVE: Nets count: {len(circuit_data.get('nets', {}))}"
+    defensive_logger.debug(
+        f"RUST DEFENSIVE: Nets count: {len(circuit_data.get('nets', {}))}"
     )
 
     # First try Rust implementation if available
     if RUST_NETLIST_AVAILABLE and RUST_NETLIST_PROCESSOR:
-        defensive_logger.info("🦀 RUST DEFENSIVE: Attempting Rust netlist generation")
+        defensive_logger.debug("RUST DEFENSIVE: Attempting Rust netlist generation")
 
         try:
             # Convert Python format to Rust format, then serialize to JSON
@@ -179,8 +179,8 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
             rust_compatible_data = convert_python_to_rust_format(circuit_data)
             circuit_json = json.dumps(rust_compatible_data, cls=CircuitSynthJSONEncoder)
 
-            defensive_logger.info(
-                f"🦀 RUST DEFENSIVE: JSON serialization completed ({len(circuit_json)} chars)"
+            defensive_logger.debug(
+                f"RUST DEFENSIVE: JSON serialization completed ({len(circuit_json)} chars)"
             )
 
             # Call Rust netlist processor
@@ -189,17 +189,17 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
             rust_duration = time.perf_counter() - rust_start
             total_duration = time.perf_counter() - start_time
 
-            defensive_logger.info(
-                f"✅ RUST DEFENSIVE SUCCESS: Rust netlist generation completed"
+            defensive_logger.debug(
+                f"RUST DEFENSIVE SUCCESS: Rust netlist generation completed"
             )
-            defensive_logger.info(
-                f"✅ RUST DEFENSIVE PERFORMANCE: Rust processing time: {rust_duration:.4f}s"
+            defensive_logger.debug(
+                f"RUST DEFENSIVE PERFORMANCE: Rust processing time: {rust_duration:.4f}s"
             )
-            defensive_logger.info(
-                f"✅ RUST DEFENSIVE PERFORMANCE: Total time: {total_duration:.4f}s"
+            defensive_logger.debug(
+                f"RUST DEFENSIVE PERFORMANCE: Total time: {total_duration:.4f}s"
             )
-            defensive_logger.info(
-                f"✅ RUST DEFENSIVE RESULT: Generated {len(netlist_result)} characters"
+            defensive_logger.debug(
+                f"RUST DEFENSIVE RESULT: Generated {len(netlist_result)} characters"
             )
 
             return netlist_result
@@ -207,16 +207,16 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
         except Exception as e:
             rust_duration = time.perf_counter() - rust_start
             defensive_logger.warning(
-                f"⚠️ RUST DEFENSIVE FALLBACK: Rust netlist generation failed after {rust_duration:.4f}s"
+                f"RUST DEFENSIVE FALLBACK: Rust netlist generation failed after {rust_duration:.4f}s"
             )
-            defensive_logger.warning(f"⚠️ RUST DEFENSIVE ERROR: {type(e).__name__}: {e}")
+            defensive_logger.warning(f"RUST DEFENSIVE ERROR: {type(e).__name__}: {e}")
             defensive_logger.warning(
-                "⚠️ RUST DEFENSIVE: Falling back to Python implementation"
+                "RUST DEFENSIVE: Falling back to Python implementation"
             )
 
     # Python fallback implementation
-    defensive_logger.info(
-        "🐍 RUST DEFENSIVE FALLBACK: Using Python netlist implementation"
+    defensive_logger.debug(
+        "RUST DEFENSIVE FALLBACK: Using Python netlist implementation"
     )
 
     try:
@@ -230,17 +230,17 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
         python_duration = time.perf_counter() - python_start
         total_duration = time.perf_counter() - start_time
 
-        defensive_logger.info(
-            f"✅ RUST DEFENSIVE PYTHON SUCCESS: Python netlist generation completed"
+        defensive_logger.debug(
+            f"RUST DEFENSIVE PYTHON SUCCESS: Python netlist generation completed"
         )
-        defensive_logger.info(
-            f"✅ RUST DEFENSIVE PYTHON PERFORMANCE: Python processing time: {python_duration:.4f}s"
+        defensive_logger.debug(
+            f"RUST DEFENSIVE PYTHON PERFORMANCE: Python processing time: {python_duration:.4f}s"
         )
-        defensive_logger.info(
-            f"✅ RUST DEFENSIVE PYTHON PERFORMANCE: Total time: {total_duration:.4f}s"
+        defensive_logger.debug(
+            f"RUST DEFENSIVE PYTHON PERFORMANCE: Total time: {total_duration:.4f}s"
         )
-        defensive_logger.info(
-            f"✅ RUST DEFENSIVE PYTHON RESULT: Generated {len(netlist_result)} characters"
+        defensive_logger.debug(
+            f"RUST DEFENSIVE PYTHON RESULT: Generated {len(netlist_result)} characters"
         )
 
         return netlist_result
@@ -363,10 +363,10 @@ class NetlistExporter:
         are uniquely identified in a schematic. This is the standardized format
         for the library's intermediate JSON representation.
         """
-
-        logger.info(f"📋 Starting to_dict() for circuit: {self.circuit.name}")
-        logger.info(
-            f"📋 Circuit has {len(self.circuit._components)} components and {len(self.circuit._nets)} nets"
+            
+        logger.debug(f"Starting to_dict() for circuit: {self.circuit.name}")
+        logger.debug(
+            f"Circuit has {len(self.circuit._components)} components and {len(self.circuit._nets)} nets"
         )
 
         # TODO: Implement UUID generation and source file tracking later
@@ -871,7 +871,7 @@ class NetlistExporter:
                 ):
                     removed = len(components_to_preserve)
 
-                print("\n📋 Summary:")
+                print("\nSummary:")
                 print(f"   - Matched: {matched}")
                 if modified > 0:
                     print(f"   - Modified: {modified}")

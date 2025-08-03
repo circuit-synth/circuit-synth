@@ -234,7 +234,7 @@ class SymbolLibraryCache:
 
         # Don't create hardcoded symbols - load from actual KiCad libraries instead
         # self._create_default_symbols()
-        logger.info(
+        logger.debug(
             "Skipping hardcoded symbols - will load from KiCad libraries on demand"
         )
 

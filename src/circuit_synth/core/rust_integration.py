@@ -47,16 +47,16 @@ class RustAccelerator:
             try:
                 module = importlib.import_module(module_name)
                 self.rust_modules[name] = module
-                logger.info(f"🦀 Rust acceleration available: {name} ({module_name})")
+                logger.debug(f"Rust acceleration available: {name} ({module_name})")
             except ImportError:
-                logger.debug(f"⚠️  Rust module not available: {name} ({module_name})")
+                logger.debug(f"Rust module not available: {name} ({module_name})")
 
         if self.rust_modules:
-            logger.info(
-                f"🚀 Rust acceleration active for {len(self.rust_modules)} modules"
+            logger.debug(
+                f"Rust acceleration active for {len(self.rust_modules)} modules"
             )
         else:
-            logger.info("🐍 Using Python implementations (Rust not available)")
+            logger.debug("Using Python implementations (Rust not available)")
 
     def get_rust_function(
         self, module_name: str, function_name: str
@@ -99,13 +99,13 @@ def rust_accelerated(rust_module: str, rust_function: str):
             rust_func = _accelerator.get_rust_function(rust_module, rust_function)
             if rust_func:
                 try:
-                    logger.debug(f"🦀 Using Rust: {rust_module}.{rust_function}")
+                    logger.debug(f"Using Rust: {rust_module}.{rust_function}")
                     return rust_func(*args, **kwargs)
                 except Exception as e:
-                    logger.warning(f"🔄 Rust failed, using Python fallback: {e}")
+                    logger.warning(f"Rust failed, using Python fallback: {e}")
 
             # Use Python implementation
-            logger.debug(f"🐍 Using Python: {python_func.__name__}")
+            logger.debug(f"Using Python: {python_func.__name__}")
             return python_func(*args, **kwargs)
 
         # Store metadata for introspection
@@ -139,10 +139,10 @@ def generate_component_sexp(component_data: dict) -> str:
         )
 
     if rust_func:
-        logger.debug("🦀 Using Rust for component S-expression generation")
+        logger.debug("Using Rust for component S-expression generation")
         return rust_func(component_data)
     else:
-        logger.debug("🐍 Using Python for component S-expression generation")
+        logger.debug("Using Python for component S-expression generation")
         # Import Python implementation
         from circuit_synth.kicad.sch_gen.s_expression_generator import (
             generate_component_sexp_python,
@@ -192,11 +192,11 @@ def create_placement_engine():
 
 
 # Module initialization
-logger.info("🔧 Rust integration module initialized")
+logger.debug("Rust integration module initialized")
 status = get_acceleration_status()
 if status["rust_available"]:
     logger.info(
         f"🚀 Circuit-synth acceleration: {status['total_modules']} Rust modules active"
     )
 else:
-    logger.info("🐍 Circuit-synth running in Python mode (Rust not available)")
+    logger.debug("Circuit-synth running in Python mode (Rust not available)")
