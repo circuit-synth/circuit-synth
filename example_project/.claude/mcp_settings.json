@@ -1,0 +1,17 @@
+{
+  "mcpServers": {},
+  "agents": {
+    "circuit-synth": {
+      "description": "Circuit-synth code generation and KiCad integration specialist",
+      "file": "agents/circuit-design/circuit-synth.md"
+    },
+    "simulation-expert": {
+      "description": "SPICE simulation and circuit validation specialist",
+      "file": "agents/circuit-design/simulation-expert.md"
+    },
+    "contributor": {
+      "description": "Circuit-synth contributor onboarding and development assistant",
+      "file": "agents/development/contributor.md"
+    }
+  }
+}

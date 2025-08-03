@@ -418,17 +418,13 @@ def format_kicad_schematic(schematic_expr: Any) -> str:
     logger.info(
         f"🚀 FORMAT_KICAD_SCHEMATIC: Starting formatting of {expr_type} ({expr_size} chars)"
     )
-    logger.debug(
-        f"Rust acceleration available: {_RUST_SEXP_AVAILABLE}"
-    )
+    logger.debug(f"Rust acceleration available: {_RUST_SEXP_AVAILABLE}")
 
     # Try Rust implementation first for maximum performance
     if _RUST_SEXP_AVAILABLE:
         rust_start = time.perf_counter()
         try:
-            logger.debug(
-                "Attempting Rust S-expression formatting"
-            )
+            logger.debug("Attempting Rust S-expression formatting")
 
             # Convert schematic_expr to format compatible with Rust module
             # For now, use Python fallback as Rust integration needs full implementation
@@ -445,14 +441,10 @@ def format_kicad_schematic(schematic_expr: Any) -> str:
             logger.error(
                 f"❌ RUST_ACCELERATION: RUST FORMATTING FAILED after {rust_time*1000:.2f}ms: {e}"
             )
-            logger.warning(
-                "Falling back to Python implementation"
-            )
+            logger.warning("Falling back to Python implementation")
             # Fall through to Python implementation
     else:
-        logger.info(
-            "Rust not available, using Python implementation"
-        )
+        logger.info("Rust not available, using Python implementation")
 
     # Use Python implementation (current and fallback)
     python_start = time.perf_counter()
@@ -462,9 +454,7 @@ def format_kicad_schematic(schematic_expr: Any) -> str:
     formatter_creation_start = time.perf_counter()
     formatter = KiCadFormatterNew()
     formatter_creation_time = time.perf_counter() - formatter_creation_start
-    logger.debug(
-        f"KiCadFormatterNew created in {formatter_creation_time*1000:.3f}ms"
-    )
+    logger.debug(f"KiCadFormatterNew created in {formatter_creation_time*1000:.3f}ms")
 
     # Format the expression with proper multi-line formatting - time the core operation
     formatting_start = time.perf_counter()

@@ -22,3 +22,6 @@
 [submodule "submodules/modm-devices"]
 	path = submodules/modm-devices
 	url = https://github.com/modm-io/modm-devices.git
+[submodule "submodules/atopile"]
+	path = submodules/atopile
+	url = https://github.com/atopile/atopile

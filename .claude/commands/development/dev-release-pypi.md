@@ -19,6 +19,8 @@ This command handles the complete release process:
 - **Check branch status** - Ensure we're on develop/main
 - **Validate version format** - Semantic versioning check
 - **Check for uncommitted changes** - Ensure clean working directory
+- **Sync with remote** - Fetch latest changes from origin
+- **Verify main branch is up-to-date** - Ensure main is current with develop
 
 ### 2. Rust Build (If Needed)
 - **Check for Rust modules** - Look for Cargo.toml files
@@ -38,10 +40,12 @@ This command handles the complete release process:
 - **Check imports** - Ensure package imports correctly
 - **Build documentation** - Generate fresh docs
 
-### 5. Git Operations
-- **Create release tag** - Tag with version number
-- **Push changes** - Push commits and tags to origin
-- **Merge to main** - If releasing from develop
+### 5. Git Operations and Release Management
+- **Merge to main** - Switch to main and merge develop (if releasing from develop)
+- **Create release tag** - Tag main branch with version number
+- **Push main branch** - Push updated main to origin
+- **Push release tag** - Push tag to origin
+- **Create GitHub release** - Generate release notes and publish
 
 ### 6. PyPI Publication
 - **Build distributions** - Create wheel and sdist
@@ -52,8 +56,12 @@ This command handles the complete release process:
 
 The command runs these steps automatically:
 
-### Pre-Release Checks
+### Pre-Release Checks and Branch Management
 ```bash
+# Fetch latest changes from remote
+echo "🔄 Fetching latest changes from origin..."
+git fetch origin
+
 # Ensure clean working directory
 if [ -n "$(git status --porcelain)" ]; then
     echo "❌ Uncommitted changes found. Commit or stash first."
@@ -73,6 +81,32 @@ if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
     echo "❌ Invalid version format. Use semantic versioning (e.g., 1.0.0)"
     exit 1
 fi
+
+# Ensure develop is up-to-date with origin
+if [[ "$current_branch" == "develop" ]]; then
+    echo "🔄 Ensuring develop is up-to-date..."
+    git pull origin develop || {
+        echo "❌ Failed to pull latest develop"
+        exit 1
+    }
+fi
+
+# Check if main needs updating from develop
+echo "🔍 Checking main branch status..."
+git checkout main
+git pull origin main
+
+# Check if main is behind develop
+behind_count=$(git rev-list --count main..develop)
+if [ "$behind_count" -gt 0 ]; then
+    echo "📋 Main is $behind_count commits behind develop"
+    echo "🔄 Main will be updated during release process"
+else
+    echo "✅ Main is up-to-date with develop"
+fi
+
+# Return to original branch
+git checkout "$current_branch"
 ```
 
 ### Core Functionality Test
@@ -171,18 +205,43 @@ echo "📊 $coverage_result"
 echo "✅ All tests passed"
 ```
 
-### Git Tagging and Push
+### Git Merge, Tagging, and Release Management
 ```bash
-# Create and push tag
-echo "🏷️  Creating release tag v$version..."
-git tag -a "v$version" -m "Release version $version"
+# Merge to main branch (if releasing from develop)
+if [[ "$current_branch" == "develop" ]]; then
+    echo "🔄 Merging develop to main..."
+    git checkout main
+    git merge develop --no-ff -m "🚀 Release $version: Merge develop to main"
+    
+    echo "✅ Merged develop to main"
+elif [[ "$current_branch" != "main" ]]; then
+    echo "⚠️  Warning: Not on main or develop branch"
+    echo "🔄 Switching to main for tagging..."
+    git checkout main
+fi
 
-# Push changes and tags
-echo "📤 Pushing to origin..."
-git push origin
+# Ensure we're on main for tagging
+current_branch_for_tag=$(git branch --show-current)
+if [[ "$current_branch_for_tag" != "main" ]]; then
+    echo "❌ Must be on main branch for release tagging"
+    exit 1
+fi
+
+# Create release tag on main
+echo "🏷️  Creating release tag v$version on main..."
+git tag -a "v$version" -m "🚀 Release version $version
+
+Features and changes in this release:
+- [Auto-generated from commits - update manually if needed]
+
+Full changelog: https://github.com/circuit-synth/circuit-synth/compare/v$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo '0.0.0')...v$version"
+
+# Push main branch and tags
+echo "📤 Pushing main branch and tags to origin..."
+git push origin main
 git push origin "v$version"
 
-echo "✅ Tagged and pushed v$version"
+echo "✅ Tagged and pushed v$version on main branch"
 ```
 
 ### PyPI Build and Upload
@@ -210,6 +269,56 @@ uv run python -m twine upload dist/* || {
 }
 
 echo "✅ Successfully uploaded to PyPI"
+```
+
+### GitHub Release Creation
+```bash
+# Create GitHub release with release notes
+echo "📝 Creating GitHub release..."
+
+# Generate release notes from commits since last tag
+last_tag=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+if [ -n "$last_tag" ]; then
+    echo "📋 Generating release notes since $last_tag..."
+    release_notes=$(git log --pretty=format:"- %s (%h)" "$last_tag"..HEAD)
+else
+    echo "📋 Generating release notes for initial release..."
+    release_notes=$(git log --pretty=format:"- %s (%h)" --max-count=10)
+fi
+
+# Create GitHub release using gh CLI
+if command -v gh >/dev/null 2>&1; then
+    echo "🚀 Creating GitHub release v$version..."
+    
+    gh release create "v$version" \
+        --title "🚀 Release v$version" \
+        --notes "## What's Changed
+
+$release_notes
+
+## Installation
+
+\`\`\`bash
+pip install circuit-synth==$version
+# or
+uv add circuit-synth==$version
+\`\`\`
+
+## PyPI Package
+📦 https://pypi.org/project/circuit-synth/$version/
+
+**Full Changelog**: https://github.com/circuit-synth/circuit-synth/compare/v$last_tag...v$version" \
+        --latest || {
+        echo "⚠️  GitHub release creation failed (continuing with PyPI release)"
+    }
+    
+    echo "✅ GitHub release created"
+else
+    echo "⚠️  GitHub CLI (gh) not found - skipping GitHub release creation"
+    echo "💡 Install with: brew install gh"
+    echo "📝 Manual release notes:"
+    echo "$release_notes"
+fi
 ```
 
 ### Post-Release Verification
@@ -261,9 +370,11 @@ Before running this command, ensure you have:
 
 1. **PyPI account** with API token configured
 2. **Git credentials** set up for pushing
-3. **Clean working directory** (no uncommitted changes)
-4. **KiCad installed** (for integration tests)
-5. **Rust toolchain** (if Rust modules present)
+3. **GitHub CLI (gh)** installed and authenticated
+4. **Clean working directory** (no uncommitted changes)
+5. **KiCad installed** (for integration tests)
+6. **Rust toolchain** (if Rust modules present)
+7. **Main branch permissions** for pushing releases
 
 ### Setup PyPI Credentials
 ```bash
@@ -278,6 +389,18 @@ Or use environment variable:
 export TWINE_PASSWORD=pypi-your-api-token-here
 ```
 
+### Setup GitHub CLI
+```bash
+# Install GitHub CLI
+brew install gh
+
+# Authenticate with GitHub
+gh auth login
+
+# Verify authentication
+gh auth status
+```
+
 ## Safety Features
 
 - **Validation checks** prevent broken releases
@@ -285,6 +408,9 @@ export TWINE_PASSWORD=pypi-your-api-token-here
 - **Clean working directory** required
 - **Version format validation** ensures consistency
 - **Confirmation prompts** for non-standard branches
+- **Main branch synchronization** ensures proper Git workflow
+- **Automatic branch merging** from develop to main
+- **Release tagging** always happens on main branch
 
 ## What Gets Released
 
@@ -292,8 +418,10 @@ The release includes:
 - **Python package** with all source code
 - **Rust binaries** (if present and built)
 - **Documentation** and examples
-- **Git tag** marking the release
-- **CHANGELOG** entry for the version
+- **Git tag** marking the release on main branch
+- **GitHub release** with auto-generated release notes
+- **PyPI package** published and available for installation
+- **Main branch** updated with latest changes from develop
 
 ## Rollback
 

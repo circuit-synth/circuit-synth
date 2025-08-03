@@ -131,9 +131,9 @@ class KiCadNetlistParser:
             if connections:  # Only add nets that have connections
                 # Clean net name - remove leading slash from hierarchical labels
                 clean_net_name = net_name
-                if clean_net_name.startswith('/'):
+                if clean_net_name.startswith("/"):
                     clean_net_name = clean_net_name[1:]
-                
+
                 net = Net(name=clean_net_name, connections=connections)
                 nets.append(net)
                 logger.debug(

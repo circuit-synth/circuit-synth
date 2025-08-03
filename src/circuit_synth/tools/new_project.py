@@ -26,6 +26,7 @@ from rich.text import Text
 # Import circuit-synth modules
 from circuit_synth.claude_integration.agent_registry import register_circuit_agents
 from circuit_synth.core.kicad_validator import validate_kicad_installation
+from circuit_synth.memory_bank import init_memory_bank
 
 console = Console()
 
@@ -988,7 +989,12 @@ def power_supply():
     is_flag=True,
     help="Include contributor agents and dev tools for circuit-synth development",
 )
-def main(skip_kicad_check: bool, minimal: bool, developer: bool):
+@click.option(
+    "--no-memory-bank",
+    is_flag=True,
+    help="Skip memory-bank system initialization",
+)
+def main(skip_kicad_check: bool, minimal: bool, developer: bool, no_memory_bank: bool):
     """Setup circuit-synth in the current uv project directory
 
     Run this command from within your uv project directory after:
@@ -1066,10 +1072,38 @@ def main(skip_kicad_check: bool, minimal: bool, developer: bool):
     else:
         console.print("⏭️  Skipped example circuits (minimal mode)", style="yellow")
 
-    # Step 5: Create project documentation
+    # Step 5: Initialize Memory-Bank System
+    if not no_memory_bank:
+        console.print("\n🧠 Initializing Memory-Bank System...", style="yellow")
+        # Create default board names based on project
+        board_names = [f"{project_name.lower().replace(' ', '-')}-v1"]
+        
+        # Initialize memory-bank system
+        success = init_memory_bank(
+            project_name=project_name,
+            board_names=board_names,
+            project_root=str(project_path)
+        )
+        
+        if success:
+            console.print("✅ Memory-bank system initialized", style="green")
+            console.print(f"📁 Created pcbs/{board_names[0]}/ with memory-bank structure", style="cyan")
+            console.print("🔄 Use 'cs-switch-board' to switch between board contexts", style="cyan")
+        else:
+            console.print("⚠️  Memory-bank initialization failed (continuing without it)", style="yellow")
+    else:
+        console.print("⏭️  Skipped memory-bank system initialization", style="yellow")
+
+    # Step 6: Create project documentation
     console.print("\n📚 Creating project documentation...", style="yellow")
     create_project_readme(project_path, project_name, additional_libraries)
-    create_claude_md(project_path)
+    
+    # Create memory-bank enhanced CLAUDE.md (or basic one if no memory-bank)
+    if not no_memory_bank:
+        # The memory-bank init_memory_bank function already creates CLAUDE.md with memory-bank docs
+        console.print("✅ Memory-bank enhanced CLAUDE.md already created", style="green")
+    else:
+        create_claude_md(project_path)
 
     # Success message
     console.print(

@@ -363,7 +363,7 @@ class NetlistExporter:
         are uniquely identified in a schematic. This is the standardized format
         for the library's intermediate JSON representation.
         """
-            
+
         logger.debug(f"Starting to_dict() for circuit: {self.circuit.name}")
         logger.debug(
             f"Circuit has {len(self.circuit._components)} components and {len(self.circuit._nets)} nets"

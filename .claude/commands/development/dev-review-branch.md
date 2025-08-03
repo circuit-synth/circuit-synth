@@ -20,7 +20,7 @@
 
 ## What This Does
 
-This command performs a comprehensive analysis of the current branch against the target branch, examining:
+This command performs a comprehensive analysis of the current branch against the target branch, including **automatic code formatting** by default, and examining:
 
 ### 1. High-Impact Changes Analysis
 - **Architectural changes** that could break system functionality
@@ -168,8 +168,65 @@ This command performs a comprehensive analysis of the current branch against the
 - **@README.md** - Check if new features, installation steps, usage examples, or architecture changes need documentation
 - **@Contributors.md** - Review if new development processes, tools, contribution paths, or setup procedures were added  
 - **@docs/** directory - Assess if API docs, technical guides, tutorials, or reference documentation requires updates
+  - **API Documentation** (`api.rst`, `index.rst`) - Verify API changes are documented
+  - **Installation Guide** (`installation.rst`) - Check setup and dependency instructions
+  - **Quick Start** (`quickstart.rst`) - Ensure examples and workflows are current
+  - **Contributing Guide** (`contributing.rst`, `CONTRIBUTING.md`) - Update development processes
+  - **Integration Guides** (`integration/CLAUDE_INTEGRATION.md`) - Validate AI integration docs
+  - **Technical References** (`PROJECT_STRUCTURE.md`, `RUST_PYPI_INTEGRATION.md`, `SCRIPT_REFERENCE.md`) - Update technical specifications
+  - **Testing Documentation** (`TESTING.md`) - Ensure test procedures are current
+  - **Simulation Setup** (`SIMULATION_SETUP.md`) - Validate SPICE and simulation docs
 - **Agent files** in `.claude/agents/` - Verify if agent knowledge, capabilities, prompts, or tools need updates
 - **Command files** in `.claude/commands/` - Check if new commands, workflows, or development processes were added
+- **🌐 circuit-synth.com website** - Verify if public website needs updates to reflect changes
+
+#### Website Content Review (circuit-synth.com)
+
+**CRITICAL: Review circuit-synth.com for accuracy after any significant changes:**
+
+**Current Website Content Areas to Validate:**
+- **Features Section** - Ensure listed capabilities match current implementation
+  - Python-defined circuit design
+  - AI-powered design assistance  
+  - KiCad project generation
+  - Automatic error checking
+  - Design history tracking
+  - Manufacturing integration
+  - SPICE simulation support
+
+- **Installation Instructions** - Verify commands and steps are current
+  - `uv` package manager usage
+  - `uv init my_circuit_project`
+  - `uv add circuit-synth`
+  - `uv run cs-new-project`
+  - `uv run python circuit-synth/main.py`
+
+- **Code Examples** - Ensure syntax and patterns are up-to-date
+  - `@circuit` decorator usage
+  - Component creation patterns
+  - Net connection syntax
+  - Import statements and module structure
+
+- **Technical Requirements** - Validate dependencies and compatibility
+  - Python version requirements
+  - KiCad version compatibility
+  - Claude Code AI integration status
+  - System requirements
+
+- **Command Reference** - Check if new commands or workflows need documentation
+  - CLI commands and flags
+  - Development workflows
+  - Testing procedures
+  - Build processes
+
+**Website Update Triggers:**
+- New features added or removed
+- Installation process changes
+- Command syntax modifications
+- API changes affecting user code
+- Workflow improvements
+- Integration updates (KiCad, Claude, etc.)
+- Version compatibility changes
 
 **Key documentation review questions:**
 - Does this change introduce new user-facing features? → Update @README.md features section
@@ -178,14 +235,27 @@ This command performs a comprehensive analysis of the current branch against the
 - Does this change affect what agents can help with or know about? → Update relevant agent knowledge
 - Does this change add new development tools, commands, or processes? → Update command documentation
 - Does this change modify project structure or architecture? → Update architecture documentation
+- Does this change affect installation, usage, or examples shown on the website? → Update circuit-synth.com
 
 **Documentation review checklist:**
 - [ ] @README.md reflects new features and capabilities
 - [ ] @Contributors.md includes any new development workflows  
 - [ ] @docs/ API/technical documentation is current
+  - [ ] `api.rst` and `index.rst` document new APIs
+  - [ ] `installation.rst` has current setup instructions
+  - [ ] `quickstart.rst` examples work with current syntax
+  - [ ] `contributing.rst` and `CONTRIBUTING.md` reflect current processes
+  - [ ] Integration guides (`integration/CLAUDE_INTEGRATION.md`) are accurate
+  - [ ] Technical references are up-to-date with architecture changes
+  - [ ] `TESTING.md` reflects current test procedures
+  - [ ] `SIMULATION_SETUP.md` has current SPICE configuration
 - [ ] Agent knowledge in `.claude/agents/` is up-to-date
 - [ ] Command documentation in `.claude/commands/` is accurate
 - [ ] Architecture diagrams and explanations are current
+- [ ] **🌐 circuit-synth.com website content is accurate and current**
+- [ ] **Website installation commands match current procedures**
+- [ ] **Website code examples use current syntax and imports**
+- [ ] **Website feature list reflects actual capabilities**
 
 ### 7. Testing Coverage Analysis
 **Circuit-Synth Testing Requirements:**
@@ -415,14 +485,28 @@ grep -c "^#" .claude/agents/*.md
 find memory-bank/ -name "*.md" -exec wc -l {} \; | sort -nr
 ```
 
-### 4. Testing and Quality Validation
+### 4. Automatic Code Formatting (Default Step)
+```bash
+# AUTOMATIC FORMATTING (runs by default)
+# Format Python code
+black src/ tests/ examples/
+isort src/ tests/ examples/
+
+# Format Rust code (if applicable)
+find rust_modules/ -name "*.rs" -exec rustfmt {} \;
+
+# Format configuration files
+prettier --write "*.{json,yml,yaml,md}" --ignore-path .gitignore
+```
+
+### 5. Testing and Quality Validation
 ```bash
 # Test execution
 uv run pytest --cov=circuit_synth --cov-report=term-missing
 uv run pytest tests/unit/test_core_circuit.py -v
 uv run pytest tests/rust_integration/ -v
 
-# Code formatting and linting
+# Code formatting validation (after auto-format)
 black --check --diff src/
 isort --check-only --diff src/
 flake8 src/ --max-line-length=100
@@ -433,7 +517,7 @@ sphinx-build -b html docs/ docs/_build/html
 markdown-link-check README.md
 ```
 
-### 5. Performance and Resource Analysis
+### 6. Performance and Resource Analysis
 ```bash
 # File size analysis
 find . -name "*.py" -exec wc -c {} \; | sort -nr | head -20
@@ -447,7 +531,7 @@ python -c "import pstats; pstats.Stats('profile.stats').sort_stats('tottime').pr
 memory_profiler examples/example_kicad_project.py
 ```
 
-### 6. Dependency and Security Analysis
+### 7. Dependency and Security Analysis
 ```bash
 # Python dependency security
 safety check
@@ -462,7 +546,7 @@ licensecheck --recursive src/
 pip-licenses --format=table
 ```
 
-### 7. Circuit-Synth Domain Validation
+### 8. Circuit-Synth Domain Validation
 ```bash
 # Component validation
 python -m circuit_synth.tools.validate_components examples/

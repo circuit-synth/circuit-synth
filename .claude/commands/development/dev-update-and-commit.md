@@ -21,14 +21,29 @@ Comprehensive workflow for documenting progress, updating documentation, and com
 
 ### 3. Format Code Before Committing
 **IMPORTANT: Always format code before committing**
-- Run formatting commands:
+- Run comprehensive formatting:
   ```bash
-  uv run black src/
-  uv run isort src/
+  uv run black src/ tests/ examples/
+  uv run isort src/ tests/ examples/
   ```
-- This ensures consistent code style across the project
+- Format configuration files:
+  ```bash
+  prettier --write "*.{json,yml,yaml}" --ignore-path .gitignore 2>/dev/null || echo "Prettier not available"
+  ```
+- This ensures consistent code style across the entire project
 
-### 4. Commit Changes (Concise Message)  
+### 4. Quality Checks Before Committing
+**IMPORTANT: Run basic quality checks**
+- Syntax validation:
+  ```bash
+  find src/ tests/ examples/ -name "*.py" -exec python -m py_compile {} \; 2>/dev/null || echo "⚠️  Syntax errors found"
+  ```
+- Quick test run (optional):
+  ```bash
+  uv run pytest tests/unit/ --tb=no -q || echo "⚠️  Unit tests failing"
+  ```
+
+### 5. Commit Changes (Concise Message)  
 **IMPORTANT: Keep commit message under 3 lines**
 - Check git status and add modified files only
 - Commit message format:
@@ -39,7 +54,7 @@ Comprehensive workflow for documenting progress, updating documentation, and com
   ```
 - NO verbose technical details in commit message
 
-### 5. Cleanup
+### 6. Cleanup
 - Remove any temporary test files
 - Verify working tree is clean
 
