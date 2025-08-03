@@ -6,9 +6,9 @@ Main circuit generated from KiCad
 from circuit_synth import *
 
 # Import subcircuit functions
-from USB_Port import USB_Port
-from Power_Supply import Power_Supply
-from ESP32_C6_MCU import ESP32_C6_MCU
+from USB_Port import usb_port
+from Power_Supply import power_supply
+from ESP32_C6_MCU import esp32_c6_mcu
 
 @circuit(name='main')
 def main():

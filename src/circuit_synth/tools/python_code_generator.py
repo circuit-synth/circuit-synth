@@ -789,7 +789,7 @@ class PythonCodeGenerator:
             code_lines.append('')
             code_lines.append('# Import subcircuit functions')
             for subcircuit_name in subcircuit_names:
-                code_lines.append(f'from {subcircuit_name} import {subcircuit_name}')
+                code_lines.append(f'from {subcircuit_name} import {subcircuit_name.lower()}')
         
         code_lines.append('')
         
