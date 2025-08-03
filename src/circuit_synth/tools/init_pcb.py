@@ -95,13 +95,125 @@ def organize_kicad_files(project_path: Path, kicad_files: dict) -> dict:
 
 
 def create_circuit_synth_structure(project_path: Path, project_name: str, kicad_dir: str = "kicad") -> None:
-    """Create circuit-synth directory structure."""
+    """Create circuit-synth directory structure with complete working example."""
     
     # Create circuit-synth directory
     circuit_synth_dir = project_path / "circuit-synth"
     circuit_synth_dir.mkdir(exist_ok=True)
     
-    # Create placeholder Python file
+    # Find the example_project directory (relative to this script)
+    current_file = Path(__file__)
+    repo_root = current_file.parent.parent.parent.parent  # Go up to circuit-synth4/
+    example_project_dir = repo_root / "example_project" / "circuit-synth"
+    
+    if not example_project_dir.exists():
+        # Fallback to simple template if examples not found
+        console.print("⚠️  Example project not found, creating simple template", style="yellow")
+        _create_simple_template(circuit_synth_dir, project_name, kicad_dir)
+        return
+    
+    # Copy all circuit files from example project
+    circuit_files = ['usb.py', 'power_supply.py', 'esp32c6.py', 'debug_header.py', 'led_blinker.py']
+    
+    for circuit_file in circuit_files:
+        source_file = example_project_dir / circuit_file
+        if source_file.exists():
+            dest_file = circuit_synth_dir / circuit_file
+            shutil.copy2(str(source_file), str(dest_file))
+    
+    # Create customized main.py for this project
+    main_py_content = f'''#!/usr/bin/env python3
+"""
+Main Circuit - {project_name}
+Professional hierarchical circuit design with modular subcircuits
+
+This is the main entry point that orchestrates all subcircuits:
+- USB-C power input with proper CC resistors and protection
+- 5V to 3.3V power regulation  
+- ESP32-C6 microcontroller with USB and debug interfaces
+- Status LED with current limiting
+- Debug header for programming and development
+"""
+
+from circuit_synth import *
+
+# Import all circuits
+from usb import usb_port
+from power_supply import power_supply
+from esp32c6 import esp32c6
+
+@circuit(name="{project_name.replace(' ', '_')}_Main")
+def main_circuit():
+    """Main hierarchical circuit - {project_name}"""
+    
+    # Create shared nets between subcircuits (ONLY nets - no components here)
+    vbus = Net('VBUS')
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    usb_dp = Net('USB_DP')
+    usb_dm = Net('USB_DM')
+
+    
+    # Create all circuits with shared nets
+    usb_port_circuit = usb_port(vbus, gnd, usb_dp, usb_dm)
+    power_supply_circuit = power_supply(vbus, vcc_3v3, gnd)
+    esp32_circuit = esp32c6(vcc_3v3, gnd, usb_dp, usb_dm)
+
+
+if __name__ == "__main__":
+    print("Starting {project_name.replace('_', ' ')} generation...")
+    
+    # Generate the complete hierarchical circuit
+    print("Creating circuit...")
+    circuit = main_circuit()
+    
+    # Generate KiCad netlist (required for ratsnest display) - save to kicad project folder
+    print("Generating KiCad netlist...")
+    circuit.generate_kicad_netlist("../kicad/{project_name.replace(' ', '_')}.net")
+    
+    # Generate JSON netlist (for debugging and analysis) - save to circuit-synth folder
+    print("Generating JSON netlist...")
+    circuit.generate_json_netlist("{project_name.replace(' ', '_')}.json")
+    
+    # Create KiCad project with hierarchical sheets
+    print("Generating KiCad project...")
+    circuit.generate_kicad_project(
+        project_name="{project_name.replace(' ', '_')}",
+        placement_algorithm="hierarchical",
+        generate_pcb=True
+    )
+    
+    print("")
+    print("{project_name} project generated!")
+    print("Check the ../kicad/ directory for KiCad files")
+    print("")
+    print("Generated circuits:")
+    print("   • USB-C port with CC resistors and ESD protection")
+    print("   • 5V to 3.3V power regulation")
+    print("   • ESP32-C6 microcontroller with support circuits")
+    print("   • Debug header for programming")  
+    print("   • Status LED with current limiting")
+    print("")
+    print("Generated files:")
+    print("   • {project_name.replace(' ', '_')}.kicad_pro - KiCad project file")
+    print("   • {project_name.replace(' ', '_')}.kicad_sch - Hierarchical schematic")
+    print("   • {project_name.replace(' ', '_')}.kicad_pcb - PCB layout")
+    print("   • {project_name.replace(' ', '_')}.net - Netlist (enables ratsnest)")
+    print("   • {project_name.replace(' ', '_')}.json - JSON netlist (for analysis)")
+    print("")
+    print("Ready for professional PCB manufacturing!")
+    print("Open ../kicad/{project_name.replace(' ', '_')}.kicad_pcb in KiCad to see the ratsnest!")
+'''
+    
+    with open(circuit_synth_dir / "main.py", "w") as f:
+        f.write(main_py_content)
+    
+    console.print("✅ Created circuit-synth/ directory with complete working example", style="green")
+
+
+def _create_simple_template(circuit_synth_dir: Path, project_name: str, kicad_dir: str) -> None:
+    """Fallback: Create simple template if example project not found."""
+    
     main_py_content = f'''#!/usr/bin/env python3
 """
 {project_name} - Circuit-Synth Integration
@@ -131,7 +243,7 @@ def {project_name.lower().replace(' ', '_').replace('-', '_')}_circuit():
     #     footprint="Package_QFP:LQFP-100_14x14mm_P0.5mm"
     # )
     
-    console.print("🚧 Circuit structure ready for implementation", style="yellow")
+    print("🚧 Circuit structure ready for implementation")
     return circuit
 
 
@@ -152,8 +264,6 @@ if __name__ == "__main__":
     
     with open(circuit_synth_dir / "main.py", "w") as f:
         f.write(main_py_content)
-    
-    console.print("✅ Created circuit-synth/ directory with template", style="green")
 
 
 def create_memory_bank(project_path: Path, project_name: str) -> None:
