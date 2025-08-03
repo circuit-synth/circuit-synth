@@ -22,8 +22,7 @@ mkdir -p website
 
 if [ -f "/var/www/html/index.html" ]; then
     cp /var/www/html/index.html website/old_website.html
-    cp /var/www/html/index.html website/index.html
-    echo "✅ Existing website preserved as old_website.html and copied as index.html"
+    echo "✅ Existing website preserved as old_website.html"
 else
     echo "ℹ️  No existing website found in /var/www/html/"
 fi
