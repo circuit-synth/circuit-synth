@@ -97,58 +97,33 @@ circuit.generate_kicad_project("voltage_regulator")</code></pre>
 
         <section id="features" class="section">
             <div class="container">
-                <h2>Why Circuit Synth?</h2>
+                <h2>Professional Circuit Design Features</h2>
                 <p class="section-subtitle">Built for real engineering teams who need professional, production-ready circuit design tools</p>
-                <div class="features-grid">
-                    <div class="feature">
-                        <h3>🚀 Mistake-Proof Design</h3>
-                        <p>Automatic validation catches wiring errors, missing connections, and component mismatches before you fabricate. No more expensive respins due to silly mistakes.</p>
-                    </div>
-                    <div class="feature">
-                        <h3>↔️ Works With Existing Projects</h3>
-                        <p>KiCad remains the source of truth. Import existing projects, modify in Python, and export back to clean KiCad files. No need to start from scratch.</p>
-                    </div>
-                    <div class="feature">
-                        <h3>🏗️ Professional Workflow</h3>
-                        <p>Integrates seamlessly with existing KiCad-based development processes. Generate industry-standard netlists and projects.</p>
-                    </div>
-                    <div class="feature">
-                        <h3>📊 Hierarchical Design</h3>
-                        <p>Multi-sheet projects with proper organization. Supports arbitrary depth circuit nesting with clean parameter passing.</p>
-                    </div>
-                    <div class="feature">
-                        <h3>🤖 Claude Code Ready</h3>
-                        <p>Deeply integrated with Claude Code for natural language circuit design. Built-in AI agent support for component search, troubleshooting, and optimization.</p>
-                    </div>
-                    <div class="feature">
-                        <h3>🔧 Production Ready</h3>
-                        <p>Generates clean, human-readable KiCad files suitable for professional development. Not machine-generated gibberish.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <section class="section">
-            <div class="container">
-                <h2>Advanced Features</h2>
-                <p class="section-subtitle">Professional-grade capabilities that transform your circuit design workflow</p>
                 <div class="advanced-features-grid">
                     <div class="advanced-feature">
                         <div class="feature-icon">🏗️</div>
-                        <h3>Hierarchical Design</h3>
-                        <p>Modular subcircuits with clear interfaces. Each function lives in its own file like software modules - USB ports, power supplies, and debug interfaces work across projects.</p>
+                        <h3>Professional Workflow</h3>
+                        <p>Work in traditional KiCad or Python - your choice. Make changes in either environment and the project auto-updates. KiCad remains the source of truth while Python provides powerful automation.</p>
                         <div class="feature-example">
-                            <code>usb_subcircuit.py → power_supply_subcircuit.py → main.py</code>
+                            <code>KiCad ↔ Python ↔ Auto-sync</code>
                         </div>
                     </div>
                     
                     <div class="advanced-feature">
-                        <div class="feature-icon">⚡</div>
-                        <h3>Automated SPICE Simulation</h3>
-                        <p>One-click simulation setup with automatic netlist generation. Get operating points, AC analysis, and transient response without manual SPICE file creation.</p>
+                        <div class="feature-icon">↔️</div>
+                        <h3>Works With Existing Projects</h3>
+                        <p>Import existing KiCad projects, enhance with Python automation, then export back to clean KiCad files. No need to start from scratch - enhance what you already have.</p>
                         <div class="feature-example">
-                            <code>sim = circuit.simulator()<br>result = sim.operating_point()</code>
+                            <code>Import → Enhance → Export → Deploy</code>
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-feature">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI-Enhanced Workflow</h3>
+                        <p>Tight integration with Claude Code for natural language circuit design. Component search, troubleshooting, design review, and optimization through intelligent AI assistance.</p>
+                        <div class="feature-example">
+                            <code>"Find STM32 with 3 SPIs available on JLCPCB"</code>
                         </div>
                     </div>
                     
@@ -162,29 +137,20 @@ circuit.generate_kicad_project("voltage_regulator")</code></pre>
                     </div>
                     
                     <div class="advanced-feature">
-                        <div class="feature-icon">📝</div>
-                        <h3>Documentation as Code</h3>
-                        <p>Docstrings automatically become schematic annotations. Keep documentation synchronized with your design - no more outdated comments or missing specs.</p>
+                        <div class="feature-icon">⚡</div>
+                        <h3>Automated SPICE Simulation</h3>
+                        <p>One-click simulation setup with automatic netlist generation. Get operating points, AC analysis, and transient response without manual SPICE file creation.</p>
                         <div class="feature-example">
-                            <code>"""3.3V regulator with 2.5mA bias current"""</code>
+                            <code>sim = circuit.simulator()<br>result = sim.operating_point()</code>
                         </div>
                     </div>
                     
                     <div class="advanced-feature">
-                        <div class="feature-icon">🔄</div>
-                        <h3>Bidirectional KiCad Sync</h3>
-                        <p>Import existing KiCad projects into Python, modify with code, then export back to clean KiCad files. KiCad remains the source of truth.</p>
+                        <div class="feature-icon">🔧</div>
+                        <h3>Production Ready</h3>
+                        <p>Generates clean, human-readable Python files and professional KiCad projects. Not machine-generated gibberish - code you can understand, modify, and maintain.</p>
                         <div class="feature-example">
-                            <code>KiCad → Python → Enhanced → KiCad</code>
-                        </div>
-                    </div>
-                    
-                    <div class="advanced-feature">
-                        <div class="feature-icon">📊</div>
-                        <h3>Version Control Ready</h3>
-                        <p>Git-friendly Python files instead of binary KiCad files. Track changes, collaborate with teams, and maintain design history with standard development tools.</p>
-                        <div class="feature-example">
-                            <code>git diff circuit.py → Clear design changes</code>
+                            <code>Professional KiCad + Readable Python</code>
                         </div>
                     </div>
                 </div>
@@ -204,8 +170,7 @@ circuit.generate_kicad_project("voltage_regulator")</code></pre>
                             <ul class="claude-features">
                                 <li>✅ <strong>Comprehensive CLAUDE.md:</strong> Complete development guide with commands, patterns, and workflows</li>
                                 <li>✅ <strong>Specialized Agents:</strong> circuit-architect, power-expert, component-guru for domain expertise</li>
-                                <li>✅ <strong>Memory Bank System:</strong> Persistent context across sessions with technical decisions and patterns</li>
-                                <li>✅ <strong>Test-Driven Development:</strong> Automated testing scripts with clear TDD workflows</li>
+                                <li>✅ <strong>Memory Bank System:</strong> Track complete board design history, debug sessions, failures, and design decisions in one persistent knowledge base that grows with every project</li>
                                 <li>✅ <strong>Contributor Focused:</strong> Claude Code + GitHub MCP = up and running in 5 minutes. We want to make it easy and fun to contribute to Circuit-Synth!</li>
                             </ul>
                         </div>
@@ -232,38 +197,21 @@ cd circuit-synth
             <div class="container">
                 <h2>Get Started in Minutes</h2>
                 <p class="section-subtitle">Create a complete ESP32-C6 development board project with hierarchical design in under 2 minutes</p>
-                <div class="steps-grid">
-                    <div class="step">
-                        <div class="step-number">1</div>
-                        <h3>Quick Setup</h3>
-                        <p>Install uv and create your project:</p>
-                        <div class="code-block">
-                            <pre><code># Install uv (Python package manager)
+                <div class="code-block">
+                    <pre><code># Install uv (Python package manager)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Create new project
 uv init my_circuit_project
-cd my_circuit_project</code></pre>
-                        </div>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
-                        <h3>Add Circuit-Synth</h3>
-                        <p>Install and setup project template:</p>
-                        <div class="code-block">
-                            <pre><code># Add circuit-synth
+cd my_circuit_project
+
+# Add circuit-synth
 uv add circuit-synth
 
 # Setup complete project template
-uv run cs-new-project</code></pre>
-                        </div>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
-                        <h3>Generate Your Circuit</h3>
-                        <p>Run the ESP32-C6 example with modular subcircuits:</p>
-                        <div class="code-block">
-                            <pre><code># Generate complete KiCad project  
+uv run cs-new-project
+
+# Generate complete KiCad project  
 uv run python circuit-synth/main.py
 
 # Result: ESP32-C6 dev board with:
@@ -271,8 +219,6 @@ uv run python circuit-synth/main.py
 # - 5V→3.3V power regulation  
 # - Programming interface
 # - Status LED control</code></pre>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
