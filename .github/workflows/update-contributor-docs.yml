@@ -41,7 +41,18 @@ jobs:
       run: |
         echo "Checking if Contributors documentation needs updates..."
         uv run python scripts/check_contributor_docs_sync.py
-        echo "needs_update=$?" >> $GITHUB_OUTPUT
+        exit_code=$?
+        echo "needs_update=$exit_code" >> $GITHUB_OUTPUT
+        if [ $exit_code -eq 1 ]; then
+          echo "Documentation needs updates - continuing workflow"
+          exit 0
+        elif [ $exit_code -eq 2 ]; then
+          echo "Error occurred during checking"
+          exit 1
+        else
+          echo "Documentation is up-to-date"
+          exit 0
+        fi
         
     - name: Update Contributors documentation
       if: steps.check_updates.outputs.needs_update == '1'

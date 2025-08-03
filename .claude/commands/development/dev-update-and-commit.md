@@ -21,12 +21,16 @@ Comprehensive workflow for documenting progress, updating documentation, and com
 
 ### 3. Format Code Before Committing
 **IMPORTANT: Always format code before committing**
-- Run formatting commands:
+- Run comprehensive formatting:
   ```bash
-  uv run black src/
-  uv run isort src/
+  uv run black src/ tests/ examples/
+  uv run isort src/ tests/ examples/
   ```
-- This ensures consistent code style across the project
+- Format configuration files:
+  ```bash
+  prettier --write "*.{json,yml,yaml}" --ignore-path .gitignore 2>/dev/null || echo "Prettier not available"
+  ```
+- This ensures consistent code style across the entire project
 
 ### 4. Commit Changes (Concise Message)  
 **IMPORTANT: Keep commit message under 3 lines**
