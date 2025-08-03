@@ -55,8 +55,27 @@ class LoggingFailsafe:
     def __init__(self):
         self.fallback_enabled = True
         self.fallback_file = Path.home() / ".circuit-synth" / "logs" / "fallback.log"
-        self.fallback_file.parent.mkdir(exist_ok=True)
         self._lock = threading.Lock()
+        self._ensure_directory()
+
+    def _ensure_directory(self):
+        """Safely ensure the logging directory exists."""
+        try:
+            self.fallback_file.parent.mkdir(parents=True, exist_ok=True)
+        except (OSError, PermissionError) as e:
+            # If we can't create the logging directory, disable fallback logging
+            # This prevents import failures in CI environments
+            self.fallback_enabled = False
+            # Try to log to stderr as last resort
+            try:
+                import sys
+
+                print(
+                    f"Warning: Could not create circuit-synth logging directory: {e}",
+                    file=sys.stderr,
+                )
+            except:
+                pass  # Even stderr failed, just disable logging
 
     def emergency_log(self, message: str, level: str = "ERROR"):
         """Emergency logging when main system fails."""

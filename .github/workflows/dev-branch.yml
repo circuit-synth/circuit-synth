@@ -3,6 +3,12 @@ name: Development Branch Tests
 on:
   push:
     branches-ignore: [ main ]
+    # Only run on specific paths to reduce costs
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'scripts/**'
   workflow_dispatch:
 
 jobs:

@@ -583,9 +583,7 @@ class PCBGenerator:
                         for ref in clean_nodes:
                             nets[net_name].add(ref)
 
-                        logger.debug(
-                            f"Net {net_name}: {clean_nodes}"
-                        )
+                        logger.debug(f"Net {net_name}: {clean_nodes}")
 
                 logger.debug(f"Extracted {len(nets)} nets from netlist")
 

@@ -632,14 +632,18 @@ class SchematicGenerator(IKiCadIntegration):
         )
 
         # 5) NATURAL HIERARCHY: Top circuit goes on root schematic, subcircuits become child sheets
-        logger.info("🔧 NATURAL HIERARCHY: Top circuit on root, subcircuits as child sheets")
-        root_uuid = str(uuid.uuid4())  # UUID for root schematic (project_name.kicad_sch)
+        logger.info(
+            "🔧 NATURAL HIERARCHY: Top circuit on root, subcircuits as child sheets"
+        )
+        root_uuid = str(
+            uuid.uuid4()
+        )  # UUID for root schematic (project_name.kicad_sch)
         hierarchical_path = [root_uuid]  # Top circuit gets just root level path
 
         logger.info(f"Root schematic UUID: {root_uuid}")
 
         # 6) Generate .kicad_sch for each circuit
-        # Store sheet writers for all circuits  
+        # Store sheet writers for all circuits
         sheet_writers = {}
 
         # Pre-scan the project to collect all assigned references
@@ -834,9 +838,7 @@ class SchematicGenerator(IKiCadIntegration):
             logger.debug(f"Loading JSON from: {json_file}")
             with open(json_file, "r") as f:
                 circuit_data = json.load(f)
-            logger.debug(
-                f"JSON loaded successfully, keys: {list(circuit_data.keys())}"
-            )
+            logger.debug(f"JSON loaded successfully, keys: {list(circuit_data.keys())}")
             logger.debug(
                 f"Components: {list(circuit_data.get('components', {}).keys())}"
             )
@@ -851,24 +853,30 @@ class SchematicGenerator(IKiCadIntegration):
             logger.debug(
                 f"Skipping temporary circuit creation to avoid reference collisions"
             )
-            logger.debug(
-                f"JSON data will be passed directly to netlist service"
-            )
+            logger.debug(f"JSON data will be passed directly to netlist service")
 
             # Generate the netlist using the modular service approach
-            logger.info(f"🔧 DEBUG: Using netlist service to generate hierarchical netlist...")
+            logger.info(
+                f"🔧 DEBUG: Using netlist service to generate hierarchical netlist..."
+            )
             from ..netlist_service import KiCadNetlistService
-            
+
             netlist_service = KiCadNetlistService()
             try:
                 # Use the correct method name and parameters
-                result = netlist_service.generate_netlist(json_file, str(netlist_path), self.project_name)
+                result = netlist_service.generate_netlist(
+                    json_file, str(netlist_path), self.project_name
+                )
                 if result.success:
                     logger.debug(f"Netlist generation succeeded!")
                     logger.debug(f"Netlist saved to: {netlist_path}")
-                    logger.debug(f"Generated netlist with {result.component_count} components and {result.net_count} nets")
+                    logger.debug(
+                        f"Generated netlist with {result.component_count} components and {result.net_count} nets"
+                    )
                 else:
-                    logger.error(f"❌ Netlist generation failed: {result.error_message}")
+                    logger.error(
+                        f"❌ Netlist generation failed: {result.error_message}"
+                    )
                     logger.warning("PCB generation will proceed without netlist")
             except Exception as netlist_error:
                 logger.error(f"❌ Netlist generation failed: {netlist_error}")
@@ -877,9 +885,7 @@ class SchematicGenerator(IKiCadIntegration):
         except Exception as e:
             import traceback
 
-            logger.error(
-                f"Failed to generate KiCad netlist with modular service: {e}"
-            )
+            logger.error(f"Failed to generate KiCad netlist with modular service: {e}")
             logger.error(f"❌ Full traceback: {traceback.format_exc()}")
             logger.warning("PCB generation will proceed without netlist")
 
@@ -920,9 +926,7 @@ class SchematicGenerator(IKiCadIntegration):
                 logger.error("❌ PCB generation failed!")
 
         # NOTE: Netlist generation now handled earlier in the method using modular service
-        logger.debug(
-            "Netlist generation completed earlier using modular service"
-        )
+        logger.debug("Netlist generation completed earlier using modular service")
 
         # Return success result
         return {
@@ -950,16 +954,20 @@ class SchematicGenerator(IKiCadIntegration):
             logger.debug("Using netlist service to generate netlist")
             # Use the modular service approach that handles hierarchical connections properly
             from ..netlist_service import KiCadNetlistService
-            
+
             netlist_service = KiCadNetlistService()
             netlist_path = str(Path(self.project_dir) / f"{self.project_name}.net")
-            
+
             # Use the correct method name and parameters
-            result = netlist_service.generate_netlist(json_file, netlist_path, self.project_name)
+            result = netlist_service.generate_netlist(
+                json_file, netlist_path, self.project_name
+            )
             if result.success:
                 logger.debug(f"Netlist service generation succeeded!")
                 logger.debug(f"Netlist saved to: {netlist_path}")
-                logger.debug(f"Generated netlist with {result.component_count} components and {result.net_count} nets")
+                logger.debug(
+                    f"Generated netlist with {result.component_count} components and {result.net_count} nets"
+                )
                 return True
             else:
                 raise RuntimeError(f"Netlist generation failed: {result.error_message}")
@@ -1029,7 +1037,9 @@ class SchematicGenerator(IKiCadIntegration):
         logger.debug(f"Processing {len(sub_dict)} circuits")
 
         for c_name, circ in sub_dict.items():
-            logger.debug(f"Processing circuit: '{c_name}' with {len(circ.components)} components, {len(circ.child_instances)} child instances")
+            logger.debug(
+                f"Processing circuit: '{c_name}' with {len(circ.components)} components, {len(circ.child_instances)} child instances"
+            )
 
             # Log component details
             logger.debug("Components in circuit:")
@@ -1469,7 +1479,9 @@ class SchematicGenerator(IKiCadIntegration):
 
         # Add all subcircuit sheets (excluding the main circuit since it's in the root)
         for c_name in sub_dict:
-            if c_name != top_name:  # Skip the main circuit as it's in the root schematic
+            if (
+                c_name != top_name
+            ):  # Skip the main circuit as it's in the root schematic
                 sheets.append([f"{c_name}.kicad_sch", c_name])
 
         pro_data["sheets"] = sheets
