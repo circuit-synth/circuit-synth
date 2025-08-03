@@ -391,8 +391,10 @@ def create_claude_agent(project_path: Path, project_name: str) -> None:
         if commands_source.exists():
             shutil.copytree(str(commands_source), str(commands_dest), dirs_exist_ok=True)
         
-        # Copy README.md and settings.json
-        for filename in ["README.md", "settings.json"]:
+        # Copy all additional configuration files
+        config_files = ["README.md", "settings.json", "AGENT_USAGE_GUIDE.md", 
+                       "README_ORGANIZATION.md", "mcp_settings.json", "session_hook_update.sh"]
+        for filename in config_files:
             source_file = example_claude_dir / filename
             if source_file.exists():
                 dest_file = claude_dir / filename
