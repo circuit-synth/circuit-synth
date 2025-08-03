@@ -73,7 +73,7 @@ from .interfaces import (
 from .kicad.unified_kicad_integration import create_unified_kicad_integration
 
 # Plugin integration
-from .plugins import SmartonAIBridge
+from .plugins import AIDesignBridge
 
 
 # Claude Code integration (optional)
