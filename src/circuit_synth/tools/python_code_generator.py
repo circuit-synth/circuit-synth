@@ -622,7 +622,7 @@ class PythonCodeGenerator:
                 # Generate subcircuit code with shared nets as parameters
                 shared_nets = shared_nets_per_subcircuit.get(name, [])
                 local_nets = hierarchical_nets.get(name, {})
-                subcircuit_code = self._generate_standalone_subcircuit_file(circuit, shared_nets, local_nets, circuits, hierarchical_tree)
+                subcircuit_code = self._generate_standalone_subcircuit_file(circuit, shared_nets, local_nets, circuits, hierarchical_tree, shared_nets_per_subcircuit)
                 
                 if preview_only:
                     logger.info(f"🗂️ MULTI_FILE: [PREVIEW] Would create {subcircuit_file}")
@@ -655,7 +655,8 @@ class PythonCodeGenerator:
             return None
 
     def _generate_standalone_subcircuit_file(self, circuit: Circuit, shared_nets: List[str] = None, local_nets: Dict[str, Net] = None, 
-                                           circuits: Dict[str, Circuit] = None, hierarchy_tree: Dict[str, List[str]] = None) -> str:
+                                           circuits: Dict[str, Circuit] = None, hierarchy_tree: Dict[str, List[str]] = None,
+                                           shared_nets_per_subcircuit: Dict[str, List[str]] = None) -> str:
         """Generate a complete Python file for a single subcircuit"""
         logger.info(f"📄 SUBCIRCUIT_FILE: Generating standalone file for {circuit.name}")
         
@@ -683,14 +684,15 @@ class PythonCodeGenerator:
         code_lines.append('')
         
         # Generate the subcircuit function with net parameters  
-        code_lines.extend(self._generate_subcircuit_code_with_params(circuit, shared_nets or [], local_nets or {}, circuits, hierarchy_tree))
+        code_lines.extend(self._generate_subcircuit_code_with_params(circuit, shared_nets or [], local_nets or {}, circuits, hierarchy_tree, shared_nets_per_subcircuit))
         
         result = "\n".join(code_lines)
         logger.info(f"📄 SUBCIRCUIT_FILE: Generated {len(code_lines)} lines for {circuit.name}")
         return result
 
     def _generate_subcircuit_code_with_params(self, circuit: Circuit, shared_nets: List[str], local_nets: Dict[str, Net] = None, 
-                                             circuits: Dict[str, Circuit] = None, hierarchy_tree: Dict[str, List[str]] = None) -> List[str]:
+                                             circuits: Dict[str, Circuit] = None, hierarchy_tree: Dict[str, List[str]] = None,
+                                             shared_nets_per_subcircuit: Dict[str, List[str]] = None) -> List[str]:
         """Generate code for a subcircuit function with net parameters and internal hierarchy"""
         logger.info(f"🔧 SUBCIRCUIT_PARAMS: Generating parameterized code for {circuit.name}")
         
@@ -744,10 +746,19 @@ class PythonCodeGenerator:
                 code_lines.append("    # Instantiate child circuits")
                 for child_name in children:
                     if child_name in circuits:
-                        # Determine interface nets for the child
-                        # This is a simplified approach - in a full implementation,
-                        # we'd need the net assignments for the child
-                        code_lines.append(f"    {child_name.lower()}_circuit = {child_name.lower()}()")
+                        # Get shared nets for this child circuit
+                        child_shared_nets = shared_nets_per_subcircuit.get(child_name, []) if shared_nets_per_subcircuit else []
+                        if child_shared_nets:
+                            # Pass shared nets as parameters
+                            net_args = []
+                            for net_name in child_shared_nets:
+                                net_var = self._sanitize_variable_name(net_name)
+                                net_args.append(net_var)
+                            args_str = ", ".join(net_args)
+                            code_lines.append(f"    {child_name.lower()}_circuit = {child_name.lower()}({args_str})")
+                        else:
+                            # No shared nets
+                            code_lines.append(f"    {child_name.lower()}_circuit = {child_name.lower()}()")
                 code_lines.append("")
 
         # Add connections (all nets, both shared and local)

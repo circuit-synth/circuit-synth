@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 0968e639-14b7-4669-8430-ba321602185e)
+	(uuid 8a22a303-5437-493a-a922-3cbabe2cd17a)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -381,7 +381,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid aaf0bf3a-e469-4b68-b556-be199cbc98ad)
+		(uuid 1a7b1a1d-4a6a-4c1d-a5b3-4b1ab88e86c1)
 		(property
 			"Reference"
 			"D3"
@@ -427,7 +427,7 @@
 			(project
 				"ESP32_C6_Dev_Board_generated"
 				(path
-					"/75025921-5d6b-455c-996c-52087fc9ba3a/f064e972-e649-4be3-8903-7bbfc3c942e5/89040597-a1f7-4dc1-b385-85dfd959c4ec/3c80951c-9185-4194-bd34-aea1adf8cb84"
+					"/b28d77df-678b-4cf4-a2a6-c7351fd2b6a3/c151a327-f87d-421e-a0f6-6f115dd91a9e/a649a11f-39b0-4bbe-993f-7568e9de78bd/0c93f4b9-24a5-4ef5-b1b3-8ac30069ccf6"
 					(reference D3)
 					(unit 1)
 				)
@@ -440,7 +440,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid ec019b6b-891e-44e3-8666-df284bdbc592)
+		(uuid ef069543-e30a-4e60-9b06-a5d0bd34cb3b)
 		(property
 			"Reference"
 			"R3"
@@ -486,7 +486,7 @@
 			(project
 				"ESP32_C6_Dev_Board_generated"
 				(path
-					"/75025921-5d6b-455c-996c-52087fc9ba3a/f064e972-e649-4be3-8903-7bbfc3c942e5/89040597-a1f7-4dc1-b385-85dfd959c4ec/3c80951c-9185-4194-bd34-aea1adf8cb84"
+					"/b28d77df-678b-4cf4-a2a6-c7351fd2b6a3/c151a327-f87d-421e-a0f6-6f115dd91a9e/a649a11f-39b0-4bbe-993f-7568e9de78bd/0c93f4b9-24a5-4ef5-b1b3-8ac30069ccf6"
 					(reference R3)
 					(unit 1)
 				)
@@ -503,7 +503,7 @@
 			)
 			(justify right)
 		)
-		(uuid d0683c55-6e71-43dd-a43c-f7a85aafa3f5)
+		(uuid 020ae4cd-014c-4983-a0e6-4615ea58ae72)
 	)
 	(hierarchical_label
 		"ESP32_C6_MCU/N$3"
@@ -515,7 +515,7 @@
 			)
 			(justify left)
 		)
-		(uuid d1dc1d48-827c-485c-8478-3aad6217e762)
+		(uuid 3d2a5647-f2b7-4907-8166-e1a94a6c4cc8)
 	)
 	(hierarchical_label
 		"ESP32_C6_MCU/N$3"
@@ -527,7 +527,7 @@
 			)
 			(justify right)
 		)
-		(uuid cdc3c4a5-de10-4a08-864c-26f45d4d12d4)
+		(uuid d84c5a2d-1b87-4fd3-a0ed-ca5260074ddb)
 	)
 	(hierarchical_label
 		LED_CONTROL
@@ -539,7 +539,7 @@
 			)
 			(justify left)
 		)
-		(uuid 02db7ffd-5548-4f35-9133-7082f94b1488)
+		(uuid 9e487dde-c8c9-4d01-b247-1d0c21507a8f)
 	)
 	(text_box
 		"LED_Blinker subcircuit\n    Parameters: GND, LED_CONTROL"
@@ -572,11 +572,11 @@
 			)
 			(justify left top)
 		)
-		(uuid cbb4a6c5-b72a-4df1-bef9-a44574b866aa)
+		(uuid 9de58b60-a20d-4d00-98a8-c05df68bb646)
 	)
 	(sheet_instances
 		(path
-			"/75025921-5d6b-455c-996c-52087fc9ba3a/f064e972-e649-4be3-8903-7bbfc3c942e5/89040597-a1f7-4dc1-b385-85dfd959c4ec/3c80951c-9185-4194-bd34-aea1adf8cb84"
+			"/b28d77df-678b-4cf4-a2a6-c7351fd2b6a3/c151a327-f87d-421e-a0f6-6f115dd91a9e/a649a11f-39b0-4bbe-993f-7568e9de78bd/0c93f4b9-24a5-4ef5-b1b3-8ac30069ccf6"
 			(page "1")
 		)
 	)
