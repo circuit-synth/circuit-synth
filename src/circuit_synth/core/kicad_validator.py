@@ -34,18 +34,28 @@ class KiCadValidator:
             return {
                 "cli": [
                     "/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli",
+                    "/Applications/KiCad.app/Contents/MacOS/kicad-cli",
                     "/usr/local/bin/kicad-cli",
                     "/opt/homebrew/bin/kicad-cli",
+                    "/usr/bin/kicad-cli",
                 ],
                 "symbols": [
                     "/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols",
+                    "/Applications/KiCad.app/Contents/SharedSupport/symbols",
+                    "/Applications/KiCad/KiCad.app/Contents/Resources/share/kicad/symbols",
+                    "/Applications/KiCad.app/Contents/Resources/share/kicad/symbols",
                     "/usr/local/share/kicad/symbols",
                     "/opt/homebrew/share/kicad/symbols",
+                    "/usr/share/kicad/symbols",
                 ],
                 "footprints": [
                     "/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints",
+                    "/Applications/KiCad.app/Contents/SharedSupport/footprints",
+                    "/Applications/KiCad/KiCad.app/Contents/Resources/share/kicad/footprints",
+                    "/Applications/KiCad.app/Contents/Resources/share/kicad/footprints",
                     "/usr/local/share/kicad/footprints",
                     "/opt/homebrew/share/kicad/footprints",
+                    "/usr/share/kicad/footprints",
                 ],
             }
         elif sys.platform.startswith("linux"):  # Linux
@@ -54,16 +64,24 @@ class KiCadValidator:
                     "/usr/bin/kicad-cli",
                     "/usr/local/bin/kicad-cli",
                     "~/.local/bin/kicad-cli",
+                    "/usr/lib/kicad/bin/kicad-cli",
+                    "/var/lib/flatpak/app/org.kicad.KiCad/current/active/files/bin/kicad-cli",
                 ],
                 "symbols": [
                     "/usr/share/kicad/symbols",
                     "/usr/local/share/kicad/symbols",
                     "~/.local/share/kicad/symbols",
+                    "/usr/share/kicad/library/symbols",
+                    "/usr/local/share/kicad/library/symbols",
+                    "/var/lib/flatpak/runtime/org.kicad.KiCad.Library/current/active/files/share/kicad/symbols",
                 ],
                 "footprints": [
                     "/usr/share/kicad/footprints",
                     "/usr/local/share/kicad/footprints",
                     "~/.local/share/kicad/footprints",
+                    "/usr/share/kicad/library/footprints",
+                    "/usr/local/share/kicad/library/footprints",
+                    "/var/lib/flatpak/runtime/org.kicad.KiCad.Library/current/active/files/share/kicad/footprints",
                 ],
             }
         elif sys.platform == "win32":  # Windows
@@ -71,14 +89,23 @@ class KiCadValidator:
                 "cli": [
                     "C:\\Program Files\\KiCad\\8.0\\bin\\kicad-cli.exe",
                     "C:\\Program Files\\KiCad\\bin\\kicad-cli.exe",
+                    "C:\\Program Files\\KiCad\\7.0\\bin\\kicad-cli.exe",
+                    "C:\\Program Files (x86)\\KiCad\\8.0\\bin\\kicad-cli.exe",
+                    "C:\\Program Files (x86)\\KiCad\\bin\\kicad-cli.exe",
                 ],
                 "symbols": [
                     "C:\\Program Files\\KiCad\\8.0\\share\\kicad\\symbols",
                     "C:\\Program Files\\KiCad\\share\\kicad\\symbols",
+                    "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\symbols",
+                    "C:\\Program Files (x86)\\KiCad\\8.0\\share\\kicad\\symbols",
+                    "C:\\Program Files (x86)\\KiCad\\share\\kicad\\symbols",
                 ],
                 "footprints": [
                     "C:\\Program Files\\KiCad\\8.0\\share\\kicad\\footprints",
                     "C:\\Program Files\\KiCad\\share\\kicad\\footprints",
+                    "C:\\Program Files\\KiCad\\7.0\\share\\kicad\\footprints",
+                    "C:\\Program Files (x86)\\KiCad\\8.0\\share\\kicad\\footprints",
+                    "C:\\Program Files (x86)\\KiCad\\share\\kicad\\footprints",
                 ],
             }
         else:

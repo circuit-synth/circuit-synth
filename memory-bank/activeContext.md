@@ -2,7 +2,6 @@
 
 ## 🎯 Current Focus: KiCad-Claude Integration Success & Dependency Optimization ✅ MAJOR SUCCESS
 
-### Current Branch: `develop` (merged from `feature/kicad-smarton-ai-plugin`)
 
 **Status**: 🚀 **MAJOR MILESTONE COMPLETE** - KiCad-Claude integration successfully merged with major performance optimizations
 

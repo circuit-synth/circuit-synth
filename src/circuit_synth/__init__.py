@@ -14,7 +14,7 @@ Or in Python:
     setup_claude_integration()
 """
 
-__version__ = "0.2.1"
+__version__ = "0.3.0"
 
 # Dependency injection imports
 # Exception imports
@@ -73,7 +73,7 @@ from .interfaces import (
 from .kicad.unified_kicad_integration import create_unified_kicad_integration
 
 # Plugin integration
-from .plugins import SmartonAIBridge
+from .plugins import AIDesignBridge
 
 
 # Claude Code integration (optional)
@@ -147,8 +147,6 @@ __all__ = [
     "require_kicad",
     "get_kicad_paths",
     "KiCadValidationError",
-    # Plugin integration
-    "SmartonAIBridge",
     # Claude Code integration
     "setup_claude_integration",
 ]

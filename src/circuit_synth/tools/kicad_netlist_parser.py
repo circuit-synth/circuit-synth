@@ -129,10 +129,15 @@ class KiCadNetlistParser:
                 connections.append((ref, pin))
 
             if connections:  # Only add nets that have connections
-                net = Net(name=net_name, connections=connections)
+                # Clean net name - remove leading slash from hierarchical labels
+                clean_net_name = net_name
+                if clean_net_name.startswith("/"):
+                    clean_net_name = clean_net_name[1:]
+
+                net = Net(name=clean_net_name, connections=connections)
                 nets.append(net)
                 logger.debug(
-                    f"Parsed net: {net_name} with {len(connections)} connections"
+                    f"Parsed net: {clean_net_name} with {len(connections)} connections"
                 )
 
         return nets

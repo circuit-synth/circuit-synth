@@ -29,20 +29,20 @@ try:
 
     RUST_NETLIST_PROCESSOR = RustNetlistProcessor()
     RUST_NETLIST_AVAILABLE = True
-    defensive_logger.info(
-        "🦀 RUST DEFENSIVE SUCCESS: rust_netlist_processor loaded successfully"
+    defensive_logger.debug(
+        "RUST DEFENSIVE SUCCESS: rust_netlist_processor loaded successfully"
     )
-    defensive_logger.info("🦀 RUST DEFENSIVE: RustNetlistProcessor instance created")
+    defensive_logger.debug("RUST DEFENSIVE: RustNetlistProcessor instance created")
 except ImportError as e:
     defensive_logger.warning(
-        f"🦀 RUST DEFENSIVE FALLBACK: rust_netlist_processor not available: {e}"
+        f"RUST DEFENSIVE FALLBACK: rust_netlist_processor not available: {e}"
     )
     # Use the proper KiCad netlist exporter instead of simple fallback
     try:
         from ..kicad.netlist_exporter import convert_json_to_netlist
 
         RUST_NETLIST_AVAILABLE = False
-        defensive_logger.info("🛡️ RUST DEFENSIVE: Using KiCad netlist exporter fallback")
+        defensive_logger.debug("RUST DEFENSIVE: Using KiCad netlist exporter fallback")
 
     except ImportError:
         # Final fallback to simple implementation
@@ -72,25 +72,44 @@ def convert_python_to_rust_format(circuit_data: dict) -> dict:
     To Rust format:
     "nets": {"net_name": {"name": "net_name", "nodes": [...]}}
     """
+    # logger.debug("🔄 DEBUG: convert_python_to_rust_format called")
     rust_data = circuit_data.copy()
 
     # Convert nets format
     python_nets = circuit_data.get("nets", {})
+    # logger.debug(f"🔄 DEBUG: Converting {len(python_nets)} nets from Python to Rust format")
     rust_nets = {}
 
     for net_name, connections in python_nets.items():
+        # logger.debug(f"🔄 DEBUG: Converting net '{net_name}' with {len(connections)} connections")
         # Convert each connection to have proper field names for Rust
         rust_nodes = []
-        for conn in connections:
+        for i, conn in enumerate(connections):
+            # logger.debug(f"🔄 DEBUG: Connection {i}: {conn}")
+            component = conn["component"]
+            pin_info = conn["pin"]
+            pin_type = pin_info["type"]
+            # logger.debug(f"🔄 DEBUG:   Component: {component} (type: {type(component)})")
+            # logger.debug(f"🔄 DEBUG:   Pin type: {pin_type} (type: {type(pin_type)})")
+
+            # Handle PinType enum objects - convert to string
+            if hasattr(pin_type, "value"):
+                pin_type_str = pin_type.value
+                # logger.debug(f"🔄 DEBUG:   Converted PinType enum to string: {pin_type_str}")
+            else:
+                pin_type_str = str(pin_type)
+                # logger.debug(f"🔄 DEBUG:   Using pin type as string: {pin_type_str}")
+
             rust_node = {
-                "component": conn["component"],
+                "component": component,
                 "pin": {
-                    "number": conn["pin"]["number"],
-                    "name": conn["pin"]["name"],
-                    "pin_type": conn["pin"]["type"],  # Convert "type" to "pin_type"
+                    "number": pin_info["number"],
+                    "name": pin_info["name"],
+                    "pin_type": pin_type_str,  # Convert "type" to "pin_type" and ensure it's a string
                 },
                 "original_path": None,
             }
+            # logger.debug(f"🔄 DEBUG:   Created rust_node: {rust_node}")
             rust_nodes.append(rust_node)
 
         # Create full Net object for Rust
@@ -139,20 +158,20 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
     start_time = time.perf_counter()
 
     # Log the attempt
-    defensive_logger.info("🔧 RUST DEFENSIVE START: Attempting netlist generation")
-    defensive_logger.info(
-        f"🔧 RUST DEFENSIVE: Circuit name: {circuit_data.get('name', 'Unknown')}"
+    defensive_logger.debug("RUST DEFENSIVE START: Attempting netlist generation")
+    defensive_logger.debug(
+        f"RUST DEFENSIVE: Circuit name: {circuit_data.get('name', 'Unknown')}"
     )
-    defensive_logger.info(
-        f"🔧 RUST DEFENSIVE: Components count: {len(circuit_data.get('components', {}))}"
+    defensive_logger.debug(
+        f"RUST DEFENSIVE: Components count: {len(circuit_data.get('components', {}))}"
     )
-    defensive_logger.info(
-        f"🔧 RUST DEFENSIVE: Nets count: {len(circuit_data.get('nets', {}))}"
+    defensive_logger.debug(
+        f"RUST DEFENSIVE: Nets count: {len(circuit_data.get('nets', {}))}"
     )
 
     # First try Rust implementation if available
     if RUST_NETLIST_AVAILABLE and RUST_NETLIST_PROCESSOR:
-        defensive_logger.info("🦀 RUST DEFENSIVE: Attempting Rust netlist generation")
+        defensive_logger.debug("RUST DEFENSIVE: Attempting Rust netlist generation")
 
         try:
             # Convert Python format to Rust format, then serialize to JSON
@@ -160,8 +179,8 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
             rust_compatible_data = convert_python_to_rust_format(circuit_data)
             circuit_json = json.dumps(rust_compatible_data, cls=CircuitSynthJSONEncoder)
 
-            defensive_logger.info(
-                f"🦀 RUST DEFENSIVE: JSON serialization completed ({len(circuit_json)} chars)"
+            defensive_logger.debug(
+                f"RUST DEFENSIVE: JSON serialization completed ({len(circuit_json)} chars)"
             )
 
             # Call Rust netlist processor
@@ -170,17 +189,17 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
             rust_duration = time.perf_counter() - rust_start
             total_duration = time.perf_counter() - start_time
 
-            defensive_logger.info(
-                f"✅ RUST DEFENSIVE SUCCESS: Rust netlist generation completed"
+            defensive_logger.debug(
+                f"RUST DEFENSIVE SUCCESS: Rust netlist generation completed"
             )
-            defensive_logger.info(
-                f"✅ RUST DEFENSIVE PERFORMANCE: Rust processing time: {rust_duration:.4f}s"
+            defensive_logger.debug(
+                f"RUST DEFENSIVE PERFORMANCE: Rust processing time: {rust_duration:.4f}s"
             )
-            defensive_logger.info(
-                f"✅ RUST DEFENSIVE PERFORMANCE: Total time: {total_duration:.4f}s"
+            defensive_logger.debug(
+                f"RUST DEFENSIVE PERFORMANCE: Total time: {total_duration:.4f}s"
             )
-            defensive_logger.info(
-                f"✅ RUST DEFENSIVE RESULT: Generated {len(netlist_result)} characters"
+            defensive_logger.debug(
+                f"RUST DEFENSIVE RESULT: Generated {len(netlist_result)} characters"
             )
 
             return netlist_result
@@ -188,16 +207,16 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
         except Exception as e:
             rust_duration = time.perf_counter() - rust_start
             defensive_logger.warning(
-                f"⚠️ RUST DEFENSIVE FALLBACK: Rust netlist generation failed after {rust_duration:.4f}s"
+                f"RUST DEFENSIVE FALLBACK: Rust netlist generation failed after {rust_duration:.4f}s"
             )
-            defensive_logger.warning(f"⚠️ RUST DEFENSIVE ERROR: {type(e).__name__}: {e}")
+            defensive_logger.warning(f"RUST DEFENSIVE ERROR: {type(e).__name__}: {e}")
             defensive_logger.warning(
-                "⚠️ RUST DEFENSIVE: Falling back to Python implementation"
+                "RUST DEFENSIVE: Falling back to Python implementation"
             )
 
     # Python fallback implementation
-    defensive_logger.info(
-        "🐍 RUST DEFENSIVE FALLBACK: Using Python netlist implementation"
+    defensive_logger.debug(
+        "RUST DEFENSIVE FALLBACK: Using Python netlist implementation"
     )
 
     try:
@@ -211,17 +230,17 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
         python_duration = time.perf_counter() - python_start
         total_duration = time.perf_counter() - start_time
 
-        defensive_logger.info(
-            f"✅ RUST DEFENSIVE PYTHON SUCCESS: Python netlist generation completed"
+        defensive_logger.debug(
+            f"RUST DEFENSIVE PYTHON SUCCESS: Python netlist generation completed"
         )
-        defensive_logger.info(
-            f"✅ RUST DEFENSIVE PYTHON PERFORMANCE: Python processing time: {python_duration:.4f}s"
+        defensive_logger.debug(
+            f"RUST DEFENSIVE PYTHON PERFORMANCE: Python processing time: {python_duration:.4f}s"
         )
-        defensive_logger.info(
-            f"✅ RUST DEFENSIVE PYTHON PERFORMANCE: Total time: {total_duration:.4f}s"
+        defensive_logger.debug(
+            f"RUST DEFENSIVE PYTHON PERFORMANCE: Total time: {total_duration:.4f}s"
         )
-        defensive_logger.info(
-            f"✅ RUST DEFENSIVE PYTHON RESULT: Generated {len(netlist_result)} characters"
+        defensive_logger.debug(
+            f"RUST DEFENSIVE PYTHON RESULT: Generated {len(netlist_result)} characters"
         )
 
         return netlist_result
@@ -344,6 +363,12 @@ class NetlistExporter:
         are uniquely identified in a schematic. This is the standardized format
         for the library's intermediate JSON representation.
         """
+
+        logger.debug(f"Starting to_dict() for circuit: {self.circuit.name}")
+        logger.debug(
+            f"Circuit has {len(self.circuit._components)} components and {len(self.circuit._nets)} nets"
+        )
+
         # TODO: Implement UUID generation and source file tracking later
         # For now, use placeholders similar to the initial exporter output
         sheet_tstamps = f"/{self.circuit.name.lower().replace(' ', '-')}-{id(self.circuit)}/"  # Simple placeholder tstamp
@@ -362,31 +387,33 @@ class NetlistExporter:
 
         # 1) Collect all components
         for comp in self.circuit._components.values():
-            data["components"][comp.ref] = comp.to_dict()  # Add using ref as key
+            comp_dict = comp.to_dict()
+            data["components"][comp.ref] = comp_dict  # Add using ref as key
 
         # 2) Gather net usage only from our local components
         #    (including any net that actually comes from a parent)
         net_to_pins = {}
-
         for comp in self.circuit._components.values():
-            for pin_obj in comp._pins.values():
+            for pin_id, pin_obj in comp._pins.items():
                 net_obj = pin_obj.net
                 if net_obj is None:
                     continue
+
                 net_name = net_obj.name
+
                 if net_name not in net_to_pins:
                     net_to_pins[net_name] = []
+
                 # Store full pin details in original Python format
-                net_to_pins[net_name].append(
-                    {
-                        "component": comp.ref,
-                        "pin": {
-                            "number": pin_obj.num,  # Keep "number" for consistency
-                            "name": pin_obj.name,
-                            "type": pin_obj.func,  # Use original "type" field name
-                        },
-                    }
-                )
+                pin_connection = {
+                    "component": comp.ref,
+                    "pin": {
+                        "number": pin_obj.num,  # Keep "number" for consistency
+                        "name": pin_obj.name,
+                        "type": pin_obj.func,  # Use original "type" field name
+                    },
+                }
+                net_to_pins[net_name].append(pin_connection)
 
         # Store them in data["nets"] - keep original Python format for compatibility
         for net_name, pin_list in net_to_pins.items():
@@ -395,7 +422,8 @@ class NetlistExporter:
         # 3) Recursively gather subcircuits
         for sc in self.circuit._subcircuits:
             exporter = NetlistExporter(sc)
-            data["subcircuits"].append(exporter.to_dict())
+            subcircuit_data = exporter.to_dict()
+            data["subcircuits"].append(subcircuit_data)
 
         # 4) Add annotations to JSON data
         for annotation in self.circuit._annotations:
@@ -414,6 +442,12 @@ class NetlistExporter:
         )
         circuit_data = self.to_dict()
         try:
+            # Ensure parent directory exists
+            from pathlib import Path
+
+            output_file = Path(filename)
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+
             with open(filename, "w", encoding="utf-8") as f:
                 json.dump(circuit_data, f, indent=2, cls=CircuitSynthJSONEncoder)
             logger.debug(
@@ -837,7 +871,7 @@ class NetlistExporter:
                 ):
                     removed = len(components_to_preserve)
 
-                print("\n📋 Summary:")
+                print("\nSummary:")
                 print(f"   - Matched: {matched}")
                 if modified > 0:
                     print(f"   - Modified: {modified}")

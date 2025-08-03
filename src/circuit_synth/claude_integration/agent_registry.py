@@ -7,8 +7,42 @@ providing professional circuit design expertise through AI sub-agents.
 
 import json
 import os
+from functools import wraps
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
+
+# Global registry for modern Claude Code agents
+_REGISTERED_AGENTS: Dict[str, Any] = {}
+
+
+def register_agent(agent_name: str) -> Callable:
+    """
+    Decorator to register a Claude Code agent class.
+
+    Usage:
+        @register_agent("contributor")
+        class ContributorAgent:
+            ...
+    """
+
+    def decorator(agent_class: Any) -> Any:
+        _REGISTERED_AGENTS[agent_name] = agent_class
+        return agent_class
+
+    return decorator
+
+
+def get_registered_agents() -> Dict[str, Any]:
+    """Get all registered agents."""
+    return _REGISTERED_AGENTS.copy()
+
+
+def create_agent_instance(agent_name: str) -> Optional[Any]:
+    """Create an instance of a registered agent."""
+    agent_class = _REGISTERED_AGENTS.get(agent_name)
+    if agent_class:
+        return agent_class()
+    return None
 
 
 class CircuitSubAgent:
@@ -53,7 +87,7 @@ def get_circuit_agents() -> Dict[str, CircuitSubAgent]:
     agents = {}
 
     # Single focused agent - circuit-synth specialist
-    agents["circuit-synth"] = CircuitSubAgent(
+    agents["circuit-design/circuit-synth"] = CircuitSubAgent(
         name="circuit-synth",
         description="Circuit-synth code generation and KiCad integration specialist",
         system_prompt="""You are a circuit-synth specialist focused specifically on:
@@ -90,7 +124,7 @@ You excel at taking circuit requirements and immediately generating working circ
     )
 
     # SPICE Simulation Expert
-    agents["simulation-expert"] = CircuitSubAgent(
+    agents["circuit-design/simulation-expert"] = CircuitSubAgent(
         name="simulation-expert",
         description="SPICE simulation and circuit validation specialist",
         system_prompt="""You are a SPICE simulation expert specializing in circuit-synth integration:
@@ -150,14 +184,66 @@ Always provide practical, working circuit-synth code with simulation examples th
 def register_circuit_agents():
     """Register all circuit design agents with Claude Code"""
 
+    # Import agents to trigger registration
+    try:
+        from .agents import contributor_agent  # This triggers @register_agent decorator
+
+        print("✅ Loaded modern agents")
+    except ImportError as e:
+        print(f"⚠️  Could not load modern agents: {e}")
+
     # Get user's Claude config directory
     claude_dir = Path.home() / ".claude" / "agents"
     claude_dir.mkdir(parents=True, exist_ok=True)
 
-    agents = get_circuit_agents()
+    # Get legacy agents (CircuitSubAgent instances)
+    legacy_agents = get_circuit_agents()
 
-    for agent_name, agent in agents.items():
-        agent_file = claude_dir / f"{agent_name}.md"
+    # Get modern registered agents and convert them to agent instances
+    registered_agent_classes = get_registered_agents()
+    modern_agents = {}
+
+    for agent_name, agent_class in registered_agent_classes.items():
+        try:
+            # Create instance and convert to CircuitSubAgent format
+            agent_instance = agent_class()
+
+            # Convert modern agent to legacy format for compatibility
+            # Organize contributor agent in development category
+            organized_name = (
+                f"development/{agent_name}"
+                if agent_name == "contributor"
+                else agent_name
+            )
+            modern_agents[organized_name] = CircuitSubAgent(
+                name=agent_name,
+                description=getattr(
+                    agent_instance, "description", f"{agent_name} agent"
+                ),
+                system_prompt=(
+                    agent_instance.get_system_prompt()
+                    if hasattr(agent_instance, "get_system_prompt")
+                    else ""
+                ),
+                allowed_tools=["*"],  # Modern agents can use all tools
+                expertise_area=getattr(agent_instance, "expertise_area", "General"),
+            )
+            print(f"✅ Converted modern agent: {agent_name}")
+        except Exception as e:
+            print(f"⚠️  Failed to convert agent {agent_name}: {e}")
+
+    # Combine all agents
+    all_agents = {**legacy_agents, **modern_agents}
+
+    for agent_name, agent in all_agents.items():
+        # Handle subdirectory structure
+        if "/" in agent_name:
+            subdir, filename = agent_name.split("/", 1)
+            agent_subdir = claude_dir / subdir
+            agent_subdir.mkdir(exist_ok=True)
+            agent_file = agent_subdir / f"{filename}.md"
+        else:
+            agent_file = claude_dir / f"{agent_name}.md"
 
         # Write agent definition
         with open(agent_file, "w") as f:
@@ -165,7 +251,7 @@ def register_circuit_agents():
 
         print(f"✅ Registered agent: {agent_name}")
 
-    print(f"📋 Registered {len(agents)} circuit design agent")
+    print(f"📋 Registered {len(all_agents)} circuit design agents total")
 
     # Also create project-local agents in current working directory
     current_dir = Path.cwd()
@@ -175,8 +261,16 @@ def register_circuit_agents():
     project_agents_dir.mkdir(parents=True, exist_ok=True)
 
     # Write agents to local project directory
-    for agent_name, agent in agents.items():
-        agent_file = project_agents_dir / f"{agent_name}.md"
+    for agent_name, agent in all_agents.items():
+        # Handle subdirectory structure
+        if "/" in agent_name:
+            subdir, filename = agent_name.split("/", 1)
+            agent_subdir = project_agents_dir / subdir
+            agent_subdir.mkdir(exist_ok=True)
+            agent_file = agent_subdir / f"{filename}.md"
+        else:
+            agent_file = project_agents_dir / f"{agent_name}.md"
+
         with open(agent_file, "w") as f:
             f.write(agent.to_markdown())
 
@@ -186,11 +280,11 @@ def register_circuit_agents():
     mcp_settings = {
         "mcpServers": {},
         "agents": {
-            agent_name: {
+            agent_name.split("/")[-1] if "/" in agent_name else agent_name: {
                 "description": agent.description,
                 "file": f"agents/{agent_name}.md",
             }
-            for agent_name, agent in agents.items()
+            for agent_name, agent in all_agents.items()
         },
     }
 
@@ -208,12 +302,32 @@ def main():
     register_circuit_agents()
     print("\n✅ Agent registration complete!")
     print("\nYou can now use these agents in Claude Code:")
-    agents = get_circuit_agents()
-    for agent_name, agent in agents.items():
+
+    # Show all registered agents (both legacy and modern)
+    try:
+        from .agents import contributor_agent  # Ensure agents are loaded
+    except ImportError:
+        pass
+
+    legacy_agents = get_circuit_agents()
+    modern_agents = get_registered_agents()
+
+    # Show legacy agents
+    for agent_name, agent in legacy_agents.items():
         print(f"  • {agent_name}: {agent.description}")
+
+    # Show modern agents
+    for agent_name, agent_class in modern_agents.items():
+        try:
+            agent_instance = agent_class()
+            description = getattr(agent_instance, "description", f"{agent_name} agent")
+            print(f"  • {agent_name}: {description}")
+        except Exception:
+            print(f"  • {agent_name}: Modern circuit-synth agent")
+
     print("\nExample usage:")
     print(
-        '  @Task(subagent_type="simulation-expert", description="Help with simulation", prompt="...")'
+        '  @Task(subagent_type="contributor", description="Help with contributing", prompt="How do I add a new component example?")'
     )
 
 

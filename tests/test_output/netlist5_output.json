@@ -1993,9 +1993,9 @@
   "duplicate_detection": {
     "templates": {},
     "unique_circuits": [
+      "uSD_Card",
       "power_filter",
       "usb",
-      "uSD_Card",
       "regulator",
       "led",
       "light_sensor"
