@@ -12,7 +12,7 @@ uv tool install circuit-synth
 
 # Create new PCB project
 uv run cs-new-pcb "ESP32 Sensor Board"
-cd esp32-sensor-board/circuit-synth && uv run python main.py
+cd esp32-sensor-board/circuit-synth && uv run circuit-synth/main.py
 
 # Or add to existing KiCad project
 uv run cs-init-pcb existing_kicad_project_dir
