@@ -12,6 +12,9 @@
 - `--output-dir=repo-review` - Directory for review outputs (default: repo-review)
 - `--run-examples=true` - Test all examples (default: true)
 - `--check-security=true` - Security scanning (default: true)
+- `--format=true` - Auto-format code before analysis (default: true)
+- `--generate-fixes=false` - Generate automated fix suggestions (default: false)
+- `--website-check=true` - Validate circuit-synth.com content accuracy (default: true)
 
 ## What This Does
 
