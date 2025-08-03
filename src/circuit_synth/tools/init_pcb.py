@@ -35,22 +35,66 @@ def find_kicad_files(directory: Path) -> dict:
     """Find KiCad files in directory."""
     kicad_files = {
         'project': None,
-        'schematic': None,
-        'pcb': None
+        'schematic': [],
+        'pcb': None,
+        'netlist': [],
+        'other': []
     }
     
     for file in directory.iterdir():
         if file.suffix == '.kicad_pro':
             kicad_files['project'] = file
         elif file.suffix == '.kicad_sch':
-            kicad_files['schematic'] = file
+            kicad_files['schematic'].append(file)
         elif file.suffix == '.kicad_pcb':
             kicad_files['pcb'] = file
+        elif file.suffix == '.net':
+            kicad_files['netlist'].append(file)
+        elif file.suffix in ['.json', '.bak']:  # Other KiCad-related files
+            kicad_files['other'].append(file)
     
     return kicad_files
 
 
-def create_circuit_synth_structure(project_path: Path, project_name: str) -> None:
+def organize_kicad_files(project_path: Path, kicad_files: dict) -> dict:
+    """Move KiCad files to organized kicad/ directory."""
+    
+    # Create kicad directory
+    kicad_dir = project_path / "kicad"
+    kicad_dir.mkdir(exist_ok=True)
+    
+    new_locations = {
+        'project': None,
+        'schematic': [],
+        'pcb': None,
+        'netlist': [],
+        'other': []
+    }
+    
+    # Move files to kicad/ directory
+    for file_type, files in kicad_files.items():
+        if file_type == 'project' and files:
+            new_path = kicad_dir / files.name
+            if not new_path.exists():
+                shutil.move(str(files), str(new_path))
+            new_locations['project'] = new_path
+        elif file_type in ['schematic', 'netlist', 'other'] and files:
+            for file in files:
+                new_path = kicad_dir / file.name
+                if not new_path.exists():
+                    shutil.move(str(file), str(new_path))
+                new_locations[file_type].append(new_path)
+        elif file_type == 'pcb' and files:
+            new_path = kicad_dir / files.name
+            if not new_path.exists():
+                shutil.move(str(files), str(new_path))
+            new_locations['pcb'] = new_path
+    
+    console.print("✅ Organized KiCad files into kicad/ directory", style="green")
+    return new_locations
+
+
+def create_circuit_synth_structure(project_path: Path, project_name: str, kicad_dir: str = "kicad") -> None:
     """Create circuit-synth directory structure."""
     
     # Create circuit-synth directory
@@ -97,11 +141,12 @@ if __name__ == "__main__":
     # Generate the circuit
     circuit = {project_name.lower().replace(' ', '_').replace('-', '_')}_circuit()
     
-    # Generate KiCad project (updates existing files)
-    circuit.generate_kicad_project("{project_name.replace(' ', '_')}")
+    # Generate KiCad project (updates existing files in kicad/ directory)
+    circuit.generate_kicad_project("{project_name.replace(' ', '_')}", output_dir="../{kicad_dir}")
     
     print("✅ {project_name} circuit-synth integration complete!")
     print("📁 Edit circuit-synth/main.py to add your components")
+    print("📁 KiCad files are organized in {kicad_dir}/ directory")
     print("📖 See README.md for next steps")
 '''
     
@@ -236,7 +281,7 @@ Automatically update memory-bank files in ./memory-bank/:
 
 - **PCB**: {project_name}
 - **Circuit Files**: ./circuit-synth/
-- **KiCad Files**: ./{project_name.replace(' ', '_')}.kicad_sch, ./{project_name.replace(' ', '_')}.kicad_pcb
+- **KiCad Files**: ./kicad/ (organized in separate directory)
 - **Memory-Bank**: ./memory-bank/
 
 ## Existing Project Integration
@@ -276,11 +321,15 @@ def create_readme(project_path: Path, project_name: str, kicad_files: dict) -> N
     
     kicad_file_list = []
     if kicad_files['project']:
-        kicad_file_list.append(f"├── {kicad_files['project'].name}     # KiCad project")
-    if kicad_files['schematic']:
-        kicad_file_list.append(f"├── {kicad_files['schematic'].name}   # KiCad schematic")
+        kicad_file_list.append(f"│   ├── {kicad_files['project'].name}     # KiCad project")
+    for schematic in kicad_files['schematic']:
+        kicad_file_list.append(f"│   ├── {schematic.name}   # KiCad schematic")
     if kicad_files['pcb']:
-        kicad_file_list.append(f"├── {kicad_files['pcb'].name}        # KiCad PCB")
+        kicad_file_list.append(f"│   ├── {kicad_files['pcb'].name}        # KiCad PCB")
+    for netlist in kicad_files['netlist']:
+        kicad_file_list.append(f"│   ├── {netlist.name}             # KiCad netlist")
+    for other in kicad_files['other']:
+        kicad_file_list.append(f"│   ├── {other.name}             # KiCad misc")
     
     readme_content = f"""# {project_name}
 
@@ -300,6 +349,7 @@ cd circuit-synth && uv run python main.py
 
 ```
 {project_name.lower().replace(' ', '-')}/
+├── kicad/             # KiCad design files
 {''.join(kicad_file_list)}
 ├── circuit-synth/     # Python circuit files
 ├── memory-bank/       # Automatic documentation
@@ -380,17 +430,27 @@ def main(project_path: str):
     
     # Show found files
     console.print("📁 Found KiCad files:", style="green")
-    for file_type, file_path in kicad_files.items():
-        if file_path:
-            console.print(f"   ✓ {file_type}: {file_path.name}", style="green")
-        else:
-            console.print(f"   - {file_type}: not found", style="dim")
+    if kicad_files['project']:
+        console.print(f"   ✓ project: {kicad_files['project'].name}", style="green")
+    else:
+        console.print(f"   - project: not found", style="dim")
+    
+    if kicad_files['schematic']:
+        for sch in kicad_files['schematic']:
+            console.print(f"   ✓ schematic: {sch.name}", style="green")
+    else:
+        console.print(f"   - schematic: not found", style="dim")
+    
+    if kicad_files['pcb']:
+        console.print(f"   ✓ pcb: {kicad_files['pcb'].name}", style="green")
+    else:
+        console.print(f"   - pcb: not found", style="dim")
     
     # Get project name
     if kicad_files['project']:
         project_name = kicad_files['project'].stem
     elif kicad_files['schematic']:
-        project_name = kicad_files['schematic'].stem
+        project_name = kicad_files['schematic'][0].stem
     else:
         project_name = project_dir.name
     
@@ -407,6 +467,10 @@ def main(project_path: str):
     console.print("\n🏗️  Setting up circuit-synth integration...", style="yellow")
     
     try:
+        # Organize KiCad files first
+        console.print("\n📁 Organizing KiCad files...", style="yellow")
+        organized_kicad_files = organize_kicad_files(project_dir, kicad_files)
+        
         # Create circuit-synth structure
         create_circuit_synth_structure(project_dir, project_name)
         
@@ -420,7 +484,7 @@ def main(project_path: str):
         
         # Create README
         console.print("\n📚 Creating documentation...", style="yellow")
-        create_readme(project_dir, project_name, kicad_files)
+        create_readme(project_dir, project_name, organized_kicad_files)
         
         # Success message
         console.print(
@@ -431,7 +495,8 @@ def main(project_path: str):
                 + Text(f"\n   1. Edit circuit-synth/main.py to define your circuit")
                 + Text(f"\n   2. Run: cd circuit-synth && uv run python main.py")
                 + Text(f"\n   3. See README.md for integration strategies")
-                + Text(f"\n\n🧠 Memory-bank: Automatic documentation enabled")
+                + Text(f"\n\n📁 KiCad files: Organized in kicad/ directory")
+                + Text(f"\n🧠 Memory-bank: Automatic documentation enabled")
                 + Text(f"\n🤖 AI Agent: PCB-specific Claude assistant configured"),
                 title="🎉 Success!",
                 style="green",
