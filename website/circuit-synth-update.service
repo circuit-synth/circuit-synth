@@ -1,0 +1,13 @@
+[Unit]
+Description=Update Circuit-Synth website from GitHub
+After=network.target
+
+[Service]
+Type=oneshot
+User=www-data
+WorkingDirectory=/var/www/circuit-synth
+ExecStart=/usr/bin/git pull origin main
+ExecStartPost=/bin/bash -c 'cp -r website/*.html website/*.css /var/www/circuit-synth/ 2>/dev/null || echo "No HTML/CSS files to copy"'
+ExecStartPost=/usr/bin/systemctl reload nginx
+StandardOutput=journal
+StandardError=journal
