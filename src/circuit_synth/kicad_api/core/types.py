@@ -320,6 +320,9 @@ class Schematic:
     revision: str = ""
     company: str = ""
     comment: str = ""
+    
+    # Project name for instance generation
+    project_name: str = ""
 
     components: List[SchematicSymbol] = field(default_factory=list)
     wires: List[Wire] = field(default_factory=list)

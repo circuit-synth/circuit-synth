@@ -104,7 +104,7 @@ class SymbolLibraryCache:
         """Add a path to search for symbol libraries."""
         if path not in self._library_paths:
             self._library_paths.append(path)
-            logger.info(f"Added library path: {path}")
+            # logger.info(f"Added library path: {path}")
 
     def get_symbol(self, lib_id: str) -> Optional[SymbolDefinition]:
         """

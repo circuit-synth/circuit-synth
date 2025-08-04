@@ -300,6 +300,11 @@ class SExpressionParser:
         # Special case: symbol expressions in lib_symbols should format their ID on same line
         is_symbol_expr = tag_name == "symbol"
         is_symbol_in_lib_symbols = is_symbol_expr and in_lib_symbols and len(sexp) >= 2
+        
+        # Special case: property expressions should format like (property "Reference" "R1"
+        # on the first line, then nested elements on subsequent lines
+        is_property_expr = tag_name == "property"
+        
         is_simple = (
             len(sexp) <= 4
             and all(not isinstance(item, list) for item in sexp)
@@ -458,6 +463,27 @@ class SExpressionParser:
                             indent + 1,
                             tag_name,
                             in_lib_symbols=in_lib_symbols,
+                            in_instances=in_instances,
+                        )
+                    )
+                result += "\n" + "\t" * indent + ")"
+                return result
+            
+            # Special handling for property expressions - format like (property "Reference" "R1"
+            if is_property_expr and len(sexp) >= 3:
+                # Format property tag, name and value on same line
+                result = "(" + str(sexp[0])  # property tag
+                result += ' "' + str(sexp[1]) + '"'  # property name (e.g., "Reference")
+                result += ' "' + str(sexp[2]) + '"'  # property value (e.g., "R1")
+                # Rest of content (like position, effects) on new lines
+                for i in range(3, len(sexp)):
+                    result += (
+                        "\n"
+                        + "\t" * (indent + 1)
+                        + self._format_sexp(
+                            sexp[i],
+                            indent + 1,
+                            tag_name,
                             in_instances=in_instances,
                         )
                     )
@@ -760,16 +786,11 @@ class SExpressionParser:
             sexp.append(self._text_to_sexp(text))
 
         # Add sheet_instances only once
-
-        # Determine the path to write
-        if hasattr(schematic, "hierarchical_path") and schematic.hierarchical_path:
-            path_str = "/" + "/".join(schematic.hierarchical_path)
-        else:
-            path_str = "/"
-
+        # For root sheet, always use "/" path
+        # Sub-sheets would use hierarchical path
         sheet_instances = [
             sexpdata.Symbol("sheet_instances"),
-            [sexpdata.Symbol("path"), path_str, [sexpdata.Symbol("page"), "1"]],
+            [sexpdata.Symbol("path"), "/", [sexpdata.Symbol("page"), "1"]],
         ]
         sexp.append(sheet_instances)
 

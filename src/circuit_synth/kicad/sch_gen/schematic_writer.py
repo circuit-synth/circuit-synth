@@ -241,6 +241,7 @@ class SchematicWriter:
             title=circuit.name,
             date=datetime.datetime.now().strftime("%Y-%m-%d"),
             company="Circuit-Synth",
+            project_name=self.project_name,  # Pass project name for component instances
             hierarchical_path=self.hierarchical_path,  # Pass hierarchical path for sheet_instances
         )
 
@@ -349,9 +350,9 @@ class SchematicWriter:
         self._add_symbol_definitions(schematic_sexpr)
         libsym_time = time.perf_counter() - libsym_start
 
-        # Add sheet_instances section
+        # Skip adding sheet_instances - parser.from_schematic() already adds it
+        # self._add_sheet_instances(schematic_sexpr)
         sheetinst_start = time.perf_counter()
-        self._add_sheet_instances(schematic_sexpr)
         sheetinst_time = time.perf_counter() - sheetinst_start
 
         sections_time = time.perf_counter() - sections_start
@@ -490,24 +491,13 @@ class SchematicWriter:
                     instance_path = "/"
                     logger.debug(f"  Creating ROOT SHEET instance with path: /")
 
-                # Create the instance
-                instance = SymbolInstance(
-                    project=self.project_name,
-                    path=instance_path,
-                    reference=new_ref,
-                    unit=comp.unit,
-                )
-                api_component.instances.append(instance)
-
-                logger.debug(f"  Instance created:")
-                logger.debug(f"    - Project: {instance.project}")
-                logger.debug(f"    - Path: {instance.path}")
-                logger.debug(f"    - Reference: {instance.reference}")
-                logger.debug(f"    - Unit: {instance.unit}")
-                logger.debug(
-                    f"  Total instances on component: {len(api_component.instances)}"
-                )
-                logger.debug(f"=== END INSTANCE CREATION FOR {new_ref} ===")
+                # Skip creating duplicate instance - ComponentManager already added one
+                # with the correct project name from self.schematic.project_name
+                logger.debug(f"  Skipping duplicate instance creation - ComponentManager already added instance")
+                logger.debug(f"  Existing instances on component: {len(api_component.instances)}")
+                for idx, inst in enumerate(api_component.instances):
+                    logger.debug(f"    Instance {idx}: project={inst.project}, path={inst.path}, ref={inst.reference}")
+                logger.debug(f"=== END INSTANCE CHECK FOR {new_ref} ===")
 
                 logger.debug(
                     f"Added component {new_ref} ({comp.lib_id}) at ({comp.position.x}, {comp.position.y})"
