@@ -7,51 +7,26 @@ Generate professional KiCad projects from Python code with hierarchical design, 
 ## 🚀 Getting Started
 
 ```bash
-# Install circuit-synth
-uv tool install circuit-synth
+# Install uv (if not already installed)  
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Create new PCB project
-uv run cs-new-pcb "ESP32 Sensor Board"
-cd esp32-sensor-board/circuit-synth && uv run circuit-synth/main.py
+# Create new project
+uv init my_circuit_project
+cd my_circuit_project
 
-# Or add to existing KiCad project
-uv run cs-init-pcb existing_kicad_project_dir
+# Add circuit-synth
+uv add circuit-synth
+
+# Setup complete project template
+uv run cs-new-project
+
+# Generate complete KiCad project  
+uv run python circuit-synth/main.py
 ```
 
-## ⚡ Performance Optimization (Optional)
+This creates an ESP32-C6 development board with USB-C, power regulation, programming interface, and status LED.
 
-Circuit-synth includes optional Rust modules for improved performance. The package works perfectly without them, using Python fallbacks.
-
-**To enable Rust acceleration for faster PCB placement and netlist processing:**
-
-```bash
-# Install development tools
-pip install maturin
-
-# Build Rust modules (in circuit-synth development directory)
-./scripts/build_rust_modules.sh
-
-# Or build individual modules:
-cd rust_modules/rust_netlist_processor && maturin develop --release
-cd rust_modules/rust_force_directed_placement && maturin develop --release
-```
-
-**Note**: Rust modules are not required for normal operation. Circuit-synth automatically falls back to Python implementations if Rust modules are unavailable.
-
-## 📋 Project Structure
-
-```
-esp32-sensor-board/
-├── circuit-synth/main.py       # Python circuit definition
-├── kicad/                      # Generated KiCad files
-├── memory-bank/                # AI documentation system
-│   ├── decisions.md            # Design rationale
-│   ├── fabrication.md          # PCB notes
-│   └── testing.md              # Validation results
-└── .claude/                    # AI assistant config
-```
-
-## 💡 Example
+## 💡 Quick Example
 
 ```python
 from circuit_synth import *
@@ -65,7 +40,7 @@ def usb_to_3v3():
     vcc_3v3_out = Net('VCC_3V3_OUT') 
     gnd = Net('GND')
     
-    # Components
+    # Components with KiCad integration
     regulator = Component(
         symbol="Regulator_Linear:AMS1117-3.3", 
         ref="U",
@@ -75,7 +50,7 @@ def usb_to_3v3():
     cap_in = Component(symbol="Device:C", ref="C", value="10uF")
     cap_out = Component(symbol="Device:C", ref="C", value="22uF")
     
-    # Connections
+    # Explicit connections
     regulator["VI"] += vbus_in
     regulator["VO"] += vcc_3v3_out
     regulator["GND"] += gnd
@@ -90,157 +65,85 @@ circuit = usb_to_3v3()
 circuit.generate_kicad_project("power_supply")
 ```
 
-## 🔧 Features
+## 🔧 Core Features
 
-- **KiCad Integration**: Generate professional .kicad_pro, .kicad_sch, .kicad_pcb files
+- **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files
 - **Hierarchical Design**: Modular subcircuits like software modules  
 - **Component Intelligence**: JLCPCB integration, symbol/footprint verification
-- **AI Acceleration**: Claude Code integration for automated design
-- **Version Control**: Git-friendly Python files vs binary KiCad
+- **AI Integration**: Claude Code agents for automated design assistance
+- **Version Control Friendly**: Git-trackable Python files vs binary KiCad files
 
-## 🔧 Advanced Features
+## 🤖 AI-Powered Design
 
-### **🏗️ Hierarchical Design**
-- **Modular Subcircuits**: Each function in its own file (like software modules)
-- **Clear Interfaces**: Explicit net definitions - no hidden dependencies
-- **Reusable Circuits**: USB ports, power supplies, debug interfaces work across projects
-- **Version Control**: Git-friendly Python files vs binary KiCad files
-
-### **🤖 AI Acceleration with Built-in Quality Assurance**
-**Work with Claude Code to describe circuits and get production-ready, validated results:**
-
-```
-👤 "Design ESP32 IoT sensor with LoRaWAN, solar charging, and environmental sensors"
-
-🤖 Claude (using circuit-synth):
-   ✅ Searches components with JLCPCB availability
-   ✅ Generates hierarchical Python circuits
-   ✅ Validates syntax, imports, and runtime execution
-   ✅ Auto-fixes common issues and provides quality reports
-   ✅ Creates complete KiCad project with proper sheets
-   ✅ Includes simulation validation and alternatives
-```
-
-### **🔍 Component Intelligence**
-- **Smart Search**: Find components by function, package, availability
-- **JLCPCB Integration**: Real-time stock levels and pricing
-- **Symbol/Footprint Verification**: No more "symbol not found" errors
-- **Manufacturing Ready**: Components verified for automated assembly
-
-### **✅ Circuit Validation & Quality Assurance**
-```python
-from circuit_synth.validation import validate_and_improve_circuit, get_circuit_design_context
-
-# Automatic validation and fixing
-code, is_valid, status = validate_and_improve_circuit(circuit_code)
-print(f"Validation: {status}")  # ✅ Circuit code validated successfully
-
-# Context-aware generation assistance
-context = get_circuit_design_context("esp32")  # Power, USB, analog contexts available
-```
-
-**Claude Code Integration:**
-```bash
-# Generate validated circuits directly
-/generate-validated-circuit "ESP32 with USB-C power" mcu
-
-# Validate existing code
-/validate-existing-circuit
-```
-
-### **⚙️ Automated SPICE Simulation**
-```python
-# One-click simulation setup
-circuit = my_circuit()
-sim = circuit.simulator()
-result = sim.operating_point()
-print(f"Output voltage: {result.get_voltage('VOUT'):.3f}V")
-```
-
-## 🧠 Memory-Bank Documentation System
-
-Automatic engineering documentation that tracks decisions across sessions:
+Work with Claude Code to describe circuits and get production-ready results:
 
 ```bash
-# AI agent automatically documents design decisions
-git commit -m "Add voltage regulator"  # → Updates decisions.md, timeline.md
+# AI agent commands (with Claude Code)
+/find-symbol STM32                    # Search KiCad symbols
+/find-footprint LQFP64                # Find footprints  
+/generate-validated-circuit "ESP32 IoT sensor" mcu
 ```
 
-**Files automatically maintained:**
-- `decisions.md` - Component choices and rationale
-- `fabrication.md` - PCB notes and assembly
-- `testing.md` - Validation results
-- `timeline.md` - Development progress
+## 📋 Project Structure
+
+```
+my_circuit_project/
+├── circuit-synth/
+│   ├── main.py              # Main circuit definition
+│   ├── power_supply.py      # Modular subcircuits
+│   ├── usb.py
+│   └── esp32c6.py
+├── MyProject/               # Generated KiCad files
+│   ├── MyProject.kicad_pro
+│   ├── MyProject.kicad_sch
+│   └── MyProject.kicad_pcb
+├── memory-bank/             # Auto-documentation
+└── .claude/                 # AI agent config
+```
+
+## ⚡ Performance (Optional)
+
+Circuit-synth includes optional Rust acceleration modules. The package works perfectly without them using Python fallbacks.
+
+**To enable Rust acceleration:**
+
+```bash
+# For developers who want maximum performance
+pip install maturin
+./scripts/build_rust_modules.sh
+```
 
 ## 🚀 Commands
 
 ```bash
-# PCB Projects
-cs-new-pcb "My Sensor Board"           # Create new PCB project
-cs-init-pcb /path/to/project           # Add to existing KiCad project
+# Project creation
+cs-new-project              # Complete project setup
+cs-new-pcb "Board Name"     # PCB-focused project
 
-# Development
-cd circuit-synth && uv run python main.py  # Generate KiCad files
-/find-symbol STM32                         # Search symbols (Claude Code)
-/jlc-search "voltage regulator"            # Find JLCPCB parts (Claude Code)
+# Development  
+cd circuit-synth && uv run python main.py    # Generate KiCad files
 ```
 
-## 🏭 Professional Workflow Benefits
+## 🏭 Why Circuit-Synth?
 
 | Traditional EE Workflow | With Circuit-Synth |
 |-------------------------|-------------------|
 | Manual component placement | `python main.py` → Complete project |
-| Hunt through symbol libraries | Verified components with availability |
+| Hunt through symbol libraries | Verified components with JLCPCB availability |
 | Visual net verification | Explicit Python connections |
-| Manual syntax/import checking | Automatic validation and fixing |
-| Difficult design versioning | Git-friendly Python files |
-| Manual SPICE netlist creation | One-line simulation setup |
-| Copy-paste circuit blocks | Reusable subcircuit modules |
-| Lost design knowledge | Automatic memory-bank documentation |
+| Binary KiCad files | Git-friendly Python source |
+| Documentation drift | Automated engineering docs |
 
-## 🤖 Organized AI Agent System
+## 📚 Learn More
 
-Each generated project includes a complete organized AI assistant environment:
-
-### **Agent Categories:**
-- **Circuit Design**: circuit-architect, circuit-synth, simulation-expert
-- **Development**: circuit_generation_agent, contributor, first_setup_agent  
-- **Manufacturing**: component-guru, jlc-parts-finder, stm32-mcu-finder
-
-### **Command Categories:**
-- **Circuit Design**: analyze-design, find-footprint, find-symbol, validate-existing-circuit
-- **Development**: dev-run-tests, dev-update-and-commit, dev-review-branch
-- **Manufacturing**: find-mcu, find_stm32
-- **Setup**: setup-kicad-plugins, setup_circuit_synth
-
-### 🧠 Critical: AI Agent Memory-Bank Usage
-
-**The AI agent MUST use memory-bank extensively for:**
-1. **Planning**: Document requirements and constraints
-2. **Implementation**: Record component choices and rationale
-3. **Testing**: Track validation results
-4. **Context**: Maintain persistent knowledge across sessions
+- **Website**: [circuit-synth.com](https://www.circuit-synth.com)
+- **Documentation**: [docs.circuit-synth.com](https://docs.circuit-synth.com)
+- **Examples**: [github.com/circuit-synth/examples](https://github.com/circuit-synth/examples)
 
 ## 🤝 Contributing
 
-```bash
-# Setup
-git clone https://github.com/circuit-synth/circuit-synth.git
-cd circuit-synth && uv sync
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
-# Register AI agents (Claude Code)
-uv run register-agents
+---
 
-# Test PCB workflow
-cs-new-pcb "Test Board"
-cd test-board/circuit-synth && uv run python main.py
-```
-
-**Resources:**
-- [Contributors/README.md](Contributors/README.md) - Setup guide
-- [CLAUDE.md](CLAUDE.md) - Development commands
-
-## 📖 Support
-
-- [Documentation](https://circuit-synth.readthedocs.io)
-- [GitHub Issues](https://github.com/circuit-synth/circuit-synth/issues)
+⚡ **Professional PCB Design, Programmatically** ⚡
