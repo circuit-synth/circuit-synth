@@ -84,7 +84,8 @@ try:
     )
 
     _rust_status = get_acceleration_status()
-    _RUST_COMPONENT_ACCELERATION = _rust_status["rust_available"]
+    # DISABLE FOR DEBUGGING
+    _RUST_COMPONENT_ACCELERATION = False  # _rust_status["rust_available"]
 
     if _RUST_COMPONENT_ACCELERATION:
         logging.getLogger(__name__).info(
@@ -216,6 +217,7 @@ class SchematicWriter:
         hierarchical_path: list = None,
         reference_manager: IntegratedReferenceManager = None,
         draw_bounding_boxes: bool = False,
+        uuid: str = None,
     ):
         """
         :param circuit: The Circuit object (subcircuit or top-level) to be written.
@@ -225,11 +227,12 @@ class SchematicWriter:
         :param project_name: The actual KiCad project name (for instances block)
         :param hierarchical_path: List of UUIDs representing the full path from root
         :param reference_manager: Optional shared reference manager for global uniqueness
+        :param uuid: Optional UUID for the schematic (if not provided, generates a new one)
         """
         self.circuit = circuit
         self.all_subcircuits = circuit_dict
         self.instance_naming_map = instance_naming_map
-        self.uuid_top = str(uuid_module.uuid4())
+        self.uuid_top = uuid if uuid else str(uuid_module.uuid4())
         self.paper_size = paper_size
         self.project_name = project_name or circuit.name
         self.hierarchical_path = hierarchical_path or []
@@ -533,9 +536,9 @@ class SchematicWriter:
                         f"  Creating SUB-SHEET instance with path: {instance_path}"
                     )
                 else:
-                    # Root sheet - just "/"
-                    instance_path = "/"
-                    logger.debug(f"  Creating ROOT SHEET instance with path: /")
+                    # Root sheet - use schematic UUID in path
+                    instance_path = f"/{self.schematic.uuid}"
+                    logger.debug(f"  Creating ROOT SHEET instance with path: {instance_path}")
 
                 # Clear any existing instances that might have been added by component_manager
                 # We need to control the project name ourselves

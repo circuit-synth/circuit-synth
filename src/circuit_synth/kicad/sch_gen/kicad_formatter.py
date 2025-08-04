@@ -49,13 +49,11 @@ try:
     import_time = time.perf_counter() - import_start
 
     if is_rust_available():
-        _RUST_SEXP_AVAILABLE = True
-        _rust_sexp_module = True
+        # DISABLE RUST to test Python formatting fixes
+        _RUST_SEXP_AVAILABLE = False
+        _rust_sexp_module = None
         logging.getLogger(__name__).info(
-            f"🦀 RUST_INTEGRATION: ✅ RUST S-EXPRESSION MODULE LOADED in {import_time*1000:.2f}ms for KiCad formatter"
-        )
-        logging.getLogger(__name__).info(
-            f"🚀 RUST_INTEGRATION: Expected 6x performance improvement for S-expression generation"
+            f"🦀 RUST_INTEGRATION: DISABLED FOR DEBUGGING - using Python fallback"
         )
     else:
         logging.getLogger(__name__).info(

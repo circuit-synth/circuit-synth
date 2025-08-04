@@ -192,7 +192,13 @@ class SExpressionParser:
                     return '"' + escaped + '"'
                 # Reference values must always be quoted (when inside instances)
                 if in_reference:
-                    return '"' + sexp + '"'
+                    logging.debug(f"DEBUG: in_reference=True, sexp='{sexp}', in_instances={in_instances}")
+                    if in_instances:
+                        logging.debug(f"DEBUG: Quoting reference value: '{sexp}' -> '\"{sexp}\"' (inside instances)")
+                        return '"' + sexp + '"'
+                    else:
+                        logging.debug(f"DEBUG: NOT quoting reference value: '{sexp}' (not inside instances)")
+                        return sexp
                 # Quote strings if they contain spaces or special characters
                 if " " in sexp or "\n" in sexp or '"' in sexp or "/" in sexp:
                     # Properly escape newlines and quotes for KiCad format
@@ -255,6 +261,11 @@ class SExpressionParser:
         is_project_expr = tag_name == "project"
         # Check if this is an instances expression
         is_instances_expr = tag_name == "instances"
+        
+        # Debug logging for instances blocks
+        if is_instances_expr:
+            logging.debug(f"DEBUG: Found instances block - sexp: {sexp[:2]}...")
+            logging.debug(f"DEBUG: Will pass in_instances=True to child expressions")
         # Check if this is a page expression
         is_page_expr = tag_name == "page"
         # Check if this is a property expression
@@ -273,6 +284,12 @@ class SExpressionParser:
         is_lib_id_expr = tag_name == "lib_id"
         # Check if this is a reference expression
         is_reference_expr = tag_name == "reference"
+        # Check if this is a path expression
+        is_path_expr = tag_name == "path"
+        
+        # Add debug logging for instances-related formatting
+        if in_instances and (is_reference_expr or is_project_expr or is_path_expr):
+            logging.debug(f"DEBUG: Formatting in instances - tag: {tag_name}, sexp: {sexp}, in_instances: {in_instances}")
 
         if is_simple:
             # Format on one line
@@ -301,6 +318,7 @@ class SExpressionParser:
                     )
                 elif is_instances_expr:
                     # Inside instances, pass the flag down
+                    logging.debug(f"DEBUG: Processing item in instances block: {item}")
                     parts.append(
                         self._format_sexp(item, indent, tag_name, in_instances=True)
                     )
@@ -392,6 +410,7 @@ class SExpressionParser:
                     )
                 elif is_reference_expr and i == 1:
                     # For reference expressions, the value at index 1 should be quoted (when inside instances)
+                    logging.debug(f"DEBUG: Processing reference value at index {i}: {item}, in_instances={in_instances}")
                     parts.append(
                         self._format_sexp(
                             item,
@@ -442,6 +461,71 @@ class SExpressionParser:
                 # Rest of content (at, effects) on new lines
                 if len(sexp) > 3:
                     for i in range(3, len(sexp)):
+                        result += (
+                            "\n"
+                            + "\t" * (indent + 1)
+                            + self._format_sexp(
+                                sexp[i],
+                                indent + 1,
+                                tag_name,
+                                in_instances=in_instances,
+                            )
+                        )
+                    result += "\n" + "\t" * indent + ")"
+                else:
+                    result += ")"
+                return result
+            
+            # Special handling for project expressions - keep project name on same line
+            if is_project_expr and len(sexp) >= 2:
+                # Format (project "name" on same line, rest on new lines
+                result = "(" + str(sexp[0]) + " "  # project tag
+                # Project name (might be empty string)
+                if in_instances and isinstance(sexp[1], str):
+                    result += '"' + str(sexp[1]) + '"'
+                else:
+                    result += self._format_sexp(
+                        sexp[1],
+                        indent,
+                        tag_name,
+                        in_project=True,
+                        in_instances=in_instances,
+                    )
+                # Rest of content on new lines
+                if len(sexp) > 2:
+                    for i in range(2, len(sexp)):
+                        result += (
+                            "\n"
+                            + "\t" * (indent + 1)
+                            + self._format_sexp(
+                                sexp[i],
+                                indent + 1,
+                                tag_name,
+                                in_instances=in_instances,
+                            )
+                        )
+                    result += "\n" + "\t" * indent + ")"
+                else:
+                    result += ")"
+                return result
+            
+            # Special handling for path expressions - keep path value on same line
+            if is_path_expr and len(sexp) >= 2:
+                # Format (path "/uuid" on same line, rest on new lines
+                result = "(" + str(sexp[0]) + " "  # path tag
+                # Path value should be quoted if it's a string
+                if isinstance(sexp[1], str):
+                    result += '"' + str(sexp[1]) + '"'
+                else:
+                    result += self._format_sexp(
+                        sexp[1],
+                        indent,
+                        tag_name,
+                        in_instances=in_instances,
+                    )
+                # Rest of content on new lines
+                if len(sexp) > 2:
+                    for i in range(2, len(sexp)):
                         result += (
                             "\n"
                             + "\t" * (indent + 1)
@@ -1255,7 +1339,8 @@ class SExpressionParser:
                         ],
                     ]
                     instances_sexp.append(project_block)
-                    logger.debug(f"    Instance block created")
+                    logger.debug(f"    Instance block created: {project_block}")
+                    logger.debug(f"    Project name type: {type(project_name)}, value: '{project_name}'")
 
             sexp.append(instances_sexp)
             logger.debug(f"  Instances S-expression added to symbol")

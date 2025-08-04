@@ -1,0 +1,53 @@
+SYSTEMATIC INSTANCES BLOCK COMPARISON
+=====================================
+
+REFERENCE (WORKING - simple_resistor_reference.kicad_sch):
+----------------------------------------------------------
+For R1 component:
+(instances
+    (project ""
+        (path "/8ea40386-79fd-4dea-8cc4-e20a6a247364"
+            (reference "R1")
+            (unit 1)
+        )
+    )
+)
+
+Main schematic UUID: 8ea40386-79fd-4dea-8cc4-e20a6a247364
+
+
+GENERATED (BROKEN - single_resistor_generated.kicad_sch):
+---------------------------------------------------------
+For R3 component:
+(instances
+    (project ""
+        (path "/3c27753a-67f6-4880-bd62-50145c7f1ee6"
+            (reference "R3")
+            (unit 1)
+        )
+    )
+)
+
+Main schematic UUID: 0cec061f-d144-4fe7-87b7-28a3ffa1ea45
+Path in instances: /3c27753a-67f6-4880-bd62-50145c7f1ee6
+
+
+KEY OBSERVATIONS:
+-----------------
+1. Both have empty project name: (project "")
+2. Both have quoted references: (reference "R1") and (reference "R3")
+3. Both have unit 1
+
+CRITICAL DIFFERENCE:
+-------------------
+The path UUID in the generated file DOES NOT MATCH the main schematic UUID!
+- Main schematic UUID: 0cec061f-d144-4fe7-87b7-28a3ffa1ea45
+- Path in instances: /3c27753a-67f6-4880-bd62-50145c7f1ee6
+
+In the reference file, the path UUID MATCHES the main schematic UUID:
+- Main schematic UUID: 8ea40386-79fd-4dea-8cc4-e20a6a247364
+- Path in instances: /8ea40386-79fd-4dea-8cc4-e20a6a247364
+
+HYPOTHESIS:
+-----------
+KiCad requires the path UUID in instances to match the schematic's UUID for components at the root level.

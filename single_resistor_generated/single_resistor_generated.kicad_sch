@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version "9.0")
-	(uuid 5eda4cf9-f3b7-4753-8ff9-af07e14d51ab)
+	(uuid a434247c-c4aa-4e42-99b7-d5aa510088d7)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
@@ -151,7 +151,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid eb4f5845-c0f1-433e-88a5-151d535bcad6)
+		(uuid 26d14b72-e195-42b4-955e-df2eb8062851)
 		(property "Reference" "R3"
 			(at 38.1 40.72 0)
 			(effects
@@ -180,10 +180,8 @@
 			)
 		)
 		(instances
-			(project
-				""
-				(path
-					"/4230698c-b526-4307-9655-afb80e239726"
+			(project ""
+				(path "/a434247c-c4aa-4e42-99b7-d5aa510088d7"
 					(reference "R3")
 					(unit 1)
 				)
@@ -205,7 +203,7 @@
 				0.0
 			)
 		)
-		(uuid 8b524237-4053-4f67-8c74-08cc3453a6a1)
+		(uuid a7739828-3a25-4e81-be86-2dff79ec32dc)
 		(property "Sheetname" "chil1"
 			(at 49.53 35.559999999999995 0)
 			(effects
@@ -226,10 +224,8 @@
 			)
 		)
 		(instances
-			(project
-				"single_resistor_generated"
-				(path
-					"/"
+			(project "single_resistor_generated"
+				(path "/"
 					(page "1")
 				)
 			)
@@ -266,11 +262,10 @@
 			)
 			(justify left top)
 		)
-		(uuid 9f96e7dd-d8c7-43d5-8b33-61f04e7ead54)
+		(uuid 854744f6-155c-4cfb-8403-03a1b678d41d)
 	)
 	(sheet_instances
-		(path
-			"/4230698c-b526-4307-9655-afb80e239726"
+		(path "/a434247c-c4aa-4e42-99b7-d5aa510088d7"
 			(page "1")
 		)
 	)

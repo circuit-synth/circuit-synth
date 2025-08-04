@@ -2,7 +2,11 @@
 """
 Simple test circuit with a single resistor to debug reference designator issue
 """
+import logging
 from circuit_synth import *
+
+# Set up detailed logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 @circuit(name='singe_resistor_generated')
 def create_single_resistor():

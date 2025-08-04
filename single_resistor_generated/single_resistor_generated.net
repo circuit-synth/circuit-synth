@@ -1,7 +1,7 @@
 (export (version "E")
   (design
     (source "single_resistor_generated.kicad_sch")
-    (date "2025-08-04T19:49:05+0000")
+    (date "2025-08-04T21:01:33+0000")
     (tool "Circuit-Synth Rust Netlist Processor v0.1.0")
       (sheet (number "1") (name "root") (tstamps "/f3e12ede-c85d-44c9-ba6c-ecb32182f3db/")
       (title_block
@@ -37,7 +37,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "2befeb0e-e4e5-4230-8a0b-935f8fcdd0af")
+      (tstamps "bb2d7d42-2a70-4c92-856f-131fa7f93b3d")
     )
     (comp (ref "R2")
       (value "10k")
@@ -53,7 +53,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "b77c252f-ed3e-4aee-8e1e-f1c845c5a157")
+      (tstamps "41fffee1-7537-4604-ad8d-1b568a5ae0df")
     )
     (comp (ref "R3")
       (value "10k")
@@ -69,7 +69,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "d52a7f7f-7171-49df-b8ea-da9aff630c59")
+      (tstamps "c03cc1e9-46ed-433a-9bcb-8101a611abe6")
     )
     )
     (libparts
