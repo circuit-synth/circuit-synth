@@ -47,6 +47,8 @@ def parse_kicad_sym_file(file_path: str) -> Dict[str, Any]:
     The dictionary is JSON-serializable. Each symbol has the child's data plus
     any inherited fields if (extends "ParentSymbolName") is used.
     """
+    print(f"🔧 SYMBOL_PARSER: parse_kicad_sym_file called for {file_path}")
+    logger.debug(f"🔧 SYMBOL_PARSER: parse_kicad_sym_file called for {file_path}")
 
     # 1) Read file
     if not os.path.isfile(file_path):
@@ -126,28 +128,62 @@ def _parse_symbol_body(name: str, body: List[Any]) -> Dict[str, Any]:
         k = _key(elem[0])
         if k == "property":
             # (property "Reference" "R" (at ...) (effects ...))
+            print(f"🔧 SYMBOL_PARSER DEBUG: Processing property element: {elem}")
+            logger.debug(f"🔧 SYMBOL_PARSER DEBUG: Processing property element: {elem}")
+            
             if len(elem) >= 3:
-                prop_name = str(elem[1])
-                prop_value = str(elem[2])
+                prop_name = str(elem[1]).strip('"')
+                prop_value = str(elem[2]).strip('"')
+                
+                print(f"🔧 SYMBOL_PARSER DEBUG: Extracted prop_name='{prop_name}', prop_value='{prop_value}'")
+                print(f"🔧 SYMBOL_PARSER DEBUG: prop_name type: {type(prop_name)}, prop_value type: {type(prop_value)}")
+                logger.debug(f"🔧 SYMBOL_PARSER DEBUG: Extracted prop_name='{prop_name}', prop_value='{prop_value}'")
+                logger.debug(f"🔧 SYMBOL_PARSER DEBUG: prop_name type: {type(prop_name)}, prop_value type: {type(prop_value)}")
 
-                # Parse positioning and effects information
-                prop_info = {"value": prop_value}
+                # Store clean property value directly instead of dictionary object
+                # This fixes the issue where dictionary objects get serialized as strings
+                print(f"🔧 SYMBOL_PARSER: Storing clean property {prop_name}='{prop_value}' (type: {type(prop_value)})")
+                logger.debug(f"🔧 SYMBOL_PARSER: Storing clean property {prop_name}='{prop_value}' (type: {type(prop_value)})")
+                # CRITICAL FIX: Store only the clean string value, not a dictionary
+                clean_prop_value = str(prop_value).strip('"')
+                result["properties"][prop_name] = clean_prop_value
+                
+                print(f"🔧 SYMBOL_PARSER DEBUG: After storing, result['properties']['{prop_name}'] = {repr(result['properties'][prop_name])}")
+                logger.debug(f"🔧 SYMBOL_PARSER DEBUG: After storing, result['properties']['{prop_name}'] = {repr(result['properties'][prop_name])}")
+
+                # CRITICAL BUG FIX: The issue was that prop_info was accidentally overwriting the clean property value
+                # We need to ensure that the properties dict is never corrupted by the prop_info dictionary
+                
+                # Verify the property is still clean before proceeding
+                if isinstance(result["properties"][prop_name], dict):
+                    print(f"🚨 CRITICAL BUG: Property {prop_name} was corrupted to dictionary!")
+                    logger.error(f"🚨 CRITICAL BUG: Property {prop_name} was corrupted to dictionary!")
+                    result["properties"][prop_name] = clean_prop_value  # Force clean value
+                
+                # Parse positioning and effects information for separate storage ONLY
+                # This metadata should NEVER affect the main properties dict
+                prop_info = {"value": clean_prop_value}
+                print(f"🔧 SYMBOL_PARSER DEBUG: Created prop_info with value: {prop_info}")
+                logger.debug(f"🔧 SYMBOL_PARSER DEBUG: Created prop_info with value: {prop_info}")
 
                 # Look for (at x y rotation) and (effects ...) in remaining elements
                 for sub_elem in elem[3:]:
                     if not isinstance(sub_elem, list) or not sub_elem:
                         continue
                     sub_k = _key(sub_elem[0])
+                    print(f"🔧 SYMBOL_PARSER DEBUG: Processing sub_elem: {sub_k}")
 
                     if sub_k == "at" and len(sub_elem) >= 3:
                         # (at x y [rotation])
-                        prop_info["position"] = {
+                        position_info = {
                             "x": float(sub_elem[1]),
                             "y": float(sub_elem[2]),
                             "rotation": (
                                 float(sub_elem[3]) if len(sub_elem) > 3 else 0.0
                             ),
                         }
+                        prop_info["position"] = position_info
+                        print(f"🔧 SYMBOL_PARSER DEBUG: Added position info: {position_info}")
                     elif sub_k == "effects":
                         # Parse effects block for justification
                         effects_info = {}
@@ -173,9 +209,28 @@ def _parse_symbol_body(name: str, body: List[Any]) -> Dict[str, Any]:
                                             float(font_elem[2]),
                                         ]
                         prop_info["effects"] = effects_info
+                        print(f"🔧 SYMBOL_PARSER DEBUG: Added effects info: {effects_info}")
 
-                # Store enhanced property information
-                result["properties"][prop_name] = prop_info
+                # Store enhanced property information in separate field if needed
+                # (for future use, but keep properties dict clean)
+                print(f"🔧 SYMBOL_PARSER DEBUG: Final prop_info before storing: {prop_info}")
+                logger.debug(f"🔧 SYMBOL_PARSER DEBUG: Final prop_info before storing: {prop_info}")
+                
+                if not hasattr(result, "_property_metadata"):
+                    result["_property_metadata"] = {}
+                result["_property_metadata"][prop_name] = prop_info
+                
+                print(f"🔧 SYMBOL_PARSER DEBUG: Stored prop_info in _property_metadata")
+                
+                # CRITICAL CHECK: Ensure the main properties dict still has clean values
+                print(f"🔧 SYMBOL_PARSER DEBUG: FINAL CHECK - result['properties']['{prop_name}'] = {repr(result['properties'][prop_name])}")
+                logger.debug(f"🔧 SYMBOL_PARSER DEBUG: FINAL CHECK - result['properties']['{prop_name}'] = {repr(result['properties'][prop_name])}")
+                
+                # FINAL VERIFICATION: Ensure property is still clean after all processing
+                if isinstance(result["properties"][prop_name], dict):
+                    print(f"🚨 CRITICAL BUG: Property {prop_name} was corrupted AGAIN!")
+                    logger.error(f"🚨 CRITICAL BUG: Property {prop_name} was corrupted AGAIN!")
+                    result["properties"][prop_name] = clean_prop_value  # Force clean value again
 
                 # Also store specific standard properties directly (for backward compatibility)
                 prop_name_lower = prop_name.lower()
@@ -446,7 +501,16 @@ def _flatten_symbol(
         pins.extend(sub_s["pins"])
         graphics.extend(sub_s["graphics"])
 
-    return {
+    print(f"🔧 FLATTEN_SYMBOL DEBUG: Flattening symbol '{sym_name}'")
+    print(f"🔧 FLATTEN_SYMBOL DEBUG: Input properties: {sym_data['properties']}")
+    logger.debug(f"🔧 FLATTEN_SYMBOL DEBUG: Flattening symbol '{sym_name}'")
+    logger.debug(f"🔧 FLATTEN_SYMBOL DEBUG: Input properties: {sym_data['properties']}")
+    
+    for prop_name, prop_value in sym_data["properties"].items():
+        print(f"🔧 FLATTEN_SYMBOL DEBUG: Property {prop_name}: {repr(prop_value)} (type: {type(prop_value)})")
+        logger.debug(f"🔧 FLATTEN_SYMBOL DEBUG: Property {prop_name}: {repr(prop_value)} (type: {type(prop_value)})")
+    
+    result = {
         "name": sym_name,
         "properties": sym_data["properties"],
         "description": sym_data["description"],
@@ -457,6 +521,11 @@ def _flatten_symbol(
         "graphics": graphics,
         "is_power": sym_data["is_power"],
     }
+    
+    print(f"🔧 FLATTEN_SYMBOL DEBUG: Output properties: {result['properties']}")
+    logger.debug(f"🔧 FLATTEN_SYMBOL DEBUG: Output properties: {result['properties']}")
+    
+    return result
 
 
 def _key(obj: Any) -> str:

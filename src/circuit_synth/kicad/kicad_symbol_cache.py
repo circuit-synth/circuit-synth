@@ -81,6 +81,8 @@ class SymbolLibCache:
     @quick_time("Get Symbol Data")
     def get_symbol_data(cls, symbol_id: str) -> Dict[str, Any]:
         """Get symbol data by symbol ID (LibraryName:SymbolName)."""
+        print(f"🔧 PYTHON_SYMBOL_CACHE: get_symbol_data called for {symbol_id}")
+        logger.debug(f"🔧 PYTHON_SYMBOL_CACHE: get_symbol_data called for {symbol_id}")
         instance = cls()
 
         # Validate format

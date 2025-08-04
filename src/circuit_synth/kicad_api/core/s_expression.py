@@ -381,6 +381,10 @@ class SExpressionParser:
         is_property_expr = tag_name == "property"
         # Check if this is a generator expression
         is_generator_expr = tag_name == "generator"
+        # Check if this is a generator_version expression
+        is_generator_version_expr = tag_name == "generator_version"
+        # Check if this is a paper expression
+        is_paper_expr = tag_name == "paper"
         # Check if this is a lib_symbols expression
         is_lib_symbols_expr = tag_name == "lib_symbols"
         # Check if this is a text expression
@@ -481,6 +485,28 @@ class SExpressionParser:
                             indent,
                             tag_name,
                             in_generator=True,
+                            in_instances=in_instances,
+                        )
+                    )
+                elif is_generator_version_expr and i == 1:
+                    # For generator_version expressions, the value at index 1 should be quoted
+                    parts.append(
+                        self._format_sexp(
+                            item,
+                            indent,
+                            tag_name,
+                            in_generator=True,
+                            in_instances=in_instances,
+                        )
+                    )
+                elif is_paper_expr and i == 1:
+                    # For paper expressions, the value at index 1 should be quoted
+                    parts.append(
+                        self._format_sexp(
+                            item,
+                            indent,
+                            tag_name,
+                            in_page=True,
                             in_instances=in_instances,
                         )
                     )
@@ -703,6 +729,34 @@ class SExpressionParser:
                                 indent + 1,
                                 tag_name,
                                 in_generator=True,
+                                in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
+                            )
+                        )
+                    elif is_generator_version_expr and i == 1:
+                        # For generator_version expressions, the value at index 1 should be quoted
+                        result += (
+                            "\n"
+                            + "\t" * (indent + 1)
+                            + self._format_sexp(
+                                item,
+                                indent + 1,
+                                tag_name,
+                                in_generator=True,
+                                in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
+                            )
+                        )
+                    elif is_paper_expr and i == 1:
+                        # For paper expressions, the value at index 1 should be quoted
+                        result += (
+                            "\n"
+                            + "\t" * (indent + 1)
+                            + self._format_sexp(
+                                item,
+                                indent + 1,
+                                tag_name,
+                                in_page=True,
                                 in_instances=in_instances,
                                 in_lib_symbols=in_lib_symbols,
                             )

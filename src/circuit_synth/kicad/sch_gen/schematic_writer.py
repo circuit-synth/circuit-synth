@@ -38,14 +38,19 @@ except ImportError:
         return decorator
 
 
+# TEMPORARY FIX: Force Python fallback to avoid dictionary string issue in Rust cache
 # Use optimized symbol cache from core.component for better performance,
 # but keep Python fallback for graphics data
-from circuit_synth.core.component import SymbolLibCache
+# from circuit_synth.core.component import SymbolLibCache
 
 # Import Python symbol cache specifically for graphics data
 from circuit_synth.kicad.kicad_symbol_cache import (
     SymbolLibCache as PythonSymbolLibCache,
 )
+
+# Use Python fallback as main cache to fix dictionary string issue
+SymbolLibCache = PythonSymbolLibCache
+print("🔧 FORCED PYTHON FALLBACK: Using Python SymbolLibCache to fix dictionary string issue")
 
 # Import from KiCad API
 from circuit_synth.kicad_api.core.types import (
@@ -1053,12 +1058,24 @@ class SchematicWriter:
 
     def _add_paper_size(self, schematic_expr: list):
         """Add paper size to the schematic expression."""
-        # Find the right place to insert paper size
-        for i, item in enumerate(schematic_expr):
-            if isinstance(item, list) and item and item[0] == Symbol("uuid"):
-                # Insert paper after uuid
-                schematic_expr.insert(i + 1, [Symbol("paper"), f"{self.paper_size}"])
+        print(f"🔧 PAPER FORMAT DEBUG: Adding paper size with quotes: \"{self.paper_size}\"")
+        
+        # Check if paper already exists to avoid duplicates
+        paper_exists = False
+        for item in schematic_expr:
+            if isinstance(item, list) and item and item[0] == Symbol("paper"):
+                paper_exists = True
+                print(f"🔧 PAPER FORMAT DEBUG: Paper already exists, skipping duplicate")
                 break
+        
+        if not paper_exists:
+            # Find the right place to insert paper size
+            for i, item in enumerate(schematic_expr):
+                if isinstance(item, list) and item and item[0] == Symbol("uuid"):
+                    # Insert paper after uuid - add quotes to match KiCad format exactly
+                    schematic_expr.insert(i + 1, [Symbol("paper"), self.paper_size])
+                    print(f"🔧 PAPER FORMAT DEBUG: Paper size inserted with quotes")
+                    break
 
     def _add_symbol_definitions(self, schematic_expr: list):
         """
@@ -1067,6 +1084,7 @@ class SchematicWriter:
         print("=" * 80)
         print("🚨 CRITICAL DEBUG: _add_symbol_definitions method called!")
         print(f"🚨 CRITICAL DEBUG: Components count: {len(self.schematic.components)}")
+        print(f"🚨 CRITICAL DEBUG: schematic_expr length: {len(schematic_expr)}")
         print("=" * 80)
         logger.info(f"🔧 SCHEMATIC_WRITER DEBUG: _add_lib_symbols called with {len(self.schematic.components)} components")
         # Find or create lib_symbols block
@@ -1167,17 +1185,20 @@ class SchematicWriter:
         """
         Build a full KiCad (symbol ...) block from the library JSON data.
         """
+        print(f"🔧 FORMATTING DEBUG: Creating symbol definition for {lib_id}")
         base_name = lib_id.split(":")[-1]
 
+        # Fix pin_numbers format to match KiCad exactly: (pin_numbers (hide yes))
         symbol_block = [
             Symbol("symbol"),
             lib_id,
-            [Symbol("pin_numbers"), Symbol("hide")],
-            [Symbol("pin_names"), [Symbol("offset"), 0.254]],
+            [Symbol("pin_numbers"), [Symbol("hide"), Symbol("yes")]],
+            [Symbol("pin_names"), [Symbol("offset"), 0]],  # Use 0 instead of 0.254 to match reference
             [Symbol("exclude_from_sim"), Symbol("no")],
             [Symbol("in_bom"), Symbol("yes")],
             [Symbol("on_board"), Symbol("yes")],
         ]
+        print(f"🔧 FORMATTING DEBUG: Fixed pin_numbers format to (hide yes) and pin_names offset to 0")
 
         # Properties
         props = lib_data.get("properties", {})
@@ -1192,26 +1213,39 @@ class SchematicWriter:
             ):
                 hide_symbol = Symbol("yes")
 
-            # Handle both old format (strings) and new format (dicts with "value" key)
-            # This fixes the reference property generation bug where dictionary objects
-            # are converted to string representations instead of extracting the value
-            print(f"🔧 SCHEMATIC_WRITER DEBUG: Processing property {prop_name}: {prop_value} (type: {type(prop_value)})")
+            # Properties should now be clean string values from the fixed parser
+            print(f"🔧 PROPERTY DEBUG: Processing property {prop_name}")
+            print(f"🔧 PROPERTY DEBUG: Raw prop_value: {repr(prop_value)}")
+            print(f"🔧 PROPERTY DEBUG: Type: {type(prop_value)}")
             
+            # Handle legacy dictionary format for backward compatibility
             if isinstance(prop_value, dict):
-                # Extract the actual value from the dictionary
+                # Extract the actual value from the dictionary (legacy format)
                 clean_prop_value = prop_value.get("value", "")
-                print(f"🔧 SCHEMATIC_WRITER DEBUG: Extracted clean value: {clean_prop_value}")
+                print(f"🔧 PROPERTY DEBUG: Legacy dict format, extracted: {repr(clean_prop_value)}")
             else:
-                # Use the value as-is if it's already a string
+                # Use the clean string value directly (new fixed format)
                 clean_prop_value = str(prop_value) if prop_value else ""
-                print(f"🔧 SCHEMATIC_WRITER DEBUG: Using string value: {clean_prop_value}")
+                print(f"🔧 PROPERTY DEBUG: Using clean string value: {repr(clean_prop_value)}")
+            
+            print(f"🔧 PROPERTY DEBUG: Final clean_prop_value: {repr(clean_prop_value)}")
 
+            # Use proper positioning based on property type to match KiCad reference
+            if prop_name == "Reference":
+                position = [Symbol("at"), 2.032, 0, 90]
+            elif prop_name == "Value":
+                position = [Symbol("at"), 0, 0, 90]
+            elif prop_name == "Footprint":
+                position = [Symbol("at"), -1.778, 0, 90]
+            else:
+                position = [Symbol("at"), 0, 0, 0]
+            
             symbol_block.append(
                 [
                     Symbol("property"),
                     prop_name,
                     clean_prop_value,
-                    [Symbol("at"), 0.0, 0.0, 0],
+                    position,
                     [
                         Symbol("effects"),
                         [Symbol("font"), [Symbol("size"), 1.27, 1.27]],
@@ -1308,6 +1342,8 @@ class SchematicWriter:
                 pin_name = str(p.get("name", "~"))
                 pin_num = str(p.get("number", ""))
 
+                print(f"🔧 PIN FORMAT DEBUG: Creating pin {pin_num} with compact format")
+                # Use compact pin format to match KiCad exactly: (pin passive line ...)
                 pin_sym_block.append(
                     [
                         Symbol("pin"),
@@ -1333,6 +1369,7 @@ class SchematicWriter:
                         ],
                     ]
                 )
+                print(f"🔧 PIN FORMAT DEBUG: Pin {pin_num} created successfully")
 
             symbol_block.append(pin_sym_block)
 
@@ -1348,30 +1385,36 @@ class SchematicWriter:
         if isinstance(sexpr_data, list):
             cleaned_list = []
             for i, item in enumerate(sexpr_data):
+                print(f"🔧 CLEANING DEBUG: Item {i}: {repr(item)} (type: {type(item)})")
                 if isinstance(item, list):
                     # Recursively clean nested lists
                     cleaned_list.append(self._clean_dictionary_strings_from_sexpr(item))
                 elif isinstance(item, str):
                     # Check if this is a dictionary string representation
+                    print(f"🔧 CLEANING DEBUG: Processing string item: {repr(item[:200])}")
                     if item.startswith("{'value':") or item.startswith('{"value":'):
-                        print(f"🔧 CLEANING DEBUG: Found dictionary string: {item[:50]}...")
+                        print(f"🔧 CLEANING DEBUG: Found dictionary string: {item[:100]}...")
                         # Try to extract the value from the dictionary string
                         try:
                             import ast
                             dict_obj = ast.literal_eval(item)
                             if isinstance(dict_obj, dict) and "value" in dict_obj:
-                                print(f"🔧 CLEANING DEBUG: Extracted value: {dict_obj['value']}")
-                                cleaned_list.append(dict_obj["value"])
+                                extracted_value = dict_obj["value"]
+                                print(f"🔧 CLEANING DEBUG: Successfully extracted value: {repr(extracted_value)}")
+                                cleaned_list.append(extracted_value)
                             else:
+                                print(f"🔧 CLEANING DEBUG: Dict doesn't have 'value' key: {dict_obj}")
                                 cleaned_list.append(item)  # Keep original if can't extract
                         except (ValueError, SyntaxError) as e:
                             print(f"🔧 CLEANING DEBUG: Failed to parse dictionary string: {e}")
                             # If we can't parse it, keep the original
                             cleaned_list.append(item)
                     else:
+                        print(f"🔧 CLEANING DEBUG: Not a dictionary string, keeping as-is")
                         cleaned_list.append(item)
                 else:
                     cleaned_list.append(item)
+            print(f"🔧 CLEANING DEBUG: Cleaned list: {cleaned_list[:3] if len(cleaned_list) > 3 else cleaned_list}")
             return cleaned_list
         else:
             return sexpr_data

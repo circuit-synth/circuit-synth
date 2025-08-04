@@ -1,23 +1,22 @@
 (kicad_sch
 	(version 20250114)
 	(generator "kicad_api")
-	(generator_version 9.0)
-	(uuid 9dcf078d-8293-41ab-bf62-8310796b3ded)
-	(paper A4)
-	(paper A4)
+	(generator_version "9.0")
+	(uuid cfcfd780-36ca-4a0c-ba34-d43e7940cf5a)
+	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property
-				"Reference"
-				"{'value': 'R', 'position': {'x': 2.032, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Reference" "R"
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -25,10 +24,8 @@
 					(hide no)
 				)
 			)
-			(property
-				"Value"
-				"{'value': 'R', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Value" "R"
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -36,10 +33,8 @@
 					(hide no)
 				)
 			)
-			(property
-				"Footprint"
-				"{'value': '', 'position': {'x': -1.778, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Footprint" ""
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -47,10 +42,8 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Datasheet"
-				"{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Datasheet" "~"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -58,10 +51,8 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Description"
-				"{'value': 'Resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Description" "Resistor"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -69,10 +60,8 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_keywords"
-				"{'value': 'R res resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "ki_keywords" "R res resistor"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -80,10 +69,8 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_fp_filters"
-				"{'value': 'R_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "ki_fp_filters" "R_*"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -111,7 +98,7 @@
 					(at 0.0 3.81 270)
 					(length 1.27)
 					(name
-						~
+						"~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -133,7 +120,7 @@
 					(at 0.0 -3.81 90)
 					(length 1.27)
 					(name
-						~
+						"~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -153,21 +140,19 @@
 		)
 	)
 	(title_block
-		(title top)
+		(title test_circuit)
 		(date 2025-08-04)
 		(company Circuit-Synth)
 	)
 	(symbol
-		(lib_id Device:R)
-		(at 38.1 45.72 0)
+		(lib_id "Device:R")
+		(at 99.06 99.06 0)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 721cc22d-7cea-46ca-bef1-2ef537be6f06)
-		(property
-			"Reference"
-			"R1"
-			(at 40.64 44.449999999999996 0)
+		(uuid abe0f92c-03ed-4900-bf4a-0590b14b0975)
+		(property "Reference" "R1"
+			(at 101.60000000000001 97.79 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -175,10 +160,8 @@
 				(justify left)
 			)
 		)
-		(property
-			"Value"
-			"10k"
-			(at 40.64 46.99 0)
+		(property "Value" "1k"
+			(at 101.60000000000001 100.33 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -186,10 +169,8 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"Resistor_SMD:R_0805_2012Metric"
-			(at 38.1 55.72 0)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 99.06 109.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -199,34 +180,20 @@
 		)
 		(instances
 			(project
-				"circuit"
+				"debug_test"
 				(path
 					"/"
-					(reference R1)
-					(unit 1)
-				)
-			)
-			(project
-				"generated_project"
-				(path
-					"/50b29d65-f667-46a0-bc9a-63b22f4f45f1"
-					(reference R1)
+					(reference "R1")
 					(unit 1)
 				)
 			)
 		)
 	)
-	(sheet_instances
-		(path
-			"/50b29d65-f667-46a0-bc9a-63b22f4f45f1"
-			(page "1")
-		)
-	)
-	(embedded_fonts no)
 	(sheet_instances
 		(path
 			"/"
 			(page "1")
 		)
 	)
+	(embedded_fonts no)
 )

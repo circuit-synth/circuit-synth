@@ -59,10 +59,12 @@ class LLMPlacementManager:
         return placements
 
 
+# TEMPORARY FIX: Force Python fallback to avoid dictionary string issue in Rust cache
 # Use optimized symbol cache from core.component for better performance
-from circuit_synth.core.component import SymbolLibCache
+# from circuit_synth.core.component import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
+print("🔧 MAIN_GENERATOR: Using Python SymbolLibCache to fix dictionary string issue")
 from circuit_synth.kicad.netlist_importer import CircuitSynthParser
 from circuit_synth.kicad.sch_editor.schematic_reader import SchematicReader
 
@@ -461,8 +463,9 @@ class SchematicGenerator(IKiCadIntegration):
         """Add bounding boxes to an existing synchronized project."""
         try:
             # Import necessary classes
+            # TEMPORARY FIX: Force Python fallback to avoid dictionary string issue in Rust cache
             # Use optimized symbol cache from core.component for better performance
-            from circuit_synth.core.component import SymbolLibCache
+            # from circuit_synth.core.component import SymbolLibCache
 
             from ...kicad_api.core.types import Point, Rectangle
             from ..kicad_symbol_cache import SymbolLibCache
@@ -1618,8 +1621,9 @@ class SchematicGenerator(IKiCadIntegration):
     def get_symbol_libraries(self) -> List[str]:
         """Get list of available symbol libraries."""
         try:
+            # TEMPORARY FIX: Force Python fallback to avoid dictionary string issue in Rust cache
             # Use optimized symbol cache from core.component for better performance
-            from circuit_synth.core.component import SymbolLibCache
+            # from circuit_synth.core.component import SymbolLibCache
             from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
             cache = SymbolLibCache()

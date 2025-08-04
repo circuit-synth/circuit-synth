@@ -109,6 +109,8 @@ class RustAcceleratedSymbolLibCache:
             - Rust: ~0.005s per symbol lookup
             - Python: ~0.293s per symbol lookup (55x slower)
         """
+        print(f"🔧 RUST_ACCELERATED_CACHE: get_symbol_data called for {symbol_id}")
+        logger.debug(f"🔧 RUST_ACCELERATED_CACHE: get_symbol_data called for {symbol_id}")
         instance = cls()
 
         if instance._using_rust:

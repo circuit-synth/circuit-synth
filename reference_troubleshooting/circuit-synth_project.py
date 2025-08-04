@@ -1,18 +1,28 @@
 from circuit_synth import *
 
+print("🔧 DEBUG: Starting circuit-synth test script")
+print("🔧 DEBUG: Imported circuit_synth modules")
+
 @circuit(name="top")
 def top():
+    print("🔧 DEBUG: Creating top circuit")
     resistor = Component(symbol="Device:R", ref="R", value="10k",footprint="Resistor_SMD:R_0805_2012Metric")
-
-
+    print(f"🔧 DEBUG: Created resistor component: {resistor}")
+    return resistor
 
 def main():
+    print("🔧 DEBUG: Starting main() function")
     circuit = top()
+    print(f"🔧 DEBUG: Got circuit: {circuit}")
+    print("🔧 DEBUG: About to call generate_kicad_project...")
     circuit.generate_kicad_project(project_name="generated_project")
+    print("🔧 DEBUG: generate_kicad_project completed successfully!")
 
 if __name__ == "__main__":
+    print("🔧 DEBUG: Script started as main module")
     main()
     print("KiCad project generated successfully!")
+    print("🔧 DEBUG: Script completed")
     
 # DEBUGGING NOTES:
 # Issue: KiCad shows "R?" instead of "R1" despite correct file contents
