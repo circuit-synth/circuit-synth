@@ -18,6 +18,26 @@ cd esp32-sensor-board/circuit-synth && uv run circuit-synth/main.py
 uv run cs-init-pcb existing_kicad_project_dir
 ```
 
+## ⚡ Performance Optimization (Optional)
+
+Circuit-synth includes optional Rust modules for improved performance. The package works perfectly without them, using Python fallbacks.
+
+**To enable Rust acceleration for faster PCB placement and netlist processing:**
+
+```bash
+# Install development tools
+pip install maturin
+
+# Build Rust modules (in circuit-synth development directory)
+./scripts/build_rust_modules.sh
+
+# Or build individual modules:
+cd rust_modules/rust_netlist_processor && maturin develop --release
+cd rust_modules/rust_force_directed_placement && maturin develop --release
+```
+
+**Note**: Rust modules are not required for normal operation. Circuit-synth automatically falls back to Python implementations if Rust modules are unavailable.
+
 ## 📋 Project Structure
 
 ```
