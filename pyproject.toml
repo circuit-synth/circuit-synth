@@ -154,6 +154,7 @@ markers = [
     "integration: marks tests as integration tests",
     "functional: marks tests as functional tests",
     "cache: marks tests as cache-related tests",
+    "asyncio: marks tests as async tests",
 ]
 env = [
     "KICAD_SYMBOL_DIR=tests/test_data/kicad_symbols",
