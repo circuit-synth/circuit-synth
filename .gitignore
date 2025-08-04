@@ -174,3 +174,4 @@ cache/
 test_output/
 
 .pypircmemory-bank/
+.pypirc
