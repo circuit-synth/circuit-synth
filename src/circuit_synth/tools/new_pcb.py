@@ -102,7 +102,7 @@ def _copy_claude_directory(src_claude_dir, dest_claude_dir: Path, pcb_name: str,
             console.print(f"[yellow]Warning: Could not copy {subdir_name} directory: {e}[/yellow]")
 
 
-def copy_example_project_structure(pcb_path: Path, pcb_name: str) -> None:
+def copy_example_project_structure(pcb_path: Path, pcb_name: str, skip_pyproject: bool = False) -> None:
     """Copy the complete example_project structure and customize it."""
     circuit_name = pcb_name.replace(" ", "_")
     
@@ -121,11 +121,13 @@ def copy_example_project_structure(pcb_path: Path, pcb_name: str) -> None:
         readme_customized = readme_customized.replace('ESP32_C6_Dev_Board', circuit_name)
         (pcb_path / 'README.md').write_text(readme_customized)
         
-        # Copy pyproject.toml
-        pyproject_content = (template_files / 'pyproject.toml').read_text()
-        pyproject_customized = pyproject_content.replace('esp32-c6-dev-board', pcb_path.name)
-        pyproject_customized = pyproject_customized.replace('ESP32-C6 Development Board', pcb_name)
-        (pcb_path / 'pyproject.toml').write_text(pyproject_customized)
+        # Skip copying pyproject.toml if requested (when we already have one)
+        if not skip_pyproject:
+            # Copy pyproject.toml
+            pyproject_content = (template_files / 'pyproject.toml').read_text()
+            pyproject_customized = pyproject_content.replace('esp32-c6-dev-board', pcb_path.name)
+            pyproject_customized = pyproject_customized.replace('ESP32-C6 Development Board', pcb_name)
+            (pcb_path / 'pyproject.toml').write_text(pyproject_customized)
         
         # Create circuit-synth directory
         circuit_dir = pcb_path / 'circuit-synth'
@@ -160,10 +162,10 @@ def copy_example_project_structure(pcb_path: Path, pcb_name: str) -> None:
     except Exception as e:
         console.print(f"[yellow]Warning: Could not copy from example_project template: {e}[/yellow]")
         console.print("[yellow]Falling back to basic structure...[/yellow]")
-        _create_fallback_structure(pcb_path, pcb_name)
+        _create_fallback_structure(pcb_path, pcb_name, skip_pyproject=(original_pyproject_content is not None))
 
 
-def _create_fallback_structure(pcb_path: Path, pcb_name: str) -> None:
+def _create_fallback_structure(pcb_path: Path, pcb_name: str, skip_pyproject: bool = False) -> None:
     """Fallback: Create basic structure if example_project template not available."""
     circuit_name = pcb_name.replace(' ', '_')
     
@@ -211,9 +213,10 @@ if __name__ == "__main__":
     claude_md = pcb_path / "CLAUDE.md"
     claude_md.write_text(f'''# {pcb_name}\n\nCircuit design project\n''')
     
-    # Create basic pyproject.toml
-    pyproject_toml = pcb_path / "pyproject.toml"
-    pyproject_toml.write_text(f'''[project]\nname = "{pcb_path.name}"\ndescription = "{pcb_name}"\n''')
+    # Create basic pyproject.toml (only if not skipping)
+    if not skip_pyproject:
+        pyproject_toml = pcb_path / "pyproject.toml"
+        pyproject_toml.write_text(f'''[project]\nname = "{pcb_path.name}"\ndescription = "{pcb_name}"\n''')
     
     console.print(f"[green]✅ Created basic project structure[/green]")
 
@@ -269,12 +272,18 @@ def main(name: Optional[str], minimal: bool):
     
     console.print(f"📁 Transforming '{pcb_path.name}' into a circuit-synth project...", style="green")
     
-    # Clean up ALL non-hidden files and directories
+    # Store the original pyproject.toml content
+    original_pyproject_path = pcb_path / "pyproject.toml"
+    original_pyproject_content = None
+    if original_pyproject_path.exists():
+        original_pyproject_content = original_pyproject_path.read_text()
+    
+    # Clean up ALL non-hidden files and directories EXCEPT pyproject.toml
     console.print("\n🧹 Cleaning up existing files...", style="yellow")
     
     for item in pcb_path.iterdir():
-        # Skip hidden files (like .git)
-        if item.name.startswith('.'):
+        # Skip hidden files (like .git) and pyproject.toml
+        if item.name.startswith('.') or item.name == 'pyproject.toml':
             continue
             
         if item.is_file():
@@ -287,9 +296,10 @@ def main(name: Optional[str], minimal: bool):
     # Copy complete example project structure
     console.print("\n📝 Copying example project structure...", style="yellow")
     if not minimal:
-        copy_example_project_structure(pcb_path, pcb_name)
+        # Skip copying pyproject.toml if we preserved the original
+        copy_example_project_structure(pcb_path, pcb_name, skip_pyproject=(original_pyproject_content is not None))
     else:
-        _create_fallback_structure(pcb_path, pcb_name)
+        _create_fallback_structure(pcb_path, pcb_name, skip_pyproject=(original_pyproject_content is not None))
     
     # Success message
     console.print(
