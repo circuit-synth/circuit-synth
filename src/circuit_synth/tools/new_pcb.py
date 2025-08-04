@@ -233,22 +233,32 @@ if __name__ == "__main__":
 
 
 @click.command()
-@click.argument('pcb_name')
+@click.option('--name', '-n', help='Override project name (default: use directory name)')
 @click.option('--minimal', is_flag=True, help='Create minimal PCB (no examples)')
-def main(pcb_name: str, minimal: bool):
-    """Create a new PCB development environment in the current directory.
+def main(name: Optional[str], minimal: bool):
+    """Transform current directory into a circuit-synth PCB project.
     
     This command assumes you're in a fresh uv project directory and will:
     1. Delete all files except .git and hidden files
     2. Add the circuit-synth project template
+    3. Use the directory name as the project name (unless overridden)
     
     Examples:
-        cs-new-pcb "ESP32 Sensor Board"
-        cs-new-pcb "Power Supply Module" --minimal
+        cs-new-pcb                    # Uses current directory name
+        cs-new-pcb --name "My PCB"    # Override with custom name
+        cs-new-pcb --minimal          # Minimal setup without examples
     """
     
     # Always use current directory
     pcb_path = Path.cwd()
+    
+    # Use directory name as default PCB name, or use provided name
+    if name:
+        pcb_name = name
+    else:
+        # Convert directory name to readable format
+        # e.g., "my-awesome-pcb" -> "My Awesome PCB"
+        pcb_name = pcb_path.name.replace('-', ' ').replace('_', ' ').title()
     
     console.print(
         Panel.fit(
@@ -257,7 +267,7 @@ def main(pcb_name: str, minimal: bool):
         )
     )
     
-    console.print(f"📁 Setting up PCB project in current directory: {pcb_path.name}/", style="green")
+    console.print(f"📁 Transforming '{pcb_path.name}' into a circuit-synth project...", style="green")
     
     # Clean up ALL non-hidden files and directories
     console.print("\n🧹 Cleaning up existing files...", style="yellow")
