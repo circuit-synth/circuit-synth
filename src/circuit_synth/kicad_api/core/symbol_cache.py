@@ -119,45 +119,34 @@ class SymbolLibraryCache:
         Returns:
             SymbolDefinition if found, None otherwise
         """
-        # First check if already loaded
-        if lib_id in self._symbols:
-            return self._symbols[lib_id]
-
-        # Try lazy symbol search first (much faster)
-        symbol = self._lazy_symbol_search(lib_id)
-        if symbol:
-            return symbol
-
-        # Only build complete index as last resort
-        logger.debug(f"Lazy search failed for {lib_id}, falling back to complete index")
-        self._build_complete_index()
-
-        # Try to parse the lib_id
+        # SIMPLIFIED: Direct symbol loading without complex caching or indexing
         try:
             lib_name, sym_name = lib_id.split(":")
         except ValueError:
-            logger.error(
-                f"Invalid symbol_id format; expected 'LibName:SymbolName', got '{lib_id}'"
-            )
+            logger.error(f"Invalid symbol_id format; expected 'LibName:SymbolName', got '{lib_id}'")
             return None
 
-        # Try to load the symbol from the specified library
-        if self._load_symbol(lib_id):
-            return self._symbols.get(lib_id)
+        # Find the library file and load the symbol directly
+        logger.info(f"🔍 DEBUG: Looking for symbol {lib_id} (lib_name={lib_name}, sym_name={sym_name})")
+        logger.info(f"🔍 DEBUG: Available library paths: {[p.stem for p in self._library_paths]}")
+        
+        for lib_file_path in self._library_paths:
+            if lib_file_path.stem == lib_name:
+                logger.info(f"🔍 DEBUG: Found matching library: {lib_file_path}")
+                library_data = self._load_library(lib_file_path)
+                if library_data and "symbols" in library_data:
+                    if sym_name in library_data["symbols"]:
+                        logger.info(f"🔍 DEBUG: Found symbol {sym_name} in library!")
+                        symbol_data = library_data["symbols"][sym_name]
+                        symbol_def = self._convert_to_symbol_definition(lib_id, symbol_data)
+                        return symbol_def
+                    else:
+                        logger.info(f"🔍 DEBUG: Symbol {sym_name} not found in library {lib_name}")
+                        logger.info(f"🔍 DEBUG: Available symbols: {list(library_data['symbols'].keys())[:10]}...")  # Show first 10
+                else:
+                    logger.info(f"🔍 DEBUG: No symbols data in library {lib_name}")
 
-        # If that fails, try to find the symbol in any library
-        if sym_name in self._symbol_index:
-            actual_lib_name = self._symbol_index[sym_name]["lib_name"]
-            actual_lib_id = f"{actual_lib_name}:{sym_name}"
-            logger.info(
-                f"Found symbol '{sym_name}' in library '{actual_lib_name}' instead of '{lib_name}'"
-            )
-
-            if self._load_symbol(actual_lib_id):
-                # Also store under the original lib_id for future lookups
-                self._symbols[lib_id] = self._symbols[actual_lib_id]
-                return self._symbols[lib_id]
-
+        logger.info(f"🔍 DEBUG: Symbol {lib_id} not found in any library")
         return None
 
     def get_symbol_by_name(self, symbol_name: str) -> Optional[SymbolDefinition]:
@@ -232,11 +221,28 @@ class SymbolLibraryCache:
             except Exception as e:
                 logger.warning(f"Failed to load symbol cache: {e}")
 
-        # Don't create hardcoded symbols - load from actual KiCad libraries instead
-        # self._create_default_symbols()
-        logger.debug(
-            "Skipping hardcoded symbols - will load from KiCad libraries on demand"
-        )
+        # Add default KiCad library paths for symbol discovery
+        self._discover_kicad_library_paths()
+
+    def _discover_kicad_library_paths(self):
+        """Discover and add KiCad symbol library paths."""
+        # Common KiCad installation paths
+        possible_base_paths = [
+            Path("/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols"),  # macOS
+            Path("/usr/share/kicad/symbols"),  # Linux
+            Path("/usr/local/share/kicad/symbols"),  # Linux alternative
+        ]
+        
+        for base_path in possible_base_paths:
+            if base_path.exists():
+                logger.info(f"Found KiCad symbol library directory: {base_path}")
+                # Add individual .kicad_sym files instead of the parent directory
+                for lib_file in base_path.glob("*.kicad_sym"):
+                    self.add_library_path(lib_file)
+                    logger.debug(f"Added symbol library: {lib_file.stem}")
+                return
+        
+        logger.warning("No KiCad symbol libraries found in standard locations")
 
     def _load_symbol(self, lib_id: str) -> bool:
         """
@@ -272,7 +278,8 @@ class SymbolLibraryCache:
         symbol_def = self._convert_to_symbol_definition(lib_id, symbol_data)
 
         if symbol_def:
-            self._symbols[lib_id] = symbol_def
+            # TEMPORARY: Disable caching to fix reference property generation bug
+            # self._symbols[lib_id] = symbol_def
             return True
 
         return False
@@ -741,10 +748,10 @@ class SymbolLibraryCache:
             # Handle both old format (strings) and new format (dicts with "value" key)
             if isinstance(reference_prop, dict):
                 reference = reference_prop.get("value", "U")
-                logger.info(f"🔧 KICAD_API DEBUG: Dictionary reference - raw={reference_prop}, extracted={reference}")
+                # logger.info(f"🔧 KICAD_API DEBUG: Dictionary reference - raw={reference_prop}, extracted={reference}")
             else:
                 reference = str(reference_prop)
-                logger.info(f"🔧 KICAD_API DEBUG: String reference - {reference}")
+                # logger.info(f"🔧 KICAD_API DEBUG: String reference - {reference}")
 
             # Convert pins
             pins = []
@@ -865,8 +872,8 @@ class SymbolLibraryCache:
 
             # Create symbol definition
             final_reference_prefix = reference.rstrip("?")
-            logger.info(f"🔧 KICAD_API DEBUG: Creating SymbolDefinition for {lib_id} with reference_prefix={final_reference_prefix}")
-            logger.info(f"🔧 KICAD_API DEBUG: Final property values - description='{description}', keywords='{keywords}', datasheet='{datasheet}'")
+            # logger.info(f"🔧 KICAD_API DEBUG: Creating SymbolDefinition for {lib_id} with reference_prefix={final_reference_prefix}")
+            # logger.info(f"🔧 KICAD_API DEBUG: Final property values - description='{description}', keywords='{keywords}', datasheet='{datasheet}'")
             
             symbol_def = SymbolDefinition(
                 lib_id=lib_id,

@@ -7,8 +7,12 @@ Generate professional KiCad projects from Python code with hierarchical design, 
 ## 🚀 Getting Started
 
 ```bash
+# Make new uv Python project
+uv init new_project_directory
+cd new_project_directory
+
 # Install circuit-synth
-uv tool install circuit-synth
+uv add circuit-synth
 
 # Create new PCB project
 uv run cs-new-pcb "ESP32 Sensor Board"

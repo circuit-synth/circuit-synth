@@ -1455,13 +1455,7 @@ class SExpressionParser:
         sexp.append([sexpdata.Symbol("on_board"), sexpdata.Symbol("yes")])
 
         # Add properties
-        # DEBUG: Add logging to track what's being passed to s-expression generation
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.info(f"🔧 S_EXPRESSION DEBUG: symbol_def.reference_prefix = {symbol_def.reference_prefix} (type: {type(symbol_def.reference_prefix)})")
-        logger.info(f"🔧 S_EXPRESSION DEBUG: symbol_def.description = {symbol_def.description} (type: {type(symbol_def.description)})")
-        logger.info(f"🔧 S_EXPRESSION DEBUG: symbol_def.keywords = {symbol_def.keywords} (type: {type(symbol_def.keywords)})")
-        logger.info(f"🔧 S_EXPRESSION DEBUG: symbol_def.datasheet = {symbol_def.datasheet} (type: {type(symbol_def.datasheet)})")
+        # Symbol properties should be clean strings after our fixes
         
         properties = [
             ("Reference", symbol_def.reference_prefix, [0, 0, 0]),
@@ -1475,7 +1469,7 @@ class SExpressionParser:
             properties.append(("ki_keywords", symbol_def.keywords, [0, -12.7, 0]))
 
         for prop_name, prop_value, position in properties:
-            logger.info(f"🔧 S_EXPRESSION DEBUG: Processing property {prop_name} = {prop_value} (type: {type(prop_value)})")
+            # Clean property extraction - should be string values only
             prop = [sexpdata.Symbol("property"), prop_name, prop_value]
             prop.append([sexpdata.Symbol("at"), position[0], position[1], position[2]])
             effects = [
