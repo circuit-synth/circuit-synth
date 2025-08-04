@@ -173,4 +173,4 @@ example_kicad_project/
 cache/
 test_output/
 
-.pypirc
+.pypircmemory-bank/
