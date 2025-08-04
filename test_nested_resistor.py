@@ -10,7 +10,37 @@ def create_single_resistor():
 
     
     # Create a single resistor
-    R1 = Component(
+    R = Component(
+        symbol="Device:R",
+        ref="R",
+        value="10k",
+        footprint="Resistor_SMD:R_0603_1608Metric"
+    )
+
+    child1()
+
+@circuit(name='chil1')
+def child1():
+    """Test circuit with just one resistor"""
+
+    
+    # Create a single resistor
+    R = Component(
+        symbol="Device:R",
+        ref="R",
+        value="10k",
+        footprint="Resistor_SMD:R_0603_1608Metric"
+    )
+
+    child2()
+
+@circuit(name='child2')
+def child2():
+    """Test circuit with just one resistor"""
+
+    
+    # Create a single resistor
+    R = Component(
         symbol="Device:R",
         ref="R",
         value="10k",

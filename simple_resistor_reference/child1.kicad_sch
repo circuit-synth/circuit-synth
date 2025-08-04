@@ -1,38 +1,38 @@
 (kicad_sch
 	(version 20250114)
-	(generator "kicad_api")
+	(generator "eeschema")
 	(generator_version "9.0")
-	(uuid 5eda4cf9-f3b7-4753-8ff9-af07e14d51ab)
+	(uuid "4daca4e2-c1e2-4c98-89ab-7f5b2d42983e")
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "R"
-				(at 0.0 0.0 0)
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Value" "R"
-				(at 0.0 0.0 0)
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -41,7 +41,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -50,7 +50,7 @@
 				)
 			)
 			(property "Description" "Resistor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -59,7 +59,7 @@
 				)
 			)
 			(property "ki_keywords" "R res resistor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -68,7 +68,7 @@
 				)
 			)
 			(property "ki_fp_filters" "R_*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -90,21 +90,17 @@
 				)
 			)
 			(symbol "R_1_1"
-				(pin
-					passive
-					line
-					(at 0.0 3.81 270)
+				(pin passive line
+					(at 0 3.81 270)
 					(length 1.27)
-					(name
-						~
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number
-						"1"
+					(number "1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -112,21 +108,17 @@
 						)
 					)
 				)
-				(pin
-					passive
-					line
-					(at 0.0 -3.81 90)
+				(pin passive line
+					(at 0 -3.81 90)
 					(length 1.27)
-					(name
-						~
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number
-						"2"
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -135,25 +127,21 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
-	)
-	(title_block
-		(title singe_resistor_generated)
-		(date 2025-08-04)
-		(company Circuit-Synth)
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 38.1 45.72 0)
+		(at 123.19 85.09 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid eb4f5845-c0f1-433e-88a5-151d535bcad6)
-		(property "Reference" "R3"
-			(at 38.1 40.72 0)
+		(uuid "e60371d9-afe7-494a-ad6f-d69e02697095")
+		(property "Reference" "R2"
+			(at 125.73 83.8199 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -162,7 +150,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 38.1 50.72 0)
+			(at 125.73 86.3599 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -171,7 +159,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 38.1 55.72 0)
+			(at 121.412 85.09 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -179,35 +167,57 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" "~"
+			(at 123.19 85.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 123.19 85.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "f5f7a52a-9ed6-442f-85d6-b5f7b31dfa9b")
+		)
+		(pin "1"
+			(uuid "dade83ae-3829-49db-80da-9beaef85a5bd")
+		)
 		(instances
-			(project
-				""
-				(path
-					"/4230698c-b526-4307-9655-afb80e239726"
-					(reference "R3")
+			(project "simple_resistor_reference"
+				(path "/8ea40386-79fd-4dea-8cc4-e20a6a247364/5c9a6dd5-fe4a-4d9b-993b-8c5ee2461010"
+					(reference "R2")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(sheet
-		(at 49.53 36.83)
-		(size 35.4 20.32)
+		(at 144.78 97.79)
+		(size 33.02 22.86)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
 		(stroke
-			(width 0.12)
+			(width 0.1524)
 			(type solid)
 		)
 		(fill
-			(color
-				0
-				0
-				0
-				0.0
-			)
+			(color 0 0 0 0.0000)
 		)
-		(uuid 8b524237-4053-4f67-8c74-08cc3453a6a1)
-		(property "Sheetname" "chil1"
-			(at 49.53 35.559999999999995 0)
+		(uuid "db6c7bdb-be8f-47ca-ac20-40a64e7f00e4")
+		(property "Sheetname" "child2"
+			(at 144.78 97.0784 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -215,64 +225,21 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "chil1.kicad_sch"
-			(at 49.53 58.42 0)
+		(property "Sheetfile" "child2.kicad_sch"
+			(at 144.78 121.2346 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left top)
-				(hide yes)
 			)
 		)
 		(instances
-			(project
-				"single_resistor_generated"
-				(path
-					"/"
-					(page "1")
+			(project "simple_resistor_reference"
+				(path "/8ea40386-79fd-4dea-8cc4-e20a6a247364/5c9a6dd5-fe4a-4d9b-993b-8c5ee2461010"
+					(page "3")
 				)
 			)
 		)
 	)
-	(text_box
-		"Test circuit with just one resistor"
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid 9f96e7dd-d8c7-43d5-8b33-61f04e7ead54)
-	)
-	(sheet_instances
-		(path
-			"/4230698c-b526-4307-9655-afb80e239726"
-			(page "1")
-		)
-	)
-	(embedded_fonts no)
 )

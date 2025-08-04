@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version "9.0")
-	(uuid 5eda4cf9-f3b7-4753-8ff9-af07e14d51ab)
+	(uuid b580f59c-0e0b-4c8e-b2f2-aed6d2b0f1af)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
@@ -138,7 +138,7 @@
 		)
 	)
 	(title_block
-		(title singe_resistor_generated)
+		(title child2)
 		(date 2025-08-04)
 		(company Circuit-Synth)
 	)
@@ -151,8 +151,8 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid eb4f5845-c0f1-433e-88a5-151d535bcad6)
-		(property "Reference" "R3"
+		(uuid 773c14e8-8b75-41c9-99dc-943bdbcf94b2)
+		(property "Reference" "R1"
 			(at 38.1 40.72 0)
 			(effects
 				(font
@@ -181,56 +181,11 @@
 		)
 		(instances
 			(project
-				""
-				(path
-					"/4230698c-b526-4307-9655-afb80e239726"
-					(reference "R3")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(sheet
-		(at 49.53 36.83)
-		(size 35.4 20.32)
-		(stroke
-			(width 0.12)
-			(type solid)
-		)
-		(fill
-			(color
-				0
-				0
-				0
-				0.0
-			)
-		)
-		(uuid 8b524237-4053-4f67-8c74-08cc3453a6a1)
-		(property "Sheetname" "chil1"
-			(at 49.53 35.559999999999995 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Sheetfile" "chil1.kicad_sch"
-			(at 49.53 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-				(hide yes)
-			)
-		)
-		(instances
-			(project
 				"single_resistor_generated"
 				(path
-					"/"
-					(page "1")
+					"/4230698c-b526-4307-9655-afb80e239726/5eda4cf9-f3b7-4753-8ff9-af07e14d51ab/8b524237-4053-4f67-8c74-08cc3453a6a1/38af8e3c-47c5-482a-a87e-dba934441f1e"
+					(reference "R1")
+					(unit 1)
 				)
 			)
 		)
@@ -266,11 +221,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 9f96e7dd-d8c7-43d5-8b33-61f04e7ead54)
+		(uuid cf1bbe95-5b5c-4bec-8343-e2f03d2d149a)
 	)
 	(sheet_instances
 		(path
-			"/4230698c-b526-4307-9655-afb80e239726"
+			"/4230698c-b526-4307-9655-afb80e239726/5eda4cf9-f3b7-4753-8ff9-af07e14d51ab/8b524237-4053-4f67-8c74-08cc3453a6a1/38af8e3c-47c5-482a-a87e-dba934441f1e"
 			(page "1")
 		)
 	)

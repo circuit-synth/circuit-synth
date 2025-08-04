@@ -149,7 +149,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
+		(property "Value" "10k"
 			(at 128.27 82.5499 0)
 			(effects
 				(font
@@ -158,7 +158,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 123.952 81.28 90)
 			(effects
 				(font
@@ -196,6 +196,48 @@
 				(path "/8ea40386-79fd-4dea-8cc4-e20a6a247364"
 					(reference "R1")
 					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet
+		(at 149.86 86.36)
+		(size 17.78 16.51)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "5c9a6dd5-fe4a-4d9b-993b-8c5ee2461010")
+		(property "Sheetname" "child1"
+			(at 149.86 85.6484 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "child1.kicad_sch"
+			(at 149.86 103.4546 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "simple_resistor_reference"
+				(path "/8ea40386-79fd-4dea-8cc4-e20a6a247364"
+					(page "2")
 				)
 			)
 		)

@@ -129,6 +129,7 @@ class SExpressionParser:
         in_lib_symbols: bool = False,
         in_name: bool = False,
         in_text: bool = False,
+        in_reference: bool = False,
     ) -> str:
         """Format S-expression with proper indentation.
 
@@ -146,6 +147,7 @@ class SExpressionParser:
             in_symbol: True if we're formatting a symbol library ID
             in_lib_symbols: True if we're inside a lib_symbols section
             in_text: True if we're formatting text content
+            in_reference: True if we're formatting a reference value (inside instances)
         """
         if not isinstance(sexp, list):
             # Handle symbols and values
@@ -188,6 +190,9 @@ class SExpressionParser:
                         .replace("\n", "\\n")
                     )
                     return '"' + escaped + '"'
+                # Reference values must always be quoted (when inside instances)
+                if in_reference:
+                    return '"' + sexp + '"'
                 # Quote strings if they contain spaces or special characters
                 if " " in sexp or "\n" in sexp or '"' in sexp or "/" in sexp:
                     # Properly escape newlines and quotes for KiCad format
@@ -260,6 +265,14 @@ class SExpressionParser:
         is_lib_symbols_expr = tag_name == "lib_symbols"
         # Check if this is a text expression
         is_text_expr = tag_name == "text"
+        # Check if this is a generator_version expression
+        is_generator_version_expr = tag_name == "generator_version"
+        # Check if this is a paper expression
+        is_paper_expr = tag_name == "paper"
+        # Check if this is a lib_id expression
+        is_lib_id_expr = tag_name == "lib_id"
+        # Check if this is a reference expression
+        is_reference_expr = tag_name == "reference"
 
         if is_simple:
             # Format on one line
@@ -357,6 +370,15 @@ class SExpressionParser:
                             in_instances=in_instances,
                         )
                     )
+                elif is_generator_version_expr and i == 1:
+                    # For generator_version expressions, the value at index 1 should be quoted
+                    parts.append('"' + str(item) + '"')
+                elif is_paper_expr and i == 1:
+                    # For paper expressions, the value at index 1 should be quoted
+                    parts.append('"' + str(item) + '"')
+                elif is_lib_id_expr and i == 1:
+                    # For lib_id expressions, the value at index 1 should be quoted
+                    parts.append('"' + str(item) + '"')
                 elif is_text_expr and i == 1:
                     # For text expressions, the text content at index 1 should be quoted
                     parts.append(
@@ -365,6 +387,17 @@ class SExpressionParser:
                             indent,
                             tag_name,
                             in_text=True,
+                            in_instances=in_instances,
+                        )
+                    )
+                elif is_reference_expr and i == 1:
+                    # For reference expressions, the value at index 1 should be quoted (when inside instances)
+                    parts.append(
+                        self._format_sexp(
+                            item,
+                            indent,
+                            tag_name,
+                            in_reference=True,
                             in_instances=in_instances,
                         )
                     )
@@ -396,6 +429,32 @@ class SExpressionParser:
                         )
                     )
                 result += "\n" + "\t" * indent + ")"
+                return result
+            
+            # Special handling for property expressions - inline first 3 elements
+            if is_property_expr and len(sexp) >= 3:
+                # Format (property "name" "value" on same line
+                result = "(" + str(sexp[0])  # property tag
+                # Property name should be quoted
+                result += ' "' + str(sexp[1]) + '"'
+                # Property value should be quoted
+                result += ' "' + str(sexp[2]) + '"'
+                # Rest of content (at, effects) on new lines
+                if len(sexp) > 3:
+                    for i in range(3, len(sexp)):
+                        result += (
+                            "\n"
+                            + "\t" * (indent + 1)
+                            + self._format_sexp(
+                                sexp[i],
+                                indent + 1,
+                                tag_name,
+                                in_instances=in_instances,
+                            )
+                        )
+                    result += "\n" + "\t" * indent + ")"
+                else:
+                    result += ")"
                 return result
 
             # Format with indentation
@@ -552,6 +611,19 @@ class SExpressionParser:
                                 in_instances=in_instances,
                             )
                         )
+                    elif is_reference_expr and i == 1:
+                        # For reference expressions, the value at index 1 should be quoted (when inside instances)
+                        result += (
+                            "\n"
+                            + "\t" * (indent + 1)
+                            + self._format_sexp(
+                                item,
+                                indent + 1,
+                                tag_name,
+                                in_reference=True,
+                                in_instances=in_instances,
+                            )
+                        )
                     else:
                         result += (
                             "\n"
@@ -648,8 +720,9 @@ class SExpressionParser:
         sexp.append([sexpdata.Symbol("generator_version"), "9.0"])
         sexp.append([sexpdata.Symbol("uuid"), schematic.uuid])
 
-        # Add paper size only once
-        sexp.append([sexpdata.Symbol("paper"), "A4"])
+        # Add paper size only once - use the paper size from schematic if available
+        paper_size = getattr(schematic, 'paper_size', 'A4')
+        sexp.append([sexpdata.Symbol("paper"), paper_size])
 
         # Add lib_symbols section
         lib_symbols = self._generate_lib_symbols(schematic)
@@ -1016,9 +1089,11 @@ class SExpressionParser:
         ]
         sexp.append(at_expr)
 
-        # Add unit
-        if symbol.unit != 1:
-            sexp.append([sexpdata.Symbol("unit"), symbol.unit])
+        # Add unit (always add, even if 1, for KiCad compatibility)
+        sexp.append([sexpdata.Symbol("unit"), symbol.unit])
+
+        # Add exclude_from_sim (always no for now)
+        sexp.append([sexpdata.Symbol("exclude_from_sim"), sexpdata.Symbol("no")])
 
         # Add flags - use symbols not strings for KiCad compatibility
         sexp.append(
@@ -1040,6 +1115,9 @@ class SExpressionParser:
             ]
         )
 
+        # Add fields_autoplaced
+        sexp.append([sexpdata.Symbol("fields_autoplaced"), sexpdata.Symbol("yes")])
+
         # Add UUID
         sexp.append([sexpdata.Symbol("uuid"), symbol.uuid])
 
@@ -1054,6 +1132,7 @@ class SExpressionParser:
                 [
                     sexpdata.Symbol("effects"),
                     [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
+                    [sexpdata.Symbol("justify"), sexpdata.Symbol("left")],
                 ]
             )
             sexp.append(prop)
@@ -1068,6 +1147,7 @@ class SExpressionParser:
                 [
                     sexpdata.Symbol("effects"),
                     [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
+                    [sexpdata.Symbol("justify"), sexpdata.Symbol("left")],
                 ]
             )
             sexp.append(prop)
@@ -1311,10 +1391,13 @@ class SExpressionParser:
             sexp.append(pin_sexp)
 
         # Add instances section for new KiCad format
+        # Sheets need the actual project name in their instances
         instances = [sexpdata.Symbol("instances")]
+        # Get the project name from the schematic if available
+        project_name = getattr(sheet, '_project_name', 'circuit_synth')  # fallback to circuit_synth if not set
         project_instance = [
             sexpdata.Symbol("project"),
-            "circuit_synth",
+            project_name,
             [sexpdata.Symbol("path"), "/", [sexpdata.Symbol("page"), "1"]],
         ]
         instances.append(project_instance)
@@ -1355,10 +1438,11 @@ class SExpressionParser:
         sexp = [sexpdata.Symbol("symbol"), symbol_def.lib_id]
 
         # Add basic properties
+        # For KiCad compatibility, pin_numbers uses special format: (pin_numbers hide)
         sexp.append(
             [
                 sexpdata.Symbol("pin_numbers"),
-                [sexpdata.Symbol("hide"), sexpdata.Symbol("no")],
+                sexpdata.Symbol("hide"),  # Not a list, just the symbol
             ]
         )
         sexp.append([sexpdata.Symbol("pin_names"), [sexpdata.Symbol("offset"), 0.254]])

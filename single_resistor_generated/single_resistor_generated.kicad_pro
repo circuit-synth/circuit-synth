@@ -61,6 +61,14 @@
     [
       "single_resistor_generated.kicad_sch",
       ""
+    ],
+    [
+      "chil1.kicad_sch",
+      "chil1"
+    ],
+    [
+      "child2.kicad_sch",
+      "child2"
     ]
   ],
   "text_variables": {}

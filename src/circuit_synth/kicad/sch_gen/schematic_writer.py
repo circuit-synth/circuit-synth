@@ -357,26 +357,20 @@ class SchematicWriter:
             "⚡ STEP 7/8: Adding additional sections (paper, lib_symbols, sheet_instances)..."
         )
 
-        # Add text annotations (TextBox, TextProperty, etc.)
-        self._add_annotations()
-
-        # Convert to S-expression format using the parser
-        schematic_sexpr = self.parser.from_schematic(self.schematic)
-
-        # Add paper size (not in the API types yet)
+        # Paper size is now added by the parser, so we don't need to add it again
         paper_start = time.perf_counter()
-        self._add_paper_size(schematic_sexpr)
-        paper_time = time.perf_counter() - paper_start
+        # self._add_paper_size(schematic_sexpr)  # Removed to avoid duplicate
+        paper_time = 0  # No paper processing time
 
         # Add lib_symbols section
         libsym_start = time.perf_counter()
         self._add_symbol_definitions(schematic_sexpr)
         libsym_time = time.perf_counter() - libsym_start
 
-        # Add sheet_instances section
+        # sheet_instances is now added by the parser, so we don't need to add it again
         sheetinst_start = time.perf_counter()
-        self._add_sheet_instances(schematic_sexpr)
-        sheetinst_time = time.perf_counter() - sheetinst_start
+        # self._add_sheet_instances(schematic_sexpr)  # Removed to avoid duplicate
+        sheetinst_time = 0  # No sheet instances processing time
 
         sections_time = time.perf_counter() - sections_start
         logger.info(
@@ -543,9 +537,25 @@ class SchematicWriter:
                     instance_path = "/"
                     logger.debug(f"  Creating ROOT SHEET instance with path: /")
 
+                # Clear any existing instances that might have been added by component_manager
+                # We need to control the project name ourselves
+                api_component.instances.clear()
+                
                 # Create the instance
+                # Determine project name based on hierarchy level:
+                # - Root level (hierarchical_path has only 1 UUID - the root): empty string ""
+                # - Nested levels (hierarchical_path has more than 1 UUID): actual project name
+                if self.hierarchical_path and len(self.hierarchical_path) > 1:
+                    # We're in a nested schematic (path has more than just root UUID) - use project name
+                    instance_project = self.project_name
+                    logger.debug(f"  Using project name for nested component: {instance_project}")
+                else:
+                    # We're in the root schematic (path has only root UUID or is empty) - use empty string
+                    instance_project = ""
+                    logger.debug(f"  Using empty project name for root component")
+                
                 instance = SymbolInstance(
-                    project=self.project_name,
+                    project=instance_project,
                     path=instance_path,
                     reference=new_ref,
                     unit=comp.unit,
@@ -798,6 +808,9 @@ class SchematicWriter:
                 position=Point(sheet_x, sheet_y),
                 size=(width, height),
             )
+            
+            # Add project name to sheet for instances generation
+            sheet._project_name = self.project_name
 
             # Add pins for all child's net names
             grid_size = 1.27  # KiCad 50mil grid

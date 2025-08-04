@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version "9.0")
-	(uuid 5eda4cf9-f3b7-4753-8ff9-af07e14d51ab)
+	(uuid bca91dec-e7fe-4087-99d8-40e983593d12)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
@@ -138,7 +138,7 @@
 		)
 	)
 	(title_block
-		(title singe_resistor_generated)
+		(title chil1)
 		(date 2025-08-04)
 		(company Circuit-Synth)
 	)
@@ -151,8 +151,8 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid eb4f5845-c0f1-433e-88a5-151d535bcad6)
-		(property "Reference" "R3"
+		(uuid 4a0b8eb1-7a69-49cd-a795-c74a9b113031)
+		(property "Reference" "R2"
 			(at 38.1 40.72 0)
 			(effects
 				(font
@@ -181,10 +181,10 @@
 		)
 		(instances
 			(project
-				""
+				"single_resistor_generated"
 				(path
-					"/4230698c-b526-4307-9655-afb80e239726"
-					(reference "R3")
+					"/4230698c-b526-4307-9655-afb80e239726/5eda4cf9-f3b7-4753-8ff9-af07e14d51ab/8b524237-4053-4f67-8c74-08cc3453a6a1"
+					(reference "R2")
 					(unit 1)
 				)
 			)
@@ -205,8 +205,8 @@
 				0.0
 			)
 		)
-		(uuid 8b524237-4053-4f67-8c74-08cc3453a6a1)
-		(property "Sheetname" "chil1"
+		(uuid 38af8e3c-47c5-482a-a87e-dba934441f1e)
+		(property "Sheetname" "child2"
 			(at 49.53 35.559999999999995 0)
 			(effects
 				(font
@@ -215,7 +215,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "chil1.kicad_sch"
+		(property "Sheetfile" "child2.kicad_sch"
 			(at 49.53 58.42 0)
 			(effects
 				(font
@@ -266,11 +266,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 9f96e7dd-d8c7-43d5-8b33-61f04e7ead54)
+		(uuid ec7d2f05-2638-43f2-bb4a-f4ed03d7970b)
 	)
 	(sheet_instances
 		(path
-			"/4230698c-b526-4307-9655-afb80e239726"
+			"/4230698c-b526-4307-9655-afb80e239726/5eda4cf9-f3b7-4753-8ff9-af07e14d51ab/8b524237-4053-4f67-8c74-08cc3453a6a1"
 			(page "1")
 		)
 	)
