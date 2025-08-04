@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 046fb90f-2ed4-4349-ae25-ddec1c37634d)
+	(uuid 9ad0211c-f30e-4cc7-bf65-64cb8792c4b9)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -163,7 +163,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid cd343db5-f39c-441a-a558-0c34cc00e90e)
+		(uuid a5f617bb-6261-4a05-95ab-2f2241f4bc01)
 		(property
 			"Reference"
 			"R1"
@@ -207,7 +207,7 @@
 			(project
 				"single_resistor_generated"
 				(path
-					"/3bf14ccd-a29f-4eec-909b-9f7f3d0d4eff"
+					"/f81bb3c9-8339-4872-935f-859c54563d6e"
 					(reference R1)
 					(unit 1)
 				)
@@ -245,7 +245,7 @@
 			)
 			(justify left top)
 		)
-		(uuid 1e35073b-3a43-4976-9b5d-ce42f48816f2)
+		(uuid d3b589c4-ff09-4ab8-9c3f-3a68bdc80b9e)
 	)
 	(text_box
 		"Test circuit with just one resistor"
@@ -278,11 +278,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 1e35073b-3a43-4976-9b5d-ce42f48816f2)
+		(uuid d3b589c4-ff09-4ab8-9c3f-3a68bdc80b9e)
 	)
 	(sheet_instances
 		(path
-			"/3bf14ccd-a29f-4eec-909b-9f7f3d0d4eff"
+			"/f81bb3c9-8339-4872-935f-859c54563d6e"
 			(page "1")
 		)
 	)

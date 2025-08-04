@@ -27,6 +27,9 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+# Enable debug logging for this module
+logger.setLevel(logging.DEBUG)
+
 
 class ParseError(Exception):
     pass

@@ -1103,6 +1103,7 @@ class SchematicWriter:
             symbol_ids.add(comp.lib_id)
 
         for sym_id in sorted(symbol_ids):
+            logger.debug(f"📚 SCHEMATIC_WRITER: Fetching symbol data for '{sym_id}'")
             lib_data = SymbolLibCache.get_symbol_data(sym_id)
             if not lib_data:
                 logger.warning(
@@ -1110,6 +1111,7 @@ class SchematicWriter:
                     sym_id,
                 )
                 continue
+            logger.debug(f"    ✅ SCHEMATIC_WRITER: Got symbol data for '{sym_id}' with properties: {list(lib_data.get('properties', {}).keys()) if isinstance(lib_data, dict) else 'N/A'}")
 
             # Check if graphics data is missing from Rust cache - if so, use Python fallback
             if "graphics" not in lib_data or not lib_data["graphics"]:
@@ -1151,6 +1153,7 @@ class SchematicWriter:
         """
         Build a full KiCad (symbol ...) block from the library JSON data.
         """
+        logger.debug(f"🔧 SCHEMATIC_WRITER: Creating symbol definition for '{lib_id}'")
         base_name = lib_id.split(":")[-1]
 
         symbol_block = [
@@ -1165,7 +1168,9 @@ class SchematicWriter:
 
         # Properties
         props = lib_data.get("properties", {})
+        logger.debug(f"    📋 SCHEMATIC_WRITER: Symbol '{lib_id}' has {len(props)} properties")
         for prop_name, prop_value in props.items():
+            logger.debug(f"        🏷️  SCHEMATIC_WRITER: Property '{prop_name}' = '{prop_value}' (type: {type(prop_value).__name__})")
             hide_symbol = Symbol("no")
             if prop_name in (
                 "Footprint",
