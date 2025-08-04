@@ -549,9 +549,9 @@ class SchematicWriter:
                         f"  Creating SUB-SHEET instance with path: {instance_path}"
                     )
                 else:
-                    # Root sheet - just "/"
-                    instance_path = "/"
-                    logger.debug(f"  Creating ROOT SHEET instance with path: /")
+                    # Root sheet - use the schematic UUID
+                    instance_path = f"/{self.uuid_top}"
+                    logger.debug(f"  Creating ROOT SHEET instance with path: /{self.uuid_top}")
 
                 # Skip creating duplicate instance - ComponentManager already added one
                 # with the correct project name from self.schematic.project_name
@@ -1223,6 +1223,8 @@ class SchematicWriter:
                 # Extract the actual value from the dictionary (legacy format)
                 clean_prop_value = prop_value.get("value", "")
                 print(f"🔧 PROPERTY DEBUG: Legacy dict format, extracted: {repr(clean_prop_value)}")
+                print(f"🚨 CACHE BUG: Property {prop_name} is still a dictionary! This should be fixed in the cache.")
+                logger.warning(f"🚨 CACHE BUG: Property {prop_name} is still a dictionary! This should be fixed in the cache.")
             else:
                 # Use the clean string value directly (new fixed format)
                 clean_prop_value = str(prop_value) if prop_value else ""

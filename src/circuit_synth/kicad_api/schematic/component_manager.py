@@ -118,7 +118,11 @@ class ComponentManager:
             project_name, hierarchical_path = get_project_hierarchy_path(schematic_path)
         else:
             project_name = getattr(self.schematic, "project_name", "generated_project")
-            hierarchical_path = "/"
+            # Use the schematic's UUID for the hierarchical path
+            if hasattr(self.schematic, 'uuid') and self.schematic.uuid:
+                hierarchical_path = f"/{self.schematic.uuid}"
+            else:
+                hierarchical_path = "/"
         add_symbol_instance(component, project_name, hierarchical_path)
 
         # Add to schematic
@@ -211,7 +215,11 @@ class ComponentManager:
                 )
             else:
                 project_name = getattr(self.schematic, "project_name", "generated_project")
-                hierarchical_path = "/"
+                # Use the schematic's UUID for the hierarchical path
+                if hasattr(self.schematic, 'uuid') and self.schematic.uuid:
+                    hierarchical_path = f"/{self.schematic.uuid}"
+                else:
+                    hierarchical_path = "/"
             add_symbol_instance(component, project_name, hierarchical_path)
             logger.debug(
                 f"Added instance information to component {component.reference}"

@@ -277,6 +277,9 @@ class SExpressionParser:
                 # Property values must always be quoted
                 if in_property_value:
                     return '"' + sexp + '"'
+                # UUID values must always be quoted
+                if parent_tag == "uuid":
+                    return '"' + str(sexp) + '"'
                 # Generator values must always be quoted
                 if in_generator:
                     return '"' + sexp + '"'
@@ -359,14 +362,6 @@ class SExpressionParser:
         # on the first line, then nested elements on subsequent lines
         is_property_expr = tag_name == "property"
         
-        is_simple = (
-            len(sexp) <= 4
-            and all(not isinstance(item, list) for item in sexp)
-            and sum(len(str(item)) for item in sexp) < 60
-        ) or (
-            is_symbol_in_lib_symbols and len(sexp) == 2
-        )  # Just symbol tag and ID
-
         # Check if this is a number expression
         is_number_expr = tag_name == "number"
         # Check if this is a name expression
@@ -377,6 +372,19 @@ class SExpressionParser:
         is_instances_expr = tag_name == "instances"
         # Check if this is a page expression
         is_page_expr = tag_name == "page"
+        # Check if this is a pin expression
+        is_pin_expr = tag_name == "pin"
+        
+        # Pin expressions should be formatted as simple expressions when they have just pin number and uuid
+        is_simple_pin = is_pin_expr and len(sexp) == 3 and isinstance(sexp[2], list) and len(sexp[2]) == 2
+        
+        is_simple = (
+            len(sexp) <= 4
+            and all(not isinstance(item, list) for item in sexp)
+            and sum(len(str(item)) for item in sexp) < 60
+        ) or (
+            is_symbol_in_lib_symbols and len(sexp) == 2
+        ) or is_simple_pin  # Pin expressions with just number and uuid
         # Check if this is a property expression
         is_property_expr = tag_name == "property"
         # Check if this is a generator expression
@@ -405,6 +413,11 @@ class SExpressionParser:
                 elif is_name_expr and i == 1:
                     parts.append(
                         self._format_sexp(item, indent, tag_name, in_name=True)
+                    )
+                # For pin expressions, pass in_number=True for the pin number at index 1
+                elif is_pin_expr and i == 1:
+                    parts.append(
+                        self._format_sexp(item, indent, tag_name, in_number=True)
                     )
                 # For project expressions, pass in_project=True for the value at index 1
                 elif is_project_expr and i == 1:
@@ -1247,9 +1260,11 @@ class SExpressionParser:
         ]
         sexp.append(at_expr)
 
-        # Add unit
-        if symbol.unit != 1:
-            sexp.append([sexpdata.Symbol("unit"), symbol.unit])
+        # Add unit (always include unit, even if it's 1, as KiCad expects it)
+        sexp.append([sexpdata.Symbol("unit"), symbol.unit])
+
+        # Add exclude_from_sim flag (required for proper KiCad compatibility)
+        sexp.append([sexpdata.Symbol("exclude_from_sim"), sexpdata.Symbol("no")])
 
         # Add flags - use symbols not strings for KiCad compatibility
         sexp.append(
@@ -1270,6 +1285,9 @@ class SExpressionParser:
                 sexpdata.Symbol("yes") if symbol.dnp else sexpdata.Symbol("no"),
             ]
         )
+
+        # Add fields_autoplaced flag (critical for proper reference display)
+        sexp.append([sexpdata.Symbol("fields_autoplaced"), sexpdata.Symbol("yes")])
 
         # Add UUID
         sexp.append([sexpdata.Symbol("uuid"), symbol.uuid])
@@ -1341,6 +1359,42 @@ class SExpressionParser:
             )
             sexp.append(prop)
 
+        # Add Datasheet property (required for KiCad compatibility)
+        datasheet_value = "~"  # Default KiCad value for no datasheet
+        if hasattr(symbol, 'datasheet') and symbol.datasheet:
+            datasheet_value = symbol.datasheet
+        elif 'Datasheet' in symbol.properties:
+            datasheet_value = symbol.properties['Datasheet']
+        
+        prop = [sexpdata.Symbol("property"), "Datasheet", datasheet_value]
+        prop.append([sexpdata.Symbol("at"), symbol.position.x, symbol.position.y, 0])
+        prop.append(
+            [
+                sexpdata.Symbol("effects"),
+                [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
+                [sexpdata.Symbol("hide"), sexpdata.Symbol("yes")],
+            ]
+        )
+        sexp.append(prop)
+
+        # Add Description property (required for KiCad compatibility)
+        description_value = "Resistor"  # Default for resistors
+        if hasattr(symbol, 'description') and symbol.description:
+            description_value = symbol.description
+        elif 'Description' in symbol.properties:
+            description_value = symbol.properties['Description']
+        
+        prop = [sexpdata.Symbol("property"), "Description", description_value]
+        prop.append([sexpdata.Symbol("at"), symbol.position.x, symbol.position.y, 0])
+        prop.append(
+            [
+                sexpdata.Symbol("effects"),
+                [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
+                [sexpdata.Symbol("hide"), sexpdata.Symbol("yes")],
+            ]
+        )
+        sexp.append(prop)
+
         # Add custom properties, but skip internal ones and standard KiCad properties
         internal_properties = {
             "hierarchy_path",
@@ -1382,6 +1436,49 @@ class SExpressionParser:
                     ]
                 )
                 sexp.append(prop)
+
+        # Add pin UUIDs (required for KiCad compatibility)
+        # Get symbol definition to find pins
+        try:
+            from ..core.symbol_cache import get_symbol_cache
+            symbol_cache = get_symbol_cache()
+            symbol_def = symbol_cache.get_symbol(symbol.lib_id)
+            if symbol_def and hasattr(symbol_def, 'pins') and symbol_def.pins:
+                import uuid
+                for pin_def in symbol_def.pins:
+                    pin_number = pin_def.get("number", "")
+                    if pin_number:
+                        pin_uuid = str(uuid.uuid4())
+                        sexp.append([sexpdata.Symbol("pin"), str(pin_number), [sexpdata.Symbol("uuid"), pin_uuid]])
+            elif symbol_def and isinstance(symbol_def, dict) and "pins" in symbol_def:
+                import uuid
+                for pin_def in symbol_def["pins"]:
+                    pin_number = pin_def.get("number", "")
+                    if pin_number:
+                        pin_uuid = str(uuid.uuid4())
+                        sexp.append([sexpdata.Symbol("pin"), str(pin_number), [sexpdata.Symbol("uuid"), pin_uuid]])
+            else:
+                # Fallback: add standard pin UUIDs for common components
+                import uuid
+                if "R" in symbol.lib_id:  # Resistor has pins 1 and 2
+                    pin_uuid_1 = str(uuid.uuid4())
+                    pin_uuid_2 = str(uuid.uuid4())
+                    # Ensure pin numbers are strings and will be quoted
+                    sexp.append([sexpdata.Symbol("pin"), "1", [sexpdata.Symbol("uuid"), pin_uuid_1]])
+                    sexp.append([sexpdata.Symbol("pin"), "2", [sexpdata.Symbol("uuid"), pin_uuid_2]])
+        except Exception as e:
+            logger.warning(f"Could not add pin UUIDs for symbol {symbol.lib_id}: {e}")
+            # Fallback: add standard pin UUIDs for resistors
+            try:
+                import uuid
+                if "R" in symbol.lib_id:  # Resistor has pins 1 and 2
+                    pin_uuid_1 = str(uuid.uuid4())
+                    pin_uuid_2 = str(uuid.uuid4())
+                    # Ensure pin numbers are strings and will be quoted
+                    sexp.append([sexpdata.Symbol("pin"), "1", [sexpdata.Symbol("uuid"), pin_uuid_1]])
+                    sexp.append([sexpdata.Symbol("pin"), "2", [sexpdata.Symbol("uuid"), pin_uuid_2]])
+            except:
+                pass
 
         # Add mirror if present
         if symbol.mirror:

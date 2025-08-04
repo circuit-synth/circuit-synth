@@ -15,9 +15,7 @@
     "layer_presets": [],
     "viewports": []
   },
-  "boards": [
-    "generated_project.kicad_pcb"
-  ],
+  "boards": [],
   "cvpcb": {
     "equivalence_files": []
   },
@@ -416,7 +414,7 @@
   },
   "sheets": [
     [
-      "generated_project.kicad_sch",
+      "51d89a2f-a8cf-45b1-bea7-1060d36b7672",
       ""
     ]
   ],

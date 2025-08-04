@@ -1,9 +1,9 @@
 (export (version "E")
     (design
       (source "generated_project.kicad_sch")
-      (date "2025-08-04T01:48:10-0700")
+      (date "2025-08-04T07:49:09-0700")
       (tool "Circuit-Synth Exporter v0.1.0")
-      (sheet (number "1") (name "root") (tstamps "/5f91a6c1-35f2-4ae2-8ce9-0b24429a62b2/")
+      (sheet (number "1") (name "root") (tstamps "/fa60f96a-ac44-467f-bb7a-30e6b658f653/")
       (title_block
         (title)
         (company)
@@ -33,7 +33,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "e7135ad6-8866-4ef0-8f7d-f49a967274f9")))
+      (tstamps "7b89f084-d18a-4e03-b903-5076fb81c227")))
     (libparts
     (libpart (lib "Device") (part "R")
       (description "Resistor")

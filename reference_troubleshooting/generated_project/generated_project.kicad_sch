@@ -1,23 +1,22 @@
 (kicad_sch
 	(version 20250114)
 	(generator "kicad_api")
-	(generator_version 9.0)
-	(uuid 457e4b81-a528-4a9b-919c-97b0f5bd011d)
-	(paper A4)
-	(paper A4)
+	(generator_version "9.0")
+	(uuid "96743d57-e65a-439f-bce6-f86928a01181")
+	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property
-				"Reference"
-				"{'value': 'R', 'position': {'x': 2.032, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Reference" "R"
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -25,10 +24,8 @@
 					(hide no)
 				)
 			)
-			(property
-				"Value"
-				"{'value': 'R', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Value" "R"
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -36,10 +33,8 @@
 					(hide no)
 				)
 			)
-			(property
-				"Footprint"
-				"{'value': '', 'position': {'x': -1.778, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Footprint" ""
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -47,10 +42,8 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Datasheet"
-				"{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Datasheet" "~"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -58,10 +51,8 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Description"
-				"{'value': 'Resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Description" "Resistor"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -69,10 +60,8 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_keywords"
-				"{'value': 'R res resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "ki_keywords" "R res resistor"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -80,10 +69,8 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_fp_filters"
-				"{'value': 'R_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "ki_fp_filters" "R_*"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -111,7 +98,7 @@
 					(at 0.0 3.81 270)
 					(length 1.27)
 					(name
-						~
+						"~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -133,7 +120,7 @@
 					(at 0.0 -3.81 90)
 					(length 1.27)
 					(name
-						~
+						"~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -158,15 +145,16 @@
 		(company Circuit-Synth)
 	)
 	(symbol
-		(lib_id Device:R)
+		(lib_id "Device:R")
 		(at 38.1 45.72 0)
+		(unit 1)
+		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid dc30acc3-5abf-49df-9eb7-44ec54484ef2)
-		(property
-			"Reference"
-			"R1"
+		(fields_autoplaced yes)
+		(uuid "2d82695f-895a-4999-877d-92ef1e1e78de")
+		(property "Reference" "R1"
 			(at 40.64 44.449999999999996 0)
 			(effects
 				(font
@@ -175,9 +163,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Value"
-			"10k"
+		(property "Value" "10k"
 			(at 40.64 46.99 0)
 			(effects
 				(font
@@ -186,9 +172,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 38.1 55.72 0)
 			(effects
 				(font
@@ -197,36 +181,42 @@
 				(hide yes)
 			)
 		)
-		(instances
-			(project
-				"circuit"
-				(path
-					"/"
-					(reference R1)
-					(unit 1)
+		(property "Datasheet" "~"
+			(at 38.1 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
+		)
+		(property "Description" "Resistor"
+			(at 38.1 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1" (uuid "3c52958f-c1e1-4bd4-94c1-ecbee26c6bb2"))
+		(pin "2" (uuid "f11e8960-85e7-46d3-9841-81b57b6dae77"))
+		(instances
 			(project
 				"generated_project"
 				(path
-					"/b40d40d4-a6d3-4171-be87-0d406e3fad13"
-					(reference R1)
+					"/96743d57-e65a-439f-bce6-f86928a01181"
+					(reference "R1")
 					(unit 1)
 				)
 			)
 		)
 	)
-	(sheet_instances
-		(path
-			"/b40d40d4-a6d3-4171-be87-0d406e3fad13"
-			(page "1")
-		)
-	)
-	(embedded_fonts no)
 	(sheet_instances
 		(path
 			"/"
 			(page "1")
 		)
 	)
+	(embedded_fonts no)
 )

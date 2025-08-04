@@ -1,20 +1,22 @@
 (kicad_sch
 	(version 20250114)
 	(generator "kicad_api")
-	(generator_version 9.0)
-	(uuid f841b892-f610-4897-ad8c-69cd60c5fc38)
-	(paper A4)
+	(generator_version "9.0")
+	(uuid "02341f55-dd56-474d-b88e-ebb357d27bab")
+	(paper "A4")
 	(lib_symbols
 		(symbol "Device:LED"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "D"
-				(at 0.0 0.0 0)
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -23,7 +25,7 @@
 				)
 			)
 			(property "Value" "LED"
-				(at 0.0 0.0 0)
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -32,7 +34,7 @@
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -41,7 +43,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -50,7 +52,7 @@
 				)
 			)
 			(property "Description" "Light emitting diode"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -59,7 +61,7 @@
 				)
 			)
 			(property "Sim.Pins" "1=K 2=A"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -68,7 +70,7 @@
 				)
 			)
 			(property "ki_keywords" "LED diode"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -77,7 +79,7 @@
 				)
 			)
 			(property "ki_fp_filters" "LED* LED_SMD:* LED_THT:*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -167,7 +169,7 @@
 					(at -3.81 0.0 0)
 					(length 2.54)
 					(name
-						K
+						"K"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -189,7 +191,7 @@
 					(at 3.81 0.0 180)
 					(length 2.54)
 					(name
-						A
+						"A"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -208,15 +210,17 @@
 			)
 		)
 		(symbol "Device:R"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "R"
-				(at 0.0 0.0 0)
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -225,7 +229,7 @@
 				)
 			)
 			(property "Value" "R"
-				(at 0.0 0.0 0)
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -234,7 +238,7 @@
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -243,7 +247,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -252,7 +256,7 @@
 				)
 			)
 			(property "Description" "Resistor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -261,7 +265,7 @@
 				)
 			)
 			(property "ki_keywords" "R res resistor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -270,7 +274,7 @@
 				)
 			)
 			(property "ki_fp_filters" "R_*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -298,7 +302,7 @@
 					(at 0.0 3.81 270)
 					(length 1.27)
 					(name
-						~
+						"~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -320,7 +324,7 @@
 					(at 0.0 -3.81 90)
 					(length 1.27)
 					(name
-						~
+						"~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -339,19 +343,21 @@
 			)
 		)
 	)
-	(paper A4)
 	(title_block
 		(title LED_Blinker)
 		(date 2025-08-04)
 		(company Circuit-Synth)
 	)
 	(symbol
-		(lib_id Device:LED)
+		(lib_id "Device:LED")
 		(at 45.72 45.72 0)
+		(unit 1)
+		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 56a8539a-3b41-4ce6-8954-9ff3a077f796)
+		(fields_autoplaced yes)
+		(uuid "32ab7d12-101e-450e-b6d0-260a083ed3e9")
 		(property "Reference" "D3"
 			(at 48.26 44.449999999999996 0)
 			(effects
@@ -370,24 +376,45 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" "~"
+			(at 45.72 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 45.72 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(instances
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/"
-					(reference D3)
+					"/02341f55-dd56-474d-b88e-ebb357d27bab"
+					(reference "D3")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id Device:R)
+		(lib_id "Device:R")
 		(at 68.58 45.72 0)
+		(unit 1)
+		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 8a2a1913-28d5-4af4-8ed7-2cfb194b5f29)
+		(fields_autoplaced yes)
+		(uuid "5507c832-e4fb-4fb1-b101-93b0598d6baf")
 		(property "Reference" "R3"
 			(at 71.12 44.449999999999996 0)
 			(effects
@@ -415,12 +442,32 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" "~"
+			(at 68.58 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 68.58 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1" (uuid "8ff8f1bc-22df-4c94-8a3f-ad2914d25df2"))
+		(pin "2" (uuid "008c14d2-e433-4c86-b878-1d26c8743d1b"))
 		(instances
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/"
-					(reference R3)
+					"/02341f55-dd56-474d-b88e-ebb357d27bab"
+					(reference "R3")
 					(unit 1)
 				)
 			)
@@ -436,7 +483,7 @@
 			)
 			(justify right)
 		)
-		(uuid a9312604-3278-47f0-b16b-c81fc5704eeb)
+		(uuid "a5cda6ee-e539-4c0c-bc20-42b736830632")
 	)
 	(hierarchical_label
 		GND
@@ -448,7 +495,7 @@
 			)
 			(justify right)
 		)
-		(uuid 6b604a45-ef3a-42cb-b085-b37b38aebebd)
+		(uuid "96d2a12b-eabc-4640-b1e3-009500fa3081")
 	)
 	(hierarchical_label
 		N$3
@@ -460,7 +507,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9a8dc74c-77a0-45eb-9410-3f8eacedcc3b)
+		(uuid "910de88d-7531-4f0c-a30e-7975b34de460")
 	)
 	(hierarchical_label
 		N$3
@@ -472,7 +519,7 @@
 			)
 			(justify right)
 		)
-		(uuid aac85034-7375-4b40-895f-c7a6823da4ad)
+		(uuid "74120c2a-5b4e-49ed-9590-68f981939b2a")
 	)
 	(hierarchical_label
 		LED_CONTROL
@@ -484,7 +531,7 @@
 			)
 			(justify left)
 		)
-		(uuid 4c5a9740-7725-4595-9d91-62bfc4ea65ce)
+		(uuid "a1216b28-ab62-459b-88c9-54823fad7a03")
 	)
 	(text_box
 		"LED with current limiting resistor - Correct circuit topology"
@@ -517,7 +564,7 @@
 			)
 			(justify left top)
 		)
-		(uuid f004cfb9-ae60-46b2-a0c5-7f8c208109bb)
+		(uuid "e09438b3-d3e0-45be-8f0f-f141b368410d")
 	)
 	(sheet_instances
 		(path

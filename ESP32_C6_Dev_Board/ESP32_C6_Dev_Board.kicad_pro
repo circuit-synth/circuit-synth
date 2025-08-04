@@ -414,27 +414,27 @@
   },
   "sheets": [
     [
-      "f1e31098-bad7-47a4-9781-5d9eec1f6eba",
+      "a2d99e67-82a4-4481-aebb-efa63f7f57c2",
       ""
     ],
     [
-      "3c853981-93ec-45b2-a3ca-1469b490961c",
+      "832bdc39-5ff5-415a-9fa7-784a3b8ab5ee",
       "USB_Port"
     ],
     [
-      "5e7fc042-1fe8-478c-92d5-4c62922b21e6",
+      "aa535900-c0d6-4d31-8cc6-895f0d8dc8e9",
       "Power_Supply"
     ],
     [
-      "9f5652a5-66d0-4eaa-8aee-16184470a2d6",
+      "b4437023-a2d3-4f02-b4f6-3a2eaa3b85ea",
       "ESP32_C6_MCU"
     ],
     [
-      "7ad30d86-6d88-4d6c-8b0a-8a61dfb3e385",
+      "d51443c8-7ed7-4ab5-84ba-0ef63d003b55",
       "Debug_Header"
     ],
     [
-      "d1f6cccc-0f1e-4922-9bfd-ceed152ad64f",
+      "c0d6810b-e0a9-4caa-9fec-e9c556be4218",
       "LED_Blinker"
     ]
   ],

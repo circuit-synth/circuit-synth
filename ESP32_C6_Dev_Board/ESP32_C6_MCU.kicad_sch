@@ -1,20 +1,22 @@
 (kicad_sch
 	(version 20250114)
 	(generator "kicad_api")
-	(generator_version 9.0)
-	(uuid b9f6ab9b-41d4-441f-b062-69b433fbe1b7)
-	(paper A4)
+	(generator_version "9.0")
+	(uuid "acafe760-8305-4219-9542-80ec18fae1b1")
+	(paper "A4")
 	(lib_symbols
 		(symbol "Device:C"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "C"
-				(at 0.0 0.0 0)
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -23,7 +25,7 @@
 				)
 			)
 			(property "Value" "C"
-				(at 0.0 0.0 0)
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -32,7 +34,7 @@
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -41,7 +43,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -50,7 +52,7 @@
 				)
 			)
 			(property "Description" "Unpolarized capacitor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -59,7 +61,7 @@
 				)
 			)
 			(property "ki_keywords" "cap capacitor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -68,7 +70,7 @@
 				)
 			)
 			(property "ki_fp_filters" "C_*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -111,7 +113,7 @@
 					(at 0.0 3.81 270)
 					(length 2.794)
 					(name
-						~
+						"~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -133,7 +135,7 @@
 					(at 0.0 -3.81 90)
 					(length 2.794)
 					(name
-						~
+						"~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -152,15 +154,17 @@
 			)
 		)
 		(symbol "Device:R"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "R"
-				(at 0.0 0.0 0)
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -169,7 +173,7 @@
 				)
 			)
 			(property "Value" "R"
-				(at 0.0 0.0 0)
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -178,7 +182,7 @@
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -187,7 +191,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -196,7 +200,7 @@
 				)
 			)
 			(property "Description" "Resistor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -205,7 +209,7 @@
 				)
 			)
 			(property "ki_keywords" "R res resistor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -214,7 +218,7 @@
 				)
 			)
 			(property "ki_fp_filters" "R_*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -242,7 +246,7 @@
 					(at 0.0 3.81 270)
 					(length 1.27)
 					(name
-						~
+						"~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -264,7 +268,7 @@
 					(at 0.0 -3.81 90)
 					(length 1.27)
 					(name
-						~
+						"~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -283,15 +287,17 @@
 			)
 		)
 		(symbol "RF_Module:ESP32-C6-MINI-1"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "U"
-				(at 0.0 0.0 0)
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -300,7 +306,7 @@
 				)
 			)
 			(property "Value" "ESP32-C6-MINI-1"
-				(at 0.0 0.0 0)
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -309,7 +315,7 @@
 				)
 			)
 			(property "Footprint" "RF_Module:ESP32-C6-MINI-1"
-				(at 0.0 0.0 0)
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -318,7 +324,7 @@
 				)
 			)
 			(property "Datasheet" "https://www.espressif.com/sites/default/files/documentation/esp32-c6-mini-1_mini-1u_datasheet_en.pdf"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -327,7 +333,7 @@
 				)
 			)
 			(property "Description" "RF Module, ESP32-C6 SoC, Wi-Fi 802.11b/g/n/ax, Bluetooth, BLE, Zigbee, Thread, 32-bit, 3.3V, SMD, onboard antenna"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -336,7 +342,7 @@
 				)
 			)
 			(property "ki_keywords" "Radio BT ESP Espressif"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -345,7 +351,7 @@
 				)
 			)
 			(property "ki_fp_filters" "ESP32?C6?MINI?1*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -373,7 +379,7 @@
 					(at -15.24 20.32 0)
 					(length 2.54)
 					(name
-						EN
+						"EN"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -395,7 +401,7 @@
 					(at -15.24 15.24 0)
 					(length 2.54)
 					(name
-						IO0
+						"IO0"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -417,7 +423,7 @@
 					(at -15.24 12.7 0)
 					(length 2.54)
 					(name
-						IO1
+						"IO1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -439,7 +445,7 @@
 					(at -15.24 10.16 0)
 					(length 2.54)
 					(name
-						IO2
+						"IO2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -461,7 +467,7 @@
 					(at -15.24 7.62 0)
 					(length 2.54)
 					(name
-						IO3
+						"IO3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -483,7 +489,7 @@
 					(at -15.24 5.08 0)
 					(length 2.54)
 					(name
-						IO4
+						"IO4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -505,7 +511,7 @@
 					(at -15.24 2.54 0)
 					(length 2.54)
 					(name
-						IO5
+						"IO5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -527,7 +533,7 @@
 					(at -15.24 0.0 0)
 					(length 2.54)
 					(name
-						IO6
+						"IO6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -549,7 +555,7 @@
 					(at -15.24 -2.54 0)
 					(length 2.54)
 					(name
-						IO7
+						"IO7"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -571,7 +577,7 @@
 					(at -15.24 -5.08 0)
 					(length 2.54)
 					(name
-						IO8
+						"IO8"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -593,7 +599,7 @@
 					(at -15.24 -7.62 0)
 					(length 2.54)
 					(name
-						IO9
+						"IO9"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -615,7 +621,7 @@
 					(at -12.7 -12.7 0)
 					(length 2.54)
 					(name
-						NC
+						"NC"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -637,7 +643,7 @@
 					(at -12.7 -15.24 0)
 					(length 2.54)
 					(name
-						NC
+						"NC"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -659,7 +665,7 @@
 					(at -12.7 -17.78 0)
 					(length 2.54)
 					(name
-						NC
+						"NC"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -681,7 +687,7 @@
 					(at -12.7 -20.32 0)
 					(length 2.54)
 					(name
-						NC
+						"NC"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -703,7 +709,7 @@
 					(at 0.0 25.4 270)
 					(length 2.54)
 					(name
-						3V3
+						"3V3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -725,7 +731,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -747,7 +753,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -769,7 +775,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -791,7 +797,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -813,7 +819,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -835,7 +841,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -857,7 +863,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -879,7 +885,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -901,7 +907,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -923,7 +929,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -945,7 +951,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -967,7 +973,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -989,7 +995,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1011,7 +1017,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1033,7 +1039,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1055,7 +1061,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1077,7 +1083,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1099,7 +1105,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1121,7 +1127,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1143,7 +1149,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1165,7 +1171,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1187,7 +1193,7 @@
 					(at 0.0 -25.4 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1209,7 +1215,7 @@
 					(at 12.7 -15.24 180)
 					(length 2.54)
 					(name
-						NC
+						"NC"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1231,7 +1237,7 @@
 					(at 12.7 -17.78 180)
 					(length 2.54)
 					(name
-						NC
+						"NC"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1253,7 +1259,7 @@
 					(at 12.7 -20.32 180)
 					(length 2.54)
 					(name
-						NC
+						"NC"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1275,7 +1281,7 @@
 					(at 15.24 20.32 180)
 					(length 2.54)
 					(name
-						TXD0
+						"TXD0"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1297,7 +1303,7 @@
 					(at 15.24 17.78 180)
 					(length 2.54)
 					(name
-						RXD0
+						"RXD0"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1319,7 +1325,7 @@
 					(at 15.24 12.7 180)
 					(length 2.54)
 					(name
-						IO12
+						"IO12"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1341,7 +1347,7 @@
 					(at 15.24 10.16 180)
 					(length 2.54)
 					(name
-						IO13
+						"IO13"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1363,7 +1369,7 @@
 					(at 15.24 7.62 180)
 					(length 2.54)
 					(name
-						IO14
+						"IO14"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1385,7 +1391,7 @@
 					(at 15.24 5.08 180)
 					(length 2.54)
 					(name
-						IO15
+						"IO15"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1407,7 +1413,7 @@
 					(at 15.24 0.0 180)
 					(length 2.54)
 					(name
-						IO18
+						"IO18"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1429,7 +1435,7 @@
 					(at 15.24 -2.54 180)
 					(length 2.54)
 					(name
-						IO19
+						"IO19"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1451,7 +1457,7 @@
 					(at 15.24 -5.08 180)
 					(length 2.54)
 					(name
-						IO20
+						"IO20"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1473,7 +1479,7 @@
 					(at 15.24 -7.62 180)
 					(length 2.54)
 					(name
-						IO21
+						"IO21"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1495,7 +1501,7 @@
 					(at 15.24 -10.16 180)
 					(length 2.54)
 					(name
-						IO22
+						"IO22"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1517,7 +1523,7 @@
 					(at 15.24 -12.7 180)
 					(length 2.54)
 					(name
-						IO23
+						"IO23"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1536,19 +1542,21 @@
 			)
 		)
 	)
-	(paper A4)
 	(title_block
 		(title ESP32_C6_MCU)
 		(date 2025-08-04)
 		(company Circuit-Synth)
 	)
 	(symbol
-		(lib_id RF_Module:ESP32-C6-MINI-1)
+		(lib_id "RF_Module:ESP32-C6-MINI-1")
 		(at 58.42 76.2 0)
+		(unit 1)
+		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid fb50c3e6-7495-4d75-b4cb-7e036eea96db)
+		(fields_autoplaced yes)
+		(uuid "288264c5-f1fa-43a8-a29b-5d94a69b0299")
 		(property "Reference" "U2"
 			(at 60.96 74.93 0)
 			(effects
@@ -1567,24 +1575,47 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" "~"
+			(at 58.42 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 58.42 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1" (uuid "46d62cfd-f3d1-4ac6-9169-be67dcd37bdc"))
+		(pin "2" (uuid "a68d253a-e811-49e0-9821-012aa63e9e5a"))
 		(instances
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/"
-					(reference U2)
+					"/acafe760-8305-4219-9542-80ec18fae1b1"
+					(reference "U2")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id Device:C)
+		(lib_id "Device:C")
 		(at 91.44 76.2 0)
+		(unit 1)
+		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 7e9dd13d-f274-4346-825a-06a47043ef5c)
+		(fields_autoplaced yes)
+		(uuid "7edbcbb4-29f5-4950-a4b4-e0ec1de4421e")
 		(property "Reference" "C4"
 			(at 93.98 74.93 0)
 			(effects
@@ -1612,24 +1643,45 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" "~"
+			(at 91.44 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 91.44 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(instances
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/"
-					(reference C4)
+					"/acafe760-8305-4219-9542-80ec18fae1b1"
+					(reference "C4")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id Device:R)
+		(lib_id "Device:R")
 		(at 111.76 76.2 0)
+		(unit 1)
+		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 1fe28bd9-5efa-4d35-af7e-3abd0741b1bc)
+		(fields_autoplaced yes)
+		(uuid "05a80ffd-bed5-4081-8108-9400cbb9126d")
 		(property "Reference" "R4"
 			(at 114.30000000000001 74.93 0)
 			(effects
@@ -1657,24 +1709,47 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" "~"
+			(at 111.76 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 111.76 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1" (uuid "ae579547-ea27-468e-a068-69e2b1a137a9"))
+		(pin "2" (uuid "af09b4a9-244e-4c2c-9ed8-a10e86927a54"))
 		(instances
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/"
-					(reference R4)
+					"/acafe760-8305-4219-9542-80ec18fae1b1"
+					(reference "R4")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id Device:R)
+		(lib_id "Device:R")
 		(at 132.08 76.2 0)
+		(unit 1)
+		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 95540931-465b-4fb3-b4f5-5861c7a583a6)
+		(fields_autoplaced yes)
+		(uuid "12bed057-d4d4-4ace-a9f5-93252b6f11e9")
 		(property "Reference" "R5"
 			(at 134.62 74.93 0)
 			(effects
@@ -1702,12 +1777,32 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" "~"
+			(at 132.08 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 132.08 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1" (uuid "f13c6f17-7bd9-4eaf-b846-3e95d061f46a"))
+		(pin "2" (uuid "2a690cab-5292-4ff9-9924-09f5e626e733"))
 		(instances
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/"
-					(reference R5)
+					"/acafe760-8305-4219-9542-80ec18fae1b1"
+					(reference "R5")
 					(unit 1)
 				)
 			)
@@ -1723,7 +1818,7 @@
 			)
 			(justify right)
 		)
-		(uuid 4d2c64ac-0db5-46cb-9644-90820d75cf4b)
+		(uuid "166e7b2b-62ce-4b7e-be25-a8ef104d9f4f")
 	)
 	(hierarchical_label
 		DEBUG_EN
@@ -1735,7 +1830,7 @@
 			)
 			(justify right)
 		)
-		(uuid d9e01166-6eb4-4cf4-9acd-951b09e5cefc)
+		(uuid "309857ad-84a4-4270-99c8-d9c712a6eece")
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -1747,7 +1842,7 @@
 			)
 			(justify right)
 		)
-		(uuid 95e2113d-bbfd-4e2a-8e15-26cd74a76a51)
+		(uuid "447b96f6-b902-41c1-8f92-4a1028ab3084")
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -1759,7 +1854,7 @@
 			)
 			(justify right)
 		)
-		(uuid 4461379a-25fb-491c-b7e5-97d5bac05c62)
+		(uuid "a127bdc7-70cb-480c-ab3f-d5f280bd23dc")
 	)
 	(hierarchical_label
 		LED_CONTROL
@@ -1771,7 +1866,7 @@
 			)
 			(justify right)
 		)
-		(uuid fbb9669e-95b4-4300-b33d-3a6affb811a8)
+		(uuid "5368c8fd-b37d-4fad-aa43-6b6276f9e277")
 	)
 	(hierarchical_label
 		LED_CONTROL
@@ -1783,7 +1878,7 @@
 			)
 			(justify right)
 		)
-		(uuid ca7ea614-0a9b-44bc-aa52-ff5717236b78)
+		(uuid "85c3bce0-9d11-4085-bf4a-3202830cf658")
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -1795,7 +1890,7 @@
 			)
 			(justify left)
 		)
-		(uuid 66c13079-fb56-49b2-ac5c-96f959639914)
+		(uuid "65b4b4b9-97d2-4b5b-9cc8-6824816f15f5")
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -1807,7 +1902,7 @@
 			)
 			(justify left)
 		)
-		(uuid 7732dc47-292c-461a-8e8b-1f0aa961afef)
+		(uuid "ce8329c5-0dda-4ec0-a8f7-c73d50a6bcba")
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -1819,7 +1914,7 @@
 			)
 			(justify left)
 		)
-		(uuid 84b162c3-d2b6-4aa0-824b-51a795b89679)
+		(uuid "fd2ca1ff-62d9-4b33-b5fc-cc738224aa64")
 	)
 	(hierarchical_label
 		GND
@@ -1831,7 +1926,7 @@
 			)
 			(justify right)
 		)
-		(uuid 471a2ea1-b2c4-4232-80b8-e54c8f51e105)
+		(uuid "599c6f67-029e-4ebe-a507-153404b49917")
 	)
 	(hierarchical_label
 		GND
@@ -1843,7 +1938,7 @@
 			)
 			(justify right)
 		)
-		(uuid d2e9ca64-dff7-422d-9e85-d5211be7fcae)
+		(uuid "c59178c8-ce0b-48a9-a32f-951e7df9e0d9")
 	)
 	(hierarchical_label
 		GND
@@ -1855,7 +1950,7 @@
 			)
 			(justify right)
 		)
-		(uuid 08cda2d0-da3e-4ba9-82cd-daba18291bd2)
+		(uuid "1e247f40-cbf8-4536-a15f-2932de8f95fb")
 	)
 	(hierarchical_label
 		GND
@@ -1867,7 +1962,7 @@
 			)
 			(justify right)
 		)
-		(uuid 76677757-d12d-47ea-9a9b-081795af7c86)
+		(uuid "deb11132-ae38-4978-ba50-1cd628962855")
 	)
 	(hierarchical_label
 		GND
@@ -1879,7 +1974,7 @@
 			)
 			(justify right)
 		)
-		(uuid 0dd4b125-3de2-4338-bce2-9cbd8b63deb5)
+		(uuid "dbc580ef-1a47-4458-84c8-a9d1bbbd00b3")
 	)
 	(hierarchical_label
 		GND
@@ -1891,7 +1986,7 @@
 			)
 			(justify right)
 		)
-		(uuid b1a5a416-200b-4fa0-a721-98f890ae7cb2)
+		(uuid "aba7a3a9-965f-4eed-b358-1dcbed1409bb")
 	)
 	(hierarchical_label
 		GND
@@ -1903,7 +1998,7 @@
 			)
 			(justify right)
 		)
-		(uuid 9d40c543-25d9-4738-bdd9-23211c647deb)
+		(uuid "0def5ecd-b0d1-4483-ae88-36724cc3e578")
 	)
 	(hierarchical_label
 		GND
@@ -1915,7 +2010,7 @@
 			)
 			(justify right)
 		)
-		(uuid 7be6adad-6cd0-4bff-9c4b-ccd3211f55f9)
+		(uuid "3c7e4fb7-a531-414c-98ff-94b6dbd0dae4")
 	)
 	(hierarchical_label
 		GND
@@ -1927,7 +2022,7 @@
 			)
 			(justify right)
 		)
-		(uuid 4eb3317d-d952-4c75-ae55-64da042112f7)
+		(uuid "ea4fdf36-2d81-4478-92cb-edc732d8c28b")
 	)
 	(hierarchical_label
 		GND
@@ -1939,7 +2034,7 @@
 			)
 			(justify right)
 		)
-		(uuid d9b9169c-188f-4317-a5da-360dfd8b2a95)
+		(uuid "4fce8813-b193-4007-9576-30dbedaac589")
 	)
 	(hierarchical_label
 		GND
@@ -1951,7 +2046,7 @@
 			)
 			(justify right)
 		)
-		(uuid f825e408-978e-4611-bdd0-a391c033cbba)
+		(uuid "46b87445-f9a3-4f74-b7ba-9be5b429aa5d")
 	)
 	(hierarchical_label
 		GND
@@ -1963,7 +2058,7 @@
 			)
 			(justify right)
 		)
-		(uuid a8251553-88fc-4455-b714-e8d24c6dea6c)
+		(uuid "72b403cb-9d6e-4dfa-a033-12598c253e44")
 	)
 	(hierarchical_label
 		GND
@@ -1975,7 +2070,7 @@
 			)
 			(justify right)
 		)
-		(uuid bf3bbc2d-01cc-4098-be44-218ada8a0296)
+		(uuid "a12d4baf-95ae-4b11-9932-a0bb4a16ea44")
 	)
 	(hierarchical_label
 		GND
@@ -1987,7 +2082,7 @@
 			)
 			(justify right)
 		)
-		(uuid 35fc685d-9fd5-428d-bb9a-81c6f6803b21)
+		(uuid "43fc23ad-0213-466b-bfdf-168ba21a060c")
 	)
 	(hierarchical_label
 		GND
@@ -1999,7 +2094,7 @@
 			)
 			(justify right)
 		)
-		(uuid 3f3f9466-bbc2-4885-8a79-6fdc3936661d)
+		(uuid "86e3f8e2-d296-47f9-82f4-a0e168b0dba5")
 	)
 	(hierarchical_label
 		GND
@@ -2011,7 +2106,7 @@
 			)
 			(justify right)
 		)
-		(uuid dc43ffe1-1849-495a-9780-20f236d6fd9e)
+		(uuid "889bd10f-112c-4cd3-bc55-d78dc749bd4b")
 	)
 	(hierarchical_label
 		GND
@@ -2023,7 +2118,7 @@
 			)
 			(justify right)
 		)
-		(uuid 6bfa3132-e30f-46b6-a12e-e68eb3fb654d)
+		(uuid "bd8ba4e0-d179-4079-abd4-e5550d19202e")
 	)
 	(hierarchical_label
 		GND
@@ -2035,7 +2130,7 @@
 			)
 			(justify right)
 		)
-		(uuid e97f800e-14c2-4c06-a8bc-689e8c0df2cb)
+		(uuid "1afc55af-557a-4213-9849-0b69155b3f81")
 	)
 	(hierarchical_label
 		GND
@@ -2047,7 +2142,7 @@
 			)
 			(justify right)
 		)
-		(uuid eb32a00e-317f-4b2c-8ce2-ba05944c5c87)
+		(uuid "a0578b8a-6168-46d7-8829-8e858ada4541")
 	)
 	(hierarchical_label
 		GND
@@ -2059,7 +2154,7 @@
 			)
 			(justify right)
 		)
-		(uuid 8c12e116-521b-437a-b4f3-8541a303c7fe)
+		(uuid "e050dff7-c521-4a6d-b224-440e5349bc68")
 	)
 	(hierarchical_label
 		GND
@@ -2071,7 +2166,7 @@
 			)
 			(justify right)
 		)
-		(uuid bd3ace09-69bf-4e38-921c-8d427eb78668)
+		(uuid "41697b6b-e4f0-4164-8456-b1441a50916a")
 	)
 	(hierarchical_label
 		GND
@@ -2083,7 +2178,7 @@
 			)
 			(justify right)
 		)
-		(uuid eed1c8fa-923c-47c4-8500-80d0489e5529)
+		(uuid "2d71451b-e665-4fef-9e6d-9927968d17ee")
 	)
 	(hierarchical_label
 		GND
@@ -2095,7 +2190,7 @@
 			)
 			(justify right)
 		)
-		(uuid b3dbc015-8203-453c-9d2b-01c1582108e5)
+		(uuid "2f07eaee-464a-42f7-861d-b61e50bd55bd")
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -2107,7 +2202,7 @@
 			)
 			(justify left)
 		)
-		(uuid 871581b9-9873-4d2f-af2b-ceb7263b42ac)
+		(uuid "2c595665-5eee-467e-ad65-29b53b8c4b70")
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -2119,7 +2214,7 @@
 			)
 			(justify left)
 		)
-		(uuid 08b7d1f5-013d-415e-8cc1-f65e79d84289)
+		(uuid "dbbb2b95-28a7-401c-8a3a-a41ab8cc53bb")
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -2131,7 +2226,7 @@
 			)
 			(justify left)
 		)
-		(uuid d269abe9-52de-4f6c-8853-ca7301a8423b)
+		(uuid "fe56cbac-e18b-4eea-a35e-e20b842ad254")
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -2143,7 +2238,7 @@
 			)
 			(justify left)
 		)
-		(uuid 48855b9f-df92-4ede-9a89-ba9ece964905)
+		(uuid "1d9884fc-82f1-4d49-865a-c7548688600e")
 	)
 	(hierarchical_label
 		USB_DP_MCU
@@ -2155,7 +2250,7 @@
 			)
 			(justify left)
 		)
-		(uuid 5b3296c5-62e9-491e-a615-1f97bd136428)
+		(uuid "0b310d03-f2ee-4521-84d5-5f33874e8893")
 	)
 	(hierarchical_label
 		USB_DP_MCU
@@ -2167,7 +2262,7 @@
 			)
 			(justify left)
 		)
-		(uuid d190bd8a-488f-4c45-9671-552e017c4da9)
+		(uuid "1e7b95f3-86f5-4b61-80ec-9072e0f749b6")
 	)
 	(hierarchical_label
 		USB_DP_MCU
@@ -2179,7 +2274,7 @@
 			)
 			(justify right)
 		)
-		(uuid 5854715d-3878-4049-8da5-18f258e1c323)
+		(uuid "44fbbbfc-200f-40f9-8719-f7bcc9690ae8")
 	)
 	(hierarchical_label
 		USB_DM_MCU
@@ -2191,7 +2286,7 @@
 			)
 			(justify left)
 		)
-		(uuid a3922d5e-6b03-4a69-b6e5-5dfd94f6ff1c)
+		(uuid "c027eae7-bd32-484d-a3f3-ad6ab926c949")
 	)
 	(hierarchical_label
 		USB_DM_MCU
@@ -2203,7 +2298,7 @@
 			)
 			(justify left)
 		)
-		(uuid 6b2f3186-6ff8-41be-a567-a05958c6c78f)
+		(uuid "4e26106e-ea94-4c77-b916-b187f7b0f896")
 	)
 	(hierarchical_label
 		USB_DM_MCU
@@ -2215,7 +2310,7 @@
 			)
 			(justify right)
 		)
-		(uuid b311ea58-9d1d-49e6-8d92-059d643fe44b)
+		(uuid "97cc273f-9f68-40f5-8005-acad8e0b0fe5")
 	)
 	(hierarchical_label
 		USB_DP
@@ -2227,7 +2322,7 @@
 			)
 			(justify left)
 		)
-		(uuid f3731ff6-a8a4-4dba-8d7e-a9e981d941fe)
+		(uuid "b6d92118-dbfb-45ec-a37d-96886bfdf39d")
 	)
 	(hierarchical_label
 		USB_DM
@@ -2239,7 +2334,7 @@
 			)
 			(justify left)
 		)
-		(uuid fb9fe4e8-4ec4-46f4-96d9-c8a6fa1cdf27)
+		(uuid "b1d3bc77-235a-42a4-92e9-4221f9cb5aad")
 	)
 	(hierarchical_label
 		DEBUG_EN
@@ -2251,7 +2346,7 @@
 			)
 			(justify left)
 		)
-		(uuid bb88816b-d608-4d16-bf98-dced88e7e779)
+		(uuid "c356abd1-9829-4699-87db-115fcdee8181")
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -2263,7 +2358,7 @@
 			)
 			(justify left)
 		)
-		(uuid fbc64da9-d1ab-40d6-bbb7-9b7dae342fc7)
+		(uuid "5b2c2b01-29a4-48df-8e46-08ea8f03e0a2")
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -2275,7 +2370,7 @@
 			)
 			(justify left)
 		)
-		(uuid c8742a06-1179-4464-874f-ce95deb31d49)
+		(uuid "5e743ac9-ee3d-45c1-9097-d535af6e4554")
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -2287,7 +2382,7 @@
 			)
 			(justify left)
 		)
-		(uuid a20a9c63-7bcf-40ac-acdb-8226f1894d85)
+		(uuid "485e4406-b4cf-43ac-a7e2-3ed986ee3d48")
 	)
 	(hierarchical_label
 		GND
@@ -2299,7 +2394,7 @@
 			)
 			(justify left)
 		)
-		(uuid 889570c0-1004-4549-852d-81aeaac6b688)
+		(uuid "b49f7c48-919b-4b45-8da7-e31ae8b3d7db")
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -2311,7 +2406,7 @@
 			)
 			(justify left)
 		)
-		(uuid d85054d6-4860-403d-a7cf-e3bb7631846d)
+		(uuid "40710476-9d55-45e2-aa01-5a8bbe8e8ad8")
 	)
 	(hierarchical_label
 		GND
@@ -2323,7 +2418,7 @@
 			)
 			(justify left)
 		)
-		(uuid b3246637-dffe-4fef-ae7d-974e1986dd0d)
+		(uuid "91343636-6b00-49d3-9df8-834739731073")
 	)
 	(hierarchical_label
 		LED_CONTROL
@@ -2335,7 +2430,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9e0723df-cd28-4428-9f7d-64c24f7522ea)
+		(uuid "e97d62ab-01d6-4583-a5dc-e24ffcc2fa76")
 	)
 	(hierarchical_label
 		N$3
@@ -2347,7 +2442,7 @@
 			)
 			(justify left)
 		)
-		(uuid 1d244ca3-548e-4f50-aa01-e2a6a6878467)
+		(uuid "5316c942-7acf-4c24-b55e-3ef1336c7458")
 	)
 	(sheet
 		(at 34.29 151.13)
@@ -2364,7 +2459,7 @@
 				0.0
 			)
 		)
-		(uuid 34684de4-0e9e-4645-b994-4e62f2c84202)
+		(uuid "7c9e8114-0160-4008-9900-90244fef0c58")
 		(property "Sheetname" "Debug_Header"
 			(at 34.29 149.85999999999999 0)
 			(effects
@@ -2394,7 +2489,7 @@
 				)
 				(justify right)
 			)
-			(uuid 4dbc31b6-b8b7-455d-a90b-a3f51247549b)
+			(uuid "815780d0-4840-4263-8a0d-56bb91e7025d")
 		)
 		(pin
 			DEBUG_IO0
@@ -2406,7 +2501,7 @@
 				)
 				(justify right)
 			)
-			(uuid 53577e2e-9ece-4f8e-bba1-e0056cfde1fe)
+			(uuid "1b4a5f9c-0241-4152-9f43-d09c1402529d")
 		)
 		(pin
 			DEBUG_RX
@@ -2418,7 +2513,7 @@
 				)
 				(justify right)
 			)
-			(uuid b7e58d2f-f638-4d37-bcd3-d6dacf296edb)
+			(uuid "526121ca-bb58-4b37-ac9e-8a60cb4c6942")
 		)
 		(pin
 			DEBUG_TX
@@ -2430,7 +2525,7 @@
 				)
 				(justify right)
 			)
-			(uuid e057b3da-6f2e-4ac5-92ef-bf41c8ec875f)
+			(uuid "f1bf091f-0b2c-4877-ac77-2ba00041316d")
 		)
 		(pin
 			GND
@@ -2442,7 +2537,7 @@
 				)
 				(justify right)
 			)
-			(uuid 0b5f83d2-cd7d-48be-893f-148b5151c6ea)
+			(uuid "aa294f40-a7c3-422b-94a6-f3f0bafe9921")
 		)
 		(pin
 			VCC_3V3
@@ -2454,7 +2549,7 @@
 				)
 				(justify right)
 			)
-			(uuid 418abc9e-85bf-4ac4-badc-93a283dd6c4f)
+			(uuid "54a67708-6fcb-44fa-a898-b9df52eed036")
 		)
 		(instances
 			(project
@@ -2481,7 +2576,7 @@
 				0.0
 			)
 		)
-		(uuid dbafffe0-b609-45c5-93fa-fd8134c22e4e)
+		(uuid "12d1e850-78f0-469b-b658-5865608738fd")
 		(property "Sheetname" "LED_Blinker"
 			(at 93.98 152.4 0)
 			(effects
@@ -2511,7 +2606,7 @@
 				)
 				(justify right)
 			)
-			(uuid 5e8c7287-f557-4733-b044-7f638439719e)
+			(uuid "a3a54d83-c724-464a-af7d-ebd22d02e252")
 		)
 		(pin
 			LED_CONTROL
@@ -2523,7 +2618,7 @@
 				)
 				(justify right)
 			)
-			(uuid d4ae200d-d3bd-4637-ba3b-a2296c486b13)
+			(uuid "31635028-36bb-477c-a39e-80b782f1fe31")
 		)
 		(pin
 			N$3
@@ -2535,7 +2630,7 @@
 				)
 				(justify right)
 			)
-			(uuid 0bbd5a63-fe86-4759-bf9f-ec624e215fa2)
+			(uuid "7cd22fd9-5ab3-4fcc-9644-c3cd0e3b192b")
 		)
 		(instances
 			(project
@@ -2578,7 +2673,7 @@
 			)
 			(justify left top)
 		)
-		(uuid 4cacfca2-99ac-47c9-b28f-27dd2bc86163)
+		(uuid "6d24d44f-867f-4eca-bcee-9427c8520e43")
 	)
 	(sheet_instances
 		(path

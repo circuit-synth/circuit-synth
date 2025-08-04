@@ -233,15 +233,16 @@ def _parse_symbol_body(name: str, body: List[Any]) -> Dict[str, Any]:
                     result["properties"][prop_name] = clean_prop_value  # Force clean value again
 
                 # Also store specific standard properties directly (for backward compatibility)
+                # CRITICAL FIX: Use clean_prop_value instead of prop_value to avoid dictionary strings
                 prop_name_lower = prop_name.lower()
                 if prop_name_lower == "description":
-                    result["description"] = prop_value
+                    result["description"] = clean_prop_value
                 elif prop_name_lower == "datasheet":
-                    result["datasheet"] = prop_value
+                    result["datasheet"] = clean_prop_value
                 elif prop_name_lower == "keywords":
-                    result["keywords"] = prop_value
+                    result["keywords"] = clean_prop_value
                 elif prop_name_lower == "ki_fp_filters":  # KiCad standard name
-                    result["fp_filters"] = prop_value
+                    result["fp_filters"] = clean_prop_value
 
         elif k == "extends":
             if len(elem) >= 2:

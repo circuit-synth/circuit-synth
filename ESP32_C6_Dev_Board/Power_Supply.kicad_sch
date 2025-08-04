@@ -1,20 +1,22 @@
 (kicad_sch
 	(version 20250114)
 	(generator "kicad_api")
-	(generator_version 9.0)
-	(uuid 61535847-b87d-48c5-b1b8-168924794420)
-	(paper A4)
+	(generator_version "9.0")
+	(uuid "c5815c90-669c-4fca-afc6-96f3524fa3af")
+	(paper "A4")
 	(lib_symbols
 		(symbol "Device:C"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "C"
-				(at 0.0 0.0 0)
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -23,7 +25,7 @@
 				)
 			)
 			(property "Value" "C"
-				(at 0.0 0.0 0)
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -32,7 +34,7 @@
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -41,7 +43,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -50,7 +52,7 @@
 				)
 			)
 			(property "Description" "Unpolarized capacitor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -59,7 +61,7 @@
 				)
 			)
 			(property "ki_keywords" "cap capacitor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -68,7 +70,7 @@
 				)
 			)
 			(property "ki_fp_filters" "C_*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -111,7 +113,7 @@
 					(at 0.0 3.81 270)
 					(length 2.794)
 					(name
-						~
+						"~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -133,7 +135,7 @@
 					(at 0.0 -3.81 90)
 					(length 2.794)
 					(name
-						~
+						"~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -152,15 +154,17 @@
 			)
 		)
 		(symbol "Regulator_Linear:AMS1117-3.3"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "U"
-				(at 0.0 0.0 0)
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -169,7 +173,7 @@
 				)
 			)
 			(property "Value" "AMS1117-3.3"
-				(at 0.0 0.0 0)
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -178,7 +182,7 @@
 				)
 			)
 			(property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
-				(at 0.0 0.0 0)
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -187,7 +191,7 @@
 				)
 			)
 			(property "Datasheet" "http://www.advanced-monolithic.com/pdf/ds1117.pdf"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -196,7 +200,7 @@
 				)
 			)
 			(property "Description" "1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -205,7 +209,7 @@
 				)
 			)
 			(property "ki_keywords" "linear regulator ldo fixed positive"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -214,7 +218,7 @@
 				)
 			)
 			(property "ki_fp_filters" "SOT?223*TabPin2*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -242,7 +246,7 @@
 					(at -7.62 0.0 0)
 					(length 2.54)
 					(name
-						VI
+						"VI"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -264,7 +268,7 @@
 					(at 0.0 -7.62 90)
 					(length 2.54)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -286,7 +290,7 @@
 					(at 7.62 0.0 180)
 					(length 2.54)
 					(name
-						VO
+						"VO"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -305,19 +309,21 @@
 			)
 		)
 	)
-	(paper A4)
 	(title_block
 		(title Power_Supply)
 		(date 2025-08-04)
 		(company Circuit-Synth)
 	)
 	(symbol
-		(lib_id Regulator_Linear:AMS1117-3.3)
+		(lib_id "Regulator_Linear:AMS1117-3.3")
 		(at 45.72 58.42 0)
+		(unit 1)
+		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 16b7a175-b34d-43e2-a61f-0fced3871270)
+		(fields_autoplaced yes)
+		(uuid "610fdb4c-b873-4f1c-ab0f-bec7dba6a5b2")
 		(property "Reference" "U1"
 			(at 48.26 57.15 0)
 			(effects
@@ -336,24 +342,47 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" "~"
+			(at 45.72 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 45.72 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1" (uuid "23bb73e5-bbc3-4b62-b4dd-1b6d5e1f2bd1"))
+		(pin "2" (uuid "4f10cad9-13be-4526-a304-d138c1ca58b5"))
 		(instances
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/"
-					(reference U1)
+					"/c5815c90-669c-4fca-afc6-96f3524fa3af"
+					(reference "U1")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id Device:C)
+		(lib_id "Device:C")
 		(at 71.12 58.42 0)
+		(unit 1)
+		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 464b17eb-2356-44b6-8dc2-05ec1c44545c)
+		(fields_autoplaced yes)
+		(uuid "cf4797c0-4f39-468f-aa28-d87e483e6fd8")
 		(property "Reference" "C2"
 			(at 73.66000000000001 57.15 0)
 			(effects
@@ -381,24 +410,45 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" "~"
+			(at 71.12 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 71.12 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(instances
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/"
-					(reference C2)
+					"/c5815c90-669c-4fca-afc6-96f3524fa3af"
+					(reference "C2")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id Device:C)
+		(lib_id "Device:C")
 		(at 91.44 58.42 0)
+		(unit 1)
+		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid c19684a7-aef2-453e-afeb-22de8173e8f8)
+		(fields_autoplaced yes)
+		(uuid "f13ed218-df1b-492a-9ac5-c0ac4c33d9ae")
 		(property "Reference" "C3"
 			(at 93.98 57.15 0)
 			(effects
@@ -426,12 +476,30 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" "~"
+			(at 91.44 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 91.44 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(instances
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/"
-					(reference C3)
+					"/c5815c90-669c-4fca-afc6-96f3524fa3af"
+					(reference "C3")
 					(unit 1)
 				)
 			)
@@ -447,7 +515,7 @@
 			)
 			(justify right)
 		)
-		(uuid 551b5501-9995-4ff6-8d9e-a75eba3b3aff)
+		(uuid "5213cd7f-1224-40ac-9abf-5e9b9e1fb2e0")
 	)
 	(hierarchical_label
 		VBUS
@@ -459,7 +527,7 @@
 			)
 			(justify right)
 		)
-		(uuid dba8eaa0-ff3c-4f70-9175-4b861843fffc)
+		(uuid "39aa616a-3ee2-4c0d-872c-edcb42403628")
 	)
 	(hierarchical_label
 		VBUS
@@ -471,7 +539,7 @@
 			)
 			(justify left)
 		)
-		(uuid a7c50f64-9a1f-4664-9b93-844c3d1012a7)
+		(uuid "95c23899-f14d-46dc-a65a-7da27f175556")
 	)
 	(hierarchical_label
 		GND
@@ -483,7 +551,7 @@
 			)
 			(justify right)
 		)
-		(uuid 018c9feb-696c-4471-84ff-42cfec6434b1)
+		(uuid "f30070a5-2a43-47ca-bb88-61f9b57a19c3")
 	)
 	(hierarchical_label
 		GND
@@ -495,7 +563,7 @@
 			)
 			(justify right)
 		)
-		(uuid 5e390ae8-003d-4429-8bce-273331c5ad82)
+		(uuid "2fd839da-4520-40d1-9fbb-3e7fbf3aae53")
 	)
 	(hierarchical_label
 		GND
@@ -507,7 +575,7 @@
 			)
 			(justify right)
 		)
-		(uuid 34efe58e-2bd5-411f-8caf-8d723deb33a4)
+		(uuid "7bac41d7-3fbb-4f79-9c76-984fbf7e186d")
 	)
 	(hierarchical_label
 		GND
@@ -519,7 +587,7 @@
 			)
 			(justify right)
 		)
-		(uuid 4a879b1d-64dc-4105-b55c-08092cd9893a)
+		(uuid "9a6a8b48-e933-49ed-9ba9-d66f509cfd9f")
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -531,7 +599,7 @@
 			)
 			(justify left)
 		)
-		(uuid dffb666f-37dc-4916-9276-240edc0500b1)
+		(uuid "fdfbbcc9-1152-4224-b43c-db72d87d7e9e")
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -543,7 +611,7 @@
 			)
 			(justify left)
 		)
-		(uuid ad671198-7a12-46f2-84de-8e4cc9bec678)
+		(uuid "c257696d-cd91-496f-8f3c-9af7ab5d025a")
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -555,7 +623,7 @@
 			)
 			(justify left)
 		)
-		(uuid 4c488213-c89f-40d0-8654-882d7c1ba69f)
+		(uuid "22460f66-507a-4e34-891a-4ca77b218c93")
 	)
 	(text_box
 		"5V to 3.3V power regulation subcircuit"
@@ -588,7 +656,7 @@
 			)
 			(justify left top)
 		)
-		(uuid ca874b0c-efe8-4267-9507-71c649336318)
+		(uuid "47eed9a8-fd6e-4fc4-931b-231210072dfa")
 	)
 	(sheet_instances
 		(path

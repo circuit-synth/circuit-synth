@@ -1,20 +1,22 @@
 (kicad_sch
 	(version 20250114)
 	(generator "kicad_api")
-	(generator_version 9.0)
-	(uuid c3ae199d-2148-444d-b366-6706f05ab32e)
-	(paper A4)
+	(generator_version "9.0")
+	(uuid "1a27095b-3f99-4fba-a328-39fe71b7e92c")
+	(paper "A4")
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_02x03_Odd_Even"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "J"
-				(at 0.0 0.0 0)
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -23,7 +25,7 @@
 				)
 			)
 			(property "Value" "Conn_02x03_Odd_Even"
-				(at 0.0 0.0 0)
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -32,7 +34,7 @@
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -41,7 +43,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -50,7 +52,7 @@
 				)
 			)
 			(property "Description" "Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -59,7 +61,7 @@
 				)
 			)
 			(property "ki_keywords" "connector"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -68,7 +70,7 @@
 				)
 			)
 			(property "ki_fp_filters" "Connector*:*_2x??_*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -162,7 +164,7 @@
 					(at -5.08 2.54 0)
 					(length 3.81)
 					(name
-						Pin_1
+						"Pin_1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -184,7 +186,7 @@
 					(at -5.08 0.0 0)
 					(length 3.81)
 					(name
-						Pin_3
+						"Pin_3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -206,7 +208,7 @@
 					(at -5.08 -2.54 0)
 					(length 3.81)
 					(name
-						Pin_5
+						"Pin_5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -228,7 +230,7 @@
 					(at 7.62 2.54 180)
 					(length 3.81)
 					(name
-						Pin_2
+						"Pin_2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -250,7 +252,7 @@
 					(at 7.62 0.0 180)
 					(length 3.81)
 					(name
-						Pin_4
+						"Pin_4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -272,7 +274,7 @@
 					(at 7.62 -2.54 180)
 					(length 3.81)
 					(name
-						Pin_6
+						"Pin_6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -291,19 +293,21 @@
 			)
 		)
 	)
-	(paper A4)
 	(title_block
 		(title Debug_Header)
 		(date 2025-08-04)
 		(company Circuit-Synth)
 	)
 	(symbol
-		(lib_id Connector_Generic:Conn_02x03_Odd_Even)
+		(lib_id "Connector_Generic:Conn_02x03_Odd_Even")
 		(at 58.42 45.72 0)
+		(unit 1)
+		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 783875a9-227a-4068-9fb2-fe5427b468f7)
+		(fields_autoplaced yes)
+		(uuid "03eac964-0b9a-4e62-bfbe-e45aea4acccd")
 		(property "Reference" "J2"
 			(at 60.96 44.449999999999996 0)
 			(effects
@@ -322,12 +326,30 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" "~"
+			(at 58.42 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 58.42 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(instances
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/"
-					(reference J2)
+					"/1a27095b-3f99-4fba-a328-39fe71b7e92c"
+					(reference "J2")
 					(unit 1)
 				)
 			)
@@ -343,7 +365,7 @@
 			)
 			(justify right)
 		)
-		(uuid 592e66ab-9ea0-4ef2-9210-d55792bd82b1)
+		(uuid "70f96741-48d4-4bbc-b038-b3c3faa949de")
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -355,7 +377,7 @@
 			)
 			(justify right)
 		)
-		(uuid f85b954a-751b-4595-9e45-00c38279dbb5)
+		(uuid "2ff124a9-efd2-4745-8ad4-bb564f22a59e")
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -367,7 +389,7 @@
 			)
 			(justify right)
 		)
-		(uuid 87bc6819-9450-482e-b26a-2e7a03c8a7f6)
+		(uuid "84462440-ce75-48f1-a139-ca2f204325e3")
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -379,7 +401,7 @@
 			)
 			(justify left)
 		)
-		(uuid d90d91ca-322e-448e-b17d-ac28074bef3f)
+		(uuid "bb16e3b7-e9ac-4ace-8881-08ad18780237")
 	)
 	(hierarchical_label
 		GND
@@ -391,7 +413,7 @@
 			)
 			(justify left)
 		)
-		(uuid 226d5ed6-d531-40d4-8ef7-c4b57e08c032)
+		(uuid "858b4e4c-c8b5-411a-93c8-8395f03c8b65")
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -403,7 +425,7 @@
 			)
 			(justify left)
 		)
-		(uuid a6431f6b-56d2-4661-b355-a2b411fedd1e)
+		(uuid "5f370567-eb6a-46fd-9b93-900ac7a84150")
 	)
 	(text_box
 		"Debug header for programming and debugging"
@@ -436,7 +458,7 @@
 			)
 			(justify left top)
 		)
-		(uuid b84a7981-af68-4a73-b882-b6e302371f58)
+		(uuid "3ed94da4-2acf-476f-8131-d2cb7a60103d")
 	)
 	(sheet_instances
 		(path

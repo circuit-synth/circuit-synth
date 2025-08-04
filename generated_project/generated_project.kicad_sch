@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 9dcf078d-8293-41ab-bf62-8310796b3ded)
+	(uuid 9e58d4ce-07c3-4d22-8b4f-3433cbebc13d)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -163,7 +163,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 721cc22d-7cea-46ca-bef1-2ef537be6f06)
+		(uuid 72ca40f6-d5c0-48e3-b02f-f1f2a8e19ca2)
 		(property
 			"Reference"
 			"R1"
@@ -209,7 +209,7 @@
 			(project
 				"generated_project"
 				(path
-					"/50b29d65-f667-46a0-bc9a-63b22f4f45f1"
+					"/277e8834-c9cb-4eae-86a6-7686ca3c575d"
 					(reference R1)
 					(unit 1)
 				)
@@ -218,7 +218,7 @@
 	)
 	(sheet_instances
 		(path
-			"/50b29d65-f667-46a0-bc9a-63b22f4f45f1"
+			"/277e8834-c9cb-4eae-86a6-7686ca3c575d"
 			(page "1")
 		)
 	)
