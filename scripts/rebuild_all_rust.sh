@@ -44,7 +44,6 @@ rebuild_rust_module() {
         rm -rf build/
         rm -rf dist/
         rm -rf *.egg-info/
-        rm -rf .venv/
     fi
     
     # Update Rust dependencies
@@ -55,21 +54,14 @@ rebuild_rust_module() {
     if [ -f "pyproject.toml" ] || [ -f "Cargo.toml" ]; then
         echo "  🐍 Building Python bindings with maturin..."
         
-        # Use existing virtual environment or create if needed
-        if [ ! -d ".venv" ] || [ "$CLEAN_BUILD" = true ]; then
-            echo "  📁 Creating virtual environment..."
-            python3 -m venv .venv
+        # Set VIRTUAL_ENV to use the main project's virtual environment
+        if [ -d "$BASE_DIR/.venv" ]; then
+            echo "  🎯 Installing in main project virtual environment..."
+            VIRTUAL_ENV="$BASE_DIR/.venv" maturin develop --release
+        else
+            echo "  ⚠️  Main project .venv not found, using default installation..."
+            maturin develop --release
         fi
-        source .venv/bin/activate
-        
-        # Install/upgrade maturin if needed
-        if ! pip show maturin &> /dev/null; then
-            echo "  📥 Installing maturin..."
-            pip install maturin
-        fi
-        
-        # Build and install the module
-        maturin develop --release
         
         echo "  ✅ $module_name rebuilt successfully"
     else
