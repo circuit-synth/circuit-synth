@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 347c74f7-c11a-4e1c-9f96-571dc3dbca69)
+	(uuid 314a6bd5-99f9-4fd0-a316-6f7ee3a58a6f)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -345,7 +345,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid dd6054e9-8f98-4e88-bacb-03077869597b)
+		(uuid ad316cc6-1232-4e50-80f1-7f0eeffac621)
 		(property
 			"Reference"
 			"U1"
@@ -379,7 +379,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/8292186f-f948-43aa-be13-9a99dbe10c4b/1b032959-5505-47c4-8352-d668b039fae9/6cca9993-c3ce-49a0-af0c-050b41fed651"
+					"/1d38f4fe-5f13-4cb7-8b5c-c85eb430a6d0/cb0ba442-dc03-43fb-9130-7094516fa05f/58f2b373-2b73-4066-94a1-9a576b7d3277"
 					(reference U1)
 					(unit 1)
 				)
@@ -392,7 +392,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid d26e5509-3bc8-4e75-a6e8-08eea6602888)
+		(uuid e6b0cb65-1f8f-4191-8d17-38196fc2f44a)
 		(property
 			"Reference"
 			"C2"
@@ -436,7 +436,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/8292186f-f948-43aa-be13-9a99dbe10c4b/1b032959-5505-47c4-8352-d668b039fae9/6cca9993-c3ce-49a0-af0c-050b41fed651"
+					"/1d38f4fe-5f13-4cb7-8b5c-c85eb430a6d0/cb0ba442-dc03-43fb-9130-7094516fa05f/58f2b373-2b73-4066-94a1-9a576b7d3277"
 					(reference C2)
 					(unit 1)
 				)
@@ -449,7 +449,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 00b832b3-b4d0-4120-8e15-c1f32f4ddfe5)
+		(uuid 80e590aa-76f3-4f01-bf15-0aa88c2a8bdb)
 		(property
 			"Reference"
 			"C3"
@@ -493,7 +493,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/8292186f-f948-43aa-be13-9a99dbe10c4b/1b032959-5505-47c4-8352-d668b039fae9/6cca9993-c3ce-49a0-af0c-050b41fed651"
+					"/1d38f4fe-5f13-4cb7-8b5c-c85eb430a6d0/cb0ba442-dc03-43fb-9130-7094516fa05f/58f2b373-2b73-4066-94a1-9a576b7d3277"
 					(reference C3)
 					(unit 1)
 				)
@@ -510,7 +510,7 @@
 			)
 			(justify right)
 		)
-		(uuid 95c5e2e2-2c4e-456f-8630-c2247d67dbfb)
+		(uuid 8dff2cad-38a3-4c96-90ee-a4d0a3d02d2d)
 	)
 	(hierarchical_label
 		VBUS
@@ -522,7 +522,7 @@
 			)
 			(justify right)
 		)
-		(uuid 30fcfbab-d9fa-40cc-ae1d-0327e1d7da73)
+		(uuid bb37d497-7373-4417-b085-b041f33b3d55)
 	)
 	(hierarchical_label
 		VBUS
@@ -534,7 +534,7 @@
 			)
 			(justify left)
 		)
-		(uuid df7a0f87-b1bf-4604-ad62-1bf83b0ae6e1)
+		(uuid 64fd7bec-b51b-4017-bcf7-19a5f297c300)
 	)
 	(hierarchical_label
 		GND
@@ -546,7 +546,7 @@
 			)
 			(justify right)
 		)
-		(uuid 459747ce-afb8-4780-a94e-de7bf1338763)
+		(uuid 3080cb4c-9c3a-4e6b-8434-c5563ee34483)
 	)
 	(hierarchical_label
 		GND
@@ -558,7 +558,7 @@
 			)
 			(justify right)
 		)
-		(uuid 16b7bec2-d0ab-4522-b690-e537c94ec01a)
+		(uuid 75cb5ff5-869d-426a-a4c2-b4ce54df16b5)
 	)
 	(hierarchical_label
 		GND
@@ -570,7 +570,7 @@
 			)
 			(justify right)
 		)
-		(uuid 76bb1bac-55da-40cb-9974-6caab5c05b12)
+		(uuid 72c95036-269d-418c-ba83-7e0c15dd842f)
 	)
 	(hierarchical_label
 		GND
@@ -582,7 +582,7 @@
 			)
 			(justify right)
 		)
-		(uuid 3ecbdd29-52b6-4bca-9619-1e57f5776f9c)
+		(uuid ecccee5d-7f0d-4775-83b4-f7e02e05b67a)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -594,7 +594,7 @@
 			)
 			(justify left)
 		)
-		(uuid 4878e843-52d1-4ae3-babc-c3441a484920)
+		(uuid fc382c44-0402-4f7b-bf81-0a3a0cfa4e03)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -606,7 +606,7 @@
 			)
 			(justify left)
 		)
-		(uuid ac383fdb-ab2f-4231-81e4-b5f4ba85beb2)
+		(uuid 21bb4139-9de5-4100-bb86-c47e2e5aed97)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -618,7 +618,7 @@
 			)
 			(justify left)
 		)
-		(uuid c31a4124-f70e-4a7d-a878-f1c0a3322ac2)
+		(uuid e3d6819a-bfab-4ee4-9db6-b54d41671f31)
 	)
 	(text_box
 		"5V to 3.3V power regulation subcircuit"
@@ -651,11 +651,11 @@
 			)
 			(justify left top)
 		)
-		(uuid eb0aeca5-a1c0-45d7-84ec-dc3ed2393daa)
+		(uuid 35db4397-8332-400f-9772-c9b2a09e2e7c)
 	)
 	(sheet_instances
 		(path
-			"/8292186f-f948-43aa-be13-9a99dbe10c4b/1b032959-5505-47c4-8352-d668b039fae9/6cca9993-c3ce-49a0-af0c-050b41fed651"
+			"/1d38f4fe-5f13-4cb7-8b5c-c85eb430a6d0/cb0ba442-dc03-43fb-9130-7094516fa05f/58f2b373-2b73-4066-94a1-9a576b7d3277"
 			(page "1")
 		)
 	)

@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid b0dcb9ce-4cd6-479b-84dd-da0219cd680c)
+	(uuid 76c63c54-9ba3-42fc-9455-259a431d9e25)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -317,7 +317,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid b1912501-1f98-4f79-845d-915aff25c2e7)
+		(uuid cd54ae2e-4965-4933-a8e2-f26440c8ca96)
 		(property
 			"Reference"
 			"J2"
@@ -351,7 +351,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/8292186f-f948-43aa-be13-9a99dbe10c4b/1b032959-5505-47c4-8352-d668b039fae9/96ba17d7-1381-41ec-b2de-eedf75274aba/72c481af-5a31-4e8f-883e-12971508d727"
+					"/1d38f4fe-5f13-4cb7-8b5c-c85eb430a6d0/cb0ba442-dc03-43fb-9130-7094516fa05f/94094eed-07e4-4e21-a543-de9f417d6c58/4a2338f8-b90c-4892-aab8-d63de51b7f68"
 					(reference J2)
 					(unit 1)
 				)
@@ -368,7 +368,7 @@
 			)
 			(justify right)
 		)
-		(uuid 08ad6cda-5d51-4cc1-8495-fb6c6bbd487c)
+		(uuid 816880e0-9981-4e99-93c2-218a5038786c)
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -380,7 +380,7 @@
 			)
 			(justify right)
 		)
-		(uuid 8ac4b618-fae5-4d6a-942d-5ecb550321f6)
+		(uuid 1b6a30e2-8b51-4775-8c46-6451c4f7038a)
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -392,7 +392,7 @@
 			)
 			(justify right)
 		)
-		(uuid 1e422ac8-a3f7-4424-825b-a76f7a5dca91)
+		(uuid b792b869-565a-4b9d-9e21-9fea82530c57)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -404,7 +404,7 @@
 			)
 			(justify left)
 		)
-		(uuid c051cedb-87db-445d-849a-9dc34774bd67)
+		(uuid 3904f0e0-1f6d-48dc-b546-607d671cb458)
 	)
 	(hierarchical_label
 		GND
@@ -416,7 +416,7 @@
 			)
 			(justify left)
 		)
-		(uuid c3fa3d60-7f99-4873-828e-e2c9fa7d179d)
+		(uuid 342cbcda-3f0f-4d3a-aed7-29aa67fc187e)
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -428,7 +428,7 @@
 			)
 			(justify left)
 		)
-		(uuid 144cb7ee-932f-4f35-bef0-7dfe591ee31a)
+		(uuid f1e7f908-638b-4a9b-9ad9-67380f858ee3)
 	)
 	(text_box
 		"Debug header for programming and debugging"
@@ -461,11 +461,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 122ddfda-548f-424b-95a6-6aa4e2c16af3)
+		(uuid e6d7d366-89e1-420e-9559-7884270f3b4a)
 	)
 	(sheet_instances
 		(path
-			"/8292186f-f948-43aa-be13-9a99dbe10c4b/1b032959-5505-47c4-8352-d668b039fae9/96ba17d7-1381-41ec-b2de-eedf75274aba/72c481af-5a31-4e8f-883e-12971508d727"
+			"/1d38f4fe-5f13-4cb7-8b5c-c85eb430a6d0/cb0ba442-dc03-43fb-9130-7094516fa05f/94094eed-07e4-4e21-a543-de9f417d6c58/4a2338f8-b90c-4892-aab8-d63de51b7f68"
 			(page "1")
 		)
 	)
