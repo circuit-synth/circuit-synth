@@ -119,7 +119,12 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-circuit_synth = ["py.typed"]
+circuit_synth = [
+    "py.typed",
+    "data/templates/project/*",
+    "data/templates/claude/*", 
+    "data/templates/memory_bank/*"
+]
 
 [tool.black]
 line-length = 88
@@ -172,6 +177,7 @@ members = [
     "my_kicad_proejct",
     "example_project",
     "my_circuit_project",
+    "test-external-setup/test-project",
 ]
 
 [dependency-groups]

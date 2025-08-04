@@ -10,6 +10,7 @@ resolution-markers = [
 members = [
     "circuit-synth",
     "example-project",
+    "test-project",
 ]
 
 [[package]]
@@ -292,7 +293,7 @@ wheels = [
 
 [[package]]
 name = "circuit-synth"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
@@ -2113,6 +2114,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/3b/44/6716b257b0aa6bfd5
 wheels = [
     { url = "https://files.pythonhosted.org/packages/52/a7/d2782e4e3f77c8450f727ba74a8f12756d5ba823d81b941f1b04da9d033a/sphinxcontrib_serializinghtml-2.0.0-py3-none-any.whl", hash = "sha256:6e2cb0eef194e10c27ec0023bfeb25badbbb5868244cf5bc5bdc04e4464bf331", size = 92072, upload-time = "2024-07-29T01:10:08.203Z" },
 ]
+
+[[package]]
+name = "test-project"
+version = "0.1.0"
+source = { virtual = "test-external-setup/test-project" }
 
 [[package]]
 name = "twine"
