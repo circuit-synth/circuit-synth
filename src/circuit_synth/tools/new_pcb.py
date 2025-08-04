@@ -236,15 +236,19 @@ if __name__ == "__main__":
 @click.argument('pcb_name')
 @click.option('--minimal', is_flag=True, help='Create minimal PCB (no examples)')
 def main(pcb_name: str, minimal: bool):
-    """Create a new PCB development environment.
+    """Create a new PCB development environment in the current directory.
+    
+    This command assumes you're in a fresh uv project directory and will:
+    1. Delete all files except .git and hidden files
+    2. Add the circuit-synth project template
     
     Examples:
         cs-new-pcb "ESP32 Sensor Board"
         cs-new-pcb "Power Supply Module" --minimal
     """
     
-    # Store the original working directory where the command was invoked
-    original_cwd = Path.cwd()
+    # Always use current directory
+    pcb_path = Path.cwd()
     
     console.print(
         Panel.fit(
@@ -253,16 +257,22 @@ def main(pcb_name: str, minimal: bool):
         )
     )
     
-    # Create PCB directory in the original working directory
-    pcb_dir_name = pcb_name.lower().replace(' ', '-').replace('_', '-')
-    pcb_path = original_cwd / pcb_dir_name
+    console.print(f"📁 Setting up PCB project in current directory: {pcb_path.name}/", style="green")
     
-    if pcb_path.exists():
-        console.print(f"❌ Directory {pcb_dir_name}/ already exists", style="red")
-        sys.exit(1)
+    # Clean up ALL non-hidden files and directories
+    console.print("\n🧹 Cleaning up existing files...", style="yellow")
     
-    pcb_path.mkdir()
-    console.print(f"📁 Created PCB directory: {pcb_dir_name}/", style="green")
+    for item in pcb_path.iterdir():
+        # Skip hidden files (like .git)
+        if item.name.startswith('.'):
+            continue
+            
+        if item.is_file():
+            item.unlink()
+            console.print(f"   ✓ Removed {item.name}", style="dim")
+        elif item.is_dir():
+            shutil.rmtree(item)
+            console.print(f"   ✓ Removed {item.name}/", style="dim")
     
     # Copy complete example project structure
     console.print("\n📝 Copying example project structure...", style="yellow")
@@ -275,8 +285,8 @@ def main(pcb_name: str, minimal: bool):
     console.print(
         Panel.fit(
             Text(f"✅ PCB '{pcb_name}' created successfully!", style="bold green")
-            + Text(f"\n\n📁 Location: {pcb_path}")
-            + Text(f"\n🚀 Get started: cd {pcb_dir_name}/circuit-synth && uv run python main.py")
+            + Text(f"\n\n📁 Location: Current directory")
+            + Text(f"\n🚀 Get started: cd circuit-synth && uv run python main.py")
             + Text(f"\n🧠 Memory-bank: Automatic documentation enabled")
             + Text(f"\n🤖 AI Agent: Comprehensive Claude assistant configured")
             + Text(f"\n📖 Documentation: See README.md and CLAUDE.md"),
