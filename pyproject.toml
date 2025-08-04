@@ -123,7 +123,12 @@ circuit_synth = [
     "py.typed",
     "data/templates/project/*",
     "data/templates/claude/*", 
-    "data/templates/memory_bank/*"
+    "data/templates/memory_bank/*",
+    "data/templates/example_project/*",
+    "data/templates/example_project/circuit-synth/*",
+    "data/templates/example_project/.claude/*",
+    "data/templates/example_project/.claude/agents/*/*",
+    "data/templates/example_project/.claude/commands/*/*"
 ]
 
 [tool.black]
