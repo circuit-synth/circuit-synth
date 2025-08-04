@@ -1180,7 +1180,7 @@ class SchematicWriter:
                 [
                     Symbol("property"),
                     prop_name,
-                    str(prop_value),
+                    prop_value,
                     [Symbol("at"), 0.0, 0.0, 0],
                     [
                         Symbol("effects"),

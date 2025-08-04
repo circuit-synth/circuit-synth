@@ -104,8 +104,8 @@ if ! command -v cargo &> /dev/null; then
 fi
 
 if ! command -v maturin &> /dev/null; then
-    echo "📦 Installing maturin..."
-    pip install maturin
+    echo "📦 Installing maturin with uv..."
+    uv pip install maturin
 fi
 
 echo "✅ Rust toolchain ready"

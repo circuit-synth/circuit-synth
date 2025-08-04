@@ -22,10 +22,10 @@ The issue stems from malformed S-expression formatting in the KiCad schematic ge
 3. **Reverted core files**: Replaced formatter and writer files with v0.2.2 versions
 4. **Verified schematic data**: Confirmed generated `.kicad_sch` files contain correct reference assignments
 
-### 🔄 Current Status
-- **Files reverted successfully**: Formatter and writer files now match v0.2.2
-- **Schematic data correct**: References properly assigned as R1, R2 in file
-- **Display issue persists**: KiCad still shows "R?" instead of proper references
+### ✅ ISSUE RESOLVED (2025-08-04)
+- **Root cause identified**: Symbol library property values were being serialized as Python dictionary strings
+- **Fix applied**: Modified `_create_symbol_definition` in `schematic_writer.py` to extract actual value from property info dict
+- **Issue resolved**: KiCad now displays proper references (R1, R2, etc.) instead of "R?"
 
 ## Key Findings
 - The schematic file contains correct reference data: `(reference R1)`, `(reference R2)`
@@ -39,12 +39,21 @@ The issue stems from malformed S-expression formatting in the KiCad schematic ge
       ...
   ```
 
-## Next Steps Required
-1. **Investigate additional pipeline files**: Other S-expression generation components may need reverting
-2. **Check property value formatting**: Address Python dictionary strings in property values
-3. **Test complete pipeline**: Verify end-to-end generation produces KiCad-compatible output
-4. **Consider symbol library issues**: May need to examine symbol definition formatting
-5. **Review symbol property generation**: Fix the Python dict serialization in symbol properties
+## Final Solution
+
+The issue was caused by changes to the symbol parser between v0.2.2 and v0.3.0. The parser was modified to store property information as dictionaries containing value, position, and effects data, instead of simple strings. This caused the schematic writer to generate malformed symbol definitions with Python dictionary strings as property values.
+
+**Complete fix required reverting two files to v0.2.2:**
+
+1. **Symbol Parser** (`src/circuit_synth/kicad/kicad_symbol_parser.py`):
+   - Reverted to store properties as simple strings: `result["properties"][prop_name] = prop_value`
+   - Removed the complex dictionary structure that stored position and effects
+
+2. **Schematic Writer** (`src/circuit_synth/kicad/sch_gen/schematic_writer.py`):
+   - Already reverted in initial fix attempt
+   - Works correctly with simple string property values
+
+The root cause was a mismatch between what the parser produced (complex dictionaries) and what the schematic writer expected (simple strings). By reverting both files to their v0.2.2 versions, the reference display issue is completely resolved.
 
 ## Technical Context
 - **Branch**: `hotfix/revert-sexpression-v0.2.2`

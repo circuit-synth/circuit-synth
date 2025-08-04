@@ -58,7 +58,7 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "test_complete_revert.kicad_prl",
+    "filename": "simple_resistor_reference.kicad_prl",
     "version": 5
   },
   "net_inspector_panel": {
