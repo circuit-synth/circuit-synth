@@ -8,7 +8,131 @@
 ```
 
 ## Arguments
-- `version` - Version number (e.g., "0.2.0", "1.0.0-beta.1") - required
+- `version` - Version number - **REQUIRED** - Must follow strict semantic versioning rules (see Version Validation below)
+
+## 🔒 Version Validation Rules
+
+**CRITICAL: The command MUST validate version numbers before proceeding with any release steps.**
+
+### Required Format
+- **Semantic Versioning**: `MAJOR.MINOR.PATCH` (e.g., "1.2.3")
+- **Pre-release**: `MAJOR.MINOR.PATCH-LABEL` (e.g., "1.2.3-beta.1", "2.0.0-rc.1")
+- **No 'v' prefix**: Use "1.2.3" NOT "v1.2.3"
+
+### Version Type Guidelines
+
+**🔴 MAJOR (X.0.0) - Breaking Changes**
+- Breaking API changes
+- Incompatible functionality changes
+- Major architecture overhauls
+- **Examples**: 1.0.0 → 2.0.0
+
+**🟡 MINOR (0.X.0) - New Features**
+- New functionality added
+- New commands or major features
+- Backwards-compatible changes
+- **Examples**: 0.4.2 → 0.5.0
+
+**🟢 PATCH (0.0.X) - Bug Fixes**
+- Bug fixes and small improvements
+- Documentation updates
+- Template improvements (like .claude directory fixes)
+- Backwards-compatible bug fixes
+- **Examples**: 0.4.2 → 0.4.3
+
+### Validation Requirements
+
+The command MUST check:
+
+1. **Current Version**: Get current version from pyproject.toml
+2. **Version Format**: Validate semantic versioning format
+3. **Version Increment**: Ensure proper increment (no skipping versions)
+4. **Change Type Assessment**: Require explicit confirmation of change type
+
+### Interactive Validation Process
+
+```bash
+# Example validation flow
+current_version=$(grep "version" pyproject.toml | cut -d'"' -f2)
+echo "Current version: $current_version"
+echo "Requested version: $version"
+
+# Validate format
+if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
+    echo "❌ Invalid version format. Use semantic versioning (e.g., 1.2.3)"
+    exit 1
+fi
+
+# Parse versions
+IFS='.' read -ra CURRENT <<< "$current_version"
+IFS='.' read -ra NEW <<< "${version%%-*}"  # Remove pre-release suffix
+
+current_major=${CURRENT[0]}
+current_minor=${CURRENT[1]}
+current_patch=${CURRENT[2]}
+new_major=${NEW[0]}
+new_minor=${NEW[1]}
+new_patch=${NEW[2]}
+
+# Determine change type and validate
+if [[ $new_major -gt $current_major ]]; then
+    change_type="MAJOR"
+elif [[ $new_major -eq $current_major && $new_minor -gt $current_minor ]]; then
+    change_type="MINOR"
+elif [[ $new_major -eq $current_major && $new_minor -eq $current_minor && $new_patch -gt $current_patch ]]; then
+    change_type="PATCH"
+else
+    echo "❌ Invalid version increment. Version must be greater than current."
+    echo "   Current: $current_version"
+    echo "   Requested: $version"
+    exit 1
+fi
+
+# Require explicit confirmation
+echo ""
+echo "🔍 CHANGE TYPE: $change_type"
+case $change_type in
+    "MAJOR")
+        echo "⚠️  MAJOR release - Breaking changes"
+        echo "   - API compatibility broken"
+        echo "   - Users may need code changes"
+        ;;
+    "MINOR")
+        echo "✨ MINOR release - New features"
+        echo "   - New functionality added"
+        echo "   - Backwards compatible"
+        ;;
+    "PATCH")
+        echo "🔧 PATCH release - Bug fixes"
+        echo "   - Bug fixes and improvements"
+        echo "   - No new features"
+        ;;
+esac
+
+echo ""
+read -p "Is this the correct change type for your release? (y/N): " -n 1 -r
+echo ""
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "❌ Release cancelled. Please choose the correct version number:"
+    echo "   - PATCH: $current_major.$current_minor.$((current_patch + 1))"
+    echo "   - MINOR: $current_major.$((current_minor + 1)).0"
+    echo "   - MAJOR: $((current_major + 1)).0.0"
+    exit 1
+fi
+```
+
+### Common Version Mistakes
+
+**❌ Wrong:**
+- Skipping versions: 0.4.2 → 0.6.0
+- Wrong format: v1.2.3, 1.2, 1.2.3.4
+- Wrong type: Bug fix as MINOR (0.4.2 → 0.5.0)
+- Wrong type: New feature as PATCH (0.4.2 → 0.4.3)
+
+**✅ Correct:**
+- Sequential: 0.4.2 → 0.4.3 (patch)
+- Sequential: 0.4.3 → 0.5.0 (minor)
+- Sequential: 0.5.0 → 1.0.0 (major)
 
 ## What This Does
 
@@ -17,7 +141,7 @@ This command handles the complete release process:
 ### 1. Pre-Release Validation
 - **Test core functionality** - Run main examples
 - **Check branch status** - Ensure we're on develop/main
-- **Validate version format** - Semantic versioning check
+- **Validate version format** - Strict semantic versioning validation with interactive confirmation
 - **Check for uncommitted changes** - Ensure clean working directory
 
 ### 2. Rust Build (If Needed)
@@ -68,9 +192,61 @@ if [[ "$current_branch" != "develop" && "$current_branch" != "main" ]]; then
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then exit 1; fi
 fi
 
-# Validate version format
+# STRICT VERSION VALIDATION (see Version Validation Rules above)
+current_version=$(grep "version = " pyproject.toml | cut -d'"' -f2)
+echo "Current version: $current_version"
+echo "Requested version: $version"
+
+# Validate format
 if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
-    echo "❌ Invalid version format. Use semantic versioning (e.g., 1.0.0)"
+    echo "❌ Invalid version format. Use semantic versioning (e.g., 1.2.3)"
+    exit 1
+fi
+
+# Parse and validate increment
+IFS='.' read -ra CURRENT <<< "$current_version"
+IFS='.' read -ra NEW <<< "${version%%-*}"
+
+current_major=${CURRENT[0]}
+current_minor=${CURRENT[1]}
+current_patch=${CURRENT[2]}
+new_major=${NEW[0]}
+new_minor=${NEW[1]}
+new_patch=${NEW[2]}
+
+# Determine change type and validate increment
+if [[ $new_major -gt $current_major ]]; then
+    change_type="MAJOR"
+elif [[ $new_major -eq $current_major && $new_minor -gt $current_minor ]]; then
+    change_type="MINOR"
+elif [[ $new_major -eq $current_major && $new_minor -eq $current_minor && $new_patch -gt $current_patch ]]; then
+    change_type="PATCH"
+else
+    echo "❌ Invalid version increment. Version must be greater than current."
+    echo "   Current: $current_version → Requested: $version"
+    echo "   Valid options:"
+    echo "   - PATCH: $current_major.$current_minor.$((current_patch + 1))"
+    echo "   - MINOR: $current_major.$((current_minor + 1)).0"
+    echo "   - MAJOR: $((current_major + 1)).0.0"
+    exit 1
+fi
+
+# Interactive confirmation
+echo ""
+echo "🔍 CHANGE TYPE: $change_type"
+case $change_type in
+    "MAJOR") echo "⚠️  MAJOR - Breaking changes, API incompatibility" ;;
+    "MINOR") echo "✨ MINOR - New features, backwards compatible" ;;
+    "PATCH") echo "🔧 PATCH - Bug fixes, improvements, templates" ;;
+esac
+
+read -p "Is this the correct change type? (y/N): " -n 1 -r
+echo ""
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "❌ Release cancelled. Choose correct version:"
+    echo "   - PATCH: $current_major.$current_minor.$((current_patch + 1))"
+    echo "   - MINOR: $current_major.$((current_minor + 1)).0"
+    echo "   - MAJOR: $((current_major + 1)).0.0"
     exit 1
 fi
 ```
