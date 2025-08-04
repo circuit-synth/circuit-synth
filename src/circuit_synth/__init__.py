@@ -14,7 +14,7 @@ Or in Python:
     setup_claude_integration()
 """
 
-__version__ = "0.5.1"
+__version__ = "0.5.2"
 
 # Dependency injection imports
 # Exception imports
