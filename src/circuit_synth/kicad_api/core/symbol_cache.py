@@ -743,15 +743,22 @@ class SymbolLibraryCache:
         try:
             # Extract basic properties - they can be strings or dicts with enhanced info
             properties = symbol_data.get("properties", {})
-            reference_prop = properties.get("Reference", "U")
-
             # Handle both old format (strings) and new format (dicts with "value" key)
-            if isinstance(reference_prop, dict):
-                reference = reference_prop.get("value", "U")
-                # logger.info(f"🔧 KICAD_API DEBUG: Dictionary reference - raw={reference_prop}, extracted={reference}")
-            else:
-                reference = str(reference_prop)
-                # logger.info(f"🔧 KICAD_API DEBUG: String reference - {reference}")
+            def extract_property_value(prop_name, fallback=""):
+                # Try direct field first
+                direct_value = symbol_data.get(prop_name.lower())
+                if direct_value:
+                    return direct_value
+
+                # Try properties
+                prop_data = properties.get(prop_name, fallback)
+                if isinstance(prop_data, dict):
+                    return prop_data.get("value", fallback)
+                return str(prop_data) if prop_data else fallback
+
+            # Extract reference prefix using the centralized extraction function
+            reference = extract_property_value("Reference", "U")
+            logger.info(f"🔧 SYMBOL_CACHE DEBUG: Extracted reference for {lib_id}: {reference} (type: {type(reference)})")
 
             # Convert pins
             pins = []
@@ -787,18 +794,6 @@ class SymbolLibraryCache:
                 pins.append(pin)
 
             # Get description, keywords, datasheet from direct fields or properties
-            # Handle both old format (strings) and new format (dicts with "value" key)
-            def extract_property_value(prop_name, fallback=""):
-                # Try direct field first
-                direct_value = symbol_data.get(prop_name.lower())
-                if direct_value:
-                    return direct_value
-
-                # Try properties
-                prop_data = properties.get(prop_name, fallback)
-                if isinstance(prop_data, dict):
-                    return prop_data.get("value", fallback)
-                return str(prop_data) if prop_data else fallback
 
             description = extract_property_value(
                 "Description"
@@ -875,13 +870,18 @@ class SymbolLibraryCache:
             # logger.info(f"🔧 KICAD_API DEBUG: Creating SymbolDefinition for {lib_id} with reference_prefix={final_reference_prefix}")
             # logger.info(f"🔧 KICAD_API DEBUG: Final property values - description='{description}', keywords='{keywords}', datasheet='{datasheet}'")
             
+            # Extract name using the same extraction logic
+            name = extract_property_value("Value") or symbol_data.get("name", lib_id.split(":")[-1])
+            if isinstance(name, dict) and 'value' in name:
+                name = name['value']
+            
             symbol_def = SymbolDefinition(
                 lib_id=lib_id,
-                name=symbol_data.get("name", lib_id.split(":")[-1]),
-                reference_prefix=final_reference_prefix,
-                description=description,
-                keywords=keywords,
-                datasheet=datasheet,
+                name=str(name),
+                reference_prefix=str(final_reference_prefix),
+                description=str(description),
+                keywords=str(keywords),
+                datasheet=str(datasheet),
                 pins=pins,
                 units=symbol_data.get("unit_count", 1),
                 power_symbol=symbol_data.get("is_power", False),

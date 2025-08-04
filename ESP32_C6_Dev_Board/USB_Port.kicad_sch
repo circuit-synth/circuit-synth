@@ -2,8 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 3f1d8cf8-5f10-49a1-89e0-5dfdb99a4cf1)
-	(paper A4)
+	(uuid 0f1049a1-b418-4d59-96c3-f6f4dc6c062e)
 	(paper A4)
 	(lib_symbols
 		(symbol "Connector:USB_C_Receptacle_USB2.0_16P"
@@ -14,9 +13,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property
-				"Reference"
-				"{'value': 'J', 'position': {'x': 0.0, 'y': 22.225, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Reference" "J"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -25,9 +22,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Value"
-				"{'value': 'USB_C_Receptacle_USB2.0_16P', 'position': {'x': 0.0, 'y': 19.685, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Value" "USB_C_Receptacle_USB2.0_16P"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -36,9 +31,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Footprint"
-				"{'value': '', 'position': {'x': 3.81, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Footprint" ""
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -47,9 +40,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Datasheet"
-				"{'value': 'https://www.usb.org/sites/default/files/documents/usb_type-c.zip', 'position': {'x': 3.81, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Datasheet" "https://www.usb.org/sites/default/files/documents/usb_type-c.zip"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -58,9 +49,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Description"
-				"{'value': 'USB 2.0-only 16P Type-C Receptacle connector', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Description" "USB 2.0-only 16P Type-C Receptacle connector"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -69,9 +58,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_keywords"
-				"{'value': 'usb universal serial bus type-C USB2.0', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_keywords" "usb universal serial bus type-C USB2.0"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -80,9 +67,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_fp_filters"
-				"{'value': 'USB*C*Receptacle*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_fp_filters" "USB*C*Receptacle*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -779,9 +764,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property
-				"Reference"
-				"{'value': 'C', 'position': {'x': 0.635, 'y': 2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
+			(property "Reference" "C"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -790,9 +773,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Value"
-				"{'value': 'C', 'position': {'x': 0.635, 'y': -2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
+			(property "Value" "C"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -801,9 +782,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Footprint"
-				"{'value': '', 'position': {'x': 0.9652, 'y': -3.81, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Footprint" ""
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -812,9 +791,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Datasheet"
-				"{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Datasheet" "~"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -823,9 +800,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Description"
-				"{'value': 'Unpolarized capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Description" "Unpolarized capacitor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -834,9 +809,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_keywords"
-				"{'value': 'cap capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_keywords" "cap capacitor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -845,9 +818,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_fp_filters"
-				"{'value': 'C_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_fp_filters" "C_*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -939,9 +910,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property
-				"Reference"
-				"{'value': 'R', 'position': {'x': 2.032, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Reference" "R"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -950,9 +919,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Value"
-				"{'value': 'R', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Value" "R"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -961,9 +928,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Footprint"
-				"{'value': '', 'position': {'x': -1.778, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Footprint" ""
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -972,9 +937,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Datasheet"
-				"{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Datasheet" "~"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -983,9 +946,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Description"
-				"{'value': 'Resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Description" "Resistor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -994,9 +955,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_keywords"
-				"{'value': 'R res resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_keywords" "R res resistor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1005,9 +964,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_fp_filters"
-				"{'value': 'R_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_fp_filters" "R_*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1084,9 +1041,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property
-				"Reference"
-				"{'value': 'D', 'position': {'x': 0.0, 'y': 2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Reference" "D"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1095,9 +1050,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Value"
-				"{'value': 'ESD5Zxx', 'position': {'x': 0.0, 'y': -2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Value" "ESD5Zxx"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1106,9 +1059,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Footprint"
-				"{'value': 'Diode_SMD:D_SOD-523', 'position': {'x': 0.0, 'y': -4.445, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Footprint" "Diode_SMD:D_SOD-523"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1117,9 +1068,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Datasheet"
-				"{'value': 'https://www.onsemi.com/pdf/datasheet/esd5z2.5t1-d.pdf', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Datasheet" "https://www.onsemi.com/pdf/datasheet/esd5z2.5t1-d.pdf"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1128,9 +1077,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Description"
-				"{'value': 'ESD Protection Diode, SOD-523', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Description" "ESD Protection Diode, SOD-523"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1139,9 +1086,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_keywords"
-				"{'value': 'esd tvs unidirectional diode', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_keywords" "esd tvs unidirectional diode"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1150,9 +1095,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_fp_filters"
-				"{'value': 'D?SOD?523*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_fp_filters" "D?SOD?523*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -1253,9 +1196,10 @@
 			)
 		)
 	)
+	(paper A4)
 	(title_block
 		(title USB_Port)
-		(date 2025-08-03)
+		(date 2025-08-04)
 		(company Circuit-Synth)
 	)
 	(symbol
@@ -1264,10 +1208,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 0675e1e4-b31d-4ed3-b6f1-55b6c3a23f44)
-		(property
-			"Reference"
-			"J1"
+		(uuid ade30057-69dc-431e-9e9f-7d28f3d6c41a)
+		(property "Reference" "J1"
 			(at 48.26 64.77000000000001 0)
 			(effects
 				(font
@@ -1276,9 +1218,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal"
+		(property "Footprint" "Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal"
 			(at 45.72 76.04 0)
 			(effects
 				(font
@@ -1289,17 +1229,9 @@
 		)
 		(instances
 			(project
-				"circuit"
-				(path
-					"/"
-					(reference J1)
-					(unit 1)
-				)
-			)
-			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/6adc9722-4d87-4c7f-b24b-4e8cbcefff32"
+					"/"
 					(reference J1)
 					(unit 1)
 				)
@@ -1312,10 +1244,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 81dad7fc-b51e-4a7a-a872-7f20632f4abd)
-		(property
-			"Reference"
-			"R1"
+		(uuid daef6f64-8fb8-48bc-a203-073395360a78)
+		(property "Reference" "R1"
 			(at 78.74000000000001 64.77000000000001 0)
 			(effects
 				(font
@@ -1324,9 +1254,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Value"
-			"5.1k"
+		(property "Value" "5.1k"
 			(at 78.74000000000001 67.31 0)
 			(effects
 				(font
@@ -1335,9 +1263,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"Resistor_SMD:R_0603_1608Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 76.2 76.04 0)
 			(effects
 				(font
@@ -1348,17 +1274,9 @@
 		)
 		(instances
 			(project
-				"circuit"
-				(path
-					"/"
-					(reference R1)
-					(unit 1)
-				)
-			)
-			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/6adc9722-4d87-4c7f-b24b-4e8cbcefff32"
+					"/"
 					(reference R1)
 					(unit 1)
 				)
@@ -1371,10 +1289,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 87690bcf-6b7f-4ef7-bbfd-3eba7d94d14e)
-		(property
-			"Reference"
-			"R2"
+		(uuid e27ccbb6-2146-4376-90b8-dae997e7bfa5)
+		(property "Reference" "R2"
 			(at 99.06 64.77000000000001 0)
 			(effects
 				(font
@@ -1383,9 +1299,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Value"
-			"5.1k"
+		(property "Value" "5.1k"
 			(at 99.06 67.31 0)
 			(effects
 				(font
@@ -1394,9 +1308,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"Resistor_SMD:R_0603_1608Metric"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 96.52 76.04 0)
 			(effects
 				(font
@@ -1407,17 +1319,9 @@
 		)
 		(instances
 			(project
-				"circuit"
-				(path
-					"/"
-					(reference R2)
-					(unit 1)
-				)
-			)
-			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/6adc9722-4d87-4c7f-b24b-4e8cbcefff32"
+					"/"
 					(reference R2)
 					(unit 1)
 				)
@@ -1430,10 +1334,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid de55de06-ddf5-44c5-a23b-1069688e223f)
-		(property
-			"Reference"
-			"D1"
+		(uuid 71b0bcbf-6011-4f7c-8a62-485bbba61a37)
+		(property "Reference" "D1"
 			(at 119.38000000000001 64.77000000000001 0)
 			(effects
 				(font
@@ -1442,9 +1344,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"Diode_SMD:D_SOD-523"
+		(property "Footprint" "Diode_SMD:D_SOD-523"
 			(at 116.84 76.04 0)
 			(effects
 				(font
@@ -1455,17 +1355,9 @@
 		)
 		(instances
 			(project
-				"circuit"
-				(path
-					"/"
-					(reference D1)
-					(unit 1)
-				)
-			)
-			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/6adc9722-4d87-4c7f-b24b-4e8cbcefff32"
+					"/"
 					(reference D1)
 					(unit 1)
 				)
@@ -1478,10 +1370,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 541058d6-975d-41c9-9fc6-3ac4d07eb071)
-		(property
-			"Reference"
-			"D2"
+		(uuid 3199cd1a-823c-4b96-9166-dfcd9059ad9b)
+		(property "Reference" "D2"
 			(at 144.78 64.77000000000001 0)
 			(effects
 				(font
@@ -1490,9 +1380,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"Diode_SMD:D_SOD-523"
+		(property "Footprint" "Diode_SMD:D_SOD-523"
 			(at 142.24 76.04 0)
 			(effects
 				(font
@@ -1503,17 +1391,9 @@
 		)
 		(instances
 			(project
-				"circuit"
-				(path
-					"/"
-					(reference D2)
-					(unit 1)
-				)
-			)
-			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/6adc9722-4d87-4c7f-b24b-4e8cbcefff32"
+					"/"
 					(reference D2)
 					(unit 1)
 				)
@@ -1526,10 +1406,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 94c98883-a996-40eb-bbc4-50275eec4d62)
-		(property
-			"Reference"
-			"C1"
+		(uuid bac28539-1cf3-46ea-8946-313ebd74e6b3)
+		(property "Reference" "C1"
 			(at 165.1 64.77000000000001 0)
 			(effects
 				(font
@@ -1538,9 +1416,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Value"
-			"10uF"
+		(property "Value" "10uF"
 			(at 165.1 67.31 0)
 			(effects
 				(font
@@ -1549,9 +1425,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 162.56 76.04 0)
 			(effects
 				(font
@@ -1562,21 +1436,13 @@
 		)
 		(instances
 			(project
-				"circuit"
+				"ESP32_C6_Dev_Board"
 				(path
 					"/"
 					(reference C1)
 					(unit 1)
 				)
 			)
-			(project
-				"ESP32_C6_Dev_Board"
-				(path
-					"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/6adc9722-4d87-4c7f-b24b-4e8cbcefff32"
-					(reference C1)
-					(unit 1)
-				)
-			)
 		)
 	)
 	(hierarchical_label
@@ -1589,7 +1455,7 @@
 			)
 			(justify right)
 		)
-		(uuid 5c4162a5-13ab-4342-be0f-b594e3871d07)
+		(uuid f103f44e-7221-40c8-917b-68a844f618c6)
 	)
 	(hierarchical_label
 		GND
@@ -1601,7 +1467,7 @@
 			)
 			(justify right)
 		)
-		(uuid 192e2578-d06c-479e-9963-a51c86dff66a)
+		(uuid 0ecfaa59-c78b-40f5-ad23-c441ed143554)
 	)
 	(hierarchical_label
 		GND
@@ -1613,7 +1479,7 @@
 			)
 			(justify right)
 		)
-		(uuid 0078ee54-b24c-4f0f-8005-14d8789d2ee9)
+		(uuid 6ecac95a-c07e-4299-a6c4-89570948937d)
 	)
 	(hierarchical_label
 		GND
@@ -1625,7 +1491,7 @@
 			)
 			(justify right)
 		)
-		(uuid f0b8954d-7dcc-4446-a735-e01e9b43750c)
+		(uuid a34df4c0-d394-4aa1-86c9-a6bbee913e76)
 	)
 	(hierarchical_label
 		GND
@@ -1637,7 +1503,7 @@
 			)
 			(justify right)
 		)
-		(uuid 331797cf-3a23-4c6a-9744-39cf2c6578d2)
+		(uuid 090af91b-267f-412b-98d2-498f65ff1ae3)
 	)
 	(hierarchical_label
 		GND
@@ -1649,7 +1515,7 @@
 			)
 			(justify right)
 		)
-		(uuid c9be0631-d296-404f-a2e2-25d5b3106d49)
+		(uuid 7435ac6b-c368-4499-ab95-62ae4276b4a3)
 	)
 	(hierarchical_label
 		GND
@@ -1661,7 +1527,7 @@
 			)
 			(justify right)
 		)
-		(uuid 943534a2-0387-49e0-8b99-1ce8d4ffb811)
+		(uuid d3679b2f-a54b-4265-9c6e-f2fda45bbdf6)
 	)
 	(hierarchical_label
 		GND
@@ -1673,7 +1539,7 @@
 			)
 			(justify right)
 		)
-		(uuid b7102361-6f57-42af-a6da-1074f7568ad4)
+		(uuid 0b10e5c3-a417-4dea-b9a7-9684e016b80c)
 	)
 	(hierarchical_label
 		GND
@@ -1685,7 +1551,7 @@
 			)
 			(justify left)
 		)
-		(uuid 5dad5a1e-9bbb-49d4-b55e-d288450e6e03)
+		(uuid dae29710-3b05-4580-83bc-66133433a9f4)
 	)
 	(hierarchical_label
 		GND
@@ -1697,7 +1563,7 @@
 			)
 			(justify left)
 		)
-		(uuid c3d0fdf9-c8eb-455c-9281-a9d1c08973b5)
+		(uuid f3f4d1c1-145c-4627-96d2-e877b530548e)
 	)
 	(hierarchical_label
 		GND
@@ -1709,7 +1575,7 @@
 			)
 			(justify right)
 		)
-		(uuid a2cb2356-fafc-4197-b44d-243c421dda10)
+		(uuid 77ff8770-03b2-4b6a-84e8-03f38aeea917)
 	)
 	(hierarchical_label
 		VBUS
@@ -1721,7 +1587,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9d96690e-c803-4f53-905c-564b429eb86f)
+		(uuid 6b9a01eb-333e-4fe5-84ea-bffa5260a952)
 	)
 	(hierarchical_label
 		VBUS
@@ -1733,7 +1599,7 @@
 			)
 			(justify left)
 		)
-		(uuid 92e4ec78-bd23-432a-b1df-775c6724eae0)
+		(uuid af2b1300-6d50-4b3b-98f5-82fd32664e84)
 	)
 	(hierarchical_label
 		VBUS
@@ -1745,7 +1611,7 @@
 			)
 			(justify left)
 		)
-		(uuid cbe75dba-a4d1-443c-a248-8b56fc4bc148)
+		(uuid b87c7061-4f01-4c59-8b78-87f17006df0a)
 	)
 	(hierarchical_label
 		VBUS
@@ -1757,7 +1623,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9337766b-e35a-4e22-9282-a4b83234d049)
+		(uuid 4afeecff-c9e2-408a-8bc2-9027f0e1dcc8)
 	)
 	(hierarchical_label
 		VBUS
@@ -1769,7 +1635,7 @@
 			)
 			(justify left)
 		)
-		(uuid 7bc7b940-cddf-47a8-aaaf-9764728237df)
+		(uuid 19ce2582-b0d5-4216-8f89-82d08ecb9fac)
 	)
 	(hierarchical_label
 		N$1
@@ -1781,7 +1647,7 @@
 			)
 			(justify left)
 		)
-		(uuid d30ee952-b8aa-4de5-ad13-4f4b4ec62988)
+		(uuid 6c64d776-75c5-4694-b937-7ccaa30d0b0c)
 	)
 	(hierarchical_label
 		N$1
@@ -1793,7 +1659,7 @@
 			)
 			(justify left)
 		)
-		(uuid de80e5c2-1f2f-4f03-b06c-4eba5e40296d)
+		(uuid bc745fee-6c86-4710-8fbe-d90692f202b5)
 	)
 	(hierarchical_label
 		N$1
@@ -1805,7 +1671,7 @@
 			)
 			(justify left)
 		)
-		(uuid 5cad604e-59f8-4441-81a4-deb7291a6212)
+		(uuid 5468763d-3646-4957-a295-0141dd5021e0)
 	)
 	(hierarchical_label
 		N$2
@@ -1817,7 +1683,7 @@
 			)
 			(justify left)
 		)
-		(uuid b5376ecf-a0fc-4b94-a3f4-a9fc53b5023f)
+		(uuid 28c4c39b-b8a9-46c8-9ef3-a9c2e002b58a)
 	)
 	(hierarchical_label
 		N$2
@@ -1829,7 +1695,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9e40000b-6047-48b0-9ed3-a99687fc4f35)
+		(uuid 3a8576d2-c53e-482f-be9f-d35d18a0c85c)
 	)
 	(hierarchical_label
 		N$2
@@ -1841,7 +1707,7 @@
 			)
 			(justify left)
 		)
-		(uuid 72ccf82b-d9b7-4a12-a180-365ae642035c)
+		(uuid f7676633-9b64-4646-9e05-8210e29aecb3)
 	)
 	(hierarchical_label
 		USB_DM
@@ -1853,7 +1719,7 @@
 			)
 			(justify left)
 		)
-		(uuid ef2def0a-0620-456a-aa45-226ae2873f32)
+		(uuid bfd50ac0-3169-4c81-8209-460a4a809923)
 	)
 	(hierarchical_label
 		USB_DM
@@ -1865,7 +1731,7 @@
 			)
 			(justify left)
 		)
-		(uuid 998efcfa-9d18-441b-a48f-d7f0ca56f846)
+		(uuid fc3b9bb4-2e90-423e-b3e1-01805f1fff92)
 	)
 	(hierarchical_label
 		USB_DM
@@ -1877,7 +1743,7 @@
 			)
 			(justify right)
 		)
-		(uuid 41562f57-9f11-4bf9-a4a5-302f5c8c48fc)
+		(uuid 701ec981-bec8-42d8-8a37-45ff4d7f89d6)
 	)
 	(hierarchical_label
 		USB_DP
@@ -1889,7 +1755,7 @@
 			)
 			(justify left)
 		)
-		(uuid f259452e-4b37-4b1e-9604-b7141bfe7117)
+		(uuid 03a5e06e-f0d0-4d49-9fc1-b2c30e8c1fc5)
 	)
 	(hierarchical_label
 		USB_DP
@@ -1901,7 +1767,7 @@
 			)
 			(justify left)
 		)
-		(uuid eccd8ca3-a89b-4706-9020-a48be79ba316)
+		(uuid 61a7f47a-66be-46ac-b904-f80168239b38)
 	)
 	(hierarchical_label
 		USB_DP
@@ -1913,7 +1779,7 @@
 			)
 			(justify right)
 		)
-		(uuid 37d1befd-c9d3-475b-a191-5ee3fb23a398)
+		(uuid 736f4264-0d35-4843-b7f4-f1fb8ebbacdd)
 	)
 	(text_box
 		"USB-C port with CC resistors, ESD protection, and proper grounding"
@@ -1946,19 +1812,13 @@
 			)
 			(justify left top)
 		)
-		(uuid fcef06ad-f8b7-4302-af9a-445b45a8d8d3)
+		(uuid 3c231df8-64ab-4d9d-8ca9-e05c95a45244)
 	)
-	(sheet_instances
-		(path
-			"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/6adc9722-4d87-4c7f-b24b-4e8cbcefff32"
-			(page "1")
-		)
-	)
-	(embedded_fonts no)
 	(sheet_instances
 		(path
 			"/"
 			(page "1")
 		)
 	)
+	(embedded_fonts no)
 )

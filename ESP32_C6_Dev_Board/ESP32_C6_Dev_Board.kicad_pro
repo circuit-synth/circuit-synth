@@ -1,13 +1,24 @@
 {
   "board": {
+    "3dviewports": [],
     "design_settings": {
       "defaults": {}
-    }
+    },
+    "ipc2581": {
+      "dist": "",
+      "distpn": "",
+      "internal_id": "",
+      "mfg": "",
+      "mpn": ""
+    },
+    "layer_pairs": [],
+    "layer_presets": [],
+    "viewports": []
   },
-  "boards": [
-    "ESP32_C6_Dev_Board.kicad_pcb"
-  ],
-  "cvpcb": {},
+  "boards": [],
+  "cvpcb": {
+    "equivalence_files": []
+  },
   "erc": {},
   "libraries": {
     "pinned_footprint_libs": [],
@@ -15,10 +26,50 @@
   },
   "meta": {
     "filename": "ESP32_C6_Dev_Board.kicad_pro",
-    "version": 1
+    "version": 3
   },
-  "net_settings": {},
-  "pcbnew": {},
+  "net_settings": {
+    "classes": [
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Default",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 2147483647,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.2,
+        "via_diameter": 0.6,
+        "via_drill": 0.3,
+        "wire_width": 6
+      }
+    ],
+    "meta": {
+      "version": 4
+    },
+    "net_colors": null,
+    "netclass_assignments": null,
+    "netclass_patterns": []
+  },
+  "pcbnew": {
+    "last_paths": {
+      "gencad": "",
+      "idf": "",
+      "netlist": "",
+      "plot": "",
+      "pos_files": "",
+      "specctra_dsn": "",
+      "step": "",
+      "svg": "",
+      "vrml": ""
+    },
+    "page_layout_descr_file": ""
+  },
   "schematic": {
     "annotate_start_num": 0,
     "drawing": {
@@ -59,27 +110,27 @@
   },
   "sheets": [
     [
-      "ESP32_C6_Dev_Board.kicad_sch",
+      "f1e31098-bad7-47a4-9781-5d9eec1f6eba",
       ""
     ],
     [
-      "USB_Port.kicad_sch",
+      "3c853981-93ec-45b2-a3ca-1469b490961c",
       "USB_Port"
     ],
     [
-      "Power_Supply.kicad_sch",
+      "5e7fc042-1fe8-478c-92d5-4c62922b21e6",
       "Power_Supply"
     ],
     [
-      "ESP32_C6_MCU.kicad_sch",
+      "9f5652a5-66d0-4eaa-8aee-16184470a2d6",
       "ESP32_C6_MCU"
     ],
     [
-      "Debug_Header.kicad_sch",
+      "7ad30d86-6d88-4d6c-8b0a-8a61dfb3e385",
       "Debug_Header"
     ],
     [
-      "LED_Blinker.kicad_sch",
+      "d1f6cccc-0f1e-4922-9bfd-ceed152ad64f",
       "LED_Blinker"
     ]
   ],

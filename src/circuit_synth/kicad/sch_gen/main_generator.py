@@ -650,17 +650,69 @@ class SchematicGenerator(IKiCadIntegration):
         all_assigned_refs = self._collect_all_references(json_file)
 
         # Create a shared reference manager for global uniqueness
-        from .integrated_reference_manager import IntegratedReferenceManager
+        # from .integrated_reference_manager import IntegratedReferenceManager  # REMOVED - file was deleted
+        
+        # Simple replacement for IntegratedReferenceManager functionality
+        class SimpleReferenceManager:
+            """Simple replacement for the deleted IntegratedReferenceManager."""
+            
+            def __init__(self):
+                self.reference_counters = {}
+                self.existing_refs = set()
+            
+            def get_reference_for_symbol(self, component):
+                """Get or assign a reference for a component."""
+                # If the component has a placeholder reference (like "R?"), assign a proper one
+                if component.reference.endswith("?") or not component.reference:
+                    return self.get_next_reference_for_type(component.lib_id)
+                else:
+                    return component.reference  # Use existing reference if it's valid
+            
+            def get_next_reference_for_type(self, lib_id):
+                """Get next reference for a component type."""
+                # Extract component type from lib_id (e.g., "Device:R" -> "R")
+                comp_type = lib_id.split(":")[-1]
+                
+                # Get first letter for reference prefix
+                if comp_type.startswith("R"):
+                    prefix = "R"
+                elif comp_type.startswith("C"):
+                    prefix = "C"
+                elif comp_type.startswith("L"):
+                    prefix = "L"
+                elif comp_type.startswith("U"):
+                    prefix = "U"
+                elif comp_type.startswith("D"):
+                    prefix = "D"
+                elif comp_type.startswith("Q"):
+                    prefix = "Q"
+                else:
+                    prefix = "U"  # Default to U for unknown types
+                
+                # Increment counter for this prefix
+                if prefix not in self.reference_counters:
+                    self.reference_counters[prefix] = 1
+                else:
+                    self.reference_counters[prefix] += 1
+                
+                return f"{prefix}{self.reference_counters[prefix]}"
+            
+            def should_reassign(self, reference):
+                """Check if a reference should be reassigned."""
+                return False  # Don't reassign by default
+            
+            def add_existing_references(self, refs):
+                """Add existing references to avoid conflicts."""
+                self.existing_refs.update(refs)
+                logger.debug(f"Added {len(refs)} existing references to avoid conflicts")
 
-        shared_ref_manager = IntegratedReferenceManager()
+        shared_ref_manager = SimpleReferenceManager()
         logger.debug("Created shared reference manager for global uniqueness")
 
         # Pre-populate the reference manager with all assigned references
         # This ensures we respect existing references and don't create conflicts
         if all_assigned_refs:
-            shared_ref_manager.api_ref_manager.add_existing_references(
-                list(all_assigned_refs)
-            )
+            shared_ref_manager.add_existing_references(list(all_assigned_refs))
             logger.debug(
                 f"Pre-populated reference manager with {len(all_assigned_refs)} existing references"
             )
@@ -685,7 +737,10 @@ class SchematicGenerator(IKiCadIntegration):
             reference_manager=shared_ref_manager,  # Pass shared reference manager
             draw_bounding_boxes=draw_bounding_boxes,  # Pass bounding box flag
         )
+        print(f"🔧 MAIN_GENERATOR DEBUG: About to call main_writer.generate_s_expr()")
+        print(f"🔧 MAIN_GENERATOR DEBUG: main_writer type={type(main_writer)}")
         main_sch_expr = main_writer.generate_s_expr()
+        print(f"🔧 MAIN_GENERATOR DEBUG: generate_s_expr() returned, type={type(main_sch_expr)}")
         sheet_uuids[top_name] = main_writer.uuid_top
         sheet_writers[top_name] = main_writer  # Store main writer for reference
 
@@ -696,7 +751,10 @@ class SchematicGenerator(IKiCadIntegration):
 
         # Write main circuit to root schematic (project_name.kicad_sch)
         out_path = self.project_dir / f"{self.project_name}.kicad_sch"
+        print(f"🔧 MAIN_GENERATOR DEBUG: About to write schematic to {out_path}")
+        print(f"🔧 MAIN_GENERATOR DEBUG: main_sch_expr type={type(main_sch_expr)}")
         write_schematic_file(main_sch_expr, str(out_path))
+        print(f"🔧 MAIN_GENERATOR DEBUG: Finished writing schematic")
 
         # Now generate other subcircuits recursively
         # Create a mapping to track which circuits have been generated

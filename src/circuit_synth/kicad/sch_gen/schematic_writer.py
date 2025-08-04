@@ -72,7 +72,55 @@ from .collision_manager import SHEET_MARGIN
 
 # Import existing dependencies
 from .data_structures import Circuit
-from .integrated_reference_manager import IntegratedReferenceManager
+# from .integrated_reference_manager import IntegratedReferenceManager  # REMOVED - file was deleted
+
+# Simple replacement for IntegratedReferenceManager functionality
+class SimpleReferenceManager:
+    """Simple replacement for the deleted IntegratedReferenceManager."""
+    
+    def __init__(self):
+        self.reference_counters = {}
+    
+    def get_reference_for_symbol(self, component):
+        """Get or assign a reference for a component."""
+        # If the component has a placeholder reference (like "R?"), assign a proper one
+        if component.reference.endswith("?") or not component.reference:
+            return self.get_next_reference_for_type(component.lib_id)
+        else:
+            return component.reference  # Use existing reference if it's valid
+    
+    def get_next_reference_for_type(self, lib_id):
+        """Get next reference for a component type."""
+        # Extract component type from lib_id (e.g., "Device:R" -> "R")
+        comp_type = lib_id.split(":")[-1]
+        
+        # Get first letter for reference prefix
+        if comp_type.startswith("R"):
+            prefix = "R"
+        elif comp_type.startswith("C"):
+            prefix = "C"
+        elif comp_type.startswith("L"):
+            prefix = "L"
+        elif comp_type.startswith("U"):
+            prefix = "U"
+        elif comp_type.startswith("D"):
+            prefix = "D"
+        elif comp_type.startswith("Q"):
+            prefix = "Q"
+        else:
+            prefix = "U"  # Default to U for unknown types
+        
+        # Increment counter for this prefix
+        if prefix not in self.reference_counters:
+            self.reference_counters[prefix] = 1
+        else:
+            self.reference_counters[prefix] += 1
+        
+        return f"{prefix}{self.reference_counters[prefix]}"
+    
+    def should_reassign(self, reference):
+        """Check if a reference should be reassigned."""
+        return False  # Don't reassign by default
 from .kicad_formatter import format_kicad_schematic
 from .shape_drawer import arc_s_expr, circle_s_expr, polyline_s_expr, rectangle_s_expr
 
@@ -214,7 +262,7 @@ class SchematicWriter:
         paper_size: str = "A4",
         project_name: str = None,
         hierarchical_path: list = None,
-        reference_manager: IntegratedReferenceManager = None,
+        reference_manager = None,
         draw_bounding_boxes: bool = False,
     ):
         """
@@ -258,7 +306,7 @@ class SchematicWriter:
             self.reference_manager = reference_manager
             logger.debug(f"  - Using shared reference manager")
         else:
-            self.reference_manager = IntegratedReferenceManager()
+            self.reference_manager = SimpleReferenceManager()
             logger.debug(f"  - Created new reference manager")
 
         # Initialize component to UUID mapping for symbol_instances table
@@ -281,6 +329,10 @@ class SchematicWriter:
 
         PERFORMANCE MONITORING: Times each major operation and reports Rust acceleration status.
         """
+        print("=" * 80)
+        print("🚨 CRITICAL DEBUG: generate_s_expr() method called!")
+        print(f"🚨 CRITICAL DEBUG: Circuit name: '{self.circuit.name}'")
+        print("=" * 80)
         start_time = time.perf_counter()
         # Schematic generation details removed for clean output
 
@@ -430,6 +482,7 @@ class SchematicWriter:
             self.reference_mapping[original_ref] = new_ref
 
             # Add component using the API
+            logger.debug(f"      Adding component to API with reference: {new_ref}")
             api_component = self.component_manager.add_component(
                 library_id=comp.lib_id,
                 reference=new_ref,
@@ -445,6 +498,10 @@ class SchematicWriter:
 
                 # Update the original component reference
                 comp.reference = new_ref
+                
+                # Ensure the API component has the correct reference
+                api_component.reference = new_ref
+                logger.debug(f"      API component created with reference: {api_component.reference}")
 
                 # Copy additional properties
                 api_component.rotation = comp.rotation
@@ -1007,6 +1064,11 @@ class SchematicWriter:
         """
         Add symbol definitions to the lib_symbols section.
         """
+        print("=" * 80)
+        print("🚨 CRITICAL DEBUG: _add_symbol_definitions method called!")
+        print(f"🚨 CRITICAL DEBUG: Components count: {len(self.schematic.components)}")
+        print("=" * 80)
+        logger.info(f"🔧 SCHEMATIC_WRITER DEBUG: _add_lib_symbols called with {len(self.schematic.components)} components")
         # Find or create lib_symbols block
         lib_symbols_block = None
         for item in schematic_expr:
@@ -1039,12 +1101,16 @@ class SchematicWriter:
 
         for sym_id in sorted(symbol_ids):
             lib_data = SymbolLibCache.get_symbol_data(sym_id)
+            print(f"🔧 SYMBOL_CACHE DEBUG: Retrieved data for {sym_id}:")
+            if lib_data and "properties" in lib_data:
+                print(f"🔧 SYMBOL_CACHE DEBUG: Properties: {lib_data['properties']}")
             if not lib_data:
                 logger.warning(
                     "No symbol library data found for '%s'. Skipping definition.",
                     sym_id,
                 )
                 continue
+            
 
             # Check if graphics data is missing from Rust cache - if so, use Python fallback
             if "graphics" not in lib_data or not lib_data["graphics"]:
@@ -1070,11 +1136,23 @@ class SchematicWriter:
             else:
                 pass  # Graphics data already available
 
+            print(f"🔧 SCHEMATIC_WRITER DEBUG: Processing symbol {sym_id}, lib_data type: {type(lib_data)}")
+            logger.info(f"🔧 SCHEMATIC_WRITER DEBUG: Processing symbol {sym_id}, lib_data type: {type(lib_data)}")
+            
             if isinstance(lib_data, list):
-                # It's already an S-expression block
-                lib_symbols_block.append(lib_data)
+                # It's already an S-expression block, but we need to clean any dictionary strings
+                print(f"🔧 SCHEMATIC_WRITER DEBUG: Using S-expression block for {sym_id}")
+                logger.info(f"🔧 SCHEMATIC_WRITER DEBUG: Using S-expression block for {sym_id}")
+                print(f"🔧 SCHEMATIC_WRITER DEBUG: lib_data before cleaning: {lib_data[:3] if len(lib_data) > 3 else lib_data}")
+                
+                # Clean dictionary strings from the S-expression block
+                cleaned_lib_data = self._clean_dictionary_strings_from_sexpr(lib_data)
+                print(f"🔧 SCHEMATIC_WRITER DEBUG: lib_data after cleaning: {cleaned_lib_data[:3] if len(cleaned_lib_data) > 3 else cleaned_lib_data}")
+                lib_symbols_block.append(cleaned_lib_data)
             else:
                 # Build from JSON-based library data
+                print(f"🔧 SCHEMATIC_WRITER DEBUG: Building from JSON data for {sym_id}")
+                logger.info(f"🔧 SCHEMATIC_WRITER DEBUG: Building from JSON data for {sym_id}")
                 new_sym_def = self._create_symbol_definition(sym_id, lib_data)
                 if new_sym_def:
                     if isinstance(new_sym_def[0], Symbol):
@@ -1114,12 +1192,16 @@ class SchematicWriter:
             # Handle both old format (strings) and new format (dicts with "value" key)
             # This fixes the reference property generation bug where dictionary objects
             # are converted to string representations instead of extracting the value
+            logger.info(f"🔧 SCHEMATIC_WRITER DEBUG: Processing property {prop_name}: {prop_value} (type: {type(prop_value)})")
+            
             if isinstance(prop_value, dict):
                 # Extract the actual value from the dictionary
                 clean_prop_value = prop_value.get("value", "")
+                logger.info(f"🔧 SCHEMATIC_WRITER DEBUG: Extracted clean value: {clean_prop_value}")
             else:
                 # Use the value as-is if it's already a string
                 clean_prop_value = str(prop_value) if prop_value else ""
+                logger.info(f"🔧 SCHEMATIC_WRITER DEBUG: Using string value: {clean_prop_value}")
 
             symbol_block.append(
                 [
@@ -1253,6 +1335,44 @@ class SchematicWriter:
 
         return symbol_block
 
+    def _clean_dictionary_strings_from_sexpr(self, sexpr_data):
+        """
+        Recursively clean dictionary strings from S-expression data.
+        This handles the case where symbol cache returns pre-built S-expressions
+        that still contain dictionary string representations.
+        """
+        print(f"🔧 CLEANING DEBUG: Processing sexpr_data type: {type(sexpr_data)}")
+        if isinstance(sexpr_data, list):
+            cleaned_list = []
+            for i, item in enumerate(sexpr_data):
+                if isinstance(item, list):
+                    # Recursively clean nested lists
+                    cleaned_list.append(self._clean_dictionary_strings_from_sexpr(item))
+                elif isinstance(item, str):
+                    # Check if this is a dictionary string representation
+                    if item.startswith("{'value':") or item.startswith('{"value":'):
+                        print(f"🔧 CLEANING DEBUG: Found dictionary string: {item[:50]}...")
+                        # Try to extract the value from the dictionary string
+                        try:
+                            import ast
+                            dict_obj = ast.literal_eval(item)
+                            if isinstance(dict_obj, dict) and "value" in dict_obj:
+                                print(f"🔧 CLEANING DEBUG: Extracted value: {dict_obj['value']}")
+                                cleaned_list.append(dict_obj["value"])
+                            else:
+                                cleaned_list.append(item)  # Keep original if can't extract
+                        except (ValueError, SyntaxError) as e:
+                            print(f"🔧 CLEANING DEBUG: Failed to parse dictionary string: {e}")
+                            # If we can't parse it, keep the original
+                            cleaned_list.append(item)
+                    else:
+                        cleaned_list.append(item)
+                else:
+                    cleaned_list.append(item)
+            return cleaned_list
+        else:
+            return sexpr_data
+
     def _add_sheet_instances(self, schematic_expr: list):
         """Add sheet_instances section."""
         sheet_instances = [
@@ -1319,10 +1439,15 @@ class SchematicWriter:
 def write_schematic_file(schematic_expr: list, out_path: str):
     """
     Helper to serialize the final S-expression to a .kicad_sch file.
-
+    
     PERFORMANCE OPTIMIZATION: Uses Rust-accelerated formatting when available.
     This is the final step where the Rust S-expression formatter provides maximum benefit.
     """
+    print(f"🔧 WRITE_SCHEMATIC_FILE DEBUG: Called with out_path={out_path}")
+    print(f"🔧 WRITE_SCHEMATIC_FILE DEBUG: schematic_expr type={type(schematic_expr)}, length={len(schematic_expr) if isinstance(schematic_expr, list) else 'N/A'}")
+
+    # PERFORMANCE OPTIMIZATION: Uses Rust-accelerated formatting when available.
+    # This is the final step where the Rust S-expression formatter provides maximum benefit.
     start_time = time.perf_counter()
     expr_size = len(str(schematic_expr)) if schematic_expr else 0
 

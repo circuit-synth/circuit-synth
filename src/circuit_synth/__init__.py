@@ -70,7 +70,7 @@ from .interfaces import (
     IKiCadIntegration,
     KiCadGenerationConfig,
 )
-from .kicad.unified_kicad_integration import create_unified_kicad_integration
+# from .kicad.unified_kicad_integration import create_unified_kicad_integration  # Module removed during cleanup
 
 # Plugin integration
 from .plugins import AIDesignBridge
@@ -142,7 +142,7 @@ __all__ = [
     "create_rust_capacitor",
     "get_rust_component_status",
     # KiCad integration and validation
-    "create_unified_kicad_integration",
+    # "create_unified_kicad_integration",  # Module removed during cleanup
     "validate_kicad_installation",
     "require_kicad",
     "get_kicad_paths",

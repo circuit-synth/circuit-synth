@@ -2,8 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 98871d60-1f11-495f-bb72-221524e32535)
-	(paper A4)
+	(uuid 61535847-b87d-48c5-b1b8-168924794420)
 	(paper A4)
 	(lib_symbols
 		(symbol "Device:C"
@@ -14,9 +13,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property
-				"Reference"
-				"{'value': 'C', 'position': {'x': 0.635, 'y': 2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
+			(property "Reference" "C"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -25,9 +22,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Value"
-				"{'value': 'C', 'position': {'x': 0.635, 'y': -2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
+			(property "Value" "C"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -36,9 +31,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Footprint"
-				"{'value': '', 'position': {'x': 0.9652, 'y': -3.81, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Footprint" ""
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -47,9 +40,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Datasheet"
-				"{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Datasheet" "~"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -58,9 +49,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Description"
-				"{'value': 'Unpolarized capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Description" "Unpolarized capacitor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -69,9 +58,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_keywords"
-				"{'value': 'cap capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_keywords" "cap capacitor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -80,9 +67,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_fp_filters"
-				"{'value': 'C_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_fp_filters" "C_*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -174,9 +159,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property
-				"Reference"
-				"{'value': 'U', 'position': {'x': -3.81, 'y': 3.175, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Reference" "U"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -185,9 +168,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Value"
-				"{'value': 'AMS1117-3.3', 'position': {'x': 0.0, 'y': 3.175, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
+			(property "Value" "AMS1117-3.3"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -196,9 +177,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Footprint"
-				"{'value': 'Package_TO_SOT_SMD:SOT-223-3_TabPin2', 'position': {'x': 0.0, 'y': 5.08, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -207,9 +186,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Datasheet"
-				"{'value': 'http://www.advanced-monolithic.com/pdf/ds1117.pdf', 'position': {'x': 2.54, 'y': -6.35, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Datasheet" "http://www.advanced-monolithic.com/pdf/ds1117.pdf"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -218,9 +195,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Description"
-				"{'value': '1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Description" "1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -229,9 +204,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_keywords"
-				"{'value': 'linear regulator ldo fixed positive', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_keywords" "linear regulator ldo fixed positive"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -240,9 +213,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_fp_filters"
-				"{'value': 'SOT?223*TabPin2*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_fp_filters" "SOT?223*TabPin2*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -334,9 +305,10 @@
 			)
 		)
 	)
+	(paper A4)
 	(title_block
 		(title Power_Supply)
-		(date 2025-08-03)
+		(date 2025-08-04)
 		(company Circuit-Synth)
 	)
 	(symbol
@@ -345,10 +317,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 97371d33-f6b5-4257-8e34-020a788d7ed8)
-		(property
-			"Reference"
-			"U1"
+		(uuid 16b7a175-b34d-43e2-a61f-0fced3871270)
+		(property "Reference" "U1"
 			(at 48.26 57.15 0)
 			(effects
 				(font
@@ -357,9 +327,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
 			(at 45.72 68.42 0)
 			(effects
 				(font
@@ -370,17 +338,9 @@
 		)
 		(instances
 			(project
-				"circuit"
-				(path
-					"/"
-					(reference U1)
-					(unit 1)
-				)
-			)
-			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/5668113b-e1e8-4183-886b-f5f42c9b394c"
+					"/"
 					(reference U1)
 					(unit 1)
 				)
@@ -393,10 +353,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid a0de9dbf-fc9e-45b8-8b57-26a276e9e0b2)
-		(property
-			"Reference"
-			"C2"
+		(uuid 464b17eb-2356-44b6-8dc2-05ec1c44545c)
+		(property "Reference" "C2"
 			(at 73.66000000000001 57.15 0)
 			(effects
 				(font
@@ -405,9 +363,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Value"
-			"10uF"
+		(property "Value" "10uF"
 			(at 73.66000000000001 59.690000000000005 0)
 			(effects
 				(font
@@ -416,9 +372,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 71.12 68.42 0)
 			(effects
 				(font
@@ -429,17 +383,9 @@
 		)
 		(instances
 			(project
-				"circuit"
-				(path
-					"/"
-					(reference C2)
-					(unit 1)
-				)
-			)
-			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/5668113b-e1e8-4183-886b-f5f42c9b394c"
+					"/"
 					(reference C2)
 					(unit 1)
 				)
@@ -452,10 +398,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid d4b28de9-e432-4a92-9617-fd7b184417a4)
-		(property
-			"Reference"
-			"C3"
+		(uuid c19684a7-aef2-453e-afeb-22de8173e8f8)
+		(property "Reference" "C3"
 			(at 93.98 57.15 0)
 			(effects
 				(font
@@ -464,9 +408,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Value"
-			"22uF"
+		(property "Value" "22uF"
 			(at 93.98 59.690000000000005 0)
 			(effects
 				(font
@@ -475,9 +417,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"Capacitor_SMD:C_0805_2012Metric"
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 91.44 68.42 0)
 			(effects
 				(font
@@ -488,21 +428,13 @@
 		)
 		(instances
 			(project
-				"circuit"
+				"ESP32_C6_Dev_Board"
 				(path
 					"/"
 					(reference C3)
 					(unit 1)
 				)
 			)
-			(project
-				"ESP32_C6_Dev_Board"
-				(path
-					"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/5668113b-e1e8-4183-886b-f5f42c9b394c"
-					(reference C3)
-					(unit 1)
-				)
-			)
 		)
 	)
 	(hierarchical_label
@@ -515,7 +447,7 @@
 			)
 			(justify right)
 		)
-		(uuid d80b828c-fb80-4cb4-9e34-f5fc5c4cd204)
+		(uuid 551b5501-9995-4ff6-8d9e-a75eba3b3aff)
 	)
 	(hierarchical_label
 		VBUS
@@ -527,7 +459,7 @@
 			)
 			(justify right)
 		)
-		(uuid 7c1179de-3c10-4899-a68f-f0b9b17a9ce7)
+		(uuid dba8eaa0-ff3c-4f70-9175-4b861843fffc)
 	)
 	(hierarchical_label
 		VBUS
@@ -539,7 +471,7 @@
 			)
 			(justify left)
 		)
-		(uuid e4bf7e4c-4496-455d-88b3-75495dbee1c7)
+		(uuid a7c50f64-9a1f-4664-9b93-844c3d1012a7)
 	)
 	(hierarchical_label
 		GND
@@ -551,7 +483,7 @@
 			)
 			(justify right)
 		)
-		(uuid 47d4fabd-7ddf-453a-8760-a1231c803588)
+		(uuid 018c9feb-696c-4471-84ff-42cfec6434b1)
 	)
 	(hierarchical_label
 		GND
@@ -563,7 +495,7 @@
 			)
 			(justify right)
 		)
-		(uuid 15bc551a-e0db-40af-a31f-6c15c3fd62a3)
+		(uuid 5e390ae8-003d-4429-8bce-273331c5ad82)
 	)
 	(hierarchical_label
 		GND
@@ -575,7 +507,7 @@
 			)
 			(justify right)
 		)
-		(uuid 329894b2-c486-4c0c-903b-f0af144361f4)
+		(uuid 34efe58e-2bd5-411f-8caf-8d723deb33a4)
 	)
 	(hierarchical_label
 		GND
@@ -587,7 +519,7 @@
 			)
 			(justify right)
 		)
-		(uuid 490a1df6-8615-4caf-80f2-c662def182c9)
+		(uuid 4a879b1d-64dc-4105-b55c-08092cd9893a)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -599,7 +531,7 @@
 			)
 			(justify left)
 		)
-		(uuid d103ff5f-f0c7-4962-bb3d-a6c604b91334)
+		(uuid dffb666f-37dc-4916-9276-240edc0500b1)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -611,7 +543,7 @@
 			)
 			(justify left)
 		)
-		(uuid 6366e513-6942-4cce-a5cd-e9db2aae6299)
+		(uuid ad671198-7a12-46f2-84de-8e4cc9bec678)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -623,7 +555,7 @@
 			)
 			(justify left)
 		)
-		(uuid bec68406-2940-4027-b68a-75c4b6620fc4)
+		(uuid 4c488213-c89f-40d0-8654-882d7c1ba69f)
 	)
 	(text_box
 		"5V to 3.3V power regulation subcircuit"
@@ -656,19 +588,13 @@
 			)
 			(justify left top)
 		)
-		(uuid b0592089-d431-47be-96f0-f97fed05f503)
+		(uuid ca874b0c-efe8-4267-9507-71c649336318)
 	)
-	(sheet_instances
-		(path
-			"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/5668113b-e1e8-4183-886b-f5f42c9b394c"
-			(page "1")
-		)
-	)
-	(embedded_fonts no)
 	(sheet_instances
 		(path
 			"/"
 			(page "1")
 		)
 	)
+	(embedded_fonts no)
 )

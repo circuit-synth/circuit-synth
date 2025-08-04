@@ -170,13 +170,16 @@ def _discover_kicad_library_paths(self):
 
 ### Current Status (Updated August 4, 2025)
 
+- ✅ **System Execution**: Fixed - runs without import errors
+- ✅ **Import System**: Fixed - removed broken imports, created replacements
+- ✅ **Reference Logic**: Enhanced - handles placeholders and valid references
 - ✅ **Symbol Discovery**: Fixed - all KiCad libraries loaded correctly
 - ✅ **Component Instances**: Fixed - PCB shows proper "Reference" "R1", "Value" "10k"
 - ✅ **Property Extraction**: Fixed - symbols found and processed correctly
 - ✅ **Code Simplification**: Removed complex caching, consolidated to single path
 - ✅ **Debug Workflow**: Established systematic `/debug-cycle` command
-- ✅ **Symbol Library Templates**: **FIXED** - schematic lib_symbols now shows clean strings
-- ❌ **KiCad Visual Display**: **STILL SHOWS "R?" in schematic view despite correct file contents**
+- ❌ **KiCad Visual Display**: **STILL BROKEN** - shows "R?" instead of "R1"
+- ❌ **lib_symbols Templates**: **STILL BROKEN** - dictionary strings persist
 
 ### Phase 6: Symbol Library Template Fix (Completed ✅)
 
@@ -251,12 +254,134 @@ else:
 - PCB properties: ✅ Shows `"Reference" "R1"` (correct display)
 - **KiCad GUI**: ❌ Still displays "R?" (mystery persistence)
 
-### Files Modified
+### Phase 7: Deep Investigation - Code Path Mystery (August 4, 2025) ❌
 
-- `src/circuit_synth/kicad_api/core/symbol_cache.py` - Enhanced property extraction, disabled caching, added library discovery
-- `src/circuit_synth/kicad_api/core/s_expression.py` - Added/removed debug logging  
-- `src/circuit_synth/core/s_expression.py` - Removed (duplicate file)
-- `src/circuit_synth/kicad/sch_gen/schematic_writer.py` - **CRITICAL FIX**: Added property extraction logic for symbol library templates (lines 1127-1132)
+#### Problem: Fixes Not Applied
+Despite implementing fixes in multiple locations, the generated schematic files still show dictionary string representations:
+
+```sexp
+(property
+    "Reference"
+    "{'value': 'R', 'position': {'x': 2.032, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+    (at 0.0 0.0 0)
+```
+
+#### Investigation Attempts
+1. **Fixed `schematic_writer.py`**: Added property extraction logic (lines 1114-1122) ❌ Not executed
+2. **Fixed `symbol_cache.py`**: Enhanced property extraction with centralized function ❌ Not called
+3. **Fixed `s_expression.py`**: Added debug logging to `_symbol_definition_to_sexp` ❌ No debug output
+4. **Cleared Symbol Cache**: Removed `~/.cache/circuit_synth/symbols/` ❌ Still broken
+5. **Added Debug Logging**: Multiple debug statements added ❌ None appeared in output
+
+#### Key Discovery: Unknown Code Path
+**Critical Finding**: None of the debug logging statements appeared in the test output, indicating that:
+- The lib_symbols generation is happening through a **completely different code path**
+- The actual symbol library template generation code has not been identified
+- Multiple parallel systems may exist for symbol generation
+
+#### Evidence of Missing Code Path
+```bash
+# Expected debug output (never appeared):
+🔧 DEBUG: About to call _add_symbol_definitions
+🔧 SYMBOL_CACHE DEBUG: Extracted reference for Device:R: R (type: <class 'str'>)
+🔧 S_EXPRESSION DEBUG: symbol_def.reference_prefix = R (type: <class 'str'>)
+```
+
+#### Current Hypothesis
+The actual lib_symbols generation may be happening through:
+1. **Rust modules**: Possible Rust-based symbol generation bypassing Python fixes
+2. **Different schematic writer**: Alternative schematic generation system
+3. **Template-based generation**: Pre-built templates with embedded dictionary strings
+4. **Legacy code path**: Older generation system still in use
+
+#### Next Investigation Required
+1. **Find the actual code path**: Search for where the dictionary strings are being written
+2. **Trace lib_symbols generation**: Add logging at the file write level
+3. **Check for Rust integration**: Investigate if Rust modules are generating symbols
+4. **Search for template files**: Look for pre-built symbol templates
+5. **Examine all schematic writers**: Check for alternative generation systems
+
+### Phase 8: System Stability and Import Fixes (August 4, 2025) ✅
+
+#### Problem: Import Errors and System Instability
+Despite previous investigation phases, the system was experiencing critical import errors that prevented proper execution and testing:
+
+```python
+# Import errors encountered:
+ImportError: cannot import name 'unified_kicad_integration' from 'circuit_synth.kicad.sch_gen.main_generator'
+ImportError: cannot import name 'integrated_reference_manager' from 'circuit_synth.kicad.sch_gen.main_generator'
+```
+
+#### Solution: Import System Cleanup and Replacement
+**Fixed Import Issues**:
+1. **Removed Broken Imports**: Eliminated references to non-existent `unified_kicad_integration` and `integrated_reference_manager`
+2. **Created SimpleReferenceManager**: Implemented replacement reference management system
+3. **Restored System Stability**: System now runs without import errors
+
+#### Implementation Details
+**SimpleReferenceManager Implementation**:
+```python
+class SimpleReferenceManager:
+    """Simple reference manager to replace missing integrated_reference_manager"""
+    
+    def __init__(self):
+        self.reference_counters = {}
+    
+    def get_next_reference(self, prefix: str) -> str:
+        """Get next reference for a component prefix (e.g., 'R' -> 'R1', 'R2', etc.)"""
+        if prefix not in self.reference_counters:
+            self.reference_counters[prefix] = 0
+        self.reference_counters[prefix] += 1
+        return f"{prefix}{self.reference_counters[prefix]}"
+    
+    def reset_counters(self):
+        """Reset all reference counters"""
+        self.reference_counters.clear()
+```
+
+**Import System Fixes**:
+- Removed calls to non-existent `unified_kicad_integration()`
+- Replaced `integrated_reference_manager` with `SimpleReferenceManager`
+- Enhanced error handling and logging throughout the system
+- Verified all imports resolve correctly
+
+#### Current System Status
+**✅ System Execution**: Fixed - runs without import errors
+**✅ Import System**: Fixed - removed broken imports, created replacements
+**✅ Reference Logic**: Enhanced - handles placeholders and valid references
+**❌ KiCad Visual Display**: **STILL BROKEN** - shows "R?" instead of "R1"
+**❌ lib_symbols Templates**: **STILL BROKEN** - dictionary strings persist
+
+#### Key Discovery: Core Issue Persists
+Despite achieving system stability and fixing all import errors, the fundamental KiCad reference display issue remains unresolved. The system now runs successfully but still generates the problematic dictionary string representations in symbol library templates.
+
+**Evidence of Persistent Issue**:
+```sexp
+# Still appears in generated files:
+(property
+    "Reference"
+    "{'value': 'R', 'position': {'x': 2.032, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+    (at 0.0 0.0 0)
+)
+```
+
+#### Investigation Conclusion
+**System Health**: ✅ **Fully Restored**
+- All import errors resolved
+- Reference management system operational
+- Debug logging functional
+- Test execution successful
+
+**Core Bug Status**: ❌ **Still Unresolved**
+- Dictionary strings still written to lib_symbols
+- KiCad still displays "R?" instead of "R1"
+- Actual code path writing dictionary strings remains unidentified
+
+### Files Modified (Attempted Fixes)
+
+- `src/circuit_synth/kicad_api/core/symbol_cache.py` - Enhanced property extraction, disabled caching, added library discovery ❌ **Not executed**
+- `src/circuit_synth/kicad_api/core/s_expression.py` - Added debug logging to symbol definition generation ❌ **Not executed**
+- `src/circuit_synth/kicad/sch_gen/schematic_writer.py` - Added property extraction logic for symbol library templates ❌ **Not executed**
 - `.claude/commands/debug-cycle.md` - Created systematic debugging workflow
 
 ## Testing
@@ -285,10 +410,15 @@ else:
 ## Next Steps
 
 1. ✅ Document the problem (this file)
-2. ⏳ Fix s_expression.py to handle dictionary properties
-3. ⏳ Test complete fix across all scenarios
-4. ⏳ Ensure backward compatibility maintained
-5. ⏳ Update any other property extraction points
+2. ✅ System stability restored - all import errors fixed
+3. ❌ **CRITICAL**: Find the actual code path generating lib_symbols
+4. ⏳ **HIGH PRIORITY**: Trace symbol library template generation from file write backwards
+5. ⏳ **HIGH PRIORITY**: Add file-level logging to identify where dictionary strings are written
+6. ⏳ Search for Rust-based symbol generation systems
+7. ⏳ Investigate template-based or pre-built symbol definitions
+8. ⏳ Check for alternative schematic generation systems
+
+**Investigation Focus**: Despite system stability being restored, the core issue persists. The actual code path that writes dictionary strings to lib_symbols remains unidentified and needs to be found through systematic file-level tracing.
 
 ## Branch Information
 

@@ -21,12 +21,12 @@ print(f"   Core imports: {core_import_end - core_import_start:.4f}s")
 print("⏱️  Importing KiCad integration...")
 kicad_import_start = time.perf_counter()
 try:
-    from circuit_synth.kicad.unified_kicad_integration import (
-        create_unified_kicad_integration,
-    )
+    # from circuit_synth.kicad.unified_kicad_integration import (
+    #     create_unified_kicad_integration,
+    # )  # Module removed during cleanup
 
     kicad_import_end = time.perf_counter()
-    print(f"   KiCad integration: {kicad_import_end - kicad_import_start:.4f}s")
+    print(f"   KiCad integration: {kicad_import_end - kicad_import_start:.4f}s (skipped - module removed)")
 except ImportError as e:
     print(f"   KiCad integration failed: {e}")
 

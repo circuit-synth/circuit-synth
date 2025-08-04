@@ -2,8 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 910c5ec0-0baf-4472-b43c-fe67db8804e3)
-	(paper A4)
+	(uuid f841b892-f610-4897-ad8c-69cd60c5fc38)
 	(paper A4)
 	(lib_symbols
 		(symbol "Device:LED"
@@ -14,9 +13,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property
-				"Reference"
-				"{'value': 'D', 'position': {'x': 0.0, 'y': 2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Reference" "D"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -25,9 +22,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Value"
-				"{'value': 'LED', 'position': {'x': 0.0, 'y': -2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Value" "LED"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -36,9 +31,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Footprint"
-				"{'value': '', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Footprint" ""
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -47,9 +40,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Datasheet"
-				"{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Datasheet" "~"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -58,9 +49,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Description"
-				"{'value': 'Light emitting diode', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Description" "Light emitting diode"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -69,9 +58,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Sim.Pins"
-				"{'value': '1=K 2=A', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Sim.Pins" "1=K 2=A"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -80,9 +67,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"ki_keywords"
-				"{'value': 'LED diode', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_keywords" "LED diode"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -91,9 +76,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_fp_filters"
-				"{'value': 'LED* LED_SMD:* LED_THT:*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_fp_filters" "LED* LED_SMD:* LED_THT:*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -232,9 +215,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property
-				"Reference"
-				"{'value': 'R', 'position': {'x': 2.032, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Reference" "R"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -243,9 +224,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Value"
-				"{'value': 'R', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Value" "R"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -254,9 +233,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Footprint"
-				"{'value': '', 'position': {'x': -1.778, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Footprint" ""
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -265,9 +242,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Datasheet"
-				"{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Datasheet" "~"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -276,9 +251,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Description"
-				"{'value': 'Resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Description" "Resistor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -287,9 +260,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_keywords"
-				"{'value': 'R res resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_keywords" "R res resistor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -298,9 +269,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_fp_filters"
-				"{'value': 'R_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_fp_filters" "R_*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -370,9 +339,10 @@
 			)
 		)
 	)
+	(paper A4)
 	(title_block
 		(title LED_Blinker)
-		(date 2025-08-03)
+		(date 2025-08-04)
 		(company Circuit-Synth)
 	)
 	(symbol
@@ -381,10 +351,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid f8479841-7d3d-4e3a-beff-1588c80081c9)
-		(property
-			"Reference"
-			"D3"
+		(uuid 56a8539a-3b41-4ce6-8954-9ff3a077f796)
+		(property "Reference" "D3"
 			(at 48.26 44.449999999999996 0)
 			(effects
 				(font
@@ -393,9 +361,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"LED_SMD:LED_0805_2012Metric"
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
 			(at 45.72 55.72 0)
 			(effects
 				(font
@@ -406,17 +372,9 @@
 		)
 		(instances
 			(project
-				"circuit"
-				(path
-					"/"
-					(reference D3)
-					(unit 1)
-				)
-			)
-			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/76f218ad-104f-4bc1-bf78-3b64e297315a/6107526d-4206-40a3-8439-deeee49f6686"
+					"/"
 					(reference D3)
 					(unit 1)
 				)
@@ -429,10 +387,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 11729d30-414d-46a5-a26c-396cd2032338)
-		(property
-			"Reference"
-			"R3"
+		(uuid 8a2a1913-28d5-4af4-8ed7-2cfb194b5f29)
+		(property "Reference" "R3"
 			(at 71.12 44.449999999999996 0)
 			(effects
 				(font
@@ -441,9 +397,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Value"
-			"330"
+		(property "Value" "330"
 			(at 71.12 46.99 0)
 			(effects
 				(font
@@ -452,9 +406,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Footprint"
-			"Resistor_SMD:R_0805_2012Metric"
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 68.58 55.72 0)
 			(effects
 				(font
@@ -465,21 +417,13 @@
 		)
 		(instances
 			(project
-				"circuit"
+				"ESP32_C6_Dev_Board"
 				(path
 					"/"
 					(reference R3)
 					(unit 1)
 				)
 			)
-			(project
-				"ESP32_C6_Dev_Board"
-				(path
-					"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/76f218ad-104f-4bc1-bf78-3b64e297315a/6107526d-4206-40a3-8439-deeee49f6686"
-					(reference R3)
-					(unit 1)
-				)
-			)
 		)
 	)
 	(hierarchical_label
@@ -492,7 +436,7 @@
 			)
 			(justify right)
 		)
-		(uuid b82b064a-8459-4560-acfe-624396d3c8b4)
+		(uuid a9312604-3278-47f0-b16b-c81fc5704eeb)
 	)
 	(hierarchical_label
 		GND
@@ -504,7 +448,7 @@
 			)
 			(justify right)
 		)
-		(uuid eda621a9-703d-42a9-b633-7110236944fd)
+		(uuid 6b604a45-ef3a-42cb-b085-b37b38aebebd)
 	)
 	(hierarchical_label
 		N$3
@@ -516,7 +460,7 @@
 			)
 			(justify left)
 		)
-		(uuid 76ad0ba9-da93-45b1-b2c9-30b5fe410633)
+		(uuid 9a8dc74c-77a0-45eb-9410-3f8eacedcc3b)
 	)
 	(hierarchical_label
 		N$3
@@ -528,7 +472,7 @@
 			)
 			(justify right)
 		)
-		(uuid eb2f52af-2499-40a3-aa4c-f5b2f090c640)
+		(uuid aac85034-7375-4b40-895f-c7a6823da4ad)
 	)
 	(hierarchical_label
 		LED_CONTROL
@@ -540,7 +484,7 @@
 			)
 			(justify left)
 		)
-		(uuid 34376216-2f59-4c02-99e3-92eef4a90f69)
+		(uuid 4c5a9740-7725-4595-9d91-62bfc4ea65ce)
 	)
 	(text_box
 		"LED with current limiting resistor - Correct circuit topology"
@@ -573,19 +517,13 @@
 			)
 			(justify left top)
 		)
-		(uuid 49c34475-79ec-4e35-886c-3e562e6e0487)
+		(uuid f004cfb9-ae60-46b2-a0c5-7f8c208109bb)
 	)
-	(sheet_instances
-		(path
-			"/a65a288f-6b7a-45f0-8df8-b6a8bd4b6117/772b1100-11ee-448f-ba4a-4744e7105f3c/76f218ad-104f-4bc1-bf78-3b64e297315a/6107526d-4206-40a3-8439-deeee49f6686"
-			(page "1")
-		)
-	)
-	(embedded_fonts no)
 	(sheet_instances
 		(path
 			"/"
 			(page "1")
 		)
 	)
+	(embedded_fonts no)
 )

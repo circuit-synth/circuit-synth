@@ -743,10 +743,8 @@ class SExpressionParser:
         # Add paper size only once
         sexp.append([sexpdata.Symbol("paper"), "A4"])
 
-        # Add lib_symbols section
-        lib_symbols = self._generate_lib_symbols(schematic)
-        if lib_symbols:
-            sexp.append(lib_symbols)
+        # lib_symbols section removed - now handled by SchematicWriter
+        # This prevents the unfixed symbol generation from interfering with the fixed version
 
         # Add title block
         if schematic.title or schematic.date or schematic.revision:
@@ -1212,7 +1210,12 @@ class SExpressionParser:
         }
         for name, value in symbol.properties.items():
             if name not in internal_properties:
-                prop = [sexpdata.Symbol("property"), name, str(value)]
+                # Extract the actual value from dictionary if it's a dict with 'value' key
+                if isinstance(value, dict) and 'value' in value:
+                    prop_value = value['value']
+                else:
+                    prop_value = str(value)
+                prop = [sexpdata.Symbol("property"), name, prop_value]
                 # Position relative to symbol
                 prop.append(
                     [
@@ -1431,164 +1434,6 @@ class SExpressionParser:
 
         return sexp
 
-    def _generate_lib_symbols(self, schematic: Schematic) -> Optional[List]:
-        """Generate lib_symbols section with symbol definitions."""
-        if not schematic.components:
-            return None
-
-        lib_symbols = [sexpdata.Symbol("lib_symbols")]
-
-        # Track which symbols we've already added
-        added_symbols = set()
-        symbol_cache = get_symbol_cache()
-
-        for component in schematic.components:
-            lib_id = component.lib_id
-            if lib_id in added_symbols:
-                continue
-            added_symbols.add(lib_id)
-
-            # Get symbol from cache
-            symbol_def_obj = symbol_cache.get_symbol(lib_id)
-            if symbol_def_obj:
-                symbol_def = self._symbol_definition_to_sexp(symbol_def_obj)
-                lib_symbols.append(symbol_def)
-            else:
-                logger.warning(f"Symbol {lib_id} not found in symbol cache")
-                continue
-
-        return lib_symbols if len(lib_symbols) > 1 else None
-
-    def _symbol_definition_to_sexp(self, symbol_def) -> List:
-        """Convert a SymbolDefinition object to S-expression format."""
-        sexp = [sexpdata.Symbol("symbol"), symbol_def.lib_id]
-
-        # Add basic properties
-        sexp.append(
-            [
-                sexpdata.Symbol("pin_numbers"),
-                [sexpdata.Symbol("hide"), sexpdata.Symbol("no")],
-            ]
-        )
-        sexp.append([sexpdata.Symbol("pin_names"), [sexpdata.Symbol("offset"), 0.254]])
-        sexp.append([sexpdata.Symbol("exclude_from_sim"), sexpdata.Symbol("no")])
-        sexp.append([sexpdata.Symbol("in_bom"), sexpdata.Symbol("yes")])
-        sexp.append([sexpdata.Symbol("on_board"), sexpdata.Symbol("yes")])
-
-        # Add properties
-        # Symbol properties should be clean strings after our fixes
-        
-        properties = [
-            ("Reference", symbol_def.reference_prefix, [0, 0, 0]),
-            ("Value", symbol_def.name, [0, -2.54, 0]),
-            ("Footprint", "", [0, -5.08, 0]),
-            ("Datasheet", symbol_def.datasheet or "~", [0, -7.62, 0]),
-            ("Description", symbol_def.description, [0, -10.16, 0]),
-        ]
-
-        if symbol_def.keywords:
-            properties.append(("ki_keywords", symbol_def.keywords, [0, -12.7, 0]))
-
-        for prop_name, prop_value, position in properties:
-            # Clean property extraction - should be string values only
-            prop = [sexpdata.Symbol("property"), prop_name, prop_value]
-            prop.append([sexpdata.Symbol("at"), position[0], position[1], position[2]])
-            effects = [
-                sexpdata.Symbol("effects"),
-                [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
-            ]
-            if prop_name not in ["Reference", "Value"]:
-                effects.append([sexpdata.Symbol("hide"), sexpdata.Symbol("yes")])
-            prop.append(effects)
-            sexp.append(prop)
-
-        # Add graphic elements sub-symbol
-        if symbol_def.graphic_elements:
-            # Extract symbol name from lib_id (e.g., "Device:R" -> "R")
-            symbol_name = (
-                symbol_def.lib_id.split(":")[-1]
-                if ":" in symbol_def.lib_id
-                else symbol_def.lib_id
-            )
-            graphics_symbol = [sexpdata.Symbol("symbol"), f"{symbol_name}_0_1"]
-            for i, element in enumerate(symbol_def.graphic_elements):
-                graphic_sexp = self._graphic_element_to_sexp(element)
-                graphics_symbol.append(graphic_sexp)
-            sexp.append(graphics_symbol)
-
-        # Add pins sub-symbol
-        if symbol_def.pins:
-            # Extract symbol name from lib_id (e.g., "Device:R" -> "R")
-            symbol_name = (
-                symbol_def.lib_id.split(":")[-1]
-                if ":" in symbol_def.lib_id
-                else symbol_def.lib_id
-            )
-            pins_symbol = [sexpdata.Symbol("symbol"), f"{symbol_name}_1_1"]
-
-            # Track which position/name combinations we've seen to hide duplicates
-            seen_positions = {}
-
-            for pin in symbol_def.pins:
-                # Create a key based on position and name
-                pos_key = f"{pin.position.x},{pin.position.y},{pin.name}"
-
-                # Check if this is a duplicate position/name combination
-                is_duplicate = pos_key in seen_positions
-                if not is_duplicate:
-                    seen_positions[pos_key] = pin.number
-
-                pin_sexp = [
-                    sexpdata.Symbol("pin"),
-                    sexpdata.Symbol(
-                        pin.type
-                    ),  # electrical type (passive, input, output, etc.)
-                    sexpdata.Symbol("line"),  # graphic style
-                ]
-
-                # Add (hide yes) for duplicate pins
-                if is_duplicate:
-                    pin_sexp.append([sexpdata.Symbol("hide"), sexpdata.Symbol("yes")])
-                pin_sexp.extend(
-                    [
-                        [
-                            sexpdata.Symbol("at"),
-                            pin.position.x,
-                            pin.position.y,
-                            pin.orientation,
-                        ],
-                        [sexpdata.Symbol("length"), pin.length],
-                        [
-                            sexpdata.Symbol("name"),
-                            str(pin.name),
-                            [
-                                sexpdata.Symbol("effects"),
-                                [
-                                    sexpdata.Symbol("font"),
-                                    [sexpdata.Symbol("size"), 1.27, 1.27],
-                                ],
-                            ],
-                        ],
-                        # Pin number MUST be a quoted string
-                        [
-                            sexpdata.Symbol("number"),
-                            str(pin.number),
-                            [
-                                sexpdata.Symbol("effects"),
-                                [
-                                    sexpdata.Symbol("font"),
-                                    [sexpdata.Symbol("size"), 1.27, 1.27],
-                                ],
-                            ],
-                        ],
-                    ]
-                )
-
-                pins_symbol.append(pin_sexp)
-            sexp.append(pins_symbol)
-
-        sexp.append([sexpdata.Symbol("embedded_fonts"), sexpdata.Symbol("no")])
-        return sexp
 
     def _graphic_element_to_sexp(self, element: Dict[str, Any]) -> List:
         """Convert a graphic element to S-expression format."""
