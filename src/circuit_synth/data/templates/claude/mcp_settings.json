@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "circuit-synth-jlc-parts-finder": {
+      "command": "uvx",
+      "args": ["circuit-synth-jlc-parts-finder"],
+      "description": "JLCPCB component finder with KiCad integration"
+    }
+  }
+}

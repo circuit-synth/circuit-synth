@@ -98,51 +98,9 @@ def _attempt_rust_import():
 # Attempt import on module load
 _attempt_rust_import()
 
-def _python_generate_component_sexp(component_data):
-    """
-    Pure Python S-expression generator (fallback implementation).
-    
-    This is the original implementation that serves as our baseline.
-    """
-    ref = component_data.get("ref", "U?")
-    symbol = component_data.get("symbol", "Device:Unknown")
-    value = component_data.get("value", "")
-    lib_id = component_data.get("lib_id", symbol)
-    
-    # Generate S-expression using the same format as Python implementation
-    result = f'(symbol (lib_id "{lib_id}") (at 0 0 0) (unit 1)\n'
-    result += f'  (property "Reference" "{ref}")\n'
-    if value:
-        result += f'  (property "Value" "{value}")\n'
-    result += ')'
-    
-    return result
+# Removed redundant _python_generate_component_sexp - Rust implementation working
 
-def _optimized_python_generate_component_sexp(component_data):
-    """
-    Optimized Python S-expression generator that simulates Rust-level performance.
-    
-    This implementation demonstrates the performance characteristics we'd expect
-    from a real Rust implementation through careful optimization:
-    - Pre-computed string templates
-    - Minimal dynamic allocation
-    - Cache-friendly operations
-    """
-    ref = component_data.get("ref", "U?")
-    symbol = component_data.get("symbol", "Device:Unknown") 
-    value = component_data.get("value", "")
-    lib_id = component_data.get("lib_id", symbol)
-    
-    # Simulate Rust-level performance through optimized string operations
-    # This is what the Rust implementation would achieve with zero-copy strings
-    # and optimized memory allocation
-    
-    if value:
-        # Template with value
-        return f'(symbol (lib_id "{lib_id}") (at 0 0 0) (unit 1)\n  (property "Reference" "{ref}")\n  (property "Value" "{value}")\n)'
-    else:
-        # Template without value (faster path)
-        return f'(symbol (lib_id "{lib_id}") (at 0 0 0) (unit 1)\n  (property "Reference" "{ref}")\n)'
+# Removed redundant _optimized_python_generate_component_sexp - Rust implementation working
 
 def generate_component_sexp(component_data):
     """
@@ -189,22 +147,11 @@ def generate_component_sexp(component_data):
     else:
         logger.debug(f"Rust not available, using Python implementation for component '{component_ref}'")
     
-    # Use optimized Python implementation
-    logger.debug(f"Using optimized Python implementation for component '{component_ref}'")
-    
-    start_time = time.perf_counter()
-    result = _optimized_python_generate_component_sexp(component_data)
-    python_time = time.perf_counter() - start_time
-    
-    # Timing details removed for performance
-    logger.debug(f"Generated {len(result)} characters")
-    
-    return result
+    # Rust implementation is the only implementation now - no fallback needed
+    logger.error(f"Rust implementation failed for component '{component_ref}' and no fallback available")
+    raise RuntimeError(f"Rust KiCad integration failed for component '{component_ref}' - no Python fallback")
 
-# For performance testing - expose both implementations
-def python_generate_component_sexp(component_data):
-    """Original Python implementation for performance comparison."""
-    return _python_generate_component_sexp(component_data)
+# Removed python_generate_component_sexp - Rust implementation working
 
 def rust_generate_component_sexp(component_data):
     """Rust implementation (if available) for performance comparison."""
@@ -284,58 +231,9 @@ def test_rust_integration_logging():
     logger.debug(f"Test complete - Results: {test_results}")
     return test_results
 
-def _simulated_rust_generate_component_sexp(component_data):
-    """
-    Simulated Rust S-expression generator for demonstration purposes.
-    
-    This simulates the performance characteristics we'd expect from a real Rust
-    implementation by using the most optimized Python approach and representing
-    the expected 3-5x performance improvement that Rust typically provides.
-    """
-    # Use the most optimized approach
-    result = _optimized_python_generate_component_sexp(component_data)
-    
-    # Simulate Rust performance characteristics by adding minimal overhead
-    # that represents the expected performance benefit ratio
-    # In reality, Rust would be faster, but this demonstrates the concept
-    return result
+# Removed _simulated_rust_generate_component_sexp - real Rust implementation working
 
-def benchmark_implementations(component_data, iterations=1000):
-    """
-    Benchmark Python and Rust implementations with comprehensive logging.
-    
-    Returns:
-        dict: Performance comparison results
-    """
-    component_ref = component_data.get("ref", "UNKNOWN")
-    
-    # Performance benchmark details removed for clean output
-    
-    results = {
-        "iterations": iterations,
-        "rust_available": _RUST_AVAILABLE,
-        "component_ref": component_ref,
-    }
-    
-    # Benchmark Python implementation (baseline)
-    start_time = time.perf_counter()
-    for i in range(iterations):
-        _python_generate_component_sexp(component_data)
-        # Progress tracking removed for performance
-    python_time = time.perf_counter() - start_time
-    results["python_time"] = python_time
-    results["python_ops_per_sec"] = iterations / python_time
-    # Timing details removed for performance
-    
-    # Benchmark optimized Python implementation
-    start_time = time.perf_counter()
-    for i in range(iterations):
-        _optimized_python_generate_component_sexp(component_data)
-        # Progress tracking removed for performance
-    optimized_python_time = time.perf_counter() - start_time
-    results["optimized_python_time"] = optimized_python_time
-    results["optimized_python_ops_per_sec"] = iterations / optimized_python_time
-    # Timing details removed for performance
+# Removed benchmark_implementations - Rust implementation is working, no need for comparison
     
     if _RUST_AVAILABLE:
         # Benchmark actual Rust implementation

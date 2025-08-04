@@ -684,6 +684,7 @@ class SchematicGenerator(IKiCadIntegration):
             hierarchical_path=hierarchical_path,  # Just root level path
             reference_manager=shared_ref_manager,  # Pass shared reference manager
             draw_bounding_boxes=draw_bounding_boxes,  # Pass bounding box flag
+            uuid=root_uuid,  # Pass the root UUID to ensure consistency
         )
         main_sch_expr = main_writer.generate_s_expr()
         sheet_uuids[top_name] = main_writer.uuid_top
@@ -740,7 +741,6 @@ class SchematicGenerator(IKiCadIntegration):
                                 sheet_symbol_uuid = main_writer.sheet_symbol_map[c_name]
                                 hierarchical_path = [
                                     root_uuid,
-                                    sheet_uuids[top_name],
                                     sheet_symbol_uuid,
                                 ]
                             else:
@@ -817,7 +817,7 @@ class SchematicGenerator(IKiCadIntegration):
                 break
 
         # 7) Update .kicad_pro to reference all .kicad_sch
-        self._update_kicad_pro(sub_dict, top_name)
+        self._update_kicad_pro(sub_dict, top_name, root_uuid, sheet_uuids)
 
         logger.info(f"Done generating KiCad project at '{self.project_dir}'")
 
@@ -1460,9 +1460,15 @@ class SchematicGenerator(IKiCadIntegration):
 
         return cover_uuid, sheet_symbol_uuid
 
-    def _update_kicad_pro(self, sub_dict: dict, top_name: str):
+    def _update_kicad_pro(self, sub_dict: dict, top_name: str, root_uuid: str = None, sheet_uuids: dict = None):
         """
         Update the .kicad_pro file to reference all generated .kicad_sch files.
+        
+        Args:
+            sub_dict: Dictionary of subcircuits
+            top_name: Name of the top-level circuit
+            root_uuid: UUID of the root schematic
+            sheet_uuids: Dictionary mapping sheet names to their UUIDs
         """
         kicad_pro_path = self.project_dir / f"{self.project_name}.kicad_pro"
         logger.debug(f"Updating .kicad_pro at {kicad_pro_path}")
@@ -1471,18 +1477,56 @@ class SchematicGenerator(IKiCadIntegration):
         with open(kicad_pro_path, "r") as f:
             pro_data = json.load(f)
 
-        # Update sheets list
+        # Update sheets list with UUIDs (KiCad 20250114 format)
         sheets = []
 
         # Add the root sheet (main circuit is in the root schematic)
-        sheets.append([f"{self.project_name}.kicad_sch", ""])
+        # Use the root_uuid if provided, otherwise read it from the schematic file
+        if root_uuid:
+            sheets.append([root_uuid, ""])
+        else:
+            # Try to read UUID from the generated schematic file
+            root_sch_path = self.project_dir / f"{self.project_name}.kicad_sch"
+            if root_sch_path.exists():
+                with open(root_sch_path, "r") as f:
+                    content = f.read()
+                    # Parse UUID from schematic
+                    import re
+                    uuid_match = re.search(r'\(uuid\s+([a-f0-9-]+)\)', content)
+                    if uuid_match:
+                        sheets.append([uuid_match.group(1), ""])
+                    else:
+                        # Fallback to old format if UUID not found
+                        logger.warning("Could not find UUID in root schematic, using filename")
+                        sheets.append([f"{self.project_name}.kicad_sch", ""])
+            else:
+                # Fallback to old format
+                sheets.append([f"{self.project_name}.kicad_sch", ""])
 
         # Add all subcircuit sheets (excluding the main circuit since it's in the root)
         for c_name in sub_dict:
-            if (
-                c_name != top_name
-            ):  # Skip the main circuit as it's in the root schematic
-                sheets.append([f"{c_name}.kicad_sch", c_name])
+            if c_name != top_name:  # Skip the main circuit as it's in the root schematic
+                if sheet_uuids and c_name in sheet_uuids:
+                    # Use the provided UUID
+                    sheets.append([sheet_uuids[c_name], c_name])
+                else:
+                    # Try to read UUID from the schematic file
+                    sch_path = self.project_dir / f"{c_name}.kicad_sch"
+                    if sch_path.exists():
+                        with open(sch_path, "r") as f:
+                            content = f.read()
+                            # Parse UUID from schematic
+                            import re
+                            uuid_match = re.search(r'\(uuid\s+([a-f0-9-]+)\)', content)
+                            if uuid_match:
+                                sheets.append([uuid_match.group(1), c_name])
+                            else:
+                                # Fallback to old format if UUID not found
+                                logger.warning(f"Could not find UUID in {c_name} schematic, using filename")
+                                sheets.append([f"{c_name}.kicad_sch", c_name])
+                    else:
+                        # Fallback to old format
+                        sheets.append([f"{c_name}.kicad_sch", c_name])
 
         pro_data["sheets"] = sheets
 
@@ -1490,7 +1534,7 @@ class SchematicGenerator(IKiCadIntegration):
         with open(kicad_pro_path, "w") as f:
             json.dump(pro_data, f, indent=2)
 
-        logger.debug(f"Updated .kicad_pro with {len(sheets)} schematic entries.")
+        logger.debug(f"Updated .kicad_pro with {len(sheets)} schematic entries with UUIDs.")
 
     def generate_pcb_from_schematics(
         self,

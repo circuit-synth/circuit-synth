@@ -7,32 +7,20 @@ from .connection_centric import ConnectionCentricPlacement
 from .connectivity_driven import ConnectivityDrivenPlacer
 from .hierarchical_placement import HierarchicalPlacer
 
-# Use Rust implementation for force-directed placement (Phase 3 migration)
-try:
-    from rust_force_directed_placement import (
-        ForceDirectedPlacer as RustForceDirectedPlacer,
-    )
+# Use Rust implementation for force-directed placement (Python fallback removed)
+from rust_force_directed_placement import (
+    ForceDirectedPlacer as RustForceDirectedPlacer,
+)
 
-    # Create compatibility wrapper
-    ForceDirectedPlacer = RustForceDirectedPlacer
+# Create compatibility wrapper
+ForceDirectedPlacer = RustForceDirectedPlacer
 
-    def apply_force_directed_placement(*args, **kwargs):
-        """Compatibility wrapper for Rust force-directed placement."""
-        placer = RustForceDirectedPlacer()
-        return placer.place(*args, **kwargs)
+def apply_force_directed_placement(*args, **kwargs):
+    """Compatibility wrapper for Rust force-directed placement."""
+    placer = RustForceDirectedPlacer()
+    return placer.place(*args, **kwargs)
 
-    RUST_PLACEMENT_AVAILABLE = True
-except ImportError:
-    # Fallback to Python implementation
-    from .force_directed import ForceDirectedPlacer, apply_force_directed_placement
-
-    RUST_PLACEMENT_AVAILABLE = False
-    import warnings
-
-    warnings.warn(
-        "Rust force-directed placement not available, using Python fallback",
-        UserWarning,
-    )
+RUST_PLACEMENT_AVAILABLE = True  # Always true now
 
 __all__ = [
     "ComponentWrapper",

@@ -44,72 +44,6 @@ class SExpressionParser:
         """Initialize the parser."""
         pass
 
-    def _get_property_positioning(self, lib_id: str, property_name: str):
-        """
-        Get property positioning from the KiCad symbol library.
-
-        Args:
-            lib_id: Library ID like "Device:R"
-            property_name: Property name like "Reference" or "Value"
-
-        Returns:
-            Tuple of (position_dict, effects_dict) or (None, None) if not found
-        """
-        try:
-            # Get symbol data from cache
-            symbol_cache = get_symbol_cache()
-            symbol_def = symbol_cache.get_symbol(lib_id)
-
-            if not symbol_def:
-                logger.debug(f"No symbol definition found for {lib_id}")
-                return None, None
-
-            # Look for the property in the symbol definition
-            # We need to parse the raw library data since SymbolDefinition doesn't store positioning
-            from ...kicad.kicad_symbol_parser import parse_kicad_sym_file
-
-            # Get library path from lib_id
-            lib_name = lib_id.split(":")[0]
-            # Try to find the library file (this is a simplified approach)
-            import os
-
-            kicad_symbol_paths = [
-                f"/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/{lib_name}.kicad_sym",
-                f"/usr/share/kicad/symbols/{lib_name}.kicad_sym",  # Linux
-                f"C:/Program Files/KiCad/share/kicad/symbols/{lib_name}.kicad_sym",  # Windows
-            ]
-
-            for lib_path in kicad_symbol_paths:
-                if os.path.exists(lib_path):
-                    try:
-                        lib_data = parse_kicad_sym_file(lib_path)
-                        symbol_name = lib_id.split(":")[1]
-
-                        if "symbols" in lib_data and symbol_name in lib_data["symbols"]:
-                            symbol_props = lib_data["symbols"][symbol_name].get(
-                                "properties", {}
-                            )
-
-                            if property_name in symbol_props:
-                                prop_data = symbol_props[property_name]
-                                if isinstance(prop_data, dict):
-                                    position = prop_data.get("position")
-                                    effects = prop_data.get("effects")
-                                    return position, effects
-                    except Exception as e:
-                        logger.debug(f"Error parsing symbol library {lib_path}: {e}")
-                        continue
-                    break
-
-            logger.debug(f"No positioning data found for {lib_id}:{property_name}")
-            return None, None
-
-        except Exception as e:
-            logger.debug(
-                f"Error getting property positioning for {lib_id}:{property_name}: {e}"
-            )
-            return None, None
-
     def parse_file(self, filepath: Union[str, Path]) -> Schematic:
         """
         Parse a KiCad schematic file.
@@ -195,6 +129,7 @@ class SExpressionParser:
         in_lib_symbols: bool = False,
         in_name: bool = False,
         in_text: bool = False,
+        in_reference: bool = False,
     ) -> str:
         """Format S-expression with proper indentation.
 
@@ -212,6 +147,7 @@ class SExpressionParser:
             in_symbol: True if we're formatting a symbol library ID
             in_lib_symbols: True if we're inside a lib_symbols section
             in_text: True if we're formatting text content
+            in_reference: True if we're formatting a reference value (inside instances)
         """
         if not isinstance(sexp, list):
             # Handle symbols and values
@@ -254,6 +190,15 @@ class SExpressionParser:
                         .replace("\n", "\\n")
                     )
                     return '"' + escaped + '"'
+                # Reference values must always be quoted (when inside instances)
+                if in_reference:
+                    logging.debug(f"DEBUG: in_reference=True, sexp='{sexp}', in_instances={in_instances}")
+                    if in_instances:
+                        logging.debug(f"DEBUG: Quoting reference value: '{sexp}' -> '\"{sexp}\"' (inside instances)")
+                        return '"' + sexp + '"'
+                    else:
+                        logging.debug(f"DEBUG: NOT quoting reference value: '{sexp}' (not inside instances)")
+                        return sexp
                 # Quote strings if they contain spaces or special characters
                 if " " in sexp or "\n" in sexp or '"' in sexp or "/" in sexp:
                     # Properly escape newlines and quotes for KiCad format
@@ -316,6 +261,11 @@ class SExpressionParser:
         is_project_expr = tag_name == "project"
         # Check if this is an instances expression
         is_instances_expr = tag_name == "instances"
+        
+        # Debug logging for instances blocks
+        if is_instances_expr:
+            logging.debug(f"DEBUG: Found instances block - sexp: {sexp[:2]}...")
+            logging.debug(f"DEBUG: Will pass in_instances=True to child expressions")
         # Check if this is a page expression
         is_page_expr = tag_name == "page"
         # Check if this is a property expression
@@ -326,6 +276,20 @@ class SExpressionParser:
         is_lib_symbols_expr = tag_name == "lib_symbols"
         # Check if this is a text expression
         is_text_expr = tag_name == "text"
+        # Check if this is a generator_version expression
+        is_generator_version_expr = tag_name == "generator_version"
+        # Check if this is a paper expression
+        is_paper_expr = tag_name == "paper"
+        # Check if this is a lib_id expression
+        is_lib_id_expr = tag_name == "lib_id"
+        # Check if this is a reference expression
+        is_reference_expr = tag_name == "reference"
+        # Check if this is a path expression
+        is_path_expr = tag_name == "path"
+        
+        # Add debug logging for instances-related formatting
+        if in_instances and (is_reference_expr or is_project_expr or is_path_expr):
+            logging.debug(f"DEBUG: Formatting in instances - tag: {tag_name}, sexp: {sexp}, in_instances: {in_instances}")
 
         if is_simple:
             # Format on one line
@@ -354,6 +318,7 @@ class SExpressionParser:
                     )
                 elif is_instances_expr:
                     # Inside instances, pass the flag down
+                    logging.debug(f"DEBUG: Processing item in instances block: {item}")
                     parts.append(
                         self._format_sexp(item, indent, tag_name, in_instances=True)
                     )
@@ -423,6 +388,15 @@ class SExpressionParser:
                             in_instances=in_instances,
                         )
                     )
+                elif is_generator_version_expr and i == 1:
+                    # For generator_version expressions, the value at index 1 should be quoted
+                    parts.append('"' + str(item) + '"')
+                elif is_paper_expr and i == 1:
+                    # For paper expressions, the value at index 1 should be quoted
+                    parts.append('"' + str(item) + '"')
+                elif is_lib_id_expr and i == 1:
+                    # For lib_id expressions, the value at index 1 should be quoted
+                    parts.append('"' + str(item) + '"')
                 elif is_text_expr and i == 1:
                     # For text expressions, the text content at index 1 should be quoted
                     parts.append(
@@ -431,6 +405,18 @@ class SExpressionParser:
                             indent,
                             tag_name,
                             in_text=True,
+                            in_instances=in_instances,
+                        )
+                    )
+                elif is_reference_expr and i == 1:
+                    # For reference expressions, the value at index 1 should be quoted (when inside instances)
+                    logging.debug(f"DEBUG: Processing reference value at index {i}: {item}, in_instances={in_instances}")
+                    parts.append(
+                        self._format_sexp(
+                            item,
+                            indent,
+                            tag_name,
+                            in_reference=True,
                             in_instances=in_instances,
                         )
                     )
@@ -462,6 +448,97 @@ class SExpressionParser:
                         )
                     )
                 result += "\n" + "\t" * indent + ")"
+                return result
+            
+            # Special handling for property expressions - inline first 3 elements
+            if is_property_expr and len(sexp) >= 3:
+                # Format (property "name" "value" on same line
+                result = "(" + str(sexp[0])  # property tag
+                # Property name should be quoted
+                result += ' "' + str(sexp[1]) + '"'
+                # Property value should be quoted
+                result += ' "' + str(sexp[2]) + '"'
+                # Rest of content (at, effects) on new lines
+                if len(sexp) > 3:
+                    for i in range(3, len(sexp)):
+                        result += (
+                            "\n"
+                            + "\t" * (indent + 1)
+                            + self._format_sexp(
+                                sexp[i],
+                                indent + 1,
+                                tag_name,
+                                in_instances=in_instances,
+                            )
+                        )
+                    result += "\n" + "\t" * indent + ")"
+                else:
+                    result += ")"
+                return result
+            
+            # Special handling for project expressions - keep project name on same line
+            if is_project_expr and len(sexp) >= 2:
+                # Format (project "name" on same line, rest on new lines
+                result = "(" + str(sexp[0]) + " "  # project tag
+                # Project name (might be empty string)
+                if in_instances and isinstance(sexp[1], str):
+                    result += '"' + str(sexp[1]) + '"'
+                else:
+                    result += self._format_sexp(
+                        sexp[1],
+                        indent,
+                        tag_name,
+                        in_project=True,
+                        in_instances=in_instances,
+                    )
+                # Rest of content on new lines
+                if len(sexp) > 2:
+                    for i in range(2, len(sexp)):
+                        result += (
+                            "\n"
+                            + "\t" * (indent + 1)
+                            + self._format_sexp(
+                                sexp[i],
+                                indent + 1,
+                                tag_name,
+                                in_instances=in_instances,
+                            )
+                        )
+                    result += "\n" + "\t" * indent + ")"
+                else:
+                    result += ")"
+                return result
+            
+            # Special handling for path expressions - keep path value on same line
+            if is_path_expr and len(sexp) >= 2:
+                # Format (path "/uuid" on same line, rest on new lines
+                result = "(" + str(sexp[0]) + " "  # path tag
+                # Path value should be quoted if it's a string
+                if isinstance(sexp[1], str):
+                    result += '"' + str(sexp[1]) + '"'
+                else:
+                    result += self._format_sexp(
+                        sexp[1],
+                        indent,
+                        tag_name,
+                        in_instances=in_instances,
+                    )
+                # Rest of content on new lines
+                if len(sexp) > 2:
+                    for i in range(2, len(sexp)):
+                        result += (
+                            "\n"
+                            + "\t" * (indent + 1)
+                            + self._format_sexp(
+                                sexp[i],
+                                indent + 1,
+                                tag_name,
+                                in_instances=in_instances,
+                            )
+                        )
+                    result += "\n" + "\t" * indent + ")"
+                else:
+                    result += ")"
                 return result
 
             # Format with indentation
@@ -618,6 +695,19 @@ class SExpressionParser:
                                 in_instances=in_instances,
                             )
                         )
+                    elif is_reference_expr and i == 1:
+                        # For reference expressions, the value at index 1 should be quoted (when inside instances)
+                        result += (
+                            "\n"
+                            + "\t" * (indent + 1)
+                            + self._format_sexp(
+                                item,
+                                indent + 1,
+                                tag_name,
+                                in_reference=True,
+                                in_instances=in_instances,
+                            )
+                        )
                     else:
                         result += (
                             "\n"
@@ -714,8 +804,9 @@ class SExpressionParser:
         sexp.append([sexpdata.Symbol("generator_version"), "9.0"])
         sexp.append([sexpdata.Symbol("uuid"), schematic.uuid])
 
-        # Add paper size only once
-        sexp.append([sexpdata.Symbol("paper"), "A4"])
+        # Add paper size only once - use the paper size from schematic if available
+        paper_size = getattr(schematic, 'paper_size', 'A4')
+        sexp.append([sexpdata.Symbol("paper"), paper_size])
 
         # Add lib_symbols section
         lib_symbols = self._generate_lib_symbols(schematic)
@@ -1082,9 +1173,11 @@ class SExpressionParser:
         ]
         sexp.append(at_expr)
 
-        # Add unit
-        if symbol.unit != 1:
-            sexp.append([sexpdata.Symbol("unit"), symbol.unit])
+        # Add unit (always add, even if 1, for KiCad compatibility)
+        sexp.append([sexpdata.Symbol("unit"), symbol.unit])
+
+        # Add exclude_from_sim (always no for now)
+        sexp.append([sexpdata.Symbol("exclude_from_sim"), sexpdata.Symbol("no")])
 
         # Add flags - use symbols not strings for KiCad compatibility
         sexp.append(
@@ -1106,58 +1199,41 @@ class SExpressionParser:
             ]
         )
 
+        # Add fields_autoplaced
+        sexp.append([sexpdata.Symbol("fields_autoplaced"), sexpdata.Symbol("yes")])
+
         # Add UUID
         sexp.append([sexpdata.Symbol("uuid"), symbol.uuid])
 
-        # Add properties with library-based positioning
+        # Add properties with proper formatting
         if symbol.reference:
             prop = [sexpdata.Symbol("property"), "Reference", symbol.reference]
-
-            # Use hardcoded positioning that works well for now
-            # TODO: Fix library positioning to work correctly with component orientation
+            # Position relative to symbol
+            prop.append(
+                [sexpdata.Symbol("at"), symbol.position.x, symbol.position.y - 5, 0]
+            )
             prop.append(
                 [
-                    sexpdata.Symbol("at"),
-                    symbol.position.x + 2.54,
-                    symbol.position.y - 1.27,
-                    0,
+                    sexpdata.Symbol("effects"),
+                    [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
+                    [sexpdata.Symbol("justify"), sexpdata.Symbol("left")],
                 ]
             )
-
-            # Add effects (justification, font, etc.)
-            effects = [
-                sexpdata.Symbol("effects"),
-                [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
-            ]
-            # Use good justification
-            effects.append([sexpdata.Symbol("justify"), sexpdata.Symbol("left")])
-
-            prop.append(effects)
             sexp.append(prop)
 
         if symbol.value:
             prop = [sexpdata.Symbol("property"), "Value", str(symbol.value)]
-
-            # Use hardcoded positioning that works well for now
-            # TODO: Fix library positioning to work correctly with component orientation
+            # Position relative to symbol
+            prop.append(
+                [sexpdata.Symbol("at"), symbol.position.x, symbol.position.y + 5, 0]
+            )
             prop.append(
                 [
-                    sexpdata.Symbol("at"),
-                    symbol.position.x + 2.54,
-                    symbol.position.y + 1.27,
-                    0,
+                    sexpdata.Symbol("effects"),
+                    [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
+                    [sexpdata.Symbol("justify"), sexpdata.Symbol("left")],
                 ]
             )
-
-            # Add effects (justification, font, etc.)
-            effects = [
-                sexpdata.Symbol("effects"),
-                [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
-            ]
-            # Use good justification
-            effects.append([sexpdata.Symbol("justify"), sexpdata.Symbol("left")])
-
-            prop.append(effects)
             sexp.append(prop)
 
         if symbol.footprint:
@@ -1263,7 +1339,8 @@ class SExpressionParser:
                         ],
                     ]
                     instances_sexp.append(project_block)
-                    logger.debug(f"    Instance block created")
+                    logger.debug(f"    Instance block created: {project_block}")
+                    logger.debug(f"    Project name type: {type(project_name)}, value: '{project_name}'")
 
             sexp.append(instances_sexp)
             logger.debug(f"  Instances S-expression added to symbol")
@@ -1399,10 +1476,13 @@ class SExpressionParser:
             sexp.append(pin_sexp)
 
         # Add instances section for new KiCad format
+        # Sheets need the actual project name in their instances
         instances = [sexpdata.Symbol("instances")]
+        # Get the project name from the schematic if available
+        project_name = getattr(sheet, '_project_name', 'circuit_synth')  # fallback to circuit_synth if not set
         project_instance = [
             sexpdata.Symbol("project"),
-            "circuit_synth",
+            project_name,
             [sexpdata.Symbol("path"), "/", [sexpdata.Symbol("page"), "1"]],
         ]
         instances.append(project_instance)
@@ -1443,10 +1523,11 @@ class SExpressionParser:
         sexp = [sexpdata.Symbol("symbol"), symbol_def.lib_id]
 
         # Add basic properties
+        # For KiCad compatibility, pin_numbers uses special format: (pin_numbers hide)
         sexp.append(
             [
                 sexpdata.Symbol("pin_numbers"),
-                [sexpdata.Symbol("hide"), sexpdata.Symbol("no")],
+                sexpdata.Symbol("hide"),  # Not a list, just the symbol
             ]
         )
         sexp.append([sexpdata.Symbol("pin_names"), [sexpdata.Symbol("offset"), 0.254]])

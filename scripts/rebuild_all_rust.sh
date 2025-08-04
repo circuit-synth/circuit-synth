@@ -16,8 +16,9 @@ if [[ "$1" == "--clean" ]]; then
     echo "🧹 Clean build mode enabled"
 fi
 
-# Get the base directory
-BASE_DIR="/Users/shanemattner/Desktop/Circuit_Synth2/submodules/circuit-synth"
+# Get the base directory dynamically
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(dirname "$SCRIPT_DIR")"
 RUST_MODULES_DIR="$BASE_DIR/rust_modules"
 
 # Function to incrementally rebuild a Rust module
@@ -43,7 +44,6 @@ rebuild_rust_module() {
         rm -rf build/
         rm -rf dist/
         rm -rf *.egg-info/
-        rm -rf .venv/
     fi
     
     # Update Rust dependencies
@@ -54,21 +54,14 @@ rebuild_rust_module() {
     if [ -f "pyproject.toml" ] || [ -f "Cargo.toml" ]; then
         echo "  🐍 Building Python bindings with maturin..."
         
-        # Use existing virtual environment or create if needed
-        if [ ! -d ".venv" ] || [ "$CLEAN_BUILD" = true ]; then
-            echo "  📁 Creating virtual environment..."
-            python3 -m venv .venv
+        # Set VIRTUAL_ENV to use the main project's virtual environment
+        if [ -d "$BASE_DIR/.venv" ]; then
+            echo "  🎯 Installing in main project virtual environment..."
+            VIRTUAL_ENV="$BASE_DIR/.venv" maturin develop --release
+        else
+            echo "  ⚠️  Main project .venv not found, using default installation..."
+            maturin develop --release
         fi
-        source .venv/bin/activate
-        
-        # Install/upgrade maturin if needed
-        if ! pip show maturin &> /dev/null; then
-            echo "  📥 Installing maturin..."
-            pip install maturin
-        fi
-        
-        # Build and install the module
-        maturin develop --release
         
         echo "  ✅ $module_name rebuilt successfully"
     else
@@ -111,8 +104,8 @@ if ! command -v cargo &> /dev/null; then
 fi
 
 if ! command -v maturin &> /dev/null; then
-    echo "📦 Installing maturin..."
-    pip install maturin
+    echo "📦 Installing maturin with uv..."
+    uv pip install maturin
 fi
 
 echo "✅ Rust toolchain ready"

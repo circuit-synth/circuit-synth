@@ -1,0 +1,9 @@
+[project]
+name = "esp32-c6-dev-board"
+version = "0.1.0"
+description = "ESP32-C6 Development Board"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "circuit-synth",
+]

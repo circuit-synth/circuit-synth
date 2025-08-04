@@ -49,21 +49,19 @@ try:
     import_time = time.perf_counter() - import_start
 
     if is_rust_available():
-        _RUST_SEXP_AVAILABLE = True
-        _rust_sexp_module = True
-        logging.getLogger(__name__).debug(
-            f"Rust S-expression module loaded in {import_time*1000:.2f}ms for KiCad formatter"
-        )
-        logging.getLogger(__name__).debug(
-            f"Expected 6x performance improvement for S-expression generation"
+        # DISABLE RUST to test Python formatting fixes
+        _RUST_SEXP_AVAILABLE = False
+        _rust_sexp_module = None
+        logging.getLogger(__name__).info(
+            f"🦀 RUST_INTEGRATION: DISABLED FOR DEBUGGING - using Python fallback"
         )
     else:
         logging.getLogger(__name__).info(
-            f"Rust module found but not compiled (loaded in {import_time*1000:.2f}ms), using Python fallback"
+            f"🐍 RUST_INTEGRATION: Rust module found but not compiled (loaded in {import_time*1000:.2f}ms), using Python fallback"
         )
 except ImportError as e:
     logging.getLogger(__name__).info(
-        f"Rust S-expression module not available ({e}), using Python fallback"
+        f"🐍 RUST_INTEGRATION: Rust S-expression module not available ({e}), using Python fallback"
     )
 except Exception as e:
     logging.getLogger(__name__).warning(
@@ -71,6 +69,9 @@ except Exception as e:
     )
 
 logger = logging.getLogger(__name__)
+
+# Set debug level for formatting issues
+logger.setLevel(logging.DEBUG)
 
 
 class KiCadFormatterNew:
@@ -105,6 +106,12 @@ class KiCadFormatterNew:
             current_elem = (
                 str(expr[0]) if expr and isinstance(expr[0], Symbol) else None
             )
+
+            # Debug log for specific problematic elements
+            if current_elem in ["generator_version", "paper", "lib_id", "property", "pin_numbers"]:
+                logger.debug(f"🔍 FORMAT: Processing {current_elem} with expr: {expr[:3]}...")
+                if len(expr) > 1:
+                    logger.debug(f"    Second element type: {type(expr[1])}, value: {expr[1]}")
 
             # Check if this is a special KiCad construct that needs inline formatting
             if self._is_inline_construct(expr, parent_context):
@@ -418,13 +425,17 @@ def format_kicad_schematic(schematic_expr: Any) -> str:
     logger.info(
         f"🚀 FORMAT_KICAD_SCHEMATIC: Starting formatting of {expr_type} ({expr_size} chars)"
     )
-    logger.debug(f"Rust acceleration available: {_RUST_SEXP_AVAILABLE}")
+    logger.info(
+        f"🔍 FORMAT_KICAD_SCHEMATIC: Rust acceleration available: {_RUST_SEXP_AVAILABLE}"
+    )
 
     # Try Rust implementation first for maximum performance
     if _RUST_SEXP_AVAILABLE:
         rust_start = time.perf_counter()
         try:
-            logger.debug("Attempting Rust S-expression formatting")
+            logger.info(
+                "🦀 RUST_ACCELERATION: ⚡ ATTEMPTING RUST S-EXPRESSION FORMATTING"
+            )
 
             # Convert schematic_expr to format compatible with Rust module
             # For now, use Python fallback as Rust integration needs full implementation
@@ -441,20 +452,26 @@ def format_kicad_schematic(schematic_expr: Any) -> str:
             logger.error(
                 f"❌ RUST_ACCELERATION: RUST FORMATTING FAILED after {rust_time*1000:.2f}ms: {e}"
             )
-            logger.warning("Falling back to Python implementation")
+            logger.warning(
+                "🔄 RUST_ACCELERATION: 🐍 FALLING BACK TO PYTHON IMPLEMENTATION"
+            )
             # Fall through to Python implementation
     else:
-        logger.info("Rust not available, using Python implementation")
+        logger.info(
+            "🐍 FORMAT_KICAD_SCHEMATIC: Rust not available, using Python implementation"
+        )
 
     # Use Python implementation (current and fallback)
     python_start = time.perf_counter()
-    logger.debug("Starting Python S-expression formatting")
+    logger.info("🐍 PYTHON_FORMATTING: ⚡ STARTING PYTHON S-EXPRESSION FORMATTING")
 
     # Create formatter instance - time this critical step
     formatter_creation_start = time.perf_counter()
     formatter = KiCadFormatterNew()
     formatter_creation_time = time.perf_counter() - formatter_creation_start
-    logger.debug(f"KiCadFormatterNew created in {formatter_creation_time*1000:.3f}ms")
+    logger.debug(
+        f"🔧 PYTHON_FORMATTING: KiCadFormatterNew created in {formatter_creation_time*1000:.3f}ms"
+    )
 
     # Format the expression with proper multi-line formatting - time the core operation
     formatting_start = time.perf_counter()
