@@ -112,41 +112,152 @@ def extract_property_value(prop_name, fallback=""):
 # 🔧 S_EXPRESSION DEBUG: symbol_def.reference_prefix = R (type: <class 'str'>)
 ```
 
-### Current Status (Updated August 3, 2025)
+### Phase 4: Systematic Debug Cycle Implementation (Completed ✅)
 
-- ✅ **Component instances**: Fixed - properly display "R1", "10k"
-- ✅ **Property extraction**: Fixed - SymbolDefinition objects created correctly
-- ✅ **Debug visibility**: Added comprehensive logging for troubleshooting
-- ❌ **Symbol library templates**: Still broken - show dictionary strings
-- ❌ **KiCad visual display**: Still shows "R?" in schematic view
+**Created `/debug-cycle` Command**: Systematic debugging workflow for tight feedback loops:
+- Test → Compare → Enhance Logging → Fix → Repeat cycle
+- User provides test script, reference output, and success criteria
+- Claude executes disciplined debugging with clear progress tracking
 
-### Remaining Issue Analysis
+### Phase 5: Symbol Discovery and Caching Issues (Completed ✅)
 
-**Problem**: Symbol library definitions still contain malformed dictionary strings:
-```sexp
-(property
-    "Reference" 
-    "{'value': 'R', 'position': {'x': 2.032, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-    (at 0.0 0.0 0)
-    ...
-)
+#### Root Cause: Symbol Caching Bypassed Fixes
+**Discovery**: Symbol caching was storing raw dictionary format and bypassing property extraction fixes.
+```bash
+# Found cached symbol data with raw dictionaries:
+/Users/user/.cache/circuit_synth/symbols/Device_ec2a6e32.json
+{
+  "Reference": {
+    "value": "R",
+    "position": {"x": 2.032, "y": 0.0, "rotation": 90.0},
+    "effects": {"font_size": [1.27, 1.27]}
+  }
+}
 ```
 
-**Evidence**: Debug logs show property extraction working correctly, but generated output still malformed. This indicates **two separate code paths**:
-1. **Component instance generation** (✅ working)
-2. **Symbol library template generation** (❌ still using raw dictionary data)
+#### Solution: Disable Caching and Simplify Code
+**Caching Removal**:
+- Disabled symbol caching to force fresh property extraction
+- Simplified complex caching logic with direct symbol loading
+- Fixed KiCad library path discovery
 
-### Next Steps Required
+**Code Simplification**:
+```python
+# OLD: Complex caching with multiple code paths
+# - _lazy_symbol_search()
+# - _build_complete_index() 
+# - Complex cache management
 
-1. **Locate Alternative Symbol Generation Path**: Find code that bypasses SymbolDefinition processing
-2. **Fix Raw Dictionary Usage**: Ensure all symbol generation uses proper property extraction
-3. **Complete Testing**: Verify KiCad displays proper references ("R1" not "R?")
+# NEW: Simple direct loading
+def get_symbol(self, lib_id: str) -> Optional[SymbolDefinition]:
+    lib_name, sym_name = lib_id.split(":")
+    for lib_file_path in self._library_paths:
+        if lib_file_path.stem == lib_name:
+            library_data = self._load_library(lib_file_path)
+            if sym_name in library_data["symbols"]:
+                return self._convert_to_symbol_definition(lib_id, symbol_data)
+```
+
+#### Library Discovery Fix
+**Problem**: `get_symbol_cache()` created empty symbol cache without KiCad library paths
+**Solution**: Added automatic KiCad library discovery:
+```python
+def _discover_kicad_library_paths(self):
+    base_path = Path("/Applications/KiCad/.../symbols")  # macOS
+    for lib_file in base_path.glob("*.kicad_sym"):
+        self.add_library_path(lib_file)  # Add individual .kicad_sym files
+```
+
+### Current Status (Updated August 4, 2025)
+
+- ✅ **Symbol Discovery**: Fixed - all KiCad libraries loaded correctly
+- ✅ **Component Instances**: Fixed - PCB shows proper "Reference" "R1", "Value" "10k"
+- ✅ **Property Extraction**: Fixed - symbols found and processed correctly
+- ✅ **Code Simplification**: Removed complex caching, consolidated to single path
+- ✅ **Debug Workflow**: Established systematic `/debug-cycle` command
+- ✅ **Symbol Library Templates**: **FIXED** - schematic lib_symbols now shows clean strings
+- ❌ **KiCad Visual Display**: **STILL SHOWS "R?" in schematic view despite correct file contents**
+
+### Phase 6: Symbol Library Template Fix (Completed ✅)
+
+#### Problem Discovery
+The symbol library template generation was happening in a **separate code path** in `src/circuit_synth/kicad/sch_gen/schematic_writer.py`. This system bypassed our `kicad_api` fixes and was directly using raw dictionary data.
+
+#### Root Cause: Two Parallel Systems
+**Evidence of Dual Architecture**:
+1. **kicad_api system** (✅ working) - used for component instances
+2. **sch_gen system** (❌ broken) - used for symbol library templates
+
+#### Solution Implementation
+**Fixed `schematic_writer.py:1127-1132`**:
+```python
+# Handle both old format (strings) and new format (dicts with "value" key)
+# This fixes the reference property generation bug where dictionary objects
+# are converted to string representations instead of extracting the value
+if isinstance(prop_value, dict):
+    # Extract the actual value from the dictionary
+    clean_prop_value = prop_value.get("value", "")
+else:
+    # Use the value as-is if it's already a string
+    clean_prop_value = str(prop_value) if prop_value else ""
+```
+
+#### Debug Evidence
+**Before Fix**:
+```sexp
+(property "Reference" "{'value': 'R', 'position': {...}}")  # ❌ Dictionary string
+```
+
+**After Fix** (Confirmed in generated files):
+```sexp
+(property "Reference" "R"                                   # ✅ Clean string
+```
+
+### Remaining Mystery: KiCad Display Issue
+
+**Current State**: **FILES FIXED, DISPLAY BROKEN** ✅❌
+
+**What's Working**:
+```bash
+# Symbol library templates now show clean values:
+(property "Reference" "R"        # ✅ Fixed
+(property "Value" "R"           # ✅ Fixed
+(property "Datasheet" "~"       # ✅ Fixed
+
+# Component instances still work correctly:
+(property "Reference" "R1"      # ✅ Fixed
+(property "Value" "10k"         # ✅ Fixed
+```
+
+**What's Still Broken**:
+- **KiCad Visual Display**: Despite correct file contents, KiCad still shows "R?" 
+- **Possible Causes**: 
+  - KiCad caching issue (needs refresh/reload)
+  - Missing annotation step in KiCad
+  - Different property used for display vs file storage
+  - Generated UUID conflicts or schema version issues
+
+### Investigation Required
+
+**Next Steps to Resolve Display Issue**:
+1. **KiCad Cache Clear**: Try clearing KiCad's internal caches
+2. **Annotation Test**: Run KiCad's annotation tool to assign references
+3. **Schema Validation**: Verify generated files match KiCad schema exactly
+4. **Fresh KiCad Instance**: Test with completely new KiCad session
+
+**Evidence Files Updated**:
+- Schematic lib_symbols: ✅ Shows `"Reference" "R"` (clean string)
+- Component instances: ✅ Shows `"Reference" "R1"` (proper reference)
+- PCB properties: ✅ Shows `"Reference" "R1"` (correct display)
+- **KiCad GUI**: ❌ Still displays "R?" (mystery persistence)
 
 ### Files Modified
 
-- `src/circuit_synth/kicad_api/core/symbol_cache.py` - Enhanced property extraction
-- `src/circuit_synth/kicad_api/core/s_expression.py` - Added debug logging
+- `src/circuit_synth/kicad_api/core/symbol_cache.py` - Enhanced property extraction, disabled caching, added library discovery
+- `src/circuit_synth/kicad_api/core/s_expression.py` - Added/removed debug logging  
 - `src/circuit_synth/core/s_expression.py` - Removed (duplicate file)
+- `src/circuit_synth/kicad/sch_gen/schematic_writer.py` - **CRITICAL FIX**: Added property extraction logic for symbol library templates (lines 1127-1132)
+- `.claude/commands/debug-cycle.md` - Created systematic debugging workflow
 
 ## Testing
 
@@ -161,8 +272,9 @@ def extract_property_value(prop_name, fallback=""):
 3. Verify KiCad displays proper component references
 
 ### Test Files
-- `bidirectional_update_test/step1_imported_python/` - Simple test case
-- `example_project/circuit-synth/` - Complex hierarchical example
+- `reference_troubleshooting/circuit-synth_project.py` - Debug test script (single resistor)
+- `reference_troubleshooting/generated_project/` - Generated output for comparison
+- `reference_troubleshooting/test_project/` - Reference working output
 
 ## Git History
 

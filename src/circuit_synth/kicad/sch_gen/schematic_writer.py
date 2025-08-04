@@ -1121,11 +1121,21 @@ class SchematicWriter:
             ):
                 hide_symbol = Symbol("yes")
 
+            # Handle both old format (strings) and new format (dicts with "value" key)
+            # This fixes the reference property generation bug where dictionary objects
+            # are converted to string representations instead of extracting the value
+            if isinstance(prop_value, dict):
+                # Extract the actual value from the dictionary
+                clean_prop_value = prop_value.get("value", "")
+            else:
+                # Use the value as-is if it's already a string
+                clean_prop_value = str(prop_value) if prop_value else ""
+
             symbol_block.append(
                 [
                     Symbol("property"),
                     prop_name,
-                    str(prop_value),
+                    clean_prop_value,
                     [Symbol("at"), 0.0, 0.0, 0],
                     [
                         Symbol("effects"),
