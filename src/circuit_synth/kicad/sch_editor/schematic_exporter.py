@@ -98,7 +98,12 @@ class SchematicExporter:
 
         # Add lib_symbols section
         lib_symbols_section = [sexpdata.Symbol("lib_symbols")]
+        print(f"🔧 SCHEMATIC_EXPORTER DEBUG: Processing {len(schematic_obj.lib_symbols)} lib_symbols")
         for lib_id, symbol_sexpr in schematic_obj.lib_symbols.items():
+            print(f"🔧 SCHEMATIC_EXPORTER DEBUG: Processing lib_id: {lib_id}")
+            print(f"🔧 SCHEMATIC_EXPORTER DEBUG: symbol_sexpr type: {type(symbol_sexpr)}")
+            if isinstance(symbol_sexpr, list) and len(symbol_sexpr) > 2:
+                print(f"🔧 SCHEMATIC_EXPORTER DEBUG: First few elements: {symbol_sexpr[:3]}")
             lib_symbols_section.append(symbol_sexpr)
         inner_data.append(lib_symbols_section)
 

@@ -117,7 +117,7 @@ class ComponentManager:
         if schematic_path:
             project_name, hierarchical_path = get_project_hierarchy_path(schematic_path)
         else:
-            project_name = getattr(self.schematic, "project_name", "circuit")
+            project_name = getattr(self.schematic, "project_name", "generated_project")
             hierarchical_path = "/"
         add_symbol_instance(component, project_name, hierarchical_path)
 
@@ -210,7 +210,7 @@ class ComponentManager:
                     schematic_path
                 )
             else:
-                project_name = getattr(self.schematic, "project_name", "circuit")
+                project_name = getattr(self.schematic, "project_name", "generated_project")
                 hierarchical_path = "/"
             add_symbol_instance(component, project_name, hierarchical_path)
             logger.debug(

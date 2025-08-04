@@ -11,7 +11,7 @@ from ..core.types import SchematicSymbol, SymbolInstance
 
 
 def add_symbol_instance(
-    symbol: SchematicSymbol, project_name: str = "circuit", hierarchical_path: str = "/"
+    symbol: SchematicSymbol, project_name: str = "generated_project", hierarchical_path: str = "/"
 ) -> None:
     """
     Add proper instance information to a schematic symbol.
@@ -24,6 +24,8 @@ def add_symbol_instance(
         project_name: Name of the KiCad project (default: "circuit")
         hierarchical_path: Hierarchical path in the schematic (default: "/" for root)
     """
+    print(f"🔧 INSTANCE_UTILS DEBUG: Adding instance for symbol {symbol.reference} with project_name='{project_name}', hierarchical_path='{hierarchical_path}'")
+    
     # Create the instance
     instance = SymbolInstance(
         project=project_name,

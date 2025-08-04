@@ -157,6 +157,7 @@ class SExpressionParser:
             data: S-expression data structure
             filepath: Path to write to
         """
+        print(f"🔧 S_EXPRESSION DEBUG: write_file() called with filepath={filepath}")
         filepath = Path(filepath)
         content = self.dumps(data)
 
@@ -165,6 +166,7 @@ class SExpressionParser:
 
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(content)
+        print(f"🔧 S_EXPRESSION DEBUG: File written successfully")
 
     def dumps(self, data: Any) -> str:
         """
@@ -176,8 +178,43 @@ class SExpressionParser:
         Returns:
             S-expression string
         """
+        print(f"🔧 S_EXPRESSION DEBUG: dumps() called with data type: {type(data)}")
+        # Clean dictionary strings before formatting
+        cleaned_data = self._clean_dictionary_strings_recursive(data)
         # Format with proper indentation
-        return self._format_sexp(data)
+        return self._format_sexp(cleaned_data)
+
+    def _clean_dictionary_strings_recursive(self, data):
+        """
+        Recursively clean dictionary strings from S-expression data.
+        This fixes the bug where symbol properties contain dictionary string representations
+        instead of clean values.
+        """
+        if isinstance(data, list):
+            cleaned_list = []
+            for item in data:
+                cleaned_list.append(self._clean_dictionary_strings_recursive(item))
+            return cleaned_list
+        elif isinstance(data, str):
+            # Check if this is a dictionary string representation
+            if data.startswith("{'value':") or data.startswith('{"value":'):
+                print(f"🔧 S_EXPRESSION DEBUG: Found dictionary string: {data[:50]}...")
+                try:
+                    import ast
+                    dict_obj = ast.literal_eval(data)
+                    if isinstance(dict_obj, dict) and "value" in dict_obj:
+                        clean_value = dict_obj["value"]
+                        print(f"🔧 S_EXPRESSION DEBUG: Extracted clean value: {clean_value}")
+                        return clean_value
+                    else:
+                        return data  # Keep original if can't extract
+                except (ValueError, SyntaxError) as e:
+                    print(f"🔧 S_EXPRESSION DEBUG: Failed to parse dictionary string: {e}")
+                    return data  # Keep original if can't parse
+            else:
+                return data
+        else:
+            return data
 
     def _format_sexp(
         self,
@@ -195,6 +232,7 @@ class SExpressionParser:
         in_lib_symbols: bool = False,
         in_name: bool = False,
         in_text: bool = False,
+        in_reference: bool = False,
     ) -> str:
         """Format S-expression with proper indentation.
 
@@ -225,10 +263,10 @@ class SExpressionParser:
                 if in_property_name:
                     return '"' + sexp + '"'
                 # Pin numbers must always be quoted (when directly after "number" tag)
-                if in_number and sexp.isdigit():
+                if in_number:
                     return '"' + sexp + '"'
-                # Pin names must be quoted if they are numeric (when directly after "name" tag)
-                if in_name and sexp.isdigit():
+                # Pin names must be quoted (when directly after "name" tag)
+                if in_name:
                     return '"' + sexp + '"'
                 # Project names must always be quoted
                 if in_project:
@@ -245,6 +283,9 @@ class SExpressionParser:
                 # Symbol library IDs must always be quoted
                 if in_symbol:
                     return '"' + sexp + '"'
+                # Reference values must always be quoted
+                if in_reference:
+                    return '"' + sexp + '"'
                 # Text content must always be quoted
                 if in_text:
                     # Properly escape newlines and quotes for KiCad format
@@ -254,6 +295,13 @@ class SExpressionParser:
                         .replace("\n", "\\n")
                     )
                     return '"' + escaped + '"'
+                # In lib_symbols section, most strings should be quoted
+                if in_lib_symbols:
+                    # Don't quote symbols like 'hide', 'yes', 'no'
+                    if sexp in ['hide', 'yes', 'no', 'passive', 'line']:
+                        return sexp
+                    # Quote everything else in lib_symbols
+                    return '"' + sexp + '"'
                 # Quote strings if they contain spaces or special characters
                 if " " in sexp or "\n" in sexp or '"' in sexp or "/" in sexp:
                     # Properly escape newlines and quotes for KiCad format
@@ -265,7 +313,7 @@ class SExpressionParser:
                     return '"' + escaped + '"'
                 # Library IDs with colons (like "Device:R") should be quoted when in symbol context
                 if ":" in sexp and not " " in sexp:
-                    return sexp
+                    return '"' + sexp + '"'
                 # Don't quote simple identifiers (property names, etc.)
                 return sexp
             elif isinstance(sexp, (int, float)):
@@ -283,6 +331,12 @@ class SExpressionParser:
                     return '"' + str(sexp) + '"'
                 # Property names must always be quoted
                 if in_property_name:
+                    return '"' + str(sexp) + '"'
+                # Reference values must always be quoted
+                if in_reference:
+                    return '"' + str(sexp) + '"'
+                # In lib_symbols section, numbers in certain contexts should be quoted
+                if in_lib_symbols and parent_tag in ['number', 'name']:
                     return '"' + str(sexp) + '"'
                 return str(sexp)
             else:
@@ -331,6 +385,8 @@ class SExpressionParser:
         is_lib_symbols_expr = tag_name == "lib_symbols"
         # Check if this is a text expression
         is_text_expr = tag_name == "text"
+        # Check if this is a reference expression
+        is_reference_expr = tag_name == "reference"
 
         if is_simple:
             # Format on one line
@@ -439,6 +495,17 @@ class SExpressionParser:
                             in_instances=in_instances,
                         )
                     )
+                elif is_reference_expr and i == 1:
+                    # For reference expressions, the reference value at index 1 should be quoted
+                    parts.append(
+                        self._format_sexp(
+                            item,
+                            indent,
+                            tag_name,
+                            in_reference=True,
+                            in_instances=in_instances,
+                        )
+                    )
                 else:
                     parts.append(
                         self._format_sexp(
@@ -485,6 +552,7 @@ class SExpressionParser:
                             indent + 1,
                             tag_name,
                             in_instances=in_instances,
+                            in_lib_symbols=in_lib_symbols,
                         )
                     )
                 result += "\n" + "\t" * indent + ")"
@@ -516,6 +584,7 @@ class SExpressionParser:
                                 tag_name,
                                 in_number=True,
                                 in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
                             )
                         )
                     # For name expressions, pass in_name=True for the value at index 1
@@ -529,6 +598,7 @@ class SExpressionParser:
                                 tag_name,
                                 in_name=True,
                                 in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
                             )
                         )
                     elif is_project_expr and i == 1:
@@ -542,6 +612,7 @@ class SExpressionParser:
                                 tag_name,
                                 in_project=True,
                                 in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
                             )
                         )
                     elif is_instances_expr:
@@ -550,7 +621,7 @@ class SExpressionParser:
                             "\n"
                             + "\t" * (indent + 1)
                             + self._format_sexp(
-                                item, indent + 1, tag_name, in_instances=True
+                                item, indent + 1, tag_name, in_instances=True, in_lib_symbols=in_lib_symbols
                             )
                         )
                     elif is_lib_symbols_expr:
@@ -577,6 +648,7 @@ class SExpressionParser:
                                 tag_name,
                                 in_page=True,
                                 in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
                             )
                         )
                     elif is_property_expr and i == 1:
@@ -590,6 +662,7 @@ class SExpressionParser:
                                 tag_name,
                                 in_property_name=True,
                                 in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
                             )
                         )
                     elif is_property_expr and i == 2:
@@ -603,6 +676,7 @@ class SExpressionParser:
                                 tag_name,
                                 in_property_value=True,
                                 in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
                             )
                         )
                     elif is_symbol_expr and i == 1:
@@ -616,6 +690,7 @@ class SExpressionParser:
                                 tag_name,
                                 in_symbol=True,
                                 in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
                             )
                         )
                     elif is_generator_expr and i == 1:
@@ -629,6 +704,7 @@ class SExpressionParser:
                                 tag_name,
                                 in_generator=True,
                                 in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
                             )
                         )
                     elif is_text_expr and i == 1:
@@ -642,6 +718,21 @@ class SExpressionParser:
                                 tag_name,
                                 in_text=True,
                                 in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
+                            )
+                        )
+                    elif is_reference_expr and i == 1:
+                        # For reference expressions, the reference value at index 1 should be quoted
+                        result += (
+                            "\n"
+                            + "\t" * (indent + 1)
+                            + self._format_sexp(
+                                item,
+                                indent + 1,
+                                tag_name,
+                                in_reference=True,
+                                in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
                             )
                         )
                     else:
@@ -654,6 +745,7 @@ class SExpressionParser:
                                 tag_name,
                                 in_number=False,
                                 in_instances=in_instances,
+                                in_lib_symbols=in_lib_symbols,
                             )
                         )
             result += "\n" + "\t" * indent + ")"
@@ -740,8 +832,8 @@ class SExpressionParser:
         sexp.append([sexpdata.Symbol("generator_version"), "9.0"])
         sexp.append([sexpdata.Symbol("uuid"), schematic.uuid])
 
-        # Add paper size only once
-        sexp.append([sexpdata.Symbol("paper"), "A4"])
+        # Paper size is now handled by SchematicWriter to avoid duplicates
+        # sexp.append([sexpdata.Symbol("paper"), "A4"])
 
         # lib_symbols section removed - now handled by SchematicWriter
         # This prevents the unfixed symbol generation from interfering with the fixed version

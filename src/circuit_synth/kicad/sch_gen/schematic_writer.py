@@ -1057,7 +1057,7 @@ class SchematicWriter:
         for i, item in enumerate(schematic_expr):
             if isinstance(item, list) and item and item[0] == Symbol("uuid"):
                 # Insert paper after uuid
-                schematic_expr.insert(i + 1, [Symbol("paper"), self.paper_size])
+                schematic_expr.insert(i + 1, [Symbol("paper"), f"{self.paper_size}"])
                 break
 
     def _add_symbol_definitions(self, schematic_expr: list):
@@ -1102,8 +1102,11 @@ class SchematicWriter:
         for sym_id in sorted(symbol_ids):
             lib_data = SymbolLibCache.get_symbol_data(sym_id)
             print(f"🔧 SYMBOL_CACHE DEBUG: Retrieved data for {sym_id}:")
+            print(f"🔧 SYMBOL_CACHE DEBUG: lib_data type: {type(lib_data)}")
             if lib_data and "properties" in lib_data:
                 print(f"🔧 SYMBOL_CACHE DEBUG: Properties: {lib_data['properties']}")
+                for prop_name, prop_value in lib_data['properties'].items():
+                    print(f"🔧 SYMBOL_CACHE DEBUG: Property {prop_name}: {prop_value} (type: {type(prop_value)})")
             if not lib_data:
                 logger.warning(
                     "No symbol library data found for '%s'. Skipping definition.",
@@ -1192,16 +1195,16 @@ class SchematicWriter:
             # Handle both old format (strings) and new format (dicts with "value" key)
             # This fixes the reference property generation bug where dictionary objects
             # are converted to string representations instead of extracting the value
-            logger.info(f"🔧 SCHEMATIC_WRITER DEBUG: Processing property {prop_name}: {prop_value} (type: {type(prop_value)})")
+            print(f"🔧 SCHEMATIC_WRITER DEBUG: Processing property {prop_name}: {prop_value} (type: {type(prop_value)})")
             
             if isinstance(prop_value, dict):
                 # Extract the actual value from the dictionary
                 clean_prop_value = prop_value.get("value", "")
-                logger.info(f"🔧 SCHEMATIC_WRITER DEBUG: Extracted clean value: {clean_prop_value}")
+                print(f"🔧 SCHEMATIC_WRITER DEBUG: Extracted clean value: {clean_prop_value}")
             else:
                 # Use the value as-is if it's already a string
                 clean_prop_value = str(prop_value) if prop_value else ""
-                logger.info(f"🔧 SCHEMATIC_WRITER DEBUG: Using string value: {clean_prop_value}")
+                print(f"🔧 SCHEMATIC_WRITER DEBUG: Using string value: {clean_prop_value}")
 
             symbol_block.append(
                 [
