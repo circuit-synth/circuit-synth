@@ -75,19 +75,20 @@ class ConnectionAnalyzer:
                     self.connection_matrix[(comp1, comp2)] += 1
 
         # Log connection analysis results
-        logger.info("Connection analysis complete:")
-        logger.info(
-            f"  Total components with connections: {len(self.connection_counts)}"
-        )
-        logger.info(f"  Total pairwise connections: {len(self.connection_matrix)}")
+        # DEBUG: Comment out verbose connection logging to reduce noise
+        # logger.info("Connection analysis complete:")
+        # logger.info(
+        #     f"  Total components with connections: {len(self.connection_counts)}"
+        # )
+        # logger.info(f"  Total pairwise connections: {len(self.connection_matrix)}")
 
-        # Log top connected components
-        sorted_comps = sorted(
-            self.connection_counts.items(), key=lambda x: x[1], reverse=True
-        )
-        logger.info("Top 10 most connected components:")
-        for comp_ref, count in sorted_comps[:10]:
-            logger.info(f"    {comp_ref}: {count} connections")
+        # # Log top connected components
+        # sorted_comps = sorted(
+        #     self.connection_counts.items(), key=lambda x: x[1], reverse=True
+        # )
+        # logger.info("Top 10 most connected components:")
+        # for comp_ref, count in sorted_comps[:10]:
+        #     logger.info(f"    {comp_ref}: {count} connections")
 
         # Identify component groups
         self._identify_groups()

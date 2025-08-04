@@ -15,6 +15,14 @@ from ..core.circuit import Circuit
 logger = logging.getLogger(__name__)
 
 
+def _extract_property_value(properties: Dict[str, Any], prop_name: str, fallback: str = "") -> str:
+    """Helper function to extract value from property (handles both string and dict formats)."""
+    prop_data = properties.get(prop_name, fallback)
+    if isinstance(prop_data, dict):
+        return prop_data.get("value", fallback)
+    return str(prop_data) if prop_data else fallback
+
+
 @dataclass
 class CanonicalConnection:
     """
@@ -251,8 +259,11 @@ class CanonicalCircuit:
 
             # Extract component properties
             properties = cls._extract_properties(symbol)
-            reference = properties.get("Reference", "")
-            value = properties.get("Value", "")
+            reference = _extract_property_value(properties, "Reference", "")
+            value = _extract_property_value(properties, "Value", "")
+            
+            # DEBUG: Add logging to track reference property extraction
+            logger.info(f"🔧 CANONICAL DEBUG: reference={reference}, value={value}")
 
             if not reference or not value:
                 logger.debug(f"Skipping symbol without reference or value")
@@ -352,7 +363,7 @@ class CanonicalCircuit:
     def _is_power_symbol(symbol: Dict[str, Any]) -> bool:
         """Check if a symbol is a power symbol (reference starts with #PWR)."""
         properties = symbol.get("properties", {})
-        reference = properties.get("Reference", "")
+        reference = _extract_property_value(properties, "Reference", "")
         return reference.startswith("#PWR")
 
     @staticmethod
@@ -464,7 +475,7 @@ class CanonicalCircuit:
 
         lib_id = symbol.get("lib_id", "")
         properties = symbol.get("properties", {})
-        reference = properties.get("Reference", "")
+        reference = _extract_property_value(properties, "Reference", "")
 
         # Simple heuristic based on component type
         if "R" in lib_id or reference.startswith("R"):

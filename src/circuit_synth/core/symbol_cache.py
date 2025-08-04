@@ -583,9 +583,34 @@ class SymbolLibraryCache:
         Convert parsed symbol data from kicad_symbol_parser to SymbolDefinition.
         """
         try:
-            # Extract basic properties - they are stored as strings, not dicts
+            # Extract basic properties - handle both old format (strings) and new format (dicts)
             properties = symbol_data.get("properties", {})
-            reference = properties.get("Reference", "U")
+            
+            # Helper function to extract value from property (handles both string and dict formats)
+            def extract_property_value(prop_name, fallback=""):
+                # Try direct field first
+                direct_value = symbol_data.get(prop_name.lower())
+                if direct_value:
+                    return direct_value
+
+                # Try properties with both string and dict format support
+                prop_data = properties.get(prop_name, fallback)
+                if isinstance(prop_data, dict):
+                    return prop_data.get("value", fallback)
+                return str(prop_data) if prop_data else fallback
+            
+            # DEBUG: Add logging to track reference property extraction
+            reference_raw = properties.get("Reference", "U") 
+            reference = extract_property_value("Reference", "U")
+            
+            # Add debug logging
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.info(f"🔧 REFERENCE DEBUG: lib_id={lib_id}, raw_ref={reference_raw}, extracted_ref={reference}")
+            if isinstance(reference_raw, dict):
+                logger.info(f"🔧 REFERENCE DEBUG: Dictionary detected - {reference_raw}")
+            else:
+                logger.info(f"🔧 REFERENCE DEBUG: String format - {reference_raw}")
 
             # Convert pins
             pins = []
@@ -619,10 +644,13 @@ class SymbolLibraryCache:
                 )
                 pins.append(pin)
 
-            # Get description, keywords, datasheet from direct fields or properties
-            description = symbol_data.get("description") or properties.get("Value", "")
-            keywords = symbol_data.get("keywords") or properties.get("Keywords", "")
-            datasheet = symbol_data.get("datasheet") or properties.get("Datasheet", "")
+            # Get description, keywords, datasheet using helper function for consistency
+            description = extract_property_value("Description") or extract_property_value("Value")
+            keywords = extract_property_value("Keywords") or extract_property_value("ki_keywords")
+            datasheet = extract_property_value("Datasheet")
+            
+            # Add more debug logging for other properties
+            logger.info(f"🔧 PROPERTY DEBUG: description={description}, keywords={keywords}, datasheet={datasheet}")
 
             # Extract graphic elements from parsed data
             # The parser stores them in the "graphics" field

@@ -741,8 +741,10 @@ class SymbolLibraryCache:
             # Handle both old format (strings) and new format (dicts with "value" key)
             if isinstance(reference_prop, dict):
                 reference = reference_prop.get("value", "U")
+                logger.info(f"🔧 KICAD_API DEBUG: Dictionary reference - raw={reference_prop}, extracted={reference}")
             else:
                 reference = str(reference_prop)
+                logger.info(f"🔧 KICAD_API DEBUG: String reference - {reference}")
 
             # Convert pins
             pins = []
@@ -862,10 +864,14 @@ class SymbolLibraryCache:
                 graphic_elements.append(converted)
 
             # Create symbol definition
+            final_reference_prefix = reference.rstrip("?")
+            logger.info(f"🔧 KICAD_API DEBUG: Creating SymbolDefinition for {lib_id} with reference_prefix={final_reference_prefix}")
+            logger.info(f"🔧 KICAD_API DEBUG: Final property values - description='{description}', keywords='{keywords}', datasheet='{datasheet}'")
+            
             symbol_def = SymbolDefinition(
                 lib_id=lib_id,
                 name=symbol_data.get("name", lib_id.split(":")[-1]),
-                reference_prefix=reference.rstrip("?"),
+                reference_prefix=final_reference_prefix,
                 description=description,
                 keywords=keywords,
                 datasheet=datasheet,
