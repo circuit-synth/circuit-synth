@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version 9.0)
-	(uuid 1f0c71ca-908e-44a9-a356-d79b080f91de)
+	(uuid 06346070-389e-41f6-9b3a-dafd50f06c44)
 	(paper A4)
 	(paper A4)
 	(lib_symbols
@@ -1445,7 +1445,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 6e20c5d7-13a6-4a94-80f6-3b52311c2eab)
+		(uuid aa647e98-1739-4527-8e1d-37427268193c)
 		(property
 			"Reference"
 			"C1"
@@ -1491,7 +1491,7 @@
 			(project
 				"initial_kicad_generated"
 				(path
-					"/283e7e1b-f0d8-4991-9549-4b34bae9b2c9"
+					"/0001f6e2-7864-4e6f-959d-a2167701bebb"
 					(reference C1)
 					(unit 1)
 				)
@@ -1504,7 +1504,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid 6108d51f-91dd-4b87-9e74-c7e203bd08dc)
+		(uuid 0989c09d-d668-4102-9c37-46bc2c023e08)
 		(property
 			"Reference"
 			"U1"
@@ -1550,7 +1550,7 @@
 			(project
 				"initial_kicad_generated"
 				(path
-					"/283e7e1b-f0d8-4991-9549-4b34bae9b2c9"
+					"/0001f6e2-7864-4e6f-959d-a2167701bebb"
 					(reference U1)
 					(unit 1)
 				)
@@ -1567,7 +1567,7 @@
 			)
 			(justify left)
 		)
-		(uuid e84307ce-348d-4253-b730-21f1740f854f)
+		(uuid c05d5ca0-c761-4a29-a737-1377ab60cca9)
 	)
 	(hierarchical_label
 		+3V3
@@ -1579,7 +1579,7 @@
 			)
 			(justify left)
 		)
-		(uuid bf812c51-0f7b-44a8-a9b0-05bebe6a0b30)
+		(uuid 35edd410-df12-419a-8b25-c0b84bb18c17)
 	)
 	(hierarchical_label
 		GND
@@ -1591,7 +1591,7 @@
 			)
 			(justify right)
 		)
-		(uuid 101bedca-21fa-44cb-a036-18e441f19f78)
+		(uuid 29574ab9-2e91-4a51-a851-75986740657c)
 	)
 	(hierarchical_label
 		GND
@@ -1603,7 +1603,7 @@
 			)
 			(justify right)
 		)
-		(uuid 8e4f7b72-d21a-40e8-b08d-2e36a0f2b197)
+		(uuid b3634ecb-497d-4bc5-8299-9aeed21951d0)
 	)
 	(hierarchical_label
 		GND
@@ -1615,7 +1615,7 @@
 			)
 			(justify right)
 		)
-		(uuid ccb3023e-ef45-419c-b240-7d33bcc3ddc7)
+		(uuid a494bf8b-12a9-4217-90a7-55c3421ed3d4)
 	)
 	(hierarchical_label
 		GND
@@ -1627,7 +1627,7 @@
 			)
 			(justify right)
 		)
-		(uuid c87dc766-ae34-4bb6-9fd0-965c9e1c2c05)
+		(uuid 0eed6774-0a61-45c7-867d-40496f2878f0)
 	)
 	(hierarchical_label
 		GND
@@ -1639,7 +1639,7 @@
 			)
 			(justify right)
 		)
-		(uuid 09600258-c354-4790-b1e9-a885827d889a)
+		(uuid 9af6822e-b858-494a-97c1-12478fff17dd)
 	)
 	(hierarchical_label
 		GND
@@ -1651,7 +1651,7 @@
 			)
 			(justify right)
 		)
-		(uuid 0c99cd81-5e9d-4c83-8e9c-ce7a4f4f5360)
+		(uuid 7c78a217-6c46-435e-9c93-3a2a01155340)
 	)
 	(hierarchical_label
 		GND
@@ -1663,7 +1663,7 @@
 			)
 			(justify right)
 		)
-		(uuid bc602510-2ca3-4cf5-ad62-abd1e3d7caf4)
+		(uuid 2bb0a64e-426e-4995-a5b2-53af7d1b2bbe)
 	)
 	(hierarchical_label
 		GND
@@ -1675,7 +1675,7 @@
 			)
 			(justify right)
 		)
-		(uuid 5d863ba2-9fc9-4a8b-b731-63634d9a2ab3)
+		(uuid 383363f9-cf8f-4131-a3bd-3816a5fbf8de)
 	)
 	(hierarchical_label
 		GND
@@ -1687,7 +1687,7 @@
 			)
 			(justify right)
 		)
-		(uuid c4cda828-e81a-4580-a092-af00931bff9e)
+		(uuid 2e9b6a25-78eb-4fdd-81ad-ba6474298e00)
 	)
 	(hierarchical_label
 		GND
@@ -1699,7 +1699,7 @@
 			)
 			(justify right)
 		)
-		(uuid bf8b30a0-7780-4ff5-80bb-187e07bcc814)
+		(uuid 30193f38-54e6-4007-b3ec-a4006b187b5d)
 	)
 	(hierarchical_label
 		GND
@@ -1711,7 +1711,7 @@
 			)
 			(justify right)
 		)
-		(uuid 5abe81d8-d519-4776-98e0-90d0adfd94d6)
+		(uuid 3b332e02-af13-44fe-bb9a-c3fb6d1ebc6a)
 	)
 	(hierarchical_label
 		GND
@@ -1723,7 +1723,7 @@
 			)
 			(justify right)
 		)
-		(uuid 42d18d99-73cc-4f18-856d-54992efd32ab)
+		(uuid 4b33df06-fb56-4285-8cc1-a4ca47cf903e)
 	)
 	(hierarchical_label
 		GND
@@ -1735,7 +1735,7 @@
 			)
 			(justify right)
 		)
-		(uuid 95dfc5a0-4bfc-47ff-922b-1271085a10a8)
+		(uuid 99502926-c0fc-4001-b3a0-943b928fb1ef)
 	)
 	(hierarchical_label
 		GND
@@ -1747,7 +1747,7 @@
 			)
 			(justify right)
 		)
-		(uuid a34dba42-0970-466d-8eef-9686e8d0d8d0)
+		(uuid 517fcdaa-0034-43d4-ad5f-a04370ada16c)
 	)
 	(hierarchical_label
 		GND
@@ -1759,7 +1759,7 @@
 			)
 			(justify right)
 		)
-		(uuid 45bab5cc-946f-44c6-978e-ff68366de765)
+		(uuid 73187f03-a4b6-43c4-97ad-fe8c409c6354)
 	)
 	(hierarchical_label
 		GND
@@ -1771,7 +1771,7 @@
 			)
 			(justify right)
 		)
-		(uuid 1771bc69-5b9d-46b6-aeb8-83812c73a813)
+		(uuid 056adfc0-dd81-454e-935a-e27567b04ae1)
 	)
 	(hierarchical_label
 		GND
@@ -1783,7 +1783,7 @@
 			)
 			(justify right)
 		)
-		(uuid 197ce200-8222-4746-930f-a65b6031fac3)
+		(uuid d392010a-381f-43a7-ae62-c101d227f861)
 	)
 	(hierarchical_label
 		GND
@@ -1795,7 +1795,7 @@
 			)
 			(justify right)
 		)
-		(uuid 1a0ae1e7-4593-4971-8a3c-23a788abbd97)
+		(uuid 2eb87027-58fd-4116-b1c2-fed83a7e26ca)
 	)
 	(hierarchical_label
 		GND
@@ -1807,7 +1807,7 @@
 			)
 			(justify right)
 		)
-		(uuid 3ff4f53e-a02a-41dd-b5b1-77ce670ae3bf)
+		(uuid 10e83793-84ab-4e8c-a65f-a1717e022f7f)
 	)
 	(hierarchical_label
 		GND
@@ -1819,7 +1819,7 @@
 			)
 			(justify right)
 		)
-		(uuid d706623a-ce83-4516-91d8-05697f81e848)
+		(uuid 38a05bb7-492f-4886-8fc3-f1a4144272e1)
 	)
 	(hierarchical_label
 		GND
@@ -1831,7 +1831,7 @@
 			)
 			(justify right)
 		)
-		(uuid 1dbaab2f-a984-455f-afef-46fd2b304a77)
+		(uuid 67615511-2aed-40e9-b900-0c08253ecaf1)
 	)
 	(hierarchical_label
 		GND
@@ -1843,7 +1843,7 @@
 			)
 			(justify right)
 		)
-		(uuid 8c0ae4bb-f63c-4b0c-99dd-cc5a193921f1)
+		(uuid b5a13634-3c53-4714-8fea-5d982cbeb72a)
 	)
 	(hierarchical_label
 		GND
@@ -1855,7 +1855,7 @@
 			)
 			(justify right)
 		)
-		(uuid ba1cb4c9-77ee-4a7e-8ea7-5bf67198d6f3)
+		(uuid bc5cec4d-ca2f-4c6e-b5a6-0383193eb533)
 	)
 	(text_box
 		"Generated circuit from KiCad"
@@ -1888,11 +1888,11 @@
 			)
 			(justify left top)
 		)
-		(uuid 21ec4469-374f-4e0f-9287-970c50012363)
+		(uuid 96e44662-6cec-456e-96b9-7e291a69e28b)
 	)
 	(sheet_instances
 		(path
-			"/283e7e1b-f0d8-4991-9549-4b34bae9b2c9"
+			"/0001f6e2-7864-4e6f-959d-a2167701bebb"
 			(page "1")
 		)
 	)

@@ -1,9 +1,9 @@
 (export (version "E")
     (design
       (source "initial_kicad_generated.kicad_sch")
-      (date "2025-08-03T00:50:21-0700")
+      (date "2025-08-03T19:33:50-0700")
       (tool "Circuit-Synth Exporter v0.1.0")
-      (sheet (number "1") (name "root") (tstamps "/662c1c08-474d-449d-92e5-26ac28105f63/")
+      (sheet (number "1") (name "root") (tstamps "/b43efa70-7b0b-449e-831b-6ae0e12f810a/")
       (title_block
         (title)
         (company)
@@ -33,7 +33,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "C_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "eb3e6d0c-fbf4-4fc3-8ee4-17e26c52a6a7"))
+      (tstamps "0f47ad51-72dd-4925-ada8-4cb10558b140"))
     (comp (ref "U1")
       (value "ESP32-C6-MINI-1")
       (footprint "RF_Module:ESP32-C6-MINI-1")
@@ -47,7 +47,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "ESP32?C6?MINI?1*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "b3c49c87-60b2-4f62-a950-a4adb9188893")))
+      (tstamps "cb39144e-c925-42fc-a61e-f2f6970b0cb4")))
     (libparts
     (libpart (lib "Device") (part "C")
       (description "Unpolarized capacitor")

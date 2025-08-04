@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 """
-Circuit Generated from KiCad
+Step 5: Test KiCad Preservation During Python Regeneration
+
+This Python file (from Step 4) will regenerate KiCad files back into Step 3's directory.
+The test verifies that manual component positions from Step 3 are preserved
+and not overwritten by circuit-synth generation.
+
+Expected behavior:
+- Circuit topology should be updated if needed
+- Component positions should remain where manually placed in Step 3
+- No loss of user's manual KiCad work
 """
 
 from circuit_synth import *
@@ -47,5 +56,10 @@ def main():
 if __name__ == '__main__':
     circuit = main()
     # Generate KiCad netlist (required for ratsnest display)
-    circuit.generate_kicad_netlist("initial_kicad_generated/initial_kicad_generated.net")
-    circuit.generate_kicad_project(project_name="initial_kicad_generated")
+    # Step 5: Test KiCad preservation using UPDATE MODE
+    # force_regenerate=False should trigger update mode that preserves manual work
+    print("🔄 Testing KiCad update mode (should preserve manual component positions)")
+    circuit.generate_kicad_project(
+        project_name="initial_kicad_generated", 
+        force_regenerate=False  # This should trigger update mode!
+    )
