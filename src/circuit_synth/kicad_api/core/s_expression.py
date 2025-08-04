@@ -1109,55 +1109,33 @@ class SExpressionParser:
         # Add UUID
         sexp.append([sexpdata.Symbol("uuid"), symbol.uuid])
 
-        # Add properties with library-based positioning
+        # Add properties with proper formatting
         if symbol.reference:
             prop = [sexpdata.Symbol("property"), "Reference", symbol.reference]
-
-            # Use hardcoded positioning that works well for now
-            # TODO: Fix library positioning to work correctly with component orientation
+            # Position relative to symbol
+            prop.append(
+                [sexpdata.Symbol("at"), symbol.position.x, symbol.position.y - 5, 0]
+            )
             prop.append(
                 [
-                    sexpdata.Symbol("at"),
-                    symbol.position.x + 2.54,
-                    symbol.position.y - 1.27,
-                    0,
+                    sexpdata.Symbol("effects"),
+                    [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
                 ]
             )
-
-            # Add effects (justification, font, etc.)
-            effects = [
-                sexpdata.Symbol("effects"),
-                [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
-            ]
-            # Use good justification
-            effects.append([sexpdata.Symbol("justify"), sexpdata.Symbol("left")])
-
-            prop.append(effects)
             sexp.append(prop)
 
         if symbol.value:
             prop = [sexpdata.Symbol("property"), "Value", str(symbol.value)]
-
-            # Use hardcoded positioning that works well for now
-            # TODO: Fix library positioning to work correctly with component orientation
+            # Position relative to symbol
+            prop.append(
+                [sexpdata.Symbol("at"), symbol.position.x, symbol.position.y + 5, 0]
+            )
             prop.append(
                 [
-                    sexpdata.Symbol("at"),
-                    symbol.position.x + 2.54,
-                    symbol.position.y + 1.27,
-                    0,
+                    sexpdata.Symbol("effects"),
+                    [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
                 ]
             )
-
-            # Add effects (justification, font, etc.)
-            effects = [
-                sexpdata.Symbol("effects"),
-                [sexpdata.Symbol("font"), [sexpdata.Symbol("size"), 1.27, 1.27]],
-            ]
-            # Use good justification
-            effects.append([sexpdata.Symbol("justify"), sexpdata.Symbol("left")])
-
-            prop.append(effects)
             sexp.append(prop)
 
         if symbol.footprint:

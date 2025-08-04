@@ -1,0 +1,157 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version 9.0)
+	(uuid 9cb49c6e-0dae-4f0e-9ed2-ef09d7511a17)
+	(paper A4)
+	(lib_symbols)
+	(paper A4)
+	(title_block
+		(title root)
+		(date 2025-08-04)
+		(company Circuit-Synth)
+	)
+	(hierarchical_label
+		3V3
+		(shape input)
+		(at 77.31 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 7f055913-0a75-45ae-9292-1629d5ff4cc0)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 77.31 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 75412957-ee08-4419-a17d-528fd3324450)
+	)
+	(sheet
+		(at 38.1 36.83)
+		(size 39.21 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 8f21c935-7d36-4ce9-9025-5ed784b3628b)
+		(property
+			"Sheetname"
+			"TestCircuit"
+			(at 38.1 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"TestCircuit.kicad_sch"
+			(at 38.1 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			3V3
+			passive
+			(at 76.04 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 67a8d152-ad18-48ec-8d98-c226a2c5097e)
+		)
+		(pin
+			GND
+			passive
+			(at 76.04 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 7c834f94-cf77-4b1c-9c2b-c3f91557c126)
+		)
+		(instances
+			(project
+				"circuit_synth"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Root circuit"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid b3e229b5-9c59-4be8-8623-506bf6b1fb1b)
+	)
+	(sheet_instances
+		(path
+			"/e4af6c70-bfc2-49f0-b19d-2e7ff8644b0e"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
+	)
+)
