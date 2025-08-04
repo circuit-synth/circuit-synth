@@ -34,32 +34,17 @@ try:
     )
     defensive_logger.debug("RUST DEFENSIVE: RustNetlistProcessor instance created")
 except ImportError as e:
-    defensive_logger.warning(
-        f"RUST DEFENSIVE FALLBACK: rust_netlist_processor not available: {e}"
+    defensive_logger.error(
+        f"RUST NETLIST IMPORT FAILED: rust_netlist_processor not available: {e}"
     )
-    # Use the proper KiCad netlist exporter instead of simple fallback
-    try:
-        from ..kicad.netlist_exporter import convert_json_to_netlist
-
-        RUST_NETLIST_AVAILABLE = False
-        defensive_logger.debug("RUST DEFENSIVE: Using KiCad netlist exporter fallback")
-
-    except ImportError:
-        # Final fallback to simple implementation
-        def convert_json_to_netlist(json_data, output_path):
-            """Simple netlist conversion for open source version."""
-            # Basic implementation that writes a simple netlist format
-            with open(output_path, "w") as f:
-                f.write("# Simple netlist format\n")
-                if "components" in json_data:
-                    for comp in json_data["components"]:
-                        f.write(f"# Component: {comp.get('ref', 'Unknown')}\n")
-                if "nets" in json_data:
-                    for net in json_data["nets"]:
-                        f.write(f"# Net: {net.get('name', 'Unknown')}\n")
-            return True
-
-        RUST_NETLIST_AVAILABLE = False
+    defensive_logger.error("Please ensure rust_netlist_processor is compiled with: maturin develop --release")
+    RUST_NETLIST_AVAILABLE = False
+    RUST_NETLIST_PROCESSOR = None
+    
+    # No fallback - require Rust implementation
+    def convert_json_to_netlist(json_data, output_path):
+        """Placeholder - Rust implementation required."""
+        raise CircuitSynthError("rust_netlist_processor not available - run: maturin develop --release")
 
 
 def convert_python_to_rust_format(circuit_data: dict) -> dict:
@@ -134,12 +119,10 @@ def convert_python_to_rust_format(circuit_data: dict) -> dict:
 
 def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
     """
-    Generate KiCad netlist with defensive Rust integration and comprehensive logging.
+    Generate KiCad netlist using Rust implementation with comprehensive logging.
 
-    This function implements the defensive integration pattern:
-    1. First tries Rust implementation for maximum performance
-    2. Falls back to Python implementation if Rust fails
-    3. Provides extensive logging for performance monitoring
+    This function uses the high-performance Rust netlist processor for maximum speed.
+    Python fallback has been removed since Rust implementation is stable and working.
 
     Args:
         circuit_data: Dictionary containing circuit data in Circuit-Synth format
@@ -148,7 +131,7 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
         str: Generated KiCad netlist content
 
     Raises:
-        CircuitSynthError: If both Rust and Python implementations fail
+        CircuitSynthError: If Rust implementation fails
     """
     import json
     import time
@@ -169,8 +152,11 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
         f"RUST DEFENSIVE: Nets count: {len(circuit_data.get('nets', {}))}"
     )
 
-    # First try Rust implementation if available
-    if RUST_NETLIST_AVAILABLE and RUST_NETLIST_PROCESSOR:
+    # Use Rust implementation (only option now - Python fallback removed)
+    if not RUST_NETLIST_AVAILABLE or not RUST_NETLIST_PROCESSOR:
+        raise CircuitSynthError("Rust netlist processor not available - ensure rust_netlist_processor is compiled")
+    
+    # Rust implementation (only option)
         defensive_logger.debug("RUST DEFENSIVE: Attempting Rust netlist generation")
 
         try:
@@ -206,56 +192,15 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
 
         except Exception as e:
             rust_duration = time.perf_counter() - rust_start
-            defensive_logger.warning(
-                f"RUST DEFENSIVE FALLBACK: Rust netlist generation failed after {rust_duration:.4f}s"
+            total_duration = time.perf_counter() - start_time
+            
+            defensive_logger.error(
+                f"❌ RUST NETLIST FAILURE: Rust netlist generation failed after {rust_duration:.4f}s"
             )
-            defensive_logger.warning(f"RUST DEFENSIVE ERROR: {type(e).__name__}: {e}")
-            defensive_logger.warning(
-                "RUST DEFENSIVE: Falling back to Python implementation"
-            )
+            defensive_logger.error(f"❌ RUST ERROR: {type(e).__name__}: {e}")
+            defensive_logger.error(f"❌ TOTAL TIME: {total_duration:.4f}s")
 
-    # Python fallback implementation
-    defensive_logger.debug(
-        "RUST DEFENSIVE FALLBACK: Using Python netlist implementation"
-    )
-
-    try:
-        python_start = time.perf_counter()
-
-        # Use the existing KiCad netlist exporter
-        from ..kicad.netlist_exporter import generate_netlist
-
-        netlist_result = generate_netlist(circuit_data)
-
-        python_duration = time.perf_counter() - python_start
-        total_duration = time.perf_counter() - start_time
-
-        defensive_logger.debug(
-            f"RUST DEFENSIVE PYTHON SUCCESS: Python netlist generation completed"
-        )
-        defensive_logger.debug(
-            f"RUST DEFENSIVE PYTHON PERFORMANCE: Python processing time: {python_duration:.4f}s"
-        )
-        defensive_logger.debug(
-            f"RUST DEFENSIVE PYTHON PERFORMANCE: Total time: {total_duration:.4f}s"
-        )
-        defensive_logger.debug(
-            f"RUST DEFENSIVE PYTHON RESULT: Generated {len(netlist_result)} characters"
-        )
-
-        return netlist_result
-
-    except Exception as e:
-        python_duration = time.perf_counter() - python_start
-        total_duration = time.perf_counter() - start_time
-
-        defensive_logger.error(
-            f"❌ RUST DEFENSIVE FAILURE: Python fallback also failed after {python_duration:.4f}s"
-        )
-        defensive_logger.error(f"❌ RUST DEFENSIVE ERROR: {type(e).__name__}: {e}")
-        defensive_logger.error(f"❌ RUST DEFENSIVE TOTAL TIME: {total_duration:.4f}s")
-
-        raise CircuitSynthError(f"Both Rust and Python netlist generation failed: {e}")
+            raise CircuitSynthError(f"Rust netlist generation failed: {e}")
 
 
 class NetlistExporter:

@@ -16,8 +16,9 @@ if [[ "$1" == "--clean" ]]; then
     echo "🧹 Clean build mode enabled"
 fi
 
-# Get the base directory
-BASE_DIR="/Users/shanemattner/Desktop/Circuit_Synth2/submodules/circuit-synth"
+# Get the base directory dynamically
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(dirname "$SCRIPT_DIR")"
 RUST_MODULES_DIR="$BASE_DIR/rust_modules"
 
 # Function to incrementally rebuild a Rust module
