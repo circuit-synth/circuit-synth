@@ -68,6 +68,17 @@ Based on previous analysis, expect to find:
   - Over-engineered abstractions
   - Legacy/experimental code
 
+## Interactive Regression Testing Guide
+After analysis completes, the tool provides **interactive guidance** for regression testing:
+
+1. **Cache Clearing**: Prompts to clear all caches for clean testing
+2. **Core Tests**: Guides through critical circuit generation tests
+3. **KiCad Verification**: Step-by-step KiCad integration testing
+4. **Component Intelligence**: Optional component search testing
+5. **Safety Decisions**: Advises whether it's safe to remove dead code
+
+The guide ensures you **never break core functionality** by validating everything works before code removal.
+
 ## Safety Notes
 - Creates backup files before modifying source code
 - Only adds logging statements, doesn't change logic

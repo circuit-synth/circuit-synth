@@ -3,14 +3,24 @@
 
 echo "🧹 Clearing all circuit-synth caches..."
 
-# 1. Main circuit_synth cache directory
-CACHE_DIR="$HOME/.cache/circuit_synth"
-if [ -d "$CACHE_DIR" ]; then
-    echo "  📁 Removing $CACHE_DIR"
-    rm -rf "$CACHE_DIR"
+# 1. Main circuit_synth cache directories
+MAIN_CACHE_DIR="$HOME/.cache/circuit_synth"
+ALT_CACHE_DIR="$HOME/.circuit-synth"
+
+if [ -d "$MAIN_CACHE_DIR" ]; then
+    echo "  📁 Removing $MAIN_CACHE_DIR"
+    rm -rf "$MAIN_CACHE_DIR"
     echo "     ✅ Removed main cache directory"
 else
     echo "     ℹ️  No main cache directory found"
+fi
+
+if [ -d "$ALT_CACHE_DIR" ]; then
+    echo "  📁 Removing $ALT_CACHE_DIR"
+    rm -rf "$ALT_CACHE_DIR"
+    echo "     ✅ Removed alternative cache directory"
+else
+    echo "     ℹ️  No alternative cache directory found"
 fi
 
 # 2. Remove any Python __pycache__ directories in the project
@@ -22,12 +32,23 @@ echo "     ✅ Removed Python cache files"
 echo "  📦 Clearing UV package caches (optional)"
 uv cache clean 2>/dev/null || echo "     ℹ️  UV cache clean not available"
 
-# 4. Remove any temporary files
-echo "  🗑️  Removing temporary files"
+# 4. Remove any temporary files and test outputs  
+echo "  🗑️  Removing temporary files and test outputs"
 find /tmp -name "*circuit*" -type f -user "$(whoami)" 2>/dev/null | head -5 | while read file; do
     echo "     Removing: $file"
     rm -f "$file"
 done
+
+# Clear test outputs in example project
+if [ -d "example_project/circuit-synth" ]; then
+    echo "  🧪 Clearing test outputs in example_project/"
+    rm -rf example_project/circuit-synth/ESP32_C6_Dev_Board/ 2>/dev/null || true
+    rm -f example_project/circuit-synth/*.json 2>/dev/null || true
+    rm -f example_project/circuit-synth/*.net 2>/dev/null || true
+    rm -f example_project/circuit-synth/*.log 2>/dev/null || true
+    rm -f example_project/circuit-synth/test_*.* 2>/dev/null || true
+    echo "     ✅ Cleared test outputs"
+fi
 
 # 5. Clear any environment variables that might affect caching
 echo "  🌍 Clearing cache environment variables"

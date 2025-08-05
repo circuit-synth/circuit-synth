@@ -311,6 +311,144 @@ class DeadCodeAnalyzer:
         print(f"✅ Report generated: {output_file}")
 
 
+def guide_regression_testing():
+    """Interactive guide for regression testing after dead code analysis."""
+    print("\n🎯 REGRESSION TESTING GUIDE")
+    print("=" * 50)
+    
+    # Step 1: Cache clearing
+    print("\n📋 STEP 1: CLEAR ALL CACHES (CRITICAL)")
+    print("Before testing, you MUST clear all caches to ensure clean testing:")
+    print()
+    print("   ./scripts/clear_all_caches.sh")
+    print("   # OR manually:")
+    print("   rm -rf ~/.cache/circuit_synth/")
+    print("   rm -rf ~/.circuit-synth/")
+    print("   find . -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true")
+    print("   rm -rf example_project/circuit-synth/ESP32_C6_Dev_Board/")
+    
+    input("\n⏸️  Press Enter when caches are cleared...")
+    
+    # Step 2: Core tests
+    print("\n📋 STEP 2: CORE CIRCUIT GENERATION (CRITICAL)")
+    print("These tests MUST pass - they verify fundamental functionality:")
+    print()
+    
+    core_tests = [
+        ("Basic circuit creation", "cd example_project/circuit-synth/ && uv run python -c \"from circuit_synth import *; @circuit\ndef test(): Component(symbol='Device:R', ref='R1'); print('✅ Basic circuit works'); test()\""),
+        ("Hierarchical example", "cd example_project/circuit-synth/ && uv run python main.py"),
+        ("Net connections", "cd example_project/circuit-synth/ && uv run python -c \"from circuit_synth import *; @circuit\ndef test(): r1=Component(symbol='Device:R',ref='R1'); r2=Component(symbol='Device:R',ref='R2'); vcc=Net('VCC'); r1[1]+=vcc; r2[1]+=vcc; print('✅ Nets work'); test()\""),
+    ]
+    
+    for i, (name, cmd) in enumerate(core_tests, 1):
+        print(f"\n🔍 Test 2.{i}: {name}")
+        print(f"Command: {cmd}")
+        
+        try:
+            response = input("   Run this test? (Y/n): ").strip().lower()
+            if response not in ('n', 'no'):
+                print("   📋 Run the command above, then report results:")
+                result = input("   Result (pass/fail/skip): ").strip().lower()
+                if result == 'fail':
+                    print("   ❌ CRITICAL TEST FAILED!")
+                    print("   🛑 DO NOT REMOVE DEAD CODE until this is fixed!")
+                    return
+                elif result == 'pass':
+                    print("   ✅ Test passed")
+                else:
+                    print("   ⏭️  Test skipped")
+        except KeyboardInterrupt:
+            print("\n⏭️  Skipping remaining tests")
+            return
+    
+    # Step 3: KiCad verification
+    print("\n📋 STEP 3: KICAD INTEGRATION VERIFICATION")
+    print("Manually verify KiCad project generation:")
+    print()
+    print("1. Open KiCad")
+    print("2. Open: example_project/circuit-synth/ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.kicad_pro")
+    print("3. Check schematic opens without errors")
+    print("4. Verify hierarchical sheets are present and navigable")
+    print("5. Open PCB and verify ratsnest connections appear")
+    print("6. Check for missing symbols or footprints")
+    
+    try:
+        kicad_result = input("\n📋 KiCad verification result (pass/fail/skip): ").strip().lower()
+        if kicad_result == 'fail':
+            print("❌ KiCad integration broken!")
+            print("🛑 DO NOT REMOVE DEAD CODE until KiCad works!")
+            return
+        elif kicad_result == 'pass':
+            print("✅ KiCad integration working")
+        else:
+            print("⏭️  KiCad verification skipped")
+    except KeyboardInterrupt:
+        print("\n⏭️  Skipping KiCad verification")
+        return
+    
+    # Step 4: Component intelligence
+    print("\n📋 STEP 4: COMPONENT INTELLIGENCE (OPTIONAL)")
+    print("Test component search and JLCPCB integration:")
+    
+    component_tests = [
+        ("Symbol search", "uv run python -c \"from circuit_synth.kicad.symbol_search import find_symbols; print(f'Found {len(find_symbols(\"STM32\"))} STM32 symbols')\""),
+        ("JLCPCB search", "uv run python -c \"from circuit_synth.manufacturing.jlcpcb import search_jlc_components_web; print(f'JLCPCB: {len(search_jlc_components_web(\"STM32G0\", max_results=3))} components')\""),
+    ]
+    
+    try:
+        response = input("\nRun component intelligence tests? (y/N): ").strip().lower()
+        if response in ('y', 'yes'):
+            for name, cmd in component_tests:
+                print(f"\n🧪 {name}:")
+                print(f"   {cmd}")
+                result = input("   Result (pass/fail/skip): ").strip().lower()
+                if result == 'fail':
+                    print("   ⚠️  Component intelligence may be affected")
+                elif result == 'pass':
+                    print("   ✅ Component test passed")
+    except KeyboardInterrupt:
+        print("\n⏭️  Skipping component tests")
+    
+    # Step 5: Summary and next steps
+    print("\n📋 STEP 5: REGRESSION TEST SUMMARY")
+    print("=" * 40)
+    
+    try:
+        overall_result = input("Overall test result (pass/fail): ").strip().lower()
+        
+        if overall_result == 'pass':
+            print("\n✅ REGRESSION TESTS PASSED!")
+            print("🟢 It's safe to proceed with dead code removal")
+            print()
+            print("📋 Recommended dead code removal process:")
+            print("1. Start with highest-impact dead modules (most functions, zero usage)")
+            print("2. Remove one module at a time")
+            print("3. Run core tests after each removal")
+            print("4. Commit changes incrementally")
+            print("5. Re-run dead code analysis to track progress")
+            print()
+            print("🎯 Focus on these high-impact targets first:")
+            print("   - Complete modules with 50+ unused functions")
+            print("   - Duplicate implementations (PCB, interface layers)")
+            print("   - Over-engineered abstractions with zero usage")
+            
+        else:
+            print("\n❌ REGRESSION TESTS FAILED!")
+            print("🛑 DO NOT REMOVE DEAD CODE YET!")
+            print()
+            print("🔧 Required actions:")
+            print("1. Fix failing tests first")
+            print("2. Ensure all core functionality works")
+            print("3. Re-run dead code analysis if needed")
+            print("4. Only remove dead code after all tests pass")
+    
+    except KeyboardInterrupt:
+        print("\n⏭️  Summary skipped")
+    
+    print(f"\n📚 Complete test documentation: docs/MANUAL_REGRESSION_TESTS.md")
+    print("🔄 Re-run this analysis anytime with: python scripts/dead-code-analysis.py")
+
+
 def main():
     """Main entry point for dead code analysis."""
     parser = argparse.ArgumentParser(description="Dead Code Analysis Tool")
@@ -398,6 +536,29 @@ def main():
         print(f"✅ Analysis complete!")
         print(f"📊 Results: {analysis['total_called']}/{analysis['total_instrumented']} functions called ({analysis['utilization']:.1f}% utilization)")
         print(f"📁 Files: {report_file}, {unique_file}, {log_file}")
+        
+        # Guide user through next steps
+        print(f"\n" + "="*60)
+        print("🧹 NEXT STEPS: MANUAL REGRESSION TESTING")
+        print("="*60)
+        
+        if analysis['dead_functions'] > 0:
+            print(f"⚠️  Found {analysis['dead_functions']:,} potentially dead functions!")
+            print(f"📖 Before removing any code, run comprehensive regression tests.")
+            print(f"📋 See docs/MANUAL_REGRESSION_TESTS.md for detailed procedures.")
+            print()
+            
+            # Interactive guide
+            try:
+                response = input("🤖 Would you like guidance for regression testing? (y/N): ").strip().lower()
+                if response in ('y', 'yes'):
+                    guide_regression_testing()
+            except KeyboardInterrupt:
+                print("\n⏭️  Skipping regression testing guidance")
+        else:
+            print("✅ No dead code detected - system appears to be efficiently utilized!")
+            
+        print(f"\n📚 Full regression test documentation: docs/MANUAL_REGRESSION_TESTS.md")
         
     except KeyboardInterrupt:
         print("\n❌ Analysis interrupted by user")
