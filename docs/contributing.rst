@@ -1,9 +1,8 @@
 Contributing
 ============
 
-Please see the `CONTRIBUTING.md <https://github.com/circuitsynth/circuit-synth/blob/main/CONTRIBUTING.md>`_ file in the repository for detailed contribution guidelines.
-
-This page provides a quick overview of the contribution process.
+.. note::
+   This page has been moved. Please see :doc:`CONTRIBUTING` for the full contribution guide.
 
 Development Setup
 -----------------

@@ -19,13 +19,41 @@ Circuit-Synth is an open-source Python library that fits seamlessly into normal 
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Getting Started:
 
    installation
    quickstart
-   api
    examples
-   contributing
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Architecture & Design:
+
+   ARCHITECTURE
+   JSON_SCHEMA
+   PROJECT_STRUCTURE
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API Reference:
+
+   api
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Development:
+
+   CONTRIBUTING
+   TESTING
+   RUST_PYPI_INTEGRATION
+   SCRIPT_REFERENCE
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Advanced Topics:
+
+   SIMULATION_SETUP
+   integration/CLAUDE_INTEGRATION
 
 Quick Start
 -----------
