@@ -4,11 +4,13 @@
 
 ## Usage
 ```bash
-/dev-release-pypi [version]
+/dev-release-pypi <version>
 ```
 
+**⚠️ CRITICAL: Version number is MANDATORY - command will fail if not provided!**
+
 ## Arguments
-- `version` - Version number (e.g., "0.2.0", "1.0.0-beta.1") - required
+- `version` - **REQUIRED** Version number (e.g., "0.2.0", "1.0.0-beta.1") - **MUST BE SPECIFIED**
 
 ## What This Does
 
@@ -41,10 +43,11 @@ This command handles the complete release process:
 - **Build documentation** - Generate fresh docs
 
 ### 5. Git Operations and Release Management
-- **Merge to main** - Switch to main and merge develop (if releasing from develop)
+- **Create GitHub PR** - Create PR to merge develop into main (if releasing from develop)
+- **Wait for PR merge** - Process pauses for manual PR review and merge
+- **Verify main branch** - Ensure we're on updated main branch for tagging
 - **Create release tag** - Tag main branch with version number
-- **Push main branch** - Push updated main to origin
-- **Push release tag** - Push tag to origin
+- **Push release tag** - Push tag to origin (main updated via PR merge)
 - **Create GitHub release** - Generate release notes and publish
 
 ### 6. PyPI Publication
@@ -58,6 +61,19 @@ The command runs these steps automatically:
 
 ### Pre-Release Checks and Branch Management
 ```bash
+# CRITICAL: Always require version number as parameter
+if [ -z "$1" ]; then
+    echo "❌ ERROR: Version number is required!"
+    echo "Usage: /dev-release-pypi <version>"
+    echo "Example: /dev-release-pypi 0.6.2"
+    echo "Example: /dev-release-pypi 0.7.0"
+    echo "Example: /dev-release-pypi 1.0.0-beta.1"
+    exit 1
+fi
+
+version="$1"
+echo "🎯 Starting release process for version: $version"
+
 # Fetch latest changes from remote
 echo "🔄 Fetching latest changes from origin..."
 git fetch origin
@@ -79,8 +95,22 @@ fi
 # Validate version format
 if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
     echo "❌ Invalid version format. Use semantic versioning (e.g., 1.0.0)"
+    echo "Provided: $version"
     exit 1
 fi
+
+# Show current version for comparison
+current_version=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+echo "📊 Current version: $current_version"
+echo "📊 New version: $version"
+echo ""
+read -p "🤔 Confirm release version $version? (y/N): " -n 1 -r
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then 
+    echo ""
+    echo "❌ Release cancelled. Please specify the correct version."
+    exit 1
+fi
+echo ""
 
 # Ensure develop is up-to-date with origin
 if [[ "$current_branch" == "develop" ]]; then
@@ -205,27 +235,89 @@ echo "📊 $coverage_result"
 echo "✅ All tests passed"
 ```
 
-### Git Merge, Tagging, and Release Management
+### Git Operations and Release PR Management
 ```bash
-# Merge to main branch (if releasing from develop)
+# Create GitHub PR to merge develop into main (if releasing from develop)
 if [[ "$current_branch" == "develop" ]]; then
-    echo "🔄 Merging develop to main..."
-    git checkout main
-    git merge develop --no-ff -m "🚀 Release $version: Merge develop to main"
+    echo "🔄 Creating GitHub PR to merge develop into main..."
     
-    echo "✅ Merged develop to main"
+    # Create PR using GitHub CLI
+    if command -v gh >/dev/null 2>&1; then
+        pr_title="🚀 Release v$version: Merge develop to main"
+        pr_body="## Release v$version
+
+### Summary
+This PR merges the develop branch into main for the v$version release.
+
+### Changes
+$(git log --pretty=format:"- %s (%h)" main..develop | head -10)
+
+### Pre-Release Checklist
+- [x] All tests passing
+- [x] Version updated to $version
+- [x] Core functionality validated
+- [x] Documentation updated
+
+### Post-Merge Actions
+After this PR is merged, the release process will:
+1. Tag main branch with v$version
+2. Build and publish to PyPI
+3. Create GitHub release with release notes
+
+**Ready for release!** 🚀"
+
+        echo "📝 Creating PR: $pr_title"
+        pr_url=$(gh pr create --title "$pr_title" --body "$pr_body" --base main --head develop)
+        
+        if [ $? -eq 0 ]; then
+            echo "✅ Created PR: $pr_url"
+            echo ""
+            echo "🔔 NEXT STEPS:"
+            echo "   1. Review and merge the PR: $pr_url"
+            echo "   2. Re-run this command after merge to complete the release"
+            echo ""
+            echo "⏸️  Release process paused - waiting for PR merge"
+            exit 0
+        else
+            echo "❌ Failed to create PR - falling back to manual merge"
+            echo "⚠️  Manual merge required:"
+            echo "   1. Create PR manually: develop → main"  
+            echo "   2. Merge the PR"
+            echo "   3. Re-run this command"
+            exit 1
+        fi
+    else
+        echo "❌ GitHub CLI (gh) not found"
+        echo "🔧 Install with: brew install gh"
+        echo ""
+        echo "⚠️  Manual steps required:"
+        echo "   1. Create PR manually: develop → main"
+        echo "   2. Merge the PR" 
+        echo "   3. Re-run this command from main branch"
+        exit 1
+    fi
+    
 elif [[ "$current_branch" != "main" ]]; then
     echo "⚠️  Warning: Not on main or develop branch"
-    echo "🔄 Switching to main for tagging..."
-    git checkout main
+    echo "🔄 For releases, use develop branch to create PR, or main branch to tag existing release"
+    exit 1
 fi
 
-# Ensure we're on main for tagging
+# If we're on main, proceed with tagging (assumes PR was already merged)
+echo "🔍 Verifying we're on main branch for release tagging..."
 current_branch_for_tag=$(git branch --show-current)
 if [[ "$current_branch_for_tag" != "main" ]]; then
     echo "❌ Must be on main branch for release tagging"
+    echo "💡 Switch to main branch and re-run this command"
     exit 1
 fi
+
+# Ensure main is up-to-date
+echo "🔄 Ensuring main branch is up-to-date..."
+git pull origin main || {
+    echo "❌ Failed to pull latest main branch"
+    exit 1
+}
 
 # Create release tag on main
 echo "🏷️  Creating release tag v$version on main..."
@@ -236,10 +328,12 @@ Features and changes in this release:
 
 Full changelog: https://github.com/circuit-synth/circuit-synth/compare/v$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo '0.0.0')...v$version"
 
-# Push main branch and tags
-echo "📤 Pushing main branch and tags to origin..."
-git push origin main
-git push origin "v$version"
+# Push tags to origin (main branch should already be pushed via PR merge)
+echo "📤 Pushing release tag to origin..."
+git push origin "v$version" || {
+    echo "❌ Failed to push release tag"
+    exit 1
+}
 
 echo "✅ Tagged and pushed v$version on main branch"
 ```
@@ -350,11 +444,34 @@ rm -rf "$temp_dir"
 
 ## Example Usage
 
+### Two-Step Release Process
+
+**Step 1: Create Release PR (from develop branch)**
+```bash
+# From develop branch - creates PR to merge into main
+/dev-release-pypi 0.7.0
+# → Creates GitHub PR: develop → main
+# → Process pauses for manual PR review/merge
+```
+
+**Step 2: Complete Release (from main branch after PR merge)**
+```bash
+# Switch to main branch and pull latest
+git checkout main && git pull origin main
+
+# Complete the release - tags and publishes
+/dev-release-pypi 0.7.0
+# → Tags main branch with v0.7.0
+# → Publishes to PyPI
+# → Creates GitHub release
+```
+
+### Version Examples
 ```bash
 # Release patch version
 /dev-release-pypi 0.1.1
 
-# Release minor version
+# Release minor version  
 /dev-release-pypi 0.2.0
 
 # Release beta version
@@ -407,10 +524,10 @@ gh auth status
 - **Test failures block** the release process
 - **Clean working directory** required
 - **Version format validation** ensures consistency
-- **Confirmation prompts** for non-standard branches
-- **Main branch synchronization** ensures proper Git workflow
-- **Automatic branch merging** from develop to main
-- **Release tagging** always happens on main branch
+- **GitHub PR workflow** ensures code review before main branch merge
+- **Manual merge approval** prevents accidental releases
+- **Main branch protection** - releases only happen on main after PR merge
+- **Release tagging** always happens on main branch after proper review
 
 ## What Gets Released
 
