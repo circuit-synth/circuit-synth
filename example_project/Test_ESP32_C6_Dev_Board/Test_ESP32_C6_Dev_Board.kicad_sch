@@ -1,0 +1,628 @@
+(kicad_sch
+	(version 20250114)
+	(generator "kicad_api")
+	(generator_version "9.0")
+	(uuid 98bc7cff-855f-4761-9d9d-fd625bbb7203)
+	(paper "A4")
+	(lib_symbols)
+	(title_block
+		(title ESP32_C6_Dev_Board_Main)
+		(date 2025-08-04)
+		(company Circuit-Synth)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 78.58 36.83 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 6bc05dfe-7ecb-4c8f-85c7-1d15e3039e1a)
+	)
+	(hierarchical_label
+		N$1
+		(shape input)
+		(at 78.58 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 9fd64c50-327e-4779-851f-2c5d041148fc)
+	)
+	(hierarchical_label
+		N$2
+		(shape input)
+		(at 78.58 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 58908c36-e4d5-401e-a250-3ba56821ab7d)
+	)
+	(hierarchical_label
+		USB_DM
+		(shape input)
+		(at 78.58 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 84b1f772-5487-407e-bc85-cd401226bbc8)
+	)
+	(hierarchical_label
+		USB_DP
+		(shape input)
+		(at 78.58 46.99 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid e2dd5319-4dd0-4bb8-b480-ba0e3031b750)
+	)
+	(hierarchical_label
+		VBUS
+		(shape input)
+		(at 78.58 49.53 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid e174662f-6d1d-4383-a0d1-1bd7e8c8908d)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 138.27 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid e1b0ea63-c05c-4721-b9b2-4f216304e0de)
+	)
+	(hierarchical_label
+		VBUS
+		(shape input)
+		(at 138.27 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 024efe57-0db8-4e6d-8753-026a32a49d1b)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 138.27 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid f654a8c3-b673-468f-8a79-8b94d62c0018)
+	)
+	(hierarchical_label
+		DEBUG_EN
+		(shape input)
+		(at 143.35 66.04 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid e15ca09f-03dd-4020-a345-799400744560)
+	)
+	(hierarchical_label
+		DEBUG_IO0
+		(shape input)
+		(at 143.35 68.58 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 51ef0af7-2891-41a6-ae30-87c325393d6f)
+	)
+	(hierarchical_label
+		DEBUG_RX
+		(shape input)
+		(at 143.35 71.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 3e8e85c3-53bf-4263-83de-0fe64e0a2e3c)
+	)
+	(hierarchical_label
+		DEBUG_TX
+		(shape input)
+		(at 143.35 73.66 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 9c719dff-ca25-4ead-9708-c6381120356a)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 143.35 76.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid c2ab2d04-9827-4d2f-a561-8c5ad4c527cb)
+	)
+	(hierarchical_label
+		LED_CONTROL
+		(shape input)
+		(at 143.35 78.74 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid f60ab221-ab95-47af-9fff-9052bdb3b9e3)
+	)
+	(hierarchical_label
+		USB_DM
+		(shape input)
+		(at 143.35 81.28 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 69cdb885-d7ba-4ba1-997e-aa2dcc9ffaf4)
+	)
+	(hierarchical_label
+		USB_DM_MCU
+		(shape input)
+		(at 143.35 83.82000000000001 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 230047e8-b755-4c57-9ce1-eb4b37448e2a)
+	)
+	(hierarchical_label
+		USB_DP
+		(shape input)
+		(at 143.35 86.36 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 67ea8ab8-1638-43b2-ba63-5ff1c8f62571)
+	)
+	(hierarchical_label
+		USB_DP_MCU
+		(shape input)
+		(at 143.35 88.9 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 685131a1-a25f-433d-b886-8842facd5e60)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 143.35 91.44 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 078b4bd1-3fce-4e9b-93ff-6c068554e342)
+	)
+	(sheet
+		(at 35.56 34.29)
+		(size 43.019999999999996 25.4)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 94cb9e95-bd62-4be0-90e6-15782aa475b8)
+		(property "Sheetname" "USB_Port"
+			(at 35.56 33.019999999999996 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "USB_Port.kicad_sch"
+			(at 35.56 60.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 77.31 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 3ce69345-4611-4ee9-a5e5-aceb23110819)
+		)
+		(pin
+			N$1
+			passive
+			(at 77.31 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid d64f28fd-1359-4b92-8bab-0b41b858f115)
+		)
+		(pin
+			N$2
+			passive
+			(at 77.31 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 165b5c19-2005-480f-847f-8a5197a390b4)
+		)
+		(pin
+			USB_DM
+			passive
+			(at 77.31 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 7721f918-a12e-4c16-bd9d-ebe40ea9cabd)
+		)
+		(pin
+			USB_DP
+			passive
+			(at 77.31 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid d269df64-163a-4644-b64c-d69a44f7c4dd)
+		)
+		(pin
+			VBUS
+			passive
+			(at 77.31 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 9ca2b9a1-42f5-463b-94e7-8ed451983f86)
+		)
+		(instances
+			(project "Test_ESP32_C6_Dev_Board"
+				(path "/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 93.98 36.83)
+		(size 44.29 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid c5ec768f-2177-4863-b730-b1788f2e1c69)
+		(property "Sheetname" "Power_Supply"
+			(at 93.98 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "Power_Supply.kicad_sch"
+			(at 93.98 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 137.0 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 94cb3105-7d6e-4096-b599-fa130e9e717a)
+		)
+		(pin
+			VBUS
+			passive
+			(at 137.0 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid e863a0ce-7292-4d47-9d56-08d28bf29a09)
+		)
+		(pin
+			VCC_3V3
+			passive
+			(at 137.0 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid cd24ed1b-2b75-4f96-8765-2273139c8bf7)
+		)
+		(instances
+			(project "Test_ESP32_C6_Dev_Board"
+				(path "/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 93.98 63.5)
+		(size 49.37 38.1)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid c4d1e793-0043-4fea-988a-e78c2ce1996a)
+		(property "Sheetname" "ESP32_C6_MCU"
+			(at 93.98 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "ESP32_C6_MCU.kicad_sch"
+			(at 93.98 102.86999999999999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			DEBUG_EN
+			passive
+			(at 142.07999999999998 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid ca2ee241-f27c-4482-80b6-1a4e4def4ab1)
+		)
+		(pin
+			DEBUG_IO0
+			passive
+			(at 142.07999999999998 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 255c1749-a427-4338-ba74-189dc6b1668f)
+		)
+		(pin
+			DEBUG_RX
+			passive
+			(at 142.07999999999998 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 114286f2-2f5e-42cf-89af-5f2a0fdaa475)
+		)
+		(pin
+			DEBUG_TX
+			passive
+			(at 142.07999999999998 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid eb9459b7-21b1-4512-b870-34c94099bc9a)
+		)
+		(pin
+			GND
+			passive
+			(at 142.07999999999998 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 65693eb2-43ff-4a3f-8201-e5f5455b304b)
+		)
+		(pin
+			LED_CONTROL
+			passive
+			(at 142.07999999999998 78.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid adf4211d-c4f9-4753-9ee8-085fb898e74e)
+		)
+		(pin
+			USB_DM
+			passive
+			(at 142.07999999999998 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid bc77a610-e4ec-487a-ac7f-876dd72dfc51)
+		)
+		(pin
+			USB_DM_MCU
+			passive
+			(at 142.07999999999998 83.82000000000001 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 9ad49af1-7861-4fe4-9993-2d514a790866)
+		)
+		(pin
+			USB_DP
+			passive
+			(at 142.07999999999998 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 759940db-8f87-4c86-8c77-33f3ef8d2bd3)
+		)
+		(pin
+			USB_DP_MCU
+			passive
+			(at 142.07999999999998 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid d9d26540-bdd7-4334-977a-9954eaf51d08)
+		)
+		(pin
+			VCC_3V3
+			passive
+			(at 142.07999999999998 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid dfc43760-b5d6-422a-86a2-95afbb0c48f3)
+		)
+		(instances
+			(project "Test_ESP32_C6_Dev_Board"
+				(path "/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/98bc7cff-855f-4761-9d9d-fd625bbb7203"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

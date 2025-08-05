@@ -844,3 +844,66 @@ usb_conn = Component(symbol="Connector:USB_C_Receptacle_USB2.0", ref="J", footpr
 - Check that all components have valid symbols and footprints
 - Verify net connections are complete (no unconnected pins)
 - Ensure reference designators are unique and follow conventions
+
+## PyPI Release Process
+
+**IMPORTANT: Clean repository before releasing to PyPI**
+
+The repository includes an automated release script that handles the complete PyPI release pipeline:
+
+```bash
+# Release to PyPI (from develop or main branch)
+./scripts/release_to_pypi.sh 0.5.1
+```
+
+### Pre-Release Checklist
+
+**1. Clean up test/temporary files:**
+The release script will check for and warn about files that shouldn't be in the main branch:
+- Top-level Python scripts (test_*.py, *_test.py, debug scripts)
+- Generated directories (*_generated/, *_reference/, *_Dev_Board/)
+- Temporary files (*.log, *.tmp, *.txt)
+- Debug/analysis files (*.md except README.md, CLAUDE.md, Contributors.md)
+
+**2. Ensure clean working directory:**
+```bash
+git status  # Should show no uncommitted changes
+```
+
+**3. Update from develop branch:**
+```bash
+git checkout develop
+git pull origin develop
+```
+
+### What the Release Script Does
+
+1. **Validates** version format and clean working directory
+2. **Checks** for test/temporary files that shouldn't be released
+3. **Updates** version in pyproject.toml and __init__.py
+4. **Runs** test suite to ensure everything works
+5. **Merges** develop → main (if releasing from develop)
+6. **Tags** the release with semantic version
+7. **Builds** source and wheel distributions
+8. **Cleans** build artifacts and caches
+9. **Uploads** to PyPI
+10. **Creates** GitHub release with changelog
+
+### Manual Cleanup (if needed)
+
+If you have test files in the top-level directory:
+```bash
+# Move test files to appropriate directories
+mv test_*.py tests/
+mv *_generated/ *_reference/ examples/testing/
+
+# Or remove if no longer needed
+rm -rf *_Dev_Board/ *.log *.tmp
+```
+
+### Post-Release
+
+After successful release:
+- Package available at: https://pypi.org/project/circuit-synth/
+- GitHub release created with changelog
+- Users can install with: `pip install circuit-synth==VERSION`

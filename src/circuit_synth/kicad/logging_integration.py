@@ -22,8 +22,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-# Import unified logging system
-from ..core.logging import (
+# Import minimal logging replacement
+from ..core.logging_minimal import (
     UserContext,
     context_logger,
     get_current_context,

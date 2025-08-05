@@ -32,6 +32,39 @@ if [ -n "$(git status --porcelain)" ]; then
     exit 1
 fi
 
+# Check for test/temporary files that shouldn't be in main
+echo -e "${BLUE}🔍 Checking for test/temporary files...${NC}"
+UNWANTED_FILES=$(find . -maxdepth 1 \( \
+    -name "*.py" -o \
+    -name "*.log" -o \
+    -name "*.tmp" -o \
+    -name "*.md" -o \
+    -name "*.txt" -o \
+    -name "test_*" -o \
+    -name "*_test.py" -o \
+    -name "*_generated" -o \
+    -name "*_reference" -o \
+    -type d -name "*_Dev_Board" -o \
+    -type d -name "*_generated" -o \
+    -type d -name "*_reference" \
+\) ! -path "./.git/*" ! -path "./.*" ! -name "README.md" ! -name "LICENSE" ! -name "CLAUDE.md" ! -name "Contributors.md" | grep -v "^\\./\\.")
+
+if [ -n "$UNWANTED_FILES" ]; then
+    echo -e "${YELLOW}⚠️  Found files/directories that may not belong in the main branch:${NC}"
+    echo "$UNWANTED_FILES" | head -20
+    if [ $(echo "$UNWANTED_FILES" | wc -l) -gt 20 ]; then
+        echo "... and $(( $(echo "$UNWANTED_FILES" | wc -l) - 20 )) more files"
+    fi
+    echo
+    read -p "These files appear to be test/temporary files. Continue anyway? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then 
+        echo -e "${RED}❌ Release cancelled. Please clean up test files first.${NC}"
+        echo -e "${BLUE}💡 Tip: Consider moving test files to tests/ or examples/ directories${NC}"
+        exit 1
+    fi
+fi
+
 # Validate version format
 if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
     echo -e "${RED}❌ Invalid version format. Use semantic versioning (e.g., 1.0.0)${NC}"
@@ -147,6 +180,16 @@ echo -e "\n${YELLOW}📦 Building and uploading to PyPI...${NC}"
 
 # Clean previous builds
 rm -rf dist/ build/ *.egg-info/
+
+# Additional cleanup of common temporary files
+echo -e "${BLUE}🧹 Cleaning up temporary build artifacts...${NC}"
+find . -type f -name "*.pyc" -delete 2>/dev/null || true
+find . -type f -name "*.pyo" -delete 2>/dev/null || true
+find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
+find . -type d -name ".mypy_cache" -exec rm -rf {} + 2>/dev/null || true
+find . -type d -name ".ruff_cache" -exec rm -rf {} + 2>/dev/null || true
+find . -type f -name ".DS_Store" -delete 2>/dev/null || true
 
 # Build distributions
 echo -e "${BLUE}🏗️  Building distributions...${NC}"
