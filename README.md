@@ -140,9 +140,208 @@ cd circuit-synth && uv run python main.py    # Generate KiCad files
 - **Documentation**: [docs.circuit-synth.com](https://docs.circuit-synth.com)
 - **Examples**: [github.com/circuit-synth/examples](https://github.com/circuit-synth/examples)
 
+## 🔧 Development Installation
+
+For contributing to circuit-synth or advanced usage:
+
+```bash
+# Clone repository
+git clone https://github.com/circuit-synth/circuit-synth.git
+cd circuit-synth
+
+# Development installation with uv (recommended)
+uv sync
+
+# Alternative: pip installation
+pip install -e ".[dev]"
+
+# Register AI agents for enhanced development
+uv run register-agents
+
+# Run tests to verify installation
+uv run pytest
+```
+
+## ⚙️ Rust Module Development
+
+Circuit-synth uses Rust backend for performance-critical operations. The Python package works without Rust modules using fallbacks.
+
+### Building Rust Modules
+
+```bash
+# Install Rust toolchain (if not installed)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Build all Rust modules
+./scripts/build_rust_modules.sh
+
+# Build specific module manually
+cd rust_modules/rust_netlist_processor
+cargo build --release
+maturin develop
+```
+
+### Testing Rust Integration
+
+```bash
+# Test all Rust modules
+./scripts/test_rust_modules.sh
+
+# Run comprehensive test suite
+./scripts/run_all_tests.sh
+
+# Test with verbose output
+./scripts/run_all_tests.sh --verbose
+```
+
+## 🧪 Testing & Quality Assurance
+
+```bash
+# Run full test suite
+./scripts/run_all_tests.sh
+
+# Python tests only
+uv run pytest --cov=circuit_synth
+
+# Rust tests only  
+./scripts/test_rust_modules.sh
+
+# Code formatting and linting
+black src/
+isort src/
+flake8 src/
+mypy src/
+
+# Run specific test file
+uv run pytest tests/unit/test_core_circuit.py -v
+```
+
+## 🔍 KiCad Integration Details
+
+### Prerequisites
+
+**KiCad 8.0+ Required:**
+```bash
+# macOS
+brew install kicad
+
+# Ubuntu/Debian  
+sudo apt install kicad
+
+# Windows: Download from kicad.org
+```
+
+### KiCad Plugin (Optional)
+
+Install the AI-powered KiCad plugin for direct Claude Code integration:
+
+```bash
+# Install KiCad plugins
+uv run cs-setup-kicad-plugins
+```
+
+**Usage:**
+- **PCB Editor**: Tools → External Plugins → "Circuit-Synth AI"  
+- **Schematic Editor**: Tools → Generate BOM → "Circuit-Synth AI"
+
+## 🛠️ Advanced Configuration
+
+### Environment Variables
+
+```bash
+# Optional performance settings
+export CIRCUIT_SYNTH_USE_RUST=true
+export CIRCUIT_SYNTH_PARALLEL_PROCESSING=true
+
+# KiCad path override (if needed)
+export KICAD_SYMBOL_DIR="/custom/path/to/symbols"
+export KICAD_FOOTPRINT_DIR="/custom/path/to/footprints"
+```
+
+### Component Database Configuration
+
+```bash
+# JLCPCB API configuration (optional)
+export JLCPCB_API_KEY="your_api_key"
+export JLCPCB_CACHE_DURATION=3600  # Cache for 1 hour
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**KiCad Symbol/Footprint Not Found:**
+```bash
+# Verify KiCad installation
+kicad-cli version
+
+# Search for symbols/footprints
+/find-symbol STM32
+/find-footprint LQFP64
+
+# Check library paths
+find /usr/share/kicad/symbols -name "*.kicad_sym" | head -5
+```
+
+**Rust Module Build Failures:**
+```bash
+# Install required tools
+pip install maturin
+cargo --version  # Verify Rust installation
+
+# Clean build
+cargo clean
+./scripts/build_rust_modules.sh
+```
+
+**AI Agent Issues:**
+```bash
+# Re-register agents
+uv run register-agents
+
+# Verify Claude Code integration
+claude --version  # Ensure Claude Code is installed
+```
+
+## 🏗️ Architecture Overview
+
+### Technical Stack
+- **Frontend**: Python 3.9+ with type hints
+- **Backend**: Rust modules for performance-critical operations
+- **KiCad Integration**: Direct file format support (.kicad_pro, .kicad_sch, .kicad_pcb)
+- **AI Integration**: Claude Code agents with specialized circuit design expertise
+
+### File Structure
+```
+circuit-synth/
+├── src/circuit_synth/           # Python package
+│   ├── core/                    # Core circuit representation
+│   ├── kicad/                   # KiCad file I/O
+│   ├── component_info/          # Component databases
+│   ├── manufacturing/           # JLCPCB, etc.
+│   └── simulation/              # SPICE integration
+├── rust_modules/                # Rust acceleration
+├── examples/                    # Usage examples
+├── tests/                       # Test suites
+└── scripts/                     # Build and development scripts
+```
+
 ## 🤝 Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+### Development Workflow
+1. **Fork repository** and create feature branch
+2. **Follow coding standards** (black, isort, mypy)
+3. **Add tests** for new functionality
+4. **Update documentation** as needed
+5. **Submit pull request** with clear description
+
+### Coding Standards
+- **Python**: Type hints, dataclasses, SOLID principles
+- **Rust**: Standard formatting with `cargo fmt`
+- **Documentation**: Clear docstrings and inline comments
+- **Testing**: Comprehensive test coverage for new features
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
