@@ -80,6 +80,7 @@ circuit.generate_kicad_project("power_supply")
 - **Hierarchical Design**: Modular subcircuits like software modules  
 - **Component Intelligence**: JLCPCB integration, symbol/footprint verification
 - **AI Acceleration**: Claude Code integration for automated design
+- **Test Plan Generation**: Automated test procedures for validation and manufacturing
 - **Version Control**: Git-friendly Python files vs binary KiCad
 
 ## 🔧 Advanced Features
@@ -187,7 +188,7 @@ cd circuit-synth && uv run python main.py  # Generate KiCad files
 Each generated project includes a complete organized AI assistant environment:
 
 ### **Agent Categories:**
-- **Circuit Design**: circuit-architect, circuit-synth, simulation-expert
+- **Circuit Design**: circuit-architect, circuit-synth, simulation-expert, test-plan-creator
 - **Development**: circuit_generation_agent, contributor, first_setup_agent  
 - **Manufacturing**: component-guru, jlc-parts-finder, stm32-mcu-finder
 
@@ -195,6 +196,7 @@ Each generated project includes a complete organized AI assistant environment:
 - **Circuit Design**: analyze-design, find-footprint, find-symbol, validate-existing-circuit
 - **Development**: dev-run-tests, dev-update-and-commit, dev-review-branch
 - **Manufacturing**: find-mcu, find_stm32
+- **Test Planning**: create-test-plan, generate-manufacturing-tests
 - **Setup**: setup-kicad-plugins, setup_circuit_synth
 
 ### 🧠 Critical: AI Agent Memory-Bank Usage

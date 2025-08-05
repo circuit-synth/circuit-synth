@@ -103,6 +103,10 @@ cs-setup-kicad-plugins = "circuit_synth.tools.setup_kicad_plugins:main"
 cs-memory-bank-init = "circuit_synth.memory_bank.cli:init_cli"
 cs-memory-bank-remove = "circuit_synth.memory_bank.cli:remove_cli"
 
+# Test Plan Generation
+create-test-plan = "circuit_synth.tools.test_plan_commands:create_test_plan"
+generate-manufacturing-tests = "circuit_synth.tools.test_plan_commands:generate_manufacturing_tests"
+
 # Plugin Management
 install-kicad-plugins = "install_kicad_plugins:main"
 
@@ -151,6 +155,7 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 markers = [
     "slow: marks tests as slow running tests",
+    "asyncio: marks tests as async/await tests",
     "integration: marks tests as integration tests",
     "functional: marks tests as functional tests",
     "cache: marks tests as cache-related tests",
