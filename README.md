@@ -137,12 +137,12 @@ cd circuit-synth && uv run python main.py    # Generate KiCad files
 ## 📚 Learn More
 
 - **Website**: [circuit-synth.com](https://www.circuit-synth.com)
-- **Documentation**: [docs.circuit-synth.com](https://docs.circuit-synth.com)
+- **Documentation**: [docs.circuit-synth.com](https://circuit-synth.readthedocs.io/en/latest/)
 - **Examples**: [github.com/circuit-synth/examples](https://github.com/circuit-synth/examples)
 
 ## 🤝 Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+See [Contributors.md](Contributors.md) for development setup and guidelines.
 
 ---
 
