@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version "9.0")
-	(uuid 4562a2f0-6907-42b4-ada0-889985212aee)
+	(uuid ae1f1597-dd63-4ecc-ad60-beeb9744b088)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:C"
@@ -13,7 +13,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "C"
+			(property "Reference" "{'value': 'C', 'position': {'x': 0.635, 'y': 2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -22,7 +22,7 @@
 					(hide no)
 				)
 			)
-			(property "Value" "C"
+			(property "Value" "{'value': 'C', 'position': {'x': 0.635, 'y': -2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -31,7 +31,7 @@
 					(hide no)
 				)
 			)
-			(property "Footprint" ""
+			(property "Footprint" "{'value': '', 'position': {'x': 0.9652, 'y': -3.81, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -40,7 +40,7 @@
 					(hide yes)
 				)
 			)
-			(property "Datasheet" "~"
+			(property "Datasheet" "{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -49,7 +49,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Unpolarized capacitor"
+			(property "Description" "{'value': 'Unpolarized capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -58,7 +58,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "cap capacitor"
+			(property "ki_keywords" "{'value': 'cap capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -67,7 +67,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "C_*"
+			(property "ki_fp_filters" "{'value': 'C_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -159,7 +159,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "U"
+			(property "Reference" "{'value': 'U', 'position': {'x': -3.81, 'y': 3.175, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -168,7 +168,7 @@
 					(hide no)
 				)
 			)
-			(property "Value" "AMS1117-3.3"
+			(property "Value" "{'value': 'AMS1117-3.3', 'position': {'x': 0.0, 'y': 3.175, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -177,7 +177,7 @@
 					(hide no)
 				)
 			)
-			(property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+			(property "Footprint" "{'value': 'Package_TO_SOT_SMD:SOT-223-3_TabPin2', 'position': {'x': 0.0, 'y': 5.08, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -186,7 +186,7 @@
 					(hide yes)
 				)
 			)
-			(property "Datasheet" "http://www.advanced-monolithic.com/pdf/ds1117.pdf"
+			(property "Datasheet" "{'value': 'http://www.advanced-monolithic.com/pdf/ds1117.pdf', 'position': {'x': 2.54, 'y': -6.35, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -195,7 +195,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"
+			(property "Description" "{'value': '1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -204,7 +204,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "linear regulator ldo fixed positive"
+			(property "ki_keywords" "{'value': 'linear regulator ldo fixed positive', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -213,7 +213,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "SOT?223*TabPin2*"
+			(property "ki_fp_filters" "{'value': 'SOT?223*TabPin2*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -319,7 +319,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid f3dcaec6-2494-4b6a-87a5-0072edd88671)
+		(uuid 72e86ee7-3e7f-4bc1-b4ce-4ce0913feaea)
 		(property "Reference" "U1"
 			(at 45.72 53.42 0)
 			(effects
@@ -340,7 +340,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/9fa42aba-f2c1-4499-ad02-53004eea53a7/252ca280-0d65-402d-88f2-8c495a3e5dd2"
+				(path "/56a2a6ad-09f9-40dd-ab0d-1de62705c5ee/98adda0e-e577-44fa-92a4-04ab00665f5a"
 					(reference "U1")
 					(unit 1)
 				)
@@ -356,7 +356,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 7d1db0a0-67eb-41b2-8108-5f9dab8653fe)
+		(uuid 8f5e0e0a-03e7-4eae-be6a-cc16fe50f837)
 		(property "Reference" "C2"
 			(at 71.12 53.42 0)
 			(effects
@@ -386,7 +386,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/9fa42aba-f2c1-4499-ad02-53004eea53a7/252ca280-0d65-402d-88f2-8c495a3e5dd2"
+				(path "/56a2a6ad-09f9-40dd-ab0d-1de62705c5ee/98adda0e-e577-44fa-92a4-04ab00665f5a"
 					(reference "C2")
 					(unit 1)
 				)
@@ -402,7 +402,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid cc017436-9888-4740-9300-0643d4f55add)
+		(uuid ef96c02b-b9de-4eea-8656-99dd3f38f6d2)
 		(property "Reference" "C3"
 			(at 91.44 53.42 0)
 			(effects
@@ -432,7 +432,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/9fa42aba-f2c1-4499-ad02-53004eea53a7/252ca280-0d65-402d-88f2-8c495a3e5dd2"
+				(path "/56a2a6ad-09f9-40dd-ab0d-1de62705c5ee/98adda0e-e577-44fa-92a4-04ab00665f5a"
 					(reference "C3")
 					(unit 1)
 				)
@@ -449,7 +449,7 @@
 			)
 			(justify right)
 		)
-		(uuid addbc9eb-c640-4720-96c5-2b67b42d057b)
+		(uuid 36af8f22-1128-4137-b585-d9eed6f79ddf)
 	)
 	(hierarchical_label
 		VBUS
@@ -461,7 +461,7 @@
 			)
 			(justify right)
 		)
-		(uuid 994ba14b-c711-4d75-a20b-7f608f38b5ac)
+		(uuid 4aef2e7a-177a-41bd-8ef3-7ed8a99e2494)
 	)
 	(hierarchical_label
 		VBUS
@@ -473,7 +473,7 @@
 			)
 			(justify left)
 		)
-		(uuid d2ee1065-88f9-491e-9edc-68619abdc2bc)
+		(uuid 8e7fc988-a676-45df-86a4-4fed62462e42)
 	)
 	(hierarchical_label
 		GND
@@ -485,7 +485,7 @@
 			)
 			(justify right)
 		)
-		(uuid ba74f053-bf94-48c4-97a7-3dea9773b457)
+		(uuid 665ee28d-6319-4af4-95d8-25f88b37c162)
 	)
 	(hierarchical_label
 		GND
@@ -497,7 +497,7 @@
 			)
 			(justify right)
 		)
-		(uuid 8a4e8e8a-8c1f-400a-a0cc-6e28f4cd1499)
+		(uuid 364289c3-6302-4595-a1d6-3469d4ff8308)
 	)
 	(hierarchical_label
 		GND
@@ -509,7 +509,7 @@
 			)
 			(justify right)
 		)
-		(uuid c6d0ab53-e33c-441e-bf6c-8dfbf9f776eb)
+		(uuid 318a6763-f6b6-4f9c-aac3-dbc6a00b0509)
 	)
 	(hierarchical_label
 		GND
@@ -521,7 +521,7 @@
 			)
 			(justify right)
 		)
-		(uuid 1bb0b019-af31-43e6-b410-5a183567c94b)
+		(uuid 81714f62-2a4b-4559-bb6b-22bae18e8afe)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -533,7 +533,7 @@
 			)
 			(justify left)
 		)
-		(uuid e45fa5c7-76f1-481f-9d17-a914101ab8f3)
+		(uuid e3bd4262-6466-49b3-82da-f20f232b2ed8)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -545,7 +545,7 @@
 			)
 			(justify left)
 		)
-		(uuid e42c97ce-d70c-42fe-8ca2-3cd1417a944c)
+		(uuid d4195510-5dd5-408c-aee2-4163a750e42b)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -557,7 +557,7 @@
 			)
 			(justify left)
 		)
-		(uuid 29481138-6904-47e3-ad36-53eeea515a98)
+		(uuid a0e216f3-b988-4986-b8f2-c013ea3236fb)
 	)
 	(text_box
 		"5V to 3.3V power regulation subcircuit"
@@ -590,10 +590,10 @@
 			)
 			(justify left top)
 		)
-		(uuid 0705eb36-5bfe-4fd9-95f2-3754b97ea32f)
+		(uuid 338e7297-823b-495d-8086-383c9867bee3)
 	)
 	(sheet_instances
-		(path "/9fa42aba-f2c1-4499-ad02-53004eea53a7/252ca280-0d65-402d-88f2-8c495a3e5dd2"
+		(path "/56a2a6ad-09f9-40dd-ab0d-1de62705c5ee/98adda0e-e577-44fa-92a4-04ab00665f5a"
 			(page "1")
 		)
 	)
