@@ -117,17 +117,6 @@ my_circuit_project/
 └── pyproject.toml           # Project dependencies
 ```
 
-## ⚡ Performance (Optional)
-
-Circuit-synth includes optional Rust acceleration modules. The package works perfectly without them using Python fallbacks.
-
-**To enable Rust acceleration:**
-
-```bash
-# For developers who want maximum performance
-pip install maturin
-./scripts/build_rust_modules.sh
-```
 
 ## 🚀 Commands
 
