@@ -1,3 +1,9 @@
+---
+name: circuit-generation-agent
+description: Specialized agent for generating complete circuit-synth Python code
+tools: "*"
+---
+
 # Circuit Generation Agent
 
 ## Purpose

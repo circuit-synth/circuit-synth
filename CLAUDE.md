@@ -845,6 +845,41 @@ usb_conn = Component(symbol="Connector:USB_C_Receptacle_USB2.0", ref="J", footpr
 - Verify net connections are complete (no unconnected pins)
 - Ensure reference designators are unique and follow conventions
 
+## JSON-Centric Architecture
+
+Circuit-synth uses **JSON as the canonical intermediate representation** for all circuit data. This is critical to understand:
+
+### Data Flow
+```
+Python Circuit Code ←→ JSON (Central Format) ←→ KiCad Files
+```
+
+- **Python → JSON**: `circuit.to_dict()` or `circuit.generate_json_netlist()`
+- **JSON → KiCad**: Internal JSON processing generates .kicad_* files
+- **KiCad → JSON**: Parser extracts circuit structure to JSON format
+- **JSON → Python**: `json_to_python_project` generates Python code
+
+### Key Points
+1. **Hierarchical circuits are stored as nested JSON** with subcircuits preserved
+2. **Round-trip conversion is lossless** - no information lost in any direction
+3. **JSON is the single source of truth** - all conversions go through JSON
+4. **One JSON format** - consistent structure for all operations
+
+### Working with JSON
+```python
+# Export circuit to JSON
+circuit.generate_json_netlist("my_circuit.json")
+
+# Load circuit from JSON
+from circuit_synth.io import load_circuit_from_json_file
+circuit = load_circuit_from_json_file("my_circuit.json")
+
+# KiCad generation uses JSON internally
+circuit.generate_kicad_project("my_project")  # Creates temp JSON, then KiCad files
+```
+
+For detailed architecture information, see `docs/ARCHITECTURE.md`.
+
 ## PyPI Release Process
 
 **IMPORTANT: Clean repository before releasing to PyPI**

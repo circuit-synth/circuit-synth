@@ -424,6 +424,7 @@ class SchematicGenerator(IKiCadIntegration):
 
         # Import here to avoid circular dependencies
         from circuit_synth.kicad_api.schematic.sync_adapter import SyncAdapter
+        from circuit_synth.kicad_api.schematic.hierarchical_synchronizer import HierarchicalSynchronizer
 
         # Load circuit from JSON using the same loader as generate
         logger.debug(f"Loading circuit from {json_file}")
@@ -437,15 +438,32 @@ class SchematicGenerator(IKiCadIntegration):
         # Get project path
         project_path = self.project_dir / f"{self.project_name}.kicad_pro"
 
-        # Create synchronizer
-        logger.debug(f"Creating synchronizer for project: {project_path}")
-        synchronizer = SyncAdapter(
-            project_path=str(project_path), preserve_user_components=True
-        )
+        # Check if this is a hierarchical project
+        has_subcircuits = bool(sub_dict)
+        
+        if has_subcircuits:
+            # Use hierarchical synchronizer for projects with subcircuits
+            logger.debug(f"Creating hierarchical synchronizer for project: {project_path}")
+            logger.info(f"Detected hierarchical project with {len(sub_dict)} subcircuits")
+            synchronizer = HierarchicalSynchronizer(
+                project_path=str(project_path), preserve_user_components=True
+            )
+            # Show hierarchy info
+            logger.info(synchronizer.get_hierarchy_info())
+        else:
+            # Use regular synchronizer for flat projects
+            logger.debug(f"Creating synchronizer for flat project: {project_path}")
+            synchronizer = SyncAdapter(
+                project_path=str(project_path), preserve_user_components=True
+            )
 
         # Perform synchronization
         logger.debug("Starting synchronization...")
-        sync_report = synchronizer.sync_with_circuit(top_circuit)
+        if has_subcircuits:
+            # Pass subcircuit dictionary for hierarchical sync
+            sync_report = synchronizer.sync_with_circuit(top_circuit, sub_dict)
+        else:
+            sync_report = synchronizer.sync_with_circuit(top_circuit)
 
         # Add bounding boxes if requested
         if draw_bounding_boxes:
@@ -535,14 +553,34 @@ class SchematicGenerator(IKiCadIntegration):
         """Display synchronization results to user"""
         logger.info("\n=== Project Update Summary ===")
 
-        summary = sync_report.get("summary", {})
-        logger.info(f"✓ Components matched: {summary.get('matched', 0)}")
-        logger.info(f"✓ Components added: {summary.get('added', 0)}")
-        logger.info(f"✓ Components modified: {summary.get('modified', 0)}")
-        logger.info(f"✓ Components preserved: {summary.get('preserved', 0)}")
+        # Check if this is a hierarchical report
+        if 'sheets_synchronized' in sync_report:
+            # Hierarchical project report
+            logger.info(f"✓ Sheets synchronized: {sync_report.get('sheets_synchronized', 0)}")
+            logger.info(f"✓ Total components matched: {sync_report.get('total_matched', 0)}")
+            logger.info(f"✓ Total components added: {sync_report.get('total_added', 0)}")
+            logger.info(f"✓ Total components modified: {sync_report.get('total_modified', 0)}")
+            logger.info(f"✓ Total components preserved: {sync_report.get('total_preserved', 0)}")
+            
+            # Show per-sheet details if available
+            sheet_reports = sync_report.get('sheet_reports', {})
+            if sheet_reports:
+                logger.info("\n=== Per-Sheet Summary ===")
+                for sheet_path, sheet_report in sheet_reports.items():
+                    logger.info(f"  {sheet_path}:")
+                    logger.info(f"    Matched: {sheet_report.get('matched', 0)}, "
+                               f"Added: {sheet_report.get('added', 0)}, "
+                               f"Modified: {sheet_report.get('modified', 0)}")
+        else:
+            # Regular flat project report
+            summary = sync_report.get("summary", {})
+            logger.info(f"✓ Components matched: {summary.get('matched', 0)}")
+            logger.info(f"✓ Components added: {summary.get('added', 0)}")
+            logger.info(f"✓ Components modified: {summary.get('modified', 0)}")
+            logger.info(f"✓ Components preserved: {summary.get('preserved', 0)}")
 
-        if summary.get("removed", 0) > 0:
-            logger.info(f"✓ Components removed: {summary.get('removed', 0)}")
+            if summary.get("removed", 0) > 0:
+                logger.info(f"✓ Components removed: {summary.get('removed', 0)}")
 
         logger.info("✓ All manual work preserved!")
         logger.info(f"\nProject updated successfully at: {self.project_dir}")
