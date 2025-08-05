@@ -10,12 +10,15 @@ import math
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Tuple
 
-from circuit_synth.kicad_api.pcb.placement.base import BoundingBox
-from circuit_synth.kicad_api.pcb.placement.courtyard_collision import (
-    CourtyardCollisionDetector,
-    Polygon,
-)
-from circuit_synth.kicad_api.pcb.types import Footprint, Point
+from circuit_synth.pcb.types import Footprint, Point
+# Using simplified placement - removed complex courtyard collision for now
+from typing import NamedTuple
+
+class BoundingBox(NamedTuple):
+    x: float
+    y: float
+    width: float
+    height: float
 
 
 @dataclass
