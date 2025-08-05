@@ -172,9 +172,15 @@ class SExpressionParser:
                 # Page values must always be quoted
                 if in_page:
                     return '"' + sexp + '"'
-                # Property values must always be quoted
+                # Property values must always be quoted and properly escaped
                 if in_property_value:
-                    return '"' + sexp + '"'
+                    # Properly escape backslashes, quotes, and newlines for KiCad format
+                    escaped = (
+                        sexp.replace("\\", "\\\\")
+                        .replace('"', '\\"')
+                        .replace("\n", "\\n")
+                    )
+                    return '"' + escaped + '"'
                 # Generator values must always be quoted
                 if in_generator:
                     return '"' + sexp + '"'
