@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version "9.0")
-	(uuid 80838269-37d4-4f8e-8f2c-15ddf0d422c8)
+	(uuid 45673ad7-778d-4cc5-9d0f-b25451e1ae16)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:C"
@@ -319,7 +319,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid d7bd32b7-e8f4-4dd3-bee7-e4b68e98d567)
+		(uuid 96678cbc-4313-4ce6-9234-14c53f8b5b5c)
 		(property "Reference" "U1"
 			(at 45.72 53.42 0)
 			(effects
@@ -340,7 +340,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/89e2227d-633e-4c13-a983-9f5e0122e9c9/4d90dd7f-1144-4cec-bed0-f42cf7d5d229"
+				(path "/e6bb0540-277a-441c-bbe7-6cfffecc0740/6a72e9ef-f70a-4e15-a9cf-636f0fb5a033"
 					(reference "U1")
 					(unit 1)
 				)
@@ -356,7 +356,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 23daea73-7be3-44a3-8cca-2176cffc82e2)
+		(uuid 0b6b0039-5265-44f3-9c45-d5cc3fbb8def)
 		(property "Reference" "C2"
 			(at 71.12 53.42 0)
 			(effects
@@ -386,7 +386,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/89e2227d-633e-4c13-a983-9f5e0122e9c9/4d90dd7f-1144-4cec-bed0-f42cf7d5d229"
+				(path "/e6bb0540-277a-441c-bbe7-6cfffecc0740/6a72e9ef-f70a-4e15-a9cf-636f0fb5a033"
 					(reference "C2")
 					(unit 1)
 				)
@@ -402,7 +402,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 78021f89-a88a-4e15-a3c0-f064f50255c9)
+		(uuid 1846250e-134b-4eee-9693-db8f4db2c2cd)
 		(property "Reference" "C3"
 			(at 91.44 53.42 0)
 			(effects
@@ -432,7 +432,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/89e2227d-633e-4c13-a983-9f5e0122e9c9/4d90dd7f-1144-4cec-bed0-f42cf7d5d229"
+				(path "/e6bb0540-277a-441c-bbe7-6cfffecc0740/6a72e9ef-f70a-4e15-a9cf-636f0fb5a033"
 					(reference "C3")
 					(unit 1)
 				)
@@ -449,7 +449,7 @@
 			)
 			(justify right)
 		)
-		(uuid a1dff13b-8f35-477d-a802-c232fed0d9f8)
+		(uuid 81168421-b698-45c3-ad47-395fd952968a)
 	)
 	(hierarchical_label
 		VBUS
@@ -461,7 +461,7 @@
 			)
 			(justify right)
 		)
-		(uuid 7b537a6a-a394-4625-85b8-8f89fa1dd434)
+		(uuid 280b60cf-9bb5-460b-aeb1-42623eb728ec)
 	)
 	(hierarchical_label
 		VBUS
@@ -473,7 +473,7 @@
 			)
 			(justify left)
 		)
-		(uuid 0971dc45-5dab-415b-8b87-462d877ece37)
+		(uuid 3c25b18f-dfc5-45a4-995b-59bf0d2039a7)
 	)
 	(hierarchical_label
 		GND
@@ -485,7 +485,7 @@
 			)
 			(justify right)
 		)
-		(uuid f4e52121-411e-4fad-bc95-bb5db7f8f6d8)
+		(uuid 97a37924-0f1f-40df-a5b9-a6d4e7d51635)
 	)
 	(hierarchical_label
 		GND
@@ -497,7 +497,7 @@
 			)
 			(justify right)
 		)
-		(uuid e1a3c427-0aeb-4488-80dd-e469d04eb6c3)
+		(uuid f7a1255c-f35b-44b3-bb71-930c27d963cc)
 	)
 	(hierarchical_label
 		GND
@@ -509,7 +509,7 @@
 			)
 			(justify right)
 		)
-		(uuid 95d2dd43-1abc-4122-aa47-66d8ee075326)
+		(uuid 6829c207-4227-4245-83f2-0aa70173d7e8)
 	)
 	(hierarchical_label
 		GND
@@ -521,7 +521,7 @@
 			)
 			(justify right)
 		)
-		(uuid 59cb7060-bd4b-4180-b733-d9055d485792)
+		(uuid 2d7d68d0-4916-4e4e-8da3-3858f1161e87)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -533,7 +533,7 @@
 			)
 			(justify left)
 		)
-		(uuid 388cb655-db0d-497e-91cb-fc35dea13c7d)
+		(uuid 6ade75ae-35cf-44aa-819d-3a5c21373ee4)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -545,7 +545,7 @@
 			)
 			(justify left)
 		)
-		(uuid c1770e05-8d92-4c68-9397-8b704f1fd85b)
+		(uuid 69789b26-3e8f-4c27-b1c6-c417e68a2869)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -557,7 +557,7 @@
 			)
 			(justify left)
 		)
-		(uuid fda1e3a4-a7bb-4257-8fb3-11032d882756)
+		(uuid 7493ca9e-ebfc-42ab-9c24-ea41955c099f)
 	)
 	(text_box
 		"5V to 3.3V power regulation subcircuit"
@@ -590,10 +590,10 @@
 			)
 			(justify left top)
 		)
-		(uuid e8add9de-edb5-4dc5-a650-11e9f1ca44bd)
+		(uuid 9dd63c7e-0289-4332-a2d5-ccc15a832bdf)
 	)
 	(sheet_instances
-		(path "/89e2227d-633e-4c13-a983-9f5e0122e9c9/4d90dd7f-1144-4cec-bed0-f42cf7d5d229"
+		(path "/e6bb0540-277a-441c-bbe7-6cfffecc0740/6a72e9ef-f70a-4e15-a9cf-636f0fb5a033"
 			(page "1")
 		)
 	)

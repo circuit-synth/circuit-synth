@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version "9.0")
-	(uuid 89e2227d-633e-4c13-a983-9f5e0122e9c9)
+	(uuid e6bb0540-277a-441c-bbe7-6cfffecc0740)
 	(paper "A4")
 	(lib_symbols)
 	(title_block
@@ -20,7 +20,7 @@
 			)
 			(justify left)
 		)
-		(uuid c0e333be-17f8-4b43-81fa-b2504ee59153)
+		(uuid d156c4dc-68cc-4fb2-882b-7b055b2349ef)
 	)
 	(hierarchical_label
 		N$1
@@ -32,7 +32,7 @@
 			)
 			(justify left)
 		)
-		(uuid 94dcf572-3fbf-4178-bcb8-a42b6b2c5247)
+		(uuid 222c1831-e480-4768-b54c-934991ca4a56)
 	)
 	(hierarchical_label
 		N$2
@@ -44,7 +44,7 @@
 			)
 			(justify left)
 		)
-		(uuid 8f59583a-f458-4cc7-a92c-ce0d949d9565)
+		(uuid 60db2241-45b9-4ec5-971d-ab07f66fe54a)
 	)
 	(hierarchical_label
 		USB_DM
@@ -56,7 +56,7 @@
 			)
 			(justify left)
 		)
-		(uuid 50d9c0da-4b0c-4cf5-bf3a-1755eb5d3091)
+		(uuid 45d60df3-f802-47a0-9291-8a170b4f1b62)
 	)
 	(hierarchical_label
 		USB_DP
@@ -68,7 +68,7 @@
 			)
 			(justify left)
 		)
-		(uuid 39dbae03-b880-4ddb-b8a0-dc786812341a)
+		(uuid ae7f4976-5a3c-48f2-9bd4-d9ae7ccde5ac)
 	)
 	(hierarchical_label
 		VBUS
@@ -80,7 +80,7 @@
 			)
 			(justify left)
 		)
-		(uuid 8f05a9c3-3bae-46aa-9b03-f1251cef86a9)
+		(uuid b18088d7-6114-4849-b3a3-1f3f7f3bb140)
 	)
 	(hierarchical_label
 		GND
@@ -92,7 +92,7 @@
 			)
 			(justify left)
 		)
-		(uuid c25ef279-df72-456f-aa03-d386dc87cb87)
+		(uuid 20f26d41-31c4-4d6c-8d59-40ad059f480d)
 	)
 	(hierarchical_label
 		VBUS
@@ -104,7 +104,7 @@
 			)
 			(justify left)
 		)
-		(uuid cb99f7b6-0858-44d8-81c5-7a6fa15ae633)
+		(uuid 37924d20-86b8-48f1-8831-b6e804fc958f)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -116,7 +116,7 @@
 			)
 			(justify left)
 		)
-		(uuid 49d1dade-dfd3-4606-bd6d-573ae8ecba80)
+		(uuid 3af9c8ea-ad2a-48a8-85da-54cdc6ef427c)
 	)
 	(hierarchical_label
 		DEBUG_EN
@@ -128,7 +128,7 @@
 			)
 			(justify left)
 		)
-		(uuid aea7a89a-72f3-47c2-af59-dafe9ed3e7f6)
+		(uuid 6644b78a-9d24-4e8f-9163-167a19fc360d)
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -140,7 +140,7 @@
 			)
 			(justify left)
 		)
-		(uuid 087e4b1f-4dad-4d04-a627-fa166c1d6477)
+		(uuid 19460d97-4583-4f19-a618-bd70f79bab63)
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -152,7 +152,7 @@
 			)
 			(justify left)
 		)
-		(uuid 1ffa5944-5a41-4988-9ceb-dbacb20d3377)
+		(uuid cded3ba8-4b62-4eea-8c0d-6ca575f473f7)
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -164,7 +164,7 @@
 			)
 			(justify left)
 		)
-		(uuid 70933756-7c14-4283-a452-ed1c38231fe8)
+		(uuid 932ba4d5-0f44-481a-a78a-1abd7b60bd30)
 	)
 	(hierarchical_label
 		GND
@@ -176,7 +176,7 @@
 			)
 			(justify left)
 		)
-		(uuid e576e875-0eda-4b59-867a-c6ee195ecf0a)
+		(uuid ec390b5e-4069-404a-b46c-40815a3d03a2)
 	)
 	(hierarchical_label
 		LED_CONTROL
@@ -188,7 +188,7 @@
 			)
 			(justify left)
 		)
-		(uuid 6b56d4f5-cc83-4982-aecf-695a978070d2)
+		(uuid f5cccfb4-229e-4adf-a143-989582a0b80f)
 	)
 	(hierarchical_label
 		USB_DM
@@ -200,7 +200,7 @@
 			)
 			(justify left)
 		)
-		(uuid 91236932-6213-400c-ad29-a98e09a2b227)
+		(uuid 94e4fec0-a796-4932-9ac6-627e757022c3)
 	)
 	(hierarchical_label
 		USB_DM_MCU
@@ -212,7 +212,7 @@
 			)
 			(justify left)
 		)
-		(uuid 7f661446-e12b-4978-9ced-e95e39a221e0)
+		(uuid 52a17112-2c53-4c7f-9e25-7372e7d656e1)
 	)
 	(hierarchical_label
 		USB_DP
@@ -224,7 +224,7 @@
 			)
 			(justify left)
 		)
-		(uuid c90e78c6-660b-4c69-a656-928c745fcc47)
+		(uuid 2091f6cf-9516-4bc7-9362-b7bca9b13282)
 	)
 	(hierarchical_label
 		USB_DP_MCU
@@ -236,7 +236,7 @@
 			)
 			(justify left)
 		)
-		(uuid 07d59596-af99-42f6-8788-95948017fc3c)
+		(uuid 47752068-a27e-4b0e-82b2-9f3d637dde18)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -248,7 +248,7 @@
 			)
 			(justify left)
 		)
-		(uuid d92f0886-5fa9-4299-84bb-ddb46815d222)
+		(uuid 7d8419d9-49f1-414f-8730-c5fbe7ca6e58)
 	)
 	(sheet
 		(at 35.56 34.29)
@@ -265,7 +265,7 @@
 				0.0
 			)
 		)
-		(uuid 812ace70-9605-4fac-9a13-e6cf57bc9d67)
+		(uuid 012803ac-34c4-4f5b-8481-861124809ad1)
 		(property "Sheetname" "USB_Port"
 			(at 35.56 33.019999999999996 0)
 			(effects
@@ -295,7 +295,7 @@
 				)
 				(justify right)
 			)
-			(uuid fc4bf4c8-1a71-4cdc-9435-0c8410b625bc)
+			(uuid de26b503-aa9b-4354-8791-10bbd8aa57ea)
 		)
 		(pin
 			N$1
@@ -307,7 +307,7 @@
 				)
 				(justify right)
 			)
-			(uuid c4739fac-f686-4ea3-8ae1-56fa33895741)
+			(uuid 452cf884-f789-4d96-a14a-863c61bb73f6)
 		)
 		(pin
 			N$2
@@ -319,7 +319,7 @@
 				)
 				(justify right)
 			)
-			(uuid a3ec0ddd-2689-493a-833e-09881338a2a3)
+			(uuid bbfd999a-4d87-4ac3-a6dd-dafa50653913)
 		)
 		(pin
 			USB_DM
@@ -331,7 +331,7 @@
 				)
 				(justify right)
 			)
-			(uuid 4a43df7c-7004-48cd-8062-3588f21c2f36)
+			(uuid 18ab4bab-9556-483f-9b12-b15d3873c57f)
 		)
 		(pin
 			USB_DP
@@ -343,7 +343,7 @@
 				)
 				(justify right)
 			)
-			(uuid 393a53d6-74b7-40fd-b39c-e190877fbbc8)
+			(uuid 95bbe2b5-0897-4a41-903c-0288ad0077db)
 		)
 		(pin
 			VBUS
@@ -355,7 +355,7 @@
 				)
 				(justify right)
 			)
-			(uuid c5ab7ab1-714b-473e-aec1-8f9c486df1f3)
+			(uuid bba5d7c1-2d19-443f-9725-7382c5b86b0d)
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
@@ -380,7 +380,7 @@
 				0.0
 			)
 		)
-		(uuid 4d90dd7f-1144-4cec-bed0-f42cf7d5d229)
+		(uuid 6a72e9ef-f70a-4e15-a9cf-636f0fb5a033)
 		(property "Sheetname" "Power_Supply"
 			(at 93.98 35.559999999999995 0)
 			(effects
@@ -410,7 +410,7 @@
 				)
 				(justify right)
 			)
-			(uuid 51c07042-4cec-40b3-ab30-03f07e806b67)
+			(uuid 9bc3e504-90d3-4f6d-8f8f-4e717c2a7aeb)
 		)
 		(pin
 			VBUS
@@ -422,7 +422,7 @@
 				)
 				(justify right)
 			)
-			(uuid 0d385996-dfd7-4dc7-91bb-dd9eaca4aef3)
+			(uuid aa0137d2-372d-4d4a-bb80-592cc75c95e7)
 		)
 		(pin
 			VCC_3V3
@@ -434,7 +434,7 @@
 				)
 				(justify right)
 			)
-			(uuid b79ac3b2-4aec-4800-b658-46382a69ee07)
+			(uuid 64a1691d-c74d-4488-85ed-7566523fe2de)
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
@@ -459,7 +459,7 @@
 				0.0
 			)
 		)
-		(uuid 79337bfd-cc13-4a34-a338-337827218834)
+		(uuid 922a6d15-afc8-4e4c-b55f-54e47f59fa9f)
 		(property "Sheetname" "ESP32_C6_MCU"
 			(at 93.98 62.23 0)
 			(effects
@@ -489,7 +489,7 @@
 				)
 				(justify right)
 			)
-			(uuid 10c054f0-0f9f-4247-adb5-9752d452d949)
+			(uuid 55adfb3c-c8e5-4042-a26d-90d057f53865)
 		)
 		(pin
 			DEBUG_IO0
@@ -501,7 +501,7 @@
 				)
 				(justify right)
 			)
-			(uuid 404cf722-2d19-4c4a-9bae-167dd1be93c9)
+			(uuid 21768f49-76f0-4881-a064-d52a818f947a)
 		)
 		(pin
 			DEBUG_RX
@@ -513,7 +513,7 @@
 				)
 				(justify right)
 			)
-			(uuid 42661fd0-a085-4f3e-9454-723d8234c79a)
+			(uuid 0cd664f1-c9fc-4cb3-a776-c26df4033259)
 		)
 		(pin
 			DEBUG_TX
@@ -525,7 +525,7 @@
 				)
 				(justify right)
 			)
-			(uuid d4ad2836-cc0a-44e3-bc06-aee1704a4707)
+			(uuid dd581218-1935-47df-9a54-c0198cb25d84)
 		)
 		(pin
 			GND
@@ -537,7 +537,7 @@
 				)
 				(justify right)
 			)
-			(uuid 6ceb5203-4465-4072-8fc1-4965a0b615d8)
+			(uuid 8856d122-ed1b-4225-a64d-0d7fe38d9e23)
 		)
 		(pin
 			LED_CONTROL
@@ -549,7 +549,7 @@
 				)
 				(justify right)
 			)
-			(uuid 5ceaba05-7089-4ad2-ad95-ce14a3787593)
+			(uuid 1e29fc31-33ef-4dac-acf2-01565602ee44)
 		)
 		(pin
 			USB_DM
@@ -561,7 +561,7 @@
 				)
 				(justify right)
 			)
-			(uuid 3617a88e-5cfa-4e26-a3aa-ad6790090525)
+			(uuid 85d0d764-42b4-43f1-9238-e0ed85ce6200)
 		)
 		(pin
 			USB_DM_MCU
@@ -573,7 +573,7 @@
 				)
 				(justify right)
 			)
-			(uuid f0ef0119-4798-4706-bf1d-d6f581f46f3b)
+			(uuid 9f7216d2-d5d9-4100-90a8-2fbc3d99b8ba)
 		)
 		(pin
 			USB_DP
@@ -585,7 +585,7 @@
 				)
 				(justify right)
 			)
-			(uuid bd7f8c1a-b2b0-4484-bc1e-5f88c8e4014a)
+			(uuid 544cd711-bf0c-4fb8-85dd-b236688567ce)
 		)
 		(pin
 			USB_DP_MCU
@@ -597,7 +597,7 @@
 				)
 				(justify right)
 			)
-			(uuid f0cdc41e-afbe-4610-b2c2-ba859bd776bd)
+			(uuid 165f7996-25c7-4231-b839-c1dcb34f0431)
 		)
 		(pin
 			VCC_3V3
@@ -609,7 +609,7 @@
 				)
 				(justify right)
 			)
-			(uuid d6ae3521-36f3-41ea-8a6a-8630be60036b)
+			(uuid 1c11690f-651f-46da-a0b2-5cbfcfdbc8f3)
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
@@ -650,10 +650,10 @@
 			)
 			(justify left top)
 		)
-		(uuid 9ae67f89-719a-4c13-abf8-2f06823d8aa3)
+		(uuid a88c1802-8eb2-4c09-8527-d1bb3091b88c)
 	)
 	(sheet_instances
-		(path "/89e2227d-633e-4c13-a983-9f5e0122e9c9"
+		(path "/e6bb0540-277a-441c-bbe7-6cfffecc0740"
 			(page "1")
 		)
 	)
