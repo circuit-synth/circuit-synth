@@ -18,7 +18,7 @@ cd my_circuit_project
 uv add circuit-synth
 
 # Setup complete project template
-uv run cs-new-project
+uv run cs-new-pcb
 
 # Generate complete KiCad project  
 uv run python circuit-synth/main.py

@@ -7,20 +7,24 @@ from .connection_centric import ConnectionCentricPlacement
 from .connectivity_driven import ConnectivityDrivenPlacer
 from .hierarchical_placement import HierarchicalPlacer
 
-# Use Rust implementation for force-directed placement (Python fallback removed)
-from rust_force_directed_placement import (
-    ForceDirectedPlacer as RustForceDirectedPlacer,
-)
-
-# Create compatibility wrapper
-ForceDirectedPlacer = RustForceDirectedPlacer
+# Use Rust implementation for force-directed placement with Python fallback
+try:
+    from rust_force_directed_placement import (
+        ForceDirectedPlacer as RustForceDirectedPlacer,
+    )
+    ForceDirectedPlacer = RustForceDirectedPlacer
+    PCB_RUST_PLACEMENT_AVAILABLE = True
+except ImportError:
+    # Python fallback for placement
+    from .force_directed import ForceDirectedPlacer
+    PCB_RUST_PLACEMENT_AVAILABLE = False
 
 def apply_force_directed_placement(*args, **kwargs):
-    """Compatibility wrapper for Rust force-directed placement."""
-    placer = RustForceDirectedPlacer()
+    """Compatibility wrapper for force-directed placement with fallback."""
+    placer = ForceDirectedPlacer()
     return placer.place(*args, **kwargs)
 
-RUST_PLACEMENT_AVAILABLE = True  # Always true now
+RUST_PLACEMENT_AVAILABLE = PCB_RUST_PLACEMENT_AVAILABLE
 
 __all__ = [
     "ComponentWrapper",
