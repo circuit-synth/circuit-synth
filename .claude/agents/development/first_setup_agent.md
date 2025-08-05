@@ -1,3 +1,9 @@
+---
+name: first-setup-agent
+description: Comprehensive setup agent for circuit-synth development environment
+tools: "*"
+---
+
 # Circuit-Synth First Setup Agent
 
 ## Purpose
