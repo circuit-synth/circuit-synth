@@ -790,54 +790,7 @@ class SchematicWriter:
             child_circ = self.all_subcircuits[sub_name]
 
             # Get all net names for this subcircuit to create sheet pins
-            # For hierarchical sheets, we need to include both internal nets AND
-            # the parameters passed to the subcircuit function
             pin_list = sorted([n.name for n in child_circ.nets])
-            
-            # CRITICAL FIX: Also include the parameters from child circuit instances
-            # For subcircuits that only contain other subcircuits (no components),
-            # the parameters won't show up as nets, so we need to extract them from
-            # the instance connections
-            if hasattr(child_info, 'instance_nets') and child_info.get('instance_nets'):
-                # If instance_nets mapping is available, use it
-                instance_nets = child_info['instance_nets']
-                for param_name, net_name in instance_nets.items():
-                    if net_name not in pin_list:
-                        pin_list.append(net_name)
-                pin_list = sorted(pin_list)
-            elif len(child_circ.components) == 0 and len(child_circ.child_instances) > 0:
-                # This is a hierarchical sheet with only subcircuits
-                # We need to infer the parameters from the parent circuit's nets
-                # that connect to this subcircuit instance
-                logger.debug(f"Subcircuit '{sub_name}' has no components, checking parent connections")
-                
-                # Look for nets in the parent circuit that might connect to this instance
-                # This is a heuristic approach - ideally we'd have explicit parameter info
-                parent_nets = set()
-                for net in self.circuit.nets:
-                    # Add all parent nets as potential connections
-                    # In a more sophisticated implementation, we'd track which nets
-                    # actually connect to this specific subcircuit instance
-                    parent_nets.add(net.name)
-                
-                # For now, use common signal names that are likely to be hierarchical connections
-                common_hierarchical_signals = ['VCC', 'GND', 'VIN', 'VOUT', 'INPUT', 'OUTPUT', 
-                                             'FILTERED', 'PROCESSED', 'V_MONITOR']
-                for signal in common_hierarchical_signals:
-                    if signal in parent_nets and signal not in pin_list:
-                        pin_list.append(signal)
-                
-                # Also check the subcircuit's child instances to infer parameters
-                for child_inst in child_circ.child_instances:
-                    child_sub = self.all_subcircuits.get(child_inst['sub_name'])
-                    if child_sub:
-                        # Add any nets from child subcircuits that might be parameters
-                        for net in child_sub.nets:
-                            if net.name not in pin_list and net.name in parent_nets:
-                                pin_list.append(net.name)
-                
-                pin_list = sorted(pin_list)
-                logger.info(f"Inferred hierarchical pins for '{sub_name}': {pin_list}")
 
             # Use pre-calculated position and size
             cx = child_info.get("x", 50.0)
