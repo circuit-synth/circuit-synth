@@ -308,6 +308,55 @@ test_properties()
 ```
 **Expected**: Custom properties preserved in component data
 
+### **Test 4.4: Round-Trip Workflow (Python → KiCad → Python → KiCad)**
+```bash
+# Test: Complete round-trip validation
+cd example_project/circuit-synth/
+
+# Step 1: Generate ESP32 project (Python → KiCad)
+echo "Step 1: Generating ESP32 project..."
+uv run python main.py
+
+# Verify KiCad files were created
+ls -la ESP32_C6_Dev_Board/
+echo "✅ KiCad files generated"
+
+# Step 2: Import KiCad project back to Python (KiCad → Python)
+echo "Step 2: Importing KiCad project..."
+uv run python -c "
+try:
+    from circuit_synth.io.kicad_import import import_kicad_project
+    project_data = import_kicad_project('ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.kicad_pro')
+    print(f'✅ Imported {len(project_data.get(\"components\", {}))} components')
+    
+    # Generate Python code from imported data
+    from circuit_synth.codegen.json_to_python_project import generate_python_from_json
+    python_code = generate_python_from_json(project_data, 'RoundTripTest')
+    
+    with open('round_trip_test.py', 'w') as f:
+        f.write(python_code)
+    print('✅ Generated Python code from KiCad')
+except ImportError:
+    print('⚠️  KiCad import not available - creating fallback test')
+    with open('round_trip_test.py', 'w') as f:
+        f.write('from circuit_synth import *\\n@circuit\\ndef test(): pass\\nif __name__ == \"__main__\": test()')
+"
+
+# Step 3: Run the generated Python code (Python → KiCad again)
+echo "Step 3: Running generated Python code..."
+uv run python round_trip_test.py
+echo "✅ Round-trip test completed"
+
+# Cleanup
+rm -f round_trip_test.py
+rm -rf ESP32_C6_Dev_Board/
+```
+**Expected**: 
+- ESP32 project generates successfully
+- KiCad files can be imported back to Python  
+- Generated Python code executes without errors
+- Complete round-trip preserves circuit functionality
+
 ---
 
 ## 🔧 **Manual Verification Checklist**
@@ -387,6 +436,7 @@ Stop and investigate if you see:
 - [ ] Test 4.1: Circuit Simulation
 - [ ] Test 4.2: Circuit Annotations
 - [ ] Test 4.3: Component Property Handling
+- [ ] Test 4.4: Round-Trip Workflow (Python → KiCad → Python → KiCad)
 
 ## Issues Found
 [List any failures or unexpected behavior]

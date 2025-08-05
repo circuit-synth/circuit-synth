@@ -28,9 +28,9 @@ class PythonCodeGenerator:
         """Generate the circuit.generate_kicad_netlist() and circuit.generate_kicad_project() calls"""
         if self.project_name:
             project_name = f"{self.project_name}_generated"
-            return f'    # Generate KiCad netlist (required for ratsnest display)\n    circuit.generate_kicad_netlist("{project_name}/{project_name}.net")\n    circuit.generate_kicad_project(project_name="{project_name}")'
+            return f'    # Generate KiCad project (creates directory)\n    circuit.generate_kicad_project(project_name="{project_name}")\n    # Generate KiCad netlist (required for ratsnest display)\n    circuit.generate_kicad_netlist("{project_name}/{project_name}.net")'
         else:
-            return "    # Generate KiCad netlist (required for ratsnest display)\n    circuit.generate_kicad_netlist()\n    circuit.generate_kicad_project()"
+            return "    # Generate KiCad project\n    circuit.generate_kicad_project()\n    # Generate KiCad netlist (required for ratsnest display)\n    circuit.generate_kicad_netlist()"
 
     def _sanitize_variable_name(self, name: str) -> str:
         """

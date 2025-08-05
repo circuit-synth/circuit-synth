@@ -73,9 +73,26 @@ def simple_circuit():
 class TestValidatedCircuitGenerator:
     """Test the integrated circuit generator."""
     
-    @pytest.mark.asyncio
-    async def test_generator_integration(self):
+    def test_generator_integration(self):
         """Test that the generator integrates validation properly."""
         # This would test the full integration
         # Implementation depends on how we mock the base agent
-        pass
+        # For now, just verify the validation functions are importable and callable
+        
+        # Test that we can import and call the validation functions
+        from circuit_synth.validation import validate_and_improve_circuit, get_circuit_design_context
+        
+        # Test basic functionality
+        simple_code = '''
+from circuit_synth import Component
+resistor = Component("Device:R", "R")
+'''
+        result_code, is_valid, status = validate_and_improve_circuit(simple_code)
+        assert isinstance(result_code, str)
+        assert isinstance(is_valid, bool)
+        assert isinstance(status, str)
+        
+        # Test context generation
+        context = get_circuit_design_context("general")
+        assert isinstance(context, str)
+        assert len(context) > 0
