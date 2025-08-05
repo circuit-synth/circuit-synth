@@ -32,13 +32,8 @@ This creates an ESP32-C6 development board with USB-C, power regulation, program
 from circuit_synth import *
 
 @circuit(name="Power_Supply")
-def usb_to_3v3():
-    """USB-C to 3.3V regulation"""
-    
-    # Define nets
-    vbus_in = Net('VBUS_IN')
-    vcc_3v3_out = Net('VCC_3V3_OUT') 
-    gnd = Net('GND')
+def power_supply(vbus_in, vcc_3v3_out, gnd):
+    """5V to 3.3V power regulation subcircuit"""
     
     # Components with KiCad integration
     regulator = Component(
@@ -47,12 +42,15 @@ def usb_to_3v3():
         footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
     )
     
-    cap_in = Component(symbol="Device:C", ref="C", value="10uF")
-    cap_out = Component(symbol="Device:C", ref="C", value="22uF")
+    # Input/output capacitors
+    cap_in = Component(symbol="Device:C", ref="C", value="10uF",
+                      footprint="Capacitor_SMD:C_0805_2012Metric")
+    cap_out = Component(symbol="Device:C", ref="C", value="22uF",
+                       footprint="Capacitor_SMD:C_0805_2012Metric")
     
     # Explicit connections
-    regulator["VI"] += vbus_in
-    regulator["VO"] += vcc_3v3_out
+    regulator["VI"] += vbus_in    # Input pin
+    regulator["VO"] += vcc_3v3_out # Output pin
     regulator["GND"] += gnd
     
     cap_in[1] += vbus_in
@@ -60,9 +58,22 @@ def usb_to_3v3():
     cap_out[1] += vcc_3v3_out
     cap_out[2] += gnd
 
+@circuit(name="Main_Circuit")
+def main_circuit():
+    """Complete circuit with hierarchical design"""
+    
+    # Create shared nets
+    vbus = Net('VBUS')
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    
+    # Use the power supply subcircuit
+    power_circuit = power_supply(vbus, vcc_3v3, gnd)
+
 # Generate KiCad project
-circuit = usb_to_3v3()
-circuit.generate_kicad_project("power_supply")
+if __name__ == "__main__":
+    circuit = main_circuit()
+    circuit.generate_kicad_project("my_board")
 ```
 
 ## 🔧 Core Features
@@ -89,16 +100,21 @@ Work with Claude Code to describe circuits and get production-ready results:
 ```
 my_circuit_project/
 ├── circuit-synth/
-│   ├── main.py              # Main circuit definition
-│   ├── power_supply.py      # Modular subcircuits
-│   ├── usb.py
-│   └── esp32c6.py
-├── MyProject/               # Generated KiCad files
-│   ├── MyProject.kicad_pro
-│   ├── MyProject.kicad_sch
-│   └── MyProject.kicad_pcb
-├── memory-bank/             # Auto-documentation
-└── .claude/                 # AI agent config
+│   ├── main.py              # ESP32-C6 dev board (hierarchical)
+│   ├── power_supply.py      # 5V→3.3V regulation
+│   ├── usb.py               # USB-C with CC resistors
+│   ├── esp32c6.py           # ESP32-C6 microcontroller
+│   ├── debug_header.py      # Programming interface
+│   ├── led_blinker.py       # Status LED control
+│   └── ESP32_C6_Dev_Board.json  # Generated netlist
+├── ESP32_C6_Dev_Board/      # Generated KiCad files
+│   ├── ESP32_C6_Dev_Board.kicad_pro
+│   ├── ESP32_C6_Dev_Board.kicad_sch
+│   ├── ESP32_C6_Dev_Board.kicad_pcb
+│   └── ESP32_C6_Dev_Board.net
+├── README.md                # Project guide
+├── CLAUDE.md                # AI assistant instructions
+└── pyproject.toml           # Project dependencies
 ```
 
 ## ⚡ Performance (Optional)
@@ -120,8 +136,8 @@ pip install maturin
 cs-new-project              # Complete project setup
 cs-new-pcb "Board Name"     # PCB-focused project
 
-# Development  
-cd circuit-synth && uv run python main.py    # Generate KiCad files
+# Generate KiCad files
+cd circuit-synth && uv run python main.py    # Creates complete ESP32-C6 dev board
 ```
 
 ## 🏭 Why Circuit-Synth?
