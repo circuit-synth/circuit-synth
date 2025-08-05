@@ -1,0 +1,26 @@
+{
+  "name": "main_circuit",
+  "description": "Main circuit that ties everything together",
+  "tstamps": "/main_circuit-4382048576/",
+  "source_file": "main_circuit.kicad_sch",
+  "components": {
+    "J1": {
+      "symbol": "Connector:Barrel_Jack_Switch",
+      "ref": "J1",
+      "value": "",
+      "footprint": "Connector_BarrelJack:BarrelJack_Horizontal",
+      "datasheet": "~",
+      "description": "DC Barrel Jack with an internal switch",
+      "properties": {
+        "ki_fp_filters": "BarrelJack*"
+      },
+      "tstamps": "",
+      "_extra_fields": {
+        "ki_fp_filters": "BarrelJack*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "number": "1",
+          "func": 
