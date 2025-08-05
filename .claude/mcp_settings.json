@@ -9,6 +9,10 @@
       "description": "SPICE simulation and circuit validation specialist",
       "file": "agents/circuit-design/simulation-expert.md"
     },
+    "test-plan-creator": {
+      "description": "Circuit test plan generation and validation specialist",
+      "file": "agents/test-plan-creator.md"
+    },
     "contributor": {
       "description": "Circuit-synth contributor onboarding and development assistant",
       "file": "agents/development/contributor.md"

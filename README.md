@@ -82,6 +82,7 @@ if __name__ == "__main__":
 - **Hierarchical Design**: Modular subcircuits like software modules  
 - **Component Intelligence**: JLCPCB integration, symbol/footprint verification
 - **AI Integration**: Claude Code agents for automated design assistance
+- **Test Plan Generation**: Automated test procedures for validation and manufacturing
 - **Version Control Friendly**: Git-trackable Python files vs binary KiCad files
 
 ## 🤖 AI-Powered Design
@@ -129,6 +130,11 @@ Circuit-synth includes specialized AI agents for different aspects of circuit de
 - **Expertise**: Technical research, documentation analysis, multi-step problem solving
 - **Example**: *"Research best practices for EMI reduction in switching power supplies"*
 
+#### **test-plan-creator** - Test Plan Generation and Validation
+- **Use for**: Creating comprehensive test procedures for circuit validation
+- **Expertise**: Functional, performance, safety, and manufacturing test plans
+- **Example**: *"Generate test plan for ESP32 dev board with power measurements"*
+
 ### Using Agents Effectively
 
 ```bash
@@ -146,6 +152,18 @@ Circuit-synth includes specialized AI agents for different aspects of circuit de
 ```
 
 **Pro Tip**: Let the **circuit-architect** coordinate complex projects - it will automatically delegate to other specialists as needed!
+
+### **Agent Categories:**
+- **Circuit Design**: circuit-architect, circuit-synth, simulation-expert, test-plan-creator
+- **Development**: circuit_generation_agent, contributor, first_setup_agent  
+- **Manufacturing**: component-guru, jlc-parts-finder, stm32-mcu-finder
+
+### **Command Categories:**
+- **Circuit Design**: analyze-design, find-footprint, find-symbol, validate-existing-circuit
+- **Development**: dev-run-tests, dev-update-and-commit, dev-review-branch
+- **Manufacturing**: find-mcu, find_stm32
+- **Test Planning**: create-test-plan, generate-manufacturing-tests
+- **Setup**: setup-kicad-plugins, setup_circuit_synth
 
 ## 🚀 Commands
 
