@@ -47,6 +47,11 @@ except ImportError as e:
         try:
             # Import the Python netlist exporter
             from ..kicad.netlist_exporter import generate_netlist
+            from pathlib import Path
+            
+            # Ensure output directory exists
+            output_file = Path(output_path)
+            output_file.parent.mkdir(parents=True, exist_ok=True)
             
             # Read the JSON file
             with open(json_file_path, 'r') as f:
