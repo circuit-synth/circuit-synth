@@ -95,6 +95,93 @@ Work with Claude Code to describe circuits and get production-ready results:
 /generate-validated-circuit "ESP32 IoT sensor" mcu
 ```
 
+### 🤖 Claude Code Agents
+
+Circuit-synth includes specialized AI agents for different aspects of circuit design. Each agent has deep expertise in their domain:
+
+#### **circuit-architect** - Master Circuit Design Coordinator
+- **Use for**: Complex multi-component designs, system-level architecture
+- **Expertise**: Circuit topology planning, component selection, design trade-offs
+- **Example**: *"Design a complete IoT sensor node with power management, wireless connectivity, and sensor interfaces"*
+
+#### **circuit-synth** - Circuit Code Generation Specialist  
+- **Use for**: Converting natural language to working Python circuit code
+- **Expertise**: circuit-synth syntax, KiCad integration, hierarchical design patterns
+- **Example**: *"Generate Python code for a USB-C PD trigger circuit with 20V output"*
+
+#### **simulation-expert** - SPICE Simulation and Circuit Validation
+- **Use for**: Circuit analysis, performance optimization, validation
+- **Expertise**: SPICE simulation setup, component modeling, performance analysis
+- **Example**: *"Simulate this amplifier circuit and optimize for 40dB gain with <100mW power"*
+
+#### **component-guru** - Manufacturing and Component Sourcing
+- **Use for**: Component selection, manufacturing optimization, sourcing alternatives
+- **Expertise**: JLCPCB availability, component specifications, manufacturing constraints
+- **Example**: *"Find alternative op-amps for this design that are in stock at JLCPCB"*
+
+#### **jlc-parts-finder** - JLCPCB Component Intelligence
+- **Use for**: Real-time component availability, pricing, and alternatives
+- **Expertise**: JLCPCB catalog search, stock levels, KiCad symbol verification
+- **Example**: *"Find STM32 with 3 SPIs available on JLCPCB under $5"*
+
+#### **general-purpose** - Research and Analysis
+- **Use for**: Open-ended research, codebase analysis, complex searches
+- **Expertise**: Technical research, documentation analysis, multi-step problem solving
+- **Example**: *"Research best practices for EMI reduction in switching power supplies"*
+
+### Using Agents Effectively
+
+```bash
+# Start with circuit-architect for complex projects
+"Design an ESP32-based environmental monitoring station"
+
+# Use circuit-synth for code generation
+"Generate circuit-synth code for the power supply section"
+
+# Validate with simulation-expert
+"Simulate this buck converter and verify 3.3V output ripple"
+
+# Optimize with component-guru
+"Replace expensive components with JLCPCB alternatives"
+```
+
+**Pro Tip**: Let the **circuit-architect** coordinate complex projects - it will automatically delegate to other specialists as needed!
+
+## 🚀 Commands
+
+### Project Creation
+```bash
+cs-new-project              # Complete project setup with ESP32-C6 example
+cs-new-pcb "Board Name"     # PCB-focused project template
+```
+
+### Circuit Generation
+```bash
+cd circuit-synth && uv run python main.py    # Generate KiCad files from Python code
+```
+
+### Claude Code Slash Commands
+Available when working with Claude Code in a circuit-synth project:
+
+```bash
+# Component Search
+/find-symbol STM32              # Search KiCad symbol libraries
+/find-footprint LQFP64          # Search KiCad footprint libraries
+/find-component "op-amp"        # Search for components with specifications
+
+# Circuit Generation
+/generate-validated-circuit "ESP32 IoT sensor" mcu    # AI circuit generation
+/validate-existing-circuit                            # Validate current code
+
+# Component Intelligence  
+/find-stm32 "3 SPIs, USB, available JLCPCB"          # STM32-specific search
+/jlc-search "voltage regulator 3.3V"                 # JLCPCB component search
+
+# Development (for contributors)
+/dev-run-tests                  # Run comprehensive test suite
+/dev-update-and-commit "msg"    # Update docs and commit changes
+```
+
 ## 📋 Project Structure
 
 ```
@@ -117,17 +204,6 @@ my_circuit_project/
 └── pyproject.toml           # Project dependencies
 ```
 
-
-## 🚀 Commands
-
-```bash
-# Project creation
-cs-new-project              # Complete project setup
-cs-new-pcb "Board Name"     # PCB-focused project
-
-# Generate KiCad files
-cd circuit-synth && uv run python main.py    # Creates complete ESP32-C6 dev board
-```
 
 ## 🏭 Why Circuit-Synth?
 
