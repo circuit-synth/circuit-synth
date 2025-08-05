@@ -29,40 +29,32 @@ def simple_test():
     C1[1] += SIG
     C1[2] += GND
     
-    return locals()
 
 def test_preservation():
     """Test the preservation workflow"""
     project_name = "preservation_test"
-    project_exists = os.path.exists(f"{project_name}/{project_name}.kicad_pro")
     
     # Create circuit instance
     test_circuit = simple_test()
     
-    if not project_exists:
-        print("🚀 GENERATING new KiCad project...")
-        print("After generation:")
-        print("1. Open in KiCad")
-        print("2. Move some components around")
-        print("3. Add some wires")
-        print("4. Save and close KiCad")
-        print("5. Run this script again")
-        
-        test_circuit.generate_kicad_project(project_name, force_regenerate=True)
-        print(f"\n✅ Project generated at: {project_name}/")
-        print("📝 Now make manual edits in KiCad and run this script again!")
-    else:
-        print("🔄 UPDATING existing project (preserving manual edits)...")
-        print("Your manual component positions and routing should be preserved!")
-        
-        # Update with preservation
-        test_circuit.generate_kicad_project(project_name, force_regenerate=False)
-        
-        print("\n✅ Project updated!")
-        print("🔍 Check that your manual edits were preserved:")
-        print("   - Component positions")
-        print("   - Wire routing")
-        print("   - Any manual annotations")
+    print("🚀 Running circuit-synth with automatic update detection...")
+    print("\nThe system will automatically:")
+    print("  - Create a new project if none exists")
+    print("  - Update existing project while preserving manual edits")
+    print("")
+    
+    # Let circuit-synth handle the detection automatically!
+    # The default behavior now preserves existing work
+    test_circuit.generate_kicad_project(project_name)
+    
+    # Check if this was first run or update
+    if os.path.exists(f"{project_name}/{project_name}.kicad_pro"):
+        print("\n✅ Done! The project is at: {}/".format(project_name))
+        print("\n📝 Next steps:")
+        print("1. Open the project in KiCad")
+        print("2. Make manual edits (move components, add wires, etc.)")
+        print("3. Save and close KiCad")
+        print("4. Run this script again to see preservation in action!")
 
 if __name__ == "__main__":
     test_preservation()
