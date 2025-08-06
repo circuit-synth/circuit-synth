@@ -254,7 +254,7 @@ When user asks questions like:
 **Use direct implementation immediately:**
 
 ```python
-from src.circuit_synth.stm32_search_helper import handle_stm32_peripheral_query
+from circuit_synth.ai_integration.stm32_search_helper import handle_stm32_peripheral_query
 
 # Check if this is an STM32 peripheral query first
 response = handle_stm32_peripheral_query(user_query)
