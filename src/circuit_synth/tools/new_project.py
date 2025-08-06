@@ -1077,31 +1077,42 @@ def main(skip_kicad_check: bool, minimal: bool, developer: bool, no_memory_bank:
         console.print("\n🧠 Initializing Memory-Bank System...", style="yellow")
         # Create default board names based on project
         board_names = [f"{project_name.lower().replace(' ', '-')}-v1"]
-        
+
         # Initialize memory-bank system
         success = init_memory_bank(
             project_name=project_name,
             board_names=board_names,
-            project_root=str(project_path)
+            project_root=str(project_path),
         )
-        
+
         if success:
             console.print("✅ Memory-bank system initialized", style="green")
-            console.print(f"📁 Created pcbs/{board_names[0]}/ with memory-bank structure", style="cyan")
-            console.print("🔄 Use 'cs-switch-board' to switch between board contexts", style="cyan")
+            console.print(
+                f"📁 Created pcbs/{board_names[0]}/ with memory-bank structure",
+                style="cyan",
+            )
+            console.print(
+                "🔄 Use 'cs-switch-board' to switch between board contexts",
+                style="cyan",
+            )
         else:
-            console.print("⚠️  Memory-bank initialization failed (continuing without it)", style="yellow")
+            console.print(
+                "⚠️  Memory-bank initialization failed (continuing without it)",
+                style="yellow",
+            )
     else:
         console.print("⏭️  Skipped memory-bank system initialization", style="yellow")
 
     # Step 6: Create project documentation
     console.print("\n📚 Creating project documentation...", style="yellow")
     create_project_readme(project_path, project_name, additional_libraries)
-    
+
     # Create memory-bank enhanced CLAUDE.md (or basic one if no memory-bank)
     if not no_memory_bank:
         # The memory-bank init_memory_bank function already creates CLAUDE.md with memory-bank docs
-        console.print("✅ Memory-bank enhanced CLAUDE.md already created", style="green")
+        console.print(
+            "✅ Memory-bank enhanced CLAUDE.md already created", style="green"
+        )
     else:
         create_claude_md(project_path)
 

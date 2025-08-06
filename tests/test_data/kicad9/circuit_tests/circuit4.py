@@ -9,10 +9,12 @@ Demonstrates repeated subcircuits:
 """
 
 import logging
+
 from circuit_synth import *
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
 
 @circuit(name="low_pass_filter")
 def low_pass_filter(sig_in, sig_out, gnd):
@@ -25,16 +27,10 @@ def low_pass_filter(sig_in, sig_out, gnd):
                            (gnd)
     """
     r_filter = Component(
-        symbol="Device:R",
-        ref="R",
-        value="10k",
-        footprint="Resistor_SMD:R_0805"
+        symbol="Device:R", ref="R", value="10k", footprint="Resistor_SMD:R_0805"
     )
     c_filter = Component(
-        symbol="Device:C",
-        ref="C",
-        value="100nF",
-        footprint="Capacitor_SMD:C_0805"
+        symbol="Device:C", ref="C", value="100nF", footprint="Capacitor_SMD:C_0805"
     )
 
     # R from sig_in -> filter node

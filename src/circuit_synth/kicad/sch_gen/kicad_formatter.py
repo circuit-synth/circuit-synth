@@ -108,10 +108,20 @@ class KiCadFormatterNew:
             )
 
             # Debug log for specific problematic elements
-            if current_elem in ["generator_version", "paper", "lib_id", "property", "pin_numbers"]:
-                logger.debug(f"🔍 FORMAT: Processing {current_elem} with expr: {expr[:3]}...")
+            if current_elem in [
+                "generator_version",
+                "paper",
+                "lib_id",
+                "property",
+                "pin_numbers",
+            ]:
+                logger.debug(
+                    f"🔍 FORMAT: Processing {current_elem} with expr: {expr[:3]}..."
+                )
                 if len(expr) > 1:
-                    logger.debug(f"    Second element type: {type(expr[1])}, value: {expr[1]}")
+                    logger.debug(
+                        f"    Second element type: {type(expr[1])}, value: {expr[1]}"
+                    )
 
             # Check if this is a special KiCad construct that needs inline formatting
             if self._is_inline_construct(expr, parent_context):
