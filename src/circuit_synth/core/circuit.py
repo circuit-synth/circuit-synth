@@ -358,6 +358,15 @@ class Circuit:
                             all_nets[net_name].append(connection)
 
         # Create the expected JSON structure
+        # Convert annotations to dict format if they have to_dict method
+        annotations_list = []
+        for ann in getattr(self, "_annotations", []):
+            if hasattr(ann, 'to_dict'):
+                annotations_list.append(ann.to_dict())
+            else:
+                # Fallback to string representation if no to_dict method
+                annotations_list.append(str(ann))
+        
         json_data = {
             "name": self.name,
             "description": getattr(self, "description", ""),
@@ -366,7 +375,7 @@ class Circuit:
             "components": all_components,
             "nets": all_nets,
             "subcircuits": [],  # Flattened, so no subcircuits
-            "annotations": getattr(self, "_annotations", []),
+            "annotations": annotations_list,
         }
 
         context_logger.info(
@@ -400,7 +409,7 @@ class Circuit:
         self,
         project_name: str,
         generate_pcb: bool = True,
-        force_regenerate: bool = False,
+        force_regenerate: bool = False,  # Default to preserving manual edits
         placement_algorithm: str = "connection_aware",
         draw_bounding_boxes: bool = False,
         generate_ratsnest: bool = True,
@@ -434,6 +443,48 @@ class Circuit:
             # Create output directory with the project name
             output_path = Path(project_name).resolve()
             output_path.mkdir(parents=True, exist_ok=True)
+            
+            # Check if we should preserve existing project
+            if not force_regenerate:
+                sch_path = output_path / f"{project_name}.kicad_sch"
+                if sch_path.exists():
+                    context_logger.info(
+                        "Checking if KiCad project needs updating",
+                        component="CIRCUIT",
+                        project_name=project_name
+                    )
+                    
+                    # Generate JSON to compare
+                    import tempfile
+                    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as temp_file:
+                        temp_json_path = temp_file.name
+                        self.generate_json_netlist(temp_json_path)
+                    
+                    try:
+                        from ..kicad.schematic_diff import SchematicDiffer
+                        
+                        # Check if circuits are identical
+                        if not SchematicDiffer.should_update_schematic(Path(temp_json_path), sch_path):
+                            context_logger.info(
+                                "Circuit unchanged, preserving existing KiCad project",
+                                component="CIRCUIT",
+                                project_name=project_name
+                            )
+                            return  # Skip regeneration entirely
+                        else:
+                            context_logger.info(
+                                "Circuit changed, updating KiCad project with preservation",
+                                component="CIRCUIT",
+                                project_name=project_name
+                            )
+                            # TODO: Implement differential updates
+                            # For now, fall through to regeneration
+                    finally:
+                        import os
+                        try:
+                            os.unlink(temp_json_path)
+                        except OSError:
+                            pass
 
             context_logger.info(
                 "Starting KiCad project generation",

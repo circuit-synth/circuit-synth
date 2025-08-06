@@ -133,11 +133,17 @@ class HierarchicalSynchronizer:
 
                     # From properties
                     if hasattr(sheet_elem, "properties"):
-                        for prop in sheet_elem.properties:
-                            if prop.name == "Sheetfile":
-                                sheet_file = prop.value
-                            elif prop.name == "Sheetname":
-                                sheet_name = prop.value
+                        # sheet_elem.properties might be a dictionary or list
+                        if isinstance(sheet_elem.properties, dict):
+                            sheet_file = sheet_elem.properties.get("Sheetfile", sheet_file)
+                            sheet_name = sheet_elem.properties.get("Sheetname", sheet_name)
+                        else:
+                            for prop in sheet_elem.properties:
+                                if hasattr(prop, 'name'):
+                                    if prop.name == "Sheetfile":
+                                        sheet_file = prop.value
+                                    elif prop.name == "Sheetname":
+                                        sheet_name = prop.value
 
                     logger.debug(f"Sheet file: {sheet_file}, name: {sheet_name}")
 
@@ -170,11 +176,18 @@ class HierarchicalSynchronizer:
                     sheet_name = None
 
                     if hasattr(comp, "properties"):
-                        for prop in comp.properties:
-                            if prop.name == "Sheetfile":
-                                sheet_file = prop.value
-                            elif prop.name == "Sheetname":
-                                sheet_name = prop.value
+                        # comp.properties is a dictionary, not a list of objects
+                        if isinstance(comp.properties, dict):
+                            sheet_file = comp.properties.get("Sheetfile")
+                            sheet_name = comp.properties.get("Sheetname")
+                        else:
+                            # Fallback for list of property objects (if ever used)
+                            for prop in comp.properties:
+                                if hasattr(prop, 'name'):
+                                    if prop.name == "Sheetfile":
+                                        sheet_file = prop.value
+                                    elif prop.name == "Sheetname":
+                                        sheet_name = prop.value
 
                     if sheet_file:
                         logger.debug(

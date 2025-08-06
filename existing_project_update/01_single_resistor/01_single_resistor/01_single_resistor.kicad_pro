@@ -244,7 +244,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "01_voltage_divider.kicad_pro",
+    "filename": "01_single_resistor.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -389,7 +389,7 @@
     "meta": {
       "version": 1
     },
-    "net_format_name": "",
+    "net_format_name": "KiCad",
     "ngspice": {
       "fix_include_paths": true,
       "fix_passive_vals": false,
@@ -414,7 +414,7 @@
   },
   "sheets": [
     [
-      "5050608f-97a4-4f5c-a68e-3f3ae7c0d6bc",
+      "5afee845-86b7-4941-b275-af0e91b19dc4",
       "Root"
     ]
   ],
