@@ -2,7 +2,7 @@
 
 **Addressing forum feedback**: "The example in the readme seems to show starting a new project from scratch. You might want to show how it works with existing projects and workflows."
 
-This demo shows how circuit-synth integrates with existing KiCad projects through bidirectional synchronization.
+This demo shows how circuit-synth can import existing KiCad projects to Python. Note: Bidirectional sync (updating existing projects) is experimental and has limitations.
 
 ## Workflow Demonstration
 
@@ -34,26 +34,25 @@ def add_sensor_interface(vcc, gnd):
 existing_circuit.add_subcircuit(add_sensor_interface(vcc_3v3, gnd))
 ```
 
-### Step 3: Sync Back to KiCad
+### Step 3: Generate New Project (Recommended)
 ```python
-# Update KiCad files with changes
-existing_circuit.sync_to_kicad()
+# Generate new KiCad project with added functionality
+existing_circuit.generate_kicad_project("enhanced_circuit")
 ```
 
-## What This Preserves
+**Note**: Updating existing KiCad projects in-place is experimental. The recommended workflow is:
+1. Import existing KiCad → Python ✅ (works well)
+2. Modify circuit in Python ✅ (works well)  
+3. Generate new KiCad project ✅ (works well)
+4. Manually merge changes if needed
 
-✅ **Existing component placement**  
-✅ **Manual routing and traces**  
-✅ **Custom symbol libraries**  
-✅ **Design rule checks**  
-✅ **Layer stackups and constraints**  
+## Current Limitations
 
-## What Gets Updated
-
-🔄 **New components added**  
-🔄 **Net connections updated**  
-🔄 **Schematic annotations**  
-🔄 **Component references**  
+⚠️ **Bidirectional sync limitations:**
+- Project updates (vs new generation) are experimental
+- Manual component placement may not be preserved
+- Custom routing and traces are not preserved
+- Works best for generating new projects from imported circuits
 
 ## Files in This Demo
 
