@@ -58,28 +58,28 @@ register-agents
 **🚀 AUTOMATED TESTING (Recommended):**
 ```bash
 # Run all tests (Python + Rust + Integration + Core)
-./scripts/run_all_tests.sh
+./tools/testing/run_all_tests.sh
 
 # Run with verbose output for debugging
-./scripts/run_all_tests.sh --verbose
+./tools/testing/run_all_tests.sh --verbose
 
 # Run only Python tests (fast)
-./scripts/run_all_tests.sh --python-only
+./tools/testing/run_all_tests.sh --python-only
 
 # Run only Rust tests
-./scripts/run_all_tests.sh --rust-only
+./tools/testing/run_all_tests.sh --rust-only
 
 # Stop on first failure (for debugging)
-./scripts/run_all_tests.sh --fail-fast
+./tools/testing/run_all_tests.sh --fail-fast
 ```
 
 **🦀 RUST TESTING:**
 ```bash
 # Test all Rust modules automatically
-./scripts/test_rust_modules.sh
+./tools/testing/test_rust_modules.sh
 
 # Test with verbose output and Python integration
-./scripts/test_rust_modules.sh --verbose
+./tools/testing/test_rust_modules.sh --verbose
 
 # Test specific Rust module manually
 cd rust_modules/rust_netlist_processor
@@ -124,6 +124,18 @@ python -m build
 
 # Install locally
 pip install -e .
+```
+
+### Build Tools
+```bash
+# Build all Rust modules
+./tools/build/build_rust_modules.sh
+
+# Clean rebuild everything
+./tools/build/rebuild_all_rust.sh
+
+# Format all code (Python + Rust)
+./tools/build/format_all.sh
 ```
 
 ### KiCad Component Search
@@ -888,7 +900,7 @@ The repository includes an automated release script that handles the complete Py
 
 ```bash
 # Release to PyPI (from develop or main branch)
-./scripts/release_to_pypi.sh 0.5.1
+./tools/release/release_to_pypi.sh 0.5.1
 ```
 
 ### Pre-Release Checklist
