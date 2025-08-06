@@ -11,7 +11,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 RUST_MODULES_DIR="$PROJECT_ROOT/rust_modules"
 TEST_RESULTS_FILE="$PROJECT_ROOT/rust_test_results.json"
 VERBOSE=${VERBOSE:-false}
@@ -99,7 +99,7 @@ test_rust_module() {
     
     # Skip known problematic modules for now (TODO: fix these)  
     case "$module_name" in
-        "rust_symbol_search"|"rust_core_circuit_engine"|"rust_io_processor"|"rust_kicad_integration"|"rust_netlist_processor"|"rust_reference_manager")
+        "rust_symbol_search"|"rust_core_circuit_engine"|"rust_io_processor"|"rust_netlist_processor"|"rust_reference_manager")
             log_warning "  ⚠️ Skipping $module_name (known test issues - TODO: fix)"
             update_results "$module_name" "skipped" 0 0 "Temporarily skipped due to known test issues"
             return 0
@@ -111,13 +111,22 @@ test_rust_module() {
     
     local test_output
     local test_exit_code
+    local test_args=""
+    
+    # Special handling for modules with Python features
+    case "$module_name" in
+        "rust_kicad_integration")
+            log_info "  Using --no-default-features for $module_name (has Python bindings)"
+            test_args="--no-default-features"
+            ;;
+    esac
     
     # Try lib tests first, then integration tests if lib tests don't exist
     if ls src/lib.rs >/dev/null 2>&1; then
-        test_output=$(cargo test --lib 2>&1)
+        test_output=$(cargo test --lib $test_args 2>&1)
         test_exit_code=$?
     elif [ -d "tests" ]; then
-        test_output=$(cargo test 2>&1) 
+        test_output=$(cargo test $test_args 2>&1) 
         test_exit_code=$?
     else
         log_warning "  No tests found for $module_name"

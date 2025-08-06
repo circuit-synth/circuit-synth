@@ -1,7 +1,46 @@
 //! Rust KiCad Schematic Writer
 //!
-//! A high-performance Rust implementation for generating KiCad schematic files
-//! with comprehensive hierarchical label generation.
+//! A high-performance Rust library for generating and editing KiCad schematic files.
+//!
+//! # Features
+//!
+//! - **Simple API**: Easy-to-use functions for creating basic schematics
+//! - **Component Management**: Full support for component placement and configuration
+//! - **Net Connections**: Define electrical connections between components
+//! - **Hierarchical Design**: Support for complex multi-level circuit designs
+//! - **S-expression Generation**: Clean S-expression output compatible with KiCad
+//! - **Python Bindings**: Optional PyO3 integration for Python users
+//!
+//! # Quick Start
+//!
+//! ```rust
+//! use rust_kicad_schematic_writer::schematic_api::create_minimal_schematic;
+//!
+//! // Create a basic A4 schematic
+//! let schematic = create_minimal_schematic();
+//! std::fs::write("my_schematic.kicad_sch", schematic).unwrap();
+//! ```
+//!
+//! # Advanced Usage
+//!
+//! ```rust
+//! use rust_kicad_schematic_writer::{
+//!     CircuitData, RustSchematicWriter, SchematicConfig
+//! };
+//!
+//! // Create circuit data with components and nets
+//! let circuit = CircuitData {
+//!     name: "my_circuit".to_string(),
+//!     components: vec![/* ... */],
+//!     nets: vec![/* ... */],
+//!     subcircuits: vec![],
+//! };
+//!
+//! // Configure and generate schematic
+//! let config = SchematicConfig::default();
+//! let writer = RustSchematicWriter::new(circuit, config);
+//! writer.write_to_file("output.kicad_sch").unwrap();
+//! ```
 
 use log::{debug, info};
 
@@ -10,12 +49,14 @@ pub mod s_expression;
 pub mod schematic_api;
 pub mod types;
 
+#[cfg(feature = "python")]
 pub mod python_bindings;
 
 pub use hierarchical_labels::*;
 pub use s_expression::*;
 pub use types::*;
 
+#[cfg(feature = "python")]
 pub use python_bindings::*;
 
 /// Main schematic writer that handles the complete generation pipeline
@@ -265,6 +306,7 @@ impl RustSchematicWriter {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use uuid::Uuid;
 
     #[test]
     fn test_hierarchical_label_generation() {
@@ -446,6 +488,7 @@ mod tests {
                     }],
                 },
             ],
+            subcircuits: Vec::new(),
         }
     }
 
@@ -482,6 +525,7 @@ mod tests {
                     pin_id: "1".to_string(),
                 }],
             }],
+            subcircuits: Vec::new(),
         }
     }
 }

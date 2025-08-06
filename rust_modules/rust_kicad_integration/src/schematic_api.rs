@@ -1,11 +1,62 @@
 //! Simple API for creating KiCad schematics
 //!
 //! This module provides a clean, minimal API for generating new KiCad schematic files.
+//! It's designed to be the easiest entry point for users who want to quickly create
+//! valid KiCad schematics without dealing with the complexity of the full API.
+//!
+//! # Examples
+//!
+//! ```rust
+//! use rust_kicad_schematic_writer::schematic_api::*;
+//!
+//! // Create a minimal schematic
+//! let schematic = create_minimal_schematic();
+//!
+//! // Create with specific paper size
+//! let a3_schematic = create_empty_schematic("A3");
+//! ```
 
-use lexpr::{sexp, Value};
+use lexpr::Value;
 use uuid::Uuid;
 
+/// A simple component structure for the API
+///
+/// This provides a simplified interface for defining components
+/// without needing to understand the full complexity of the Component struct.
+///
+/// # Fields
+/// * `reference` - Component reference designator (e.g., "R1", "U2")
+/// * `lib_id` - KiCad library ID (e.g., "Device:R", "MCU_ST:STM32F103")
+/// * `value` - Component value or part number
+/// * `x`, `y` - Position in millimeters
+/// * `rotation` - Rotation in degrees (0, 90, 180, 270)
+#[derive(Debug, Clone)]
+pub struct SimpleComponent {
+    pub reference: String,
+    pub lib_id: String,
+    pub value: String,
+    pub x: f64,
+    pub y: f64,
+    pub rotation: f64,
+}
+
 /// Create a new, empty KiCad schematic
+///
+/// Generates a minimal but valid KiCad schematic file with the specified paper size.
+///
+/// # Arguments
+/// * `paper_size` - Paper size ("A4", "A3", "A2", "A1", "A0", "Letter", "Legal")
+///
+/// # Returns
+/// A string containing the complete KiCad schematic in S-expression format
+///
+/// # Example
+/// ```rust
+/// use rust_kicad_schematic_writer::schematic_api::create_empty_schematic;
+/// 
+/// let schematic = create_empty_schematic("A3");
+/// std::fs::write("empty.kicad_sch", schematic).unwrap();
+/// ```
 pub fn create_empty_schematic(paper_size: &str) -> String {
     let uuid = Uuid::new_v4().to_string();
     
@@ -25,8 +76,135 @@ pub fn create_empty_schematic(paper_size: &str) -> String {
 }
 
 /// Create a minimal KiCad schematic with basic structure
+///
+/// Convenience function that creates an A4-sized empty schematic.
+/// Equivalent to calling `create_empty_schematic("A4")`.
+///
+/// # Returns
+/// A string containing a minimal A4 KiCad schematic
+///
+/// # Example
+/// ```rust
+/// use rust_kicad_schematic_writer::schematic_api::create_minimal_schematic;
+/// 
+/// let schematic = create_minimal_schematic();
+/// assert!(schematic.contains("(paper \"A4\")"));
+/// ```
 pub fn create_minimal_schematic() -> String {
     create_empty_schematic("A4")
+}
+
+/// Create a KiCad schematic with components
+///
+/// Generates a complete KiCad schematic file with the specified components.
+/// Components will be placed at their specified positions with proper
+/// reference designators and values.
+///
+/// # Arguments
+/// * `paper_size` - Paper size for the schematic
+/// * `components` - Vector of components to place in the schematic
+///
+/// # Returns
+/// A string containing the complete KiCad schematic with components
+///
+/// # Note
+/// This function is currently in development and may not generate
+/// all component properties correctly.
+pub fn create_schematic_with_components(paper_size: &str, components: Vec<SimpleComponent>) -> String {
+    let uuid = Uuid::new_v4().to_string();
+    
+    // Build lib_symbols section with component symbols
+    let mut lib_symbol_entries = Vec::new();
+    for component in &components {
+        let symbol_uuid = Uuid::new_v4().to_string();
+        let symbol = Value::list(vec![
+            Value::symbol("symbol"),
+            Value::list(vec![
+                Value::symbol("lib_id"),
+                Value::string(component.lib_id.clone()),
+            ]),
+            Value::list(vec![
+                Value::symbol("at"),
+                Value::from(component.x),
+                Value::from(component.y),
+                Value::from(component.rotation),
+            ]),
+            Value::list(vec![Value::symbol("unit"), Value::from(1)]),
+            Value::list(vec![Value::symbol("in_bom"), Value::symbol("yes")]),
+            Value::list(vec![Value::symbol("on_board"), Value::symbol("yes")]),
+            Value::list(vec![Value::symbol("dnp"), Value::symbol("no")]),
+            Value::list(vec![Value::symbol("uuid"), Value::string(symbol_uuid.clone())]),
+            Value::list(vec![
+                Value::symbol("property"),
+                Value::string("Reference"),
+                Value::string(component.reference.clone()),
+                Value::list(vec![
+                    Value::symbol("at"),
+                    Value::from(component.x),
+                    Value::from(component.y - 5.08), // Place reference above component
+                    Value::from(0),
+                ]),
+            ]),
+            Value::list(vec![
+                Value::symbol("property"),
+                Value::string("Value"),
+                Value::string(component.value.clone()),
+                Value::list(vec![
+                    Value::symbol("at"),
+                    Value::from(component.x),
+                    Value::from(component.y + 5.08), // Place value below component
+                    Value::from(0),
+                ]),
+            ]),
+            Value::list(vec![Value::symbol("pin"), Value::string("1")]),
+            Value::list(vec![Value::symbol("pin"), Value::string("2")]),
+            Value::list(vec![
+                Value::symbol("instances"),
+                Value::list(vec![
+                    Value::symbol("project"),
+                    Value::string("/"),
+                    Value::list(vec![
+                        Value::symbol("path"),
+                        Value::string(format!("/{}", symbol_uuid)),
+                    ]),
+                    Value::list(vec![
+                        Value::symbol("reference"),
+                        Value::string(component.reference.clone()),
+                    ]),
+                    Value::list(vec![
+                        Value::symbol("unit"),
+                        Value::from(1),
+                    ]),
+                ]),
+            ]),
+        ]);
+        lib_symbol_entries.push(symbol);
+    }
+    
+    // Build the complete schematic
+    let mut schematic_elements = vec![
+        Value::symbol("kicad_sch"),
+        Value::list(vec![Value::symbol("version"), Value::from(20250114)]),
+        Value::list(vec![Value::symbol("generator"), Value::string("circuit_synth")]),
+        Value::list(vec![Value::symbol("generator_version"), Value::string("1.0")]),
+        Value::list(vec![Value::symbol("uuid"), Value::string(uuid)]),
+        Value::list(vec![Value::symbol("paper"), Value::string(paper_size)]),
+    ];
+    
+    // Add lib_symbols section
+    if lib_symbol_entries.is_empty() {
+        schematic_elements.push(Value::list(vec![Value::symbol("lib_symbols")]));
+    } else {
+        let mut lib_symbols_section = vec![Value::symbol("lib_symbols")];
+        lib_symbols_section.extend(lib_symbol_entries);
+        schematic_elements.push(Value::list(lib_symbols_section));
+    }
+    
+    // Add symbol_instances (empty for now, but needed)
+    schematic_elements.push(Value::list(vec![Value::symbol("symbol_instances")]));
+    
+    let schematic = Value::list(schematic_elements);
+    lexpr::to_string(&schematic).unwrap()
 }
 
 #[cfg(test)]

@@ -1,9 +1,16 @@
 //! Type definitions for KiCad schematic generation
+//!
+//! This module contains all the core data structures used for representing
+//! KiCad schematics in Rust. These types provide a clean, type-safe interface
+//! for building complex circuit designs programmatically.
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Errors that can occur during schematic generation
+///
+/// This enum provides comprehensive error handling for all operations
+/// in the schematic generation pipeline.
 #[derive(Debug, thiserror::Error)]
 pub enum SchematicError {
     #[error("Component not found: {0}")]
@@ -26,6 +33,21 @@ pub enum SchematicError {
 }
 
 /// Configuration for schematic generation
+///
+/// This struct holds all the metadata and settings needed to generate
+/// a complete KiCad schematic file.
+///
+/// # Example
+/// ```rust
+/// use rust_kicad_schematic_writer::SchematicConfig;
+/// 
+/// let config = SchematicConfig {
+///     paper_size: "A3".to_string(),
+///     title: "My Circuit".to_string(),
+///     company: "Example Corp".to_string(),
+///     ..Default::default()
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SchematicConfig {
     pub paper_size: String,
@@ -50,6 +72,9 @@ impl Default for SchematicConfig {
 }
 
 /// 2D position in the schematic
+///
+/// Represents a coordinate in the KiCad schematic coordinate system.
+/// Units are in millimeters, and the origin (0,0) is at the top-left.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Position {
     pub x: f64,
@@ -57,6 +82,15 @@ pub struct Position {
 }
 
 /// Pin information for a component
+///
+/// Contains all the data needed to represent a component pin, including
+/// its position relative to the component origin and its electrical orientation.
+///
+/// # Fields
+/// * `number` - The pin number as shown on the schematic (e.g., "1", "A1")
+/// * `name` - The pin name/function (e.g., "VCC", "GND", "~" for unnamed)
+/// * `x`, `y` - Pin position relative to component origin in mm
+/// * `orientation` - Pin orientation in degrees (0=right, 90=up, 180=left, 270=down)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pin {
     pub number: String,
@@ -67,6 +101,22 @@ pub struct Pin {
 }
 
 /// Component in the circuit
+///
+/// Represents a single electronic component in the schematic.
+///
+/// # Example
+/// ```rust
+/// use rust_kicad_schematic_writer::{Component, Position, Pin};
+/// 
+/// let resistor = Component {
+///     reference: "R1".to_string(),
+///     lib_id: "Device:R".to_string(),
+///     value: "10k".to_string(),
+///     position: Position { x: 100.0, y: 50.0 },
+///     rotation: 0.0,
+///     pins: vec![/* pins */],
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Component {
     pub reference: String,
@@ -78,6 +128,8 @@ pub struct Component {
 }
 
 /// Connection between a component pin and a net
+///
+/// Specifies which pin of which component is connected to a net.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PinConnection {
     pub component_ref: String,
@@ -85,6 +137,9 @@ pub struct PinConnection {
 }
 
 /// Net in the circuit
+///
+/// Represents an electrical connection between component pins.
+/// All pins connected to the same net are electrically connected.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Net {
     pub name: String,
@@ -92,6 +147,25 @@ pub struct Net {
 }
 
 /// Complete circuit data with hierarchical support
+///
+/// The main data structure representing an entire circuit or subcircuit.
+/// Supports hierarchical designs through the `subcircuits` field.
+///
+/// # Hierarchical Design
+/// The `subcircuits` field allows for nested circuit designs, where each
+/// subcircuit can contain its own components, nets, and further subcircuits.
+///
+/// # Example
+/// ```rust
+/// use rust_kicad_schematic_writer::{CircuitData, Component, Net};
+/// 
+/// let circuit = CircuitData {
+///     name: "main_board".to_string(),
+///     components: vec![/* components */],
+///     nets: vec![/* nets */],
+///     subcircuits: vec![/* nested circuits */],
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CircuitData {
     pub name: String,
@@ -103,6 +177,9 @@ pub struct CircuitData {
 }
 
 /// Shape of a hierarchical label
+///
+/// Determines the visual representation and electrical behavior of a hierarchical label.
+/// These shapes follow KiCad's standard hierarchical label types.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum LabelShape {
     Input,
@@ -125,6 +202,8 @@ impl LabelShape {
 }
 
 /// Effects for label text
+///
+/// Text formatting options for hierarchical labels.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LabelEffects {
     pub font_size: f64,
@@ -132,6 +211,9 @@ pub struct LabelEffects {
 }
 
 /// Hierarchical label in the schematic
+///
+/// Represents a connection point between hierarchical sheets in KiCad.
+/// These labels allow signals to pass between different levels of the hierarchy.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HierarchicalLabel {
     pub name: String,

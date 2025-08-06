@@ -7,7 +7,7 @@ use pyo3::types::{PyDict, PyList};
 
 use crate::types::*;
 use crate::RustSchematicWriter;
-use crate::schematic_api;
+use crate::schematic_api::{self, SimpleComponent};
 use log::{debug, info};
 
 /// Initialize logging for the Python module using pyo3-log
@@ -170,6 +170,58 @@ pub fn create_empty_schematic(paper_size: &str) -> PyResult<String> {
 #[pyfunction]
 pub fn create_minimal_schematic() -> PyResult<String> {
     Ok(schematic_api::create_minimal_schematic())
+}
+
+/// Python-visible simple component class
+#[pyclass]
+#[derive(Clone)]
+pub struct PySimpleComponent {
+    #[pyo3(get, set)]
+    reference: String,
+    #[pyo3(get, set)]
+    lib_id: String,
+    #[pyo3(get, set)]
+    value: String,
+    #[pyo3(get, set)]
+    x: f64,
+    #[pyo3(get, set)]
+    y: f64,
+    #[pyo3(get, set)]
+    rotation: f64,
+}
+
+#[pymethods]
+impl PySimpleComponent {
+    #[new]
+    fn new(reference: String, lib_id: String, value: String, x: f64, y: f64, rotation: Option<f64>) -> Self {
+        Self {
+            reference,
+            lib_id,
+            value,
+            x,
+            y,
+            rotation: rotation.unwrap_or(0.0),
+        }
+    }
+}
+
+/// Create a KiCad schematic with components
+#[pyfunction]
+pub fn create_schematic_with_components(paper_size: &str, components: Vec<PySimpleComponent>) -> PyResult<String> {
+    // Convert Python components to Rust components
+    let rust_components: Vec<SimpleComponent> = components
+        .into_iter()
+        .map(|py_comp| SimpleComponent {
+            reference: py_comp.reference,
+            lib_id: py_comp.lib_id,
+            value: py_comp.value,
+            x: py_comp.x,
+            y: py_comp.y,
+            rotation: py_comp.rotation,
+        })
+        .collect();
+    
+    Ok(schematic_api::create_schematic_with_components(paper_size, rust_components))
 }
 
 /// Standalone function to generate hierarchical labels from Python data
@@ -893,6 +945,7 @@ fn rust_kicad_schematic_writer(_py: Python, m: &PyModule) -> PyResult<()> {
 
     // Add classes
     m.add_class::<PyRustSchematicWriter>()?;
+    m.add_class::<PySimpleComponent>()?;
 
     // Add standalone functions
     m.add_function(wrap_pyfunction!(
@@ -905,6 +958,7 @@ fn rust_kicad_schematic_writer(_py: Python, m: &PyModule) -> PyResult<()> {
     // Add simple schematic creation functions
     m.add_function(wrap_pyfunction!(create_empty_schematic, m)?)?;
     m.add_function(wrap_pyfunction!(create_minimal_schematic, m)?)?;
+    m.add_function(wrap_pyfunction!(create_schematic_with_components, m)?)?;
 
     info!("✅ Python module initialized successfully");
     Ok(())
