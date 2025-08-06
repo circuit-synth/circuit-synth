@@ -186,7 +186,7 @@ def create_placement_engine():
         return rust_placer_class()
     else:
         logger.debug("🐍 Using Python placement engine")
-        from circuit_synth.kicad_api.schematic.placement import PlacementEngine
+        from circuit_synth.kicad.schematic.placement import PlacementEngine
 
         return PlacementEngine()
 

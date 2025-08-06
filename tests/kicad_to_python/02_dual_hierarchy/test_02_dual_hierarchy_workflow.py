@@ -14,8 +14,10 @@ import unittest
 from pathlib import Path
 from textwrap import dedent
 
-from circuit_synth.tools.kicad_to_python_sync import KiCadToPythonSyncer
-from circuit_synth.tools.python_code_generator import PythonCodeGenerator
+from circuit_synth.tools.kicad_integration.kicad_to_python_sync import (
+    KiCadToPythonSyncer,
+)
+from circuit_synth.tools.utilities.python_code_generator import PythonCodeGenerator
 
 
 class Test02DualHierarchyWorkflow(unittest.TestCase):
@@ -84,34 +86,20 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
         generated_code = main_py.read_text()
 
         # Should generate hierarchical code with subcircuits
-<<<<<<< HEAD
         # The current implementation generates subcircuits as separate files with imports
         self.assertIn(
             "from child1 import child1",
             generated_code,
             "Should import child1 subcircuit function",
-=======
-        self.assertIn(
-            "def child1()", generated_code, "Should generate child1 subcircuit function"
->>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
         )
         self.assertIn(
             "def main()", generated_code, "Should generate main circuit function"
         )
         self.assertIn(
-<<<<<<< HEAD
-=======
-            "@circuit(name='child1')",
-            generated_code,
-            "Should have child1 circuit decorator",
-        )
-        self.assertIn(
->>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
             "@circuit(name='main')",
             generated_code,
             "Should have main circuit decorator",
         )
-<<<<<<< HEAD
 
         # Check that a separate child1.py file was created
         child1_py = self.python_output_dir / "child1.py"
@@ -127,8 +115,6 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
                 child1_content,
                 "Should have child1 circuit decorator in separate file",
             )
-=======
->>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
 
     def test_component_distribution_across_hierarchy(self):
         """Test that components are correctly distributed across hierarchical circuits"""
@@ -163,7 +149,6 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
             "Should preserve footprints",
         )
 
-<<<<<<< HEAD
         # Child sheet should have R2 - check in separate file
         child1_py = self.python_output_dir / "child1.py"
         total_r_components = generated_code.count('Component(symbol="Device:R"')
@@ -176,15 +161,6 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
         # Should have exactly 2 components total (R1 in main, R2 in child1)
         self.assertEqual(
             total_r_components, 2, "Should have exactly 2 resistor components total"
-=======
-        # Child sheet should have R2
-        self.assertIn('ref="R2"', generated_code, "Child circuit should contain R2")
-
-        # Should have exactly 2 components total (R1 in main, R2 in child1)
-        r_component_count = generated_code.count('Component(symbol="Device:R"')
-        self.assertEqual(
-            r_component_count, 2, "Should have exactly 2 resistor components"
->>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
         )
 
     def test_subcircuit_instantiation(self):
@@ -210,21 +186,12 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
 
         # Should instantiate the child circuit in main
         self.assertIn(
-<<<<<<< HEAD
             "child1_circuit = child1()",
-=======
-            "child1_instance = child1()",
->>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
             generated_code,
             "Should instantiate child1 subcircuit",
         )
 
-<<<<<<< HEAD
         # Should have proper function definitions - main in this file, child1 in separate file
-=======
-        # Should have proper function definitions
-        self.assertIn("def child1():", generated_code, "Should define child1 function")
->>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
         self.assertIn("def main():", generated_code, "Should define main function")
         self.assertIn(
             "from child1 import child1", generated_code, "Should import child1 function"
@@ -265,7 +232,6 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
         self.assertIn(
             "from circuit_synth import *", generated_code, "Should have proper imports"
         )
-<<<<<<< HEAD
         self.assertIn(
             "from child1 import child1",
             generated_code,
@@ -275,15 +241,6 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
         # Main function should exist in this file
         main_pos = generated_code.find("def main()")
         self.assertGreater(main_pos, 0, "Main function should be defined")
-=======
-
-        # Check that child circuit comes before main circuit (dependency order)
-        child1_pos = generated_code.find("def child1()")
-        main_pos = generated_code.find("def main()")
-        self.assertGreater(
-            main_pos, child1_pos, "Main function should come after child functions"
-        )
->>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
 
         # Should have generation code at the end
         self.assertIn(
@@ -392,7 +349,6 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
         self.assertIn(
             'ref="R1"', generated_code, "Should preserve R1 reference from root sheet"
         )
-<<<<<<< HEAD
 
         # Check R2 in separate child1.py file
         child1_py = self.python_output_dir / "child1.py"
@@ -405,19 +361,11 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
             )
 
         # Should NOT have truncated references in main file
-=======
-        self.assertIn(
-            'ref="R2"', generated_code, "Should preserve R2 reference from child sheet"
-        )
-
-        # Should NOT have truncated references
->>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
         self.assertNotIn(
             'ref="R"', generated_code, "Should NOT have truncated references"
         )
 
         # References should be in the correct circuit contexts
-<<<<<<< HEAD
         # R1 should be in main circuit (main.py)
         r1_pos = generated_code.find('ref="R1"')
         main_def_pos = generated_code.find("def main()")
@@ -437,27 +385,6 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
                 child1_def_pos,
                 "R2 should be defined after child1 function starts",
             )
-=======
-        # Find the positions of the circuit definitions and component references
-        child1_def_pos = generated_code.find("def child1()")
-        main_def_pos = generated_code.find("def main()")
-
-        r1_pos = generated_code.find('ref="R1"')
-        r2_pos = generated_code.find('ref="R2"')
-
-        # R2 should be in child1 circuit (between child1_def and main_def)
-        self.assertGreater(
-            r2_pos, child1_def_pos, "R2 should be defined after child1 function starts"
-        )
-        self.assertLess(
-            r2_pos, main_def_pos, "R2 should be defined before main function starts"
-        )
-
-        # R1 should be in main circuit (after main_def)
-        self.assertGreater(
-            r1_pos, main_def_pos, "R1 should be defined after main function starts"
-        )
->>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
 
     def test_full_hierarchical_round_trip(self):
         """Test complete hierarchical round-trip: KiCad→Python→KiCad→Python"""
@@ -524,7 +451,6 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
             (first_python_code, "first"),
             (second_python_code, "second"),
         ]:
-<<<<<<< HEAD
             self.assertIn("def main()", code, f"{iteration} should have main function")
             self.assertIn(
                 "from child1 import child1", code, f"{iteration} should import child1"
@@ -534,25 +460,10 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
             )
             self.assertIn(
                 "child1_circuit = child1()",
-=======
-            self.assertIn(
-                "def child1()", code, f"{iteration} should have child1 function"
-            )
-            self.assertIn("def main()", code, f"{iteration} should have main function")
-            self.assertIn(
-                'ref="R1"', code, f"{iteration} should have R1 in main circuit"
-            )
-            self.assertIn(
-                'ref="R2"', code, f"{iteration} should have R2 in child circuit"
-            )
-            self.assertIn(
-                "child1_instance = child1()",
->>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
                 code,
                 f"{iteration} should instantiate child1",
             )
 
-<<<<<<< HEAD
         # Both should have separate child1.py files
         for python_dir, iteration in [
             (first_python_dir, "first"),
@@ -572,8 +483,6 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
                     f"{iteration} should have R2 in child circuit file",
                 )
 
-=======
->>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
         # Step 5: Execute second Python to create second KiCad project
         result2 = subprocess.run(
             [sys.executable, str(second_main_py)],

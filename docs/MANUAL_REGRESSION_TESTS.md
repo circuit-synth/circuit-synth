@@ -216,7 +216,7 @@ for r in results:
 ```bash
 # Test: STM32-specific search functionality
 uv run python -c "
-from circuit_synth.stm32_search_helper import handle_stm32_peripheral_query
+from circuit_synth.ai_integration.stm32_search_helper import handle_stm32_peripheral_query
 result = handle_stm32_peripheral_query('find stm32 with 2 spi available on jlcpcb')
 if result:
     print('✅ STM32 search working')

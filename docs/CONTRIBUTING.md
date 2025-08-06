@@ -446,9 +446,9 @@ def generate_kicad_project(self, project_name: str,
 ### Core Components
 
 - **`src/circuit_synth/core/`**: Core circuit design functionality
-- **`src/circuit_synth/kicad/`**: KiCad file format handling
+- **`src/circuit_synth/kicad/`**: KiCad integration (schematics, symbols, S-expressions)
 - **`src/circuit_synth/pcb/`**: PCB generation and layout
-- **`src/circuit_synth/kicad_api/`**: Low-level KiCad API integration
+- **`src/circuit_synth/ai_integration/`**: AI-assisted circuit design tools
 
 ### Architecture Overview
 

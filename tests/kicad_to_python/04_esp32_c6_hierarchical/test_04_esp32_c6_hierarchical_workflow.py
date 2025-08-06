@@ -24,7 +24,9 @@ import unittest
 import uuid
 from pathlib import Path
 
-from circuit_synth.tools.kicad_to_python_sync import KiCadToPythonSyncer
+from circuit_synth.tools.kicad_integration.kicad_to_python_sync import (
+    KiCadToPythonSyncer,
+)
 
 
 class TestESP32C6HierarchicalWorkflow(unittest.TestCase):

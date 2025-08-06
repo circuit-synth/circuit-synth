@@ -252,7 +252,7 @@ except Exception as e:
 ```bash
 # Test STM32 search functionality
 uv run python -c "
-from circuit_synth.stm32_search_helper import handle_stm32_peripheral_query
+from circuit_synth.ai_integration.stm32_search_helper import handle_stm32_peripheral_query
 
 test_queries = [
     'find stm32 with 2 spi available on jlcpcb',

@@ -13,7 +13,7 @@ import uuid as uuid_module
 from pathlib import Path
 from typing import Any, Dict
 
-from circuit_synth.kicad_api.core.types import Point, SchematicPin, SchematicSymbol
+from circuit_synth.kicad.core.types import Point, SchematicPin, SchematicSymbol
 
 logger = logging.getLogger(__name__)
 

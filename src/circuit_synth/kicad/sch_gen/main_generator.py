@@ -57,8 +57,7 @@ from circuit_synth.core.component import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
-# Removed unused netlist_importer import
-from circuit_synth.kicad.sch_editor.schematic_reader import SchematicReader
+from circuit_synth.kicad.core.s_expression import SExpressionParser
 
 from .symbol_geometry import SymbolBoundingBoxCalculator
 
@@ -417,10 +416,10 @@ class SchematicGenerator:
         logger.info("🔄 Updating existing project while preserving your work...")
 
         # Import here to avoid circular dependencies
-        from circuit_synth.kicad_api.schematic.hierarchical_synchronizer import (
+        from circuit_synth.kicad.schematic.hierarchical_synchronizer import (
             HierarchicalSynchronizer,
         )
-        from circuit_synth.kicad_api.schematic.sync_adapter import SyncAdapter
+        from circuit_synth.kicad.schematic.sync_adapter import SyncAdapter
 
         # Load circuit from JSON using the same loader as generate
         logger.debug(f"Loading circuit from {json_file}")
@@ -482,7 +481,7 @@ class SchematicGenerator:
             # Use optimized symbol cache from core.component for better performance
             from circuit_synth.core.component import SymbolLibCache
 
-            from ...kicad_api.core.types import Point, Rectangle
+            from ...kicad.core.types import Point, Rectangle
             from ..kicad_symbol_cache import SymbolLibCache
             from .symbol_geometry import SymbolBoundingBoxCalculator
 
@@ -708,9 +707,8 @@ class SchematicGenerator:
         # Pre-populate the reference manager with all assigned references
         # This ensures we respect existing references and don't create conflicts
         if all_assigned_refs:
-            shared_ref_manager.api_ref_manager.add_existing_references(
-                list(all_assigned_refs)
-            )
+            for ref in all_assigned_refs:
+                shared_ref_manager.used_references.add(ref)
             logger.debug(
                 f"Pre-populated reference manager with {len(all_assigned_refs)} existing references"
             )
@@ -1131,9 +1129,9 @@ class SchematicGenerator:
             if existing_sch_path.exists():
                 logger.info(f"Found existing schematic file: {existing_sch_path}")
                 try:
-                    # Read existing schematic
-                    reader = SchematicReader()
-                    schematic = reader.read_file(str(existing_sch_path))
+                    # Read existing schematic using S-expression parser
+                    parser = SExpressionParser()
+                    schematic = parser.parse_file(str(existing_sch_path))
                     existing_components = schematic.components
                     logger.info(
                         f"Found {len(existing_components)} components in existing schematic"
@@ -1471,7 +1469,7 @@ class SchematicGenerator:
         sheet_symbol_uuid = str(uuid.uuid4())
 
         # Create the cover sheet content
-        cover_content = f"""(kicad_sch (version 20250114) (generator "kicad_api")
+        cover_content = f"""(kicad_sch (version 20250114) (generator "circuit_synth")
 
   (uuid {cover_uuid})
 

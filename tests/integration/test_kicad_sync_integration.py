@@ -16,7 +16,9 @@ import pytest
 
 # Import Circuit Synth for validation
 from circuit_synth import Circuit, Component, Net
-from circuit_synth.tools.kicad_to_python_sync import KiCadToPythonSyncer
+from circuit_synth.tools.kicad_integration.kicad_to_python_sync import (
+    KiCadToPythonSyncer,
+)
 
 
 class TestKiCadSyncIntegration:

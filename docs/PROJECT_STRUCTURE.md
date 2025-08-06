@@ -41,7 +41,7 @@ circuit-synth/
     - `jlcpcb/` - JLCPCB integration and availability
     - `pcbway/` - PCBWay integration (future)
     - `digikey/` - Digi-Key sourcing (future)
-  - `tools/` - CLI tools and utilities (cs-new-pcb, cs-init-pcb)
+  - `tools/` - CLI tools and utilities (cs-new-project, cs-init-pcb)
   - `validation/` - Real-time design validation and quality assurance
   - `annotations/` - Automatic and manual circuit documentation system
 
@@ -167,7 +167,7 @@ pytest tests/ -v
 
 ## 🏗️ Generated Project Structure
 
-When you run `cs-new-pcb` or `cs-init-pcb`, the following organized structure is created:
+When you run `cs-new-project` or `cs-init-pcb`, the following organized structure is created:
 
 ```
 my-sensor-board/

@@ -254,7 +254,7 @@ When user asks questions like:
 **Use direct implementation immediately:**
 
 ```python
-from src.circuit_synth.stm32_search_helper import handle_stm32_peripheral_query
+from circuit_synth.ai_integration.stm32_search_helper import handle_stm32_peripheral_query
 
 # Check if this is an STM32 peripheral query first
 response = handle_stm32_peripheral_query(user_query)
@@ -736,17 +736,17 @@ circuit-synth2/
 **Updated Import Patterns:**
 ```python
 # STM32 MCU search (modm-devices integration)
-from circuit_synth.component_info.microcontrollers.modm_device_search import search_stm32
+from circuit_synth.ai_integration.component_info.microcontrollers.modm_device_search import search_stm32
 
 # JLCPCB integration (moved from circuit_synth.jlc_integration)  
 from circuit_synth.manufacturing.jlcpcb import find_component, search_jlc_components_web
 
 # Future component families
-from circuit_synth.component_info.microcontrollers.esp32 import ESP32DeviceSearch  # (future)
-from circuit_synth.component_info.analog.opamps import OpAmpSelector  # (future)
-from circuit_synth.component_info.power.regulators import RegulatorDesigner  # (future)
-from circuit_synth.component_info.passives.resistors import ResistorSelector  # (future)
-from circuit_synth.component_info.sensors.temperature import TempSensorSelector  # (future)
+from circuit_synth.ai_integration.component_info.microcontrollers.esp32 import ESP32DeviceSearch  # (future)
+from circuit_synth.ai_integration.component_info.analog.opamps import OpAmpSelector  # (future)
+from circuit_synth.ai_integration.component_info.power.regulators import RegulatorDesigner  # (future)
+from circuit_synth.ai_integration.component_info.passives.resistors import ResistorSelector  # (future)
+from circuit_synth.ai_integration.component_info.sensors.temperature import TempSensorSelector  # (future)
 
 # Future manufacturing integrations
 from circuit_synth.manufacturing.pcbway import get_pcbway_pricing  # (future)

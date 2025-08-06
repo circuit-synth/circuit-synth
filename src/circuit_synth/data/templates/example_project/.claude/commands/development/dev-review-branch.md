@@ -474,7 +474,7 @@ python -m circuit_synth.kicad.validate_libraries
 python -m circuit_synth.agents.test_agent_capabilities
 
 # Memory bank validation
-python -m circuit_synth.memory_bank.validate_structure
+python -m circuit_synth.ai_integration.memory_bank.validate_structure
 ```
 
 ## Example Usage

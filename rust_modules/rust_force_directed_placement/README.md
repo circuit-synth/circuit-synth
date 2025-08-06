@@ -178,7 +178,7 @@ This implementation maintains **100% API compatibility** with the existing Pytho
 
 ```python
 # Before (Python implementation)
-from circuit_synth.kicad_api.pcb.placement.force_directed_placement_fixed import ForceDirectedPlacement
+from circuit_synth.pcb.placement.force_directed_placement import ForceDirectedPlacement
 
 # After (Rust implementation) 
 from rust_force_directed_placement import ForceDirectedPlacer as ForceDirectedPlacement
@@ -191,7 +191,7 @@ from rust_force_directed_placement import ForceDirectedPlacer as ForceDirectedPl
 import os
 os.environ['USE_RUST_PLACEMENT'] = '1'
 
-from circuit_synth.kicad_api.pcb.placement import get_placer
+from circuit_synth.pcb.placement import get_placer
 placer = get_placer()  # Returns Rust implementation when flag is set
 ```
 

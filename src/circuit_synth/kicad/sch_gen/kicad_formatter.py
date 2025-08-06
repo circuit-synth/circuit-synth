@@ -14,7 +14,7 @@ from typing import Any, List, Union
 from sexpdata import Symbol
 
 # Import the new API's S-expression parser
-from circuit_synth.kicad_api.core.s_expression import SExpressionParser
+from circuit_synth.kicad.core.s_expression import SExpressionParser
 
 # Import Rust S-expression module with defensive fallback
 _RUST_SEXP_AVAILABLE = False
