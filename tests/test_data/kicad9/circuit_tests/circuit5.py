@@ -10,10 +10,12 @@ but choose distinct names to avoid collisions.
 """
 
 import logging
+
 from circuit_synth import *
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
 
 @circuit(name="child_amp_stage")
 def child_amp_stage(sig_in, sig_out, gnd):
@@ -24,24 +26,22 @@ def child_amp_stage(sig_in, sig_out, gnd):
     op_amp = Component(
         symbol="Amplifier_Operational:TL081",
         ref="U11",  # forced user reference, distinct from parent's
-        footprint="Package_DIP:DIP-8_W7.62mm"
+        footprint="Package_DIP:DIP-8_W7.62mm",
     )
     resistor = Component(
-        symbol="Device:R",
-        ref="R11",
-        value="1k",
-        footprint="Resistor_SMD:R_0805"
+        symbol="Device:R", ref="R11", value="1k", footprint="Resistor_SMD:R_0805"
     )
 
     # Simple unity-buffer style connection
-    op_amp[3] += sig_in      # + input
-    op_amp[2] += sig_out     # - input
-    op_amp[6] += sig_out     # output
-    op_amp[4] += gnd         # V-
-    op_amp[7] += gnd         # V+ (for single-rail example)
+    op_amp[3] += sig_in  # + input
+    op_amp[2] += sig_out  # - input
+    op_amp[6] += sig_out  # output
+    op_amp[4] += gnd  # V-
+    op_amp[7] += gnd  # V+ (for single-rail example)
 
     resistor[1] += sig_out
-    resistor[2] += op_amp[2] # feedback to inverting input
+    resistor[2] += op_amp[2]  # feedback to inverting input
+
 
 @circuit(name="user_refs_circuit")
 def user_refs_circuit():
@@ -58,13 +58,10 @@ def user_refs_circuit():
     main_amp = Component(
         symbol="Amplifier_Operational:TL081",
         ref="U10",
-        footprint="Package_DIP:DIP-8_W7.62mm"
+        footprint="Package_DIP:DIP-8_W7.62mm",
     )
     main_res = Component(
-        symbol="Device:R",
-        ref="R10",
-        value="10k",
-        footprint="Resistor_SMD:R_0805"
+        symbol="Device:R", ref="R10", value="10k", footprint="Resistor_SMD:R_0805"
     )
 
     # Wire up a quick buffer
@@ -79,6 +76,7 @@ def user_refs_circuit():
 
     # Now instantiate the child subcircuit with forced references U11, R11
     child_amp_stage(vout, Net("CHILD_OUT"), gnd)
+
 
 if __name__ == "__main__":
     c = user_refs_circuit()

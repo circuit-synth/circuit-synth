@@ -1,17 +1,19 @@
-import pytest
 import os
 import shutil
 from pathlib import Path
+
+import pytest
 
 from circuit_synth.core.circuit import Circuit
 from circuit_synth.core.decorators import get_current_circuit, set_current_circuit
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
+
 @pytest.fixture(scope="session", autouse=True)
 def configure_kicad_paths():
     """
     Configure KiCad paths and clear symbol cache for tests.
-    
+
     Now that KiCad is installed in CI, we can use real KiCad symbols everywhere.
     """
     # Clear any existing cache
@@ -19,7 +21,7 @@ def configure_kicad_paths():
     if cache_dir.exists():
         shutil.rmtree(cache_dir)
     cache_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Clear in-memory cache
     SymbolLibCache._library_data.clear()
     SymbolLibCache._symbol_index.clear()

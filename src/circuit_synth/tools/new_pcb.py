@@ -34,54 +34,72 @@ def get_template_content(template_name: str) -> str:
     """Get content of bundled template file."""
     try:
         # Use modern importlib.resources
-        template_files = files('circuit_synth') / 'data' / 'templates' / template_name
+        template_files = files("circuit_synth") / "data" / "templates" / template_name
         return template_files.read_text()
     except Exception:
         # Fallback for development environment
         current_file = Path(__file__).resolve()
         repo_root = current_file.parent.parent.parent.parent
-        template_path = repo_root / "src" / "circuit_synth" / "data" / "templates" / template_name
+        template_path = (
+            repo_root / "src" / "circuit_synth" / "data" / "templates" / template_name
+        )
         return template_path.read_text()
 
-def _copy_claude_directory(src_claude_dir, dest_claude_dir: Path, pcb_name: str, circuit_name: str) -> None:
+
+def _copy_claude_directory(
+    src_claude_dir, dest_claude_dir: Path, pcb_name: str, circuit_name: str
+) -> None:
     """Recursively copy .claude directory structure with customization."""
     import os
-    
+
     def copy_file_with_customization(src_path, dest_path: Path):
         """Copy a file and customize project-specific content."""
         try:
             content = src_path.read_text()
             # Replace project-specific placeholders
-            content = content.replace('ESP32-C6 Development Board', pcb_name)
-            content = content.replace('ESP32_C6_Dev_Board', circuit_name)
-            content = content.replace('esp32-c6-dev-board', pcb_name.lower().replace(' ', '-'))
+            content = content.replace("ESP32-C6 Development Board", pcb_name)
+            content = content.replace("ESP32_C6_Dev_Board", circuit_name)
+            content = content.replace(
+                "esp32-c6-dev-board", pcb_name.lower().replace(" ", "-")
+            )
             dest_path.write_text(content)
         except Exception as e:
-            console.print(f"[yellow]Warning: Could not customize {dest_path}: {e}[/yellow]")
+            console.print(
+                f"[yellow]Warning: Could not customize {dest_path}: {e}[/yellow]"
+            )
             # Fall back to direct copy
             dest_path.write_text(src_path.read_text())
-    
+
     def copy_directory_recursive(src_dir, dest_dir: Path):
         """Recursively copy directory structure."""
         try:
             # Get list of items in source directory
             for item_name in os.listdir(str(src_dir)):
-                if item_name.startswith('.'):
+                if item_name.startswith("."):
                     continue  # Skip hidden files
-                    
+
                 src_item = src_dir / item_name
                 dest_item = dest_dir / item_name
-                
+
                 if src_item.is_dir():
                     dest_item.mkdir(exist_ok=True)
                     copy_directory_recursive(src_item, dest_item)
                 else:
                     copy_file_with_customization(src_item, dest_item)
         except Exception as e:
-            console.print(f"[yellow]Warning: Could not copy directory {src_dir}: {e}[/yellow]")
-    
+            console.print(
+                f"[yellow]Warning: Could not copy directory {src_dir}: {e}[/yellow]"
+            )
+
     # Copy root .claude files
-    for item_name in ['settings.json', 'README.md', 'AGENT_USAGE_GUIDE.md', 'README_ORGANIZATION.md', 'mcp_settings.json', 'session_hook_update.sh']:
+    for item_name in [
+        "settings.json",
+        "README.md",
+        "AGENT_USAGE_GUIDE.md",
+        "README_ORGANIZATION.md",
+        "mcp_settings.json",
+        "session_hook_update.sh",
+    ]:
         try:
             src_file = src_claude_dir / item_name
             dest_file = dest_claude_dir / item_name
@@ -89,9 +107,9 @@ def _copy_claude_directory(src_claude_dir, dest_claude_dir: Path, pcb_name: str,
                 copy_file_with_customization(src_file, dest_file)
         except Exception as e:
             console.print(f"[yellow]Warning: Could not copy {item_name}: {e}[/yellow]")
-    
+
     # Copy subdirectories (agents, commands)
-    for subdir_name in ['agents', 'commands']:
+    for subdir_name in ["agents", "commands"]:
         try:
             src_subdir = src_claude_dir / subdir_name
             dest_subdir = dest_claude_dir / subdir_name
@@ -99,83 +117,118 @@ def _copy_claude_directory(src_claude_dir, dest_claude_dir: Path, pcb_name: str,
                 dest_subdir.mkdir(exist_ok=True)
                 copy_directory_recursive(src_subdir, dest_subdir)
         except Exception as e:
-            console.print(f"[yellow]Warning: Could not copy {subdir_name} directory: {e}[/yellow]")
+            console.print(
+                f"[yellow]Warning: Could not copy {subdir_name} directory: {e}[/yellow]"
+            )
 
 
-def copy_example_project_structure(pcb_path: Path, pcb_name: str, skip_pyproject: bool = False) -> None:
+def copy_example_project_structure(
+    pcb_path: Path, pcb_name: str, skip_pyproject: bool = False
+) -> None:
     """Copy the complete example_project structure and customize it."""
     circuit_name = pcb_name.replace(" ", "_")
-    
+
     try:
         # Copy all files from example_project template
-        template_files = files('circuit_synth') / 'data' / 'templates' / 'example_project'
-        
+        template_files = (
+            files("circuit_synth") / "data" / "templates" / "example_project"
+        )
+
         # Copy CLAUDE.md
-        claude_content = (template_files / 'CLAUDE.md').read_text()
-        claude_customized = claude_content.replace('ESP32-C6 Development Board', pcb_name)
-        (pcb_path / 'CLAUDE.md').write_text(claude_customized)
-        
+        claude_content = (template_files / "CLAUDE.md").read_text()
+        claude_customized = claude_content.replace(
+            "ESP32-C6 Development Board", pcb_name
+        )
+        (pcb_path / "CLAUDE.md").write_text(claude_customized)
+
         # Copy README.md
-        readme_content = (template_files / 'README.md').read_text()
-        readme_customized = readme_content.replace('ESP32-C6 Development Board', pcb_name)
-        readme_customized = readme_customized.replace('ESP32_C6_Dev_Board', circuit_name)
-        (pcb_path / 'README.md').write_text(readme_customized)
-        
+        readme_content = (template_files / "README.md").read_text()
+        readme_customized = readme_content.replace(
+            "ESP32-C6 Development Board", pcb_name
+        )
+        readme_customized = readme_customized.replace(
+            "ESP32_C6_Dev_Board", circuit_name
+        )
+        (pcb_path / "README.md").write_text(readme_customized)
+
         # Skip copying pyproject.toml if requested (when we already have one)
         if not skip_pyproject:
             # Copy pyproject.toml
-            pyproject_content = (template_files / 'pyproject.toml').read_text()
-            pyproject_customized = pyproject_content.replace('esp32-c6-dev-board', pcb_path.name)
-            pyproject_customized = pyproject_customized.replace('ESP32-C6 Development Board', pcb_name)
-            (pcb_path / 'pyproject.toml').write_text(pyproject_customized)
-        
+            pyproject_content = (template_files / "pyproject.toml").read_text()
+            pyproject_customized = pyproject_content.replace(
+                "esp32-c6-dev-board", pcb_path.name
+            )
+            pyproject_customized = pyproject_customized.replace(
+                "ESP32-C6 Development Board", pcb_name
+            )
+            (pcb_path / "pyproject.toml").write_text(pyproject_customized)
+
         # Create circuit-synth directory
-        circuit_dir = pcb_path / 'circuit-synth'
+        circuit_dir = pcb_path / "circuit-synth"
         circuit_dir.mkdir(exist_ok=True)
-        
+
         # Copy all Python files from circuit-synth directory
-        circuit_template_dir = template_files / 'circuit-synth'
-        python_files = ['debug_header.py', 'esp32c6.py', 'led_blinker.py', 'power_supply.py', 'usb.py']
-        
+        circuit_template_dir = template_files / "circuit-synth"
+        python_files = [
+            "debug_header.py",
+            "esp32c6.py",
+            "led_blinker.py",
+            "power_supply.py",
+            "usb.py",
+        ]
+
         for py_file in python_files:
             content = (circuit_template_dir / py_file).read_text()
             (circuit_dir / py_file).write_text(content)
-        
+
         # Copy and customize main.py
-        main_content = (circuit_template_dir / 'main.py').read_text()
-        main_customized = main_content.replace('ESP32_C6_Dev_Board', circuit_name)
-        main_customized = main_customized.replace('"ESP32-C6 Development Board"', f'"{pcb_name}"')
-        (circuit_dir / 'main.py').write_text(main_customized)
-        
+        main_content = (circuit_template_dir / "main.py").read_text()
+        main_customized = main_content.replace("ESP32_C6_Dev_Board", circuit_name)
+        main_customized = main_customized.replace(
+            '"ESP32-C6 Development Board"', f'"{pcb_name}"'
+        )
+        (circuit_dir / "main.py").write_text(main_customized)
+
         # Copy and rename JSON file
-        json_content = (circuit_template_dir / 'ESP32_C6_Dev_Board.json').read_text()
-        json_customized = json_content.replace('ESP32_C6_Dev_Board', circuit_name)
-        (circuit_dir / f'{circuit_name}.json').write_text(json_customized)
-        
+        json_content = (circuit_template_dir / "ESP32_C6_Dev_Board.json").read_text()
+        json_customized = json_content.replace("ESP32_C6_Dev_Board", circuit_name)
+        (circuit_dir / f"{circuit_name}.json").write_text(json_customized)
+
         # Copy .claude directory with all agents and commands
-        claude_dir = pcb_path / '.claude'
+        claude_dir = pcb_path / ".claude"
         claude_dir.mkdir(exist_ok=True)
-        _copy_claude_directory(template_files / '.claude', claude_dir, pcb_name, circuit_name)
-        
-        console.print(f"[green]✅ Copied complete example project structure with .claude agents[/green]")
-        
+        _copy_claude_directory(
+            template_files / ".claude", claude_dir, pcb_name, circuit_name
+        )
+
+        console.print(
+            f"[green]✅ Copied complete example project structure with .claude agents[/green]"
+        )
+
     except Exception as e:
-        console.print(f"[yellow]Warning: Could not copy from example_project template: {e}[/yellow]")
+        console.print(
+            f"[yellow]Warning: Could not copy from example_project template: {e}[/yellow]"
+        )
         console.print("[yellow]Falling back to basic structure...[/yellow]")
-        _create_fallback_structure(pcb_path, pcb_name, skip_pyproject=(original_pyproject_content is not None))
+        _create_fallback_structure(
+            pcb_path, pcb_name, skip_pyproject=(original_pyproject_content is not None)
+        )
 
 
-def _create_fallback_structure(pcb_path: Path, pcb_name: str, skip_pyproject: bool = False) -> None:
+def _create_fallback_structure(
+    pcb_path: Path, pcb_name: str, skip_pyproject: bool = False
+) -> None:
     """Fallback: Create basic structure if example_project template not available."""
-    circuit_name = pcb_name.replace(' ', '_')
-    
+    circuit_name = pcb_name.replace(" ", "_")
+
     # Create circuit-synth directory
     circuit_dir = pcb_path / "circuit-synth"
     circuit_dir.mkdir(exist_ok=True)
-    
+
     # Create basic main.py inside circuit-synth/
     main_py = circuit_dir / "main.py"
-    main_py.write_text(f'''#!/usr/bin/env python3
+    main_py.write_text(
+        f'''#!/usr/bin/env python3
 """
 {pcb_name} - Circuit Design
 Created with circuit-synth
@@ -203,21 +256,24 @@ def main():
 if __name__ == "__main__":
     circuit = main()
     circuit.generate_kicad_project(project_name="{circuit_name}")
-''')
-    
+'''
+    )
+
     # Create basic README.md
     readme_md = pcb_path / "README.md"
-    readme_md.write_text(f'''# {pcb_name}\n\nCreated with circuit-synth\n''')
-    
+    readme_md.write_text(f"""# {pcb_name}\n\nCreated with circuit-synth\n""")
+
     # Create basic CLAUDE.md
     claude_md = pcb_path / "CLAUDE.md"
-    claude_md.write_text(f'''# {pcb_name}\n\nCircuit design project\n''')
-    
+    claude_md.write_text(f"""# {pcb_name}\n\nCircuit design project\n""")
+
     # Create basic pyproject.toml (only if not skipping)
     if not skip_pyproject:
         pyproject_toml = pcb_path / "pyproject.toml"
-        pyproject_toml.write_text(f'''[project]\nname = "{pcb_path.name}"\ndescription = "{pcb_name}"\n''')
-    
+        pyproject_toml.write_text(
+            f"""[project]\nname = "{pcb_path.name}"\ndescription = "{pcb_name}"\n"""
+        )
+
     console.print(f"[green]✅ Created basic project structure[/green]")
 
 
@@ -233,74 +289,78 @@ if __name__ == "__main__":
 # Remove create_pcb_readme - handled in copy_example_project_structure
 
 
-
-
 @click.command()
-@click.option('--name', '-n', help='Override project name (default: use directory name)')
-@click.option('--minimal', is_flag=True, help='Create minimal PCB (no examples)')
+@click.option(
+    "--name", "-n", help="Override project name (default: use directory name)"
+)
+@click.option("--minimal", is_flag=True, help="Create minimal PCB (no examples)")
 def main(name: Optional[str], minimal: bool):
     """Transform current directory into a circuit-synth PCB project.
-    
+
     This command assumes you're in a fresh uv project directory and will:
     1. Delete all files except .git and hidden files
     2. Add the circuit-synth project template
     3. Use the directory name as the project name (unless overridden)
-    
+
     Examples:
         cs-new-pcb                    # Uses current directory name
         cs-new-pcb --name "My PCB"    # Override with custom name
         cs-new-pcb --minimal          # Minimal setup without examples
     """
-    
+
     # Always use current directory
     pcb_path = Path.cwd()
-    
+
     # Use directory name as default PCB name, or use provided name
     if name:
         pcb_name = name
     else:
         # Convert directory name to readable format
         # e.g., "my-awesome-pcb" -> "My Awesome PCB"
-        pcb_name = pcb_path.name.replace('-', ' ').replace('_', ' ').title()
-    
+        pcb_name = pcb_path.name.replace("-", " ").replace("_", " ").title()
+
     console.print(
-        Panel.fit(
-            Text(f"🚀 Creating PCB: {pcb_name}", style="bold blue"), 
-            style="blue"
-        )
+        Panel.fit(Text(f"🚀 Creating PCB: {pcb_name}", style="bold blue"), style="blue")
     )
-    
-    console.print(f"📁 Transforming '{pcb_path.name}' into a circuit-synth project...", style="green")
-    
+
+    console.print(
+        f"📁 Transforming '{pcb_path.name}' into a circuit-synth project...",
+        style="green",
+    )
+
     # Store the original pyproject.toml content
     original_pyproject_path = pcb_path / "pyproject.toml"
     original_pyproject_content = None
     if original_pyproject_path.exists():
         original_pyproject_content = original_pyproject_path.read_text()
-    
+
     # Clean up ALL non-hidden files and directories EXCEPT pyproject.toml
     console.print("\n🧹 Cleaning up existing files...", style="yellow")
-    
+
     for item in pcb_path.iterdir():
         # Skip hidden files (like .git) and pyproject.toml
-        if item.name.startswith('.') or item.name == 'pyproject.toml':
+        if item.name.startswith(".") or item.name == "pyproject.toml":
             continue
-            
+
         if item.is_file():
             item.unlink()
             console.print(f"   ✓ Removed {item.name}", style="dim")
         elif item.is_dir():
             shutil.rmtree(item)
             console.print(f"   ✓ Removed {item.name}/", style="dim")
-    
+
     # Copy complete example project structure
     console.print("\n📝 Copying example project structure...", style="yellow")
     if not minimal:
         # Skip copying pyproject.toml if we preserved the original
-        copy_example_project_structure(pcb_path, pcb_name, skip_pyproject=(original_pyproject_content is not None))
+        copy_example_project_structure(
+            pcb_path, pcb_name, skip_pyproject=(original_pyproject_content is not None)
+        )
     else:
-        _create_fallback_structure(pcb_path, pcb_name, skip_pyproject=(original_pyproject_content is not None))
-    
+        _create_fallback_structure(
+            pcb_path, pcb_name, skip_pyproject=(original_pyproject_content is not None)
+        )
+
     # Success message
     console.print(
         Panel.fit(

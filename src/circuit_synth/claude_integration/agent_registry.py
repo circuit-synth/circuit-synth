@@ -82,14 +82,23 @@ class CircuitSubAgent:
 
 
 def get_circuit_agents() -> Dict[str, CircuitSubAgent]:
-    """Define essential circuit design sub-agents - minimal but powerful"""
+    """Define essential circuit design sub-agents - enhanced with research requirements"""
+
+    # Import enhanced agents
+    from .agents.circuit_design_agents import get_enhanced_circuit_agents
+
+    # Get enhanced agents with research protocols
+    enhanced_agents = get_enhanced_circuit_agents()
 
     agents = {}
 
-    # Single focused agent - circuit-synth specialist
-    agents["circuit-design/circuit-synth"] = CircuitSubAgent(
-        name="circuit-synth",
-        description="Circuit-synth code generation and KiCad integration specialist",
+    # Add enhanced agents to main collection
+    agents.update(enhanced_agents)
+
+    # Original circuit-synth specialist (now legacy, enhanced version preferred)
+    agents["circuit-design/circuit-synth-legacy"] = CircuitSubAgent(
+        name="circuit-synth-legacy",
+        description="Legacy circuit-synth code generation specialist",
         system_prompt="""You are a circuit-synth specialist focused specifically on:
 
 🔧 **Circuit-Synth Code Generation**
@@ -235,7 +244,8 @@ def register_circuit_agents():
     # Import agents to trigger registration
     try:
         from .agents import contributor_agent  # This triggers @register_agent decorator
-        from .agents import test_plan_agent  # This triggers @register_agent decorator
+
+        # from .agents import test_plan_agent  # Currently not available
 
         print("✅ Loaded modern agents")
     except ImportError as e:

@@ -5,7 +5,8 @@ Debug_Header subcircuit generated from KiCad
 
 from circuit_synth import *
 
-@circuit(name='Debug_Header')
+
+@circuit(name="Debug_Header")
 def debug_header(gnd, vcc_3v3, debug_en, debug_io0, debug_rx, debug_tx):
     """
     Debug_Header subcircuit
@@ -13,7 +14,12 @@ def debug_header(gnd, vcc_3v3, debug_en, debug_io0, debug_rx, debug_tx):
     """
 
     # Create components
-    j2 = Component(symbol="Connector_Generic:Conn_02x03_Odd_Even", ref="J2", value="~", footprint="Connector_IDC:IDC-Header_2x03_P2.54mm_Vertical")
+    j2 = Component(
+        symbol="Connector_Generic:Conn_02x03_Odd_Even",
+        ref="J2",
+        value="~",
+        footprint="Connector_IDC:IDC-Header_2x03_P2.54mm_Vertical",
+    )
 
     # Connections
     j2[1] += debug_en

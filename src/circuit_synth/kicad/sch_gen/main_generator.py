@@ -423,8 +423,10 @@ class SchematicGenerator(IKiCadIntegration):
         logger.info("🔄 Updating existing project while preserving your work...")
 
         # Import here to avoid circular dependencies
+        from circuit_synth.kicad_api.schematic.hierarchical_synchronizer import (
+            HierarchicalSynchronizer,
+        )
         from circuit_synth.kicad_api.schematic.sync_adapter import SyncAdapter
-        from circuit_synth.kicad_api.schematic.hierarchical_synchronizer import HierarchicalSynchronizer
 
         # Load circuit from JSON using the same loader as generate
         logger.debug(f"Loading circuit from {json_file}")
@@ -440,11 +442,15 @@ class SchematicGenerator(IKiCadIntegration):
 
         # Check if this is a hierarchical project
         has_subcircuits = bool(sub_dict)
-        
+
         if has_subcircuits:
             # Use hierarchical synchronizer for projects with subcircuits
-            logger.debug(f"Creating hierarchical synchronizer for project: {project_path}")
-            logger.info(f"Detected hierarchical project with {len(sub_dict)} subcircuits")
+            logger.debug(
+                f"Creating hierarchical synchronizer for project: {project_path}"
+            )
+            logger.info(
+                f"Detected hierarchical project with {len(sub_dict)} subcircuits"
+            )
             synchronizer = HierarchicalSynchronizer(
                 project_path=str(project_path), preserve_user_components=True
             )
@@ -554,23 +560,35 @@ class SchematicGenerator(IKiCadIntegration):
         logger.info("\n=== Project Update Summary ===")
 
         # Check if this is a hierarchical report
-        if 'sheets_synchronized' in sync_report:
+        if "sheets_synchronized" in sync_report:
             # Hierarchical project report
-            logger.info(f"✓ Sheets synchronized: {sync_report.get('sheets_synchronized', 0)}")
-            logger.info(f"✓ Total components matched: {sync_report.get('total_matched', 0)}")
-            logger.info(f"✓ Total components added: {sync_report.get('total_added', 0)}")
-            logger.info(f"✓ Total components modified: {sync_report.get('total_modified', 0)}")
-            logger.info(f"✓ Total components preserved: {sync_report.get('total_preserved', 0)}")
-            
+            logger.info(
+                f"✓ Sheets synchronized: {sync_report.get('sheets_synchronized', 0)}"
+            )
+            logger.info(
+                f"✓ Total components matched: {sync_report.get('total_matched', 0)}"
+            )
+            logger.info(
+                f"✓ Total components added: {sync_report.get('total_added', 0)}"
+            )
+            logger.info(
+                f"✓ Total components modified: {sync_report.get('total_modified', 0)}"
+            )
+            logger.info(
+                f"✓ Total components preserved: {sync_report.get('total_preserved', 0)}"
+            )
+
             # Show per-sheet details if available
-            sheet_reports = sync_report.get('sheet_reports', {})
+            sheet_reports = sync_report.get("sheet_reports", {})
             if sheet_reports:
                 logger.info("\n=== Per-Sheet Summary ===")
                 for sheet_path, sheet_report in sheet_reports.items():
                     logger.info(f"  {sheet_path}:")
-                    logger.info(f"    Matched: {sheet_report.get('matched', 0)}, "
-                               f"Added: {sheet_report.get('added', 0)}, "
-                               f"Modified: {sheet_report.get('modified', 0)}")
+                    logger.info(
+                        f"    Matched: {sheet_report.get('matched', 0)}, "
+                        f"Added: {sheet_report.get('added', 0)}, "
+                        f"Modified: {sheet_report.get('modified', 0)}"
+                    )
         else:
             # Regular flat project report
             summary = sync_report.get("summary", {})
@@ -1498,10 +1516,16 @@ class SchematicGenerator(IKiCadIntegration):
 
         return cover_uuid, sheet_symbol_uuid
 
-    def _update_kicad_pro(self, sub_dict: dict, top_name: str, root_uuid: str = None, sheet_uuids: dict = None):
+    def _update_kicad_pro(
+        self,
+        sub_dict: dict,
+        top_name: str,
+        root_uuid: str = None,
+        sheet_uuids: dict = None,
+    ):
         """
         Update the .kicad_pro file to reference all generated .kicad_sch files.
-        
+
         Args:
             sub_dict: Dictionary of subcircuits
             top_name: Name of the top-level circuit
@@ -1530,12 +1554,15 @@ class SchematicGenerator(IKiCadIntegration):
                     content = f.read()
                     # Parse UUID from schematic
                     import re
-                    uuid_match = re.search(r'\(uuid\s+([a-f0-9-]+)\)', content)
+
+                    uuid_match = re.search(r"\(uuid\s+([a-f0-9-]+)\)", content)
                     if uuid_match:
                         sheets.append([uuid_match.group(1), ""])
                     else:
                         # Fallback to old format if UUID not found
-                        logger.warning("Could not find UUID in root schematic, using filename")
+                        logger.warning(
+                            "Could not find UUID in root schematic, using filename"
+                        )
                         sheets.append([f"{self.project_name}.kicad_sch", ""])
             else:
                 # Fallback to old format
@@ -1543,7 +1570,9 @@ class SchematicGenerator(IKiCadIntegration):
 
         # Add all subcircuit sheets (excluding the main circuit since it's in the root)
         for c_name in sub_dict:
-            if c_name != top_name:  # Skip the main circuit as it's in the root schematic
+            if (
+                c_name != top_name
+            ):  # Skip the main circuit as it's in the root schematic
                 if sheet_uuids and c_name in sheet_uuids:
                     # Use the provided UUID
                     sheets.append([sheet_uuids[c_name], c_name])
@@ -1555,12 +1584,15 @@ class SchematicGenerator(IKiCadIntegration):
                             content = f.read()
                             # Parse UUID from schematic
                             import re
-                            uuid_match = re.search(r'\(uuid\s+([a-f0-9-]+)\)', content)
+
+                            uuid_match = re.search(r"\(uuid\s+([a-f0-9-]+)\)", content)
                             if uuid_match:
                                 sheets.append([uuid_match.group(1), c_name])
                             else:
                                 # Fallback to old format if UUID not found
-                                logger.warning(f"Could not find UUID in {c_name} schematic, using filename")
+                                logger.warning(
+                                    f"Could not find UUID in {c_name} schematic, using filename"
+                                )
                                 sheets.append([f"{c_name}.kicad_sch", c_name])
                     else:
                         # Fallback to old format
@@ -1572,7 +1604,9 @@ class SchematicGenerator(IKiCadIntegration):
         with open(kicad_pro_path, "w") as f:
             json.dump(pro_data, f, indent=2)
 
-        logger.debug(f"Updated .kicad_pro with {len(sheets)} schematic entries with UUIDs.")
+        logger.debug(
+            f"Updated .kicad_pro with {len(sheets)} schematic entries with UUIDs."
+        )
 
     def generate_pcb_from_schematics(
         self,
