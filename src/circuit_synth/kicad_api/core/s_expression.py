@@ -172,9 +172,15 @@ class SExpressionParser:
                 # Page values must always be quoted
                 if in_page:
                     return '"' + sexp + '"'
-                # Property values must always be quoted
+                # Property values must always be quoted and properly escaped
                 if in_property_value:
-                    return '"' + sexp + '"'
+                    # Properly escape backslashes, quotes, and newlines for KiCad format
+                    escaped = (
+                        sexp.replace("\\", "\\\\")
+                        .replace('"', '\\"')
+                        .replace("\n", "\\n")
+                    )
+                    return '"' + escaped + '"'
                 # Generator values must always be quoted
                 if in_generator:
                     return '"' + sexp + '"'
@@ -1360,13 +1366,29 @@ class SExpressionParser:
             # During synchronization, symbols from existing schematics might not have
             # instances data populated. This is acceptable during parsing.
             logger.warning(
-                f"Symbol {symbol.reference} has no instances information - creating minimal instances"
+                f"Symbol {symbol.reference} has no instances information - creating default instances"
             )
-            # Create minimal instances data to avoid breaking synchronization
-            minimal_instances = [sexpdata.Symbol("instances")]
-            sexp.append(minimal_instances)
+            # Create proper instances data with project information
+            instances_sexp = [sexpdata.Symbol("instances")]
+
+            # Get project name from context or use default
+            project_name = getattr(symbol, "_project_name", "preservation_test")
+
+            # Create a default instance block
+            instance_block = [
+                sexpdata.Symbol("project"),
+                project_name,
+                [
+                    sexpdata.Symbol("path"),
+                    "/",  # Root path
+                    [sexpdata.Symbol("reference"), symbol.reference],
+                    [sexpdata.Symbol("unit"), symbol.unit if symbol.unit else 1],
+                ],
+            ]
+            instances_sexp.append(instance_block)
+            sexp.append(instances_sexp)
             logger.debug(
-                f"  Added minimal instances S-expression for synchronization compatibility"
+                f"  Added default instances S-expression for {symbol.reference} with project {project_name}"
             )
 
         return sexp
