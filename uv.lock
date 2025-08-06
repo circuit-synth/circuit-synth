@@ -5,11 +5,8 @@ requires-python = ">=3.12"
 [manifest]
 members = [
     "circuit-synth",
-    "cs-test",
     "example-project",
-    "final-test",
-    "fresh-agent-test",
-    "validation-test",
+    "test-project",
 ]
 
 [[package]]
@@ -601,17 +598,6 @@ wheels = [
 ]
 
 [[package]]
-name = "cs-test"
-version = "0.1.0"
-source = { virtual = "cs_test" }
-dependencies = [
-    { name = "circuit-synth" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "circuit-synth", editable = "." }]
-
-[[package]]
 name = "cycler"
 version = "0.12.1"
 source = { registry = "https://pypi.org/simple" }
@@ -659,17 +645,6 @@ wheels = [
 ]
 
 [[package]]
-name = "final-test"
-version = "0.1.0"
-source = { virtual = "test_agent_setup/final_test" }
-dependencies = [
-    { name = "circuit-synth" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "circuit-synth", editable = "." }]
-
-[[package]]
 name = "flake8"
 version = "7.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -707,17 +682,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/a0/ee/f626cd372932d828508137a79b85167fdcf3adab2e3bed433f295c596c6a/fonttools-4.59.0-cp313-cp313-win_amd64.whl", hash = "sha256:26731739daa23b872643f0e4072d5939960237d540c35c14e6a06d47d71ca8fe", size = 2248560, upload-time = "2025-07-16T12:04:36.034Z" },
     { url = "https://files.pythonhosted.org/packages/d0/9c/df0ef2c51845a13043e5088f7bb988ca6cd5bb82d5d4203d6a158aa58cf2/fonttools-4.59.0-py3-none-any.whl", hash = "sha256:241313683afd3baacb32a6bd124d0bce7404bc5280e12e291bae1b9bba28711d", size = 1128050, upload-time = "2025-07-16T12:04:52.687Z" },
 ]
-
-[[package]]
-name = "fresh-agent-test"
-version = "0.1.0"
-source = { virtual = "test_agent_setup/fresh_agent_test" }
-dependencies = [
-    { name = "circuit-synth" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "circuit-synth", editable = "." }]
 
 [[package]]
 name = "frozenlist"
@@ -2171,6 +2135,17 @@ wheels = [
 ]
 
 [[package]]
+name = "test-project"
+version = "0.1.0"
+source = { virtual = "test_8_agents/test_project" }
+dependencies = [
+    { name = "circuit-synth" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "circuit-synth", editable = "." }]
+
+[[package]]
 name = "twine"
 version = "6.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2237,17 +2212,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/15/22/9ee70a2574a4f4599
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a7/c2/fe1e52489ae3122415c51f387e221dd0773709bad6c6cdaa599e8a2c5185/urllib3-2.5.0-py3-none-any.whl", hash = "sha256:e6b01673c0fa6a13e374b50871808eb3bf7046c4b125b216f6bf1cc604cff0dc", size = 129795, upload-time = "2025-06-18T14:07:40.39Z" },
 ]
-
-[[package]]
-name = "validation-test"
-version = "0.1.0"
-source = { virtual = "test_agent_setup/validation_test" }
-dependencies = [
-    { name = "circuit-synth" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "circuit-synth", editable = "." }]
 
 [[package]]
 name = "virtualenv"

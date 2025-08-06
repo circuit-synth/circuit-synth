@@ -184,6 +184,9 @@ members = [
     "test_agent_setup/fresh_agent_test",
     "test_agent_setup/validation_test",
     "test_agent_setup/final_test",
+    "agent_validation_test/agent_test",
+    "test_generation/format_test",
+    "test_8_agents/test_project",
 ]
 
 [dependency-groups]
