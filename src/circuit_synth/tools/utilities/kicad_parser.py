@@ -14,8 +14,8 @@ import tempfile
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from circuit_synth.tools.kicad_netlist_parser import KiCadNetlistParser
-from circuit_synth.tools.models import Circuit, Component, Net
+from circuit_synth.tools.utilities.kicad_netlist_parser import KiCadNetlistParser
+from circuit_synth.tools.utilities.models import Circuit, Component, Net
 
 logger = logging.getLogger(__name__)
 

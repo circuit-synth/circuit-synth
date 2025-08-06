@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from circuit_synth.tools.models import Circuit, Component, Net
-from circuit_synth.tools.python_code_generator import PythonCodeGenerator
+from circuit_synth import Circuit, Component, Net
+from circuit_synth.tools.utilities.python_code_generator import PythonCodeGenerator
 
 
 class TestPythonCodeGeneratorEdgeCases:
@@ -33,7 +33,7 @@ class TestPythonCodeGeneratorEdgeCases:
 
     def test_empty_circuit_generation(self, generator):
         """Test generation of code for empty circuits"""
-        empty_circuit = Circuit(name="empty", components=[], nets=[])
+        empty_circuit = Circuit(name="empty")
 
         # Should generate valid Python code even for empty circuits
         code = generator._generate_flat_code(empty_circuit)
@@ -46,11 +46,10 @@ class TestPythonCodeGeneratorEdgeCases:
 
     def test_circuit_with_no_nets(self, generator):
         """Test generation of code for circuits with components but no nets"""
-        circuit = Circuit(
-            name="no_nets",
-            components=[Component(reference="R1", lib_id="Device:R", value="10k")],
-            nets=[],
-        )
+        circuit = Circuit(name="no_nets")
+        # Add component to circuit
+        r1 = Component(symbol="Device:R", ref="R1", value="10k")
+        circuit.add_component(r1)
 
         code = generator._generate_flat_code(circuit)
 
@@ -80,14 +79,16 @@ class TestPythonCodeGeneratorEdgeCases:
 
     def test_single_circuit_file_generation(self, generator, temp_output_dir):
         """Test generation of single file for non-hierarchical circuits"""
-        circuit = Circuit(
-            name="main",
-            components=[Component(reference="R1", lib_id="Device:R", value="10k")],
-            nets=[
-                Net(name="VCC", connections=[("R1", "1")]),
-                Net(name="GND", connections=[("R1", "2")]),
-            ],
-        )
+        circuit = Circuit(name="main")
+        r1 = Component(symbol="Device:R", ref="R1", value="10k")
+        circuit.add_component(r1)
+
+        vcc = Net("VCC")
+        gnd = Net("GND")
+        r1[1] += vcc
+        r1[2] += gnd
+        circuit.add_net(vcc)
+        circuit.add_net(gnd)
 
         circuits = {"main": circuit}
         main_file = temp_output_dir / "main.py"
@@ -108,7 +109,7 @@ class TestPythonCodeGeneratorEdgeCases:
         """Test generation of separate files for hierarchical circuits with no shared nets"""
         main_circuit = Circuit(
             name="main",
-            components=[Component(reference="R1", lib_id="Device:R", value="1k")],
+            components=[Component(symbol="Device:R", ref="R1", value="1k")],
             nets=[
                 Net(name="VCC_MAIN", connections=[]),
                 Net(name="GND_MAIN", connections=[]),
@@ -117,7 +118,7 @@ class TestPythonCodeGeneratorEdgeCases:
 
         child_circuit = Circuit(
             name="child1",
-            components=[Component(reference="R2", lib_id="Device:R", value="2k")],
+            components=[Component(symbol="Device:R", ref="R2", value="2k")],
             nets=[
                 Net(name="VCC_CHILD", connections=[]),
                 Net(name="GND_CHILD", connections=[]),
@@ -147,7 +148,7 @@ class TestPythonCodeGeneratorEdgeCases:
         """Test generation of separate files for hierarchical circuits with shared nets"""
         main_circuit = Circuit(
             name="main",
-            components=[Component(reference="R1", lib_id="Device:R", value="1k")],
+            components=[Component(symbol="Device:R", ref="R1", value="1k")],
             nets=[
                 Net(name="VCC", connections=[]),
                 Net(name="GND", connections=[]),
@@ -157,7 +158,7 @@ class TestPythonCodeGeneratorEdgeCases:
 
         child_circuit = Circuit(
             name="child1",
-            components=[Component(reference="R2", lib_id="Device:R", value="2k")],
+            components=[Component(symbol="Device:R", ref="R2", value="2k")],
             nets=[
                 Net(name="VCC", connections=[]),
                 Net(name="GND", connections=[]),
@@ -353,7 +354,7 @@ class TestPythonCodeGeneratorEdgeCases:
         """Test generation of net connection statements"""
         circuit = Circuit(
             name="main",
-            components=[Component(reference="R1", lib_id="Device:R", value="10k")],
+            components=[Component(symbol="Device:R", ref="R1", value="10k")],
             nets=[
                 Net(name="VCC", connections=[("R1", "1")]),
                 Net(name="GND", connections=[("R1", "2")]),
@@ -372,7 +373,7 @@ class TestPythonCodeGeneratorEdgeCases:
         """Test that unconnected nets are properly filtered out"""
         circuit = Circuit(
             name="main",
-            components=[Component(reference="R1", lib_id="Device:R", value="10k")],
+            components=[Component(symbol="Device:R", ref="R1", value="10k")],
             nets=[
                 Net(name="VCC", connections=[("R1", "1")]),
                 Net(

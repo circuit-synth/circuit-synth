@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from circuit_synth.cli.utilities.models import Circuit, Component, Net
+from circuit_synth.tools.utilities.models import Circuit, Component, Net
 
 logger = logging.getLogger(__name__)
 

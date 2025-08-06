@@ -30,7 +30,9 @@ import pytest
 # Import circuit-synth functionality
 try:
     from circuit_synth import Circuit, Component, Net
-    from circuit_synth.tools.kicad_to_python_sync import KiCadToPythonSyncer
+    from circuit_synth.tools.kicad_integration.kicad_to_python_sync import (
+        KiCadToPythonSyncer,
+    )
 except ImportError as e:
     pytest.skip(
         f"Circuit-synth import functionality not available: {e}",

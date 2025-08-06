@@ -26,11 +26,11 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from circuit_synth.tools.kicad_parser import KiCadParser
+from circuit_synth.tools.utilities.kicad_parser import KiCadParser
 
 # Import refactored modules
-from circuit_synth.tools.models import Circuit, Component, Net
-from circuit_synth.tools.python_code_generator import PythonCodeGenerator
+from circuit_synth.tools.utilities.models import Circuit, Component, Net
+from circuit_synth.tools.utilities.python_code_generator import PythonCodeGenerator
 
 # Configure logging
 logging.basicConfig(

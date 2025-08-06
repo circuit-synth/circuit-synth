@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 from typing import List, Tuple
 
-from circuit_synth.tools.models import Component, Net
+from circuit_synth.tools.utilities.models import Component, Net
 
 logger = logging.getLogger(__name__)
 
