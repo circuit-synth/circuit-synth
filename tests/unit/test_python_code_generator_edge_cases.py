@@ -48,7 +48,7 @@ class TestPythonCodeGeneratorEdgeCases:
         """Test generation of code for circuits with components but no nets"""
         circuit = Circuit(name="no_nets")
         # Add component to circuit
-        r1 = Component(symbol="Device:R", ref="R1", value="10k")
+        r1 = Component("Device:R", ref="R1", value="10k")
         circuit.add_component(r1)
 
         code = generator._generate_flat_code(circuit)
@@ -80,7 +80,7 @@ class TestPythonCodeGeneratorEdgeCases:
     def test_single_circuit_file_generation(self, generator, temp_output_dir):
         """Test generation of single file for non-hierarchical circuits"""
         circuit = Circuit(name="main")
-        r1 = Component(symbol="Device:R", ref="R1", value="10k")
+        r1 = Component("Device:R", ref="R1", value="10k")
         circuit.add_component(r1)
 
         vcc = Net("VCC")

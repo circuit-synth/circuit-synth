@@ -6,7 +6,7 @@ Tests both validation logic and context generation functionality.
 
 import pytest
 
-from circuit_synth.validation import (
+from circuit_synth.ai_integration.validation import (
     get_circuit_design_context,
     validate_and_improve_circuit,
 )
@@ -88,7 +88,7 @@ class TestValidatedCircuitGenerator:
         # For now, just verify the validation functions are importable and callable
 
         # Test that we can import and call the validation functions
-        from circuit_synth.validation import (
+        from circuit_synth.ai_integration.validation import (
             get_circuit_design_context,
             validate_and_improve_circuit,
         )
