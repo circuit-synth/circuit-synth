@@ -7,6 +7,7 @@ use log::{debug, info};
 
 pub mod hierarchical_labels;
 pub mod s_expression;
+pub mod schematic_api;
 pub mod types;
 
 pub mod python_bindings;

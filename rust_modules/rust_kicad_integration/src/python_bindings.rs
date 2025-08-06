@@ -7,6 +7,7 @@ use pyo3::types::{PyDict, PyList};
 
 use crate::types::*;
 use crate::RustSchematicWriter;
+use crate::schematic_api;
 use log::{debug, info};
 
 /// Initialize logging for the Python module using pyo3-log
@@ -156,6 +157,19 @@ impl PyRustSchematicWriter {
             Ok(dict.into())
         })
     }
+}
+
+/// Create an empty KiCad schematic with specified paper size
+#[pyfunction]
+#[pyo3(signature = (paper_size="A4"))]
+pub fn create_empty_schematic(paper_size: &str) -> PyResult<String> {
+    Ok(schematic_api::create_empty_schematic(paper_size))
+}
+
+/// Create a minimal KiCad schematic with default A4 paper
+#[pyfunction]
+pub fn create_minimal_schematic() -> PyResult<String> {
+    Ok(schematic_api::create_minimal_schematic())
 }
 
 /// Standalone function to generate hierarchical labels from Python data
@@ -887,6 +901,10 @@ fn rust_kicad_schematic_writer(_py: Python, m: &PyModule) -> PyResult<()> {
     )?)?;
     m.add_function(wrap_pyfunction!(generate_schematic_from_python, m)?)?;
     m.add_function(wrap_pyfunction!(generate_component_sexp, m)?)?;
+    
+    // Add simple schematic creation functions
+    m.add_function(wrap_pyfunction!(create_empty_schematic, m)?)?;
+    m.add_function(wrap_pyfunction!(create_minimal_schematic, m)?)?;
 
     info!("✅ Python module initialized successfully");
     Ok(())
