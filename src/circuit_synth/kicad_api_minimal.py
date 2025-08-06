@@ -6,27 +6,37 @@ to maintain backward compatibility while removing the bulk of the
 unused implementation.
 """
 
+
 class Junction:
     """Minimal Junction stub"""
+
     def __init__(self, *args, **kwargs):
         pass
+
 
 class Label:
     """Minimal Label stub"""
+
     def __init__(self, *args, **kwargs):
         pass
+
 
 class Schematic:
     """Minimal Schematic stub"""
+
     def __init__(self, *args, **kwargs):
         pass
+
 
 class SchematicSymbol:
     """Minimal SchematicSymbol stub"""
+
     def __init__(self, *args, **kwargs):
         pass
 
+
 class Wire:
     """Minimal Wire stub"""
+
     def __init__(self, *args, **kwargs):
         pass

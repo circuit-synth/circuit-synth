@@ -64,10 +64,10 @@ from .core.rust_components import (
     get_rust_component_status,
 )
 
-# Removed unused interface abstractions and unified integration
-
 # Plugin integration
 from .plugins import AIDesignBridge
+
+# Removed unused interface abstractions and unified integration
 
 
 # Claude Code integration (optional)

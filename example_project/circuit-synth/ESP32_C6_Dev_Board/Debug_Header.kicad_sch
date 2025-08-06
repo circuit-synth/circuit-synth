@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version "9.0")
-	(uuid c2d64e93-b75e-4734-868b-26fd5f0193aa)
+	(uuid df025b50-3303-4b88-8deb-afd0134fd94a)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_02x03_Odd_Even"
@@ -305,7 +305,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 7a1b2a6e-a615-4faa-8363-a18db7f0fcd2)
+		(uuid 2d5a3fe9-4eb5-4979-9338-0625ac428ac8)
 		(property "Reference" "J2"
 			(at 58.42 40.72 0)
 			(effects
@@ -326,7 +326,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/cd176441-12b1-45ce-9539-705db226cf5a/36228f78-e7c0-4ef4-9b03-a65877da5658/53d63b60-b990-4975-ba2b-a3a756336eb4"
+				(path "/aec751bd-5fec-46c2-9398-4fa862e8fba2/d97f18d9-8791-4301-a9c0-a8182e88bbbf/4213c1a1-c149-4185-957b-05912378c9e4"
 					(reference "J2")
 					(unit 1)
 				)
@@ -343,7 +343,7 @@
 			)
 			(justify right)
 		)
-		(uuid ed55eb6b-8c7d-4338-a58d-6a37616651b4)
+		(uuid 46ca91c9-714f-4e9e-afd9-62f6e6492697)
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -355,7 +355,7 @@
 			)
 			(justify right)
 		)
-		(uuid 84f24fa4-5cd6-4647-a6f0-61d474de40e7)
+		(uuid 3b90eb78-68fc-4955-9f58-02021174e4c5)
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -367,7 +367,7 @@
 			)
 			(justify right)
 		)
-		(uuid 166f1616-840c-46b9-a526-b95ec034cb7f)
+		(uuid f271d877-c6f8-4ac3-9325-05d154821f1a)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -379,7 +379,7 @@
 			)
 			(justify left)
 		)
-		(uuid 2d5899eb-98c7-400d-9f57-9b615d13d5a9)
+		(uuid 82305cbf-3113-4a9b-9b87-bd2e25a52d74)
 	)
 	(hierarchical_label
 		GND
@@ -391,7 +391,7 @@
 			)
 			(justify left)
 		)
-		(uuid 0023369a-6156-47e2-bf6d-0c303f247930)
+		(uuid fca20d7a-8ffc-4e06-a944-38cf1d59c765)
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -403,7 +403,7 @@
 			)
 			(justify left)
 		)
-		(uuid 4fb0b2b8-a73f-49c2-87eb-bdbe43fc72e1)
+		(uuid 4ed4c753-9e9f-4046-bd7b-0ff1d39093f9)
 	)
 	(text_box
 		"Debug header for programming and debugging"
@@ -436,10 +436,10 @@
 			)
 			(justify left top)
 		)
-		(uuid 0f300dbe-7ca3-431e-a135-d556adae2192)
+		(uuid 7f284903-8b2d-478f-8682-501e6dddba54)
 	)
 	(sheet_instances
-		(path "/cd176441-12b1-45ce-9539-705db226cf5a/36228f78-e7c0-4ef4-9b03-a65877da5658/53d63b60-b990-4975-ba2b-a3a756336eb4"
+		(path "/aec751bd-5fec-46c2-9398-4fa862e8fba2/d97f18d9-8791-4301-a9c0-a8182e88bbbf/4213c1a1-c149-4185-957b-05912378c9e4"
 			(page "1")
 		)
 	)

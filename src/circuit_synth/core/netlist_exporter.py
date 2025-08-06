@@ -37,38 +37,46 @@ except ImportError as e:
     defensive_logger.error(
         f"RUST NETLIST IMPORT FAILED: rust_netlist_processor not available: {e}"
     )
-    defensive_logger.error("Please ensure rust_netlist_processor is compiled with: maturin develop --release")
+    defensive_logger.error(
+        "Please ensure rust_netlist_processor is compiled with: maturin develop --release"
+    )
     RUST_NETLIST_AVAILABLE = False
     RUST_NETLIST_PROCESSOR = None
-    
+
     # Python fallback implementation
     def convert_json_to_netlist(json_file_path, output_path):
         """Python fallback for netlist conversion when Rust is unavailable."""
         try:
             # Import the Python netlist exporter
-            from ..kicad.netlist_exporter import generate_netlist
             from pathlib import Path
-            
+
+            from ..kicad.netlist_exporter import generate_netlist
+
             # Ensure output directory exists
             output_file = Path(output_path)
             output_file.parent.mkdir(parents=True, exist_ok=True)
-            
+
             # Read the JSON file
-            with open(json_file_path, 'r') as f:
+            with open(json_file_path, "r") as f:
                 circuit_data = json.load(f)
-            
+
             # Generate KiCad netlist using Python implementation
             netlist_content = generate_netlist(circuit_data)
-            
+
             # Write to output file
-            with open(output_path, 'w') as f:
+            with open(output_path, "w") as f:
                 f.write(netlist_content)
-                
-            defensive_logger.info("Python fallback: Successfully generated KiCad netlist at %s", output_path)
-            
+
+            defensive_logger.info(
+                "Python fallback: Successfully generated KiCad netlist at %s",
+                output_path,
+            )
+
         except Exception as e:
             defensive_logger.error("Python fallback failed: %s", e)
-            raise CircuitSynthError(f"Failed to generate netlist with Python fallback: {e}")
+            raise CircuitSynthError(
+                f"Failed to generate netlist with Python fallback: {e}"
+            )
 
 
 def convert_python_to_rust_format(circuit_data: dict) -> dict:
@@ -178,9 +186,11 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
 
     # Use Rust implementation (only option now - Python fallback removed)
     if not RUST_NETLIST_AVAILABLE or not RUST_NETLIST_PROCESSOR:
-        raise CircuitSynthError("Rust netlist processor not available - ensure rust_netlist_processor is compiled")
-    
-    # Rust implementation (only option)
+        raise CircuitSynthError(
+            "Rust netlist processor not available - ensure rust_netlist_processor is compiled"
+        )
+
+        # Rust implementation (only option)
         defensive_logger.debug("RUST DEFENSIVE: Attempting Rust netlist generation")
 
         try:
@@ -217,7 +227,7 @@ def generate_kicad_netlist_defensive(circuit_data: dict) -> str:
         except Exception as e:
             rust_duration = time.perf_counter() - rust_start
             total_duration = time.perf_counter() - start_time
-            
+
             defensive_logger.error(
                 f"❌ RUST NETLIST FAILURE: Rust netlist generation failed after {rust_duration:.4f}s"
             )

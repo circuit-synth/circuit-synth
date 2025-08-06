@@ -318,7 +318,9 @@ class Component(SimplifiedPinAccess):
             # Store the user's reference (handle None values)
             if value is None:
                 super().__setattr__("_user_reference", "")
-                super().__setattr__("_is_prefix", True)  # Default to prefix when no reference
+                super().__setattr__(
+                    "_is_prefix", True
+                )  # Default to prefix when no reference
                 super().__setattr__("ref", None)  # Update the dataclass field
                 context_logger.debug(
                     "Component reference set to None", component="COMPONENT"

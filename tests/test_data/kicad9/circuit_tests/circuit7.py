@@ -14,10 +14,12 @@ We verify that:
   - Normal I/O pins can be connected or left out.
 """
 import logging
+
 from circuit_synth import *
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
 
 @circuit(name="pin_edge_cases_circuit")
 def pin_edge_cases_circuit():
@@ -43,11 +45,11 @@ def pin_edge_cases_circuit():
     op_amp = Component(
         symbol="Amplifier_Operational:TL081",
         ref="U1",
-        footprint="Package_DIP:DIP-8_W7.62mm"
+        footprint="Package_DIP:DIP-8_W7.62mm",
     )
 
     # Connect power pins
-    op_amp[4] += gnd   # V-
+    op_amp[4] += gnd  # V-
     op_amp[7] += rail_12v  # V+
 
     # Connect the output
@@ -59,6 +61,7 @@ def pin_edge_cases_circuit():
     # We could optionally connect the input pins if needed,
     # but let's leave them unconnected for demonstration.
     # That will allow us to see how they appear in JSON.
+
 
 if __name__ == "__main__":
     c = pin_edge_cases_circuit()

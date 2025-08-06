@@ -612,12 +612,24 @@ cd ../..
 # Test build tool functionality
 echo "🔧 5.1a: Testing build tools..."
 
-# Test help commands
-./tools/build/format_all.sh --help >/dev/null 2>&1 && echo "✅ 5.1b: format_all.sh responds" || echo "❌ 5.1b: format_all.sh failed"
+# Test script existence and permissions (better than --help since they don't all support it)
+if [ -x "./tools/build/format_all.sh" ]; then
+    echo "✅ 5.1b: format_all.sh exists and is executable"
+else
+    echo "❌ 5.1b: format_all.sh missing or not executable"
+fi
 
-./tools/testing/run_all_tests.sh --help >/dev/null 2>&1 && echo "✅ 5.1c: run_all_tests.sh responds" || echo "❌ 5.1c: run_all_tests.sh failed"
+if [ -x "./tools/testing/run_all_tests.sh" ]; then
+    echo "✅ 5.1c: run_all_tests.sh exists and is executable"
+else
+    echo "❌ 5.1c: run_all_tests.sh missing or not executable"
+fi
 
-./tools/release/release_to_pypi.sh --help >/dev/null 2>&1 && echo "✅ 5.1d: release_to_pypi.sh responds" || echo "❌ 5.1d: release_to_pypi.sh failed"
+if [ -x "./tools/release/release_to_pypi.sh" ]; then
+    echo "✅ 5.1d: release_to_pypi.sh exists and is executable"
+else
+    echo "❌ 5.1d: release_to_pypi.sh missing or not executable"
+fi
 ```
 
 #### Test 5.2: CLI Tools
@@ -670,13 +682,13 @@ def performance_test():
             nets[i-1] += comp[1]
             nets[i] += comp[2]
     
-    return components, nets
+    return len(components), len(nets)
 
-components, nets = performance_test()
+comp_count, net_count = performance_test()
 duration = time.time() - start
 
 print(f'✅ 6.1: Performance test completed in {duration:.2f}s')
-print(f'  Created {len(components)} components and {len(nets)} nets')
+print(f'  Created {comp_count} components and {net_count} nets')
 "
 ```
 
@@ -689,9 +701,15 @@ echo "🧹 6.2: Testing cleanup functionality..."
 mkdir -p /tmp/circuit_test_cleanup
 cd /tmp/circuit_test_cleanup
 
+# Change to project root for proper imports
+cd /Users/shanemattner/Desktop/circuit-synth2
+
 # Generate test files
 uv run python -c "
+import os
+os.chdir('/tmp/circuit_test_cleanup')
 from circuit_synth import *
+
 @circuit
 def cleanup_test():
     r1 = Component(symbol='Device:R', ref='R1', value='1k')

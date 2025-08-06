@@ -20,13 +20,14 @@ from ...core.dependency_injection import (
     ServiceLocator,
 )
 
-# Removed unused interface abstractions - using concrete implementation
-
 # Import existing implementation modules
 from .circuit_loader import assign_subcircuit_instance_labels, load_circuit_hierarchy
 from .collision_manager import SHEET_MARGIN, CollisionManager
 from .connection_aware_collision_manager import ConnectionAwareCollisionManager
 from .schematic_writer import SchematicWriter, write_schematic_file
+
+# Removed unused interface abstractions - using concrete implementation
+
 
 # LLM placement not available - using optimized collision-based placement
 LLM_PLACEMENT_AVAILABLE = False
@@ -55,6 +56,7 @@ class LLMPlacementManager:
 from circuit_synth.core.component import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
+
 # Removed unused netlist_importer import
 from circuit_synth.kicad.sch_editor.schematic_reader import SchematicReader
 
@@ -1452,10 +1454,16 @@ class SchematicGenerator:
 
         return cover_uuid, sheet_symbol_uuid
 
-    def _update_kicad_pro(self, sub_dict: dict, top_name: str, root_uuid: str = None, sheet_uuids: dict = None):
+    def _update_kicad_pro(
+        self,
+        sub_dict: dict,
+        top_name: str,
+        root_uuid: str = None,
+        sheet_uuids: dict = None,
+    ):
         """
         Update the .kicad_pro file to reference all generated .kicad_sch files.
-        
+
         Args:
             sub_dict: Dictionary of subcircuits
             top_name: Name of the top-level circuit
@@ -1484,12 +1492,15 @@ class SchematicGenerator:
                     content = f.read()
                     # Parse UUID from schematic
                     import re
-                    uuid_match = re.search(r'\(uuid\s+([a-f0-9-]+)\)', content)
+
+                    uuid_match = re.search(r"\(uuid\s+([a-f0-9-]+)\)", content)
                     if uuid_match:
                         sheets.append([uuid_match.group(1), ""])
                     else:
                         # Fallback to old format if UUID not found
-                        logger.warning("Could not find UUID in root schematic, using filename")
+                        logger.warning(
+                            "Could not find UUID in root schematic, using filename"
+                        )
                         sheets.append([f"{self.project_name}.kicad_sch", ""])
             else:
                 # Fallback to old format
@@ -1497,7 +1508,9 @@ class SchematicGenerator:
 
         # Add all subcircuit sheets (excluding the main circuit since it's in the root)
         for c_name in sub_dict:
-            if c_name != top_name:  # Skip the main circuit as it's in the root schematic
+            if (
+                c_name != top_name
+            ):  # Skip the main circuit as it's in the root schematic
                 if sheet_uuids and c_name in sheet_uuids:
                     # Use the provided UUID
                     sheets.append([sheet_uuids[c_name], c_name])
@@ -1509,12 +1522,15 @@ class SchematicGenerator:
                             content = f.read()
                             # Parse UUID from schematic
                             import re
-                            uuid_match = re.search(r'\(uuid\s+([a-f0-9-]+)\)', content)
+
+                            uuid_match = re.search(r"\(uuid\s+([a-f0-9-]+)\)", content)
                             if uuid_match:
                                 sheets.append([uuid_match.group(1), c_name])
                             else:
                                 # Fallback to old format if UUID not found
-                                logger.warning(f"Could not find UUID in {c_name} schematic, using filename")
+                                logger.warning(
+                                    f"Could not find UUID in {c_name} schematic, using filename"
+                                )
                                 sheets.append([f"{c_name}.kicad_sch", c_name])
                     else:
                         # Fallback to old format
@@ -1526,7 +1542,9 @@ class SchematicGenerator:
         with open(kicad_pro_path, "w") as f:
             json.dump(pro_data, f, indent=2)
 
-        logger.debug(f"Updated .kicad_pro with {len(sheets)} schematic entries with UUIDs.")
+        logger.debug(
+            f"Updated .kicad_pro with {len(sheets)} schematic entries with UUIDs."
+        )
 
     def generate_pcb_from_schematics(
         self,

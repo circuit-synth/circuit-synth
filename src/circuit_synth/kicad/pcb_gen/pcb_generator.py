@@ -17,6 +17,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from circuit_synth.core.circuit import Circuit
 from circuit_synth.kicad.sch_editor.schematic_reader import SchematicReader
 from circuit_synth.pcb import PCBBoard
+
 # Removed duplicate PCB API imports - using single implementation
 from circuit_synth.pcb.simple_ratsnest import add_ratsnest_to_pcb
 
@@ -332,7 +333,7 @@ class PCBGenerator:
                             return -margin, -margin, margin, margin
                         # Simple bounding box calculation
                         min_x = min(fp.position.x for fp in footprints) - margin
-                        min_y = min(fp.position.y for fp in footprints) - margin  
+                        min_y = min(fp.position.y for fp in footprints) - margin
                         max_x = max(fp.position.x for fp in footprints) + margin
                         max_y = max(fp.position.y for fp in footprints) + margin
                         return min_x, min_y, max_x, max_y
@@ -874,7 +875,8 @@ class PCBGenerator:
                             # Create new net
                             net_num = len(pcb.pcb_data["nets"])
                             # Simplified - create basic net structure
-                            from circuit_synth.pcb.types import Net  
+                            from circuit_synth.pcb.types import Net
+
                             new_net = Net(number=net_num, name=unconnected_net_name)
                             pcb.pcb_data["nets"].append(new_net)
 
