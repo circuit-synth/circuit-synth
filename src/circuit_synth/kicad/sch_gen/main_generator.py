@@ -20,21 +20,14 @@ from ...core.dependency_injection import (
     ServiceLocator,
 )
 
-# Import abstract interfaces
-from ...interfaces.kicad_interface import (
-    IFootprintLibrary,
-    IKiCadIntegration,
-    IPCBGenerator,
-    ISchematicGenerator,
-    ISymbolLibrary,
-    KiCadGenerationConfig,
-)
-
 # Import existing implementation modules
 from .circuit_loader import assign_subcircuit_instance_labels, load_circuit_hierarchy
 from .collision_manager import SHEET_MARGIN, CollisionManager
 from .connection_aware_collision_manager import ConnectionAwareCollisionManager
 from .schematic_writer import SchematicWriter, write_schematic_file
+
+# Removed unused interface abstractions - using concrete implementation
+
 
 # LLM placement not available - using optimized collision-based placement
 LLM_PLACEMENT_AVAILABLE = False
@@ -63,7 +56,8 @@ class LLMPlacementManager:
 from circuit_synth.core.component import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
-from circuit_synth.kicad.netlist_importer import CircuitSynthParser
+
+# Removed unused netlist_importer import
 from circuit_synth.kicad.sch_editor.schematic_reader import SchematicReader
 
 from .symbol_geometry import SymbolBoundingBoxCalculator
@@ -71,7 +65,7 @@ from .symbol_geometry import SymbolBoundingBoxCalculator
 logger = logging.getLogger(__name__)
 
 
-class SchematicGeneratorImpl(ISchematicGenerator):
+class SchematicGeneratorImpl:
     """Implementation of ISchematicGenerator interface using existing logic."""
 
     def __init__(self, output_dir: str, project_name: str):
@@ -82,7 +76,7 @@ class SchematicGeneratorImpl(ISchematicGenerator):
     def generate_from_circuit_data(
         self,
         circuit_data: Dict[str, Any],
-        config: Optional[KiCadGenerationConfig] = None,
+        config: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         """Generate schematic from circuit data using existing implementation."""
         try:
@@ -120,7 +114,7 @@ class SchematicGeneratorImpl(ISchematicGenerator):
             return {"success": False, "error": str(e)}
 
 
-class SchematicGenerator(IKiCadIntegration):
+class SchematicGenerator:
     """
     Refactored KiCad integration implementing IKiCadIntegration interface.
 
@@ -163,7 +157,7 @@ class SchematicGenerator(IKiCadIntegration):
         self,
         circuit_data: Dict[str, Any],
         output_path: Path,
-        config: Optional[KiCadGenerationConfig] = None,
+        config: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         """Generate KiCad schematic from circuit data."""
         try:
@@ -199,7 +193,7 @@ class SchematicGenerator(IKiCadIntegration):
         self,
         schematic_path: Path,
         output_path: Path,
-        config: Optional[KiCadGenerationConfig] = None,
+        config: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         """Generate KiCad PCB from schematic."""
         try:
@@ -257,7 +251,7 @@ class SchematicGenerator(IKiCadIntegration):
             logger.error(f"Design validation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def get_schematic_generator(self) -> ISchematicGenerator:
+    def get_schematic_generator(self) -> "SchematicGeneratorImpl":
         """Get schematic generator interface."""
         if self._schematic_generator is None:
             self._schematic_generator = SchematicGeneratorImpl(
@@ -265,20 +259,20 @@ class SchematicGenerator(IKiCadIntegration):
             )
         return self._schematic_generator
 
-    def get_pcb_generator(self) -> IPCBGenerator:
+    def get_pcb_generator(self):
         """Get PCB generator interface."""
         if self._pcb_generator is None:
             # Import here to avoid circular imports
             from ..pcb_gen.pcb_generator import PCBGenerator
 
-            class PCBGeneratorAdapter(IPCBGenerator):
+            class PCBGeneratorAdapter:
                 def __init__(self, output_dir: str, project_name: str):
                     self.pcb_gen = PCBGenerator(output_dir, project_name)
 
                 def generate_from_schematic(
                     self,
                     schematic_path: Path,
-                    config: Optional[KiCadGenerationConfig] = None,
+                    config: Optional[Dict] = None,
                 ) -> Dict[str, Any]:
                     try:
                         result = self.pcb_gen.generate_pcb(str(schematic_path))
@@ -291,11 +285,11 @@ class SchematicGenerator(IKiCadIntegration):
             )
         return self._pcb_generator
 
-    def get_symbol_library(self) -> ISymbolLibrary:
+    def get_symbol_library(self):
         """Get symbol library interface."""
         if self._symbol_library is None:
 
-            class SymbolLibraryAdapter(ISymbolLibrary):
+            class SymbolLibraryAdapter:
                 def search_symbols(self, query: str) -> List[Dict[str, Any]]:
                     # Implement symbol search using existing symbol cache
                     return []
@@ -307,11 +301,11 @@ class SchematicGenerator(IKiCadIntegration):
             self._symbol_library = SymbolLibraryAdapter()
         return self._symbol_library
 
-    def get_footprint_library(self) -> IFootprintLibrary:
+    def get_footprint_library(self):
         """Get footprint library interface."""
         if self._footprint_library is None:
 
-            class FootprintLibraryAdapter(IFootprintLibrary):
+            class FootprintLibraryAdapter:
                 def search_footprints(self, query: str) -> List[Dict[str, Any]]:
                     # Implement footprint search
                     return []
@@ -1692,14 +1686,14 @@ class SchematicGenerator(IKiCadIntegration):
         # For now, return empty list
         return []
 
-    def create_schematic_generator(self) -> "ISchematicGenerator":
+    def create_schematic_generator(self) -> "SchematicGeneratorImpl":
         """Create a schematic generator instance."""
         return SchematicGeneratorImpl(str(self.output_dir), self.project_name)
 
-    def create_pcb_generator(self) -> "IPCBGenerator":
+    def create_pcb_generator(self):
         """Create a PCB generator instance."""
 
-        class PCBGeneratorAdapter(IPCBGenerator):
+        class PCBGeneratorAdapter:
             def __init__(self, output_dir: str, project_name: str):
                 # Import locally to avoid circular import
                 from circuit_synth.kicad.pcb_gen import PCBGenerator
@@ -1709,7 +1703,7 @@ class SchematicGenerator(IKiCadIntegration):
             def generate_from_circuit_data(
                 self,
                 circuit_data: Dict[str, Any],
-                config: Optional[KiCadGenerationConfig] = None,
+                config: Optional[Dict] = None,
             ) -> Dict[str, Any]:
                 """Generate PCB from circuit data."""
                 try:

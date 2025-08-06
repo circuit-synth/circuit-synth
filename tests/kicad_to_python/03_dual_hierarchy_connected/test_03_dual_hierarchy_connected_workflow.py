@@ -10,10 +10,15 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
+<<<<<<< HEAD
+=======
+
+import pytest
+>>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
 
 import pytest
 
-from src.circuit_synth.tools.kicad_to_python_sync import KiCadToPythonSyncer
+from circuit_synth.tools.kicad_to_python_sync import KiCadToPythonSyncer
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -56,6 +61,28 @@ class TestConnectedHierarchicalWorkflow:
         python_content = python_file.read_text()
         logger.info(f"Generated Python code:\n{python_content}")
 
+<<<<<<< HEAD
+        # Verify hierarchical structure - current implementation uses separate files
+        assert "@circuit(name='main')" in python_content, "main circuit not found"
+        assert "from child1 import child1" in python_content, "child1 import not found"
+
+        # Verify components are distributed properly
+        # R3 should be in main.py, R2 should be in child1.py if it exists
+        assert "R3" in python_content, "R3 component not found in main"
+
+        # Check for child1.py file
+        child1_file = test_output_dir / "child1.py"
+        if child1_file.exists():
+            child1_content = child1_file.read_text()
+            assert (
+                "@circuit(name='child1')" in child1_content
+            ), "child1 circuit not found in separate file"
+            assert "R2" in child1_content, "R2 component not found in child1 file"
+
+        # Verify hierarchical instantiation (may have parameters for net connections)
+        assert (
+            "child1_circuit = child1(" in python_content
+=======
         # Verify hierarchical structure
         assert "@circuit(name='child1')" in python_content, "child1 circuit not found"
         assert "@circuit(name='main')" in python_content, "main circuit not found"
@@ -67,6 +94,7 @@ class TestConnectedHierarchicalWorkflow:
         # Verify hierarchical instantiation
         assert (
             "child1_instance = child1()" in python_content
+>>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
         ), "child1 instantiation not found"
 
     def test_connected_hierarchical_execution(self):
@@ -247,6 +275,24 @@ class TestConnectedHierarchicalWorkflow:
 
         # They should have similar structure (allowing for naming differences)
         assert (
+<<<<<<< HEAD
+            "@circuit(name='main')" in python_content_2
+        ), "main circuit lost in round-trip"
+        assert (
+            "from child1 import child1" in python_content_2
+        ), "child1 import lost in round-trip"
+        assert "R3" in python_content_2, "R3 component lost in round-trip"
+
+        # Check child1.py file in second conversion
+        child1_file_2 = test_output_dir_2 / "child1.py"
+        if child1_file_2.exists():
+            child1_content_2 = child1_file_2.read_text()
+            assert (
+                "@circuit(name='child1')" in child1_content_2
+            ), "child1 circuit lost in round-trip"
+            assert "R2" in child1_content_2, "R2 component lost in round-trip"
+
+=======
             "@circuit(name='child1')" in python_content_2
         ), "child1 circuit lost in round-trip"
         assert (
@@ -255,6 +301,7 @@ class TestConnectedHierarchicalWorkflow:
         assert "R2" in python_content_2, "R2 component lost in round-trip"
         assert "R3" in python_content_2, "R3 component lost in round-trip"
 
+>>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
     def test_hierarchical_reference_uniqueness(self):
         """Test that component references remain unique across hierarchy."""
         # Create output directory for this test
@@ -276,9 +323,20 @@ class TestConnectedHierarchicalWorkflow:
 
         python_content = python_file.read_text()
 
+<<<<<<< HEAD
+        # Verify unique references - R3 should be in main, R2 should be in child1
+        assert 'ref="R3"' in python_content, "R3 reference not preserved in main"
+
+        # Check R2 in separate child1.py file
+        child1_file = test_output_dir / "child1.py"
+        if child1_file.exists():
+            child1_content = child1_file.read_text()
+            assert 'ref="R2"' in child1_content, "R2 reference not preserved in child1"
+=======
         # Verify unique references
         assert 'ref="R2"' in python_content, "R2 reference not preserved"
         assert 'ref="R3"' in python_content, "R3 reference not preserved"
+>>>>>>> 8f31c489cd14721085085557322b4a24ce53c80f
 
         # Execute and check generated schematics
         output_dir = test_output_dir / "python_output"

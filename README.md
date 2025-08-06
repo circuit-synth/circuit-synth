@@ -295,9 +295,29 @@ maturin develop
 
 ## 🧪 Testing & Quality Assurance
 
+### Pre-Release Testing (CRITICAL for PyPI)
+
+```bash
+# Comprehensive regression test before any release
+./tools/testing/run_full_regression_tests.py
+
+# This performs COMPLETE environment reconstruction:
+# - Clears ALL caches (Python, Rust, system)
+# - Reinstalls Python environment from scratch
+# - Rebuilds all Rust modules with Python bindings
+# - Runs comprehensive functionality tests
+# - Validates example project generation
+# - Takes ~2 minutes, gives 100% confidence
+```
+
+### Development Testing
+
 ```bash
 # Run full test suite
 ./scripts/run_all_tests.sh
+
+# Quick regression test (skip reinstall)
+./tools/testing/run_full_regression_tests.py --skip-install --quick
 
 # Python tests only
 uv run pytest --cov=circuit_synth

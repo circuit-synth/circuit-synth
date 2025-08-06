@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version "9.0")
-	(uuid 1a8a0cb6-2e8e-495c-8223-56e7327369cc)
+	(uuid 239dc5a4-75bb-40d7-8883-94b354720985)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:C"
@@ -13,7 +13,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "{'value': 'C', 'position': {'x': 0.635, 'y': 2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
+			(property "Reference" "C"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -22,7 +22,7 @@
 					(hide no)
 				)
 			)
-			(property "Value" "{'value': 'C', 'position': {'x': 0.635, 'y': -2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
+			(property "Value" "C"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -31,7 +31,7 @@
 					(hide no)
 				)
 			)
-			(property "Footprint" "{'value': '', 'position': {'x': 0.9652, 'y': -3.81, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Footprint" ""
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -40,7 +40,7 @@
 					(hide yes)
 				)
 			)
-			(property "Datasheet" "{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Datasheet" "~"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -49,7 +49,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "{'value': 'Unpolarized capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Description" "Unpolarized capacitor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -58,7 +58,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "{'value': 'cap capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_keywords" "cap capacitor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -67,7 +67,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "{'value': 'C_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_fp_filters" "C_*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -159,7 +159,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "{'value': 'U', 'position': {'x': -3.81, 'y': 3.175, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Reference" "U"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -168,7 +168,7 @@
 					(hide no)
 				)
 			)
-			(property "Value" "{'value': 'AMS1117-3.3', 'position': {'x': 0.0, 'y': 3.175, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
+			(property "Value" "AMS1117-3.3"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -177,7 +177,7 @@
 					(hide no)
 				)
 			)
-			(property "Footprint" "{'value': 'Package_TO_SOT_SMD:SOT-223-3_TabPin2', 'position': {'x': 0.0, 'y': 5.08, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -186,7 +186,7 @@
 					(hide yes)
 				)
 			)
-			(property "Datasheet" "{'value': 'http://www.advanced-monolithic.com/pdf/ds1117.pdf', 'position': {'x': 2.54, 'y': -6.35, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Datasheet" "http://www.advanced-monolithic.com/pdf/ds1117.pdf"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -195,7 +195,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "{'value': '1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Description" "1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -204,7 +204,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "{'value': 'linear regulator ldo fixed positive', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_keywords" "linear regulator ldo fixed positive"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -213,7 +213,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "{'value': 'SOT?223*TabPin2*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_fp_filters" "SOT?223*TabPin2*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -307,7 +307,7 @@
 	)
 	(title_block
 		(title Power_Supply)
-		(date 2025-08-04)
+		(date 2025-08-05)
 		(company Circuit-Synth)
 	)
 	(symbol
@@ -319,7 +319,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid c173f72f-754e-4239-8044-be7d81d7c0d2)
+		(uuid 8f2ff27d-bea8-408f-acc6-59c20063b9d9)
 		(property "Reference" "U1"
 			(at 45.72 53.42 0)
 			(effects
@@ -340,7 +340,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/7f5e0feb-c45e-4483-9b65-1782b8e806f0"
+				(path "/aec751bd-5fec-46c2-9398-4fa862e8fba2/f708a9ba-35ea-4ca1-8f62-ca2cdb29d717"
 					(reference "U1")
 					(unit 1)
 				)
@@ -356,7 +356,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid c7114ea2-cc3b-4dbc-8876-9b8f880631c7)
+		(uuid cdaf9238-f2bf-4844-9b36-07cf59ec3be6)
 		(property "Reference" "C2"
 			(at 71.12 53.42 0)
 			(effects
@@ -386,7 +386,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/7f5e0feb-c45e-4483-9b65-1782b8e806f0"
+				(path "/aec751bd-5fec-46c2-9398-4fa862e8fba2/f708a9ba-35ea-4ca1-8f62-ca2cdb29d717"
 					(reference "C2")
 					(unit 1)
 				)
@@ -402,7 +402,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid dc44833f-ab70-4073-a8e8-9cb76c0e3c3a)
+		(uuid 54c5f374-a6ca-4840-9d0c-288130f37acb)
 		(property "Reference" "C3"
 			(at 91.44 53.42 0)
 			(effects
@@ -432,7 +432,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/7f5e0feb-c45e-4483-9b65-1782b8e806f0"
+				(path "/aec751bd-5fec-46c2-9398-4fa862e8fba2/f708a9ba-35ea-4ca1-8f62-ca2cdb29d717"
 					(reference "C3")
 					(unit 1)
 				)
@@ -449,7 +449,7 @@
 			)
 			(justify right)
 		)
-		(uuid b7d9cac8-5d11-4fe0-a0a8-899c06e2324b)
+		(uuid c751aaa4-5491-456c-a147-a8f33ba40927)
 	)
 	(hierarchical_label
 		VBUS
@@ -461,7 +461,7 @@
 			)
 			(justify right)
 		)
-		(uuid 6b05c43f-4c97-45b6-b0df-84b5f23f6e74)
+		(uuid d35364f7-6394-4bf1-a8a4-97f86d70cee4)
 	)
 	(hierarchical_label
 		VBUS
@@ -473,7 +473,7 @@
 			)
 			(justify left)
 		)
-		(uuid 4d2a325c-a723-4924-a4ab-f2da341be92c)
+		(uuid cb9bc335-14b6-4980-819d-67e11297d627)
 	)
 	(hierarchical_label
 		GND
@@ -485,7 +485,7 @@
 			)
 			(justify right)
 		)
-		(uuid ab9b7ebe-b221-492d-8463-0dc5662f9eec)
+		(uuid e30e0fbe-a30a-4f3c-8d8e-010348d16ed0)
 	)
 	(hierarchical_label
 		GND
@@ -497,7 +497,7 @@
 			)
 			(justify right)
 		)
-		(uuid 0c20a183-183e-4690-b826-11922048e8cc)
+		(uuid 1b4dce25-c718-4de4-8257-67fe6318c122)
 	)
 	(hierarchical_label
 		GND
@@ -509,7 +509,7 @@
 			)
 			(justify right)
 		)
-		(uuid 23b68a2a-6f82-4e0c-b5b6-38ec4bf96a44)
+		(uuid dbf31f2b-5dd2-4d2a-9506-3483d490c6f1)
 	)
 	(hierarchical_label
 		GND
@@ -521,7 +521,7 @@
 			)
 			(justify right)
 		)
-		(uuid f5ccdd7d-89e1-4055-8ce7-4ce6d2988ff4)
+		(uuid 500f78e8-971a-4d87-a175-259535c5404a)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -533,7 +533,7 @@
 			)
 			(justify left)
 		)
-		(uuid 24271269-4eb8-407d-9f6a-8d83d17e898b)
+		(uuid 25c7a34b-302a-475e-9b9f-2093ec7cc5bf)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -545,7 +545,7 @@
 			)
 			(justify left)
 		)
-		(uuid 59c652d1-f520-4d3b-9e52-50bdeedd9780)
+		(uuid 5d4c113d-48cb-49d9-8855-416280bb0045)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -557,7 +557,7 @@
 			)
 			(justify left)
 		)
-		(uuid 78adfeb0-74be-42d9-beb7-a325fdac78ce)
+		(uuid e7c552de-8077-4911-88c5-96fcee296d74)
 	)
 	(text_box
 		"5V to 3.3V power regulation subcircuit"
@@ -590,10 +590,10 @@
 			)
 			(justify left top)
 		)
-		(uuid c0a4641e-1860-4a5c-a277-fff074af46bb)
+		(uuid ca74560a-b65c-4d05-a08c-7431a0f058d1)
 	)
 	(sheet_instances
-		(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/7f5e0feb-c45e-4483-9b65-1782b8e806f0"
+		(path "/aec751bd-5fec-46c2-9398-4fa862e8fba2/f708a9ba-35ea-4ca1-8f62-ca2cdb29d717"
 			(page "1")
 		)
 	)

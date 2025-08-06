@@ -16,11 +16,9 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from circuit_synth.core.circuit import Circuit
 from circuit_synth.kicad.sch_editor.schematic_reader import SchematicReader
-from circuit_synth.kicad_api.pcb import PCBBoard
-from circuit_synth.kicad_api.pcb.placement import ComponentWrapper
-from circuit_synth.kicad_api.pcb.routing import export_pcb_to_dsn, import_ses_to_pcb
-from circuit_synth.kicad_api.pcb.routing.freerouting_docker import route_pcb_docker
-from circuit_synth.kicad_api.pcb.types import Net
+from circuit_synth.pcb import PCBBoard
+
+# Removed duplicate PCB API imports - using single implementation
 from circuit_synth.pcb.simple_ratsnest import add_ratsnest_to_pcb
 
 logger = logging.getLogger(__name__)
@@ -329,9 +327,16 @@ class PCBGenerator:
                     )
 
                     # Calculate actual board size needed based on placement
-                    from circuit_synth.kicad_api.pcb.placement.utils import (
-                        calculate_placement_bbox,
-                    )
+                    # Simplified placement calculation
+                    def calculate_placement_bbox(footprints, margin=10.0):
+                        if not footprints:
+                            return -margin, -margin, margin, margin
+                        # Simple bounding box calculation
+                        min_x = min(fp.position.x for fp in footprints) - margin
+                        min_y = min(fp.position.y for fp in footprints) - margin
+                        max_x = max(fp.position.x for fp in footprints) + margin
+                        max_y = max(fp.position.y for fp in footprints) + margin
+                        return min_x, min_y, max_x, max_y
 
                     footprints = list(pcb.footprints.values())
                     min_x, min_y, max_x, max_y = calculate_placement_bbox(
@@ -869,6 +874,9 @@ class PCBGenerator:
 
                             # Create new net
                             net_num = len(pcb.pcb_data["nets"])
+                            # Simplified - create basic net structure
+                            from circuit_synth.pcb.types import Net
+
                             new_net = Net(number=net_num, name=unconnected_net_name)
                             pcb.pcb_data["nets"].append(new_net)
 
@@ -1067,7 +1075,7 @@ class PCBGenerator:
                     )
 
                 # Reload the routed PCB
-                from circuit_synth.kicad_api.pcb import PCBParser
+                from circuit_synth.pcb import PCBParser
 
                 parser = PCBParser()
                 routed_data = parser.parse_file(str(temp_pcb_file))

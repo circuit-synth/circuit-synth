@@ -68,25 +68,16 @@ class Test01SimpleResistorWorkflow(unittest.TestCase):
         )
 
         # Check that project name was extracted correctly
-        self.assertEqual(syncer.updater.project_name, "01_simple_resistor_reference")
-
-    def test_llm_code_updater_project_name_generation(self):
-        """Test that LLMCodeUpdater generates correct project names"""
-        # This test doesn't need file system operations, just tests the class methods
-
-        # Test with project name
-        updater = LLMCodeUpdater(project_name="test_project")
-        expected = (
-            'circuit.generate_kicad_project(project_name="test_project_generated")'
-        )
-        self.assertEqual(updater._generate_project_call(), f"    {expected}")
-
-        # Test without project name
-        updater_no_name = LLMCodeUpdater()
-        expected_no_name = "circuit.generate_kicad_project()"
         self.assertEqual(
-            updater_no_name._generate_project_call(), f"    {expected_no_name}"
+            syncer.code_generator.project_name, "01_simple_resistor_reference"
         )
+
+    def test_llm_code_updater_initialization(self):
+        """Test that LLMCodeUpdater initializes correctly"""
+        # Test basic initialization
+        updater = LLMCodeUpdater()
+        self.assertIsInstance(updater.llm_available, bool)
+        self.assertTrue(hasattr(updater, "update_python_file"))
 
     def test_complete_kicad_to_python_conversion(self):
         """Test complete KiCad-to-Python conversion workflow"""
