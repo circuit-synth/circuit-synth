@@ -115,14 +115,15 @@ class FMEAReportGenerator:
         if output_path is None:
             output_path = f"{self.project_name}_FMEA_Report_{self.report_date}.pdf"
             
-        # Create the PDF document
+        # Create the PDF document in landscape orientation for better table visibility
+        from reportlab.lib.pagesizes import landscape
         doc = SimpleDocTemplate(
             output_path,
-            pagesize=letter,
-            rightMargin=72,
-            leftMargin=72,
-            topMargin=72,
-            bottomMargin=18,
+            pagesize=landscape(letter),
+            rightMargin=36,
+            leftMargin=36,
+            topMargin=36,
+            bottomMargin=36,
         )
         
         # Build the content
@@ -277,18 +278,26 @@ class FMEAReportGenerator:
         elements.append(Paragraph("FMEA Analysis Table", self.styles['CustomHeading1']))
         elements.append(Spacer(1, 0.1*inch))
         
-        # Table headers
-        headers = ['ID', 'Component', 'Failure Mode', 'Effect', 'S', 'O', 'D', 'RPN', 'Risk']
+        # Split into multiple tables if too many failure modes
+        # Show top 15 most critical in main table
+        critical_modes = sorted(failure_modes, key=lambda x: x.get('rpn', 0), reverse=True)[:15]
         
-        # Prepare table data
+        # Table headers with better formatting
+        headers = ['#', 'Component', 'Failure Mode', 'S', 'O', 'D', 'RPN', 'Risk']
+        
+        # Prepare table data with Paragraph objects for text wrapping
         table_data = [headers]
-        for i, fm in enumerate(failure_modes, 1):
+        for i, fm in enumerate(critical_modes, 1):
             risk_level = self._get_risk_level(fm.get('rpn', 0))
+            
+            # Use Paragraph for long text fields to enable wrapping
+            component_para = Paragraph(fm.get('component', ''), self.styles['BodyText'])
+            failure_para = Paragraph(fm.get('failure_mode', ''), self.styles['BodyText'])
+            
             row = [
                 str(i),
-                fm.get('component', '')[:20],  # Truncate long names
-                fm.get('failure_mode', '')[:30],
-                fm.get('effect', '')[:30],
+                component_para,
+                failure_para,
                 str(fm.get('severity', 0)),
                 str(fm.get('occurrence', 0)),
                 str(fm.get('detection', 0)),
@@ -297,9 +306,9 @@ class FMEAReportGenerator:
             ]
             table_data.append(row)
             
-        # Create table
-        table = Table(table_data, colWidths=[0.4*inch, 1.2*inch, 1.5*inch, 1.5*inch, 
-                                             0.3*inch, 0.3*inch, 0.3*inch, 0.5*inch, 0.8*inch])
+        # Create table with better column widths for landscape orientation
+        table = Table(table_data, colWidths=[0.3*inch, 1.8*inch, 2.2*inch, 
+                                             0.3*inch, 0.3*inch, 0.3*inch, 0.5*inch, 0.7*inch])
         
         # Apply table styling
         table_style = TableStyle([
@@ -312,17 +321,51 @@ class FMEAReportGenerator:
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
         ])
         
-        # Color code by risk level
-        for i, fm in enumerate(failure_modes, 1):
+        # Color code by risk level - only for rows that exist in the table
+        for i, fm in enumerate(critical_modes, 1):
             rpn = fm.get('rpn', 0)
-            if rpn >= 300:
-                table_style.add('BACKGROUND', (8, i), (8, i), colors.red)
-                table_style.add('TEXTCOLOR', (8, i), (8, i), colors.white)
-            elif rpn >= 125:
-                table_style.add('BACKGROUND', (8, i), (8, i), colors.orange)
+            if i <= len(critical_modes):  # Ensure we don't exceed table rows
+                if rpn >= 300:
+                    table_style.add('BACKGROUND', (7, i), (7, i), colors.red)
+                    table_style.add('TEXTCOLOR', (7, i), (7, i), colors.white)
+                elif rpn >= 125:
+                    table_style.add('BACKGROUND', (7, i), (7, i), colors.orange)
                 
         table.setStyle(table_style)
         elements.append(table)
+        
+        # Add a detailed table for causes and effects
+        if len(failure_modes) > 0:
+            elements.append(Spacer(1, 0.3*inch))
+            elements.append(Paragraph("Detailed Failure Analysis", self.styles['CustomHeading2']))
+            elements.append(Spacer(1, 0.1*inch))
+            
+            # Create detailed table with causes and recommendations
+            detail_headers = ['Component', 'Failure Mode', 'Root Cause', 'Effect', 'Recommendation']
+            detail_data = [detail_headers]
+            
+            for fm in critical_modes[:10]:  # Top 10 for detailed analysis
+                comp_para = Paragraph(fm.get('component', ''), self.styles['BodyText'])
+                mode_para = Paragraph(fm.get('failure_mode', ''), self.styles['BodyText'])
+                cause_para = Paragraph(fm.get('cause', 'Not specified'), self.styles['BodyText'])
+                effect_para = Paragraph(fm.get('effect', 'Not specified'), self.styles['BodyText'])
+                rec_para = Paragraph(fm.get('recommendation', 'Review design'), self.styles['BodyText'])
+                
+                detail_row = [comp_para, mode_para, cause_para, effect_para, rec_para]
+                detail_data.append(detail_row)
+            
+            detail_table = Table(detail_data, colWidths=[1.8*inch, 1.8*inch, 2.0*inch, 2.0*inch, 2.4*inch])
+            detail_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 9),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ]))
+            elements.append(detail_table)
         
         return elements
         

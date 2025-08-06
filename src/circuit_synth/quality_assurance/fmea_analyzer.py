@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from .fmea_report_generator import FMEAReportGenerator
+from .circuit_parser import extract_components_from_python
 
 
 class ComponentType(Enum):
@@ -343,17 +344,25 @@ class UniversalFMEAAnalyzer:
                 circuit_data['component_count'] = len(components)
                 
         elif file_path.suffix == '.py':
-            # Parse Python circuit file
-            with open(file_path, 'r') as f:
-                content = f.read()
-                
-            # Extract components using AST parsing
+            # Parse Python circuit file using dedicated parser
             try:
-                tree = ast.parse(content)
-                # This is simplified - real implementation would parse Component() calls
-                circuit_data['description'] = f"Python circuit: {file_path.name}"
-            except SyntaxError:
-                print(f"Warning: Could not parse Python file {file_path}")
+                parsed_data = extract_components_from_python(str(file_path))
+                components = parsed_data.get('components', {})
+                nets = parsed_data.get('nets', {})
+                circuit_data['component_count'] = len(components)
+                circuit_data['description'] = parsed_data.get('description', f"Python circuit: {file_path.name}")
+                
+                # Extract subcircuits as subsystems
+                if parsed_data.get('subcircuits'):
+                    circuit_data['subsystem_count'] = len(parsed_data['subcircuits'])
+                    circuit_data['subsystems'] = [
+                        {'name': name, 'description': info.get('docstring', '')}
+                        for name, info in parsed_data['subcircuits'].items()
+                    ]
+            except Exception as e:
+                print(f"Warning: Could not parse Python file {file_path}: {e}")
+                components = {}
+                nets = {}
         
         # Analyze each component
         self.failure_modes = []
