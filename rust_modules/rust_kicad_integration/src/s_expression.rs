@@ -116,7 +116,7 @@ fn generate_component_sexp(component: &Component) -> Result<Value, SchematicErro
             (at ,pos_x ,ref_y 0)
             (effects (font (size 1.27 1.27)))
         )),
-        sexp!((property "Value" ,value.clone()
+        sexp!((property "Value" ,value
             (at ,pos_x ,val_y 0)
             (effects (font (size 1.27 1.27)))
         )),
