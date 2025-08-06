@@ -86,7 +86,7 @@ def setup_claude_integration():
 
 
 # KiCad API imports
-from .kicad_api import (
+from .kicad.core.types import (
     Junction,
     Label,
     Schematic,

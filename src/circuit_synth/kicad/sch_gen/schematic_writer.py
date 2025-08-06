@@ -24,7 +24,7 @@ logging.basicConfig(
 
 from sexpdata import Symbol, dumps
 
-from circuit_synth.kicad_api.core.s_expression import SExpressionParser
+from circuit_synth.kicad.core.s_expression import SExpressionParser
 
 # Add performance timing
 try:
@@ -48,7 +48,7 @@ from circuit_synth.kicad.kicad_symbol_cache import (
 )
 
 # Import from KiCad API
-from circuit_synth.kicad_api.core.types import (
+from circuit_synth.kicad.core.types import (
     Junction,
     Label,
     LabelType,
@@ -62,8 +62,8 @@ from circuit_synth.kicad_api.core.types import (
     Text,
     Wire,
 )
-from circuit_synth.kicad_api.schematic.component_manager import ComponentManager
-from circuit_synth.kicad_api.schematic.placement import (
+from circuit_synth.kicad.schematic.component_manager import ComponentManager
+from circuit_synth.kicad.schematic.placement import (
     PlacementEngine,
     PlacementStrategy,
 )
@@ -1005,7 +1005,7 @@ class SchematicWriter:
 
     def _add_textbox_annotation(self, textbox):
         """Add a TextBox annotation as a KiCad text_box element."""
-        from circuit_synth.kicad_api.core.types import Text
+        from circuit_synth.kicad.core.types import Text
 
         # Handle both dictionary data and object data
         if isinstance(textbox, dict):
@@ -1055,7 +1055,7 @@ class SchematicWriter:
 
     def _add_text_annotation(self, text_prop):
         """Add a TextProperty annotation as a simple KiCad text element."""
-        from circuit_synth.kicad_api.core.types import Text
+        from circuit_synth.kicad.core.types import Text
 
         # Handle both dictionary data and object data
         if isinstance(text_prop, dict):
@@ -1123,7 +1123,7 @@ class SchematicWriter:
                     cell_x = x_start + (col_idx * cell_width)
                     cell_y = y_start + (row_idx * cell_height)
 
-                    from circuit_synth.kicad_api.core.types import Text
+                    from circuit_synth.kicad.core.types import Text
 
                     text_element = Text(
                         content=str(cell_text),
@@ -1524,14 +1524,13 @@ def write_schematic_file(schematic_expr: list, out_path: str):
         f"🔍 WRITE_SCHEMATIC_FILE: Debug analysis completed in {debug_time*1000:.2f}ms, found {sheet_pin_count} sheet pins"
     )
 
-    # Use the kicad_api's S-expression parser to write the file
     # This now uses the Rust-accelerated format_kicad_schematic function internally
     parser_start = time.perf_counter()
     logger.info(
         "⚡ WRITE_SCHEMATIC_FILE: Starting S-expression parsing and formatting (RUST ACCELERATION POINT)"
     )
 
-    from circuit_synth.kicad_api.core.s_expression import SExpressionParser
+    from circuit_synth.kicad.core.s_expression import SExpressionParser
 
     parser = SExpressionParser()
     parser.write_file(schematic_expr, out_path)

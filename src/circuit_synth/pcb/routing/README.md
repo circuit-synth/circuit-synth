@@ -75,7 +75,7 @@ Quick install:
 ### Basic Usage
 
 ```python
-from circuit_synth_core.kicad_api.pcb.routing import (
+from circuit_synth.pcb.routing import (
     export_pcb_to_dsn, route_pcb, import_ses_to_pcb
 )
 
@@ -97,7 +97,7 @@ else:
 ### Using Docker (No Java Required)
 
 ```python
-from circuit_synth_core.kicad_api.pcb.routing import route_pcb_docker
+from circuit_synth.pcb.routing import route_pcb_docker
 
 # Route using Docker - no Java installation needed!
 success, result = route_pcb_docker("my_board.dsn", "my_board.ses")
@@ -127,7 +127,7 @@ success, result = route_pcb(
 ### Custom DSN Export
 
 ```python
-from circuit_synth_core.kicad_api.pcb.routing import DSNExporter
+from circuit_synth.pcb.routing import DSNExporter
 
 # Create exporter with custom rules
 exporter = DSNExporter(
@@ -145,7 +145,7 @@ exporter.export("my_board.dsn")
 ### Advanced Routing Configuration
 
 ```python
-from circuit_synth_core.kicad_api.pcb.routing import (
+from circuit_synth.pcb.routing import (
     FreeroutingRunner, FreeroutingConfig, RoutingEffort
 )
 
@@ -177,7 +177,7 @@ success, result = runner.route("my_board.dsn", "my_board.ses")
 ### Docker-based Routing
 
 ```python
-from circuit_synth_core.kicad_api.pcb.routing import (
+from circuit_synth.pcb.routing import (
     FreeroutingDockerRunner, FreeroutingConfig, RoutingEffort
 )
 
@@ -336,7 +336,7 @@ Main class for importing SES routing data.
 
 1. **Generate PCB with Circuit Synth**
    ```python
-   from circuit_synth_core import generate_pcb
+   from circuit_synth import generate_pcb
    generate_pcb(circuit, "my_board")
    ```
 

@@ -10,8 +10,8 @@ from pathlib import Path
 
 from circuit_synth import Circuit, Component, Net, circuit
 
-# from circuit_synth.kicad_api.schematic import SchematicParser  # TODO: SchematicParser not implemented yet
-from circuit_synth.kicad_api.schematic.hierarchical_synchronizer import (
+# from circuit_synth.kicad.schematic import SchematicParser  # TODO: SchematicParser not implemented yet
+from circuit_synth.kicad.schematic.hierarchical_synchronizer import (
     HierarchicalSynchronizer,
 )
 

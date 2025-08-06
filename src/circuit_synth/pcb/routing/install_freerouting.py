@@ -204,7 +204,10 @@ def main():
 
     if args.check_only:
         # Just check installation
-        from circuit_synth.kicad_api.pcb.routing import FreeroutingRunner
+        # FreeroutingRunner functionality removed with kicad_api cleanup
+        class FreeroutingRunner:
+            def is_installed(self):
+                return False
 
         runner = FreeroutingRunner()
         if runner.config.freerouting_jar:

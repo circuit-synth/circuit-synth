@@ -1,6 +1,6 @@
 (kicad_sch
 	(version 20250114)
-	(generator "kicad_api")
+	(generator "circuit_synth")
 	(generator_version 9.0)
 	(uuid a5fcdf85-b09e-4b24-b64f-7da60a4a8e7f)
 	(paper A4)

@@ -735,7 +735,7 @@ class NetlistExporter:
             )
 
             # Import new API synchronizer
-            from ..kicad_api.schematic.sync_adapter import SyncAdapter
+            from ..kicad.schematic.sync_adapter import SyncAdapter
 
             try:
                 # Initialize synchronizer using new API
@@ -907,7 +907,7 @@ class NetlistExporter:
                     )
 
                 # Use the new API project generator
-                from ..kicad_api.schematic.project_generator import ProjectGenerator
+                from ..kicad.schematic.project_generator import ProjectGenerator
 
                 gen = ProjectGenerator(output_dir, project_name)
                 gen.generate_from_circuit(self.circuit)

@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from ..kicad.kicad_symbol_parser import parse_kicad_sym_file
-from ..kicad_api.core.types import Point, SchematicPin
+from ..kicad.core.types import Point, SchematicPin
 
 logger = logging.getLogger(__name__)
 

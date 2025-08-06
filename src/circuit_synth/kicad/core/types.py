@@ -313,7 +313,7 @@ class Schematic:
     """Complete schematic representation."""
 
     version: str = "20250114"
-    generator: str = "kicad_api"
+    generator: str = "circuit_synth"
     uuid: str = field(default_factory=lambda: str(uuid.uuid4()))
     title: str = ""
     date: str = ""
