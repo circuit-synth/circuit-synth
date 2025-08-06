@@ -70,13 +70,13 @@ class CircuitSubAgent:
             "expertise": self.expertise_area,
         }
 
-        yaml_header = "---\\n"
+        yaml_header = "---\n"
         for key, value in frontmatter.items():
             if isinstance(value, list):
-                yaml_header += f"{key}: {json.dumps(value)}\\n"
+                yaml_header += f"{key}: {json.dumps(value)}\n"
             else:
-                yaml_header += f"{key}: {value}\\n"
-        yaml_header += "---\\n\\n"
+                yaml_header += f"{key}: {value}\n"
+        yaml_header += "---\n\n"
 
         return yaml_header + self.system_prompt
 

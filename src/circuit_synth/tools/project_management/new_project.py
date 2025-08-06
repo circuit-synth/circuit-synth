@@ -1184,10 +1184,10 @@ def main(skip_kicad_check: bool, minimal: bool, developer: bool, no_memory_bank:
             + Text(f"\n\n📁 Location: {project_path}")
             + Text(f"\n🚀 Get started: uv run python circuit-synth/main.py")
             + Text(
-                f"\n🤖 AI agents: {len(list((project_path / '.claude' / 'agents').glob('*.md')))} agents available in Claude Code"
+                f"\n🤖 AI agents: {len(list((project_path / '.claude' / 'agents').rglob('*.md')))} agents available in Claude Code"
             )
             + Text(
-                f"\n⚡ Commands: {len(list((project_path / '.claude' / 'commands').glob('*.md')))} slash commands available"
+                f"\n⚡ Commands: {len(list((project_path / '.claude' / 'commands').rglob('*.md')))} slash commands available"
             )
             + Text(f"\n📖 Documentation: See README.md"),
             title="🎉 Success!",
