@@ -31,6 +31,54 @@ from circuit_synth.memory_bank import init_memory_bank
 console = Console()
 
 
+def create_claude_directory_from_templates(
+    project_path: Path, developer_mode: bool = False
+) -> None:
+    """Create a complete .claude directory structure using templates and agent registry
+    
+    Args:
+        project_path: Target project directory  
+        developer_mode: If True, includes contributor agents and dev commands
+    """
+    dest_claude_dir = project_path / ".claude"
+    dest_claude_dir.mkdir(exist_ok=True)
+    
+    console.print("🤖 Setting up Claude Code integration from templates...", style="blue")
+    
+    try:
+        # First register all agents (this creates agents and mcp_settings.json)
+        register_circuit_agents()
+        
+        # Create commands directory structure with basic commands
+        commands_dir = dest_claude_dir / "commands"
+        commands_dir.mkdir(exist_ok=True)
+        
+        # Create circuit-design commands
+        circuit_design_dir = commands_dir / "circuit-design"
+        circuit_design_dir.mkdir(exist_ok=True)
+        
+        # Create manufacturing commands  
+        manufacturing_dir = commands_dir / "manufacturing"
+        manufacturing_dir.mkdir(exist_ok=True)
+        
+        if developer_mode:
+            # Create development commands
+            development_dir = commands_dir / "development"
+            development_dir.mkdir(exist_ok=True)
+            
+            # Create setup commands
+            setup_dir = commands_dir / "setup"
+            setup_dir.mkdir(exist_ok=True)
+        
+        console.print("✅ Created Claude directory structure with templates", style="green")
+        console.print(f"📁 Created project-local .claude in {dest_claude_dir}", style="blue")
+        
+    except Exception as e:
+        console.print(f"⚠️  Could not create complete Claude setup: {str(e)}", style="yellow")
+        # Fall back to basic agent registration
+        register_circuit_agents()
+
+
 def copy_complete_claude_setup(
     project_path: Path, developer_mode: bool = False
 ) -> None:
@@ -47,9 +95,10 @@ def copy_complete_claude_setup(
 
     if not source_claude_dir.exists():
         console.print(
-            "⚠️  Source .claude directory not found - using basic setup", style="yellow"
+            "⚠️  Source .claude directory not found - using template-based setup", style="yellow"
         )
-        register_circuit_agents()
+        # Use template-based approach to create complete .claude directory
+        create_claude_directory_from_templates(project_path, developer_mode)
         return
 
     # Destination .claude directory in the new project

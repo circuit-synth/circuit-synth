@@ -18,7 +18,7 @@ cd my_circuit_project
 uv add circuit-synth
 
 # Setup complete project template
-uv run cs-new-pcb
+uv run cs-new-project
 
 # Generate complete KiCad project  
 uv run python circuit-synth/main.py
@@ -170,7 +170,6 @@ Circuit-synth includes specialized AI agents for different aspects of circuit de
 ### Project Creation
 ```bash
 cs-new-project              # Complete project setup with ESP32-C6 example
-cs-new-pcb "Board Name"     # PCB-focused project template
 ```
 
 ### Circuit Generation

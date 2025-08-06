@@ -95,7 +95,6 @@ setup-claude-integration = "circuit_synth.cli.development.setup_claude:main"
 register-agents = "circuit_synth.claude_integration.agent_registry:main"
 validate-circuit = "circuit_synth.validation.real_time_check:main"
 cs-new-project = "circuit_synth.cli.project_management.new_project:main"
-cs-new-pcb = "circuit_synth.cli.project_management.new_pcb:main"
 cs-init-pcb = "circuit_synth.cli.project_management.init_pcb:main"
 cs-init-existing-project = "circuit_synth.cli.project_management.init_existing_project:main"
 cs-setup-kicad-plugins = "circuit_synth.cli.development.setup_kicad_plugins:main"
@@ -180,6 +179,7 @@ env = [
 members = [
     "example_project",
     "test_project",
+    "test_uv",
 ]
 
 [dependency-groups]

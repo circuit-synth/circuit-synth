@@ -835,7 +835,6 @@ print(f'✅ Symbol library works: Resistor has {len(symbol.pins)} pins')
 
         # List of critical CLI commands that must work
         cli_commands = [
-            ("cs-new-pcb", "cs-new-pcb", "CRITICAL"),
             ("cs-new-project", "cs-new-project", "CRITICAL"),
             ("cs-init-pcb", "cs-init-pcb", "HIGH"),
             ("register-agents", "register-agents", "MEDIUM"),
@@ -879,18 +878,18 @@ print(f'✅ Symbol library works: Resistor has {len(symbol.pins)} pins')
             tests.append(result)
 
         # Test 2: Verify the main problematic command that caused the user's error
-        result = TestResult("cs-new-pcb Execution Test", "CLI", "CRITICAL")
+        result = TestResult("cs-new-project Execution Test", "CLI", "CRITICAL")
         start_time = time.time()
 
         try:
-            # Create a temporary directory to test cs-new-pcb
+            # Create a temporary directory to test cs-new-project
             with tempfile.TemporaryDirectory() as temp_dir:
                 temp_path = Path(temp_dir)
 
-                # Try to run cs-new-pcb with minimal args to see if it starts
+                # Try to run cs-new-project with minimal args to see if it starts
                 success, stdout, stderr = self.run_command(
-                    ["uv", "run", "cs-new-pcb", "--help"],
-                    "cs-new-pcb basic execution test",
+                    ["uv", "run", "cs-new-project", "--help"],
+                    "cs-new-project basic execution test",
                     cwd=temp_path,
                     check=False,
                     timeout=30,
@@ -901,19 +900,19 @@ print(f'✅ Symbol library works: Resistor has {len(symbol.pins)} pins')
                 if success or "usage:" in stdout.lower():
                     result.passed = True
                     self.log(
-                        "✅ cs-new-pcb can execute without import errors", "SUCCESS", 1
+                        "✅ cs-new-project can execute without import errors", "SUCCESS", 1
                     )
                 else:
                     result.passed = False
                     result.error = stderr
                     self.log(
-                        f"❌ cs-new-pcb execution failed: {stderr[:200]}", "ERROR", 1
+                        f"❌ cs-new-project execution failed: {stderr[:200]}", "ERROR", 1
                     )
 
         except Exception as e:
             result.error = str(e)
             result.passed = False
-            self.log(f"❌ cs-new-pcb execution exception: {str(e)}", "ERROR", 1)
+            self.log(f"❌ cs-new-project execution exception: {str(e)}", "ERROR", 1)
         finally:
             result.duration = time.time() - start_time
 
