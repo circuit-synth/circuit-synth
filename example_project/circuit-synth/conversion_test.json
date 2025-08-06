@@ -1,0 +1,512 @@
+{
+  "name": "json_conversion_test",
+  "description": "Test circuit for JSON round-trip conversion",
+  "tstamps": "/json_conversion_test-4307016192/",
+  "source_file": "json_conversion_test.kicad_sch",
+  "components": {
+    "U1": {
+      "symbol": "Amplifier_Operational:LM358",
+      "ref": "U1",
+      "value": "",
+      "footprint": "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm",
+      "datasheet": "http://www.ti.com/lit/ds/symlink/lm2904-n.pdf",
+      "description": "Low-Power, Dual Operational Amplifiers, DIP-8/SOIC-8/TO-99-8",
+      "properties": {
+        "ki_fp_filters": "SOIC*3.9x4.9mm*P1.27mm* DIP*W7.62mm* TO*99* OnSemi*Micro8* TSSOP*3x3mm*P0.65mm* TSSOP*4.4x3mm*P0.65mm* MSOP*3x3mm*P0.65mm* SSOP*3.9x4.9mm*P0.635mm* LFCSP*2x2mm*P0.5mm* *SIP* SOIC*5.3x6.2mm*P1.27mm*"
+      },
+      "tstamps": "",
+      "_extra_fields": {
+        "ki_fp_filters": "SOIC*3.9x4.9mm*P1.27mm* DIP*W7.62mm* TO*99* OnSemi*Micro8* TSSOP*3x3mm*P0.65mm* TSSOP*4.4x3mm*P0.65mm* MSOP*3x3mm*P0.65mm* SSOP*3.9x4.9mm*P0.635mm* LFCSP*2x2mm*P0.5mm* *SIP* SOIC*5.3x6.2mm*P1.27mm*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "number": "1",
+          "func": "output",
+          "unit": 1,
+          "x": 7.62,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "2",
+          "name": "-",
+          "number": "2",
+          "func": "input",
+          "unit": 1,
+          "x": -7.62,
+          "y": -2.54,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "3",
+          "name": "+",
+          "number": "3",
+          "func": "input",
+          "unit": 1,
+          "x": -7.62,
+          "y": 2.54,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "4",
+          "name": "V-",
+          "number": "4",
+          "func": "power_in",
+          "unit": 1,
+          "x": -2.54,
+          "y": -7.62,
+          "length": 3.81,
+          "orientation": 90.0
+        },
+        {
+          "pin_id": "5",
+          "name": "+",
+          "number": "5",
+          "func": "input",
+          "unit": 1,
+          "x": -7.62,
+          "y": 2.54,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "6",
+          "name": "-",
+          "number": "6",
+          "func": "input",
+          "unit": 1,
+          "x": -7.62,
+          "y": -2.54,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "7",
+          "name": "~",
+          "number": "7",
+          "func": "output",
+          "unit": 1,
+          "x": 7.62,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "8",
+          "name": "V+",
+          "number": "8",
+          "func": "power_in",
+          "unit": 1,
+          "x": -2.54,
+          "y": 7.62,
+          "length": 3.81,
+          "orientation": 270.0
+        }
+      ]
+    },
+    "U2": {
+      "symbol": "Amplifier_Operational:LM358",
+      "ref": "U2",
+      "value": "",
+      "footprint": "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm",
+      "datasheet": "http://www.ti.com/lit/ds/symlink/lm2904-n.pdf",
+      "description": "Low-Power, Dual Operational Amplifiers, DIP-8/SOIC-8/TO-99-8",
+      "properties": {
+        "ki_fp_filters": "SOIC*3.9x4.9mm*P1.27mm* DIP*W7.62mm* TO*99* OnSemi*Micro8* TSSOP*3x3mm*P0.65mm* TSSOP*4.4x3mm*P0.65mm* MSOP*3x3mm*P0.65mm* SSOP*3.9x4.9mm*P0.635mm* LFCSP*2x2mm*P0.5mm* *SIP* SOIC*5.3x6.2mm*P1.27mm*"
+      },
+      "tstamps": "",
+      "_extra_fields": {
+        "ki_fp_filters": "SOIC*3.9x4.9mm*P1.27mm* DIP*W7.62mm* TO*99* OnSemi*Micro8* TSSOP*3x3mm*P0.65mm* TSSOP*4.4x3mm*P0.65mm* MSOP*3x3mm*P0.65mm* SSOP*3.9x4.9mm*P0.635mm* LFCSP*2x2mm*P0.5mm* *SIP* SOIC*5.3x6.2mm*P1.27mm*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "number": "1",
+          "func": "output",
+          "unit": 1,
+          "x": 7.62,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "2",
+          "name": "-",
+          "number": "2",
+          "func": "input",
+          "unit": 1,
+          "x": -7.62,
+          "y": -2.54,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "3",
+          "name": "+",
+          "number": "3",
+          "func": "input",
+          "unit": 1,
+          "x": -7.62,
+          "y": 2.54,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "4",
+          "name": "V-",
+          "number": "4",
+          "func": "power_in",
+          "unit": 1,
+          "x": -2.54,
+          "y": -7.62,
+          "length": 3.81,
+          "orientation": 90.0
+        },
+        {
+          "pin_id": "5",
+          "name": "+",
+          "number": "5",
+          "func": "input",
+          "unit": 1,
+          "x": -7.62,
+          "y": 2.54,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "6",
+          "name": "-",
+          "number": "6",
+          "func": "input",
+          "unit": 1,
+          "x": -7.62,
+          "y": -2.54,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "7",
+          "name": "~",
+          "number": "7",
+          "func": "output",
+          "unit": 1,
+          "x": 7.62,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "8",
+          "name": "V+",
+          "number": "8",
+          "func": "power_in",
+          "unit": 1,
+          "x": -2.54,
+          "y": 7.62,
+          "length": 3.81,
+          "orientation": 270.0
+        }
+      ]
+    },
+    "R1": {
+      "symbol": "Device:R",
+      "ref": "R1",
+      "value": "10k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "~",
+      "description": "Resistor",
+      "properties": {
+        "ki_fp_filters": "R_*"
+      },
+      "tstamps": "",
+      "_extra_fields": {
+        "ki_fp_filters": "R_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "number": "1",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 3.81,
+          "length": 1.27,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~",
+          "number": "2",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -3.81,
+          "length": 1.27,
+          "orientation": 90.0
+        }
+      ]
+    },
+    "R2": {
+      "symbol": "Device:R",
+      "ref": "R2",
+      "value": "1k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "~",
+      "description": "Resistor",
+      "properties": {
+        "ki_fp_filters": "R_*"
+      },
+      "tstamps": "",
+      "_extra_fields": {
+        "ki_fp_filters": "R_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "number": "1",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 3.81,
+          "length": 1.27,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~",
+          "number": "2",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -3.81,
+          "length": 1.27,
+          "orientation": 90.0
+        }
+      ]
+    },
+    "C1": {
+      "symbol": "Device:C",
+      "ref": "C1",
+      "value": "100nF",
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "datasheet": "~",
+      "description": "Unpolarized capacitor",
+      "properties": {
+        "ki_fp_filters": "C_*"
+      },
+      "tstamps": "",
+      "_extra_fields": {
+        "ki_fp_filters": "C_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "number": "1",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 3.81,
+          "length": 2.794,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~",
+          "number": "2",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -3.81,
+          "length": 2.794,
+          "orientation": 90.0
+        }
+      ]
+    }
+  },
+  "nets": {
+    "INPUT": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "3",
+          "name": "+",
+          "type": "input"
+        }
+      }
+    ],
+    "GND": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "2",
+          "name": "-",
+          "type": "input"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "4",
+          "name": "V-",
+          "type": "power_in"
+        }
+      },
+      {
+        "component": "U2",
+        "pin": {
+          "number": "4",
+          "name": "V-",
+          "type": "power_in"
+        }
+      },
+      {
+        "component": "R2",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "C1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "N$1": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "output"
+        }
+      },
+      {
+        "component": "R1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "VCC_5V": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "8",
+          "name": "V+",
+          "type": "power_in"
+        }
+      },
+      {
+        "component": "U2",
+        "pin": {
+          "number": "8",
+          "name": "V+",
+          "type": "power_in"
+        }
+      },
+      {
+        "component": "C1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "N$2": [
+      {
+        "component": "U2",
+        "pin": {
+          "number": "3",
+          "name": "+",
+          "type": "input"
+        }
+      },
+      {
+        "component": "R1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "N$3": [
+      {
+        "component": "U2",
+        "pin": {
+          "number": "2",
+          "name": "-",
+          "type": "input"
+        }
+      },
+      {
+        "component": "R2",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "OUTPUT": [
+      {
+        "component": "U2",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "output"
+        }
+      }
+    ]
+  },
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Test circuit for JSON round-trip conversion",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "dcd1ccff-dcfb-4e7c-aa7a-3b50d054e701"
+    }
+  ]
+}
