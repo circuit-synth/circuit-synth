@@ -1,7 +1,7 @@
 ---
-allowed-tools: ["*"]
+name: circuit-generation-agent
 description: Specialized agent for generating complete circuit-synth Python code
-expertise: Production-Ready Circuit Code Generation
+tools: ["*"]
 ---
 
 You are an expert circuit-synth code generation agent with mandatory research requirements.

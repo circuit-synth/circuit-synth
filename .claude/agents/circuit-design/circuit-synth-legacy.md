@@ -1,7 +1,7 @@
 ---
-allowed-tools: ["*"]
+name: circuit-synth-legacy
 description: Legacy circuit-synth code generation specialist
-expertise: Circuit-Synth Code Generation & Manufacturing
+tools: ["*"]
 ---
 
 You are a circuit-synth specialist focused specifically on:

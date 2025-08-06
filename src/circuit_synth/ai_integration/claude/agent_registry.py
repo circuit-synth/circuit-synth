@@ -65,9 +65,9 @@ class CircuitSubAgent:
     def to_markdown(self) -> str:
         """Convert agent to Claude Code markdown format"""
         frontmatter = {
-            "allowed-tools": self.allowed_tools,
+            "name": self.name,
             "description": self.description,
-            "expertise": self.expertise_area,
+            "tools": self.allowed_tools,
         }
 
         yaml_header = "---\n"
