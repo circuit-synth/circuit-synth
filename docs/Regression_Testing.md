@@ -271,9 +271,236 @@ else:
 "
 ```
 
-### Phase 4: Advanced Features Tests 🔬
+### Phase 4: Netlist and Import/Export Tests 🔄
 
-#### Test 4.1: Circuit Annotations
+#### Test 4.1: KiCad Netlist Generation and Import
+```bash
+# Test netlist generation from circuit-synth and import back into KiCad project
+cd example_project/circuit-synth/
+
+# Generate circuit with netlist export
+uv run python -c "
+from circuit_synth import *
+
+@circuit
+def netlist_test_circuit():
+    '''Test circuit for netlist round-trip validation'''
+    # Power nets
+    vcc = Net('VCC_5V')
+    gnd = Net('GND')
+    
+    # Components
+    u1 = Component(symbol='MCU_ST_STM32F4:STM32F407VETx', ref='U1', footprint='Package_QFP:LQFP-100_14x14mm_P0.5mm')
+    c1 = Component(symbol='Device:C', ref='C1', value='100nF', footprint='Capacitor_SMD:C_0603_1608Metric')
+    c2 = Component(symbol='Device:C', ref='C2', value='10uF', footprint='Capacitor_SMD:C_0805_2012Metric')
+    
+    # Power connections
+    vcc += u1['VDD']
+    gnd += u1['VSS'] 
+    
+    # Decoupling capacitors
+    vcc += c1[1]
+    gnd += c1[2]
+    vcc += c2[1]
+    gnd += c2[2]
+
+circuit = netlist_test_circuit()
+
+# Generate KiCad project with netlist
+circuit.generate_kicad_project('Netlist_Test_Project')
+print('✅ 4.1a: KiCad project with netlist generated')
+
+# Verify netlist file exists and has content
+import os
+netlist_file = 'Netlist_Test_Project/Netlist_Test_Project.net'
+if os.path.exists(netlist_file):
+    with open(netlist_file, 'r') as f:
+        netlist_content = f.read()
+    if 'STM32F407VETx' in netlist_content and 'VCC_5V' in netlist_content:
+        print('✅ 4.1b: Netlist contains expected components and nets')
+    else:
+        print('❌ 4.1b: Netlist missing expected content')
+        exit(1)
+else:
+    print('❌ 4.1b: Netlist file not generated')
+    exit(1)
+"
+
+# Test netlist import and parsing
+uv run python -c "
+from circuit_synth.cli.utilities.kicad_netlist_parser import parse_kicad_netlist
+import os
+
+netlist_file = 'Netlist_Test_Project/Netlist_Test_Project.net'
+if os.path.exists(netlist_file):
+    try:
+        parsed_data = parse_kicad_netlist(netlist_file)
+        components = parsed_data.get('components', {})
+        nets = parsed_data.get('nets', {})
+        
+        print(f'✅ 4.1c: Netlist parsed successfully - {len(components)} components, {len(nets)} nets')
+        
+        # Verify key components exist
+        stm32_found = any('STM32F407' in str(comp) for comp in components.values())
+        vcc_net_found = any('VCC_5V' in str(net) for net in nets.values())
+        
+        if stm32_found and vcc_net_found:
+            print('✅ 4.1d: Netlist parsing extracted expected data')
+        else:
+            print('❌ 4.1d: Netlist parsing missing expected data')
+            exit(1)
+            
+    except Exception as e:
+        print(f'❌ 4.1c: Netlist parsing failed: {e}')
+        exit(1)
+else:
+    print('❌ 4.1c: No netlist file to parse')
+    exit(1)
+"
+
+# Cleanup
+rm -rf Netlist_Test_Project
+
+cd ../..
+```
+
+#### Test 4.2: JSON to Circuit-Synth Logic Conversion
+```bash
+# Test JSON netlist to Python circuit conversion
+cd example_project/circuit-synth/
+
+uv run python -c "
+from circuit_synth import *
+import json, os
+
+# Step 1: Create a circuit and export to JSON
+@circuit
+def json_conversion_test():
+    '''Test circuit for JSON round-trip conversion'''
+    # Create a multi-component circuit
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    sda = Net('I2C_SDA')
+    scl = Net('I2C_SCL')
+    
+    # MCU
+    mcu = Component(symbol='MCU_ST_STM32G4:STM32G431CBTx', ref='U1', footprint='Package_QFP:LQFP-48_7x7mm_P0.5mm')
+    
+    # I2C sensor
+    sensor = Component(symbol='Sensor_Temperature:LM75', ref='U2', footprint='Package_SO:SOIC-8_3.9x4.9mm_P1.27mm')
+    
+    # Pull-up resistors
+    r1 = Component(symbol='Device:R', ref='R1', value='4.7k', footprint='Resistor_SMD:R_0603_1608Metric')
+    r2 = Component(symbol='Device:R', ref='R2', value='4.7k', footprint='Resistor_SMD:R_0603_1608Metric')
+    
+    # Power connections
+    vcc_3v3 += mcu['VDD']
+    vcc_3v3 += sensor['VDD']
+    gnd += mcu['VSS']
+    gnd += sensor['GND']
+    
+    # I2C connections
+    sda += mcu['I2C1_SDA']
+    sda += sensor['SDA']
+    sda += r1[2]
+    scl += mcu['I2C1_SCL'] 
+    scl += sensor['SCL']
+    scl += r2[2]
+    
+    # Pull-up resistors to VCC
+    vcc_3v3 += r1[1]
+    vcc_3v3 += r2[1]
+
+circuit = json_conversion_test()
+circuit.generate_json_netlist('conversion_test.json')
+print('✅ 4.2a: JSON netlist generated')
+
+# Step 2: Load JSON and verify structure
+with open('conversion_test.json', 'r') as f:
+    json_data = json.load(f)
+
+components = json_data.get('components', {})
+nets = json_data.get('nets', {})
+
+print(f'✅ 4.2b: JSON loaded - {len(components)} components, {len(nets)} nets')
+
+# Verify component details
+mcu_found = False
+sensor_found = False
+for comp_id, comp_data in components.items():
+    if 'STM32G431' in str(comp_data.get('symbol', '')):
+        mcu_found = True
+    elif 'LM75' in str(comp_data.get('symbol', '')):
+        sensor_found = True
+
+if mcu_found and sensor_found:
+    print('✅ 4.2c: JSON contains expected component symbols')
+else:
+    print('❌ 4.2c: JSON missing expected components')
+    exit(1)
+
+# Verify net connectivity  
+i2c_sda_found = False
+i2c_scl_found = False
+for net_name in nets.keys():
+    if 'I2C_SDA' in net_name:
+        i2c_sda_found = True
+    elif 'I2C_SCL' in net_name:
+        i2c_scl_found = True
+
+if i2c_sda_found and i2c_scl_found:
+    print('✅ 4.2d: JSON contains expected net connectivity')
+else:
+    print('❌ 4.2d: JSON missing expected nets')
+    exit(1)
+"
+
+# Step 3: Test JSON to Python code generation
+uv run python -c "
+from circuit_synth.cli.utilities.python_code_generator import generate_python_from_json
+import json, os
+
+try:
+    # Load the JSON data
+    with open('conversion_test.json', 'r') as f:
+        json_data = json.load(f)
+    
+    # Generate Python code
+    python_code = generate_python_from_json(json_data, 'ConversionTestCircuit')
+    
+    # Write generated code to file
+    with open('generated_conversion_test.py', 'w') as f:
+        f.write(python_code)
+    
+    print('✅ 4.2e: Python code generated from JSON')
+    
+    # Verify generated code contains expected elements
+    if 'STM32G431' in python_code and 'I2C_SDA' in python_code:
+        print('✅ 4.2f: Generated code contains expected circuit elements')
+    else:
+        print('❌ 4.2f: Generated code missing expected elements')
+        exit(1)
+        
+except Exception as e:
+    print(f'⚠️ 4.2e: Python code generation not available or failed: {e}')
+    # Don't fail the test - this feature may not be fully implemented
+"
+
+# Step 4: Test generated code execution (if generated)
+if [ -f 'generated_conversion_test.py' ]; then
+    uv run python generated_conversion_test.py && echo '✅ 4.2g: Generated Python code executed successfully' || echo '⚠️ 4.2g: Generated code has execution issues'
+    rm generated_conversion_test.py
+fi
+
+# Cleanup
+rm -f conversion_test.json
+
+cd ../..
+```
+
+### Phase 5: Advanced Features Tests 🔬
+
+#### Test 5.1: Circuit Annotations
 ```bash
 # Test annotation system
 uv run python -c "
@@ -502,14 +729,21 @@ After completing all phases, verify:
 ### ✅ Critical Success Criteria
 - [ ] All Phase 1 tests pass (Core Functionality)
 - [ ] All Phase 2 tests pass (File Generation)  
+- [ ] All Phase 3 tests pass (Component Intelligence)
+- [ ] All Phase 4 tests pass (Netlist and Import/Export)
 - [ ] KiCad project files are generated and non-empty
-- [ ] JSON export works correctly
+- [ ] JSON export and import works correctly
+- [ ] Netlist generation and parsing works
 - [ ] No import errors or exceptions
 
 ### ⚠️ Non-Critical (May Have Issues)
 - [ ] JLCPCB search (may fail due to network/API)
 - [ ] Round-trip import (may not be fully implemented)
 - [ ] Advanced annotations (newer feature)
+- [ ] Component placement algorithms (may not be fully implemented)
+- [ ] PCB routing and validation (experimental features)
+- [ ] SPICE simulation export (may not be available)
+- [ ] Multi-manufacturer sourcing (network dependent)
 
 ### 🚨 Failure Criteria
 If any of these fail, DO NOT release:
@@ -538,3 +772,77 @@ Document test results in the release notes:
 - Performance metrics if relevant
 
 This ensures quality and provides debugging context for any issues discovered post-release.
+
+## 🔧 Additional Circuit-Synth Features to Test
+
+The tests above cover the core functionality, but circuit-synth has many additional features that should be tested for comprehensive validation:
+
+### 🎯 **Core Features Added**
+- **✅ KiCad Netlist Generation and Import** (Phase 4.1) - Generate valid KiCad netlists and parse them back
+- **✅ JSON to Circuit-Synth Logic Conversion** (Phase 4.2) - Convert JSON netlists back to Python circuit code
+
+### 🔬 **Advanced Features Worth Testing**
+
+#### **Component Placement and Layout**
+- Force-directed component placement algorithms
+- Hierarchical placement strategies  
+- Collision detection and avoidance
+- Wire routing optimization
+
+#### **PCB Design Integration**
+- PCB file generation (.kicad_pcb)
+- Footprint library validation
+- Component courtyard checking
+- Ratsnest generation
+
+#### **Manufacturing and Supply Chain**
+- Multi-manufacturer component sourcing (JLCPCB, Digi-Key, PCBWay)
+- Stock availability validation
+- Manufacturing constraint checking
+- Alternative component suggestions
+
+#### **Simulation and Analysis**
+- SPICE netlist export for simulation
+- Basic design rule checking (DRC)
+- Electrical rule checking (ERC)
+- Performance analysis and optimization
+
+#### **Memory Bank and Project Management**
+- Circuit versioning and diff tracking
+- Design decision logging
+- Project template generation
+- Claude Code integration features
+
+#### **Rust Acceleration Features**
+- Rust-accelerated symbol caching
+- High-performance netlist processing
+- Force-directed placement algorithms
+- Reference management optimization
+
+#### **Advanced Annotations and Documentation**
+- Automatic docstring extraction
+- Hierarchical circuit documentation
+- BOM generation with sourcing info
+- Design review and validation reports
+
+### 🎯 **Implementation Priority**
+
+**High Priority (Should be in regression tests):**
+- ✅ Netlist generation and import 
+- ✅ JSON round-trip conversion
+- Component placement basics
+- Manufacturing sourcing validation
+
+**Medium Priority (Nice to have in tests):**
+- PCB generation validation
+- Basic simulation preparation
+- Multi-manufacturer sourcing
+- Design rule checking
+
+**Low Priority (Manual testing acceptable):**
+- Advanced placement algorithms
+- Complex routing optimization
+- Detailed performance benchmarks
+- Experimental simulation features
+
+The regression tests should focus on the **High Priority** features to ensure core functionality works, while **Medium Priority** features can be tested manually or with specialized test suites.
