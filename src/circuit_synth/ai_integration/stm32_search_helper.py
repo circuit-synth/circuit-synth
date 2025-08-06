@@ -87,12 +87,13 @@ def find_stm32_with_peripherals(
     """
     try:
         # Import here to avoid circular imports
-        from .component_info.microcontrollers import (
-            search_by_peripherals,
-        )
         from circuit_synth.manufacturing.jlcpcb import (
             cached_jlcpcb_search,
             search_jlc_components_web,
+        )
+
+        from .component_info.microcontrollers import (
+            search_by_peripherals,
         )
 
         # Step 1: Search for STM32s with required peripherals

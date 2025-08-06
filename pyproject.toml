@@ -180,6 +180,10 @@ members = [
     "example_project",
     "test_project",
     "test_uv",
+    "cs_test",
+    "test_agent_setup/fresh_agent_test",
+    "test_agent_setup/validation_test",
+    "test_agent_setup/final_test",
 ]
 
 [dependency-groups]

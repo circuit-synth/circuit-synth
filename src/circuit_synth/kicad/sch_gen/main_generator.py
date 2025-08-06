@@ -55,9 +55,8 @@ class LLMPlacementManager:
 # Use optimized symbol cache from core.component for better performance
 from circuit_synth.core.component import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
-from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
-
 from circuit_synth.kicad.core.s_expression import SExpressionParser
+from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
 from .symbol_geometry import SymbolBoundingBoxCalculator
 

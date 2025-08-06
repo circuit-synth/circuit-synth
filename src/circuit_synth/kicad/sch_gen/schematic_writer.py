@@ -42,11 +42,6 @@ except ImportError:
 # but keep Python fallback for graphics data
 from circuit_synth.core.component import SymbolLibCache
 
-# Import Python symbol cache specifically for graphics data
-from circuit_synth.kicad.kicad_symbol_cache import (
-    SymbolLibCache as PythonSymbolLibCache,
-)
-
 # Import from KiCad API
 from circuit_synth.kicad.core.types import (
     Junction,
@@ -61,6 +56,11 @@ from circuit_synth.kicad.core.types import (
     SymbolInstance,
     Text,
     Wire,
+)
+
+# Import Python symbol cache specifically for graphics data
+from circuit_synth.kicad.kicad_symbol_cache import (
+    SymbolLibCache as PythonSymbolLibCache,
 )
 from circuit_synth.kicad.schematic.component_manager import ComponentManager
 from circuit_synth.kicad.schematic.placement import (

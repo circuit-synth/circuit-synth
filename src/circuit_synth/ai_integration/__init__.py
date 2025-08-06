@@ -14,7 +14,4 @@ Supports various AI assistants including Claude Code, GitHub Copilot, Cursor, an
 # Core exports
 from .validation import get_circuit_design_context, validate_and_improve_circuit
 
-__all__ = [
-    "validate_and_improve_circuit", 
-    "get_circuit_design_context"
-]
+__all__ = ["validate_and_improve_circuit", "get_circuit_design_context"]
