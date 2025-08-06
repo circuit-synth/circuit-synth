@@ -1089,7 +1089,7 @@ except Exception as e:
         self.results.append(
             self.run_python_test(
                 """
-from circuit_synth.stm32_search_helper import handle_stm32_peripheral_query
+from circuit_synth.ai_integration.stm32_search_helper import handle_stm32_peripheral_query
 
 result = handle_stm32_peripheral_query('find stm32 with 2 spi available on jlcpcb')
 if result and len(result) > 100:
