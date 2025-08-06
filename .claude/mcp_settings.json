@@ -11,7 +11,7 @@
     },
     "test-plan-creator": {
       "description": "Circuit test plan generation and validation specialist",
-      "file": "agents/test-plan-creator.md"
+      "file": "agents/circuit-design/test-plan-creator.md"
     },
     "contributor": {
       "description": "Circuit-synth contributor onboarding and development assistant",
