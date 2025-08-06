@@ -6,17 +6,18 @@ This module provides real-time monitoring and logging of cache usage,
 comparing Python vs Rust cache performance and tracking metrics.
 """
 
-import os
-import sys
-import time
 import json
 import logging
+import os
+import sys
 import threading
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Callable
-from dataclasses import dataclass, asdict
-from contextlib import contextmanager
+import time
 from collections import defaultdict, deque
+from contextlib import contextmanager
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
+
 import psutil
 
 # Add the src directory to the path

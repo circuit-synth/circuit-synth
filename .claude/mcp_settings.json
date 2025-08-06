@@ -15,7 +15,7 @@
     },
     "test-plan-creator": {
       "description": "Circuit test plan generation and validation specialist",
-      "file": "agents/test-plan-creator.md"
+      "file": "agents/circuit-design/test-plan-creator.md"
     },
     "component-guru": {
       "description": "Component sourcing and manufacturing optimization specialist",
@@ -27,7 +27,7 @@
     },
     "stm32-mcu-finder": {
       "description": "STM32 microcontroller selection specialist with pin mapping expertise",
-      "file": "agents/manufacturing/stm32-mcu-finder.md"
+      "file": "agents/microcontrollers/stm32-mcu-finder.md"
     },
     "circuit-generation-agent": {
       "description": "Specialized agent for generating complete circuit-synth Python code",

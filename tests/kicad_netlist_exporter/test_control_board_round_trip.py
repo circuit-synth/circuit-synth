@@ -1,7 +1,8 @@
-import unittest
 import json
-import pytest
+import unittest
 from pathlib import Path
+
+import pytest
 
 from circuit_synth.kicad.netlist_exporter import convert_json_to_netlist
 from circuit_synth.kicad.sheet_hierarchy_manager import SheetHierarchyManager
@@ -25,11 +26,22 @@ class TestControlBoardRoundTrip(unittest.TestCase):
         cls.OUTPUT_DIR.mkdir(exist_ok=True)
 
         # Input/output paths - use existing files
-        cls.INPUT_JSON_PATH = cls.OUTPUT_DIR / "netlist2_output.json"  # Use existing JSON file
+        cls.INPUT_JSON_PATH = (
+            cls.OUTPUT_DIR / "netlist2_output.json"
+        )  # Use existing JSON file
         cls.OUTPUT_NETLIST_PATH = cls.OUTPUT_DIR / "control_board_exported.net"
-        cls.ORIGINAL_NETLIST_PATH = cls.BASE_DIR / "tests" / "test_data" / "kicad9" / "netlists" / "netlist2.net"  # Use matching netlist
+        cls.ORIGINAL_NETLIST_PATH = (
+            cls.BASE_DIR
+            / "tests"
+            / "test_data"
+            / "kicad9"
+            / "netlists"
+            / "netlist2.net"
+        )  # Use matching netlist
 
-    @pytest.mark.skip(reason="Test depends on generated JSON files from other test runs - core round-trip functionality tested in other netlist tests")
+    @pytest.mark.skip(
+        reason="Test depends on generated JSON files from other test runs - core round-trip functionality tested in other netlist tests"
+    )
     def test_round_trip_conversion(self):
         """
         Test the round-trip conversion of control_board.net through JSON and back.
@@ -55,7 +67,7 @@ class TestControlBoardRoundTrip(unittest.TestCase):
         self.assertEqual(
             set(original_refs),
             set(generated_refs),
-            "Component references don't match between original and generated netlists"
+            "Component references don't match between original and generated netlists",
         )
 
         # Compare component values
@@ -64,7 +76,7 @@ class TestControlBoardRoundTrip(unittest.TestCase):
         self.assertEqual(
             original_values,
             generated_values,
-            "Component values don't match between original and generated netlists"
+            "Component values don't match between original and generated netlists",
         )
 
         # Compare net names with hierarchy handling
@@ -73,12 +85,16 @@ class TestControlBoardRoundTrip(unittest.TestCase):
         self.assertEqual(
             set(original_nets),
             set(generated_nets),
-            "Net names don't match between original and generated netlists"
+            "Net names don't match between original and generated netlists",
         )
 
         # Compare net-to-component connections with pin types
-        original_connections = self._extract_net_connections_with_types(original_content)
-        generated_connections = self._extract_net_connections_with_types(generated_content)
+        original_connections = self._extract_net_connections_with_types(
+            original_content
+        )
+        generated_connections = self._extract_net_connections_with_types(
+            generated_content
+        )
 
         # Compare connections for each net
         for net_name in original_nets:
@@ -87,7 +103,7 @@ class TestControlBoardRoundTrip(unittest.TestCase):
             self.assertEqual(
                 set(orig_conns),
                 set(gen_conns),
-                f"Connections for net '{net_name}' don't match"
+                f"Connections for net '{net_name}' don't match",
             )
 
         # Verify power nets are properly handled
@@ -97,26 +113,32 @@ class TestControlBoardRoundTrip(unittest.TestCase):
                 self.assertIn(
                     net,
                     generated_nets,
-                    f"Power net '{net}' missing from generated netlist"
+                    f"Power net '{net}' missing from generated netlist",
                 )
                 # Verify power net connections match
                 self.assertEqual(
                     set(original_connections.get(net, [])),
                     set(generated_connections.get(net, [])),
-                    f"Connections for power net '{net}' don't match"
+                    f"Connections for power net '{net}' don't match",
                 )
 
     def _extract_component_refs(self, netlist_content):
         """Extract component references from netlist content."""
         import re
+
         refs = re.findall(r'\(comp \(ref "([^"]+)"\)', netlist_content)
         return refs
 
     def _extract_component_values(self, netlist_content):
         """Extract component references and their values."""
         import re
+
         values = {}
-        comp_blocks = re.findall(r'\(comp \(ref "([^"]+)".*?\(value "([^"]+)".*?\)', netlist_content, re.DOTALL)
+        comp_blocks = re.findall(
+            r'\(comp \(ref "([^"]+)".*?\(value "([^"]+)".*?\)',
+            netlist_content,
+            re.DOTALL,
+        )
         for ref, value in comp_blocks:
             values[ref] = value
         return values
@@ -124,38 +146,48 @@ class TestControlBoardRoundTrip(unittest.TestCase):
     def _extract_hierarchical_nets(self, netlist_content):
         """Extract net names with hierarchy information."""
         import re
+
         nets = []
-        net_blocks = re.findall(r'\(net \(code "[^"]+"\) \(name "([^"]+)".*?\)', netlist_content, re.DOTALL)
-        
+        net_blocks = re.findall(
+            r'\(net \(code "[^"]+"\) \(name "([^"]+)".*?\)', netlist_content, re.DOTALL
+        )
+
         for net in net_blocks:
             # Handle hierarchical paths in net names
-            normalized_net = net.replace('//', '/')  # Normalize path separators
+            normalized_net = net.replace("//", "/")  # Normalize path separators
             nets.append(normalized_net)
-        
+
         return nets
 
     def _extract_net_connections_with_types(self, netlist_content):
         """Extract net-to-component connections including pin types."""
         import re
+
         connections = {}
-        
+
         # Find all net blocks
-        net_blocks = re.findall(r'\(net \(code "[^"]+"\) \(name "([^"]+)".*?\)', netlist_content, re.DOTALL)
-        
+        net_blocks = re.findall(
+            r'\(net \(code "[^"]+"\) \(name "([^"]+)".*?\)', netlist_content, re.DOTALL
+        )
+
         for net_name in net_blocks:
             # Find the full net block
-            net_block = re.search(f'\\(net \\(code "[^"]+\"\\) \\(name "{net_name}".*?\\)', netlist_content, re.DOTALL)
+            net_block = re.search(
+                f'\\(net \\(code "[^"]+"\\) \\(name "{net_name}".*?\\)',
+                netlist_content,
+                re.DOTALL,
+            )
             if net_block:
                 # Extract nodes with pin types
                 nodes = re.findall(
                     r'\(node \(ref "([^"]+)"\) \(pin "([^"]+)"\)(?: \(pintype "([^"]+)"\))?',
-                    net_block.group(0)
+                    net_block.group(0),
                 )
                 connections[net_name] = [
                     f"{ref}:{pin}:{pintype if pintype else 'passive'}"
                     for ref, pin, pintype in nodes
                 ]
-        
+
         return connections
 
 

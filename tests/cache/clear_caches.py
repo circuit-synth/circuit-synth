@@ -6,11 +6,11 @@ This script provides utilities to clear all caches (both Python and Rust)
 to ensure clean testing environments for validating the Rust cache integration.
 """
 
-import os
-import sys
-import shutil
-import logging
 import argparse
+import logging
+import os
+import shutil
+import sys
 from pathlib import Path
 from typing import List, Optional
 

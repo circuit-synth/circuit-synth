@@ -538,12 +538,14 @@ class SchematicWriter:
                 else:
                     # Root sheet - use schematic UUID in path
                     instance_path = f"/{self.schematic.uuid}"
-                    logger.debug(f"  Creating ROOT SHEET instance with path: {instance_path}")
+                    logger.debug(
+                        f"  Creating ROOT SHEET instance with path: {instance_path}"
+                    )
 
                 # Clear any existing instances that might have been added by component_manager
                 # We need to control the project name ourselves
                 api_component.instances.clear()
-                
+
                 # Create the instance
                 # Determine project name based on hierarchy level:
                 # - Root level (hierarchical_path has only 1 UUID - the root): empty string ""
@@ -551,12 +553,14 @@ class SchematicWriter:
                 if self.hierarchical_path and len(self.hierarchical_path) > 1:
                     # We're in a nested schematic (path has more than just root UUID) - use project name
                     instance_project = self.project_name
-                    logger.debug(f"  Using project name for nested component: {instance_project}")
+                    logger.debug(
+                        f"  Using project name for nested component: {instance_project}"
+                    )
                 else:
                     # We're in the root schematic (path has only root UUID or is empty) - use empty string
                     instance_project = ""
                     logger.debug(f"  Using empty project name for root component")
-                
+
                 instance = SymbolInstance(
                     project=instance_project,
                     path=instance_path,
@@ -793,24 +797,28 @@ class SchematicWriter:
             # For hierarchical sheets, we need to include both internal nets AND
             # the parameters passed to the subcircuit function
             pin_list = sorted([n.name for n in child_circ.nets])
-            
+
             # CRITICAL FIX: Also include the parameters from child circuit instances
             # For subcircuits that only contain other subcircuits (no components),
             # the parameters won't show up as nets, so we need to extract them from
             # the instance connections
-            if hasattr(child_info, 'instance_nets') and child_info.get('instance_nets'):
+            if hasattr(child_info, "instance_nets") and child_info.get("instance_nets"):
                 # If instance_nets mapping is available, use it
-                instance_nets = child_info['instance_nets']
+                instance_nets = child_info["instance_nets"]
                 for param_name, net_name in instance_nets.items():
                     if net_name not in pin_list:
                         pin_list.append(net_name)
                 pin_list = sorted(pin_list)
-            elif len(child_circ.components) == 0 and len(child_circ.child_instances) > 0:
+            elif (
+                len(child_circ.components) == 0 and len(child_circ.child_instances) > 0
+            ):
                 # This is a hierarchical sheet with only subcircuits
                 # We need to infer the parameters from the parent circuit's nets
                 # that connect to this subcircuit instance
-                logger.debug(f"Subcircuit '{sub_name}' has no components, checking parent connections")
-                
+                logger.debug(
+                    f"Subcircuit '{sub_name}' has no components, checking parent connections"
+                )
+
                 # Look for nets in the parent circuit that might connect to this instance
                 # This is a heuristic approach - ideally we'd have explicit parameter info
                 parent_nets = set()
@@ -819,23 +827,32 @@ class SchematicWriter:
                     # In a more sophisticated implementation, we'd track which nets
                     # actually connect to this specific subcircuit instance
                     parent_nets.add(net.name)
-                
+
                 # For now, use common signal names that are likely to be hierarchical connections
-                common_hierarchical_signals = ['VCC', 'GND', 'VIN', 'VOUT', 'INPUT', 'OUTPUT', 
-                                             'FILTERED', 'PROCESSED', 'V_MONITOR']
+                common_hierarchical_signals = [
+                    "VCC",
+                    "GND",
+                    "VIN",
+                    "VOUT",
+                    "INPUT",
+                    "OUTPUT",
+                    "FILTERED",
+                    "PROCESSED",
+                    "V_MONITOR",
+                ]
                 for signal in common_hierarchical_signals:
                     if signal in parent_nets and signal not in pin_list:
                         pin_list.append(signal)
-                
+
                 # Also check the subcircuit's child instances to infer parameters
                 for child_inst in child_circ.child_instances:
-                    child_sub = self.all_subcircuits.get(child_inst['sub_name'])
+                    child_sub = self.all_subcircuits.get(child_inst["sub_name"])
                     if child_sub:
                         # Add any nets from child subcircuits that might be parameters
                         for net in child_sub.nets:
                             if net.name not in pin_list and net.name in parent_nets:
                                 pin_list.append(net.name)
-                
+
                 pin_list = sorted(pin_list)
                 logger.info(f"Inferred hierarchical pins for '{sub_name}': {pin_list}")
 
@@ -858,7 +875,7 @@ class SchematicWriter:
                 position=Point(sheet_x, sheet_y),
                 size=(width, height),
             )
-            
+
             # Add project name to sheet for instances generation
             sheet._project_name = self.project_name
 
@@ -1174,7 +1191,9 @@ class SchematicWriter:
                     sym_id,
                 )
                 continue
-            logger.debug(f"    ✅ SCHEMATIC_WRITER: Got symbol data for '{sym_id}' with properties: {list(lib_data.get('properties', {}).keys()) if isinstance(lib_data, dict) else 'N/A'}")
+            logger.debug(
+                f"    ✅ SCHEMATIC_WRITER: Got symbol data for '{sym_id}' with properties: {list(lib_data.get('properties', {}).keys()) if isinstance(lib_data, dict) else 'N/A'}"
+            )
 
             # Check if graphics data is missing from Rust cache - if so, use Python fallback
             if "graphics" not in lib_data or not lib_data["graphics"]:
@@ -1231,9 +1250,13 @@ class SchematicWriter:
 
         # Properties
         props = lib_data.get("properties", {})
-        logger.debug(f"    📋 SCHEMATIC_WRITER: Symbol '{lib_id}' has {len(props)} properties")
+        logger.debug(
+            f"    📋 SCHEMATIC_WRITER: Symbol '{lib_id}' has {len(props)} properties"
+        )
         for prop_name, prop_value in props.items():
-            logger.debug(f"        🏷️  SCHEMATIC_WRITER: Property '{prop_name}' = '{prop_value}' (type: {type(prop_value).__name__})")
+            logger.debug(
+                f"        🏷️  SCHEMATIC_WRITER: Property '{prop_name}' = '{prop_value}' (type: {type(prop_value).__name__})"
+            )
             hide_symbol = Symbol("no")
             if prop_name in (
                 "Footprint",

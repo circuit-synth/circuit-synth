@@ -3,35 +3,58 @@
 ESP32_C6_MCU subcircuit generated from KiCad
 """
 
-from circuit_synth import *
-
 # Import child circuits
 from Debug_Header import debug_header
 from LED_Blinker import led_blinker
 
-@circuit(name='ESP32_C6_MCU')
+from circuit_synth import *
+
+
+@circuit(name="ESP32_C6_MCU")
 def esp32_c6_mcu(gnd, vcc_3v3, usb_dm, usb_dp):
     """
     ESP32_C6_MCU subcircuit
     Parameters: GND, VCC_3V3, USB_DM, USB_DP
     """
     # Create local nets
-    debug_en = Net('DEBUG_EN')
-    debug_io0 = Net('DEBUG_IO0')
-    debug_rx = Net('DEBUG_RX')
-    debug_tx = Net('DEBUG_TX')
-    led_control = Net('LED_CONTROL')
-    usb_dm_mcu = Net('USB_DM_MCU')
-    usb_dp_mcu = Net('USB_DP_MCU')
+    debug_en = Net("DEBUG_EN")
+    debug_io0 = Net("DEBUG_IO0")
+    debug_rx = Net("DEBUG_RX")
+    debug_tx = Net("DEBUG_TX")
+    led_control = Net("LED_CONTROL")
+    usb_dm_mcu = Net("USB_DM_MCU")
+    usb_dp_mcu = Net("USB_DP_MCU")
 
     # Create components
-    c4 = Component(symbol="Device:C", ref="C4", value="100nF", footprint="Capacitor_SMD:C_0603_1608Metric")
-    r4 = Component(symbol="Device:R", ref="R4", value="22", footprint="Resistor_SMD:R_0603_1608Metric")
-    r5 = Component(symbol="Device:R", ref="R5", value="22", footprint="Resistor_SMD:R_0603_1608Metric")
-    u2 = Component(symbol="RF_Module:ESP32-C6-MINI-1", ref="U2", value="~", footprint="RF_Module:ESP32-C6-MINI-1")
+    c4 = Component(
+        symbol="Device:C",
+        ref="C4",
+        value="100nF",
+        footprint="Capacitor_SMD:C_0603_1608Metric",
+    )
+    r4 = Component(
+        symbol="Device:R",
+        ref="R4",
+        value="22",
+        footprint="Resistor_SMD:R_0603_1608Metric",
+    )
+    r5 = Component(
+        symbol="Device:R",
+        ref="R5",
+        value="22",
+        footprint="Resistor_SMD:R_0603_1608Metric",
+    )
+    u2 = Component(
+        symbol="RF_Module:ESP32-C6-MINI-1",
+        ref="U2",
+        value="~",
+        footprint="RF_Module:ESP32-C6-MINI-1",
+    )
 
     # Instantiate child circuits
-    debug_header_circuit = debug_header(gnd, vcc_3v3, debug_en, debug_io0, debug_rx, debug_tx)
+    debug_header_circuit = debug_header(
+        gnd, vcc_3v3, debug_en, debug_io0, debug_rx, debug_tx
+    )
     led_blinker_circuit = led_blinker(gnd, led_control)
 
     # Connections
