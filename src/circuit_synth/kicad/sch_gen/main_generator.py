@@ -57,8 +57,8 @@ from circuit_synth.core.component import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
-# Removed unused netlist_importer import
-from circuit_synth.kicad.sch_editor.schematic_reader import SchematicReader
+# Use kicad_api for schematic reading instead of sch_editor
+from circuit_synth.kicad_api.core.s_expression import SExpressionParser
 
 from .symbol_geometry import SymbolBoundingBoxCalculator
 
@@ -708,9 +708,8 @@ class SchematicGenerator:
         # Pre-populate the reference manager with all assigned references
         # This ensures we respect existing references and don't create conflicts
         if all_assigned_refs:
-            shared_ref_manager.api_ref_manager.add_existing_references(
-                list(all_assigned_refs)
-            )
+            for ref in all_assigned_refs:
+                shared_ref_manager.used_references.add(ref)
             logger.debug(
                 f"Pre-populated reference manager with {len(all_assigned_refs)} existing references"
             )
@@ -1131,9 +1130,9 @@ class SchematicGenerator:
             if existing_sch_path.exists():
                 logger.info(f"Found existing schematic file: {existing_sch_path}")
                 try:
-                    # Read existing schematic
-                    reader = SchematicReader()
-                    schematic = reader.read_file(str(existing_sch_path))
+                    # Read existing schematic using kicad_api
+                    parser = SExpressionParser()
+                    schematic = parser.parse_file(str(existing_sch_path))
                     existing_components = schematic.components
                     logger.info(
                         f"Found {len(existing_components)} components in existing schematic"

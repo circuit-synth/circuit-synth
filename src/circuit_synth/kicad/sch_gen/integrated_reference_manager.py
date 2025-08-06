@@ -1,27 +1,25 @@
 """
-Integrated Reference Manager - Bridges old and new reference generation systems.
+Integrated Reference Manager - Self-contained reference generation system.
 
-This module shows how to use the new sch_api ReferenceManager in the current
-schematic generation workflow.
+This module provides reference generation without external dependencies.
 """
 
 import logging
-from typing import Dict, Optional
-
-from circuit_synth.kicad.sch_api import ReferenceManager as NewAPIReferenceManager
+import re
+from typing import Dict, Optional, Set
 
 logger = logging.getLogger(__name__)
 
 
 class IntegratedReferenceManager:
     """
-    Adapter class that uses the new API's ReferenceManager while maintaining
-    compatibility with the existing schematic generation workflow.
+    Self-contained reference manager for schematic generation workflow.
     """
 
     def __init__(self):
-        # Use the new API's reference manager
-        self.api_ref_manager = NewAPIReferenceManager()
+        # Track used references
+        self.used_references: Set[str] = set()
+        self.reference_counters: Dict[str, int] = {}
 
         # Mapping from old component types to KiCad library IDs
         self.type_to_lib_id = {
@@ -97,18 +95,59 @@ class IntegratedReferenceManager:
         # Don't check availability - that causes conflicts in hierarchical designs
         if hasattr(component, "reference") and component.reference:
             # Ensure it's tracked in the reference manager
-            if component.reference not in self.api_ref_manager.used_references:
-                self.api_ref_manager.add_existing_references([component.reference])
+            if component.reference not in self.used_references:
+                self.used_references.add(component.reference)
             return component.reference
 
         # Only generate new reference if component has NO reference
-        reference = self.api_ref_manager.generate_reference(lib_id)
+        reference = self._generate_reference(lib_id)
 
         logger.debug(
             f"Generated reference '{reference}' for component type '{comp_type}' (lib_id: {lib_id})"
         )
 
         return reference
+
+    def _generate_reference(self, lib_id: str) -> str:
+        """Generate a new reference for a given library ID."""
+        # Extract reference prefix from lib_id
+        if ":" in lib_id:
+            symbol_name = lib_id.split(":", 1)[1]
+        else:
+            symbol_name = lib_id
+
+        # Map symbol names to reference prefixes
+        prefix_map = {
+            "R": "R",
+            "C": "C",
+            "L": "L",
+            "D": "D",
+            "LED": "D",
+            "Q": "Q",
+            "U": "U",
+            "J": "J",
+            "Conn": "J",
+            "TestPoint": "TP",
+            "Battery": "BT",
+            "V": "V",
+            "I": "I",
+            "MountingHole": "H",
+            "Fiducial": "FID",
+        }
+
+        prefix = prefix_map.get(symbol_name, "U")
+
+        # Get next counter for this prefix
+        if prefix not in self.reference_counters:
+            self.reference_counters[prefix] = 0
+
+        # Find next available reference
+        while True:
+            self.reference_counters[prefix] += 1
+            ref = f"{prefix}{self.reference_counters[prefix]}"
+            if ref not in self.used_references:
+                self.used_references.add(ref)
+                return ref
 
     def get_reference_for_symbol(self, symbol) -> str:
         """
@@ -122,24 +161,20 @@ class IntegratedReferenceManager:
         """
         # Log current state before assignment
         logger.debug(f"    Reference manager state before assignment:")
-        logger.debug(
-            f"      Used references: {sorted(self.api_ref_manager.used_references) if hasattr(self.api_ref_manager, 'used_references') else 'N/A'}"
-        )
-        logger.debug(
-            f"      Counters: {dict(self.api_ref_manager.reference_counters) if hasattr(self.api_ref_manager, 'reference_counters') else 'N/A'}"
-        )
+        logger.debug(f"      Used references: {sorted(self.used_references)}")
+        logger.debug(f"      Counters: {dict(self.reference_counters)}")
 
         # CRITICAL FIX: If symbol has a reference, ALWAYS use it
         # Don't check availability - that causes conflicts in hierarchical designs
         if symbol.reference:
             # Ensure it's tracked in the reference manager
-            if symbol.reference not in self.api_ref_manager.used_references:
-                self.api_ref_manager.add_existing_references([symbol.reference])
+            if symbol.reference not in self.used_references:
+                self.used_references.add(symbol.reference)
             logger.debug(f"      Using pre-assigned reference: {symbol.reference}")
             return symbol.reference
 
         # Only generate new reference if component has NO reference
-        reference = self.api_ref_manager.generate_reference(symbol.lib_id)
+        reference = self._generate_reference(symbol.lib_id)
 
         logger.debug(f"      Generated new reference: {reference} for {symbol.lib_id}")
 
@@ -147,7 +182,8 @@ class IntegratedReferenceManager:
 
     def reset(self):
         """Reset the reference manager for a new schematic."""
-        self.api_ref_manager = NewAPIReferenceManager()
+        self.used_references.clear()
+        self.reference_counters.clear()
 
     def enable_reassignment_mode(self):
         """
@@ -156,7 +192,7 @@ class IntegratedReferenceManager:
         """
         self.reassignment_mode = True
         # Reset the reference manager to start from 1
-        self.api_ref_manager = NewAPIReferenceManager()
+        self.reset()
 
     def should_reassign(self, reference: str) -> bool:
         """
@@ -171,7 +207,7 @@ class IntegratedReferenceManager:
         This bypasses the normal reference checking and forces a new assignment.
         """
         # Generate a new reference
-        return self.api_ref_manager.generate_reference(lib_id)
+        return self._generate_reference(lib_id)
 
 
 # Example integration into SchematicWriter
