@@ -1,13 +1,21 @@
 {
   "mcpServers": {},
   "agents": {
-    "circuit-architect": {
-      "description": "Master circuit design coordinator and architecture expert",
-      "file": "agents/circuit-design/circuit-architect.md"
+    "circuit-generation-agent": {
+      "description": "Specialized agent for generating complete circuit-synth Python code",
+      "file": "agents/circuit-generation/circuit-generation-agent.md"
     },
-    "circuit-synth": {
-      "description": "Circuit-synth code generation and KiCad integration specialist",
-      "file": "agents/circuit-design/circuit-synth.md"
+    "stm32-mcu-finder": {
+      "description": "STM32 microcontroller selection specialist with pin mapping expertise",
+      "file": "agents/microcontrollers/stm32-mcu-finder.md"
+    },
+    "jlc-parts-finder": {
+      "description": "Specialized agent for finding manufacturable components by searching JLCPCB availability and verifying KiCad symbol compatibility",
+      "file": "agents/manufacturing/jlc-parts-finder.md"
+    },
+    "circuit-synth-legacy": {
+      "description": "Legacy circuit-synth code generation specialist",
+      "file": "agents/circuit-design/circuit-synth-legacy.md"
     },
     "simulation-expert": {
       "description": "SPICE simulation and circuit validation specialist",
@@ -15,31 +23,11 @@
     },
     "test-plan-creator": {
       "description": "Circuit test plan generation and validation specialist",
-      "file": "agents/test-plan-creator.md"
-    },
-    "component-guru": {
-      "description": "Component sourcing and manufacturing optimization specialist",
-      "file": "agents/manufacturing/component-guru.md"
-    },
-    "jlc-parts-finder": {
-      "description": "JLCPCB component search and KiCad compatibility specialist",
-      "file": "agents/manufacturing/jlc-parts-finder.md"
-    },
-    "stm32-mcu-finder": {
-      "description": "STM32 microcontroller selection specialist with pin mapping expertise",
-      "file": "agents/manufacturing/stm32-mcu-finder.md"
-    },
-    "circuit-generation-agent": {
-      "description": "Specialized agent for generating complete circuit-synth Python code",
-      "file": "agents/development/circuit_generation_agent.md"
+      "file": "agents/circuit-design/test-plan-creator.md"
     },
     "contributor": {
       "description": "Circuit-synth contributor onboarding and development assistant",
       "file": "agents/development/contributor.md"
-    },
-    "first-setup-agent": {
-      "description": "Comprehensive setup agent for circuit-synth development environment",
-      "file": "agents/development/first_setup_agent.md"
     }
   }
 }
