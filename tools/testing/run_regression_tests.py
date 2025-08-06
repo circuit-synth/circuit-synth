@@ -609,9 +609,9 @@ except Exception as e:
 
 def main():
     """Main entry point"""
-    # Find project root
+    # Find project root - script is now in tools/testing/, so go up 2 levels
     script_path = Path(__file__).resolve()
-    project_root = script_path.parent.parent
+    project_root = script_path.parent.parent.parent
     
     # Verify we're in the right place
     if not (project_root / "src" / "circuit_synth").exists():
