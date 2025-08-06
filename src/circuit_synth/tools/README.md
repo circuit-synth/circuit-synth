@@ -14,7 +14,6 @@ This directory contains user-facing command-line tools and utilities that are in
 ### `project_management/`
 **Project Setup and Management**
 - `new_project.py` - Create new circuit-synth projects
-- `new_pcb.py` - Initialize PCB design workflows
 - `init_existing_project.py` - Set up circuit-synth in existing projects
 - `init_pcb.py` - Initialize PCB generation for existing circuits
 
