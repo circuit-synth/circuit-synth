@@ -12,17 +12,21 @@ try:
     from rust_force_directed_placement import (
         ForceDirectedPlacer as RustForceDirectedPlacer,
     )
+
     ForceDirectedPlacer = RustForceDirectedPlacer
     PCB_RUST_PLACEMENT_AVAILABLE = True
 except ImportError:
     # Python fallback for placement
     from .force_directed import ForceDirectedPlacer
+
     PCB_RUST_PLACEMENT_AVAILABLE = False
+
 
 def apply_force_directed_placement(*args, **kwargs):
     """Compatibility wrapper for force-directed placement with fallback."""
     placer = ForceDirectedPlacer()
     return placer.place(*args, **kwargs)
+
 
 RUST_PLACEMENT_AVAILABLE = PCB_RUST_PLACEMENT_AVAILABLE
 

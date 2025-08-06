@@ -1,47 +1,43 @@
-# Contributing to Circuit-Synth 🚀
+# Contributing to Circuit-Synth
 
-**Welcome to the most contributor-friendly EE design tool ever built!** Whether you're fixing a bug, adding a feature, or just exploring - we've made it incredibly easy to get started.
+Thank you for your interest in contributing to circuit-synth.
 
-Circuit-synth is specifically designed to work with **Claude Code** for maximum developer productivity. We've created comprehensive onboarding resources and specialized AI agents to help you contribute effectively.
+## Development Setup
 
-## 🎯 Quick Start (5 minutes)
-
-**1. Get the code:**
+1. Clone the repository:
 ```bash
 git clone https://github.com/circuit-synth/circuit-synth.git
 cd circuit-synth
 ```
 
-**2. Install and run:**
+2. Install dependencies:
 ```bash
-# Install dependencies
 uv sync
-
-# Try it out
-uv run python examples/example_kicad_project.py
 ```
 
-**3. Use Claude Code (recommended):**
+3. Run tests:
+```bash
+./scripts/run_all_tests.sh
+```
+
+4. (Optional) Register Claude Code agents:
 ```bash
 uv run register-agents
-# Now Claude Code has specialized circuit-synth agents to help you!
 ```
 
-That's it! You now have a working circuit-synth development environment.
+## Development Workflow
 
-## 🤖 Why We Love Claude Code
+1. Create a feature branch from `develop`
+2. Make your changes with tests
+3. Run the test suite: `./scripts/run_all_tests.sh`
+4. Submit a pull request to `develop`
 
-**This project is designed specifically for Claude Code + GitHub MCP.** You get:
+## Code Style
 
-- **Specialized agents** that understand circuit design, KiCad, manufacturing, and our codebase
-- **Automated workflows** - from reading GitHub issues to creating PRs
-- **Built-in guidance** - agents help with architecture, testing, and best practices
-- **Instant expertise** - no need to learn everything upfront
-
-**Quick Claude Code workflow:**
-1. Use agents like `circuit-architect`, `power-expert`, `component-guru` 
-2. Ask questions: *"How do I add Rust acceleration?"* or *"Find STM32 with 3 SPIs"*
-3. Let agents guide you through implementation and testing
+- Python: Use `black`, `isort`, `mypy`, `flake8`
+- Rust: Use `cargo fmt`, `cargo clippy`
+- Write tests for new functionality
+- Update documentation as needed
 
 
 ## 🎯 Choose Your Adventure
