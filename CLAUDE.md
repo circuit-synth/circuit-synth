@@ -55,6 +55,22 @@ register-agents
 ### Code Quality and Testing
 **IMPORTANT: Always run linting and tests after making changes**
 
+**🚨 PRE-RELEASE TESTING (CRITICAL for PyPI):**
+```bash
+# Comprehensive regression test - MUST run before ANY release
+./tools/testing/run_full_regression_tests.py
+
+# This performs COMPLETE environment reconstruction:
+# - Clears ALL caches (Python, Rust, system)
+# - Reinstalls Python environment from scratch
+# - Rebuilds all Rust modules with Python bindings
+# - Runs comprehensive functionality tests
+# - Takes ~2 minutes, prevents broken releases
+
+# Quick test during development (skip reinstall)
+./tools/testing/run_full_regression_tests.py --skip-install --quick
+```
+
 **🚀 AUTOMATED TESTING (Recommended):**
 ```bash
 # Run all tests (Python + Rust + Integration + Core)
