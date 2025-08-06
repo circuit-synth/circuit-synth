@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "circuit_synth"
-version = "0.7.0"
+version = "0.7.1"
 description = "Pythonic circuit design for production-ready KiCad projects"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -76,12 +76,12 @@ test = [
 
 [project.scripts]
 # Sync scripts
-kicad-to-python = "circuit_synth.tools.kicad_to_python_sync:main"
-python-to-kicad = "circuit_synth.tools.python_to_kicad_sync:main"
+kicad-to-python = "circuit_synth.cli.kicad_integration.kicad_to_python_sync:main"
+python-to-kicad = "circuit_synth.cli.kicad_integration.python_to_kicad_sync:main"
 
 # Symbol management scripts  
-preload-symbols = "circuit_synth.scripts.preload_symbols:main"
-preparse-symbols = "circuit_synth.scripts.preparse_kicad_symbols:main"
+preload-symbols = "circuit_synth.cli.kicad_integration.preload_symbols:main"
+preparse-symbols = "circuit_synth.cli.kicad_integration.preparse_kicad_symbols:main"
 
 # Import/Export tools
 netlist-import = "circuit_synth.kicad.netlist_importer:main"
@@ -91,22 +91,22 @@ json-to-python = "circuit_synth.codegen.json_to_python_project:main"
 validate-kicad = "circuit_synth.core.kicad_validator:main"
 
 # Claude Code Integration
-setup-claude-integration = "circuit_synth.scripts.setup_claude:main"
+setup-claude-integration = "circuit_synth.cli.development.setup_claude:main"
 register-agents = "circuit_synth.claude_integration.agent_registry:main"
 validate-circuit = "circuit_synth.validation.real_time_check:main"
-cs-new-project = "circuit_synth.tools.new_project:main"
-cs-new-pcb = "circuit_synth.tools.new_pcb:main"
-cs-init-pcb = "circuit_synth.tools.init_pcb:main"
-cs-init-existing-project = "circuit_synth.tools.init_existing_project:main"
-cs-setup-kicad-plugins = "circuit_synth.tools.setup_kicad_plugins:main"
+cs-new-project = "circuit_synth.cli.project_management.new_project:main"
+cs-new-pcb = "circuit_synth.cli.project_management.new_pcb:main"
+cs-init-pcb = "circuit_synth.cli.project_management.init_pcb:main"
+cs-init-existing-project = "circuit_synth.cli.project_management.init_existing_project:main"
+cs-setup-kicad-plugins = "circuit_synth.cli.development.setup_kicad_plugins:main"
 
 # Memory-Bank System
 cs-memory-bank-init = "circuit_synth.memory_bank.cli:init_cli"
 cs-memory-bank-remove = "circuit_synth.memory_bank.cli:remove_cli"
 
-# Test Plan Generation
-create-test-plan = "circuit_synth.tools.test_plan_commands:create_test_plan"
-generate-manufacturing-tests = "circuit_synth.tools.test_plan_commands:generate_manufacturing_tests"
+# Test Plan Generation - DISABLED: Files don't exist yet
+# create-test-plan = "circuit_synth.tools.test_plan_commands:create_test_plan"
+# generate-manufacturing-tests = "circuit_synth.tools.test_plan_commands:generate_manufacturing_tests"
 
 # Plugin Management
 install-kicad-plugins = "install_kicad_plugins:main"
