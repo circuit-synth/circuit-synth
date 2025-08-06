@@ -1,6 +1,6 @@
-# Circuit-Synth Tools
+# Circuit-Synth Development Tools
 
-This directory contains utility tools and scripts for circuit-synth development, testing, and deployment.
+This directory contains all development tools and scripts for circuit-synth. These tools are used for building, testing, analysis, and maintenance but are not part of the installed package.
 
 ## 📁 Directory Structure
 
@@ -8,29 +8,76 @@ This directory contains utility tools and scripts for circuit-synth development,
 **Continuous Integration Setup Tools**
 - `setup-ci-symbols.sh` - Cross-platform bash script for KiCad symbol setup
 - `setup_ci_symbols.py` - Python alternative for environments without bash
-- `download-kicad-symbols.sh` - Basic symbol download script
-- `extract-test-symbols.sh` - Symbol extraction utilities
 - `CI_SETUP.md` - Complete CI setup documentation
 
-**Usage**:
-```bash
-# From repository root
-./tools/ci-setup/setup-ci-symbols.sh
-```
+### `build/`
+**Build and Compilation Tools**
+- `build_rust_modules.sh` - Build all Rust modules
+- `rebuild_all_rust.sh` - Clean rebuild of all Rust components
+- `format_all.sh` - Format all code (Python + Rust)
+- `setup_formatting.sh` - Set up code formatting tools
 
-### `development/` *(Future)*
-**Development and Debugging Tools**
-- Symbol validation scripts
-- Performance benchmarking tools
-- Development environment setup
+### `testing/`
+**Test Automation and Execution**
+- `run_all_tests.sh` - Run complete test suite (Python + Rust + Integration)
+- `test_rust_modules.sh` - Run Rust-specific tests
+- `run_regression_tests.py` - Execute regression test suite
 
-### `deployment/` *(Future)*
-**Deployment and Distribution Tools**
-- Package building scripts
-- Release automation tools
-- Distribution utilities
+### `release/`
+**Release and Distribution**
+- `release_to_pypi.sh` - Automated PyPI release pipeline
+
+### `analysis/`
+**Code Analysis and Quality**
+- `dead-code-analysis.py` - Identify and analyze unused code
+- `dead-code-analysis.sh` - Shell wrapper for dead code analysis
+
+### `maintenance/`
+**Repository Maintenance Utilities**
+- `clear_all_caches.sh` - Clear all build and runtime caches
+- `enable_rust_acceleration.py` - Enable/configure Rust acceleration
+- `update_examples_with_stock.py` - Update examples with current stock info
 
 ## 🚀 Quick Reference
+
+### Build Operations
+```bash
+# Build everything
+./tools/build/build_rust_modules.sh
+
+# Format all code
+./tools/build/format_all.sh
+
+# Clean rebuild
+./tools/build/rebuild_all_rust.sh
+```
+
+### Testing
+```bash
+# Run complete test suite
+./tools/testing/run_all_tests.sh
+
+# Test only Rust modules
+./tools/testing/test_rust_modules.sh
+
+# Run regression tests
+python3 tools/testing/run_regression_tests.py
+```
+
+### Release
+```bash
+# Release to PyPI
+./tools/release/release_to_pypi.sh 0.5.1
+```
+
+### Analysis & Maintenance
+```bash
+# Analyze dead code
+./tools/analysis/dead-code-analysis.sh
+
+# Clear all caches
+./tools/maintenance/clear_all_caches.sh
+```
 
 ### CI Setup
 ```bash
@@ -41,22 +88,14 @@ This directory contains utility tools and scripts for circuit-synth development,
 python3 tools/ci-setup/setup_ci_symbols.py
 ```
 
-### Integration with Existing Scripts
-The `scripts/` directory in the repository root contains runtime scripts that are part of the installed package:
-- `scripts/circuit-synth-docker` - Docker integration
-- `scripts/deploy-production.sh` - Production deployment
-- `scripts/run-with-kicad.sh` - KiCad environment setup
+## 📋 Directory Purpose
 
-The `tools/` directory contains **development and CI tools** that are not part of the installed package but help with development workflows.
+| Directory | Purpose | Installed with Package |
+|-----------|---------|----------------------|
+| **`tools/`** | Development, build, test, analysis tools | ❌ No |
+| **`src/circuit_synth/cli/`** | User-facing CLI utilities | ✅ Yes |
+| **`src/circuit_synth/`** | Core library code | ✅ Yes |
+| **`examples/`** | Usage examples and demos | ✅ Yes |
+| **`docs/`** | API documentation and guides | ✅ Yes |
 
-## 📋 Tool Categories
-
-| Category | Location | Purpose |
-|----------|----------|---------|
-| **CI Setup** | `tools/ci-setup/` | KiCad symbols, test environment setup |
-| **Runtime Scripts** | `scripts/` | Part of installed package, runtime utilities |
-| **Docker Tools** | `docker/` | Container management and deployment |
-| **Examples** | `examples/` | Usage examples and demos |
-| **Documentation** | `docs/` | API docs, guides, and references |
-
-This organization keeps development tools separate from runtime components while maintaining clear, logical groupings.
+This organization provides clear separation between development tools (not installed) and user tools (part of the package).

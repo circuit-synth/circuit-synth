@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "kicad_api")
 	(generator_version "9.0")
-	(uuid 948d9d2e-a324-4dd4-8135-2e74202b9138)
+	(uuid df025b50-3303-4b88-8deb-afd0134fd94a)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_02x03_Odd_Even"
@@ -13,7 +13,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "{'value': 'J', 'position': {'x': 1.27, 'y': 5.08, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Reference" "J"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -22,7 +22,7 @@
 					(hide no)
 				)
 			)
-			(property "Value" "{'value': 'Conn_02x03_Odd_Even', 'position': {'x': 1.27, 'y': -5.08, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Value" "Conn_02x03_Odd_Even"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -31,7 +31,7 @@
 					(hide no)
 				)
 			)
-			(property "Footprint" "{'value': '', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Footprint" ""
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -40,7 +40,7 @@
 					(hide yes)
 				)
 			)
-			(property "Datasheet" "{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Datasheet" "~"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -49,7 +49,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "{'value': 'Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "Description" "Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -58,7 +58,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "{'value': 'connector', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_keywords" "connector"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -67,7 +67,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "{'value': 'Connector*:*_2x??_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
+			(property "ki_fp_filters" "Connector*:*_2x??_*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -293,7 +293,7 @@
 	)
 	(title_block
 		(title Debug_Header)
-		(date 2025-08-04)
+		(date 2025-08-05)
 		(company Circuit-Synth)
 	)
 	(symbol
@@ -305,7 +305,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 53f3283d-66b4-4343-afb7-41c6f740ef77)
+		(uuid 2d5a3fe9-4eb5-4979-9338-0625ac428ac8)
 		(property "Reference" "J2"
 			(at 58.42 40.72 0)
 			(effects
@@ -326,7 +326,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/9a05a165-f19d-4725-87e8-e48282ca2b96/92a1db31-3504-4626-9590-04c4327d21d3"
+				(path "/aec751bd-5fec-46c2-9398-4fa862e8fba2/d97f18d9-8791-4301-a9c0-a8182e88bbbf/4213c1a1-c149-4185-957b-05912378c9e4"
 					(reference "J2")
 					(unit 1)
 				)
@@ -343,7 +343,7 @@
 			)
 			(justify right)
 		)
-		(uuid d4bef40d-ddf0-4d09-8eb4-20ddd0bacd66)
+		(uuid 46ca91c9-714f-4e9e-afd9-62f6e6492697)
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -355,7 +355,7 @@
 			)
 			(justify right)
 		)
-		(uuid d57232ca-09f3-48ee-a066-619e8753d86f)
+		(uuid 3b90eb78-68fc-4955-9f58-02021174e4c5)
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -367,7 +367,7 @@
 			)
 			(justify right)
 		)
-		(uuid d619be5c-2ed9-4e16-bf34-d7685d8fd519)
+		(uuid f271d877-c6f8-4ac3-9325-05d154821f1a)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -379,7 +379,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9e829790-fada-47d1-8219-127d1751d94e)
+		(uuid 82305cbf-3113-4a9b-9b87-bd2e25a52d74)
 	)
 	(hierarchical_label
 		GND
@@ -391,7 +391,7 @@
 			)
 			(justify left)
 		)
-		(uuid 4bba104c-e41a-42ee-bef0-eca3cbe6ecdd)
+		(uuid fca20d7a-8ffc-4e06-a944-38cf1d59c765)
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -403,7 +403,7 @@
 			)
 			(justify left)
 		)
-		(uuid 4121f56a-f5a3-4fa1-a13d-8e43ac775256)
+		(uuid 4ed4c753-9e9f-4046-bd7b-0ff1d39093f9)
 	)
 	(text_box
 		"Debug header for programming and debugging"
@@ -436,10 +436,10 @@
 			)
 			(justify left top)
 		)
-		(uuid 1fdd5e5e-ee46-4645-a1ee-90855049e982)
+		(uuid 7f284903-8b2d-478f-8682-501e6dddba54)
 	)
 	(sheet_instances
-		(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/9a05a165-f19d-4725-87e8-e48282ca2b96/92a1db31-3504-4626-9590-04c4327d21d3"
+		(path "/aec751bd-5fec-46c2-9398-4fa862e8fba2/d97f18d9-8791-4301-a9c0-a8182e88bbbf/4213c1a1-c149-4185-957b-05912378c9e4"
 			(page "1")
 		)
 	)

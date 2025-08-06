@@ -14,7 +14,7 @@ Or in Python:
     setup_claude_integration()
 """
 
-__version__ = "0.6.6"
+__version__ = "0.7.0"
 
 # Dependency injection imports
 # Exception imports
@@ -64,16 +64,10 @@ from .core.rust_components import (
     get_rust_component_status,
 )
 
-# Interfaces imports
-from .interfaces import (
-    ICircuitModel,
-    IKiCadIntegration,
-    KiCadGenerationConfig,
-)
-from .kicad.unified_kicad_integration import create_unified_kicad_integration
-
 # Plugin integration
 from .plugins import AIDesignBridge
+
+# Removed unused interface abstractions and unified integration
 
 
 # Claude Code integration (optional)
@@ -123,10 +117,7 @@ __all__ = [
     "DependencyContainer",
     "ServiceLocator",
     "IDependencyContainer",
-    # Interfaces
-    "IKiCadIntegration",
-    "ICircuitModel",
-    "KiCadGenerationConfig",
+    # Removed unused interface abstractions
     # KiCad API
     "Schematic",
     "SchematicSymbol",
@@ -142,7 +133,6 @@ __all__ = [
     "create_rust_capacitor",
     "get_rust_component_status",
     # KiCad integration and validation
-    "create_unified_kicad_integration",
     "validate_kicad_installation",
     "require_kicad",
     "get_kicad_paths",

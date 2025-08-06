@@ -5,8 +5,7 @@ Standard templates for memory-bank markdown files with consistent formatting.
 """
 
 from datetime import datetime
-from typing import Dict, Any
-
+from typing import Any, Dict
 
 DECISIONS_TEMPLATE = """# Design Decisions
 
@@ -95,14 +94,15 @@ ISSUES_TEMPLATE = """# Issues & Solutions
 
 def generate_claude_md(project_name: str, boards: list = None, **kwargs) -> str:
     """Generate project-specific CLAUDE.md with memory-bank documentation."""
-    
+
     boards = boards or ["board-v1", "board-v2"]
     timestamp = datetime.now().isoformat()
-    
+
     # Extract optional parameters
-    project_specific_instructions = kwargs.get('project_specific_instructions', 
-        'Add any project-specific instructions here.')
-    
+    project_specific_instructions = kwargs.get(
+        "project_specific_instructions", "Add any project-specific instructions here."
+    )
+
     template = f"""# CLAUDE.md - {project_name}
 
 This file provides guidance to Claude Code when working on the {project_name} project.
@@ -128,14 +128,14 @@ This project uses a nested agent structure:
 ├── .claude/                    # Project-level agent
 ├── pcbs/
 """
-    
+
     # Add board structure dynamically
     for i, board in enumerate(boards):
         template += f"""│   ├── {board}/
 │   │   ├── .claude/           # PCB-level agent
 │   │   └── memory-bank/       # PCB-specific documentation
 """
-    
+
     template += f"""```
 
 ### Context Switching
@@ -233,11 +233,11 @@ cs-memory-bank-search "voltage regulator"
 
 # Template file mapping for easy access
 TEMPLATE_FILES = {
-    'decisions.md': DECISIONS_TEMPLATE,
-    'fabrication.md': FABRICATION_TEMPLATE,
-    'testing.md': TESTING_TEMPLATE,
-    'timeline.md': TIMELINE_TEMPLATE,
-    'issues.md': ISSUES_TEMPLATE
+    "decisions.md": DECISIONS_TEMPLATE,
+    "fabrication.md": FABRICATION_TEMPLATE,
+    "testing.md": TESTING_TEMPLATE,
+    "timeline.md": TIMELINE_TEMPLATE,
+    "issues.md": ISSUES_TEMPLATE,
 }
 
 

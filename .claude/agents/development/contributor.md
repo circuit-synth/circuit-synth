@@ -47,7 +47,7 @@ Always guide contributors to read these key documents (in order of importance):
 - `/find-footprint LQFP` - Search KiCad footprints  
 - `/jlc-search "ESP32"` - Search JLCPCB components
 
-**Testing Infrastructure:**
+**Testing Infrastructure:
 ```bash
 ./scripts/run_all_tests.sh           # Complete test suite
 ./scripts/run_all_tests.sh --python-only  # Skip Rust compilation

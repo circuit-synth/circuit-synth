@@ -6,17 +6,19 @@ Demonstrates a multi-level hierarchy:
  - Grandchild: opamp_stage (an op amp + feedback resistor)
  - Child: active_filter_child (uses opamp_stage + R/C filter)
  - Parent: multi_level_circuit (instantiates active_filter_child)
- 
+
 We will produce a JSON netlist showing:
  - Top level subcircuit: active_filter_child
  - Inside that child, a subcircuit: opamp_stage
 """
 
 import logging
+
 from circuit_synth import *
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
 
 @circuit(name="opamp_stage")
 def opamp_stage(signal_in, signal_out, gnd):
@@ -32,7 +34,7 @@ def opamp_stage(signal_in, signal_out, gnd):
     op_amp = Component(
         symbol="Amplifier_Operational:TL081",
         ref="U",
-        footprint="Package_DIP:DIP-8_W7.62mm"
+        footprint="Package_DIP:DIP-8_W7.62mm",
     )
     # Suppose pin 3 is non-inverting (+), pin 2 is inverting (-), pin 6 is output, pin 4=V-, pin 7=V+ in some library
     # We'll tie V+ to some higher supply if you like, but here we just show GND for simplicity
@@ -50,7 +52,7 @@ def opamp_stage(signal_in, signal_out, gnd):
     # V- (pin 4) => GND
     op_amp[4] += gnd
 
-    # We'll leave pin 7 unconnected or also tied to gnd if we want single-supply. 
+    # We'll leave pin 7 unconnected or also tied to gnd if we want single-supply.
     # For demonstration, let's just tie it to gnd as well:
     op_amp[7] += gnd
 
@@ -74,20 +76,14 @@ def active_filter_child(sig_in, sig_out, gnd):
 
     # R from input to filter_node
     r_filter = Component(
-        symbol="Device:R",
-        ref="R",
-        value="10k",
-        footprint="Resistor_SMD:R_0805"
+        symbol="Device:R", ref="R", value="10k", footprint="Resistor_SMD:R_0805"
     )
     r_filter[1] += sig_in
     r_filter[2] += filter_node
 
     # C from filter_node to ground
     c_filter = Component(
-        symbol="Device:C",
-        ref="C",
-        value="0.1uF",
-        footprint="Capacitor_SMD:C_0805"
+        symbol="Device:C", ref="C", value="0.1uF", footprint="Capacitor_SMD:C_0805"
     )
     c_filter[1] += filter_node
     c_filter[2] += gnd
@@ -101,7 +97,7 @@ def multi_level_circuit():
     """
     Parent circuit:
       - Provides 'audio_in', 'audio_out', 'gnd'
-      - Instantiates active_filter_child(...) 
+      - Instantiates active_filter_child(...)
         which internally calls opamp_stage(...)
     """
 
@@ -113,7 +109,7 @@ def multi_level_circuit():
     active_filter_child(audio_in, audio_out, gnd)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     c = multi_level_circuit()
 
     netlist_text = c.generate_text_netlist()

@@ -321,6 +321,7 @@ class Component(SimplifiedPinAccess):
                 super().__setattr__(
                     "_is_prefix", True
                 )  # Default to prefix when no reference
+                super().__setattr__("ref", None)  # Update the dataclass field
                 context_logger.debug(
                     "Component reference set to None", component="COMPONENT"
                 )
@@ -331,6 +332,7 @@ class Component(SimplifiedPinAccess):
                 # Check if it's a final reference (has trailing digits)
                 trailing_digits = re.search(r"\d+$", cleaned_value)
                 super().__setattr__("_is_prefix", not bool(trailing_digits))
+                super().__setattr__("ref", cleaned_value)  # Update the dataclass field
 
                 context_logger.debug(
                     "Component reference set",
@@ -338,6 +340,7 @@ class Component(SimplifiedPinAccess):
                     reference=value,
                     reference_type="final" if not self._is_prefix else "prefix",
                 )
+            return  # Don't process as dataclass field after special handling
 
         # Dataclass fields
         if name in self.__dataclass_fields__:

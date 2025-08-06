@@ -83,7 +83,7 @@ if __name__ == "__main__":
 - **Component Intelligence**: JLCPCB integration, symbol/footprint verification
 - **AI Integration**: Claude Code agents for automated design assistance
 - **Test Plan Generation**: Automated test procedures for validation and manufacturing
-- **Version Control Friendly**: Git-trackable Python files vs binary KiCad files
+- **Version Control Friendly**: Git-trackable Python files with meaningful diffs
 
 ## 🤖 AI-Powered Design
 
@@ -230,8 +230,8 @@ my_circuit_project/
 | Manual component placement | `python main.py` → Complete project |
 | Hunt through symbol libraries | Verified components with JLCPCB availability |
 | Visual net verification | Explicit Python connections |
-| Binary KiCad files | Git-friendly Python source |
-| Documentation drift | Automated engineering docs |
+| GUI-based KiCad editing | Text-based Python circuit definitions |
+| Copy-paste circuit patterns | Reusable circuit functions |
 
 ## 📚 Learn More
 
@@ -295,9 +295,29 @@ maturin develop
 
 ## 🧪 Testing & Quality Assurance
 
+### Pre-Release Testing (CRITICAL for PyPI)
+
+```bash
+# Comprehensive regression test before any release
+./tools/testing/run_full_regression_tests.py
+
+# This performs COMPLETE environment reconstruction:
+# - Clears ALL caches (Python, Rust, system)
+# - Reinstalls Python environment from scratch
+# - Rebuilds all Rust modules with Python bindings
+# - Runs comprehensive functionality tests
+# - Validates example project generation
+# - Takes ~2 minutes, gives 100% confidence
+```
+
+### Development Testing
+
 ```bash
 # Run full test suite
 ./scripts/run_all_tests.sh
+
+# Quick regression test (skip reinstall)
+./tools/testing/run_full_regression_tests.py --skip-install --quick
 
 # Python tests only
 uv run pytest --cov=circuit_synth

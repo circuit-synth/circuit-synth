@@ -9,10 +9,12 @@ Defines two circuits:
                                      its output to a simple regulator.
 """
 import logging
+
 from circuit_synth import *
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
 
 @circuit(name="resistor_divider_child")
 def resistor_divider_child(VIN, VMEAS, GND):
@@ -25,17 +27,11 @@ def resistor_divider_child(VIN, VMEAS, GND):
     The parent circuit must provide VIN, VMEAS, GND nets.
     """
     r1 = Component(
-        symbol="Device:R",
-        ref="R",
-        value="10k",
-        footprint="Resistor_SMD:R_0805"
+        symbol="Device:R", ref="R", value="10k", footprint="Resistor_SMD:R_0805"
     )
 
     r2 = Component(
-        symbol="Device:R",
-        ref="R",
-        value="5k",
-        footprint="Resistor_SMD:R_0805"
+        symbol="Device:R", ref="R", value="5k", footprint="Resistor_SMD:R_0805"
     )
 
     # Top resistor: VIN -> (divider node = VMEAS)
@@ -61,9 +57,9 @@ def regulator_circuit():
 
     # Define the main nets in this top-level circuit
     supply_5v = Net("SUPPLY_5V")
-    div_out   = Net("DIV_OUT")  # The midpoint from the child resistor divider
-    gnd       = Net("GND")
-    reg_3v3   = Net("REG_3V3")  # The regulator's output
+    div_out = Net("DIV_OUT")  # The midpoint from the child resistor divider
+    gnd = Net("GND")
+    reg_3v3 = Net("REG_3V3")  # The regulator's output
 
     # Instantiate the child resistor divider circuit
     # Top resistor node is supply_5v, midpoint is div_out, bottom is gnd
@@ -74,13 +70,14 @@ def regulator_circuit():
     regulator = Component(
         symbol="Regulator_Linear:NCP1117-3.3_SOT223",
         ref="U1",
-        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2",
     )
-    regulator[1] += gnd      # GND
+    regulator[1] += gnd  # GND
     regulator[2] += reg_3v3  # Regulator output net
     regulator[3] += supply_5v  # Input from the resistor divider
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     c = regulator_circuit()
 
     # Text netlist

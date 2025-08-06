@@ -198,12 +198,18 @@ class SExpressionParser:
                     return '"' + escaped + '"'
                 # Reference values must always be quoted (when inside instances)
                 if in_reference:
-                    logging.debug(f"DEBUG: in_reference=True, sexp='{sexp}', in_instances={in_instances}")
+                    logging.debug(
+                        f"DEBUG: in_reference=True, sexp='{sexp}', in_instances={in_instances}"
+                    )
                     if in_instances:
-                        logging.debug(f"DEBUG: Quoting reference value: '{sexp}' -> '\"{sexp}\"' (inside instances)")
+                        logging.debug(
+                            f"DEBUG: Quoting reference value: '{sexp}' -> '\"{sexp}\"' (inside instances)"
+                        )
                         return '"' + sexp + '"'
                     else:
-                        logging.debug(f"DEBUG: NOT quoting reference value: '{sexp}' (not inside instances)")
+                        logging.debug(
+                            f"DEBUG: NOT quoting reference value: '{sexp}' (not inside instances)"
+                        )
                         return sexp
                 # Quote strings if they contain spaces or special characters
                 if " " in sexp or "\n" in sexp or '"' in sexp or "/" in sexp:
@@ -267,7 +273,7 @@ class SExpressionParser:
         is_project_expr = tag_name == "project"
         # Check if this is an instances expression
         is_instances_expr = tag_name == "instances"
-        
+
         # Debug logging for instances blocks
         if is_instances_expr:
             logging.debug(f"DEBUG: Found instances block - sexp: {sexp[:2]}...")
@@ -292,10 +298,12 @@ class SExpressionParser:
         is_reference_expr = tag_name == "reference"
         # Check if this is a path expression
         is_path_expr = tag_name == "path"
-        
+
         # Add debug logging for instances-related formatting
         if in_instances and (is_reference_expr or is_project_expr or is_path_expr):
-            logging.debug(f"DEBUG: Formatting in instances - tag: {tag_name}, sexp: {sexp}, in_instances: {in_instances}")
+            logging.debug(
+                f"DEBUG: Formatting in instances - tag: {tag_name}, sexp: {sexp}, in_instances: {in_instances}"
+            )
 
         if is_simple:
             # Format on one line
@@ -416,7 +424,9 @@ class SExpressionParser:
                     )
                 elif is_reference_expr and i == 1:
                     # For reference expressions, the value at index 1 should be quoted (when inside instances)
-                    logging.debug(f"DEBUG: Processing reference value at index {i}: {item}, in_instances={in_instances}")
+                    logging.debug(
+                        f"DEBUG: Processing reference value at index {i}: {item}, in_instances={in_instances}"
+                    )
                     parts.append(
                         self._format_sexp(
                             item,
@@ -455,7 +465,7 @@ class SExpressionParser:
                     )
                 result += "\n" + "\t" * indent + ")"
                 return result
-            
+
             # Special handling for property expressions - inline first 3 elements
             if is_property_expr and len(sexp) >= 3:
                 # Format (property "name" "value" on same line
@@ -481,7 +491,7 @@ class SExpressionParser:
                 else:
                     result += ")"
                 return result
-            
+
             # Special handling for project expressions - keep project name on same line
             if is_project_expr and len(sexp) >= 2:
                 # Format (project "name" on same line, rest on new lines
@@ -514,7 +524,7 @@ class SExpressionParser:
                 else:
                     result += ")"
                 return result
-            
+
             # Special handling for path expressions - keep path value on same line
             if is_path_expr and len(sexp) >= 2:
                 # Format (path "/uuid" on same line, rest on new lines
@@ -811,7 +821,7 @@ class SExpressionParser:
         sexp.append([sexpdata.Symbol("uuid"), schematic.uuid])
 
         # Add paper size only once - use the paper size from schematic if available
-        paper_size = getattr(schematic, 'paper_size', 'A4')
+        paper_size = getattr(schematic, "paper_size", "A4")
         sexp.append([sexpdata.Symbol("paper"), paper_size])
 
         # Add lib_symbols section
@@ -1346,7 +1356,9 @@ class SExpressionParser:
                     ]
                     instances_sexp.append(project_block)
                     logger.debug(f"    Instance block created: {project_block}")
-                    logger.debug(f"    Project name type: {type(project_name)}, value: '{project_name}'")
+                    logger.debug(
+                        f"    Project name type: {type(project_name)}, value: '{project_name}'"
+                    )
 
             sexp.append(instances_sexp)
             logger.debug(f"  Instances S-expression added to symbol")
@@ -1358,10 +1370,10 @@ class SExpressionParser:
             )
             # Create proper instances data with project information
             instances_sexp = [sexpdata.Symbol("instances")]
-            
+
             # Get project name from context or use default
-            project_name = getattr(symbol, '_project_name', 'preservation_test')
-            
+            project_name = getattr(symbol, "_project_name", "preservation_test")
+
             # Create a default instance block
             instance_block = [
                 sexpdata.Symbol("project"),
@@ -1501,7 +1513,9 @@ class SExpressionParser:
         # Sheets need the actual project name in their instances
         instances = [sexpdata.Symbol("instances")]
         # Get the project name from the schematic if available
-        project_name = getattr(sheet, '_project_name', 'circuit_synth')  # fallback to circuit_synth if not set
+        project_name = getattr(
+            sheet, "_project_name", "circuit_synth"
+        )  # fallback to circuit_synth if not set
         project_instance = [
             sexpdata.Symbol("project"),
             project_name,
