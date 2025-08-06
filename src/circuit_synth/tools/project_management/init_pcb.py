@@ -26,7 +26,7 @@ from rich.prompt import Confirm
 from rich.text import Text
 
 # Import circuit-synth modules
-from circuit_synth.memory_bank import MemoryBankManager
+from circuit_synth.ai_integration.memory_bank import MemoryBankManager
 
 console = Console()
 

@@ -16,6 +16,9 @@ Or in Python:
 
 __version__ = "0.7.1"
 
+# Plugin integration
+from .ai_integration.plugins import AIDesignBridge
+
 # Dependency injection imports
 # Exception imports
 # Core imports
@@ -64,9 +67,6 @@ from .core.rust_components import (
     get_rust_component_status,
 )
 
-# Plugin integration
-from .plugins import AIDesignBridge
-
 # Removed unused interface abstractions and unified integration
 
 
@@ -74,7 +74,7 @@ from .plugins import AIDesignBridge
 def setup_claude_integration():
     """Setup Claude Code integration for professional circuit design"""
     try:
-        from .claude_integration import initialize_claude_integration
+        from .ai_integration.claude import initialize_claude_integration
 
         initialize_claude_integration()
     except ImportError as e:

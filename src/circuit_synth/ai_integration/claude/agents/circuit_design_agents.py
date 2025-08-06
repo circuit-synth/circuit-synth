@@ -311,7 +311,7 @@ STM32 family selection, peripheral mapping, and circuit integration with manufac
 
 ### 2. STM32 Family Selection (60 seconds)
 ```python
-from circuit_synth.component_info.microcontrollers.modm_device_search import search_stm32
+from circuit_synth.ai_integration.component_info.microcontrollers.modm_device_search import search_stm32
 
 # Search based on specific requirements
 matching_mcus = search_stm32(

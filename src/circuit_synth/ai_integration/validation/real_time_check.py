@@ -261,7 +261,7 @@ def validate_circuit_file(file_path: str) -> None:
 def main():
     """CLI entry point for validation"""
     if len(sys.argv) != 2:
-        print("Usage: python -m circuit_synth.validation.real_time_check <file_path>")
+        print("Usage: python -m circuit_synth.ai_integration.validation.real_time_check <file_path>")
         sys.exit(1)
 
     validate_circuit_file(sys.argv[1])

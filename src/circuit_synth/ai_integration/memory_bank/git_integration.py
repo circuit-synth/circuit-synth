@@ -47,7 +47,7 @@ if [ -f ".circuit-synth-memory-bank-config.json" ]; then
     
     # Try to update memory-bank using Python
     python3 -c "
-from circuit_synth.memory_bank.git_integration import update_memory_bank_from_commit
+from circuit_synth.ai_integration.memory_bank.git_integration import update_memory_bank_from_commit
 success = update_memory_bank_from_commit('$COMMIT_HASH')
 exit(0 if success else 1)
 " 2>/dev/null || echo "⚠️  Memory-bank update failed (continuing)"

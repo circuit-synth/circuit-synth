@@ -44,7 +44,7 @@ def get_circuit_hooks() -> Dict[str, List[CircuitHook]]:
             FILE_PATH=$(echo '$CLAUDE_TOOL_INPUT' | jq -r '.file_path // .edits[0].file_path // empty')
             if [[ "$FILE_PATH" == *.py ]] && grep -q "circuit_synth" "$FILE_PATH" 2>/dev/null; then
                 echo "🔍 Validating circuit design in $FILE_PATH..."
-                python -m circuit_synth.validation.real_time_check "$FILE_PATH" 2>/dev/null || echo "⚠️  Circuit validation tools not available"
+                python -m circuit_synth.ai_integration.validation.real_time_check "$FILE_PATH" 2>/dev/null || echo "⚠️  Circuit validation tools not available"
             fi
             """,
             description="Real-time circuit design validation",

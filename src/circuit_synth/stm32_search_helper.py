@@ -87,7 +87,7 @@ def find_stm32_with_peripherals(
     """
     try:
         # Import here to avoid circular imports
-        from src.circuit_synth.component_info.microcontrollers import (
+        from src.circuit_synth.ai_integration.component_info.microcontrollers import (
             search_by_peripherals,
         )
         from src.circuit_synth.manufacturing.jlcpcb import (

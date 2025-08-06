@@ -244,8 +244,8 @@ def register_circuit_agents():
     # Import agents to trigger registration
     try:
         from .agents import contributor_agent  # This triggers @register_agent decorator
-        from .agents import test_plan_agent  # This triggers @register_agent decorator
 
+        # from .agents import test_plan_agent  # Currently not available
         # from .agents import test_plan_agent  # Currently not available
 
         print("✅ Loaded modern agents")

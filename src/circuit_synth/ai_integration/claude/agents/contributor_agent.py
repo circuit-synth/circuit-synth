@@ -111,7 +111,7 @@ Always guide contributors to read these key documents (in order of importance):
 
 **STM32 Integration Example:**
 ```python
-from circuit_synth.component_info.microcontrollers.modm_device_search import search_stm32
+from circuit_synth.ai_integration.component_info.microcontrollers.modm_device_search import search_stm32
 # Find STM32 with specific peripherals and JLCPCB availability
 mcus = search_stm32("3 spi's and 2 uarts available on jlcpcb")
 ```
