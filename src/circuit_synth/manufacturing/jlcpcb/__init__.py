@@ -31,6 +31,14 @@ from .smart_component_finder import (
     find_components,
     print_component_recommendation,
 )
+from .fast_search import (
+    FastJLCSearch,
+    FastSearchResult,
+    fast_jlc_search,
+    find_cheapest_jlc,
+    find_most_available_jlc,
+    get_fast_searcher,
+)
 
 __all__ = [
     # API-based interface
@@ -54,4 +62,11 @@ __all__ = [
     "JLCPCBCache",
     "get_jlcpcb_cache",
     "cached_jlcpcb_search",
+    # Fast search interface
+    "FastJLCSearch",
+    "FastSearchResult",
+    "fast_jlc_search",
+    "find_cheapest_jlc",
+    "find_most_available_jlc",
+    "get_fast_searcher",
 ]
