@@ -1,0 +1,124 @@
+{
+  "session_id": "528246a9-1c51-45fb-a678-92e27b0e6fa3",
+  "board_name": "ESP32_Dev_Board",
+  "board_version": "v2.1",
+  "started_at": "2025-08-06T21:46:31.307968",
+  "symptoms": [
+    "Board not powering on",
+    "No LED indicators active",
+    "USB enumeration failing",
+    "Voltage regulator getting hot",
+    "No 3.3V on MCU power pins"
+  ],
+  "measurements": {
+    "VBUS": {
+      "value": 5.1,
+      "unit": "V",
+      "notes": "USB power input",
+      "timestamp": "2025-08-06T21:46:31.307988"
+    },
+    "VCC_3V3": {
+      "value": 0.3,
+      "unit": "V",
+      "notes": "Main 3.3V rail",
+      "timestamp": "2025-08-06T21:46:31.307992"
+    },
+    "Regulator_Input": {
+      "value": 5.0,
+      "unit": "V",
+      "notes": "Before regulator",
+      "timestamp": "2025-08-06T21:46:31.307994"
+    },
+    "Regulator_Output": {
+      "value": 0.3,
+      "unit": "V",
+      "notes": "After regulator",
+      "timestamp": "2025-08-06T21:46:31.307996"
+    },
+    "Regulator_Enable": {
+      "value": 3.3,
+      "unit": "V",
+      "notes": "Enable pin",
+      "timestamp": "2025-08-06T21:46:31.307997"
+    },
+    "Current_Draw": {
+      "value": 850,
+      "unit": "mA",
+      "notes": "Total current",
+      "timestamp": "2025-08-06T21:46:31.307998"
+    },
+    "Regulator_Temp": {
+      "value": 95,
+      "unit": "\u00b0C",
+      "notes": "Surface temperature",
+      "timestamp": "2025-08-06T21:46:31.308000"
+    },
+    "3V3_to_GND_Resistance": {
+      "value": 12,
+      "unit": "\u03a9",
+      "notes": "Power rail resistance",
+      "timestamp": "2025-08-06T21:46:31.308001"
+    }
+  },
+  "observations": [
+    {
+      "text": "Found shorted output capacitor C5",
+      "timestamp": "2025-08-06T21:46:31.308041"
+    },
+    {
+      "text": "Capacitor showed burn marks on PCB",
+      "timestamp": "2025-08-06T21:46:31.308043"
+    },
+    {
+      "text": "After replacing C5, 3.3V rail measures correctly",
+      "timestamp": "2025-08-06T21:46:31.308044"
+    }
+  ],
+  "identified_issues": [
+    {
+      "category": "digital",
+      "severity": "high",
+      "title": "USB Enumeration Failure",
+      "description": "USB device is not being recognized by the host",
+      "symptoms": [
+        "Device not detected",
+        "Enumeration fails",
+        "Device disconnect/reconnect loop"
+      ],
+      "probable_causes": [
+        "Incorrect D+/D- routing or connection",
+        "Missing or incorrect termination resistors",
+        "Crystal frequency incorrect or not oscillating",
+        "USB power negotiation failure",
+        "Firmware USB stack issues",
+        "ESD damage to USB transceiver"
+      ],
+      "test_suggestions": [
+        "Measure VBUS voltage (should be 5V)",
+        "Check D+ and D- signal integrity with scope",
+        "Verify crystal oscillation frequency",
+        "Monitor USB packets with analyzer",
+        "Test with different USB cables and ports"
+      ],
+      "solutions": [
+        "Fix D+/D- trace routing (match lengths, impedance)",
+        "Add proper crystal load capacitors",
+        "Implement USB termination per spec",
+        "Add ESD protection diodes",
+        "Update USB firmware/drivers"
+      ],
+      "confidence": 0.85,
+      "related_components": [
+        "USB Connector",
+        "Crystal",
+        "USB Transceiver",
+        "ESD Protection"
+      ],
+      "reference_designs": []
+    }
+  ],
+  "test_history": [],
+  "resolution": "Replaced shorted output capacitor C5",
+  "root_cause": "Output capacitor C5 failed short circuit, overloading regulator",
+  "ended_at": "2025-08-06T21:46:31.308045"
+}

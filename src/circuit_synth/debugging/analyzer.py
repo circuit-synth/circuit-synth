@@ -129,7 +129,18 @@ class CircuitDebugger:
     
     def __init__(self, knowledge_base_path: Optional[Path] = None):
         """Initialize the debugger with optional knowledge base"""
-        self.knowledge_base_path = knowledge_base_path or Path("memory-bank/debugging")
+        # Try multiple knowledge base locations
+        if knowledge_base_path:
+            self.knowledge_base_path = knowledge_base_path
+        else:
+            # Check for debugging_knowledge_base first (new comprehensive KB)
+            project_root = Path(__file__).parent.parent.parent.parent
+            debug_kb = project_root / "debugging_knowledge_base"
+            if debug_kb.exists():
+                self.knowledge_base_path = debug_kb
+            else:
+                self.knowledge_base_path = Path("memory-bank/debugging")
+        
         self.active_sessions: Dict[str, DebugSession] = {}
         self._load_knowledge_base()
     
@@ -137,20 +148,47 @@ class CircuitDebugger:
         """Load debugging patterns and historical data"""
         self.known_patterns = []
         self.component_failures = {}
+        self.debugging_techniques = {}
+        self.common_problems = {}
+        self.test_equipment = {}
         self.successful_resolutions = []
         
         if self.knowledge_base_path.exists():
-            # Load historical debugging data
+            # Load comprehensive knowledge bases
+            
+            # Component failure modes
+            failures_file = self.knowledge_base_path / "component_failure_modes.json"
+            if failures_file.exists():
+                with open(failures_file) as f:
+                    data = json.load(f)
+                    self.component_failures = data.get("component_failure_modes", {})
+            
+            # Debugging techniques
+            techniques_file = self.knowledge_base_path / "debugging_techniques.json"
+            if techniques_file.exists():
+                with open(techniques_file) as f:
+                    data = json.load(f)
+                    self.debugging_techniques = data.get("debugging_techniques", {})
+            
+            # Common problems and solutions
+            problems_file = self.knowledge_base_path / "common_problems_solutions.json"
+            if problems_file.exists():
+                with open(problems_file) as f:
+                    data = json.load(f)
+                    self.common_problems = data.get("common_pcb_problems", {})
+            
+            # Test equipment guide
+            equipment_file = self.knowledge_base_path / "test_equipment_guide.json"
+            if equipment_file.exists():
+                with open(equipment_file) as f:
+                    data = json.load(f)
+                    self.test_equipment = data.get("test_equipment_guide", {})
+            
+            # Historical patterns (if exists)
             patterns_file = self.knowledge_base_path / "patterns.json"
             if patterns_file.exists():
                 with open(patterns_file) as f:
                     self.known_patterns = json.load(f)
-            
-            # Load component failure database
-            failures_file = self.knowledge_base_path / "component_failures.json"
-            if failures_file.exists():
-                with open(failures_file) as f:
-                    self.component_failures = json.load(f)
     
     def start_session(self, board_name: str, board_version: str = "1.0") -> DebugSession:
         """Start a new debugging session"""
@@ -167,9 +205,177 @@ class CircuitDebugger:
         logger.info(f"Started debugging session {session.session_id} for {board_name} v{board_version}")
         return session
     
+    def analyze_with_knowledge_base(self, session: DebugSession) -> List[DebugIssue]:
+        """Enhanced analysis using comprehensive knowledge base"""
+        issues = []
+        
+        # Analyze symptoms against all knowledge bases
+        for symptom in session.symptoms:
+            symptom_lower = symptom.lower()
+            
+            # Check component failure modes
+            if self.component_failures:
+                for comp_type, comp_data in self.component_failures.items():
+                    issues.extend(self._check_component_failures(symptom_lower, comp_type, comp_data))
+            
+            # Check common PCB problems
+            if self.common_problems:
+                issues.extend(self._check_common_problems(symptom_lower))
+            
+            # Apply debugging techniques
+            if self.debugging_techniques:
+                issues.extend(self._apply_debugging_techniques(symptom_lower, session))
+        
+        return issues
+    
+    def _check_component_failures(self, symptom: str, comp_type: str, comp_data: Dict) -> List[DebugIssue]:
+        """Check for component-specific failure modes"""
+        issues = []
+        
+        if isinstance(comp_data, dict):
+            # Check direct failure modes
+            if "failure_modes" in comp_data:
+                for failure in comp_data["failure_modes"]:
+                    if any(s.lower() in symptom for s in failure.get("symptoms", [])):
+                        issue = DebugIssue(
+                            category=DebugCategory.MANUFACTURING,
+                            severity=IssueSeverity.HIGH,
+                            title=f"{comp_type.title()} - {failure.get('mode', 'Failure')}",
+                            description=failure.get('mode', ''),
+                            symptoms=failure.get("symptoms", []),
+                            probable_causes=failure.get("causes", []),
+                            test_suggestions=failure.get("detection", []),
+                            solutions=failure.get("prevention", []) + failure.get("fixes", []),
+                            confidence=0.75,
+                            related_components=[comp_type]
+                        )
+                        issues.append(issue)
+            
+            # Check subcategories
+            for subtype, subdata in comp_data.items():
+                if isinstance(subdata, dict) and "failure_modes" in subdata:
+                    for failure in subdata["failure_modes"]:
+                        if any(s.lower() in symptom for s in failure.get("symptoms", [])):
+                            issue = DebugIssue(
+                                category=DebugCategory.MANUFACTURING,
+                                severity=IssueSeverity.HIGH,
+                                title=f"{comp_type.title()}/{subtype.title()} - {failure.get('mode', 'Failure')}",
+                                description=failure.get('mode', ''),
+                                symptoms=failure.get("symptoms", []),
+                                probable_causes=failure.get("causes", []),
+                                test_suggestions=failure.get("detection", []),
+                                solutions=failure.get("prevention", []) + failure.get("fixes", []),
+                                confidence=0.75,
+                                related_components=[f"{comp_type}/{subtype}"]
+                            )
+                            issues.append(issue)
+        
+        return issues
+    
+    def _check_common_problems(self, symptom: str) -> List[DebugIssue]:
+        """Check for common PCB problems"""
+        issues = []
+        
+        for category, problems in self.common_problems.items():
+            if isinstance(problems, dict):
+                for problem_name, problem_data in problems.items():
+                    if isinstance(problem_data, dict):
+                        problem_symptoms = problem_data.get("symptoms", [])
+                        if isinstance(problem_symptoms, list):
+                            if any(s.lower() in symptom for s in problem_symptoms):
+                                # Determine severity based on category
+                                if "manufacturing" in category:
+                                    severity = IssueSeverity.HIGH
+                                elif "design" in category:
+                                    severity = IssueSeverity.MEDIUM
+                                else:
+                                    severity = IssueSeverity.LOW
+                                
+                                issue = DebugIssue(
+                                    category=DebugCategory.MANUFACTURING if "manufacturing" in category else DebugCategory.DIGITAL,
+                                    severity=severity,
+                                    title=f"{problem_name.replace('_', ' ').title()}",
+                                    description=problem_data.get("description", ""),
+                                    symptoms=problem_symptoms,
+                                    probable_causes=problem_data.get("causes", []),
+                                    test_suggestions=problem_data.get("detection", []),
+                                    solutions=problem_data.get("fixes", []) or problem_data.get("repair", []) or problem_data.get("solutions", []),
+                                    confidence=0.8,
+                                    related_components=[]
+                                )
+                                issues.append(issue)
+        
+        return issues
+    
+    def _apply_debugging_techniques(self, symptom: str, session: DebugSession) -> List[DebugIssue]:
+        """Apply systematic debugging techniques from knowledge base"""
+        issues = []
+        
+        # Power supply debugging
+        if "power" in symptom or "voltage" in symptom:
+            if "power_supply_debugging" in self.debugging_techniques:
+                power_debug = self.debugging_techniques["power_supply_debugging"]
+                
+                if "no_output" in power_debug and "not turning on" in symptom:
+                    steps = power_debug["no_output"].get("systematic_approach", [])
+                    test_suggestions = []
+                    for step in steps[:5]:  # Take first 5 steps
+                        if isinstance(step, dict):
+                            test_suggestions.append(f"Step {step.get('step')}: {step.get('action')} - {step.get('details')}")
+                    
+                    issue = DebugIssue(
+                        category=DebugCategory.POWER,
+                        severity=IssueSeverity.CRITICAL,
+                        title="Systematic Power Supply Debug",
+                        description="Follow systematic approach for power supply issues",
+                        symptoms=["No output", "Board not powering on"],
+                        probable_causes=["Multiple possible causes - follow systematic approach"],
+                        test_suggestions=test_suggestions,
+                        solutions=["Follow test results to identify root cause"],
+                        confidence=0.9,
+                        related_components=["Power Supply Section"]
+                    )
+                    issues.append(issue)
+        
+        # Digital communication debugging
+        if "i2c" in symptom:
+            if "digital_communication_debugging" in self.debugging_techniques:
+                i2c_debug = self.debugging_techniques["digital_communication_debugging"].get("i2c", {})
+                
+                if "no_ack" in i2c_debug:
+                    checks = i2c_debug["no_ack"].get("systematic_check", [])
+                    test_suggestions = []
+                    solutions = []
+                    
+                    for check in checks:
+                        if isinstance(check, dict):
+                            test_suggestions.append(f"{check.get('test')}: {check.get('method')}")
+                            if check.get('fix'):
+                                solutions.append(check['fix'])
+                    
+                    issue = DebugIssue(
+                        category=DebugCategory.DIGITAL,
+                        severity=IssueSeverity.HIGH,
+                        title="I2C Communication Debug",
+                        description="Systematic I2C troubleshooting",
+                        symptoms=["I2C no ACK", "Communication failure"],
+                        probable_causes=["Pull-up issues", "Address mismatch", "Signal quality"],
+                        test_suggestions=test_suggestions,
+                        solutions=solutions,
+                        confidence=0.85,
+                        related_components=["I2C Bus", "Pull-up Resistors"]
+                    )
+                    issues.append(issue)
+        
+        return issues
+    
     def analyze_power_issue(self, session: DebugSession) -> List[DebugIssue]:
         """Analyze power-related issues based on symptoms and measurements"""
         issues = []
+        
+        # First apply knowledge base analysis
+        kb_issues = self.analyze_with_knowledge_base(session)
+        issues.extend(kb_issues)
         
         # Check for common power issues
         if any("not turning on" in s.lower() for s in session.symptoms):
@@ -328,22 +534,43 @@ class CircuitDebugger:
         """Main analysis function that routes to specific analyzers"""
         all_issues = []
         
-        # Analyze based on symptom categories
+        # First, apply comprehensive knowledge base analysis
+        kb_issues = self.analyze_with_knowledge_base(session)
+        all_issues.extend(kb_issues)
+        
+        # Then analyze based on symptom categories for additional specific checks
         symptom_text = " ".join(session.symptoms).lower()
         
         if any(word in symptom_text for word in ["power", "voltage", "current", "hot", "burning"]):
-            all_issues.extend(self.analyze_power_issue(session))
+            power_issues = self.analyze_power_issue(session)
+            # Avoid duplicates by checking titles
+            existing_titles = {issue.title for issue in all_issues}
+            for issue in power_issues:
+                if issue.title not in existing_titles:
+                    all_issues.append(issue)
         
         if any(word in symptom_text for word in ["i2c", "spi", "uart", "usb", "can", "communication"]):
-            all_issues.extend(self.analyze_digital_communication(session))
+            comm_issues = self.analyze_digital_communication(session)
+            # Avoid duplicates by checking titles
+            existing_titles = {issue.title for issue in all_issues}
+            for issue in comm_issues:
+                if issue.title not in existing_titles:
+                    all_issues.append(issue)
         
-        # Sort by severity and confidence
-        all_issues.sort(key=lambda x: (x.severity.value, -x.confidence))
+        # Remove duplicates and sort by severity and confidence
+        unique_issues = []
+        seen_titles = set()
+        for issue in all_issues:
+            if issue.title not in seen_titles:
+                unique_issues.append(issue)
+                seen_titles.add(issue.title)
+        
+        unique_issues.sort(key=lambda x: (x.severity.value, -x.confidence))
         
         # Update session with identified issues
-        session.identified_issues = all_issues
+        session.identified_issues = unique_issues
         
-        return all_issues
+        return unique_issues
     
     def suggest_next_test(self, session: DebugSession) -> List[str]:
         """Suggest the next debugging step based on current state"""
