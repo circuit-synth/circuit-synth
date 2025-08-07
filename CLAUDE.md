@@ -174,6 +174,14 @@ pip install -e .
 # /analyze-fmea my_circuit.py - Run FMEA analysis on circuit
 # /generate-fmea-report my_circuit.py --comprehensive - Generate 50+ page FMEA report
 
+# Circuit Debugging commands (NEW!)
+# /debug-start "Board not powering on" --board="my_board" - Start debug session
+# /debug-symptom "No voltage on 3.3V rail" - Add symptom
+# /debug-measure "VCC: 0V, VBUS: 5V" - Add measurements
+# /debug-analyze - Get AI analysis of issues
+# /debug-suggest - Get next troubleshooting steps
+# /debug-tree power - Show power troubleshooting tree
+
 # Development slash commands (for contributors)
 # /dev-run-tests - Run comprehensive test suite
 # /dev-update-and-commit "description" - Update docs and commit changes
@@ -250,6 +258,49 @@ context = get_circuit_design_context("esp32")  # or "power", "analog", etc.
 # Validate code you wrote manually
 /validate-existing-circuit
 ```
+
+## Circuit Debugging System
+
+**NEW FEATURE: AI-Powered PCB Troubleshooting**
+
+The debugging system helps diagnose and fix hardware issues with intelligent analysis:
+
+### Core Functions
+```python
+from circuit_synth.debugging import CircuitDebugger, DebugSession
+
+# Start debugging session
+debugger = CircuitDebugger()
+session = debugger.start_session("my_board", "v1.0")
+
+# Add symptoms and measurements
+session.add_symptom("Board not powering on")
+session.add_measurement("VCC_3V3", 0, "V")
+
+# Analyze issues
+issues = debugger.analyze_symptoms(session)
+
+# Get troubleshooting guidance
+suggestions = debugger.suggest_next_test(session)
+```
+
+### CLI Tool
+```bash
+# Interactive debugging
+uv run python -m circuit_synth.tools.debug_cli --interactive
+
+# Or single commands
+uv run python -m circuit_synth.tools.debug_cli start my_board --version 1.0
+uv run python -m circuit_synth.tools.debug_cli symptom "No power LED"
+uv run python -m circuit_synth.tools.debug_cli analyze
+```
+
+### Features
+- **Symptom Analysis**: Categorizes issues by domain (power, digital, analog, RF)
+- **Pattern Recognition**: Matches symptoms to historical debugging sessions
+- **Test Guidance**: Systematic troubleshooting trees for common issues
+- **Knowledge Base**: Learns from past debugging sessions
+- **Equipment Guidance**: Recommends appropriate test equipment and procedures
 
 ## Code Style Guidelines
 

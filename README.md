@@ -81,6 +81,7 @@ if __name__ == "__main__":
 - **Component Intelligence**: JLCPCB & DigiKey integration, symbol/footprint verification
 - **Fast JLCPCB Search**: Direct search with 80% speed improvement, 90% less tokens
 - **AI Integration**: Claude Code agents for automated design assistance
+- **Circuit Debugging**: AI-powered PCB troubleshooting with systematic fault-finding
 - **FMEA Analysis**: Comprehensive reliability analysis with physics-based failure models
 - **Test Generation**: Automated test plans for validation
 - **Version Control**: Git-friendly text-based circuit definitions
@@ -94,6 +95,12 @@ if __name__ == "__main__":
 /find-symbol STM32                    # Search KiCad symbols
 /find-footprint LQFP64                # Find footprints  
 /generate-validated-circuit "ESP32 IoT sensor" mcu
+
+# Circuit debugging commands (NEW!)
+/debug-start "Board not powering on" --board="my_board"
+/debug-measure "VCC: 3.3V, GND: 0V"
+/debug-analyze                        # Get AI analysis
+/debug-suggest                        # Next troubleshooting steps
 ```
 
 ### 🤖 Claude Code Agents
@@ -114,6 +121,11 @@ Circuit-synth includes specialized AI agents for different aspects of circuit de
 - **Use for**: Circuit analysis, performance optimization, validation
 - **Expertise**: SPICE simulation setup, component modeling, performance analysis
 - **Example**: *"Simulate this amplifier circuit and optimize for 40dB gain with <100mW power"*
+
+#### **circuit-debugger** - AI-Powered PCB Troubleshooting Specialist (NEW!)
+- **Use for**: Hardware debugging, fault-finding, troubleshooting non-working boards
+- **Expertise**: Systematic debugging, test equipment usage, failure pattern recognition
+- **Example**: *"My board isn't powering on - help me debug the issue step by step"*
 
 #### **component-search** - Multi-Source Component Search
 - **Use for**: Component selection across all suppliers, price comparison, availability checking
