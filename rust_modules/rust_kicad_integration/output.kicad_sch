@@ -1,1 +1,0 @@
-(kicad_sch (version 20250114) (generator "rust_kicad_schematic_writer") (generator_version "0.1.0") (uuid "97de0470-0841-4688-b668-689ad37326a7") (paper "A4") (lib_symbols) (sheet_instances (path "/" (page "1"))) (embedded_fonts no))

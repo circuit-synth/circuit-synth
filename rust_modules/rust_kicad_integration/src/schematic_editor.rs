@@ -444,140 +444,277 @@ fn fix_extends_directive(symbol: &mut Value, parent_lib_id: &str) {
 /// Expand an extended symbol by merging parent and child into a complete symbol definition
 /// This removes the extends directive and incorporates all parent symbol content
 fn expand_extended_symbol(child_symbol: &mut Value, parent_symbol: &Value, lib_id: &str) {
-    eprintln!("🔧 [RUST DEBUG] EXPAND: Starting expansion for {}", lib_id);
+    eprintln!("🔧 [EXPAND] ============================================");
+    eprintln!("🔧 [EXPAND] Starting expansion for: {}", lib_id);
+    eprintln!("🔧 [EXPAND] ============================================");
     
-    // Extract parent and child items with proper property override handling
-    if let Value::Cons(parent_cons) = parent_symbol {
-        let mut parent_items = Vec::new();
-        let mut current = parent_cons.cdr();
-        
-        // Skip the parent name and collect parent content
+    // Step 1: Extract ALL child items (properties and other items)
+    eprintln!("🔧 [EXPAND] STEP 1: Extracting child items...");
+    let mut child_properties = Vec::new();
+    let mut child_other_items = Vec::new();
+    let mut child_property_names = std::collections::HashSet::new();
+    
+    if let Value::Cons(child_cons) = &*child_symbol {
+        let mut current = child_cons.cdr();
+        // Skip child name
         if let Value::Cons(name_cons) = current {
             current = name_cons.cdr();
+            
+            let mut item_count = 0;
             while let Value::Cons(c) = current {
-                parent_items.push(c.car().clone());
-                current = c.cdr();
-            }
-            eprintln!("🔧 [RUST DEBUG] EXPAND: Collected {} parent items", parent_items.len());
-        }
-        
-        // Extract child items and track property names for override detection
-        let mut child_items = Vec::new();
-        let mut child_property_names = std::collections::HashSet::new();
-        
-        if let Value::Cons(child_cons) = child_symbol {
-            let mut current = child_cons.cdr();
-            if let Value::Cons(name_cons) = current {
-                current = name_cons.cdr();
+                item_count += 1;
+                let item = c.car();
                 
-                while let Value::Cons(c) = current {
-                    if let Value::Cons(item_cons) = c.car() {
-                        if let Value::Symbol(sym) = item_cons.car() {
-                            if sym.as_ref() == "extends" {
-                                eprintln!("🔧 [RUST DEBUG] EXPAND: Skipping extends directive");
-                            } else if sym.as_ref() == "property" {
-                                // Track property names for override detection
-                                if let Value::Cons(prop_cons) = item_cons.cdr() {
-                                    if let Value::String(prop_name) = prop_cons.car() {
-                                        child_property_names.insert(prop_name.to_string());
-                                        eprintln!("🔧 [RUST DEBUG] EXPAND: Child property: {}", prop_name);
-                                    }
+                if let Value::Cons(item_cons) = item {
+                    if let Value::Symbol(sym) = item_cons.car() {
+                        let sym_name = sym.as_ref();
+                        eprintln!("🔧 [EXPAND]   Child item #{}: type = '{}'", item_count, sym_name);
+                        
+                        if sym_name == "extends" {
+                            // Skip extends directive completely
+                            eprintln!("🔧 [EXPAND]     -> SKIPPING extends directive");
+                        } else if sym_name == "property" {
+                            // Extract property name and value
+                            if let Value::Cons(prop_cons) = item_cons.cdr() {
+                                if let Value::String(prop_name) = prop_cons.car() {
+                                    // Get property value for logging
+                                    let prop_value = if let Value::Cons(val_cons) = prop_cons.cdr() {
+                                        if let Value::String(val) = val_cons.car() {
+                                            val.to_string()
+                                        } else {
+                                            "???".to_string()
+                                        }
+                                    } else {
+                                        "???".to_string()
+                                    };
+                                    
+                                    eprintln!("🔧 [EXPAND]     -> Property '{}' = '{}'", prop_name, prop_value);
+                                    child_property_names.insert(prop_name.to_string());
+                                    child_properties.push(item.clone());
                                 }
-                                child_items.push(c.car().clone());
-                            } else {
-                                child_items.push(c.car().clone());
-                                eprintln!("🔧 [RUST DEBUG] EXPAND: Child item: {}", sym.as_ref());
                             }
                         } else {
-                            child_items.push(c.car().clone());
+                            // Other child items (pin_numbers, pin_names, etc.)
+                            eprintln!("🔧 [EXPAND]     -> Other item: {}", sym_name);
+                            child_other_items.push(item.clone());
                         }
-                    } else {
-                        child_items.push(c.car().clone());
                     }
-                    current = c.cdr();
                 }
+                current = c.cdr();
             }
         }
-        
-        // Start with child items first (they take precedence)
-        let mut merged_items = child_items;
-        
-        // Add parent items that are NOT overridden by child
-        for parent_item in parent_items {
-            let mut should_include = true;
+    }
+    
+    eprintln!("🔧 [EXPAND] Child has {} properties: {:?}", 
+             child_property_names.len(), child_property_names);
+    eprintln!("🔧 [EXPAND] Child has {} other items", child_other_items.len());
+    
+    // Step 2: Process parent items
+    eprintln!("🔧 [EXPAND] STEP 2: Processing parent items...");
+    let mut parent_non_property_items = Vec::new();
+    let mut parent_properties_to_keep = Vec::new();
+    let child_name = lib_id.split(':').last().unwrap_or(lib_id);
+    eprintln!("🔧 [EXPAND] Child name for geometry updates: {}", child_name);
+    
+    if let Value::Cons(parent_cons) = parent_symbol {
+        let mut current = parent_cons.cdr();
+        // Skip parent name
+        if let Value::Cons(name_cons) = current {
+            current = name_cons.cdr();
             
-            // Skip parent properties that are overridden by child
-            if let Value::Cons(item_cons) = &parent_item {
-                if let Value::Symbol(sym) = item_cons.car() {
-                    if sym.as_ref() == "property" {
-                        if let Value::Cons(prop_cons) = item_cons.cdr() {
-                            if let Value::String(prop_name) = prop_cons.car() {
-                                if child_property_names.contains(&prop_name.to_string()) {
-                                    should_include = false;
-                                    eprintln!("🔧 [RUST DEBUG] EXPAND: Skipping overridden parent property: {}", prop_name);
+            let mut parent_item_count = 0;
+            while let Value::Cons(c) = current {
+                parent_item_count += 1;
+                let item = c.car();
+                
+                if let Value::Cons(item_cons) = item {
+                    if let Value::Symbol(sym) = item_cons.car() {
+                        let sym_name = sym.as_ref();
+                        eprintln!("🔧 [EXPAND]   Parent item #{}: type = '{}'", parent_item_count, sym_name);
+                        
+                        if sym_name == "property" {
+                            // Check if child overrides this property
+                            if let Value::Cons(prop_cons) = item_cons.cdr() {
+                                if let Value::String(prop_name) = prop_cons.car() {
+                                    // Get property value for logging
+                                    let prop_value = if let Value::Cons(val_cons) = prop_cons.cdr() {
+                                        if let Value::String(val) = val_cons.car() {
+                                            val.to_string()
+                                        } else {
+                                            "???".to_string()
+                                        }
+                                    } else {
+                                        "???".to_string()
+                                    };
+                                    
+                                    if child_property_names.contains(&prop_name.to_string()) {
+                                        eprintln!("🔧 [EXPAND]     -> Property '{}' = '{}' - SKIPPED (overridden by child)", 
+                                                prop_name, prop_value);
+                                    } else {
+                                        eprintln!("🔧 [EXPAND]     -> Property '{}' = '{}' - KEEPING (not in child)", 
+                                                prop_name, prop_value);
+                                        parent_properties_to_keep.push(item.clone());
+                                    }
                                 }
                             }
+                        } else if sym_name == "symbol" {
+                            // Geometry section - update the name
+                            if let Value::Cons(geom_name_cons) = item_cons.cdr() {
+                                if let Value::String(geom_name) = geom_name_cons.car() {
+                                    eprintln!("🔧 [EXPAND]     -> Geometry section: '{}'", geom_name);
+                                    
+                                    // Check if it's a geometry section (contains _X_Y pattern)
+                                    if geom_name.contains("_0_1") || geom_name.contains("_1_1") {
+                                        // Extract suffix
+                                        let suffix = if geom_name.contains("_0_1") { "0_1" } else { "1_1" };
+                                        let new_geom_name = format!("{}_{}", child_name, suffix);
+                                        eprintln!("🔧 [EXPAND]       RENAMING: '{}' -> '{}'", geom_name, new_geom_name);
+                                        
+                                        // Collect all items in the geometry section
+                                        let mut geom_items = Vec::new();
+                                        let mut geom_current = geom_name_cons.cdr();
+                                        let mut geom_item_count = 0;
+                                        
+                                        while let Value::Cons(gc) = geom_current {
+                                            geom_item_count += 1;
+                                            geom_items.push(gc.car().clone());
+                                            geom_current = gc.cdr();
+                                        }
+                                        
+                                        eprintln!("🔧 [EXPAND]       Geometry has {} sub-items", geom_item_count);
+                                        
+                                        // Create updated geometry section with new name
+                                        let updated_geom = Value::list(vec![
+                                            Value::symbol("symbol"),
+                                            Value::string(new_geom_name.clone()),
+                                        ].into_iter().chain(geom_items).collect::<Vec<_>>());
+                                        
+                                        parent_non_property_items.push(updated_geom);
+                                        eprintln!("🔧 [EXPAND]       ✅ Geometry section renamed and added");
+                                    } else {
+                                        eprintln!("🔧 [EXPAND]       Not a _X_Y geometry section, keeping as-is");
+                                        parent_non_property_items.push(item.clone());
+                                    }
+                                }
+                            }
+                        } else {
+                            // Other parent items (exclude_from_sim, in_bom, on_board, etc.)
+                            eprintln!("🔧 [EXPAND]     -> Other parent item: {}", sym_name);
+                            parent_non_property_items.push(item.clone());
+                        }
+                    }
+                } else {
+                    // Not a cons cell, keep as-is
+                    eprintln!("🔧 [EXPAND]   Parent item #{}: non-cons item", parent_item_count);
+                    parent_non_property_items.push(item.clone());
+                }
+                
+                current = c.cdr();
+            }
+        }
+    }
+    
+    eprintln!("🔧 [EXPAND] Parent items to keep:");
+    eprintln!("🔧 [EXPAND]   - {} non-property items", parent_non_property_items.len());
+    eprintln!("🔧 [EXPAND]   - {} properties (not overridden)", parent_properties_to_keep.len());
+    
+    // Step 3: Merge items in the correct order
+    eprintln!("🔧 [EXPAND] STEP 3: Merging items in correct order...");
+    let mut merged_items = Vec::new();
+    
+    // First: child's other items (pin_numbers, pin_names, etc.)
+    eprintln!("🔧 [EXPAND]   Adding {} child other items...", child_other_items.len());
+    merged_items.extend(child_other_items);
+    
+    // Second: parent's non-property items (including updated geometry)
+    eprintln!("🔧 [EXPAND]   Adding {} parent non-property items...", parent_non_property_items.len());
+    merged_items.extend(parent_non_property_items);
+    
+    // Third: parent properties that aren't overridden
+    eprintln!("🔧 [EXPAND]   Adding {} parent properties...", parent_properties_to_keep.len());
+    merged_items.extend(parent_properties_to_keep);
+    
+    // Fourth: all child properties (they override parent)
+    eprintln!("🔧 [EXPAND]   Adding {} child properties (override parent)...", child_properties.len());
+    merged_items.extend(child_properties);
+    
+    let total_items = merged_items.len();
+    eprintln!("🔧 [EXPAND] Total merged items: {}", total_items);
+    
+    // Count final properties before moving merged_items
+    let mut final_prop_count = 0;
+    let mut final_prop_names = Vec::new();
+    for item in &merged_items {
+        if let Value::Cons(item_cons) = item {
+            if let Value::Symbol(sym) = item_cons.car() {
+                if sym.as_ref() == "property" {
+                    if let Value::Cons(prop_cons) = item_cons.cdr() {
+                        if let Value::String(prop_name) = prop_cons.car() {
+                            final_prop_count += 1;
+                            final_prop_names.push(prop_name.to_string());
                         }
                     }
                 }
             }
-            
-            if should_include {
-                merged_items.push(parent_item);
-                if let Value::Cons(item_cons) = &merged_items.last().unwrap() {
-                    if let Value::Symbol(sym) = item_cons.car() {
-                        eprintln!("🔧 [RUST DEBUG] EXPAND: Added parent item: {}", sym.as_ref());
-                    }
-                }
-            }
         }
-        
-        // Update symbol names in geometry sections to use child name
-        let child_name = lib_id.split(':').last().unwrap_or(lib_id);
-        for item in &mut merged_items {
-            update_symbol_names_in_item(item, child_name);
-        }
-        
-        // Create complete symbol with merged content
-        eprintln!("🔧 [RUST DEBUG] EXPAND: Creating complete symbol with {} merged items", merged_items.len());
-        let complete_symbol = Value::list(vec![
-            Value::symbol("symbol"),
-            Value::string(lib_id),
-        ].into_iter().chain(merged_items).collect::<Vec<_>>());
-        
-        eprintln!("🔧 [RUST DEBUG] EXPAND: Expansion complete");
-        *child_symbol = complete_symbol;
-    } else {
-        eprintln!("❌ [RUST DEBUG] EXPAND: Parent symbol is not a cons, cannot expand");
     }
+    
+    // Step 4: Create the complete expanded symbol
+    eprintln!("🔧 [EXPAND] STEP 4: Creating complete symbol...");
+    let complete_symbol = Value::list(vec![
+        Value::symbol("symbol"),
+        Value::string(lib_id),
+    ].into_iter().chain(merged_items).collect::<Vec<_>>());
+    
+    // Log final statistics
+    eprintln!("🔧 [EXPAND] ============================================");
+    eprintln!("🔧 [EXPAND] EXPANSION COMPLETE for {}", lib_id);
+    eprintln!("🔧 [EXPAND] Final symbol has {} total items", total_items);
+    eprintln!("🔧 [EXPAND] Final properties ({}): {:?}", final_prop_count, final_prop_names);
+    eprintln!("🔧 [EXPAND] ============================================");
+    
+    *child_symbol = complete_symbol;
 }
 
 /// Update symbol names in geometry sections (e.g., AP1117-15_0_1 -> AMS1117-3.3_0_1)
 fn update_symbol_names_in_item(item: &mut Value, new_name: &str) {
+    eprintln!("🔧 [RUST DEBUG] update_symbol_names_in_item called with new_name: {}", new_name);
     if let Value::Cons(item_cons) = item {
         if let Value::Symbol(sym) = item_cons.car() {
+            eprintln!("🔧 [RUST DEBUG] Checking item with symbol: {}", sym.as_ref());
             if sym.as_ref() == "symbol" {
                 // This is a symbol geometry section, update the name
                 if let Value::Cons(name_cons) = item_cons.cdr() {
                     if let Value::String(old_name) = name_cons.car() {
+                        eprintln!("🔧 [RUST DEBUG] Found symbol geometry with name: {}", old_name);
+                        // Check if this is a geometry section (contains _X_Y pattern)
                         if old_name.contains("_0_1") || old_name.contains("_1_1") {
-                            let suffix = if old_name.contains("_0_1") { "_0_1" } else { "_1_1" };
+                            // Extract the suffix (e.g., "_0_1" or "_1_1")
+                            let suffix = if old_name.contains("_0_1") { 
+                                "0_1" 
+                            } else { 
+                                "1_1" 
+                            };
                             let new_symbol_name = format!("{}_{}", new_name, suffix);
                             eprintln!("🔧 [RUST DEBUG] EXPAND: Updating symbol name: {} -> {}", old_name, new_symbol_name);
-                            // Create new cons with updated name
-                            let updated_name_cons = Value::list(vec![
-                                Value::string(new_symbol_name),
-                            ].into_iter().chain(
-                                if let Value::Cons(rest) = name_cons.cdr() {
-                                    vec![Value::Cons(rest.clone())]
-                                } else {
-                                    vec![name_cons.cdr().clone()]
-                                }
-                            ).collect::<Vec<_>>());
+                            
+                            // Build the rest of the cons list (everything after the name)
+                            let mut rest_items = Vec::new();
+                            let mut current = name_cons.cdr();
+                            while let Value::Cons(c) = current {
+                                rest_items.push(c.car().clone());
+                                current = c.cdr();
+                            }
+                            // Handle the case where the last item is not a cons
+                            if !matches!(current, Value::Null) {
+                                rest_items.push(current.clone());
+                            }
+                            
+                            // Rebuild the complete item with the new name
                             *item = Value::list(vec![
-                                item_cons.car().clone(),
-                                updated_name_cons
-                            ]);
+                                Value::symbol("symbol"),
+                                Value::string(new_symbol_name),
+                            ].into_iter().chain(rest_items).collect::<Vec<_>>());
                         }
                     }
                 }
