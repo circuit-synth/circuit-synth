@@ -285,6 +285,9 @@ def test_agent_functionality(agent_name):
 ### Comprehensive Analysis Execution
 
 ```bash
+# Create output directory structure
+mkdir -p repo-review/findings/{agent-test-results,example-test-results,rust-module-status,security-scan-results,performance-profiles,coverage-reports}
+
 # Phase 1: Feature Discovery
 echo "=== Automatic Feature Discovery ==="
 python -c "
