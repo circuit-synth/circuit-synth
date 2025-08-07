@@ -4,29 +4,27 @@
 
 Generate professional KiCad projects from Python code with hierarchical design, version control, and automated documentation.
 
-## 🚀 Getting Started
+## Installation
 
 ```bash
-# Install uv (if not already installed)  
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Create new project
-uv init my_circuit_project
-cd my_circuit_project
-
-# Add circuit-synth
+# Install with uv (recommended)
 uv add circuit-synth
 
-# Setup complete project template
-uv run cs-new-project
-
-# Generate complete KiCad project  
-uv run python circuit-synth/main.py
+# Or with pip
+pip install circuit-synth
 ```
 
-This creates an ESP32-C6 development board with USB-C, power regulation, programming interface, and status LED.
+## Quick Start
 
-## 💡 Quick Example
+```bash
+# Create new project with example circuit
+uv run cs-new-project
+
+# This generates a complete ESP32-C6 development board
+cd circuit-synth && uv run python main.py
+```
+
+## Example: Power Supply Circuit
 
 ```python
 from circuit_synth import *
@@ -76,130 +74,47 @@ if __name__ == "__main__":
     circuit.generate_kicad_project("my_board")
 ```
 
-## 🔧 Core Features
+## Core Features
 
-- **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files
-- **Hierarchical Design**: Modular subcircuits like software modules  
-- **Component Intelligence**: JLCPCB integration, symbol/footprint verification
-- **AI Integration**: Claude Code agents for automated design assistance
-- **Test Plan Generation**: Automated test procedures for validation and manufacturing
-- **Version Control Friendly**: Git-trackable Python files with meaningful diffs
+- **KiCad Integration**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files
+- **Hierarchical Design**: Modular subcircuits with clean Python syntax
+- **Component Intelligence**: JLCPCB availability and footprint verification
+- **AI Assistance**: Claude Code agents for design automation
+- **Test Generation**: Automated test plans for validation
+- **Version Control**: Git-friendly text-based circuit definitions
 
-## 🤖 AI-Powered Design
+## AI-Powered Design
 
-Work with Claude Code to describe circuits and get production-ready results:
-
-```bash
-# AI agent commands (with Claude Code)
-/find-symbol STM32                    # Search KiCad symbols
-/find-footprint LQFP64                # Find footprints  
-/generate-validated-circuit "ESP32 IoT sensor" mcu
-```
-
-### 🤖 Claude Code Agents
-
-Circuit-synth includes specialized AI agents for different aspects of circuit design. Each agent has deep expertise in their domain:
-
-#### **circuit-architect** - Master Circuit Design Coordinator
-- **Use for**: Complex multi-component designs, system-level architecture
-- **Expertise**: Circuit topology planning, component selection, design trade-offs
-- **Example**: *"Design a complete IoT sensor node with power management, wireless connectivity, and sensor interfaces"*
-
-#### **circuit-synth** - Circuit Code Generation Specialist  
-- **Use for**: Converting natural language to working Python circuit code
-- **Expertise**: circuit-synth syntax, KiCad integration, hierarchical design patterns
-- **Example**: *"Generate Python code for a USB-C PD trigger circuit with 20V output"*
-
-#### **simulation-expert** - SPICE Simulation and Circuit Validation
-- **Use for**: Circuit analysis, performance optimization, validation
-- **Expertise**: SPICE simulation setup, component modeling, performance analysis
-- **Example**: *"Simulate this amplifier circuit and optimize for 40dB gain with <100mW power"*
-
-#### **component-guru** - Manufacturing and Component Sourcing
-- **Use for**: Component selection, manufacturing optimization, sourcing alternatives
-- **Expertise**: JLCPCB availability, component specifications, manufacturing constraints
-- **Example**: *"Find alternative op-amps for this design that are in stock at JLCPCB"*
-
-#### **jlc-parts-finder** - JLCPCB Component Intelligence
-- **Use for**: Real-time component availability, pricing, and alternatives
-- **Expertise**: JLCPCB catalog search, stock levels, KiCad symbol verification
-- **Example**: *"Find STM32 with 3 SPIs available on JLCPCB under $5"*
-
-#### **general-purpose** - Research and Analysis
-- **Use for**: Open-ended research, codebase analysis, complex searches
-- **Expertise**: Technical research, documentation analysis, multi-step problem solving
-- **Example**: *"Research best practices for EMI reduction in switching power supplies"*
-
-#### **test-plan-creator** - Test Plan Generation and Validation
-- **Use for**: Creating comprehensive test procedures for circuit validation
-- **Expertise**: Functional, performance, safety, and manufacturing test plans
-- **Example**: *"Generate test plan for ESP32 dev board with power measurements"*
-
-### Using Agents Effectively
+### Claude Code Commands
 
 ```bash
-# Start with circuit-architect for complex projects
-"Design an ESP32-based environmental monitoring station"
-
-# Use circuit-synth for code generation
-"Generate circuit-synth code for the power supply section"
-
-# Validate with simulation-expert
-"Simulate this buck converter and verify 3.3V output ripple"
-
-# Optimize with component-guru
-"Replace expensive components with JLCPCB alternatives"
-```
-
-**Pro Tip**: Let the **circuit-architect** coordinate complex projects - it will automatically delegate to other specialists as needed!
-
-### **Agent Categories:**
-- **Circuit Design**: circuit-architect, circuit-synth, simulation-expert, test-plan-creator
-- **Development**: circuit_generation_agent, contributor, first_setup_agent  
-- **Manufacturing**: component-guru, jlc-parts-finder, stm32-mcu-finder
-
-### **Command Categories:**
-- **Circuit Design**: analyze-design, find-footprint, find-symbol, validate-existing-circuit
-- **Development**: dev-run-tests, dev-update-and-commit, dev-review-branch
-- **Manufacturing**: find-mcu, find_stm32
-- **Test Planning**: create-test-plan, generate-manufacturing-tests
-- **Setup**: setup-kicad-plugins, setup_circuit_synth
-
-## 🚀 Commands
-
-### Project Creation
-```bash
-cs-new-project              # Complete project setup with ESP32-C6 example
-```
-
-### Circuit Generation
-```bash
-cd circuit-synth && uv run python main.py    # Generate KiCad files from Python code
-```
-
-### Claude Code Slash Commands
-Available when working with Claude Code in a circuit-synth project:
-
-```bash
-# Component Search
+# Component search
 /find-symbol STM32              # Search KiCad symbol libraries
-/find-footprint LQFP64          # Search KiCad footprint libraries
-/find-component "op-amp"        # Search for components with specifications
+/find-footprint LQFP64          # Find footprint libraries
+/find-stm32 "3 SPIs, USB"       # STM32 with specific peripherals
 
-# Circuit Generation
-/generate-validated-circuit "ESP32 IoT sensor" mcu    # AI circuit generation
-/validate-existing-circuit                            # Validate current code
+# Circuit generation
+/generate-validated-circuit "ESP32 IoT sensor" mcu
+/validate-existing-circuit      # Validate current circuit code
 
-# Component Intelligence  
-/find-stm32 "3 SPIs, USB, available JLCPCB"          # STM32-specific search
-/jlc-search "voltage regulator 3.3V"                 # JLCPCB component search
-
-# Development (for contributors)
-/dev-run-tests                  # Run comprehensive test suite
-/dev-update-and-commit "msg"    # Update docs and commit changes
+# JLCPCB integration
+/jlc-search "voltage regulator 3.3V"
 ```
 
-## 📋 Project Structure
+### Specialized AI Agents
+
+When working with Claude Code, these agents provide domain expertise:
+
+- **circuit-architect**: Overall circuit design and system architecture
+- **circuit-synth**: Python code generation for circuits  
+- **simulation-expert**: SPICE simulation and validation
+- **component-guru**: Component selection and JLCPCB sourcing
+- **jlc-parts-finder**: Real-time JLCPCB availability checking
+- **stm32-mcu-finder**: STM32 peripheral search and selection
+- **test-plan-creator**: Automated test plan generation
+
+
+## Project Structure
 
 ```
 my_circuit_project/
@@ -222,245 +137,112 @@ my_circuit_project/
 ```
 
 
-## 🏭 Why Circuit-Synth?
+## Why Circuit-Synth?
 
-| Traditional EE Workflow | With Circuit-Synth |
-|-------------------------|-------------------|
-| Manual component placement | `python main.py` → Complete project |
-| Hunt through symbol libraries | Verified components with JLCPCB availability |
+| Traditional Workflow | Circuit-Synth |
+|---------------------|---------------|
+| Manual component placement | Python code generates complete projects |
+| Search through symbol libraries | Verified components with JLCPCB availability |
 | Visual net verification | Explicit Python connections |
-| GUI-based KiCad editing | Text-based Python circuit definitions |
-| Copy-paste circuit patterns | Reusable circuit functions |
+| GUI-based editing | Version-controlled Python files |
+| Copy-paste patterns | Reusable circuit functions |
 
-## 📚 Learn More
+## Resources
 
-- **Website**: [circuit-synth.com](https://www.circuit-synth.com)
-- **Documentation**: [docs.circuit-synth.com](https://docs.circuit-synth.com)
-- **Examples**: [github.com/circuit-synth/examples](https://github.com/circuit-synth/examples)
+- [Documentation](https://docs.circuit-synth.com)
+- [Examples](https://github.com/circuit-synth/examples)
+- [Contributing](CONTRIBUTING.md)
 
-## 🔧 Development Installation
-
-For contributing to circuit-synth or advanced usage:
+## Development Setup
 
 ```bash
-# Clone repository
+# Clone and install
 git clone https://github.com/circuit-synth/circuit-synth.git
 cd circuit-synth
-
-# Development installation with uv (recommended)
 uv sync
 
-# Alternative: pip installation
-pip install -e ".[dev]"
-
-# Register AI agents for enhanced development
-uv run register-agents
-
-# Run tests to verify installation
+# Run tests
 uv run pytest
+
+# Optional: Register Claude Code agents
+uv run register-agents
 ```
 
-## ⚙️ Rust Module Development
+### Rust Acceleration (Optional)
 
-Circuit-synth uses Rust backend for performance-critical operations. The Python package works without Rust modules using fallbacks.
-
-### Building Rust Modules
+For 6x performance improvement:
 
 ```bash
-# Install Rust toolchain (if not installed)
+# Install Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
-# Build all Rust modules
+# Build modules
 ./scripts/build_rust_modules.sh
 
-# Build specific module manually
-cd rust_modules/rust_netlist_processor
-cargo build --release
-maturin develop
-```
-
-### Testing Rust Integration
-
-```bash
-# Test all Rust modules
+# Test integration
 ./scripts/test_rust_modules.sh
-
-# Run comprehensive test suite
-./scripts/run_all_tests.sh
-
-# Test with verbose output
-./scripts/run_all_tests.sh --verbose
 ```
 
-## 🧪 Testing & Quality Assurance
-
-### Pre-Release Testing (CRITICAL for PyPI)
+## Testing
 
 ```bash
-# Comprehensive regression test before any release
-./tools/testing/run_full_regression_tests.py
-
-# This performs COMPLETE environment reconstruction:
-# - Clears ALL caches (Python, Rust, system)
-# - Reinstalls Python environment from scratch
-# - Rebuilds all Rust modules with Python bindings
-# - Runs comprehensive functionality tests
-# - Validates example project generation
-# - Takes ~2 minutes, gives 100% confidence
-```
-
-### Development Testing
-
-```bash
-# Run full test suite
+# Run all tests
 ./scripts/run_all_tests.sh
-
-# Quick regression test (skip reinstall)
-./tools/testing/run_full_regression_tests.py --skip-install --quick
 
 # Python tests only
 uv run pytest --cov=circuit_synth
 
-# Rust tests only  
-./scripts/test_rust_modules.sh
+# Pre-release regression test
+./tools/testing/run_full_regression_tests.py
 
-# Code formatting and linting
-black src/
-isort src/
-flake8 src/
-mypy src/
-
-# Run specific test file
-uv run pytest tests/unit/test_core_circuit.py -v
+# Code quality
+black src/ && isort src/ && flake8 src/ && mypy src/
 ```
 
-## 🔍 KiCad Integration Details
+## KiCad Requirements
 
-### Prerequisites
+KiCad 8.0+ required:
 
-**KiCad 8.0+ Required:**
 ```bash
 # macOS
 brew install kicad
 
-# Ubuntu/Debian  
+# Linux
 sudo apt install kicad
 
-# Windows: Download from kicad.org
+# Windows
+# Download from kicad.org
 ```
 
-### KiCad Plugin (Optional)
+## Troubleshooting
 
-Install the AI-powered KiCad plugin for direct Claude Code integration:
-
-```bash
-# Install KiCad plugins
-uv run cs-setup-kicad-plugins
-```
-
-**Usage:**
-- **PCB Editor**: Tools → External Plugins → "Circuit-Synth AI"  
-- **Schematic Editor**: Tools → Generate BOM → "Circuit-Synth AI"
-
-## 🛠️ Advanced Configuration
-
-### Environment Variables
-
-```bash
-# Optional performance settings
-export CIRCUIT_SYNTH_USE_RUST=true
-export CIRCUIT_SYNTH_PARALLEL_PROCESSING=true
-
-# KiCad path override (if needed)
-export KICAD_SYMBOL_DIR="/custom/path/to/symbols"
-export KICAD_FOOTPRINT_DIR="/custom/path/to/footprints"
-```
-
-### Component Database Configuration
-
-```bash
-# JLCPCB API configuration (optional)
-export JLCPCB_API_KEY="your_api_key"
-export JLCPCB_CACHE_DURATION=3600  # Cache for 1 hour
-```
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**KiCad Symbol/Footprint Not Found:**
+**Symbol/Footprint Not Found:**
 ```bash
 # Verify KiCad installation
 kicad-cli version
 
-# Search for symbols/footprints
+# Search for components (with Claude Code)
 /find-symbol STM32
 /find-footprint LQFP64
-
-# Check library paths
-find /usr/share/kicad/symbols -name "*.kicad_sym" | head -5
 ```
 
-**Rust Module Build Failures:**
+**Build Issues:**
 ```bash
-# Install required tools
-pip install maturin
-cargo --version  # Verify Rust installation
-
-# Clean build
+# Clean rebuild
 cargo clean
 ./scripts/build_rust_modules.sh
 ```
 
-**AI Agent Issues:**
-```bash
-# Re-register agents
-uv run register-agents
+## Contributing
 
-# Verify Claude Code integration
-claude --version  # Ensure Claude Code is installed
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
-## 🏗️ Architecture Overview
-
-### Technical Stack
-- **Frontend**: Python 3.9+ with type hints
-- **Backend**: Rust modules for performance-critical operations
-- **KiCad Integration**: Direct file format support (.kicad_pro, .kicad_sch, .kicad_pcb)
-- **AI Integration**: Claude Code agents with specialized circuit design expertise
-
-### File Structure
-```
-circuit-synth/
-├── src/circuit_synth/           # Python package
-│   ├── core/                    # Core circuit representation
-│   ├── kicad/                   # KiCad file I/O
-│   ├── component_info/          # Component databases
-│   ├── manufacturing/           # JLCPCB, etc.
-│   └── simulation/              # SPICE integration
-├── rust_modules/                # Rust acceleration
-├── examples/                    # Usage examples
-├── tests/                       # Test suites
-└── scripts/                     # Build and development scripts
-```
-
-## 🤝 Contributing
-
-### Development Workflow
-1. **Fork repository** and create feature branch
-2. **Follow coding standards** (black, isort, mypy)
-3. **Add tests** for new functionality
-4. **Update documentation** as needed
-5. **Submit pull request** with clear description
-
-### Coding Standards
-- **Python**: Type hints, dataclasses, SOLID principles
-- **Rust**: Standard formatting with `cargo fmt`
-- **Documentation**: Clear docstrings and inline comments
-- **Testing**: Comprehensive test coverage for new features
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+Quick start:
+1. Fork and clone the repository
+2. Run `uv sync` to install dependencies
+3. Make changes with tests
+4. Submit a pull request
 
 ---
 
-⚡ **Professional PCB Design, Programmatically** ⚡
+**Professional PCB Design with Python**

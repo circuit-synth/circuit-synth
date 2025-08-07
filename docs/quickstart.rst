@@ -1,5 +1,5 @@
-🚀 Quick Start
-===============
+Quick Start
+===========
 
 This guide will get you up and running with Circuit-Synth in just a few minutes!
 
@@ -7,8 +7,8 @@ This guide will get you up and running with Circuit-Synth in just a few minutes!
    **New to Circuit-Synth?** This page shows you how to create your first circuit in under 5 minutes. 
    For more complex examples, see our :doc:`examples` page.
 
-💡 Basic LED Circuit Example
------------------------------
+Basic LED Circuit Example
+-------------------------
 
 Let's start with a simple LED circuit that demonstrates the core concepts:
 
@@ -35,11 +35,11 @@ Here's how to implement this circuit in Circuit-Synth:
        Perfect for getting started with Circuit-Synth!
        """
        
-       # 🔌 Create power nets
+       # Create power nets
        VCC_3V3 = Net('VCC_3V3')
        GND = Net('GND')
        
-       # 💡 Create LED component  
+       # Create LED component  
        led = Component(
            symbol="Device:LED", 
            ref="D", 
@@ -47,7 +47,7 @@ Here's how to implement this circuit in Circuit-Synth:
            footprint="LED_SMD:LED_0603_1608Metric"
        )
        
-       # ⚡ Create current limiting resistor
+       # Create current limiting resistor
        resistor = Component(
            symbol="Device:R", 
            ref="R", 
@@ -55,22 +55,22 @@ Here's how to implement this circuit in Circuit-Synth:
            footprint="Resistor_SMD:R_0603_1608Metric"
        )
        
-       # 🔗 Make connections
+       # Make connections
        VCC_3V3 += resistor[1]     # Power to resistor
        resistor[2] += led[1]      # Resistor to LED anode
        led[2] += GND              # LED cathode to ground
 
-   # 🚀 Generate KiCad files
+   # Generate KiCad files
    if __name__ == '__main__':
        circuit = simple_led()
        circuit.generate_kicad_project("my_first_circuit")
-       print("✅ Circuit generated! Check the 'my_first_circuit' folder.")
+       print("Circuit generated! Check the 'my_first_circuit' folder.")
 
-🧠 Core Concepts
------------------
+Core Concepts
+-------------
 
-📦 Components
-~~~~~~~~~~~~~
+Components
+~~~~~~~~~~
 
 Components are the building blocks of your circuits. Each component needs four key properties:
 
@@ -78,31 +78,31 @@ Components are the building blocks of your circuits. Each component needs four k
 
    <div class="circuit-component">
    <strong>Component Structure:</strong><br>
-   📍 <strong>symbol</strong>: KiCad library symbol<br>
-   🏷️ <strong>ref</strong>: Reference prefix (R, C, U, etc.)<br>
-   💰 <strong>value</strong>: Component value/name<br>
-   👣 <strong>footprint</strong>: Physical package for PCB
+   <strong>symbol</strong>: KiCad library symbol<br>
+   <strong>ref</strong>: Reference prefix (R, C, U, etc.)<br>
+   <strong>value</strong>: Component value/name<br>
+   <strong>footprint</strong>: Physical package for PCB
    </div>
 
 .. code-block:: python
 
    # Standard 10kΩ resistor (0603 package)
    resistor = Component(
-       symbol="Device:R",              # 📍 KiCad symbol
-       ref="R",                        # 🏷️ Reference prefix  
-       value="10K",                   # 💰 Resistance value
-       footprint="Resistor_SMD:R_0603_1608Metric"  # 👣 Physical footprint
+       symbol="Device:R",              # KiCad symbol
+       ref="R",                        # Reference prefix  
+       value="10K",                    # Resistance value
+       footprint="Resistor_SMD:R_0603_1608Metric"  # Physical footprint
    )
 
-🔌 Nets
-~~~~~~~~
+Nets
+~~~~
 
 Nets represent electrical connections (wires) between components:
 
 .. raw:: html
 
    <div class="net-connection">
-   💡 <strong>Tip:</strong> Use descriptive net names like 'VCC_3V3' instead of 'Net1'
+   <strong>Tip:</strong> Use descriptive net names like 'VCC_3V3' instead of 'Net1'
    </div>
 
 .. code-block:: python
@@ -141,8 +141,8 @@ Connect component pins to nets using indexing:
    # Connect pin 2 of resistor to signal net
    resistor[2] += signal_net
 
-🏗️ Hierarchical Design
------------------------
+Hierarchical Design
+-------------------
 
 Circuit-Synth excels at building complex systems from reusable building blocks:
 
@@ -181,51 +181,28 @@ Circuit-Synth excels at building complex systems from reusable building blocks:
 
    <div class="circuit-schematic">
    <pre>
-   📁 Hierarchical Project Structure:
-   ├── components.py      # 📦 Reusable parts library
-   ├── power_supply.py    # ⚡ Voltage regulators  
-   ├── led_indicators.py  # 💡 Status LEDs
-   └── main_board.py      # 🖥️  System integration
+   Hierarchical Project Structure:
+   ├── components.py      # Reusable parts library
+   ├── power_supply.py    # Voltage regulators  
+   ├── led_indicators.py  # Status LEDs
+   └── main_board.py      # System integration
    </pre>
    </div>
 
-🎯 Next Steps
---------------
+Next Steps
+----------
 
 Ready to dive deeper? Here's your learning path:
 
 .. raw:: html
 
-   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
-   
-   <div class="circuit-component">
-   <strong>🚀 Try More Examples</strong><br>
-   Explore complete projects in our examples collection
-   </div>
-   
-   <div class="circuit-component">  
-   <strong>📚 Read the API Docs</strong><br>
-   Master every feature with detailed API reference
-   </div>
-   
-   <div class="circuit-component">
-   <strong>🤝 Join the Community</strong><br>
-   Contribute features and share your circuits
-   </div>
-   
-   <div class="circuit-component">
-   <strong>⚡ Get Professional</strong><br>
-   Learn advanced placement and routing techniques
-   </div>
-   
-   </div>
 
 **What to explore next:**
 
-* 📖 :doc:`examples` - Complete ESP32, STM32, and power supply projects
-* 🔍 :doc:`api` - Comprehensive API documentation and advanced features  
-* 💻 :doc:`contributing` - Help make Circuit-Synth even better
-* 🛠️ **GitHub Issues** - Report bugs or request features
+* :doc:`examples` - Complete ESP32, STM32, and power supply projects
+* :doc:`api` - Comprehensive API documentation and advanced features  
+* :doc:`contributing` - Help make Circuit-Synth even better
+* **GitHub Issues** - Report bugs or request features
 
 .. note::
    **Stuck?** Join our community discussions or file an issue on GitHub. 
