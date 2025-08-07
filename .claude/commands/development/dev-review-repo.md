@@ -1,6 +1,6 @@
-# Repository Review Command
+# Comprehensive Repository Review Command
 
-**Purpose:** Complete repository analysis to identify what's working, what's broken, and what needs attention.
+**Purpose:** Complete repository analysis with automatic feature discovery to identify what's working, what's broken, and what needs attention. Automatically surveys the repository to ensure no features are missed.
 
 ## Usage
 ```bash
@@ -8,356 +8,556 @@
 ```
 
 ## Options
-- `--focus=all` - Focus areas: `architecture`, `security`, `performance`, `testing`, `docs`, `circuit-synth`, `all` (default: all)
+- `--focus=all` - Focus areas: `architecture`, `security`, `performance`, `testing`, `docs`, `circuit-synth`, `agents`, `manufacturing`, `all` (default: all)
 - `--output-dir=repo-review` - Directory for review outputs (default: repo-review)
-- `--run-examples=true` - Test all examples (default: true)
+- `--run-tests=true` - Run test suites (default: true)
+- `--test-examples=true` - Test all example circuits (default: true)
+- `--test-agents=true` - Test all AI agents functionality (default: true)
 - `--check-security=true` - Security scanning (default: true)
 - `--format=true` - Auto-format code before analysis (default: true)
 - `--generate-fixes=false` - Generate automated fix suggestions (default: false)
 - `--website-check=true` - Validate circuit-synth.com content accuracy (default: true)
+- `--feature-discovery=true` - Auto-discover features from codebase (default: true)
+- `--rust-analysis=true` - Analyze Rust modules and integration (default: true)
+- `--depth=standard` - Analysis depth: `quick`, `standard`, `deep` (default: standard)
 
 ## What This Does
 
-This command analyzes the entire repository and creates structured reports based on your existing repo-review pattern:
+### Phase 1: Automatic Feature Discovery
+The command first performs automatic feature discovery to ensure nothing is missed:
 
-### 1. Core Functionality
-- **Circuit/Component/Net system** - Does the core work?
-- **KiCad integration** - Can it generate working files?
-- **Examples validation** - Do the examples actually run?
-- **Agent system** - Are the Claude agents functional?
-- **Memory bank** - Is the knowledge base organized and useful?
+1. **Codebase Survey** - Scans all directories and modules to identify features
+2. **Commit Analysis** - Reviews recent commits for new/modified features
+3. **Agent Discovery** - Identifies all available AI agents and their capabilities
+4. **Tool Discovery** - Finds all CLI tools and development utilities
+5. **Integration Discovery** - Identifies external integrations (KiCad, JLCPCB, DigiKey, etc.)
+6. **Documentation Survey** - Maps all documentation and examples
 
-### 2. Code Quality and Migration Cleanup
-- **Code that works** vs code that doesn't
-- **Python/Rust transition artifacts** - leftover code from language switches
-- **Duplicate implementations** - same functionality in multiple places
-- **Dead code** from abandoned migrations
-- **Inconsistent patterns** - mixing old and new approaches
-- **Overly complex functions** that need simplification
-- **Missing error handling** that could cause crashes
+### Phase 2: Comprehensive Analysis
+Based on discovered features, performs targeted analysis:
 
-### 3. Security Issues
-- **Exposed secrets** (API keys, passwords)
-- **Unsafe code patterns** (eval, exec, shell injection)
-- **Vulnerable dependencies** with known CVEs
-- **File system vulnerabilities** (path traversal, etc.)
+### 1. Core Circuit-Synth Functionality
+- **Circuit/Component/Net system** - Core object model validation
+- **Hierarchical circuits** - Subcircuit and sheet management
+- **Pin connections** - Connection validation and net routing
+- **Reference management** - Component reference designator handling
+- **Annotations system** - Docstring and manual annotations
+- **JSON serialization** - Round-trip conversion testing
 
-### 4. Performance Problems
-- **Slow operations** identified through profiling
-- **Memory leaks** or excessive memory usage
-- **I/O bottlenecks** in file operations
-- **Inefficient algorithms** that need optimization
+### 2. KiCad Integration
+- **Symbol library access** - Cross-platform symbol search
+- **Footprint validation** - Component footprint verification
+- **Schematic generation** - .kicad_sch file creation
+- **PCB generation** - .kicad_pcb file creation
+- **Project file generation** - Complete KiCad project structure
+- **S-expression formatting** - Proper KiCad file formatting
+- **Version compatibility** - KiCad 6/7/8 support
 
-### 5. Testing Reality
-- **What's actually tested** vs what should be tested
-- **Broken tests** that need fixing
-- **Missing test coverage** in critical areas
-- **Test quality** - are tests meaningful or just padding?
+### 3. Manufacturing Integration
+- **JLCPCB Integration**
+  - Component availability checking
+  - Fast search optimization
+  - Cache management
+  - API rate limiting
+- **DigiKey Integration**
+  - OAuth authentication
+  - Product search API
+  - Pricing and availability
+  - KiCad symbol mapping
+- **Unified Search System**
+  - Multi-source component search
+  - Comparison functionality
+  - Filtering and sorting
+- **OSHPark/PCBWay** (placeholder modules)
 
-### 6. Documentation State and Quality Review
-- **Accurate documentation** vs outdated docs
-- **Missing API documentation** for public functions
-- **Broken examples** in documentation
-- **Installation instructions** that actually work
-- **README validation** - do claimed features actually exist?
-- **File reference verification** - do linked files exist?
-- **Example accuracy** - do code examples run successfully?
+### 4. AI Agent System
+- **Core Agents**
+  - circuit-architect (master coordinator)
+  - circuit-generation-agent (code generation)
+  - simulation-expert (SPICE simulation)
+  - test-plan-creator (validation)
+- **Manufacturing Agents**
+  - component-guru (sourcing optimization)
+  - component-search (multi-source search)
+  - dfm-agent (design for manufacturing)
+  - digikey-parts-finder
+  - jlc-parts-finder
+- **Quality Assurance Agents**
+  - fmea-orchestrator (failure analysis)
+  - fmea-analyst
+  - fmea-component-analyst
+  - fmea-reliability-engineer
+- **Specialized Agents**
+  - stm32-mcu-finder (MCU selection)
+  - circuit-debugger (PCB troubleshooting)
+  - contributor (development assistance)
+- **Agent Infrastructure**
+  - Memory bank system
+  - Knowledge management
+  - Agent registration (MCP)
+  - Prompt engineering
 
-**CRITICAL: Documentation Quality Review (ALL files):**
-- **AI-generated verbose content** - Remove marketing speak, excessive enthusiasm
-- **Overly complex explanations** - Simplify technical language where possible
-- **Excessive length** - Keep files concise (README <500 lines, CONTRIBUTING <300)
-- **Missing practical examples** - Add code snippets for all features
-- **Outdated information** - Remove docs for deleted features
-- **Unnecessary emojis** - Maintain professional tone
+### 5. Quality Assurance Systems
+- **FMEA (Failure Mode and Effects Analysis)**
+  - Component failure analysis
+  - System reliability assessment
+  - Risk prioritization
+  - Report generation (50+ pages)
+- **DFM (Design for Manufacturing)**
+  - Manufacturing constraints
+  - Component placement optimization
+  - Assembly complexity analysis
+  - Cost optimization
+- **Circuit Validation**
+  - Syntax validation
+  - Import verification
+  - Runtime execution testing
+  - Circuit structure validation
+- **Debugging System**
+  - Symptom analysis
+  - Pattern recognition
+  - Troubleshooting trees
+  - Equipment guidance
 
-### 7. Dependencies and Integration
-- **Outdated packages** that need updates
-- **Security vulnerabilities** in dependencies
-- **KiCad compatibility** across versions
-- **Plugin ecosystem** health and compatibility
+### 6. Rust Module Integration
+- **Active Rust Modules**
+  - rust_symbol_search
+  - rust_kicad_integration
+  - rust_core_circuit_engine
+  - rust_netlist_processor
+  - rust_reference_manager
+  - rust_symbol_cache
+  - rust_force_directed_placement
+  - rust_io_processor
+  - rust_pin_calculator
+- **Python Bindings**
+  - PyO3 integration
+  - Performance acceleration
+  - Cross-platform compatibility
+- **Build System**
+  - Cargo integration
+  - Maturin builds
+  - CI/CD pipeline
+
+### 7. Development Tools
+- **Testing Infrastructure**
+  - Unit tests (pytest)
+  - Integration tests
+  - Regression tests
+  - Rust tests (cargo test)
+  - Full regression suite
+- **Build Tools**
+  - build_rust_modules.sh
+  - rebuild_all_rust.sh
+  - format_all.sh
+- **Analysis Tools**
+  - Dead code analysis
+  - Performance profiling
+  - Memory profiling
+  - Coverage analysis
+- **CI/CD Tools**
+  - GitHub Actions setup
+  - PyPI release automation
+  - Documentation generation
+
+### 8. Component Information Systems
+- **Microcontrollers**
+  - STM32 (modm-devices integration)
+  - ESP32 (planned)
+  - PIC (planned)
+  - AVR (planned)
+- **Analog Components** (planned)
+  - Op-amps
+  - ADCs/DACs
+  - Voltage references
+- **Power Components** (planned)
+  - Regulators
+  - Power management ICs
+  - Protection circuits
+- **RF Components** (planned)
+  - Wireless modules
+  - Antennas
+  - RF transceivers
+
+### 9. Simulation and Validation
+- **SPICE Integration**
+  - PySpice backend
+  - Netlist generation
+  - Component models
+  - Simulation results
+- **Electrical Rules Check**
+  - Connection validation
+  - Power supply verification
+  - Signal integrity basics
+- **Design Rule Check**
+  - Component placement rules
+  - Routing constraints
+  - Manufacturing limits
+
+### 10. Documentation and Examples
+- **Core Documentation**
+  - README.md accuracy
+  - Contributors.md completeness
+  - API documentation (Sphinx)
+  - Installation guides
+- **Example Circuits**
+  - Basic examples
+  - Advanced examples
+  - Testing examples
+  - Tool examples
+- **Agent Documentation**
+  - Agent capabilities
+  - Command documentation
+  - Workflow examples
+- **Website Content**
+  - circuit-synth.com accuracy
+  - Feature descriptions
+  - Installation instructions
+  - Code examples
 
 ## Output Structure
 
-The command generates reports matching your existing repo-review structure:
-
 ```
 repo-review/
-├── 00-executive-summary-and-recommendations.md  # What needs attention most
-├── 01-core-functionality-analysis.md            # Does the main stuff work?
-├── 02-code-quality-and-cleanup.md               # Python/Rust migration mess
-├── 03-security-analysis.md                      # Security problems found
-├── 04-performance-analysis.md                   # Slow spots and bottlenecks
-├── 05-testing-analysis.md                       # Test coverage and quality
-├── 06-documentation-analysis.md                 # Doc accuracy and gaps
-├── 07-documentation-quality-review.md           # AI slop, verbosity, missing examples
-├── 08-documentation-validation-analysis.md      # README validation and accuracy
-├── 09-dependencies-analysis.md                  # Package health and issues
-└── findings/                                    # Raw data and logs
+├── 00-feature-discovery-report.md           # Auto-discovered features
+├── 01-executive-summary.md                  # High-level overview and priorities
+├── 02-core-functionality-analysis.md        # Circuit/Component/Net system
+├── 03-kicad-integration-analysis.md         # KiCad generation and compatibility
+├── 04-manufacturing-integration-analysis.md # JLCPCB, DigiKey, unified search
+├── 05-agent-system-analysis.md              # All AI agents and capabilities
+├── 06-quality-assurance-analysis.md         # FMEA, DFM, validation, debugging
+├── 07-rust-integration-analysis.md          # Rust modules and performance
+├── 08-development-tools-analysis.md         # Testing, build, CI/CD tools
+├── 09-component-systems-analysis.md         # MCU and component databases
+├── 10-simulation-validation-analysis.md     # SPICE and electrical checks
+├── 11-code-quality-analysis.md              # Code patterns, complexity, cleanup
+├── 12-security-analysis.md                  # Security vulnerabilities
+├── 13-performance-analysis.md               # Performance bottlenecks
+├── 14-testing-coverage-analysis.md          # Test quality and coverage
+├── 15-documentation-analysis.md             # Documentation accuracy and quality
+├── 16-dependency-analysis.md                # Package health and updates
+├── 17-migration-cleanup-analysis.md         # Python/Rust transition artifacts
+├── 18-website-validation-analysis.md        # circuit-synth.com accuracy
+├── 19-recommendations-roadmap.md            # Prioritized action items
+└── findings/                                 # Raw data, logs, and detailed reports
+    ├── discovered-features.json             # Auto-discovered feature list
+    ├── agent-test-results/                  # Agent functionality tests
+    ├── example-test-results/                # Example circuit tests
+    ├── rust-module-status/                  # Rust module analysis
+    ├── security-scan-results/               # Security scan outputs
+    ├── performance-profiles/                # Performance profiling data
+    └── coverage-reports/                    # Test coverage reports
 ```
 
-### Report Format
+## Implementation Details
 
-Each file follows your existing pattern:
+### Feature Discovery Process
 
-```markdown
-# [Area] Analysis Review
-
-## Overview
-Brief summary of what was found
-
-## Strengths
-What's working well in this area
-
-## Areas for Improvement
-What needs fixing or attention
-
-## Detailed Findings
-Specific issues with examples and locations
-
-## Recommendations
-Concrete next steps to improve this area
+```python
+def discover_features():
+    features = {
+        'core_modules': scan_python_modules('src/circuit_synth'),
+        'rust_modules': scan_rust_modules('rust_modules'),
+        'agents': discover_agents('.claude/agents'),
+        'commands': discover_commands('.claude/commands'),
+        'tools': discover_tools('tools', 'src/circuit_synth/tools'),
+        'examples': scan_examples('examples'),
+        'integrations': detect_integrations(),
+        'recent_features': analyze_recent_commits(100),
+    }
+    return features
 ```
 
-## What It Actually Does
+### Agent Testing Framework
 
-### 1. Test Core Functionality
+```python
+def test_agent_functionality(agent_name):
+    """Test if an agent can be loaded and responds correctly"""
+    tests = {
+        'load_test': can_load_agent(agent_name),
+        'prompt_test': test_agent_prompt(agent_name),
+        'capability_test': verify_agent_capabilities(agent_name),
+        'knowledge_test': check_agent_knowledge(agent_name),
+    }
+    return tests
+```
+
+### Comprehensive Analysis Execution
+
 ```bash
-# Does the main stuff work?
-uv run python examples/example_kicad_project.py
-uv run python -c "from circuit_synth import Circuit, Component, Net"
-
-# Are examples broken?
-find examples/ -name "*.py" -exec python -m py_compile {} \;
-
-# KiCad integration working?
-kicad-cli version
-```
-
-### 2. Find Python/Rust Migration Mess
-```bash
-# Look for duplicate implementations
-find . -name "*.py" -exec grep -l "rust_modules\|rust_integration" {} \;
-find . -name "*.rs" 2>/dev/null
-
-# Find dead code patterns
-grep -r "TODO.*rust\|FIXME.*rust\|deprecated.*rust" --include="*.py" .
-grep -r "import.*rust\|from.*rust" --include="*.py" .
-
-# Look for inconsistent patterns
-grep -r "class.*Component" --include="*.py" src/ | wc -l
-grep -r "def.*component" --include="*.py" src/ | wc -l
-```
-
-### 3. Security Scan
-```bash
-# Look for secrets
-grep -r "api[_-]key\|password\|secret\|token" --include="*.py" .
-
-# Dangerous patterns
-grep -r "eval\|exec\|subprocess\|os\.system" --include="*.py" .
-
-# Dependency vulnerabilities
-safety check
-bandit -r src/
-```
-
-### 4. Performance Check
-```bash
-# Profile the main example
-python -m cProfile examples/example_kicad_project.py
-
-# Find slow functions
-grep -r "time\.sleep\|threading\|asyncio" --include="*.py" src/
-```
-
-### 5. Test Reality Check
-```bash
-# What tests exist?
-find tests/ -name "*.py" | wc -l
-
-# Do they pass?
-uv run pytest tests/ --tb=short
-
-# Coverage gaps
-uv run pytest --cov=circuit_synth --cov-report=term-missing
-```
-
-### 6. Documentation Audit and Quality Review
-```bash
-# Outdated docs
-find . -name "README.md" -exec grep -l "rust\|Rust" {} \;
-
-# Missing docs
+# Phase 1: Feature Discovery
+echo "=== Automatic Feature Discovery ==="
 python -c "
-import circuit_synth
-import inspect
-for name, obj in inspect.getmembers(circuit_synth):
-    if inspect.isclass(obj) and not obj.__doc__:
-        print(f'Missing docs: {name}')
+import os
+import json
+from pathlib import Path
+
+# Discover all Python modules
+modules = []
+for root, dirs, files in os.walk('src/circuit_synth'):
+    for file in files:
+        if file.endswith('.py'):
+            modules.append(os.path.join(root, file))
+
+# Discover all agents
+agents = []
+for agent_file in Path('.claude/agents').rglob('*.md'):
+    agents.append(str(agent_file))
+
+# Discover Rust modules
+rust_modules = []
+if Path('rust_modules').exists():
+    for cargo_file in Path('rust_modules').rglob('Cargo.toml'):
+        rust_modules.append(str(cargo_file.parent))
+
+# Recent features from commits
+import subprocess
+commits = subprocess.check_output(['git', 'log', '--oneline', '-100']).decode()
+features = [line for line in commits.split('\n') if 'feat:' in line]
+
+discovery = {
+    'python_modules': len(modules),
+    'agents': len(agents),
+    'rust_modules': len(rust_modules),
+    'recent_features': len(features),
+    'timestamp': str(datetime.now())
+}
+
+with open('repo-review/findings/discovered-features.json', 'w') as f:
+    json.dump(discovery, f, indent=2)
 "
 
-# README validation - check if examples actually exist
-ls -la stm32_imu_usbc_demo_hierarchical.py 2>/dev/null || echo "Demo file not found"
-find . -name "setup-claude-integration" -o -name "*register-agents*"
+# Phase 2: Test Core Functionality
+echo "=== Testing Core Circuit-Synth Features ==="
+uv run python -c "from circuit_synth import Circuit, Component, Net; print('Core imports: OK')"
+uv run python examples/example_kicad_project.py --validate
 
-# Verify documentation links point to existing files
-find docs/ -name "*.md" | head -10
-find . -name "*SIMULATION*" -o -name "*simulation*" | head -5
-find . -name "*kicad_plugins*" -type d
+# Phase 3: Test KiCad Integration
+echo "=== Testing KiCad Integration ==="
+kicad-cli version
+find /usr/share/kicad/symbols -name "*.kicad_sym" | head -5
 
-# Documentation Quality Scan
-echo "=== Documentation Quality Review ==="
+# Phase 4: Test Manufacturing Integration
+echo "=== Testing Manufacturing Integration ==="
+uv run python -c "
+from circuit_synth.manufacturing import find_parts
+results = find_parts('resistor 10k', sources='all')
+print(f'Unified search: {len(results)} results')
+"
 
-# Check for AI slop patterns
-echo "Checking for AI-generated verbose content..."
-grep -r "(?i)(amazing|fantastic|revolutionary|game-changing)" docs/ README.md CONTRIBUTING.md 2>/dev/null
-grep -r "🚀🚀\|💡💡\|⚡⚡" docs/ README.md 2>/dev/null
-
-# Check file lengths
-echo "Checking documentation file lengths..."
-wc -l README.md CONTRIBUTING.md docs/*.md 2>/dev/null | sort -rn
-
-# Check for missing examples
-echo "Checking for missing code examples..."
-for file in docs/*.rst docs/*.md; do
-    if grep -q "def \|class " "$file" 2>/dev/null; then
-        if ! grep -q "\`\`\`python" "$file" 2>/dev/null; then
-            echo "Missing examples in: $file"
-        fi
-    fi
+# Phase 5: Test Agent System
+echo "=== Testing AI Agent System ==="
+for agent in $(ls .claude/agents/**/*.md); do
+    echo "Testing agent: $(basename $agent .md)"
+    # Test agent loading and basic functionality
 done
 
-# Sync check - new features documented?
-echo "Checking if new code is documented..."
-git diff main..HEAD --name-only | grep "\.py$" | while read file; do
-    echo "New/modified: $file - check if documented"
+# Phase 6: Test Quality Assurance Systems
+echo "=== Testing Quality Assurance Systems ==="
+uv run python -m circuit_synth.quality_assurance.fmea_cli --help
+uv run python -m circuit_synth.debugging.debug_cli --help
+
+# Phase 7: Test Rust Modules
+echo "=== Testing Rust Module Integration ==="
+cd rust_modules
+for module in */; do
+    echo "Testing Rust module: $module"
+    cd $module && cargo test --lib --no-default-features && cd ..
 done
+cd ..
+
+# Phase 8: Run Test Suites
+echo "=== Running Test Suites ==="
+uv run pytest tests/unit/ -v --tb=short
+uv run pytest tests/integration/ -v --tb=short
+./tools/testing/run_full_regression_tests.py --quick
+
+# Phase 9: Security Analysis
+echo "=== Security Analysis ==="
+safety check
+bandit -r src/ -f json > repo-review/findings/bandit-report.json
+
+# Phase 10: Performance Analysis
+echo "=== Performance Analysis ==="
+python -m cProfile -o repo-review/findings/profile.stats examples/example_kicad_project.py
+
+# Phase 11: Documentation Validation
+echo "=== Documentation Validation ==="
+sphinx-build -b html docs/ docs/_build/html
+markdown-link-check README.md Contributors.md
+
+# Phase 12: Dependency Analysis
+echo "=== Dependency Analysis ==="
+pip list --outdated > repo-review/findings/outdated-packages.txt
+pip-audit --format json > repo-review/findings/pip-audit.json
 ```
 
-### 7. Dependency Health
-```bash
-# Outdated packages
-pip list --outdated
+## Report Templates
 
-# Vulnerabilities
-pip-audit
-
-# Rust leftovers
-find . -name "Cargo.toml" -o -name "*.rs"
-```
-
-## Special Focus Areas for This Repo
-
-### Python/Rust Migration Cleanup
-Since this repo went Python → Rust → Python, it specifically looks for:
-- **Duplicate implementations** of the same functionality
-- **Dead Rust code** that's no longer used
-- **Inconsistent patterns** where some code uses old style, some new
-- **Import confusion** between Python and Rust versions
-- **Build artifacts** left over from Rust attempts
-
-### Circuit-Synth Specific Issues
-- **KiCad integration breaks** - does it actually generate working files?
-- **Component database issues** - are JLCPCB lookups working?
-- **Agent system problems** - are Claude agents functional?
-- **Memory bank organization** - is knowledge findable and accurate?
-- **Example validation** - do the examples actually run and work?
-
-## Example Usage
-
-```bash
-# Full repository review
-/dev-review-repo
-
-# Focus on specific area
-/dev-review-repo --focus=security
-
-# Skip example testing (faster)
-/dev-review-repo --run-examples=false
-
-# Focus on Python/Rust cleanup
-/dev-review-repo --focus=code-quality
-```
-
-## Documentation Quality Review Report
-
-The `07-documentation-quality-review.md` file will contain:
-
+### Feature Discovery Report
 ```markdown
-# Documentation Quality Review
+# Automatic Feature Discovery Report
 
-## Overview
-Assessment of documentation quality across the repository
+## Summary
+- Total Python modules: X
+- Total Rust modules: X
+- Total AI agents: X
+- Total CLI tools: X
+- Recent features (last 100 commits): X
 
-## Quality Issues Found
+## Discovered Features
 
-### AI-Generated Verbose Content
-- Files with marketing speak or excessive enthusiasm
-- Overly elaborate descriptions that could be concise
-- Repetitive explanations of the same concepts
+### Core Systems
+[List of discovered core modules and their purposes]
 
-### Length and Complexity Issues
-- Files exceeding recommended length limits
-- Overly complex technical explanations
-- Nested or convoluted documentation structure
+### AI Agents
+[List of all agents with their capabilities]
 
-### Missing Examples
-- Features without code demonstrations
-- APIs lacking usage examples
-- Installation steps without verification
+### Manufacturing Integrations
+[List of all supplier integrations]
 
-### Outdated Content
-- Documentation for removed features
-- Old syntax that no longer works
-- Broken links and references
+### Quality Assurance Systems
+[List of QA tools and systems]
 
-## File-by-File Analysis
+### Development Tools
+[List of all development utilities]
 
-### README.md
-- Current: X lines (target: <500)
-- AI slop found: [list patterns]
-- Missing examples: [list features]
-- Recommendations: [specific fixes]
+## Features Not Yet Documented
+[Features found in code but not in documentation]
 
-### CONTRIBUTING.md
-- Current: X lines (target: <300)
-- Verbosity issues: [list sections]
-- Outdated content: [list items]
-- Recommendations: [specific fixes]
+## Features Not Yet Tested
+[Features without corresponding tests]
+```
 
-### docs/ Directory
-[Analysis of each documentation file]
+### Agent System Analysis Report
+```markdown
+# AI Agent System Analysis
 
-## Sync Issues
-- New code not documented: [list]
-- Removed code still documented: [list]
-- API changes not reflected: [list]
+## Agent Inventory
+Total agents discovered: X
+
+### Functional Agents (Passing Tests)
+- agent_name: test_results
+
+### Non-Functional Agents (Failing Tests)
+- agent_name: failure_reason
+
+### Agent Categories
+- Circuit Design: X agents
+- Manufacturing: X agents
+- Quality Assurance: X agents
+- Development: X agents
+
+## Agent Infrastructure
+- Memory bank status: [OK/Issues]
+- MCP registration: [OK/Issues]
+- Knowledge management: [OK/Issues]
 
 ## Recommendations
-1. Remove verbose AI-generated content
-2. Add practical examples for all features
-3. Simplify complex explanations
-4. Update outdated information
-5. Reduce file lengths to targets
+[Specific fixes for non-functional agents]
 ```
 
-## What You Get
+## Advanced Features
 
-After running, you'll have a `repo-review/` directory with markdown files that tell you:
+### Automatic Feature Survey
+When `--feature-discovery=true`:
+- Scans entire codebase for modules and classes
+- Analyzes git history for feature additions
+- Discovers all agents and tools
+- Maps integrations and dependencies
+- Creates comprehensive feature inventory
 
-1. **What's broken** and needs immediate fixing
-2. **What's working well** and should be left alone  
-3. **Where the Python/Rust migration left a mess** that needs cleanup
-4. **Security issues** that need attention
-5. **Performance bottlenecks** slowing things down
-6. **Test gaps** where coverage is missing
-7. **Documentation problems** where docs are wrong or missing
-8. **README accuracy issues** - features that don't exist, broken examples
-9. **Dependency issues** with outdated or vulnerable packages
+### Agent Testing
+When `--test-agents=true`:
+- Loads each agent and verifies structure
+- Tests agent prompts and capabilities
+- Validates agent knowledge base
+- Checks MCP registration
 
-Each report is focused on **actionable findings** rather than abstract metrics or grades. The goal is to give you a clear picture of what actually needs work.
+### Rust Module Analysis
+When `--rust-analysis=true`:
+- Checks compilation status
+- Tests Python bindings
+- Measures performance impact
+- Identifies unused modules
+
+### Depth Levels
+- `quick`: Basic functionality tests only
+- `standard`: Full test suite and analysis
+- `deep`: Include performance profiling and security scanning
+
+## Usage Examples
+
+```bash
+# Full comprehensive review with all features
+/dev-review-repo
+
+# Quick review focusing on core functionality
+/dev-review-repo --depth=quick --focus=circuit-synth
+
+# Agent system review with testing
+/dev-review-repo --focus=agents --test-agents=true
+
+# Manufacturing integration review
+/dev-review-repo --focus=manufacturing
+
+# Security-focused review
+/dev-review-repo --focus=security --check-security=true
+
+# Documentation and website validation
+/dev-review-repo --focus=docs --website-check=true
+
+# Rust module analysis
+/dev-review-repo --rust-analysis=true --focus=architecture
+```
+
+## Integration with Development Workflow
+
+### Pre-Release Checklist
+Run before any release:
+```bash
+/dev-review-repo --depth=deep --generate-fixes=true
+```
+
+### Weekly Health Check
+Regular maintenance:
+```bash
+/dev-review-repo --depth=standard --focus=all
+```
+
+### Post-Feature Development
+After adding new features:
+```bash
+/dev-review-repo --feature-discovery=true --test-agents=true
+```
+
+## Customization
+
+Create `.repo-review-config.yml` for custom settings:
+```yaml
+feature_discovery:
+  include_paths:
+    - src/
+    - examples/
+    - tools/
+  exclude_patterns:
+    - __pycache__
+    - .git
+    - .venv
+
+testing:
+  test_timeout: 60
+  parallel_tests: true
+  
+analysis:
+  complexity_threshold: 10
+  coverage_threshold: 80
+  
+reports:
+  include_raw_data: true
+  generate_html: false
+```
 
 ---
 
-**This command creates a practical repository review focused on finding real issues and providing actionable recommendations for circuit-synth projects.**
+**This comprehensive repository review command ensures complete coverage of all circuit-synth features through automatic discovery, preventing stale review configurations from missing new functionality.**
