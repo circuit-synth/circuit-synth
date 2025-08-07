@@ -564,9 +564,46 @@ fn expand_extended_symbol(child_symbol: &mut Value, parent_symbol: &Value, lib_i
                                     eprintln!("🔧 [EXPAND]     -> Geometry section: '{}'", geom_name);
                                     
                                     // Check if it's a geometry section (contains _X_Y pattern)
-                                    if geom_name.contains("_0_1") || geom_name.contains("_1_1") {
-                                        // Extract suffix
-                                        let suffix = if geom_name.contains("_0_1") { "0_1" } else { "1_1" };
+                                    // Multi-unit components can have _1_1, _2_1, _3_1, etc.
+                                    // Single units can have _0_1, _1_1
+                                    let is_geometry_section = {
+                                        // Check if name ends with _<digit>_<digit> pattern
+                                        if let Some(last_underscore) = geom_name.rfind('_') {
+                                            if let Some(second_last_underscore) = geom_name[..last_underscore].rfind('_') {
+                                                let middle = &geom_name[second_last_underscore + 1..last_underscore];
+                                                let last = &geom_name[last_underscore + 1..];
+                                                // Check if both parts are digits
+                                                middle.chars().all(|c| c.is_ascii_digit()) && 
+                                                last.chars().all(|c| c.is_ascii_digit())
+                                            } else {
+                                                false
+                                            }
+                                        } else {
+                                            false
+                                        }
+                                    };
+                                    
+                                    if is_geometry_section {
+                                        // Extract the unit suffix (last two numbers separated by underscore)
+                                        // Examples:
+                                        // "LM2904_2_1" -> "2_1"
+                                        // "STM32F103C_8-B_Tx_0_1" -> "0_1"
+                                        // "AP1117-15_1_1" -> "1_1"
+                                        let suffix = {
+                                            // Find the last underscore
+                                            if let Some(last_underscore) = geom_name.rfind('_') {
+                                                // Find the second-to-last underscore
+                                                if let Some(second_last) = geom_name[..last_underscore].rfind('_') {
+                                                    // Extract everything from second-to-last underscore
+                                                    &geom_name[second_last + 1..]
+                                                } else {
+                                                    // Only one underscore found, shouldn't happen for valid geometry
+                                                    ""
+                                                }
+                                            } else {
+                                                ""
+                                            }
+                                        };
                                         let new_geom_name = format!("{}_{}", child_name, suffix);
                                         eprintln!("🔧 [EXPAND]       RENAMING: '{}' -> '{}'", geom_name, new_geom_name);
                                         
