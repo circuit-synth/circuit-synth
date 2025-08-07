@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
 - **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files
 - **Hierarchical Design**: Modular subcircuits like software modules  
-- **Component Intelligence**: JLCPCB integration, symbol/footprint verification
+- **Component Intelligence**: JLCPCB & DigiKey integration, symbol/footprint verification
 - **AI Integration**: Claude Code agents for automated design assistance
 - **FMEA Analysis**: Comprehensive reliability analysis with physics-based failure models
 - **Test Plan Generation**: Automated test procedures for validation and manufacturing
@@ -118,13 +118,18 @@ Circuit-synth includes specialized AI agents for different aspects of circuit de
 
 #### **component-guru** - Manufacturing and Component Sourcing
 - **Use for**: Component selection, manufacturing optimization, sourcing alternatives
-- **Expertise**: JLCPCB availability, component specifications, manufacturing constraints
-- **Example**: *"Find alternative op-amps for this design that are in stock at JLCPCB"*
+- **Expertise**: JLCPCB & DigiKey availability, component specifications, manufacturing constraints
+- **Example**: *"Compare op-amp options between JLCPCB and DigiKey for best value"*
 
 #### **jlc-parts-finder** - JLCPCB Component Intelligence
 - **Use for**: Real-time component availability, pricing, and alternatives
 - **Expertise**: JLCPCB catalog search, stock levels, KiCad symbol verification
 - **Example**: *"Find STM32 with 3 SPIs available on JLCPCB under $5"*
+
+#### **digikey-parts-finder** - DigiKey Component Search
+- **Use for**: Comprehensive component search with extensive catalog access
+- **Expertise**: DigiKey's 8M+ components, price breaks, alternatives, datasheets
+- **Example**: *"Find 0.1uF 0603 X7R capacitors with pricing at DigiKey"*
 
 #### **general-purpose** - Research and Analysis
 - **Use for**: Open-ended research, codebase analysis, complex searches
@@ -198,6 +203,7 @@ Available when working with Claude Code in a circuit-synth project:
 
 # Component Intelligence  
 /find-stm32 "3 SPIs, USB, available JLCPCB"          # STM32-specific search
+/find-digikey "0.1uF 0603 X7R capacitor"             # DigiKey component search
 /jlc-search "voltage regulator 3.3V"                 # JLCPCB component search
 
 # Development (for contributors)
@@ -279,7 +285,7 @@ my_circuit_project/
 | Traditional EE Workflow | With Circuit-Synth |
 |-------------------------|-------------------|
 | Manual component placement | `python main.py` → Complete project |
-| Hunt through symbol libraries | Verified components with JLCPCB availability |
+| Hunt through symbol libraries | Verified components with JLCPCB & DigiKey availability |
 | Visual net verification | Explicit Python connections |
 | GUI-based KiCad editing | Text-based Python circuit definitions |
 | Copy-paste circuit patterns | Reusable circuit functions |
@@ -435,7 +441,57 @@ export KICAD_FOOTPRINT_DIR="/custom/path/to/footprints"
 # JLCPCB API configuration (optional)
 export JLCPCB_API_KEY="your_api_key"
 export JLCPCB_CACHE_DURATION=3600  # Cache for 1 hour
+
+# DigiKey API configuration (optional, for component search)
+export DIGIKEY_CLIENT_ID="your_client_id"
+export DIGIKEY_CLIENT_SECRET="your_client_secret"
+# Or run: python -m circuit_synth.manufacturing.digikey.config_manager
 ```
+
+## 🔍 Component Sourcing
+
+circuit-synth provides integrated access to multiple component distributors for real-time availability, pricing, and specifications.
+
+### JLCPCB Integration
+Best for PCB assembly and production:
+```python
+from circuit_synth.manufacturing.jlcpcb import search_jlc_components_web
+
+# Find components available for assembly
+results = search_jlc_components_web("STM32F407", max_results=10)
+```
+
+### DigiKey Integration  
+Best for prototyping and wide selection:
+```python
+from circuit_synth.manufacturing.digikey import search_digikey_components
+
+# Search DigiKey's 8M+ component catalog
+results = search_digikey_components("0.1uF 0603 X7R", max_results=10)
+
+# Get detailed pricing and alternatives
+from circuit_synth.manufacturing.digikey import DigiKeyComponentSearch
+searcher = DigiKeyComponentSearch()
+component = searcher.get_component_details("399-1096-1-ND")
+alternatives = searcher.find_alternatives(component, max_results=5)
+```
+
+### DigiKey Setup
+```bash
+# Interactive configuration
+python -m circuit_synth.manufacturing.digikey.config_manager
+
+# Test connection
+python -m circuit_synth.manufacturing.digikey.test_connection
+```
+
+See [docs/DIGIKEY_SETUP.md](docs/DIGIKEY_SETUP.md) for detailed setup instructions.
+
+### Multi-Source Strategy
+- **Prototyping**: Use DigiKey for fast delivery and no minimums
+- **Small Batch**: Compare JLCPCB vs DigiKey for best value
+- **Production**: Optimize with JLCPCB for integrated assembly
+- **Risk Mitigation**: Maintain alternatives from multiple sources
 
 ## 🐛 Troubleshooting
 
@@ -489,7 +545,7 @@ circuit-synth/
 │   ├── core/                    # Core circuit representation
 │   ├── kicad/                   # KiCad file I/O
 │   ├── component_info/          # Component databases
-│   ├── manufacturing/           # JLCPCB, etc.
+│   ├── manufacturing/           # JLCPCB, DigiKey, etc.
 │   └── simulation/              # SPICE integration
 ├── rust_modules/                # Rust acceleration
 ├── examples/                    # Usage examples
