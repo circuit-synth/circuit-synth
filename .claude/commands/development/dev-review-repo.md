@@ -54,7 +54,7 @@ This command analyzes the entire repository and creates structured reports based
 - **Missing test coverage** in critical areas
 - **Test quality** - are tests meaningful or just padding?
 
-### 6. Documentation State
+### 6. Documentation State and Quality Review
 - **Accurate documentation** vs outdated docs
 - **Missing API documentation** for public functions
 - **Broken examples** in documentation
@@ -62,6 +62,14 @@ This command analyzes the entire repository and creates structured reports based
 - **README validation** - do claimed features actually exist?
 - **File reference verification** - do linked files exist?
 - **Example accuracy** - do code examples run successfully?
+
+**CRITICAL: Documentation Quality Review (ALL files):**
+- **AI-generated verbose content** - Remove marketing speak, excessive enthusiasm
+- **Overly complex explanations** - Simplify technical language where possible
+- **Excessive length** - Keep files concise (README <500 lines, CONTRIBUTING <300)
+- **Missing practical examples** - Add code snippets for all features
+- **Outdated information** - Remove docs for deleted features
+- **Unnecessary emojis** - Maintain professional tone
 
 ### 7. Dependencies and Integration
 - **Outdated packages** that need updates
@@ -82,8 +90,9 @@ repo-review/
 ├── 04-performance-analysis.md                   # Slow spots and bottlenecks
 ├── 05-testing-analysis.md                       # Test coverage and quality
 ├── 06-documentation-analysis.md                 # Doc accuracy and gaps
-├── 07-documentation-validation-analysis.md      # README validation and accuracy
-├── 08-dependencies-analysis.md                  # Package health and issues
+├── 07-documentation-quality-review.md           # AI slop, verbosity, missing examples
+├── 08-documentation-validation-analysis.md      # README validation and accuracy
+├── 09-dependencies-analysis.md                  # Package health and issues
 └── findings/                                    # Raw data and logs
 ```
 
@@ -174,7 +183,7 @@ uv run pytest tests/ --tb=short
 uv run pytest --cov=circuit_synth --cov-report=term-missing
 ```
 
-### 6. Documentation Audit
+### 6. Documentation Audit and Quality Review
 ```bash
 # Outdated docs
 find . -name "README.md" -exec grep -l "rust\|Rust" {} \;
@@ -196,6 +205,34 @@ find . -name "setup-claude-integration" -o -name "*register-agents*"
 find docs/ -name "*.md" | head -10
 find . -name "*SIMULATION*" -o -name "*simulation*" | head -5
 find . -name "*kicad_plugins*" -type d
+
+# Documentation Quality Scan
+echo "=== Documentation Quality Review ==="
+
+# Check for AI slop patterns
+echo "Checking for AI-generated verbose content..."
+grep -r "(?i)(amazing|fantastic|revolutionary|game-changing)" docs/ README.md CONTRIBUTING.md 2>/dev/null
+grep -r "🚀🚀\|💡💡\|⚡⚡" docs/ README.md 2>/dev/null
+
+# Check file lengths
+echo "Checking documentation file lengths..."
+wc -l README.md CONTRIBUTING.md docs/*.md 2>/dev/null | sort -rn
+
+# Check for missing examples
+echo "Checking for missing code examples..."
+for file in docs/*.rst docs/*.md; do
+    if grep -q "def \|class " "$file" 2>/dev/null; then
+        if ! grep -q "\`\`\`python" "$file" 2>/dev/null; then
+            echo "Missing examples in: $file"
+        fi
+    fi
+done
+
+# Sync check - new features documented?
+echo "Checking if new code is documented..."
+git diff main..HEAD --name-only | grep "\.py$" | while read file; do
+    echo "New/modified: $file - check if documented"
+done
 ```
 
 ### 7. Dependency Health
@@ -241,6 +278,68 @@ Since this repo went Python → Rust → Python, it specifically looks for:
 
 # Focus on Python/Rust cleanup
 /dev-review-repo --focus=code-quality
+```
+
+## Documentation Quality Review Report
+
+The `07-documentation-quality-review.md` file will contain:
+
+```markdown
+# Documentation Quality Review
+
+## Overview
+Assessment of documentation quality across the repository
+
+## Quality Issues Found
+
+### AI-Generated Verbose Content
+- Files with marketing speak or excessive enthusiasm
+- Overly elaborate descriptions that could be concise
+- Repetitive explanations of the same concepts
+
+### Length and Complexity Issues
+- Files exceeding recommended length limits
+- Overly complex technical explanations
+- Nested or convoluted documentation structure
+
+### Missing Examples
+- Features without code demonstrations
+- APIs lacking usage examples
+- Installation steps without verification
+
+### Outdated Content
+- Documentation for removed features
+- Old syntax that no longer works
+- Broken links and references
+
+## File-by-File Analysis
+
+### README.md
+- Current: X lines (target: <500)
+- AI slop found: [list patterns]
+- Missing examples: [list features]
+- Recommendations: [specific fixes]
+
+### CONTRIBUTING.md
+- Current: X lines (target: <300)
+- Verbosity issues: [list sections]
+- Outdated content: [list items]
+- Recommendations: [specific fixes]
+
+### docs/ Directory
+[Analysis of each documentation file]
+
+## Sync Issues
+- New code not documented: [list]
+- Removed code still documented: [list]
+- API changes not reflected: [list]
+
+## Recommendations
+1. Remove verbose AI-generated content
+2. Add practical examples for all features
+3. Simplify complex explanations
+4. Update outdated information
+5. Reduce file lengths to targets
 ```
 
 ## What You Get

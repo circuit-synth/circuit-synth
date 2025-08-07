@@ -172,3 +172,5 @@ cache/
 test_output/
 
 .pypirc
+memory-bank/
+.circuit_synth/
