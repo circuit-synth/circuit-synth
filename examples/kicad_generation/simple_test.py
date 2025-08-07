@@ -20,7 +20,7 @@ schematic = kicad.add_component_to_schematic(
     x=100.0,
     y=50.0,
     rotation=0.0,
-    footprint="Resistor_SMD:R_0603_1608Metric"
+    footprint="Resistor_SMD:R_0603_1608Metric",
 )
 print("✓ Added resistor R1 (330Ω)")
 
@@ -33,34 +33,24 @@ schematic = kicad.add_component_to_schematic(
     x=100.0,
     y=80.0,
     rotation=0.0,
-    footprint="LED_SMD:LED_0603_1608Metric"
+    footprint="LED_SMD:LED_0603_1608Metric",
 )
 print("✓ Added LED D1")
 
 # Add power label
 schematic = kicad.add_hierarchical_label_to_schematic(
-    schematic,
-    name="VCC",
-    shape="input",
-    x=100.0,
-    y=30.0,
-    rotation=90.0
+    schematic, name="VCC", shape="input", x=100.0, y=30.0, rotation=90.0
 )
 print("✓ Added VCC power label")
 
 # Add ground label
 schematic = kicad.add_hierarchical_label_to_schematic(
-    schematic,
-    name="GND",
-    shape="passive",
-    x=100.0,
-    y=100.0,
-    rotation=270.0
+    schematic, name="GND", shape="passive", x=100.0, y=100.0, rotation=270.0
 )
 print("✓ Added GND label")
 
 # Save the file
-with open("led_circuit.kicad_sch", 'w') as f:
+with open("led_circuit.kicad_sch", "w") as f:
     f.write(schematic)
 
 print("\n✅ Done! Created led_circuit.kicad_sch")
