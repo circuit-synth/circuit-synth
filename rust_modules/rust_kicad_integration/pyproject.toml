@@ -34,3 +34,5 @@ Documentation = "https://github.com/circuit-synth/rust-kicad-schematic-writer/bl
 
 [tool.maturin]
 module-name = "rust_kicad_schematic_writer"
+features = ["python"]
+bindings = "pyo3"

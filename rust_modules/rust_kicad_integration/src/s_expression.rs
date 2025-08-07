@@ -26,11 +26,14 @@ pub fn generate_schematic_sexp(
         sexp!((version 20250114)),
         sexp!((generator "rust_kicad_schematic_writer")),
         sexp!((generator_version "0.1.0")),
-        Value::cons(Value::symbol("uuid"), Value::string(config.uuid.clone())),
-        Value::cons(
+        Value::list(vec![
+            Value::symbol("uuid"),
+            Value::string(config.uuid.clone()),
+        ]),
+        Value::list(vec![
             Value::symbol("paper"),
             Value::string(config.paper_size.clone()),
-        ),
+        ]),
     ];
 
     // Add lib_symbols section (empty for now)
@@ -94,7 +97,10 @@ fn generate_component_sexp(component: &Component) -> Result<Value, SchematicErro
     // Build the component S-expression using Value::list
     let mut component_parts = vec![
         Value::symbol("symbol"),
-        Value::cons(Value::symbol("lib_id"), Value::string(lib_id)),
+        Value::list(vec![
+            Value::symbol("lib_id"),
+            Value::string(lib_id),
+        ]),
         sexp!((at, pos_x, pos_y, rotation)),
         sexp!((unit 1)),
         sexp!((exclude_from_sim no)),
@@ -102,12 +108,15 @@ fn generate_component_sexp(component: &Component) -> Result<Value, SchematicErro
         sexp!((on_board yes)),
         sexp!((dnp no)),
         sexp!((fields_autoplaced yes)),
-        Value::cons(Value::symbol("uuid"), Value::string(component_uuid.clone())),
+        Value::list(vec![
+            Value::symbol("uuid"),
+            Value::string(component_uuid.clone()),
+        ]),
         sexp!((property "Reference" ,reference
             (at ,pos_x ,ref_y 0)
             (effects (font (size 1.27 1.27)))
         )),
-        sexp!((property "Value" ,value.clone()
+        sexp!((property "Value" ,value
             (at ,pos_x ,val_y 0)
             (effects (font (size 1.27 1.27)))
         )),
@@ -117,7 +126,14 @@ fn generate_component_sexp(component: &Component) -> Result<Value, SchematicErro
     for pin in &component.pins {
         let pin_number = pin.number.clone();
         let pin_uuid = uuid::Uuid::new_v4().to_string();
-        let pin_sexp = sexp!((pin, pin_number(uuid, pin_uuid)));
+        let pin_sexp = Value::list(vec![
+            Value::symbol("pin"),
+            Value::string(pin_number),
+            Value::list(vec![
+                Value::symbol("uuid"),
+                Value::string(pin_uuid),
+            ]),
+        ]);
         component_parts.push(pin_sexp);
     }
 
@@ -158,12 +174,39 @@ fn generate_hierarchical_label_sexp(label: &HierarchicalLabel) -> Result<Value, 
     let justify = label.effects.justify.clone();
     let uuid = label.uuid.clone();
 
-    let label_sexp = sexp!((
-        hierarchical_label,
-        name(shape, shape)(at, pos_x, pos_y, orientation)(effects(font(
-            size, font_size, font_size
-        ))(justify, justify))(uuid, uuid)
-    ));
+    let label_sexp = Value::list(vec![
+        Value::symbol("hierarchical_label"),
+        Value::string(name),
+        Value::list(vec![
+            Value::symbol("shape"),
+            Value::symbol(shape),
+        ]),
+        Value::list(vec![
+            Value::symbol("at"),
+            Value::from(pos_x),
+            Value::from(pos_y),
+            Value::from(orientation),
+        ]),
+        Value::list(vec![
+            Value::symbol("effects"),
+            Value::list(vec![
+                Value::symbol("font"),
+                Value::list(vec![
+                    Value::symbol("size"),
+                    Value::from(font_size),
+                    Value::from(font_size),
+                ]),
+            ]),
+            Value::list(vec![
+                Value::symbol("justify"),
+                Value::symbol(&*justify),
+            ]),
+        ]),
+        Value::list(vec![
+            Value::symbol("uuid"),
+            Value::string(uuid),
+        ]),
+    ]);
 
     debug!(
         "✅ Hierarchical label S-expression generated for '{}'",

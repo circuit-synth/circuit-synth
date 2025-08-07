@@ -1,0 +1,62 @@
+[package]
+name = "kicad"
+version = "0.1.0"
+edition = "2021"
+authors = ["Shane Mattner <shane@circuit-synth.com>"]
+description = "Rust library for creating and manipulating KiCad schematic and PCB files"
+documentation = "https://docs.rs/kicad"
+homepage = "https://github.com/circuit-synth/kicad-rust"
+repository = "https://github.com/circuit-synth/kicad-rust"
+readme = "README.md"
+license = "MIT"
+keywords = ["kicad", "eda", "schematic", "pcb", "electronics"]
+categories = ["hardware-support", "parsing", "science"]
+exclude = [
+    ".github/*",
+    "tests/*",
+    "examples/*.kicad_sch",
+    "*.log",
+]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lib]
+name = "kicad"
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = []
+python = ["pyo3", "pyo3-log"]
+
+[dependencies]
+anyhow = "1.0"
+lexpr = "0.2.7"
+log = "0.4"
+env_logger = "0.10"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+uuid = { version = "1.0", features = ["v4", "serde"] }
+approx = "0.5"
+
+# Optional Python bindings
+pyo3 = { version = "0.20", features = ["extension-module"], optional = true }
+pyo3-log = { version = "0.9", optional = true }
+
+[dev-dependencies]
+tempfile = "3.0"
+pretty_assertions = "1.0"
+
+# Profile for Python extension
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+
+# Metadata for maturin (Python bindings)
+[package.metadata.maturin]
+python-source = "python"
+module-name = "kicad._kicad_rust"
+features = ["python"]

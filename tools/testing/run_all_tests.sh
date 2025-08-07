@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 VERBOSE=${VERBOSE:-false}
 RUST_ONLY=${RUST_ONLY:-false}
 PYTHON_ONLY=${PYTHON_ONLY:-false}
