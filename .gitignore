@@ -166,12 +166,9 @@ fp-info-cache
 # Functional test generated output
 tests/functional_tests/**/generated_output/
 
-# Generated example projects
-example_kicad_project/
 
 # Build and test artifacts
 cache/
 test_output/
 
 .pypirc
-memory-bank/
