@@ -116,10 +116,10 @@ Circuit-synth includes specialized AI agents for different aspects of circuit de
 - **Expertise**: SPICE simulation setup, component modeling, performance analysis
 - **Example**: *"Simulate this amplifier circuit and optimize for 40dB gain with <100mW power"*
 
-#### **component-guru** - Manufacturing and Component Sourcing
-- **Use for**: Component selection, manufacturing optimization, sourcing alternatives
-- **Expertise**: JLCPCB & DigiKey availability, component specifications, manufacturing constraints
-- **Example**: *"Compare op-amp options between JLCPCB and DigiKey for best value"*
+#### **component-search** - Multi-Source Component Search
+- **Use for**: Component selection across all suppliers, price comparison, availability checking
+- **Expertise**: JLCPCB, DigiKey, and future suppliers (Mouser, LCSC, etc.)
+- **Example**: *"Find 0.1uF 0603 capacitors across all suppliers with pricing comparison"*
 
 #### **jlc-parts-finder** - JLCPCB Component Intelligence
 - **Use for**: Real-time component availability, pricing, and alternatives
@@ -202,9 +202,10 @@ Available when working with Claude Code in a circuit-synth project:
 /validate-existing-circuit                            # Validate current code
 
 # Component Intelligence  
+/find-parts "0.1uF 0603 X7R capacitor"               # Search all suppliers
+/find-parts "STM32F407" --source jlcpcb              # JLCPCB only
+/find-parts "LM358" --compare                        # Compare across suppliers
 /find-stm32 "3 SPIs, USB, available JLCPCB"          # STM32-specific search
-/find-digikey "0.1uF 0603 X7R capacitor"             # DigiKey component search
-/jlc-search "voltage regulator 3.3V"                 # JLCPCB component search
 
 # Development (for contributors)
 /dev-run-tests                  # Run comprehensive test suite
