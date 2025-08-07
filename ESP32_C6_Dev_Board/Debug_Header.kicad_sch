@@ -14,25 +14,23 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "J"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Value" "Conn_02x03_Odd_Even"
-				(at 0.0 0.0 0)
+				(at 0 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at 0 -5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -41,7 +39,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 -7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -50,7 +48,7 @@
 				)
 			)
 			(property "Description" "Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"
-				(at 0.0 0.0 0)
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -59,16 +57,7 @@
 				)
 			)
 			(property "ki_keywords" "connector"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "Connector*:*_2x??_*"
-				(at 0.0 0.0 0)
+				(at 0 -12.7 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -159,7 +148,7 @@
 				(pin
 					passive
 					line
-					(at -5.08 2.54 0)
+					(at -5.08 2.54 0.0)
 					(length 3.81)
 					(name
 						Pin_1
@@ -181,7 +170,7 @@
 				(pin
 					passive
 					line
-					(at -5.08 0.0 0)
+					(at -5.08 0.0 0.0)
 					(length 3.81)
 					(name
 						Pin_3
@@ -203,7 +192,7 @@
 				(pin
 					passive
 					line
-					(at -5.08 -2.54 0)
+					(at -5.08 -2.54 0.0)
 					(length 3.81)
 					(name
 						Pin_5
@@ -225,7 +214,7 @@
 				(pin
 					passive
 					line
-					(at 7.62 2.54 180)
+					(at 7.62 2.54 180.0)
 					(length 3.81)
 					(name
 						Pin_2
@@ -247,7 +236,7 @@
 				(pin
 					passive
 					line
-					(at 7.62 0.0 180)
+					(at 7.62 0.0 180.0)
 					(length 3.81)
 					(name
 						Pin_4
@@ -269,7 +258,7 @@
 				(pin
 					passive
 					line
-					(at 7.62 -2.54 180)
+					(at 7.62 -2.54 180.0)
 					(length 3.81)
 					(name
 						Pin_6
@@ -289,6 +278,7 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 	)
 	(title_block
@@ -326,7 +316,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442/19bdce56-6e31-410d-bec4-2a1df54906db"
+				(path "/"
 					(reference "J2")
 					(unit 1)
 				)
@@ -405,41 +395,8 @@
 		)
 		(uuid a6ea782d-9519-4c67-8947-211e13e34053)
 	)
-	(text_box
-		"Debug header for programming and debugging"
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid 668053a1-5e52-42a0-adcd-f13e0d217055)
-	)
 	(sheet_instances
-		(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442/19bdce56-6e31-410d-bec4-2a1df54906db"
+		(path "/"
 			(page "1")
 		)
 	)

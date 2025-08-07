@@ -5,6 +5,149 @@
 	(uuid 1f0f5095-fe87-4505-96b7-4105d1cab6b8)
 	(paper "A4")
 	(lib_symbols
+		(symbol "Regulator_Linear:AMS1117-3.3"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "AMS1117-3.3"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "http://www.advanced-monolithic.com/pdf/ds1117.pdf"
+				(at 0 -7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"
+				(at 0 -10.16 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "linear regulator ldo fixed positive"
+				(at 0 -12.7 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "AMS1117-3.3_0_1"
+				(rectangle
+					(start -5.08 -5.08)
+					(end 5.08 1.905)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "AMS1117-3.3_1_1"
+				(pin
+					passive
+					line
+					(at -7.62 0.0 0.0)
+					(length 2.54)
+					(name
+						VI
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 0.0 -7.62 90.0)
+					(length 2.54)
+					(name
+						GND
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 7.62 0.0 180.0)
+					(length 2.54)
+					(name
+						VO
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Device:C"
 			(pin_numbers hide)
 			(pin_names
@@ -14,25 +157,23 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "C"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Value" "C"
-				(at 0.0 0.0 0)
+				(at 0 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at 0 -5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -41,7 +182,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 -7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -50,7 +191,7 @@
 				)
 			)
 			(property "Description" "Unpolarized capacitor"
-				(at 0.0 0.0 0)
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -59,16 +200,7 @@
 				)
 			)
 			(property "ki_keywords" "cap capacitor"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "C_*"
-				(at 0.0 0.0 0)
+				(at 0 -12.7 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -108,7 +240,7 @@
 				(pin
 					passive
 					line
-					(at 0.0 3.81 270)
+					(at 0.0 3.81 270.0)
 					(length 2.794)
 					(name
 						~
@@ -130,7 +262,7 @@
 				(pin
 					passive
 					line
-					(at 0.0 -3.81 90)
+					(at 0.0 -3.81 90.0)
 					(length 2.794)
 					(name
 						~
@@ -150,159 +282,7 @@
 					)
 				)
 			)
-		)
-		(symbol "Regulator_Linear:AMS1117-3.3"
-			(pin_numbers hide)
-			(pin_names
-				(offset 0.254)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "U"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
-				)
-			)
-			(property "Value" "AMS1117-3.3"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
-				)
-			)
-			(property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "http://www.advanced-monolithic.com/pdf/ds1117.pdf"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "linear regulator ldo fixed positive"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "SOT?223*TabPin2*"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "AMS1117-3.3_0_1"
-				(rectangle
-					(start -5.08 -5.08)
-					(end 5.08 1.905)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-			)
-			(symbol "AMS1117-3.3_1_1"
-				(pin
-					power_in
-					line
-					(at -7.62 0.0 0)
-					(length 2.54)
-					(name
-						VI
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number
-						"3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin
-					power_in
-					line
-					(at 0.0 -7.62 90)
-					(length 2.54)
-					(name
-						GND
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number
-						"1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin
-					power_out
-					line
-					(at 7.62 0.0 180)
-					(length 2.54)
-					(name
-						VO
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number
-						"2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
+			(embedded_fonts no)
 		)
 	)
 	(title_block
@@ -339,7 +319,7 @@
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board"
+			(project "92b1ce59-3a3c-4647-b1e8-53da23977cf2"
 				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/6db71840-4062-4460-b647-79ba21135577"
 					(reference "U1")
 					(unit 1)
@@ -385,7 +365,7 @@
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board"
+			(project "92b1ce59-3a3c-4647-b1e8-53da23977cf2"
 				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/6db71840-4062-4460-b647-79ba21135577"
 					(reference "C2")
 					(unit 1)
@@ -431,7 +411,7 @@
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board"
+			(project "92b1ce59-3a3c-4647-b1e8-53da23977cf2"
 				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/6db71840-4062-4460-b647-79ba21135577"
 					(reference "C3")
 					(unit 1)
@@ -559,41 +539,8 @@
 		)
 		(uuid 90ac0743-6384-4e53-ab02-cf71b37b1197)
 	)
-	(text_box
-		"5V to 3.3V power regulation subcircuit"
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid 8e2bc9f9-9b08-41fc-a3d0-6378dee41c2a)
-	)
 	(sheet_instances
-		(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/6db71840-4062-4460-b647-79ba21135577"
+		(path "/"
 			(page "1")
 		)
 	)

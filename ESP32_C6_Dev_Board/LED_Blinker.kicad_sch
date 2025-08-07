@@ -14,25 +14,23 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "D"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Value" "LED"
-				(at 0.0 0.0 0)
+				(at 0 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at 0 -5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -41,7 +39,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 -7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -50,34 +48,16 @@
 				)
 			)
 			(property "Description" "Light emitting diode"
-				(at 0.0 0.0 0)
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 					(hide yes)
-				)
-			)
-			(property "Sim.Pins" "1=K 2=A"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
 				)
 			)
 			(property "ki_keywords" "LED diode"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "LED* LED_SMD:* LED_THT:*"
-				(at 0.0 0.0 0)
+				(at 0 -12.7 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -164,7 +144,7 @@
 				(pin
 					passive
 					line
-					(at -3.81 0.0 0)
+					(at -3.81 0.0 0.0)
 					(length 2.54)
 					(name
 						K
@@ -186,7 +166,7 @@
 				(pin
 					passive
 					line
-					(at 3.81 0.0 180)
+					(at 3.81 0.0 180.0)
 					(length 2.54)
 					(name
 						A
@@ -206,6 +186,7 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 		(symbol "Device:R"
 			(pin_numbers hide)
@@ -216,25 +197,23 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "R"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Value" "R"
-				(at 0.0 0.0 0)
+				(at 0 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at 0 -5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -243,7 +222,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 -7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -252,7 +231,7 @@
 				)
 			)
 			(property "Description" "Resistor"
-				(at 0.0 0.0 0)
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -261,16 +240,7 @@
 				)
 			)
 			(property "ki_keywords" "R res resistor"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "R_*"
-				(at 0.0 0.0 0)
+				(at 0 -12.7 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -295,7 +265,7 @@
 				(pin
 					passive
 					line
-					(at 0.0 3.81 270)
+					(at 0.0 3.81 270.0)
 					(length 1.27)
 					(name
 						~
@@ -317,7 +287,7 @@
 				(pin
 					passive
 					line
-					(at 0.0 -3.81 90)
+					(at 0.0 -3.81 90.0)
 					(length 1.27)
 					(name
 						~
@@ -337,6 +307,7 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 	)
 	(title_block
@@ -374,7 +345,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442/660318e5-be8f-4eeb-b37d-6c513253bfd2"
+				(path "/"
 					(reference "D3")
 					(unit 1)
 				)
@@ -420,7 +391,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442/660318e5-be8f-4eeb-b37d-6c513253bfd2"
+				(path "/"
 					(reference "R3")
 					(unit 1)
 				)
@@ -487,41 +458,8 @@
 		)
 		(uuid 1b2f050d-29f6-467b-9080-ad9ed86093b8)
 	)
-	(text_box
-		"LED with current limiting resistor - Correct circuit topology"
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid 617935b8-0906-4d24-ac42-422ab0bf14ee)
-	)
 	(sheet_instances
-		(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442/660318e5-be8f-4eeb-b37d-6c513253bfd2"
+		(path "/"
 			(page "1")
 		)
 	)
