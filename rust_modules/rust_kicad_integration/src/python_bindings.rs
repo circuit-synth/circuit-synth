@@ -957,6 +957,40 @@ fn load_schematic(filepath: &str) -> PyResult<String> {
 
 /// Add a component to a schematic string and return the modified schematic
 #[pyfunction]
+fn add_hierarchical_label_to_schematic(
+    schematic_str: &str,
+    name: &str,
+    shape: &str,
+    x: f64,
+    y: f64,
+    rotation: f64,
+) -> PyResult<String> {
+    use crate::schematic_editor::SchematicEditor;
+    
+    init_logging();
+    info!("🐍 Python calling add_hierarchical_label_to_schematic");
+    info!("  Label: name={}, shape={}", name, shape);
+    info!("  Position: ({}, {}), rotation={}", x, y, rotation);
+    
+    debug!("  Loading schematic from string ({} bytes)", schematic_str.len());
+    
+    // Load schematic
+    let mut editor = SchematicEditor::load_from_string(schematic_str)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to load schematic: {}", e)))?;
+    
+    // Add hierarchical label
+    editor.add_hierarchical_label(name, shape, x, y, rotation)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to add label: {}", e)))?;
+    
+    // Convert back to string
+    let result = editor.to_string();
+    info!("✅ Hierarchical label added successfully");
+    debug!("  Output size: {} bytes", result.len());
+    
+    Ok(result)
+}
+
+#[pyfunction]
 #[pyo3(signature = (schematic_str, reference, lib_id, value, x, y, rotation, footprint=None))]
 fn add_component_to_schematic(
     schematic_str: &str,
@@ -1029,6 +1063,7 @@ fn rust_kicad_schematic_writer(_py: Python, m: &PyModule) -> PyResult<()> {
     // Add schematic editing functions
     m.add_function(wrap_pyfunction!(load_schematic, m)?)?;
     m.add_function(wrap_pyfunction!(add_component_to_schematic, m)?)?;
+    m.add_function(wrap_pyfunction!(add_hierarchical_label_to_schematic, m)?)?;
 
     info!("✅ Python module initialized successfully");
     Ok(())

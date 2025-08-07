@@ -5,32 +5,42 @@
 	(uuid "5f0ac341-7bbd-4a3f-be5f-8ffd62126d0c")
 	(paper "A4")
 	(lib_symbols
-		(symbol "Amplifier_Operational:LM358"
+		(symbol "Device:R"
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.127)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "U"
-				(at 0 5.08 0)
+			(property "Reference" "R"
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left)
 				)
 			)
-			(property "Value" "LM358"
-				(at 0 -5.08 0)
+			(property "Value" "R"
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left)
 				)
 			)
 			(property "Footprint" ""
+				(at -1.778 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
 				(at 0 0 0)
 				(effects
 					(font
@@ -39,7 +49,7 @@
 					(hide yes)
 				)
 			)
-			(property "Datasheet" "http://www.ti.com/lit/ds/symlink/lm2904-n.pdf"
+			(property "Description" "Resistor"
 				(at 0 0 0)
 				(effects
 					(font
@@ -48,7 +58,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Low-Power, Dual Operational Amplifiers, DIP-8/SOIC-8/TO-99-8"
+			(property "ki_keywords" "R res resistor"
 				(at 0 0 0)
 				(effects
 					(font
@@ -57,15 +67,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_locked" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "dual opamp"
+			(property "ki_fp_filters" "R_*"
 				(at 0 0 0)
 				(effects
 					(font
@@ -74,67 +76,23 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "SOIC*3.9x4.9mm*P1.27mm* DIP*W7.62mm* TO*99* OnSemi*Micro8* TSSOP*3x3mm*P0.65mm* TSSOP*4.4x3mm*P0.65mm* MSOP*3x3mm*P0.65mm* SSOP*3.9x4.9mm*P0.635mm* LFCSP*2x2mm*P0.5mm* *SIP* SOIC*5.3x6.2mm*P1.27mm*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "LM358_1_1"
-				(polyline
-					(pts
-						(xy -5.08 5.08) (xy 5.08 0) (xy -5.08 -5.08) (xy -5.08 5.08)
-					)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
 					(stroke
 						(width 0.254)
 						(type default)
 					)
 					(fill
-						(type background)
+						(type none)
 					)
 				)
-				(pin input line
-					(at -7.62 2.54 0)
-					(length 2.54)
-					(name "+"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -7.62 -2.54 0)
-					(length 2.54)
-					(name "-"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin output line
-					(at 7.62 0 180)
-					(length 2.54)
+			)
+			(symbol "R_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
 					(name "~"
 						(effects
 							(font
@@ -150,59 +108,9 @@
 						)
 					)
 				)
-			)
-			(symbol "LM358_2_1"
-				(polyline
-					(pts
-						(xy -5.08 5.08) (xy 5.08 0) (xy -5.08 -5.08) (xy -5.08 5.08)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(pin input line
-					(at -7.62 2.54 0)
-					(length 2.54)
-					(name "+"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "5"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -7.62 -2.54 0)
-					(length 2.54)
-					(name "-"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "6"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin output line
-					(at 7.62 0 180)
-					(length 2.54)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
 					(name "~"
 						(effects
 							(font
@@ -210,45 +118,7 @@
 							)
 						)
 					)
-					(number "7"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(symbol "LM358_3_1"
-				(pin power_in line
-					(at -2.54 7.62 270)
-					(length 3.81)
-					(name "V+"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "8"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at -2.54 -7.62 90)
-					(length 3.81)
-					(name "V-"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -260,217 +130,47 @@
 			(embedded_fonts no)
 		)
 	)
-	(symbol
-		(lib_id "Amplifier_Operational:LM358")
-		(at 110.49 67.31 0)
-		(unit 2)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "6dfac671-b4c8-4991-a2e3-61b63519d443")
-		(property "Reference" "U?"
-			(at 110.49 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
+	(hierarchical_label "LABEL_1"
+		(shape input)
+		(at 119.38 78.74 90)
+		(effects
+			(font
+				(size 1.27 1.27)
 			)
+			(justify left)
 		)
-		(property "Value" "LM358"
-			(at 110.49 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 110.49 67.31 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/lm2904-n.pdf"
-			(at 110.49 67.31 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Low-Power, Dual Operational Amplifiers, DIP-8/SOIC-8/TO-99-8"
-			(at 110.49 67.31 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "3"
-			(uuid "f10b82c1-6ced-4d00-a168-acda7d7057e6")
-		)
-		(pin "8"
-			(uuid "e6ef6d25-969a-4527-a38a-35ffdb221f5c")
-		)
-		(pin "4"
-			(uuid "a70e1606-90b1-4c6e-8459-d82654d31211")
-		)
-		(pin "2"
-			(uuid "9534e93f-7239-402c-bcc1-5cce215e6932")
-		)
-		(pin "1"
-			(uuid "cbcbe746-54b5-4224-9486-4f5ba20f0596")
-		)
-		(pin "5"
-			(uuid "246bd5e7-0054-4b2f-b3d9-2e7015cf999a")
-		)
-		(pin "6"
-			(uuid "9f9ade4c-483b-4f49-8752-e3025d48779c")
-		)
-		(pin "7"
-			(uuid "2af57592-1297-4c9f-89bf-0a0ae3a10944")
-		)
-		(instances
-			(project ""
-				(path "/5f0ac341-7bbd-4a3f-be5f-8ffd62126d0c"
-					(reference "U?")
-					(unit 2)
-				)
-			)
-		)
+		(uuid "26040f86-a09c-46d5-9ec6-31a3ffdcdd71")
 	)
 	(symbol
-		(lib_id "Amplifier_Operational:LM358")
-		(at 140.97 54.61 0)
-		(unit 3)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "7c4b1815-0d06-4d89-b95c-d4b20edc8437")
-		(property "Reference" "U?"
-			(at 139.7 53.3399 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "LM358"
-			(at 139.7 55.8799 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 140.97 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/lm2904-n.pdf"
-			(at 140.97 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Low-Power, Dual Operational Amplifiers, DIP-8/SOIC-8/TO-99-8"
-			(at 140.97 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "3"
-			(uuid "f10b82c1-6ced-4d00-a168-acda7d7057e6")
-		)
-		(pin "8"
-			(uuid "e6ef6d25-969a-4527-a38a-35ffdb221f5c")
-		)
-		(pin "4"
-			(uuid "a70e1606-90b1-4c6e-8459-d82654d31211")
-		)
-		(pin "2"
-			(uuid "9534e93f-7239-402c-bcc1-5cce215e6932")
-		)
-		(pin "1"
-			(uuid "cbcbe746-54b5-4224-9486-4f5ba20f0596")
-		)
-		(pin "5"
-			(uuid "246bd5e7-0054-4b2f-b3d9-2e7015cf999a")
-		)
-		(pin "6"
-			(uuid "9f9ade4c-483b-4f49-8752-e3025d48779c")
-		)
-		(pin "7"
-			(uuid "2af57592-1297-4c9f-89bf-0a0ae3a10944")
-		)
-		(instances
-			(project ""
-				(path "/5f0ac341-7bbd-4a3f-be5f-8ffd62126d0c"
-					(reference "U?")
-					(unit 3)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Amplifier_Operational:LM358")
-		(at 110.49 46.99 0)
+		(lib_id "Device:R")
+		(at 119.38 82.55 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "810006af-fed5-4ebd-b08e-070150a18e16")
-		(property "Reference" "U?"
-			(at 110.49 36.83 0)
+		(uuid "4ae8ea07-8283-4a91-9037-e5ca7b48f19d")
+		(property "Reference" "R1"
+			(at 121.92 81.2799 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
-		(property "Value" "LM358"
-			(at 110.49 39.37 0)
+		(property "Value" "10k"
+			(at 121.92 83.8199 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
-		(property "Footprint" ""
-			(at 110.49 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/lm2904-n.pdf"
-			(at 110.49 46.99 0)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 117.602 82.55 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -478,8 +178,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Low-Power, Dual Operational Amplifiers, DIP-8/SOIC-8/TO-99-8"
-			(at 110.49 46.99 0)
+		(property "Datasheet" "~"
+			(at 119.38 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -487,34 +187,25 @@
 				(hide yes)
 			)
 		)
-		(pin "3"
-			(uuid "f10b82c1-6ced-4d00-a168-acda7d7057e6")
-		)
-		(pin "8"
-			(uuid "e6ef6d25-969a-4527-a38a-35ffdb221f5c")
-		)
-		(pin "4"
-			(uuid "a70e1606-90b1-4c6e-8459-d82654d31211")
-		)
-		(pin "2"
-			(uuid "9534e93f-7239-402c-bcc1-5cce215e6932")
+		(property "Description" "Resistor"
+			(at 119.38 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
 		)
 		(pin "1"
-			(uuid "cbcbe746-54b5-4224-9486-4f5ba20f0596")
+			(uuid "00c50742-cf23-46ef-acea-f063795f7953")
 		)
-		(pin "5"
-			(uuid "246bd5e7-0054-4b2f-b3d9-2e7015cf999a")
-		)
-		(pin "6"
-			(uuid "9f9ade4c-483b-4f49-8752-e3025d48779c")
-		)
-		(pin "7"
-			(uuid "2af57592-1297-4c9f-89bf-0a0ae3a10944")
+		(pin "2"
+			(uuid "4da3cb2b-f7c2-4af7-a89a-b22eee5d3a4d")
 		)
 		(instances
-			(project ""
+			(project "kicad_reference"
 				(path "/5f0ac341-7bbd-4a3f-be5f-8ffd62126d0c"
-					(reference "U?")
+					(reference "R1")
 					(unit 1)
 				)
 			)

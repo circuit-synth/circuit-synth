@@ -41,6 +41,93 @@ impl SchematicEditor {
     }
     
     /// Add a component to the schematic at a specific position
+    pub fn add_hierarchical_label(&mut self, name: &str, shape: &str, x: f64, y: f64, rotation: f64) -> Result<(), SchematicError> {
+        info!("🏷️ Adding hierarchical label: {} at ({}, {}) rotation={}", name, x, y, rotation);
+        
+        // Generate UUID for the label
+        let label_uuid = uuid::Uuid::new_v4().to_string();
+        
+        // Create the hierarchical_label S-expression
+        // (hierarchical_label "LABEL_1"
+        //     (shape input)
+        //     (at 119.38 78.74 90)
+        //     (effects
+        //         (font
+        //             (size 1.27 1.27)
+        //         )
+        //         (justify left)
+        //     )
+        //     (uuid "26040f86-a09c-46d5-9ec6-31a3ffdcdd71")
+        // )
+        let label_sexp = Value::list(vec![
+            Value::symbol("hierarchical_label"),
+            Value::string(name),
+            Value::list(vec![
+                Value::symbol("shape"),
+                Value::symbol(shape),
+            ]),
+            Value::list(vec![
+                Value::symbol("at"),
+                Value::from(x),
+                Value::from(y),
+                Value::from(rotation as i64),
+            ]),
+            Value::list(vec![
+                Value::symbol("effects"),
+                Value::list(vec![
+                    Value::symbol("font"),
+                    Value::list(vec![
+                        Value::symbol("size"),
+                        Value::from(1.27),
+                        Value::from(1.27),
+                    ]),
+                ]),
+                Value::list(vec![
+                    Value::symbol("justify"),
+                    Value::symbol("left"),
+                ]),
+            ]),
+            Value::list(vec![
+                Value::symbol("uuid"),
+                Value::string(&label_uuid[..]),  // Convert to string slice
+            ]),
+        ]);
+        
+        debug!("  Label S-expression created with UUID: {}", label_uuid);
+        
+        // Convert to vector, add label, rebuild
+        let mut elements = sexp_to_vec(&self.sexp)?;
+        debug!("  Schematic has {} top-level elements", elements.len());
+        
+        // Find position to insert (after lib_symbols, before first symbol component)
+        let mut insert_pos = elements.len();
+        let mut found_lib_symbols = false;
+        
+        for (i, elem) in elements.iter().enumerate() {
+            if let Value::Cons(cons) = elem {
+                if let Value::Symbol(sym) = cons.car() {
+                    let sym_str = sym.as_ref();
+                    if sym_str == "lib_symbols" {
+                        found_lib_symbols = true;
+                        insert_pos = i + 1;  // Insert after lib_symbols
+                    } else if sym_str == "symbol" && found_lib_symbols {
+                        // Found first component, insert before it
+                        insert_pos = i;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        debug!("  Inserting label at position {}", insert_pos);
+        elements.insert(insert_pos, label_sexp);
+        
+        // Rebuild the S-expression
+        self.sexp = Value::list(elements);
+        info!("✅ Added hierarchical label: {}", name);
+        Ok(())
+    }
+
     pub fn add_component(&mut self, component: &SimpleComponent) -> Result<(), SchematicError> {
         info!("🔧 Adding component: {} ({})", component.reference, component.lib_id);
         
