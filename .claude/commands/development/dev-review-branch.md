@@ -163,8 +163,11 @@ This command performs a comprehensive analysis of the current branch against the
 
 ### 6. Documentation Impact Assessment
 
-**CRITICAL: Always review if core documentation needs updates based on changes:**
+**CRITICAL: Always perform comprehensive documentation review with every merge:**
 
+#### Documentation Update Requirements
+
+**Core Documentation Files:**
 - **@README.md** - Check if new features, installation steps, usage examples, or architecture changes need documentation
 - **@Contributors.md** - Review if new development processes, tools, contribution paths, or setup procedures were added  
 - **@docs/** directory - Assess if API docs, technical guides, tutorials, or reference documentation requires updates
@@ -179,6 +182,106 @@ This command performs a comprehensive analysis of the current branch against the
 - **Agent files** in `.claude/agents/` - Verify if agent knowledge, capabilities, prompts, or tools need updates
 - **Command files** in `.claude/commands/` - Check if new commands, workflows, or development processes were added
 - **🌐 circuit-synth.com website** - Verify if public website needs updates to reflect changes
+
+#### Documentation Quality Review
+
+**MANDATORY: Review ALL documentation (existing and new) for quality issues:**
+
+**Common Documentation Problems to Fix:**
+1. **AI-Generated Slop** - Remove overly verbose, repetitive AI-style content
+   - Excessive enthusiasm ("Amazing!", "Fantastic!", "Revolutionary!")
+   - Marketing speak without substance
+   - Repetitive explanations of the same concept
+   - Unnecessary emoji overuse
+   - Overly elaborate metaphors
+
+2. **Verbosity Issues** - Trim unnecessary content
+   - Paragraphs that could be single sentences
+   - Redundant sections saying the same thing
+   - Over-explaining simple concepts
+   - Excessive preambles before getting to the point
+
+3. **Complexity Problems** - Simplify where possible
+   - Overly technical language where simple terms work
+   - Nested explanations that confuse rather than clarify
+   - Convoluted examples that obscure the concept
+   - Too many cross-references making navigation difficult
+
+4. **Length Issues** - Keep documentation concise
+   - README over 500 lines (should be ~200-300)
+   - Contributing guide over 300 lines (should be ~150-200)
+   - Individual doc files over 1000 lines (break into sections)
+   - Examples without clear, focused purpose
+
+5. **Missing Examples** - Add practical demonstrations
+   - API functions without usage examples
+   - Features without code snippets
+   - Complex concepts without simple demonstrations
+   - Installation without verification steps
+
+6. **Outdated Content** - Update or remove
+   - Old syntax that no longer works
+   - Deprecated features still documented
+   - Changed workflows not reflected
+   - Broken links and references
+
+#### Documentation Review Process
+
+**Step 1: Sync Check**
+```bash
+# Check if new code matches documentation
+grep -r "def " src/ | grep -v "__" | sort > /tmp/functions.txt
+grep -r "class " src/ | sort > /tmp/classes.txt
+# Compare against documented APIs in docs/
+
+# Check if removed code is still documented
+git diff main..HEAD --name-status | grep "^D" > /tmp/deleted.txt
+# Verify deleted features are removed from docs
+```
+
+**Step 2: Quality Scan**
+```python
+# Automated quality checks
+def check_documentation_quality(file_path):
+    issues = []
+    
+    # Check for AI slop patterns
+    ai_patterns = [
+        r"(?i)(amazing|fantastic|revolutionary|game-changing)",
+        r"(?i)(unleash|supercharge|turbocharge|skyrocket)",
+        r"🚀{2,}|💡{2,}|⚡{2,}",  # Excessive emojis
+        r"(?i)(cutting-edge|state-of-the-art|next-generation)"
+    ]
+    
+    # Check for verbosity
+    with open(file_path) as f:
+        content = f.read()
+        lines = content.split('\n')
+        
+        # File too long?
+        if len(lines) > 1000:
+            issues.append(f"File too long: {len(lines)} lines")
+        
+        # Paragraphs too long?
+        paragraphs = content.split('\n\n')
+        for p in paragraphs:
+            if len(p) > 500:  # ~5 lines at 100 chars
+                issues.append("Paragraph too long")
+        
+        # Check for missing examples
+        if 'def ' in content or 'class ' in content:
+            if '```python' not in content:
+                issues.append("Code without examples")
+    
+    return issues
+```
+
+**Step 3: Content Validation**
+- Verify all code examples run without errors
+- Check that installation instructions work
+- Validate that API documentation matches implementation
+- Ensure command documentation is current
+- Test that quickstart actually works
 
 #### Website Content Review (circuit-synth.com)
 
@@ -238,6 +341,8 @@ This command performs a comprehensive analysis of the current branch against the
 - Does this change affect installation, usage, or examples shown on the website? → Update circuit-synth.com
 
 **Documentation review checklist:**
+
+**Content Accuracy:**
 - [ ] @README.md reflects new features and capabilities
 - [ ] @Contributors.md includes any new development workflows  
 - [ ] @docs/ API/technical documentation is current
@@ -245,17 +350,21 @@ This command performs a comprehensive analysis of the current branch against the
   - [ ] `installation.rst` has current setup instructions
   - [ ] `quickstart.rst` examples work with current syntax
   - [ ] `contributing.rst` and `CONTRIBUTING.md` reflect current processes
-  - [ ] Integration guides (`integration/CLAUDE_INTEGRATION.md`) are accurate
-  - [ ] Technical references are up-to-date with architecture changes
-  - [ ] `TESTING.md` reflects current test procedures
-  - [ ] `SIMULATION_SETUP.md` has current SPICE configuration
+  - [ ] Integration guides are accurate
+  - [ ] Technical references are up-to-date
 - [ ] Agent knowledge in `.claude/agents/` is up-to-date
 - [ ] Command documentation in `.claude/commands/` is accurate
-- [ ] Architecture diagrams and explanations are current
-- [ ] **🌐 circuit-synth.com website content is accurate and current**
-- [ ] **Website installation commands match current procedures**
-- [ ] **Website code examples use current syntax and imports**
-- [ ] **Website feature list reflects actual capabilities**
+- [ ] circuit-synth.com website content is accurate
+
+**Documentation Quality:**
+- [ ] **No AI-generated verbose content** (marketing speak, excessive enthusiasm)
+- [ ] **Concise and focused** (README <500 lines, CONTRIBUTING <300 lines)
+- [ ] **Clear examples provided** for all new features
+- [ ] **No outdated information** from removed features
+- [ ] **Minimal emoji usage** (professional tone)
+- [ ] **Direct and technical** language (no fluff)
+- [ ] **Proper structure** (logical flow, good headings)
+- [ ] **Working code examples** (all snippets tested)
 
 ### 7. Testing Coverage Analysis
 **Circuit-Synth Testing Requirements:**
