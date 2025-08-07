@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid 663649b8-1de6-4a80-834c-359e3cac2c0f)
+	(uuid 90d20348-23a7-4547-a35b-4be8009c30c2)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Connector:USB_C_Receptacle_USB2.0_16P"
@@ -1202,144 +1202,6 @@
 		(company Circuit-Synth)
 	)
 	(symbol
-		(lib_id "Device:C")
-		(at 132.08 66.04 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid 4527b8b3-8e88-42a5-a195-ca14a07f4aaf)
-		(property "Reference" "C1"
-			(at 132.08 61.040000000000006 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "10uF"
-			(at 132.08 71.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
-			(at 132.08 76.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project "test_esp32"
-				(path "/0d642761-8755-4913-bd75-2640e6c10e75/86c3c5dc-d343-4156-a0a7-9c24364333a4"
-					(reference "C1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Diode:ESD5Zxx")
-		(at 76.2 66.04 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid 604f078d-19ad-43a8-9922-09d011619d84)
-		(property "Reference" "D1"
-			(at 76.2 61.040000000000006 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "~"
-			(at 76.2 71.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Diode_SMD:D_SOD-523"
-			(at 76.2 76.04 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project "test_esp32"
-				(path "/0d642761-8755-4913-bd75-2640e6c10e75/86c3c5dc-d343-4156-a0a7-9c24364333a4"
-					(reference "D1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Diode:ESD5Zxx")
-		(at 81.28 101.6 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid 5d597775-32fb-4a3a-b925-ac40927f75d8)
-		(property "Reference" "D2"
-			(at 81.28 96.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "~"
-			(at 81.28 106.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Diode_SMD:D_SOD-523"
-			(at 81.28 111.6 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project "test_esp32"
-				(path "/0d642761-8755-4913-bd75-2640e6c10e75/86c3c5dc-d343-4156-a0a7-9c24364333a4"
-					(reference "D2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Connector:USB_C_Receptacle_USB2.0_16P")
 		(at 45.72 66.04 0)
 		(unit 1)
@@ -1348,18 +1210,9 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 0033b090-ed04-4a00-9a0b-87170bf20cbb)
+		(uuid f8f0ef80-b44b-4114-9cb7-4cd6e9ab8a07)
 		(property "Reference" "J1"
 			(at 45.72 61.040000000000006 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "~"
-			(at 45.72 71.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1377,8 +1230,8 @@
 			)
 		)
 		(instances
-			(project "test_esp32"
-				(path "/0d642761-8755-4913-bd75-2640e6c10e75/86c3c5dc-d343-4156-a0a7-9c24364333a4"
+			(project "ESP32_C6_Dev_Board"
+				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/a261ed7e-4d94-4976-9613-d8c61d3d1186"
 					(reference "J1")
 					(unit 1)
 				)
@@ -1387,16 +1240,16 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 106.68 66.04 0)
+		(at 76.2 66.04 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 06777afc-7b2b-4d07-9f8f-f8cc4165603b)
+		(uuid de434055-19a4-47b9-be0e-b77bd9bf0706)
 		(property "Reference" "R1"
-			(at 106.68 61.040000000000006 0)
+			(at 76.2 61.040000000000006 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1405,7 +1258,7 @@
 			)
 		)
 		(property "Value" "5.1k"
-			(at 106.68 71.04 0)
+			(at 76.2 71.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1414,7 +1267,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 106.68 76.04 0)
+			(at 76.2 76.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1423,8 +1276,8 @@
 			)
 		)
 		(instances
-			(project "test_esp32"
-				(path "/0d642761-8755-4913-bd75-2640e6c10e75/86c3c5dc-d343-4156-a0a7-9c24364333a4"
+			(project "ESP32_C6_Dev_Board"
+				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/a261ed7e-4d94-4976-9613-d8c61d3d1186"
 					(reference "R1")
 					(unit 1)
 				)
@@ -1433,16 +1286,16 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 50.8 127.0 0)
+		(at 96.52 66.04 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid e74a9484-4adf-4512-8ef1-aa77d74493e4)
+		(uuid ced1be97-07ed-46c0-9d91-d839567a5254)
 		(property "Reference" "R2"
-			(at 50.8 122.0 0)
+			(at 96.52 61.040000000000006 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1451,7 +1304,7 @@
 			)
 		)
 		(property "Value" "5.1k"
-			(at 50.8 132.0 0)
+			(at 96.52 71.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1460,7 +1313,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 50.8 137.0 0)
+			(at 96.52 76.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1469,109 +1322,133 @@
 			)
 		)
 		(instances
-			(project "test_esp32"
-				(path "/0d642761-8755-4913-bd75-2640e6c10e75/86c3c5dc-d343-4156-a0a7-9c24364333a4"
+			(project "ESP32_C6_Dev_Board"
+				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/a261ed7e-4d94-4976-9613-d8c61d3d1186"
 					(reference "R2")
 					(unit 1)
 				)
 			)
 		)
 	)
-	(hierarchical_label
-		VBUS
-		(shape input)
-		(at 132.08 62.230000000000004 90)
-		(effects
-			(font
-				(size 1.27 1.27)
+	(symbol
+		(lib_id "Diode:ESD5Zxx")
+		(at 116.84 66.04 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 8173cb72-e985-467f-ba45-79e5b5222220)
+		(property "Reference" "D1"
+			(at 116.84 61.040000000000006 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
-			(justify left)
 		)
-		(uuid abe8eb52-d504-4dfb-a5b0-c15a253cf380)
+		(property "Footprint" "Diode_SMD:D_SOD-523"
+			(at 116.84 76.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "ESP32_C6_Dev_Board"
+				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/a261ed7e-4d94-4976-9613-d8c61d3d1186"
+					(reference "D1")
+					(unit 1)
+				)
+			)
+		)
 	)
-	(hierarchical_label
-		VBUS
-		(shape input)
-		(at 60.96 50.800000000000004 0)
-		(effects
-			(font
-				(size 1.27 1.27)
+	(symbol
+		(lib_id "Diode:ESD5Zxx")
+		(at 142.24 66.04 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 373a1ec4-7c18-443c-ad1b-d876678afc47)
+		(property "Reference" "D2"
+			(at 142.24 61.040000000000006 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
-			(justify left)
 		)
-		(uuid 77c5bd23-6f25-4602-b263-26beda9c020d)
+		(property "Footprint" "Diode_SMD:D_SOD-523"
+			(at 142.24 76.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "ESP32_C6_Dev_Board"
+				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/a261ed7e-4d94-4976-9613-d8c61d3d1186"
+					(reference "D2")
+					(unit 1)
+				)
+			)
+		)
 	)
-	(hierarchical_label
-		VBUS
-		(shape input)
-		(at 60.96 50.800000000000004 0)
-		(effects
-			(font
-				(size 1.27 1.27)
+	(symbol
+		(lib_id "Device:C")
+		(at 162.56 66.04 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 67afda5e-13cc-4e9a-8f79-f2a9b7487353)
+		(property "Reference" "C1"
+			(at 162.56 61.040000000000006 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
-			(justify left)
 		)
-		(uuid 2d50deff-6fe9-4d77-99f8-eed07979a01e)
-	)
-	(hierarchical_label
-		VBUS
-		(shape input)
-		(at 60.96 50.800000000000004 0)
-		(effects
-			(font
-				(size 1.27 1.27)
+		(property "Value" "10uF"
+			(at 162.56 71.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
-			(justify left)
 		)
-		(uuid 9a224f74-5d09-43d1-9325-5a8434b962d5)
-	)
-	(hierarchical_label
-		VBUS
-		(shape input)
-		(at 60.96 50.800000000000004 0)
-		(effects
-			(font
-				(size 1.27 1.27)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 162.56 76.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
 			)
-			(justify left)
 		)
-		(uuid c5157fae-3cc5-4507-912c-464d97b5a147)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 132.08 69.85000000000001 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+		(instances
+			(project "ESP32_C6_Dev_Board"
+				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/a261ed7e-4d94-4976-9613-d8c61d3d1186"
+					(reference "C1")
+					(unit 1)
+				)
 			)
-			(justify right)
 		)
-		(uuid 5887df17-25c3-48a1-8ab1-75cf04b29ff8)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 80.01 66.04 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid c2f596bc-2365-4d32-bc78-04a07725e59b)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 85.09 101.6 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 94b8ca71-ccb6-4f4e-916b-02b239714d6d)
 	)
 	(hierarchical_label
 		GND
@@ -1583,7 +1460,7 @@
 			)
 			(justify right)
 		)
-		(uuid 36942c53-165e-4bad-bc28-58334aae0636)
+		(uuid 55ca6b6d-4ad0-4cf6-8433-425985437d5f)
 	)
 	(hierarchical_label
 		GND
@@ -1595,7 +1472,7 @@
 			)
 			(justify right)
 		)
-		(uuid 3aa35ae5-ef97-4015-a535-c85f8a5a26b1)
+		(uuid 1e68d9f3-afc8-4bb4-82e1-422fbc6b3b13)
 	)
 	(hierarchical_label
 		GND
@@ -1607,7 +1484,7 @@
 			)
 			(justify right)
 		)
-		(uuid 2f2ee9ce-499c-497a-b236-51fd6af84da5)
+		(uuid 7f9bd1d7-09e7-440f-9d72-1db0d683c88f)
 	)
 	(hierarchical_label
 		GND
@@ -1619,7 +1496,7 @@
 			)
 			(justify right)
 		)
-		(uuid ccc19b41-0152-4ed7-a357-fe036a1cf3fb)
+		(uuid 62428c65-9158-4fba-b005-af40934f7fdc)
 	)
 	(hierarchical_label
 		GND
@@ -1631,79 +1508,139 @@
 			)
 			(justify right)
 		)
-		(uuid 96128f2d-241a-47b8-a74a-4e3f2e37fe5c)
+		(uuid 3cc618a7-298d-4d20-b039-2667a4d019d9)
 	)
 	(hierarchical_label
 		GND
 		(shape input)
-		(at 106.68 69.85000000000001 270)
+		(at 38.1 88.9 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right)
 		)
-		(uuid 246bc87c-a686-45e5-9510-1e6eed442aa2)
+		(uuid fbe5eda6-bcef-491e-99d3-f1efd3f15775)
 	)
 	(hierarchical_label
 		GND
 		(shape input)
-		(at 50.8 130.81 270)
+		(at 76.2 69.85000000000001 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right)
 		)
-		(uuid 9ac51b6c-6934-4e9e-b40a-cd36c7547f3d)
+		(uuid aba17c48-deeb-47f4-a793-90844d7e1480)
 	)
 	(hierarchical_label
-		USB_DP
+		GND
 		(shape input)
-		(at 72.39 66.04 180)
+		(at 96.52 69.85000000000001 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right)
 		)
-		(uuid c9888a3f-748e-4dd6-aa32-a5bf47ea01dd)
+		(uuid 685d5753-345e-400d-8c28-9acaf0c2b542)
 	)
 	(hierarchical_label
-		USB_DP
+		GND
 		(shape input)
-		(at 60.96 68.58000000000001 0)
+		(at 120.65 66.04 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid 2efe02c5-2dc8-446a-bacf-7c0f8d65a841)
+		(uuid 9f2da990-e670-4cc4-8537-78ed6d64c9ff)
 	)
 	(hierarchical_label
-		USB_DM
+		GND
 		(shape input)
-		(at 77.47 101.6 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 7dd4768a-3924-47f5-ad36-38f4496ed176)
-	)
-	(hierarchical_label
-		USB_DM
-		(shape input)
-		(at 60.96 63.50000000000001 0)
+		(at 146.05 66.04 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid 6c829cca-1170-4ee1-8326-40de447b860d)
+		(uuid 7f64cba8-a7ab-4da1-a39b-c4fe64744269)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 162.56 69.85000000000001 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 133fc66f-9806-4feb-a0f1-7842bc07b3f4)
+	)
+	(hierarchical_label
+		VBUS
+		(shape input)
+		(at 60.96 50.800000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid d01bce00-6c7d-45d2-aba1-3e7f61fb694e)
+	)
+	(hierarchical_label
+		VBUS
+		(shape input)
+		(at 60.96 50.800000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid a79130f6-6a89-4e04-8bf8-e302554f2cc7)
+	)
+	(hierarchical_label
+		VBUS
+		(shape input)
+		(at 60.96 50.800000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid b8849c68-4612-4893-a462-8614314615d7)
+	)
+	(hierarchical_label
+		VBUS
+		(shape input)
+		(at 60.96 50.800000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid f0726a6c-7e97-4e5f-b8c9-d354604d30f8)
+	)
+	(hierarchical_label
+		VBUS
+		(shape input)
+		(at 162.56 62.230000000000004 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 013fe89f-e856-4240-b453-c08f5eaac864)
 	)
 	(hierarchical_label
 		N$1
@@ -1715,19 +1652,31 @@
 			)
 			(justify left)
 		)
-		(uuid d6c0ece8-1c7d-4931-b02b-a013dc38b6a9)
+		(uuid 9ba1b21d-1ff7-4f7f-96ef-7527beef99d4)
 	)
 	(hierarchical_label
 		N$1
 		(shape input)
-		(at 106.68 62.230000000000004 90)
+		(at 60.96 55.88000000000001 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid fab27c02-c926-48a2-8b39-6f12b6441d51)
+		(uuid 61b055e7-f38f-45c9-a864-f337f3a018f6)
+	)
+	(hierarchical_label
+		N$1
+		(shape input)
+		(at 76.2 62.230000000000004 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 0f3b428e-f511-4ea7-8b68-0914a44e8d5f)
 	)
 	(hierarchical_label
 		N$2
@@ -1739,22 +1688,106 @@
 			)
 			(justify left)
 		)
-		(uuid bf4ebc49-6d2d-4431-988b-77cab4259b21)
+		(uuid 6d3e89c1-8c26-4666-8f95-9351b9be5db2)
 	)
 	(hierarchical_label
 		N$2
 		(shape input)
-		(at 50.8 123.19 90)
+		(at 60.96 58.42000000000001 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid 9cae1108-3ff5-4df6-93be-d28f93f091ea)
+		(uuid f69260be-9304-45c2-89e5-5b8bce7b0393)
+	)
+	(hierarchical_label
+		N$2
+		(shape input)
+		(at 96.52 62.230000000000004 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid bec98f46-be4e-4f25-aeff-320375942a6a)
+	)
+	(hierarchical_label
+		USB_DM
+		(shape input)
+		(at 60.96 63.50000000000001 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 0b847d92-273e-458a-b494-3ea8e2d2180b)
+	)
+	(hierarchical_label
+		USB_DM
+		(shape input)
+		(at 60.96 63.50000000000001 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 939f2953-a938-40ea-9e7b-0dff05db0bcc)
+	)
+	(hierarchical_label
+		USB_DM
+		(shape input)
+		(at 138.43 66.04 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 3a411b0b-e6c9-4a4d-a2dc-6bf4e016c6c1)
+	)
+	(hierarchical_label
+		USB_DP
+		(shape input)
+		(at 60.96 68.58000000000001 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid f61a45bb-097e-4cc1-8845-e90afe03c973)
+	)
+	(hierarchical_label
+		USB_DP
+		(shape input)
+		(at 60.96 68.58000000000001 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 169a01e7-8b4b-4228-a034-6db398a31654)
+	)
+	(hierarchical_label
+		USB_DP
+		(shape input)
+		(at 113.03 66.04 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 7406621e-0a54-46a3-acb4-54a38fd5c41b)
 	)
 	(text_box
-		"USB_Port subcircuit\n    Parameters: GND, VBUS, USB_DM, USB_DP"
+		"USB-C port with CC resistors, ESD protection, and proper grounding"
 		(exclude_from_sim yes)
 		(at 184.0 110.0 0)
 		(size 80.0 30.0)
@@ -1784,10 +1817,10 @@
 			)
 			(justify left top)
 		)
-		(uuid af900c86-130a-4e3c-87cf-1fd87b52da4e)
+		(uuid cbe8eb98-0eb9-431b-a7e4-310015b8788f)
 	)
 	(sheet_instances
-		(path "/0d642761-8755-4913-bd75-2640e6c10e75/86c3c5dc-d343-4156-a0a7-9c24364333a4"
+		(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/a261ed7e-4d94-4976-9613-d8c61d3d1186"
 			(page "1")
 		)
 	)

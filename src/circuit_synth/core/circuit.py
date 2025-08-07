@@ -425,15 +425,10 @@ class Circuit:
             >>> circuit.generate_kicad_project("esp32s3_simple")
         """
         try:
-            # Import KiCad schematic generator with Rust backend support
-            try:
-                # Try to use Rust-integrated generator
-                from ..kicad.sch_gen.rust_integrated_generator import SchematicGenerator
-                context_logger.info("Using Rust-integrated schematic generator")
-            except ImportError:
-                # Fallback to original Python generator
-                from ..kicad.sch_gen.main_generator import SchematicGenerator
-                context_logger.info("Using Python schematic generator")
+            # Import KiCad schematic generator (intelligently selects Rust or Python)
+            from ..kicad.sch_gen.main_generator import SchematicGenerator
+            # Note: Rust backend is automatically used for simple circuits,
+            # Python backend is used for hierarchical circuits
 
             # Finalize references before generation
             self.finalize_references()

@@ -2,10 +2,10 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid 1f933b01-67d9-4352-a58d-3f10f7e6ea20)
+	(uuid 13669d76-745f-40f5-b839-01e30f56c31a)
 	(paper "A4")
 	(lib_symbols
-		(symbol "Device:LED"
+		(symbol "Device:C"
 			(pin_numbers hide)
 			(pin_names
 				(offset 0.254)
@@ -13,7 +13,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "D"
+			(property "Reference" "C"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -22,7 +22,7 @@
 					(hide no)
 				)
 			)
-			(property "Value" "LED"
+			(property "Value" "C"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -49,7 +49,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Light emitting diode"
+			(property "Description" "Unpolarized capacitor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -58,16 +58,7 @@
 					(hide yes)
 				)
 			)
-			(property "Sim.Pins" "1=K 2=A"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
-				)
-			)
-			(property "ki_keywords" "LED diode"
+			(property "ki_keywords" "cap capacitor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -76,7 +67,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "LED* LED_SMD:* LED_THT:*"
+			(property "ki_fp_filters" "C_*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -85,17 +76,14 @@
 					(hide yes)
 				)
 			)
-			(symbol "LED_0_1"
+			(symbol "C_0_1"
 				(polyline
 					(pts
-						(xy -3.048 -0.762)
-						(xy -4.572 -2.286)
-						(xy -3.81 -2.286)
-						(xy -4.572 -2.286)
-						(xy -4.572 -1.524)
+						(xy -2.032 0.762)
+						(xy 2.032 0.762)
 					)
 					(stroke
-						(width 0.0)
+						(width 0.508)
 						(type default)
 					)
 					(fill
@@ -104,55 +92,11 @@
 				)
 				(polyline
 					(pts
-						(xy -1.778 -0.762)
-						(xy -3.302 -2.286)
-						(xy -2.54 -2.286)
-						(xy -3.302 -2.286)
-						(xy -3.302 -1.524)
+						(xy -2.032 -0.762)
+						(xy 2.032 -0.762)
 					)
 					(stroke
-						(width 0.0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 0.0)
-						(xy 1.27 0.0)
-					)
-					(stroke
-						(width 0.0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 -1.27)
-						(xy -1.27 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.27 -1.27)
-						(xy 1.27 1.27)
-						(xy -1.27 0.0)
-						(xy 1.27 -1.27)
-					)
-					(stroke
-						(width 0.254)
+						(width 0.508)
 						(type default)
 					)
 					(fill
@@ -160,14 +104,14 @@
 					)
 				)
 			)
-			(symbol "LED_1_1"
+			(symbol "C_1_1"
 				(pin
 					passive
 					line
-					(at -3.81 0.0 0)
-					(length 2.54)
+					(at 0.0 3.81 270)
+					(length 2.794)
 					(name
-						K
+						~
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -186,10 +130,10 @@
 				(pin
 					passive
 					line
-					(at 3.81 0.0 180)
-					(length 2.54)
+					(at 0.0 -3.81 90)
+					(length 2.794)
 					(name
-						A
+						~
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -340,22 +284,22 @@
 		)
 	)
 	(title_block
-		(title LED_Blinker)
+		(title test_basic)
 		(date 2025-08-06)
 		(company Circuit-Synth)
 	)
 	(symbol
-		(lib_id "Device:LED")
-		(at 45.72 45.72 0)
+		(lib_id "Device:R")
+		(at 58.42 45.72 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 7dad9470-812e-4d21-ae35-886b7e6311c4)
-		(property "Reference" "D3"
-			(at 45.72 40.72 0)
+		(uuid 5e2a99c1-edbe-4b1a-bf27-4ee054f2d862)
+		(property "Reference" "R1"
+			(at 58.42 40.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -363,45 +307,36 @@
 				(justify left)
 			)
 		)
-		(property "Value" "~"
-			(at 45.72 50.72 0)
+		(property "Value" "10k"
+			(at 58.42 50.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
-			)
-		)
-		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
-			(at 45.72 55.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board_generated"
-				(path "/19d99736-1d28-4af6-b4ac-6aa629ea6cbb/9d15f2c4-9ae3-4ba8-b742-001848d28acc/c32abc71-c02e-4caa-ba95-88817e399cf0"
-					(reference "D3")
+			(project ""
+				(path "/13669d76-745f-40f5-b839-01e30f56c31a"
+					(reference "R1")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 68.58 68.58 0)
+		(lib_id "Device:C")
+		(at 38.1 45.72 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid fff943a5-4f05-4732-8200-c89c4f446458)
-		(property "Reference" "R3"
-			(at 68.58 63.58 0)
+		(uuid bba46713-5589-4129-a5b8-3a7ba29269dc)
+		(property "Reference" "C1"
+			(at 38.1 40.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -409,83 +344,74 @@
 				(justify left)
 			)
 		)
-		(property "Value" "330"
-			(at 68.58 73.58 0)
+		(property "Value" "100nF"
+			(at 38.1 50.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 68.58 78.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board_generated"
-				(path "/19d99736-1d28-4af6-b4ac-6aa629ea6cbb/9d15f2c4-9ae3-4ba8-b742-001848d28acc/c32abc71-c02e-4caa-ba95-88817e399cf0"
-					(reference "R3")
+			(project ""
+				(path "/13669d76-745f-40f5-b839-01e30f56c31a"
+					(reference "C1")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(hierarchical_label
+		VCC
+		(shape input)
+		(at 58.42 41.91 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 45b867fc-8a37-45c0-9ce7-44662b31e758)
+	)
+	(hierarchical_label
+		VCC
+		(shape input)
+		(at 38.1 41.91 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid ec79de8b-db0c-4457-bcb1-e05c6bf41096)
+	)
+	(hierarchical_label
 		GND
 		(shape input)
-		(at 41.91 45.72 180)
+		(at 58.42 49.53 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right)
 		)
-		(uuid 80a44709-6a97-416d-8467-0919fb592751)
+		(uuid b537308f-a3a5-4128-a0af-c30f7632a1fd)
 	)
 	(hierarchical_label
-		"ESP32_C6_MCU/N$3"
+		GND
 		(shape input)
-		(at 49.53 45.72 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 4d04af7f-e140-408e-9849-45e6e177fe4d)
-	)
-	(hierarchical_label
-		"ESP32_C6_MCU/N$3"
-		(shape input)
-		(at 68.58 72.39 270)
+		(at 38.1 49.53 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right)
 		)
-		(uuid 4138164f-be93-40ce-8bd6-868fc0d44696)
-	)
-	(hierarchical_label
-		LED_CONTROL
-		(shape input)
-		(at 68.58 64.77 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 03068ff5-6f52-4fa6-97ac-28e9ef9530fc)
+		(uuid 256256c9-3a3c-4f5c-9190-3d695dcb1076)
 	)
 	(text_box
-		"LED_Blinker subcircuit\n    Parameters: GND, LED_CONTROL"
+		"Test circuit for integration."
 		(exclude_from_sim yes)
 		(at 184.0 110.0 0)
 		(size 80.0 30.0)
@@ -515,10 +441,10 @@
 			)
 			(justify left top)
 		)
-		(uuid edd45459-e1fc-4d52-8beb-828f326e158d)
+		(uuid 613a02be-2073-47e9-a7cc-dc0fc2769753)
 	)
 	(sheet_instances
-		(path "/19d99736-1d28-4af6-b4ac-6aa629ea6cbb/9d15f2c4-9ae3-4ba8-b742-001848d28acc/c32abc71-c02e-4caa-ba95-88817e399cf0"
+		(path "/13669d76-745f-40f5-b839-01e30f56c31a"
 			(page "1")
 		)
 	)

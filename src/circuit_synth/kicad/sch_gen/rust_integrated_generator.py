@@ -27,7 +27,7 @@ class RustIntegratedSchematicGenerator(OriginalSchematicGenerator):
     schematic writing portion with Rust for better performance.
     """
     
-    def __init__(self, output_dir: str, project_name: str, use_rust: bool = True):
+    def __init__(self, output_dir: str, project_name: str, use_rust: bool = False):  # Disabled by default until hierarchical support
         """
         Initialize the generator.
         
@@ -39,7 +39,7 @@ class RustIntegratedSchematicGenerator(OriginalSchematicGenerator):
         super().__init__(output_dir, project_name)
         self.use_rust = use_rust
         logger.info(f"🚀 RustIntegratedSchematicGenerator initialized")
-        logger.info(f"  Rust backend: {'ENABLED ✅' if use_rust else 'DISABLED ❌'}")
+        logger.info(f"  Rust backend: {'ENABLED ✅ (Simple circuits only)' if use_rust else 'DISABLED ❌ (Using Python)'}")
         
     def generate_schematic_with_rust(self, circuit, output_path: str) -> None:
         """
@@ -78,7 +78,9 @@ class RustIntegratedSchematicGenerator(OriginalSchematicGenerator):
         logger.info(f"  Project: {self.project_name}")
         logger.info(f"  Rust backend: {'ENABLED' if self.use_rust else 'DISABLED'}")
         
-        if self.use_rust:
+        # Temporarily disable Rust for hierarchical circuits
+        # TODO: Add full hierarchical support to Rust backend
+        if self.use_rust and False:  # Disabled until hierarchical support is complete
             try:
                 # Load circuit from JSON
                 logger.info(f"  Loading circuit from: {json_file}")
@@ -130,12 +132,15 @@ class RustIntegratedSchematicGenerator(OriginalSchematicGenerator):
                 # Generate project file
                 self._generate_project_file()
                 
-                # Generate PCB if requested
+                # Generate PCB if requested (using Python implementation)
                 if generate_pcb:
-                    logger.info("  Generating PCB...")
-                    # Use parent's PCB generation
-                    super()._generate_pcb(
-                        json_file,
+                    logger.info("  Generating PCB using Python implementation...")
+                    # Import and use the PCB generator directly
+                    from ...pcb_gen.pcb_generator import PCBGenerator
+                    
+                    pcb_gen = PCBGenerator(str(self.output_dir), self.project_name)
+                    pcb_gen.generate_pcb_from_schematics(
+                        str(schematic_path),
                         placement_algorithm=placement_algorithm,
                         draw_bounding_boxes=draw_bounding_boxes,
                         **pcb_kwargs

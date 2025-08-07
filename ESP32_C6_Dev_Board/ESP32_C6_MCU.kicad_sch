@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid dc58b5ec-b5f1-4107-9ff0-df626deec31d)
+	(uuid a4423cc1-c102-4c5b-a127-d9ffe243c430)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:C"
@@ -1542,144 +1542,6 @@
 		(company Circuit-Synth)
 	)
 	(symbol
-		(lib_id "Device:C")
-		(at 137.16 76.2 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid 9fbc561e-6bb1-460e-9502-edc2a011c823)
-		(property "Reference" "C4"
-			(at 137.16 71.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "100nF"
-			(at 137.16 81.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
-			(at 137.16 86.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project "test_esp32"
-				(path "/0d642761-8755-4913-bd75-2640e6c10e75/f87ded3a-4736-48b7-b9a1-56851305c8d2"
-					(reference "C4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 96.52 76.2 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid a1aabdef-ea39-4a18-ab1b-57b032c3eb1e)
-		(property "Reference" "R4"
-			(at 96.52 71.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "22"
-			(at 96.52 81.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 96.52 86.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project "test_esp32"
-				(path "/0d642761-8755-4913-bd75-2640e6c10e75/f87ded3a-4736-48b7-b9a1-56851305c8d2"
-					(reference "R4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 116.84 76.2 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid 525b1e3b-d731-44d3-b35a-b13544f2901f)
-		(property "Reference" "R5"
-			(at 116.84 71.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "22"
-			(at 116.84 81.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 116.84 86.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project "test_esp32"
-				(path "/0d642761-8755-4913-bd75-2640e6c10e75/f87ded3a-4736-48b7-b9a1-56851305c8d2"
-					(reference "R5")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "RF_Module:ESP32-C6-MINI-1")
 		(at 58.42 76.2 0)
 		(unit 1)
@@ -1688,18 +1550,9 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 139a0004-355e-436b-a92f-b706a7004d39)
+		(uuid ed4c6ea2-aa41-40b4-a1ed-e31fca9b523c)
 		(property "Reference" "U2"
 			(at 58.42 71.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "~"
-			(at 58.42 81.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1717,385 +1570,151 @@
 			)
 		)
 		(instances
-			(project "test_esp32"
-				(path "/0d642761-8755-4913-bd75-2640e6c10e75/f87ded3a-4736-48b7-b9a1-56851305c8d2"
+			(project "ESP32_C6_Dev_Board"
+				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442"
 					(reference "U2")
 					(unit 1)
 				)
 			)
 		)
 	)
-	(hierarchical_label
-		VCC_3V3
-		(shape input)
-		(at 137.16 72.39 90)
-		(effects
-			(font
-				(size 1.27 1.27)
+	(symbol
+		(lib_id "Device:C")
+		(at 91.44 76.2 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 8e0b52d0-ec13-43c0-b1f7-73f15d9f8d77)
+		(property "Reference" "C4"
+			(at 91.44 71.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
-			(justify left)
 		)
-		(uuid 45ee554a-3756-49de-94ae-f007eaf102f9)
+		(property "Value" "100nF"
+			(at 91.44 81.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
+			(at 91.44 86.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "ESP32_C6_Dev_Board"
+				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442"
+					(reference "C4")
+					(unit 1)
+				)
+			)
+		)
 	)
-	(hierarchical_label
-		VCC_3V3
-		(shape input)
-		(at 58.42 50.800000000000004 90)
-		(effects
-			(font
-				(size 1.27 1.27)
+	(symbol
+		(lib_id "Device:R")
+		(at 111.76 76.2 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 0a757b05-7e10-4137-a19a-e120214a3cd0)
+		(property "Reference" "R4"
+			(at 111.76 71.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
-			(justify left)
 		)
-		(uuid e4279cfe-34af-47cf-8f5c-c06fa9ce121f)
+		(property "Value" "22"
+			(at 111.76 81.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 111.76 86.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "ESP32_C6_Dev_Board"
+				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442"
+					(reference "R4")
+					(unit 1)
+				)
+			)
+		)
 	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 137.16 80.01 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+	(symbol
+		(lib_id "Device:R")
+		(at 132.08 76.2 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid fd9e50c2-8039-49a3-afb7-ae0042b6b09e)
+		(property "Reference" "R5"
+			(at 132.08 71.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
-			(justify right)
 		)
-		(uuid 4efda45f-2fd5-4a28-971f-ffb975cabe54)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+		(property "Value" "22"
+			(at 132.08 81.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
-			(justify right)
 		)
-		(uuid 160be330-9b3c-4809-9979-36c6fd2361b3)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 132.08 86.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
 			)
-			(justify right)
 		)
-		(uuid 59ea2d1a-c38c-4ef7-bd3c-6d4673de885c)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
+		(instances
+			(project "ESP32_C6_Dev_Board"
+				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442"
+					(reference "R5")
+					(unit 1)
+				)
 			)
-			(justify right)
 		)
-		(uuid 2bda333a-48b3-47c1-99d8-070c63379f3c)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid dd27a432-e683-4262-a34a-6e0be48940e4)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 4b1450a4-f5b7-4ac7-bd75-603e0590d9cb)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 3e2251b5-71a9-4683-8b89-9e4512bdae16)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 644c6700-9902-4e44-8d3c-f01d9cf27591)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 30781ff5-7afe-4f3d-a555-2d73a2987462)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 2e4e9686-df64-4d17-8d61-78f24949fdd1)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid c8d0eef8-4103-44e2-9bc9-e2fb8d1b0446)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 7644212c-3318-4931-baa6-75307029b4b5)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid c1f5a3a8-793e-4ea3-8b4c-71472284c874)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 6160434e-bbef-4d20-acc5-36a476a4052c)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 82e52bf3-bcb3-4120-aff6-5d8955dcc70b)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 28eafee1-8e68-427f-868a-26ccd7ee2a82)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 9cffc1b8-92d2-4d00-95d4-240e6e09d42f)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 180f4927-8991-4f8c-8994-f78920512552)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 27d58524-4f22-4091-9ba3-a04011794cc5)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 39400b5f-276d-4c35-bb2f-0f091fe9d336)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 3c829748-319f-4c4f-be02-3321bdb45c03)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 50f3c678-14fb-4f6a-b1fc-6f7043bc6bf0)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 101.6 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 32de309f-fc4c-4d23-a351-23de45e39df6)
-	)
-	(hierarchical_label
-		USB_DP
-		(shape input)
-		(at 96.52 72.39 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid e4b56f0b-f015-4733-94b8-9e0de4b714f3)
-	)
-	(hierarchical_label
-		USB_DP_MCU
-		(shape input)
-		(at 96.52 80.01 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid b775f5bc-3583-48aa-b4d4-4e362bb43b76)
-	)
-	(hierarchical_label
-		USB_DP_MCU
-		(shape input)
-		(at 73.66 76.2 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid c977a6a6-41b6-494c-a232-1d2935241e41)
-	)
-	(hierarchical_label
-		USB_DM
-		(shape input)
-		(at 116.84 72.39 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 8e597dbf-5814-449c-af5a-e9e04d39e145)
-	)
-	(hierarchical_label
-		USB_DM_MCU
-		(shape input)
-		(at 116.84 80.01 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid ac9cd1c3-c193-4ae9-88b5-c119b1df6cca)
-	)
-	(hierarchical_label
-		USB_DM_MCU
-		(shape input)
-		(at 73.66 78.74000000000001 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 8fd2e879-9e54-49ba-8640-b604573a23f1)
 	)
 	(hierarchical_label
 		DEBUG_EN
@@ -2107,7 +1726,19 @@
 			)
 			(justify right)
 		)
-		(uuid 2d6e12d4-00e9-499b-b137-48ebf0815ab1)
+		(uuid 90c12819-559a-46d4-89d8-f787cd20821c)
+	)
+	(hierarchical_label
+		DEBUG_EN
+		(shape input)
+		(at 43.18 55.88 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 0f62537a-1322-4b9d-897b-70a25546f3be)
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -2119,7 +1750,19 @@
 			)
 			(justify right)
 		)
-		(uuid 772bc729-73b8-4670-bc1d-76bc0c6a50d1)
+		(uuid 3f2c9d94-01f3-49c4-b6cd-1c2ec5d8a079)
+	)
+	(hierarchical_label
+		DEBUG_IO0
+		(shape input)
+		(at 43.18 60.96 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid f1c4f6b4-8220-4347-b463-c568459f5e64)
 	)
 	(hierarchical_label
 		LED_CONTROL
@@ -2131,7 +1774,331 @@
 			)
 			(justify right)
 		)
-		(uuid 07b72415-4139-4b49-8cec-f09b7b059692)
+		(uuid 19043335-c22e-4152-b11d-8a184101d319)
+	)
+	(hierarchical_label
+		LED_CONTROL
+		(shape input)
+		(at 43.18 81.28 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 97dc0785-ac67-4e61-b8ac-d8d6e269200b)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 58.42 50.800000000000004 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 7bd96ee8-caa9-402a-9abe-6f54d78b9c54)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 58.42 50.800000000000004 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 3e7589f8-43d7-4001-87d9-f0485a3910ad)
+	)
+	(hierarchical_label
+		VCC_3V3
+		(shape input)
+		(at 91.44 72.39 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 321cbbdb-0046-4fd9-99be-4c6d63542c01)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid b50bc719-8cb8-4299-b6b7-6ce7ee3b2df7)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 4bcce91d-d652-475b-9a4d-237cc470947d)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 57869e08-c9e5-4614-9190-75240843e299)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 8c34521d-c0fd-4564-8102-3574b7172ba3)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid a1c4f329-0f86-4608-b2bb-149bd20da98e)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid baec50d3-62e8-4167-9c81-384eed7c9686)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 0bb989de-2507-4531-803d-0525965c1f7a)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid d28a94d8-4aaf-4aca-8d7c-147a3e3c91c4)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 53aa65d4-01bb-4645-bf0b-ab30cb7a4876)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid fa958db3-04e2-4e3c-8d00-2918494d82f7)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 15c3817e-994a-403c-87dd-2c4b818c1f06)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 881bf4fa-f92a-47ab-a6d4-e57851b9142c)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid bdcba7c7-293c-478b-ba45-7fa1ce5810f1)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid ffb4a0b9-69f4-44a0-970a-ad8493422c97)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid fbca6200-807c-4dfc-a8ae-e00a09204105)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 16fa009f-beb2-4a8e-9678-53d23b2ccb0c)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid e0ba5e92-6e20-446d-aa2b-8d65b3df8e22)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 567563f1-6e07-4445-aedf-d2a80bbb6f0a)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid db4b915c-1985-4c18-b252-5b4cef289fc3)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid bd7ab640-489a-4516-877d-d28a5f50782b)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid e44af496-89b4-467a-b252-0b515871c0c2)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 84a21671-46fe-477c-a405-8df9f6dd8a2e)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 91.44 80.01 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 4a030864-ed6c-432e-8b21-831dc16b2eb6)
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -2143,7 +2110,19 @@
 			)
 			(justify left)
 		)
-		(uuid 0214c588-95c5-432c-8dd1-c866890d8dcc)
+		(uuid 96fc01f6-eadb-4023-8890-6426839ac1b6)
+	)
+	(hierarchical_label
+		DEBUG_TX
+		(shape input)
+		(at 73.66 55.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid c6a12863-5ff4-49d0-aa93-dde4e33e1f4b)
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -2155,7 +2134,115 @@
 			)
 			(justify left)
 		)
-		(uuid 37b5dbb6-bf41-488d-80dc-13462b3124af)
+		(uuid a98980cd-58b8-4d13-a34e-310d1b3cb3f9)
+	)
+	(hierarchical_label
+		DEBUG_RX
+		(shape input)
+		(at 73.66 58.42 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 74d48242-7474-41c5-a667-6c3cc09f027e)
+	)
+	(hierarchical_label
+		USB_DP_MCU
+		(shape input)
+		(at 73.66 76.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 703f889e-3b69-4129-804f-e92beee68308)
+	)
+	(hierarchical_label
+		USB_DP_MCU
+		(shape input)
+		(at 73.66 76.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 8acbea3b-5d08-4f21-8aa7-d738a7899854)
+	)
+	(hierarchical_label
+		USB_DP_MCU
+		(shape input)
+		(at 111.76 80.01 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid c70f1177-6a5b-47a7-aaf3-086d3c575ff9)
+	)
+	(hierarchical_label
+		USB_DM_MCU
+		(shape input)
+		(at 73.66 78.74000000000001 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 086be33c-75f0-45a0-b989-e6eacf4ff540)
+	)
+	(hierarchical_label
+		USB_DM_MCU
+		(shape input)
+		(at 73.66 78.74000000000001 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid a020fb80-7912-4bed-92b7-84e66a523910)
+	)
+	(hierarchical_label
+		USB_DM_MCU
+		(shape input)
+		(at 132.08 80.01 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 4a7af69d-2182-482d-b340-334e5c4ac31f)
+	)
+	(hierarchical_label
+		USB_DP
+		(shape input)
+		(at 111.76 72.39 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 8d6b4cc1-9172-4fb3-a2f1-ca7aaa4e505e)
+	)
+	(hierarchical_label
+		USB_DM
+		(shape input)
+		(at 132.08 72.39 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid fc064540-a4fb-463f-9da7-d0fd552cc7e2)
 	)
 	(hierarchical_label
 		DEBUG_EN
@@ -2167,7 +2254,7 @@
 			)
 			(justify left)
 		)
-		(uuid 0e5e3431-3d94-477d-95cb-6369743a2b2d)
+		(uuid 27d524f1-2425-4413-86b5-6477cd8c22b4)
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -2179,7 +2266,7 @@
 			)
 			(justify left)
 		)
-		(uuid 81ec9217-cbcc-47a0-943d-9db6c655a104)
+		(uuid d6e5e6b0-b4fc-47de-9940-47af1256aca3)
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -2191,7 +2278,7 @@
 			)
 			(justify left)
 		)
-		(uuid cbdb0ca5-7f1f-46c1-870f-1678c3024764)
+		(uuid 4c9a6cb5-a5db-49b6-9207-61f2725adac5)
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -2203,7 +2290,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9bf9f058-3aa7-48ef-ac50-a3aaf6674154)
+		(uuid 90386036-0351-4cae-ad4c-5a5117311378)
 	)
 	(hierarchical_label
 		GND
@@ -2215,7 +2302,7 @@
 			)
 			(justify left)
 		)
-		(uuid 09984da9-cf01-4827-9f08-aab5dc5379d2)
+		(uuid 32b8ff52-455f-4ba9-9186-7bbef692f00a)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -2227,43 +2314,43 @@
 			)
 			(justify left)
 		)
-		(uuid 9f886332-8f08-4346-a875-63b3deaa3502)
-	)
-	(hierarchical_label
-		"ESP32_C6_MCU/N$3"
-		(shape input)
-		(at 145.89 156.21 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 2e3ba668-79f0-49de-884f-57fbeb575734)
+		(uuid e1bc52ca-f565-4aac-9c9f-4dbff7a9269e)
 	)
 	(hierarchical_label
 		GND
 		(shape input)
-		(at 145.89 158.75 0)
+		(at 143.35 156.21 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid 811532f2-e254-4d74-a83e-f267772abfa8)
+		(uuid 18d29aad-cc0f-4a80-9ea0-fa480454c991)
 	)
 	(hierarchical_label
 		LED_CONTROL
 		(shape input)
-		(at 145.89 161.29 0)
+		(at 143.35 158.75 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid 85af0142-78cc-46ae-9a6a-06e3be05ad35)
+		(uuid d282dfa1-4803-4207-b21c-9627cbe0cac6)
+	)
+	(hierarchical_label
+		N$3
+		(shape input)
+		(at 143.35 161.29 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 67844c98-4667-4004-bb8e-69334929cdec)
 	)
 	(sheet
 		(at 34.29 151.13)
@@ -2280,7 +2367,7 @@
 				0.0
 			)
 		)
-		(uuid d2283e71-0018-470e-a959-da8d72322891)
+		(uuid 19bdce56-6e31-410d-bec4-2a1df54906db)
 		(property "Sheetname" "Debug_Header"
 			(at 34.29 149.85999999999999 0)
 			(effects
@@ -2310,7 +2397,7 @@
 				)
 				(justify right)
 			)
-			(uuid 3e54f102-02de-4678-aadb-7b134035fe86)
+			(uuid a33fdbea-4f50-4bcb-9a89-d11c61ec3013)
 		)
 		(pin
 			DEBUG_IO0
@@ -2322,7 +2409,7 @@
 				)
 				(justify right)
 			)
-			(uuid e31e2a5e-f6f2-4864-acaf-27c439b54db1)
+			(uuid 371049c6-c133-4cf7-957b-c4667a14850e)
 		)
 		(pin
 			DEBUG_RX
@@ -2334,7 +2421,7 @@
 				)
 				(justify right)
 			)
-			(uuid 02e0370f-7a32-4a5f-a911-32c7813026aa)
+			(uuid a89540b6-109f-420b-aeaa-c928442dbd85)
 		)
 		(pin
 			DEBUG_TX
@@ -2346,7 +2433,7 @@
 				)
 				(justify right)
 			)
-			(uuid a22a9607-fed6-45e5-b94a-21316d254349)
+			(uuid 9988386b-beb2-4898-a655-784e09f7148b)
 		)
 		(pin
 			GND
@@ -2358,7 +2445,7 @@
 				)
 				(justify right)
 			)
-			(uuid ab6524cd-9fc3-499a-bcee-4573ad266bc2)
+			(uuid 7e1d79e8-b272-4d1a-ad5c-544eb17a3573)
 		)
 		(pin
 			VCC_3V3
@@ -2370,10 +2457,10 @@
 				)
 				(justify right)
 			)
-			(uuid c899fc04-c68e-4ef6-8578-ed1109107b59)
+			(uuid bf266f56-1938-4226-ad81-269b50d25fc9)
 		)
 		(instances
-			(project "test_esp32"
+			(project "ESP32_C6_Dev_Board"
 				(path "/"
 					(page "1")
 				)
@@ -2381,8 +2468,8 @@
 		)
 	)
 	(sheet
-		(at 90.17 153.67000000000002)
-		(size 55.72 20.32)
+		(at 93.98 153.67000000000002)
+		(size 49.37 20.32)
 		(stroke
 			(width 0.12)
 			(type solid)
@@ -2395,9 +2482,9 @@
 				0.0
 			)
 		)
-		(uuid d7d67262-9e48-419f-b42d-17f2afebcfbb)
+		(uuid 660318e5-be8f-4eeb-b37d-6c513253bfd2)
 		(property "Sheetname" "LED_Blinker"
-			(at 90.17 152.4 0)
+			(at 93.98 152.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2406,7 +2493,7 @@
 			)
 		)
 		(property "Sheetfile" "LED_Blinker.kicad_sch"
-			(at 90.17 175.26000000000002 0)
+			(at 93.98 175.26000000000002 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2416,43 +2503,43 @@
 			)
 		)
 		(pin
-			"ESP32_C6_MCU/N$3"
-			passive
-			(at 144.61999999999998 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-			(uuid 2f9ee001-b91d-4e3c-88f6-4f5972e35dc9)
-		)
-		(pin
 			GND
 			passive
-			(at 144.61999999999998 158.75 0)
+			(at 142.07999999999998 156.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid ff0ec2d8-c3b4-4f17-a9a7-56e7aabd38bb)
+			(uuid cb35a60f-5fb9-441e-9a89-c899e7edefa1)
 		)
 		(pin
 			LED_CONTROL
 			passive
-			(at 144.61999999999998 161.29 0)
+			(at 142.07999999999998 158.75 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid 403fa302-b760-48f0-93a5-2e8e3d4ba08a)
+			(uuid 76619e90-3014-4bc2-9d6a-daad53f1f312)
+		)
+		(pin
+			N$3
+			passive
+			(at 142.07999999999998 161.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 5d29eb1b-f347-43af-bf77-b88ec950cdae)
 		)
 		(instances
-			(project "test_esp32"
+			(project "ESP32_C6_Dev_Board"
 				(path "/"
 					(page "1")
 				)
@@ -2460,7 +2547,7 @@
 		)
 	)
 	(text_box
-		"ESP32_C6_MCU subcircuit\n    Parameters: GND, VCC_3V3, USB_DM, USB_DP"
+		"ESP32-C6 microcontroller subcircuit with decoupling and connections\n    \n    Args:\n        vcc_3v3: 3.3V power supply net\n        gnd: Ground net\n        usb_dp: USB Data+ net\n        usb_dm: USB Data- net"
 		(exclude_from_sim yes)
 		(at 184.0 110.0 0)
 		(size 80.0 30.0)
@@ -2490,10 +2577,10 @@
 			)
 			(justify left top)
 		)
-		(uuid 21646301-fa9b-428c-b527-895d68dea48d)
+		(uuid 704cf01d-e712-4b25-a2a6-197fbae433fd)
 	)
 	(sheet_instances
-		(path "/0d642761-8755-4913-bd75-2640e6c10e75/f87ded3a-4736-48b7-b9a1-56851305c8d2"
+		(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442"
 			(page "1")
 		)
 	)

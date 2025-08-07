@@ -2,10 +2,10 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid d966ff8a-9167-4ec4-91f7-f7c83dc3546d)
+	(uuid e7d66488-c872-4313-8ce5-16dab339684b)
 	(paper "A4")
 	(lib_symbols
-		(symbol "Device:C"
+		(symbol "Device:LED"
 			(pin_numbers hide)
 			(pin_names
 				(offset 0.254)
@@ -13,7 +13,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "C"
+			(property "Reference" "D"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -22,7 +22,7 @@
 					(hide no)
 				)
 			)
-			(property "Value" "C"
+			(property "Value" "LED"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -49,7 +49,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Unpolarized capacitor"
+			(property "Description" "Light emitting diode"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -58,7 +58,16 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "cap capacitor"
+			(property "Sim.Pins" "1=K 2=A"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property "ki_keywords" "LED diode"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -67,7 +76,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "C_*"
+			(property "ki_fp_filters" "LED* LED_SMD:* LED_THT:*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -76,14 +85,17 @@
 					(hide yes)
 				)
 			)
-			(symbol "C_0_1"
+			(symbol "LED_0_1"
 				(polyline
 					(pts
-						(xy -2.032 0.762)
-						(xy 2.032 0.762)
+						(xy -3.048 -0.762)
+						(xy -4.572 -2.286)
+						(xy -3.81 -2.286)
+						(xy -4.572 -2.286)
+						(xy -4.572 -1.524)
 					)
 					(stroke
-						(width 0.508)
+						(width 0.0)
 						(type default)
 					)
 					(fill
@@ -92,11 +104,55 @@
 				)
 				(polyline
 					(pts
-						(xy -2.032 -0.762)
-						(xy 2.032 -0.762)
+						(xy -1.778 -0.762)
+						(xy -3.302 -2.286)
+						(xy -2.54 -2.286)
+						(xy -3.302 -2.286)
+						(xy -3.302 -1.524)
 					)
 					(stroke
-						(width 0.508)
+						(width 0.0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 0.0)
+						(xy 1.27 0.0)
+					)
+					(stroke
+						(width 0.0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 -1.27)
+						(xy -1.27 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -1.27)
+						(xy 1.27 1.27)
+						(xy -1.27 0.0)
+						(xy 1.27 -1.27)
+					)
+					(stroke
+						(width 0.254)
 						(type default)
 					)
 					(fill
@@ -104,12 +160,143 @@
 					)
 				)
 			)
-			(symbol "C_1_1"
+			(symbol "LED_1_1"
+				(pin
+					passive
+					line
+					(at -3.81 0.0 0)
+					(length 2.54)
+					(name
+						K
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 3.81 0.0 180)
+					(length 2.54)
+					(name
+						A
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+		(symbol "Device:R"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "R"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property "Value" "R"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property "Footprint" ""
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Resistor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "R res resistor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "R_*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
 				(pin
 					passive
 					line
 					(at 0.0 3.81 270)
-					(length 2.794)
+					(length 1.27)
 					(name
 						~
 						(effects
@@ -131,7 +318,7 @@
 					passive
 					line
 					(at 0.0 -3.81 90)
-					(length 2.794)
+					(length 1.27)
 					(name
 						~
 						(effects
@@ -151,177 +338,24 @@
 				)
 			)
 		)
-		(symbol "Regulator_Linear:AMS1117-3.3"
-			(pin_numbers hide)
-			(pin_names
-				(offset 0.254)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "U"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
-				)
-			)
-			(property "Value" "AMS1117-3.3"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
-				)
-			)
-			(property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "http://www.advanced-monolithic.com/pdf/ds1117.pdf"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "linear regulator ldo fixed positive"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "SOT?223*TabPin2*"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "AMS1117-3.3_0_1"
-				(rectangle
-					(start -5.08 -5.08)
-					(end 5.08 1.905)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-			)
-			(symbol "AMS1117-3.3_1_1"
-				(pin
-					power_in
-					line
-					(at -7.62 0.0 0)
-					(length 2.54)
-					(name
-						VI
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number
-						"3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin
-					power_in
-					line
-					(at 0.0 -7.62 90)
-					(length 2.54)
-					(name
-						GND
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number
-						"1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin
-					power_out
-					line
-					(at 7.62 0.0 180)
-					(length 2.54)
-					(name
-						VO
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number
-						"2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-		)
 	)
 	(title_block
-		(title Power_Supply)
+		(title LED_Blinker)
 		(date 2025-08-06)
 		(company Circuit-Synth)
 	)
 	(symbol
-		(lib_id "Device:C")
-		(at 38.1 45.72 0)
+		(lib_id "Device:LED")
+		(at 45.72 45.72 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 2e4bf0f7-8a21-4092-bed6-5f07f0f4e8ea)
-		(property "Reference" "C2"
-			(at 38.1 40.72 0)
+		(uuid 4da16b03-5867-45a4-b75b-a9880fbd48d0)
+		(property "Reference" "D3"
+			(at 45.72 40.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -329,17 +363,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "10uF"
-			(at 38.1 50.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
-			(at 38.1 55.72 0)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
+			(at 45.72 55.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -348,26 +373,26 @@
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board_generated"
-				(path "/19d99736-1d28-4af6-b4ac-6aa629ea6cbb/619185f6-9626-469a-a63a-e9cc7d2ef9a7"
-					(reference "C2")
+			(project "ESP32_C6_Dev_Board"
+				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442/660318e5-be8f-4eeb-b37d-6c513253bfd2"
+					(reference "D3")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "Device:C")
-		(at 58.42 45.72 0)
+		(lib_id "Device:R")
+		(at 68.58 45.72 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 5c48c8f7-77d2-4964-ae8b-a5bb9389c2bf)
-		(property "Reference" "C3"
-			(at 58.42 40.72 0)
+		(uuid 740a38ef-14d0-4fed-9eec-2c30bf925709)
+		(property "Reference" "R3"
+			(at 68.58 40.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -375,8 +400,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "22uF"
-			(at 58.42 50.72 0)
+		(property "Value" "330"
+			(at 68.58 50.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -384,8 +409,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
-			(at 58.42 55.72 0)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 68.58 55.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -394,146 +419,76 @@
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board_generated"
-				(path "/19d99736-1d28-4af6-b4ac-6aa629ea6cbb/619185f6-9626-469a-a63a-e9cc7d2ef9a7"
-					(reference "C3")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Regulator_Linear:AMS1117-3.3")
-		(at 45.72 91.44 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid 96481a65-7154-4b3c-bc98-0db6fedd21fc)
-		(property "Reference" "U1"
-			(at 45.72 86.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "~"
-			(at 45.72 96.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-223-3_TabPin2"
-			(at 45.72 101.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project "ESP32_C6_Dev_Board_generated"
-				(path "/19d99736-1d28-4af6-b4ac-6aa629ea6cbb/619185f6-9626-469a-a63a-e9cc7d2ef9a7"
-					(reference "U1")
+			(project "ESP32_C6_Dev_Board"
+				(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442/660318e5-be8f-4eeb-b37d-6c513253bfd2"
+					(reference "R3")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(hierarchical_label
-		VBUS
+		GND
 		(shape input)
-		(at 38.1 41.91 90)
+		(at 41.91 45.72 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid c98b486d-5599-40ae-b844-408070629eb5)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 41.91 45.72 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 11cd9d9d-4871-4b3a-b167-885c4333843c)
+	)
+	(hierarchical_label
+		N$3
+		(shape input)
+		(at 49.53 45.72 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid dfb439d2-2b01-4346-b6be-fad9a661aa0e)
+		(uuid e4baa2eb-2994-46db-a2a6-765b3235602d)
 	)
 	(hierarchical_label
-		VBUS
+		N$3
 		(shape input)
-		(at 38.1 91.44 180)
+		(at 68.58 49.53 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right)
 		)
-		(uuid 1d2f3944-7122-4ca9-a56e-58008a353c61)
+		(uuid c0e896f6-1e60-4437-a627-1e12c88602f3)
 	)
 	(hierarchical_label
-		GND
+		LED_CONTROL
 		(shape input)
-		(at 38.1 49.53 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 829fbf77-9290-40ff-b32d-2219a4fed842)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 49.53 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid ce233a65-ac82-4f58-8895-eba4c401d79d)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 45.72 99.06 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 048bacb7-119c-4f9f-a0c1-50385810703e)
-	)
-	(hierarchical_label
-		VCC_3V3
-		(shape input)
-		(at 58.42 41.91 90)
+		(at 68.58 41.91 90)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid 21edc6fd-0b35-4cb7-9582-883081b52cce)
-	)
-	(hierarchical_label
-		VCC_3V3
-		(shape input)
-		(at 53.339999999999996 91.44 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 21db8408-3a29-443d-bb00-608083500cb9)
+		(uuid 1b2f050d-29f6-467b-9080-ad9ed86093b8)
 	)
 	(text_box
-		"Power_Supply subcircuit\n    Parameters: GND, VBUS, VCC_3V3"
+		"LED with current limiting resistor - Correct circuit topology"
 		(exclude_from_sim yes)
 		(at 184.0 110.0 0)
 		(size 80.0 30.0)
@@ -563,10 +518,10 @@
 			)
 			(justify left top)
 		)
-		(uuid c5589770-59cb-4c75-a30a-2d5cbd82c701)
+		(uuid 617935b8-0906-4d24-ac42-422ab0bf14ee)
 	)
 	(sheet_instances
-		(path "/19d99736-1d28-4af6-b4ac-6aa629ea6cbb/619185f6-9626-469a-a63a-e9cc7d2ef9a7"
+		(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2/01f4a979-be5e-4d96-9cb3-def3adf63442/660318e5-be8f-4eeb-b37d-6c513253bfd2"
 			(page "1")
 		)
 	)

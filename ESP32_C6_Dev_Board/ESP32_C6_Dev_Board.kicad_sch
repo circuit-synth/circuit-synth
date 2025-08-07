@@ -2,11 +2,11 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid 19d99736-1d28-4af6-b4ac-6aa629ea6cbb)
+	(uuid 92b1ce59-3a3c-4647-b1e8-53da23977cf2)
 	(paper "A4")
 	(lib_symbols)
 	(title_block
-		(title main)
+		(title ESP32_C6_Dev_Board_Main)
 		(date 2025-08-06)
 		(company Circuit-Synth)
 	)
@@ -20,7 +20,7 @@
 			)
 			(justify left)
 		)
-		(uuid 971092a7-3027-42ea-8a2a-f151b14dd3b9)
+		(uuid 6ede5d7e-32d2-49ff-8d0c-6f51cf23e326)
 	)
 	(hierarchical_label
 		N$1
@@ -32,7 +32,7 @@
 			)
 			(justify left)
 		)
-		(uuid bc4ae555-2ed5-4b9a-b5b8-c9d6aaba8b89)
+		(uuid 8658ce4b-60f2-4cfc-b240-54c008c844f2)
 	)
 	(hierarchical_label
 		N$2
@@ -44,7 +44,7 @@
 			)
 			(justify left)
 		)
-		(uuid f3dca7d2-65d5-45e6-b4a3-b557f0242033)
+		(uuid 3f771f14-b1ad-4664-867f-2f2bdb4f57a8)
 	)
 	(hierarchical_label
 		USB_DM
@@ -56,7 +56,7 @@
 			)
 			(justify left)
 		)
-		(uuid f023d0a1-8442-4a47-9a89-75c4a09a2383)
+		(uuid a6cee0f1-be5a-4301-929b-314cfbb4f036)
 	)
 	(hierarchical_label
 		USB_DP
@@ -68,7 +68,7 @@
 			)
 			(justify left)
 		)
-		(uuid 7ff233d0-4ce0-4b99-9287-1d08d9210997)
+		(uuid 446e0aec-28a4-46e6-b5a1-b07551c086f2)
 	)
 	(hierarchical_label
 		VBUS
@@ -80,7 +80,7 @@
 			)
 			(justify left)
 		)
-		(uuid 04843f7c-dd45-4110-b743-51388798becb)
+		(uuid eb53e551-4189-4bcd-8722-37720e6226b9)
 	)
 	(hierarchical_label
 		GND
@@ -92,7 +92,7 @@
 			)
 			(justify left)
 		)
-		(uuid 468378bd-3d22-40c9-8770-cdbe721efb0d)
+		(uuid 2fd15ad1-3757-4e84-b844-54f3a7609b1e)
 	)
 	(hierarchical_label
 		VBUS
@@ -104,7 +104,7 @@
 			)
 			(justify left)
 		)
-		(uuid d1dc0b56-3f64-4a82-a4a1-a06eb88bf056)
+		(uuid aa546f59-3a89-4399-9a4f-39b913235f67)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -116,7 +116,7 @@
 			)
 			(justify left)
 		)
-		(uuid 084aaa1a-85c7-4093-8556-25f51c57615c)
+		(uuid 6c81153f-bafb-4a01-b727-1ea53029a43c)
 	)
 	(hierarchical_label
 		DEBUG_EN
@@ -128,7 +128,7 @@
 			)
 			(justify left)
 		)
-		(uuid cc9ec095-8043-41b6-96a5-73dd1aa1464a)
+		(uuid e57515fa-f5d8-424a-ad56-09d47366f3fe)
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -140,7 +140,7 @@
 			)
 			(justify left)
 		)
-		(uuid b9192ff8-ca7d-43ee-9d8d-eccf0fad9322)
+		(uuid 9d1d52ec-58e3-42e7-95f4-74e3b521e473)
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -152,7 +152,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9268a99b-6d53-473a-b178-25ce0fedd870)
+		(uuid 56a8e6ec-f9ab-4e61-b9e0-7d1b9cd58ab6)
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -164,7 +164,7 @@
 			)
 			(justify left)
 		)
-		(uuid 26accf05-4170-4c33-af4c-404c61fcf4b8)
+		(uuid 937b3a7a-effb-4b72-beb1-05ca6dda734d)
 	)
 	(hierarchical_label
 		GND
@@ -176,7 +176,7 @@
 			)
 			(justify left)
 		)
-		(uuid f434f1e4-ecab-4210-83cc-4f6a96feb4b8)
+		(uuid a9254d41-83b6-4dcf-a3ac-60a673e687d9)
 	)
 	(hierarchical_label
 		LED_CONTROL
@@ -188,7 +188,7 @@
 			)
 			(justify left)
 		)
-		(uuid 02597f63-6f2f-4d43-938b-cc70868e5eb9)
+		(uuid a054ab1f-eac5-4235-87bb-3cee6d0feb57)
 	)
 	(hierarchical_label
 		USB_DM
@@ -200,7 +200,7 @@
 			)
 			(justify left)
 		)
-		(uuid d1e5c822-af12-4da1-a007-ccda49389f26)
+		(uuid 9d61b9f8-d65c-42fc-a66c-1322fb3b274b)
 	)
 	(hierarchical_label
 		USB_DM_MCU
@@ -212,7 +212,7 @@
 			)
 			(justify left)
 		)
-		(uuid 44e3b55f-c643-4679-a21f-a138103ad802)
+		(uuid 24fcaddf-be30-4904-81a3-8af2fce795ad)
 	)
 	(hierarchical_label
 		USB_DP
@@ -224,7 +224,7 @@
 			)
 			(justify left)
 		)
-		(uuid 7c66a41b-e53f-43c7-a2ac-ad0aa3347369)
+		(uuid 46e884a0-86e4-4737-b815-e1e2da13cc60)
 	)
 	(hierarchical_label
 		USB_DP_MCU
@@ -236,7 +236,7 @@
 			)
 			(justify left)
 		)
-		(uuid d54ff041-54cb-4bbf-8548-4ba02dfc5e29)
+		(uuid a377f9b6-a49d-403e-ba19-a58c36d781d3)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -248,7 +248,7 @@
 			)
 			(justify left)
 		)
-		(uuid 1d5d4ded-ca16-4297-ad6d-742a16094bfa)
+		(uuid f3549b99-88f0-4143-a1c1-ca0607186c5a)
 	)
 	(sheet
 		(at 35.56 34.29)
@@ -265,7 +265,7 @@
 				0.0
 			)
 		)
-		(uuid 3c2f0221-46fa-4d33-82d2-1b93dbf414ec)
+		(uuid a261ed7e-4d94-4976-9613-d8c61d3d1186)
 		(property "Sheetname" "USB_Port"
 			(at 35.56 33.019999999999996 0)
 			(effects
@@ -295,7 +295,7 @@
 				)
 				(justify right)
 			)
-			(uuid 54ae14c4-94fe-43bd-b6ed-5425e2d8e9eb)
+			(uuid f2cb44df-d867-433f-b9a7-baf7f2439c60)
 		)
 		(pin
 			N$1
@@ -307,7 +307,7 @@
 				)
 				(justify right)
 			)
-			(uuid d32a66e2-a91d-4cb0-9069-1d47c983187f)
+			(uuid bf7da7f9-0fc0-41fd-a373-0b8075cc2a6f)
 		)
 		(pin
 			N$2
@@ -319,7 +319,7 @@
 				)
 				(justify right)
 			)
-			(uuid 0dea522e-f008-441f-aa7c-cd962385258f)
+			(uuid d0f0ae5b-da94-4429-bd30-250a6ba8d9de)
 		)
 		(pin
 			USB_DM
@@ -331,7 +331,7 @@
 				)
 				(justify right)
 			)
-			(uuid 78a4bbb2-8dac-4073-bbc1-da784412abe6)
+			(uuid 781a7a78-fcda-4a04-92ec-e9d8dc2c1e1c)
 		)
 		(pin
 			USB_DP
@@ -343,7 +343,7 @@
 				)
 				(justify right)
 			)
-			(uuid dbefa5a6-6534-496a-90ab-33dc442ad755)
+			(uuid e653f649-59e9-49ba-bf73-7c593f8356a5)
 		)
 		(pin
 			VBUS
@@ -355,10 +355,10 @@
 				)
 				(justify right)
 			)
-			(uuid c963ce59-4b65-4bfa-a244-7698a3dd8728)
+			(uuid 66f3907f-bf99-4f07-ba79-6a3d0d0346de)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board_generated"
+			(project "ESP32_C6_Dev_Board"
 				(path "/"
 					(page "1")
 				)
@@ -380,7 +380,7 @@
 				0.0
 			)
 		)
-		(uuid 619185f6-9626-469a-a63a-e9cc7d2ef9a7)
+		(uuid 6db71840-4062-4460-b647-79ba21135577)
 		(property "Sheetname" "Power_Supply"
 			(at 93.98 35.559999999999995 0)
 			(effects
@@ -410,7 +410,7 @@
 				)
 				(justify right)
 			)
-			(uuid 2b89c73d-7faf-4b6a-995b-9eb7b6e2a042)
+			(uuid e69f9722-91d3-4e47-a737-1a9ed316d1f1)
 		)
 		(pin
 			VBUS
@@ -422,7 +422,7 @@
 				)
 				(justify right)
 			)
-			(uuid cc563c59-1548-49c8-a151-68d9c2b8c3b9)
+			(uuid 7372b42a-12b3-415b-a218-ae5d175130b3)
 		)
 		(pin
 			VCC_3V3
@@ -434,10 +434,10 @@
 				)
 				(justify right)
 			)
-			(uuid fc4cbe29-3f07-4069-a005-05df5a13c567)
+			(uuid f3115956-bf69-4f16-a2de-bb79a5cec746)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board_generated"
+			(project "ESP32_C6_Dev_Board"
 				(path "/"
 					(page "1")
 				)
@@ -459,7 +459,7 @@
 				0.0
 			)
 		)
-		(uuid 9d15f2c4-9ae3-4ba8-b742-001848d28acc)
+		(uuid 01f4a979-be5e-4d96-9cb3-def3adf63442)
 		(property "Sheetname" "ESP32_C6_MCU"
 			(at 93.98 62.23 0)
 			(effects
@@ -489,7 +489,7 @@
 				)
 				(justify right)
 			)
-			(uuid 2b5f9b9d-48af-465d-9abe-c903cb09015c)
+			(uuid 1e7ef441-9eab-44be-9304-ce7dc8806131)
 		)
 		(pin
 			DEBUG_IO0
@@ -501,7 +501,7 @@
 				)
 				(justify right)
 			)
-			(uuid 7dcc2070-d307-4073-ad6c-00895568ac75)
+			(uuid 68e23120-9aed-4f30-a60a-39bd1450784d)
 		)
 		(pin
 			DEBUG_RX
@@ -513,7 +513,7 @@
 				)
 				(justify right)
 			)
-			(uuid 26886d86-e320-45cd-9a56-aa8ebc83f2aa)
+			(uuid 69a27c47-1352-4db0-9e7c-cce582c1cc32)
 		)
 		(pin
 			DEBUG_TX
@@ -525,7 +525,7 @@
 				)
 				(justify right)
 			)
-			(uuid 1dc9baa5-b6f5-4f56-8c79-12e0e514b50f)
+			(uuid 50095226-792b-45cc-9656-763288f1b276)
 		)
 		(pin
 			GND
@@ -537,7 +537,7 @@
 				)
 				(justify right)
 			)
-			(uuid c143307a-9163-4adf-b832-e065721772e5)
+			(uuid e546795f-fb87-475c-8488-8202d5dd3a64)
 		)
 		(pin
 			LED_CONTROL
@@ -549,7 +549,7 @@
 				)
 				(justify right)
 			)
-			(uuid ec09f70e-f42f-4bc5-8a86-da803c4b5cbe)
+			(uuid 62a3e2be-fdcb-4752-887b-67d7f4521192)
 		)
 		(pin
 			USB_DM
@@ -561,7 +561,7 @@
 				)
 				(justify right)
 			)
-			(uuid f15b1aae-bb4e-4cdf-bc05-44667c589d34)
+			(uuid dc4a43a1-9aac-482a-9d4e-ab2a8f5f0e8c)
 		)
 		(pin
 			USB_DM_MCU
@@ -573,7 +573,7 @@
 				)
 				(justify right)
 			)
-			(uuid 57eda705-0322-46a5-bf70-3e2161ac107a)
+			(uuid adea911b-2a34-489a-8ff0-e78c730955a5)
 		)
 		(pin
 			USB_DP
@@ -585,7 +585,7 @@
 				)
 				(justify right)
 			)
-			(uuid eaad82a6-55bc-4cea-993e-89f0e253626d)
+			(uuid 8c685ced-fec3-45d9-9eac-6d8b312cbf4c)
 		)
 		(pin
 			USB_DP_MCU
@@ -597,7 +597,7 @@
 				)
 				(justify right)
 			)
-			(uuid 6f9a52b2-2f22-4ca3-bc26-2e6bff2ffafc)
+			(uuid 917b9a61-e696-4c59-8b55-5365c4773514)
 		)
 		(pin
 			VCC_3V3
@@ -609,10 +609,10 @@
 				)
 				(justify right)
 			)
-			(uuid 20c7c8be-fcd9-4c5e-83f8-d63017e7e9ba)
+			(uuid 9d80ce54-31ca-4d9e-985a-c9b9256272f6)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board_generated"
+			(project "ESP32_C6_Dev_Board"
 				(path "/"
 					(page "1")
 				)
@@ -620,7 +620,7 @@
 		)
 	)
 	(text_box
-		"Main circuit with hierarchical subcircuits"
+		"Main hierarchical circuit - ESP32-C6 development board"
 		(exclude_from_sim yes)
 		(at 184.0 110.0 0)
 		(size 80.0 30.0)
@@ -650,10 +650,10 @@
 			)
 			(justify left top)
 		)
-		(uuid ab38d982-3ef2-4172-b61b-b6f5c4aa919c)
+		(uuid ac26dcb2-3881-4082-84b1-cf24a9fc3433)
 	)
 	(sheet_instances
-		(path "/19d99736-1d28-4af6-b4ac-6aa629ea6cbb"
+		(path "/92b1ce59-3a3c-4647-b1e8-53da23977cf2"
 			(page "1")
 		)
 	)
