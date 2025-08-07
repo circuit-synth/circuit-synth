@@ -76,11 +76,11 @@ if __name__ == "__main__":
 
 ## Core Features
 
-- **KiCad Integration**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files
-- **Hierarchical Design**: Modular subcircuits with clean Python syntax
-- **Component Intelligence**: JLCPCB availability and footprint verification
+- **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files
+- **Hierarchical Design**: Modular subcircuits like software modules  
+- **Component Intelligence**: JLCPCB & DigiKey integration, symbol/footprint verification
 - **Fast JLCPCB Search**: Direct search with 80% speed improvement, 90% less tokens
-- **AI Assistance**: Claude Code agents for design automation
+- **AI Integration**: Claude Code agents for automated design assistance
 - **FMEA Analysis**: Comprehensive reliability analysis with physics-based failure models
 - **Test Generation**: Automated test plans for validation
 - **Version Control**: Git-friendly text-based circuit definitions
@@ -90,7 +90,103 @@ if __name__ == "__main__":
 ### Claude Code Commands
 
 ```bash
-# Component search
+# AI agent commands (with Claude Code)
+/find-symbol STM32                    # Search KiCad symbols
+/find-footprint LQFP64                # Find footprints  
+/generate-validated-circuit "ESP32 IoT sensor" mcu
+```
+
+### 🤖 Claude Code Agents
+
+Circuit-synth includes specialized AI agents for different aspects of circuit design. Each agent has deep expertise in their domain:
+
+#### **circuit-architect** - Master Circuit Design Coordinator
+- **Use for**: Complex multi-component designs, system-level architecture
+- **Expertise**: Circuit topology planning, component selection, design trade-offs
+- **Example**: *"Design a complete IoT sensor node with power management, wireless connectivity, and sensor interfaces"*
+
+#### **circuit-synth** - Circuit Code Generation Specialist  
+- **Use for**: Converting natural language to working Python circuit code
+- **Expertise**: circuit-synth syntax, KiCad integration, hierarchical design patterns
+- **Example**: *"Generate Python code for a USB-C PD trigger circuit with 20V output"*
+
+#### **simulation-expert** - SPICE Simulation and Circuit Validation
+- **Use for**: Circuit analysis, performance optimization, validation
+- **Expertise**: SPICE simulation setup, component modeling, performance analysis
+- **Example**: *"Simulate this amplifier circuit and optimize for 40dB gain with <100mW power"*
+
+#### **component-search** - Multi-Source Component Search
+- **Use for**: Component selection across all suppliers, price comparison, availability checking
+- **Expertise**: JLCPCB, DigiKey, and future suppliers (Mouser, LCSC, etc.)
+- **Example**: *"Find 0.1uF 0603 capacitors across all suppliers with pricing comparison"*
+
+#### **jlc-parts-finder** - JLCPCB Component Intelligence
+- **Use for**: Real-time component availability, pricing, and alternatives
+- **Expertise**: JLCPCB catalog search, stock levels, KiCad symbol verification
+- **Example**: *"Find STM32 with 3 SPIs available on JLCPCB under $5"*
+
+#### **general-purpose** - Research and Analysis
+- **Use for**: Open-ended research, codebase analysis, complex searches
+- **Expertise**: Technical research, documentation analysis, multi-step problem solving
+- **Example**: *"Research best practices for EMI reduction in switching power supplies"*
+
+#### **test-plan-creator** - Test Plan Generation and Validation
+- **Use for**: Creating comprehensive test procedures for circuit validation
+- **Expertise**: Functional, performance, safety, and manufacturing test plans
+- **Example**: *"Generate test plan for ESP32 dev board with power measurements"*
+
+#### **fmea-analyzer** - Failure Mode and Effects Analysis
+- **Use for**: Reliability analysis, risk assessment, failure prediction
+- **Expertise**: Component failure modes, physics of failure, IPC Class 3 compliance
+- **Example**: *"Analyze my circuit for potential failure modes and generate FMEA report"*
+
+### Using Agents Effectively
+
+```bash
+# Start with circuit-architect for complex projects
+"Design an ESP32-based environmental monitoring station"
+
+# Use circuit-synth for code generation
+"Generate circuit-synth code for the power supply section"
+
+# Validate with simulation-expert
+"Simulate this buck converter and verify 3.3V output ripple"
+
+# Optimize with component-search
+"Replace expensive components with JLCPCB alternatives"
+```
+
+**Pro Tip**: Let the **circuit-architect** coordinate complex projects - it will automatically delegate to other specialists as needed!
+
+### **Agent Categories:**
+- **Circuit Design**: circuit-architect, circuit-synth, simulation-expert, test-plan-creator
+- **Development**: circuit_generation_agent, contributor, first_setup_agent  
+- **Manufacturing**: component-search, jlc-parts-finder, stm32-mcu-finder
+
+### **Command Categories:**
+- **Circuit Design**: analyze-design, find-footprint, find-symbol, validate-existing-circuit
+- **Development**: dev-run-tests, dev-update-and-commit, dev-review-branch
+- **Manufacturing**: find-parts, find-mcu, find_stm32
+- **Test Planning**: create-test-plan, generate-manufacturing-tests
+- **Setup**: setup-kicad-plugins, setup_circuit_synth
+
+## 🚀 Commands
+
+### Project Creation
+```bash
+cs-new-project              # Complete project setup with ESP32-C6 example
+```
+
+### Circuit Generation
+```bash
+cd circuit-synth && uv run python main.py    # Generate KiCad files from Python code
+```
+
+### Claude Code Slash Commands
+Available when working with Claude Code in a circuit-synth project:
+
+```bash
+# Component Search
 /find-symbol STM32              # Search KiCad symbol libraries
 /find-footprint LQFP64          # Find footprint libraries
 /find-stm32 "3 SPIs, USB"       # STM32 with specific peripherals
@@ -99,9 +195,14 @@ if __name__ == "__main__":
 /generate-validated-circuit "ESP32 IoT sensor" mcu
 /validate-existing-circuit      # Validate current circuit code
 
-# JLCPCB integration
-/jlc-search "voltage regulator 3.3V"
-jlc-fast search STM32G4            # Fast CLI search (80% faster)
+# Component Intelligence  
+/find-parts "0.1uF 0603 X7R capacitor"               # Search all suppliers
+/find-parts "STM32F407" --source jlcpcb              # JLCPCB only
+/find-parts "LM358" --compare                        # Compare across suppliers
+/find-stm32 "3 SPIs, USB, available JLCPCB"          # STM32-specific search
+
+# Fast JLCPCB CLI (no agents, 80% faster)
+jlc-fast search STM32G4            # Direct search
 jlc-fast cheapest "10uF 0805"      # Find cheapest option
 jlc-fast most-available LM358      # Find highest stock
 
@@ -235,10 +336,10 @@ my_circuit_project/
 
 ## Why Circuit-Synth?
 
-| Traditional Workflow | Circuit-Synth |
-|---------------------|---------------|
-| Manual component placement | Python code generates complete projects |
-| Search through symbol libraries | Verified components with JLCPCB availability |
+| Traditional EE Workflow | With Circuit-Synth |
+|-------------------------|-------------------|
+| Manual component placement | `python main.py` → Complete project |
+| Hunt through symbol libraries | Verified components with JLCPCB & DigiKey availability |
 | Visual net verification | Explicit Python connections |
 | GUI-based editing | Version-controlled Python files |
 | Copy-paste patterns | Reusable circuit functions |
@@ -313,7 +414,114 @@ sudo apt install kicad
 
 ## Troubleshooting
 
-**Symbol/Footprint Not Found:**
+Install the AI-powered KiCad plugin for direct Claude Code integration:
+
+```bash
+# Install KiCad plugins
+uv run cs-setup-kicad-plugins
+```
+
+**Usage:**
+- **PCB Editor**: Tools → External Plugins → "Circuit-Synth AI"  
+- **Schematic Editor**: Tools → Generate BOM → "Circuit-Synth AI"
+
+## 🛠️ Advanced Configuration
+
+### Environment Variables
+
+```bash
+# Optional performance settings
+export CIRCUIT_SYNTH_USE_RUST=true
+export CIRCUIT_SYNTH_PARALLEL_PROCESSING=true
+
+# KiCad path override (if needed)
+export KICAD_SYMBOL_DIR="/custom/path/to/symbols"
+export KICAD_FOOTPRINT_DIR="/custom/path/to/footprints"
+```
+
+### Component Database Configuration
+
+```bash
+# JLCPCB API configuration (optional)
+export JLCPCB_API_KEY="your_api_key"
+export JLCPCB_CACHE_DURATION=3600  # Cache for 1 hour
+
+# DigiKey API configuration (optional, for component search)
+export DIGIKEY_CLIENT_ID="your_client_id"
+export DIGIKEY_CLIENT_SECRET="your_client_secret"
+# Or run: python -m circuit_synth.manufacturing.digikey.config_manager
+```
+
+## 🔍 Component Sourcing
+
+circuit-synth provides integrated access to multiple component distributors for real-time availability, pricing, and specifications.
+
+### Unified Multi-Source Search (Recommended)
+Search across all suppliers with one interface:
+```python
+from circuit_synth.manufacturing import find_parts
+
+# Search all suppliers
+results = find_parts("0.1uF 0603 X7R", sources="all")
+
+# Search specific supplier
+jlc_results = find_parts("STM32F407", sources="jlcpcb")
+dk_results = find_parts("LM358", sources="digikey")
+
+# Compare across suppliers
+comparison = find_parts("3.3V regulator", sources="all", compare=True)
+print(comparison)  # Shows price/availability comparison table
+
+# Filter by requirements
+high_stock = find_parts("10k resistor", min_stock=10000, max_price=0.10)
+```
+
+### JLCPCB Integration
+Best for PCB assembly and production:
+```python
+from circuit_synth.manufacturing.jlcpcb import search_jlc_components_web
+
+# Find components available for assembly
+results = search_jlc_components_web("STM32F407", max_results=10)
+```
+
+### DigiKey Integration  
+Best for prototyping and wide selection:
+```python
+from circuit_synth.manufacturing.digikey import search_digikey_components
+
+# Search DigiKey's 8M+ component catalog
+results = search_digikey_components("0.1uF 0603 X7R", max_results=10)
+
+# Get detailed pricing and alternatives
+from circuit_synth.manufacturing.digikey import DigiKeyComponentSearch
+searcher = DigiKeyComponentSearch()
+component = searcher.get_component_details("399-1096-1-ND")
+alternatives = searcher.find_alternatives(component, max_results=5)
+```
+
+### DigiKey Setup
+```bash
+# Interactive configuration
+python -m circuit_synth.manufacturing.digikey.config_manager
+
+# Test connection
+python -m circuit_synth.manufacturing.digikey.test_connection
+```
+
+See [docs/DIGIKEY_SETUP.md](docs/DIGIKEY_SETUP.md) for detailed setup instructions.
+
+### Multi-Source Strategy
+- **Prototyping**: Use DigiKey for fast delivery and no minimums
+- **Small Batch**: Compare JLCPCB vs DigiKey for best value
+- **Production**: Optimize with JLCPCB for integrated assembly
+- **Risk Mitigation**: Maintain alternatives from multiple sources
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**KiCad Symbol/Footprint Not Found:**
 ```bash
 # Verify KiCad installation
 kicad-cli version
@@ -334,11 +542,45 @@ cargo clean
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
-Quick start:
-1. Fork and clone the repository
-2. Run `uv sync` to install dependencies
-3. Make changes with tests
-4. Submit a pull request
+## 🏗️ Architecture Overview
+
+### Technical Stack
+- **Frontend**: Python 3.9+ with type hints
+- **Backend**: Rust modules for performance-critical operations
+- **KiCad Integration**: Direct file format support (.kicad_pro, .kicad_sch, .kicad_pcb)
+- **AI Integration**: Claude Code agents with specialized circuit design expertise
+
+### File Structure
+```
+circuit-synth/
+├── src/circuit_synth/           # Python package
+│   ├── core/                    # Core circuit representation
+│   ├── kicad/                   # KiCad file I/O
+│   ├── component_info/          # Component databases
+│   ├── manufacturing/           # JLCPCB, DigiKey, etc.
+│   └── simulation/              # SPICE integration
+├── rust_modules/                # Rust acceleration
+├── examples/                    # Usage examples
+├── tests/                       # Test suites
+└── scripts/                     # Build and development scripts
+```
+
+## 🤝 Contributing
+
+### Development Workflow
+1. **Fork repository** and create feature branch
+2. **Follow coding standards** (black, isort, mypy)
+3. **Add tests** for new functionality
+4. **Update documentation** as needed
+5. **Submit pull request** with clear description
+
+### Coding Standards
+- **Python**: Type hints, dataclasses, SOLID principles
+- **Rust**: Standard formatting with `cargo fmt`
+- **Documentation**: Clear docstrings and inline comments
+- **Testing**: Comprehensive test coverage for new features
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
