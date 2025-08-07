@@ -128,6 +128,75 @@ impl SchematicEditor {
         Ok(())
     }
 
+    pub fn remove_component(&mut self, reference: &str) -> Result<(), SchematicError> {
+        info!("🗑️ Removing component: {}", reference);
+        
+        // Convert to vector
+        let mut elements = sexp_to_vec(&self.sexp)?;
+        debug!("  Schematic has {} top-level elements", elements.len());
+        
+        // Find and remove the component with matching reference
+        let mut found = false;
+        let mut index_to_remove = None;
+        
+        for (i, elem) in elements.iter().enumerate() {
+            // Check if this is a symbol component
+            if let Value::Cons(cons) = elem {
+                if let Value::Symbol(sym) = cons.car() {
+                    if sym.as_ref() == "symbol" {
+                        // Check if this has matching reference
+                        // Look for (property "Reference" "R1" ...)
+                        let mut current = cons.cdr();
+                        while let Value::Cons(item_cons) = current {
+                            let item = item_cons.car();
+                            
+                            if let Value::Cons(prop_cons) = item {
+                                if let Value::Symbol(prop_sym) = prop_cons.car() {
+                                    if prop_sym.as_ref() == "property" {
+                                        // Check if this is the Reference property
+                                        let mut prop_current = prop_cons.cdr();
+                                        if let Value::Cons(name_cons) = prop_current {
+                                            if let Value::String(prop_name) = name_cons.car() {
+                                                if prop_name.as_ref() == "Reference" {
+                                                    // Get the value
+                                                    if let Value::Cons(value_cons) = name_cons.cdr() {
+                                                        if let Value::String(prop_value) = value_cons.car() {
+                                                            if prop_value.as_ref() == reference {
+                                                                debug!("  Found component {} at index {}", reference, i);
+                                                                found = true;
+                                                                index_to_remove = Some(i);
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            current = item_cons.cdr();
+                            if found { break; }
+                        }
+                    }
+                }
+            }
+            if found { break; }
+        }
+        
+        if let Some(index) = index_to_remove {
+            elements.remove(index);
+            info!("✅ Removed component: {}", reference);
+            
+            // Rebuild the S-expression
+            self.sexp = Value::list(elements);
+            Ok(())
+        } else {
+            Err(SchematicError::InvalidData(format!("Component {} not found", reference)))
+        }
+    }
+
     pub fn add_component(&mut self, component: &SimpleComponent) -> Result<(), SchematicError> {
         info!("🔧 Adding component: {} ({})", component.reference, component.lib_id);
         

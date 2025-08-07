@@ -957,6 +957,35 @@ fn load_schematic(filepath: &str) -> PyResult<String> {
 
 /// Add a component to a schematic string and return the modified schematic
 #[pyfunction]
+fn remove_component_from_schematic(
+    schematic_str: &str,
+    reference: &str,
+) -> PyResult<String> {
+    use crate::schematic_editor::SchematicEditor;
+    
+    init_logging();
+    info!("🐍 Python calling remove_component_from_schematic");
+    info!("  Removing component: {}", reference);
+    
+    debug!("  Loading schematic from string ({} bytes)", schematic_str.len());
+    
+    // Load schematic
+    let mut editor = SchematicEditor::load_from_string(schematic_str)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to load schematic: {}", e)))?;
+    
+    // Remove component
+    editor.remove_component(reference)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to remove component: {}", e)))?;
+    
+    // Convert back to string
+    let result = editor.to_string();
+    info!("✅ Component removed successfully");
+    debug!("  Output size: {} bytes", result.len());
+    
+    Ok(result)
+}
+
+#[pyfunction]
 fn add_hierarchical_label_to_schematic(
     schematic_str: &str,
     name: &str,
@@ -1064,6 +1093,7 @@ fn rust_kicad_schematic_writer(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(load_schematic, m)?)?;
     m.add_function(wrap_pyfunction!(add_component_to_schematic, m)?)?;
     m.add_function(wrap_pyfunction!(add_hierarchical_label_to_schematic, m)?)?;
+    m.add_function(wrap_pyfunction!(remove_component_from_schematic, m)?)?;
 
     info!("✅ Python module initialized successfully");
     Ok(())
