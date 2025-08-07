@@ -156,10 +156,13 @@ report_path = generator.generate_comprehensive_report(
 
 ```bash
 # Quick FMEA analysis
-uv run python -m circuit_synth.tools.quality_assurance.fmea_cli analyze my_circuit.py
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py
 
-# Generate comprehensive report
-uv run python -m circuit_synth.tools.quality_assurance.fmea_cli analyze my_circuit.py --comprehensive
+# Specify output file
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py -o FMEA_Report.pdf
+
+# Analyze with custom threshold
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py --threshold 150
 ```
 
 See [FMEA Guide](docs/FMEA_GUIDE.md) for detailed documentation.

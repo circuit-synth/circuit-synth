@@ -88,16 +88,16 @@ report_path = generator.generate_comprehensive_report(
 
 ```bash
 # Analyze a circuit file
-uv run python -m circuit_synth.tools.quality_assurance.fmea_cli analyze my_circuit.py
-
-# Generate comprehensive report
-uv run python -m circuit_synth.tools.quality_assurance.fmea_cli analyze my_circuit.py --comprehensive
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py
 
 # Specify output path
-uv run python -m circuit_synth.tools.quality_assurance.fmea_cli analyze my_circuit.py -o custom_report.pdf
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py -o custom_report.pdf
 
-# Set environment context
-uv run python -m circuit_synth.tools.quality_assurance.fmea_cli analyze my_circuit.py --env industrial
+# Set custom RPN threshold for high-risk items
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py --threshold 150
+
+# Show more top risks in console output
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py --top 20
 ```
 
 ### Using the cs-new-project Agent
