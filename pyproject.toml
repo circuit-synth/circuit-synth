@@ -103,6 +103,9 @@ cs-setup-kicad-plugins = "circuit_synth.tools.development.setup_kicad_plugins:ma
 cs-memory-bank-init = "circuit_synth.ai_integration.memory_bank.cli:init_cli"
 cs-memory-bank-remove = "circuit_synth.ai_integration.memory_bank.cli:remove_cli"
 
+# Quality Assurance Tools
+cs-fmea = "circuit_synth.tools.quality_assurance.fmea_cli:main"
+
 # Test Plan Generation - DISABLED: Files don't exist yet
 # create-test-plan = "circuit_synth.tools.test_plan_commands:create_test_plan"
 # generate-manufacturing-tests = "circuit_synth.tools.test_plan_commands:generate_manufacturing_tests"
