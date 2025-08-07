@@ -154,17 +154,23 @@ pip install -e .
 ./tools/build/format_all.sh
 ```
 
-### KiCad Component Search
+### Component Search Commands
 ```bash
-# Primary slash commands for finding KiCad components
+# Unified component search across suppliers (NEW!)
+# /find-parts "0.1uF 0603" - Search all suppliers
+# /find-parts "STM32F407" --source jlcpcb - JLCPCB only
+# /find-parts "LM358" --source digikey - DigiKey only
+# /find-parts "3.3V regulator" --compare - Compare across suppliers
+
+# KiCad symbol and footprint search
 # /find-symbol STM32 - Search for STM32 symbols
 # /find-footprint LQFP - Search for LQFP footprints
 
-# Circuit validation commands (NEW!)
+# Circuit validation commands
 # /generate-validated-circuit "ESP32 development board" - Generate circuit with quality assurance
 # /validate-existing-circuit - Validate and improve existing circuit code
 
-# Quality Assurance commands (NEW!)
+# Quality Assurance commands
 # /analyze-fmea my_circuit.py - Run FMEA analysis on circuit
 # /generate-fmea-report my_circuit.py --comprehensive - Generate 50+ page FMEA report
 
@@ -175,6 +181,38 @@ pip install -e .
 # Manual search in KiCad libraries (if needed)
 find /usr/share/kicad/symbols -name "*.kicad_sym" | xargs grep -l "STM32"
 find /usr/share/kicad/footprints -name "*.kicad_mod" | grep -i lqfp
+```
+
+### Multi-Source Component Search (NEW!)
+```python
+from circuit_synth.manufacturing import find_parts
+
+# Search all suppliers
+results = find_parts("0.1uF 0603 X7R", sources="all")
+
+# Search specific supplier
+jlc_results = find_parts("STM32F407", sources="jlcpcb")
+dk_results = find_parts("LM358", sources="digikey")
+
+# Compare across suppliers
+comparison = find_parts("3.3V regulator", sources="all", compare=True)
+print(comparison)  # Shows comparison table
+
+# Filter by requirements
+high_stock = find_parts("10k resistor", min_stock=10000, max_price=0.10)
+```
+
+### DigiKey Integration Setup
+```bash
+# Configure DigiKey API (one-time setup)
+python -m circuit_synth.manufacturing.digikey.config_manager
+
+# Test connection
+python -m circuit_synth.manufacturing.digikey.test_connection
+
+# Environment variables (alternative to config file)
+export DIGIKEY_CLIENT_ID="your_client_id"
+export DIGIKEY_CLIENT_SECRET="your_client_secret"
 ```
 
 ## Circuit Validation System
@@ -723,7 +761,7 @@ circuit-synth2/
 │   │   ├── jlcpcb/             # JLCPCB integration
 │   │   ├── pcbway/             # PCBWay (future)
 │   │   ├── oshpark/            # OSH Park (future)
-│   │   └── digikey/            # Digi-Key sourcing (future)
+│   │   └── digikey/            # DigiKey sourcing (implemented)
 │   ├── tools/                  # CLI tools and utilities
 │   └── [core modules...]       # Core circuit-synth functionality
 ├── examples/                   # User examples organized by complexity
@@ -754,7 +792,7 @@ from circuit_synth.ai_integration.component_info.sensors.temperature import Temp
 
 # Future manufacturing integrations
 from circuit_synth.manufacturing.pcbway import get_pcbway_pricing  # (future)
-from circuit_synth.manufacturing.digikey import search_digikey_parts  # (future)
+from circuit_synth.manufacturing.digikey import search_digikey_components  # (implemented)
 ```
 
 **Backward Compatibility:**
