@@ -45,8 +45,10 @@
 use log::{debug, info};
 
 pub mod hierarchical_labels;
+pub mod kicad_library;
 pub mod s_expression;
 pub mod schematic_api;
+pub mod schematic_editor;
 pub mod types;
 
 #[cfg(feature = "python")]

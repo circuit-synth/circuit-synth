@@ -169,7 +169,11 @@ pub fn create_empty_schematic(paper_size: &str) -> PyResult<String> {
 /// Create a minimal KiCad schematic with default A4 paper
 #[pyfunction]
 pub fn create_minimal_schematic() -> PyResult<String> {
-    Ok(schematic_api::create_minimal_schematic())
+    init_logging();
+    info!("🐍 Python calling create_minimal_schematic");
+    let result = schematic_api::create_minimal_schematic();
+    info!("✅ Minimal schematic created, {} bytes", result.len());
+    Ok(result)
 }
 
 /// Python-visible simple component class
@@ -188,12 +192,15 @@ pub struct PySimpleComponent {
     y: f64,
     #[pyo3(get, set)]
     rotation: f64,
+    #[pyo3(get, set)]
+    footprint: Option<String>,
 }
 
 #[pymethods]
 impl PySimpleComponent {
     #[new]
-    fn new(reference: String, lib_id: String, value: String, x: f64, y: f64, rotation: Option<f64>) -> Self {
+    #[pyo3(signature = (reference, lib_id, value, x, y, rotation=None, footprint=None))]
+    fn new(reference: String, lib_id: String, value: String, x: f64, y: f64, rotation: Option<f64>, footprint: Option<String>) -> Self {
         Self {
             reference,
             lib_id,
@@ -201,6 +208,7 @@ impl PySimpleComponent {
             x,
             y,
             rotation: rotation.unwrap_or(0.0),
+            footprint,
         }
     }
 }
@@ -218,6 +226,7 @@ pub fn create_schematic_with_components(paper_size: &str, components: Vec<PySimp
             x: py_comp.x,
             y: py_comp.y,
             rotation: py_comp.rotation,
+            footprint: py_comp.footprint,
         })
         .collect();
     
@@ -935,6 +944,63 @@ fn convert_config_from_python(py_dict: &PyDict) -> PyResult<SchematicConfig> {
     Ok(config)
 }
 
+/// Load a schematic from file and return as a string handle
+#[pyfunction]
+fn load_schematic(filepath: &str) -> PyResult<String> {
+    use crate::schematic_editor::SchematicEditor;
+    
+    let editor = SchematicEditor::load_from_file(filepath)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyIOError, _>(format!("Failed to load schematic: {}", e)))?;
+    
+    Ok(editor.to_string())
+}
+
+/// Add a component to a schematic string and return the modified schematic
+#[pyfunction]
+#[pyo3(signature = (schematic_str, reference, lib_id, value, x, y, rotation, footprint=None))]
+fn add_component_to_schematic(
+    schematic_str: &str,
+    reference: &str,
+    lib_id: &str,
+    value: &str,
+    x: f64,
+    y: f64,
+    rotation: f64,
+    footprint: Option<String>,
+) -> PyResult<String> {
+    use crate::schematic_editor::SchematicEditor;
+    
+    init_logging();
+    info!("🐍 Python calling add_component_to_schematic");
+    info!("  Component: ref={}, lib_id={}, value={}", reference, lib_id, value);
+    info!("  Position: ({}, {}), rotation={}", x, y, rotation);
+    if let Some(ref fp) = footprint {
+        info!("  Footprint: {}", fp);
+    }
+    
+    debug!("  Loading schematic from string ({} bytes)", schematic_str.len());
+    let mut editor = SchematicEditor::load_from_string(schematic_str)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to parse schematic: {}", e)))?;
+    
+    let component = SimpleComponent {
+        reference: reference.to_string(),
+        lib_id: lib_id.to_string(),
+        value: value.to_string(),
+        x,
+        y,
+        rotation,
+        footprint,
+    };
+    
+    debug!("  Adding component to schematic editor");
+    editor.add_component(&component)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to add component: {}", e)))?;
+    
+    let result = editor.to_string();
+    info!("✅ Component added successfully, returning {} bytes to Python", result.len());
+    Ok(result)
+}
+
 /// Initialize the Python module
 #[pymodule]
 fn rust_kicad_schematic_writer(_py: Python, m: &PyModule) -> PyResult<()> {
@@ -959,6 +1025,10 @@ fn rust_kicad_schematic_writer(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(create_empty_schematic, m)?)?;
     m.add_function(wrap_pyfunction!(create_minimal_schematic, m)?)?;
     m.add_function(wrap_pyfunction!(create_schematic_with_components, m)?)?;
+    
+    // Add schematic editing functions
+    m.add_function(wrap_pyfunction!(load_schematic, m)?)?;
+    m.add_function(wrap_pyfunction!(add_component_to_schematic, m)?)?;
 
     info!("✅ Python module initialized successfully");
     Ok(())

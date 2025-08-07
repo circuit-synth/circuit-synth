@@ -38,6 +38,7 @@ pub struct SimpleComponent {
     pub x: f64,
     pub y: f64,
     pub rotation: f64,
+    pub footprint: Option<String>,
 }
 
 /// Create a new, empty KiCad schematic
@@ -69,7 +70,6 @@ pub fn create_empty_schematic(paper_size: &str) -> String {
         Value::list(vec![Value::symbol("uuid"), Value::string(uuid)]),
         Value::list(vec![Value::symbol("paper"), Value::string(paper_size)]),
         Value::list(vec![Value::symbol("lib_symbols")]),
-        Value::list(vec![Value::symbol("symbol_instances")]),
     ]);
     
     lexpr::to_string(&schematic).unwrap()
@@ -113,8 +113,21 @@ pub fn create_minimal_schematic() -> String {
 pub fn create_schematic_with_components(paper_size: &str, components: Vec<SimpleComponent>) -> String {
     let uuid = Uuid::new_v4().to_string();
     
-    // Build lib_symbols section with component symbols
-    let mut lib_symbol_entries = Vec::new();
+    // Build the complete schematic
+    let mut schematic_elements = vec![
+        Value::symbol("kicad_sch"),
+        Value::list(vec![Value::symbol("version"), Value::from(20250114)]),
+        Value::list(vec![Value::symbol("generator"), Value::string("circuit_synth")]),
+        Value::list(vec![Value::symbol("generator_version"), Value::string("1.0")]),
+        Value::list(vec![Value::symbol("uuid"), Value::string(uuid.clone())]),
+        Value::list(vec![Value::symbol("paper"), Value::string(paper_size)]),
+    ];
+    
+    // Add empty lib_symbols section (library definitions would go here)
+    // For now we assume Device:R and other standard symbols are known to KiCad
+    schematic_elements.push(Value::list(vec![Value::symbol("lib_symbols")]));
+    
+    // Add each component as a symbol instance
     for component in &components {
         let symbol_uuid = Uuid::new_v4().to_string();
         let symbol = Value::list(vec![
@@ -130,9 +143,11 @@ pub fn create_schematic_with_components(paper_size: &str, components: Vec<Simple
                 Value::from(component.rotation),
             ]),
             Value::list(vec![Value::symbol("unit"), Value::from(1)]),
+            Value::list(vec![Value::symbol("exclude_from_sim"), Value::symbol("no")]),
             Value::list(vec![Value::symbol("in_bom"), Value::symbol("yes")]),
             Value::list(vec![Value::symbol("on_board"), Value::symbol("yes")]),
             Value::list(vec![Value::symbol("dnp"), Value::symbol("no")]),
+            Value::list(vec![Value::symbol("fields_autoplaced"), Value::symbol("yes")]),
             Value::list(vec![Value::symbol("uuid"), Value::string(symbol_uuid.clone())]),
             Value::list(vec![
                 Value::symbol("property"),
@@ -140,9 +155,21 @@ pub fn create_schematic_with_components(paper_size: &str, components: Vec<Simple
                 Value::string(component.reference.clone()),
                 Value::list(vec![
                     Value::symbol("at"),
-                    Value::from(component.x),
-                    Value::from(component.y - 5.08), // Place reference above component
+                    Value::from(component.x + 2.54),  // Offset to the right
+                    Value::from(component.y - 1.27),  // Slight offset up
                     Value::from(0),
+                ]),
+                Value::list(vec![
+                    Value::symbol("effects"),
+                    Value::list(vec![
+                        Value::symbol("font"),
+                        Value::list(vec![
+                            Value::symbol("size"),
+                            Value::from(1.27),
+                            Value::from(1.27),
+                        ]),
+                    ]),
+                    Value::list(vec![Value::symbol("justify"), Value::symbol("left")]),
                 ]),
             ]),
             Value::list(vec![
@@ -151,57 +178,76 @@ pub fn create_schematic_with_components(paper_size: &str, components: Vec<Simple
                 Value::string(component.value.clone()),
                 Value::list(vec![
                     Value::symbol("at"),
-                    Value::from(component.x),
-                    Value::from(component.y + 5.08), // Place value below component
+                    Value::from(component.x + 2.54),  // Offset to the right
+                    Value::from(component.y + 1.27),  // Slight offset down
                     Value::from(0),
                 ]),
+                Value::list(vec![
+                    Value::symbol("effects"),
+                    Value::list(vec![
+                        Value::symbol("font"),
+                        Value::list(vec![
+                            Value::symbol("size"),
+                            Value::from(1.27),
+                            Value::from(1.27),
+                        ]),
+                    ]),
+                    Value::list(vec![Value::symbol("justify"), Value::symbol("left")]),
+                ]),
             ]),
-            Value::list(vec![Value::symbol("pin"), Value::string("1")]),
-            Value::list(vec![Value::symbol("pin"), Value::string("2")]),
+            // Add pins
+            Value::list(vec![
+                Value::symbol("pin"),
+                Value::string("1"),
+                Value::list(vec![
+                    Value::symbol("uuid"),
+                    Value::string(Uuid::new_v4().to_string()),
+                ]),
+            ]),
+            Value::list(vec![
+                Value::symbol("pin"),
+                Value::string("2"),
+                Value::list(vec![
+                    Value::symbol("uuid"),
+                    Value::string(Uuid::new_v4().to_string()),
+                ]),
+            ]),
+            // Add instances section
             Value::list(vec![
                 Value::symbol("instances"),
                 Value::list(vec![
                     Value::symbol("project"),
-                    Value::string("/"),
+                    Value::string("circuit_synth"),
                     Value::list(vec![
                         Value::symbol("path"),
-                        Value::string(format!("/{}", symbol_uuid)),
-                    ]),
-                    Value::list(vec![
-                        Value::symbol("reference"),
-                        Value::string(component.reference.clone()),
-                    ]),
-                    Value::list(vec![
-                        Value::symbol("unit"),
-                        Value::from(1),
+                        Value::string(format!("/{}", uuid)),
+                        Value::list(vec![
+                            Value::symbol("reference"),
+                            Value::string(component.reference.clone()),
+                        ]),
+                        Value::list(vec![
+                            Value::symbol("unit"),
+                            Value::from(1),
+                        ]),
                     ]),
                 ]),
             ]),
         ]);
-        lib_symbol_entries.push(symbol);
+        schematic_elements.push(symbol);
     }
     
-    // Build the complete schematic
-    let mut schematic_elements = vec![
-        Value::symbol("kicad_sch"),
-        Value::list(vec![Value::symbol("version"), Value::from(20250114)]),
-        Value::list(vec![Value::symbol("generator"), Value::string("circuit_synth")]),
-        Value::list(vec![Value::symbol("generator_version"), Value::string("1.0")]),
-        Value::list(vec![Value::symbol("uuid"), Value::string(uuid)]),
-        Value::list(vec![Value::symbol("paper"), Value::string(paper_size)]),
-    ];
-    
-    // Add lib_symbols section
-    if lib_symbol_entries.is_empty() {
-        schematic_elements.push(Value::list(vec![Value::symbol("lib_symbols")]));
-    } else {
-        let mut lib_symbols_section = vec![Value::symbol("lib_symbols")];
-        lib_symbols_section.extend(lib_symbol_entries);
-        schematic_elements.push(Value::list(lib_symbols_section));
-    }
-    
-    // Add symbol_instances (empty for now, but needed)
-    schematic_elements.push(Value::list(vec![Value::symbol("symbol_instances")]));
+    // Add sheet_instances section
+    schematic_elements.push(Value::list(vec![
+        Value::symbol("sheet_instances"),
+        Value::list(vec![
+            Value::symbol("path"),
+            Value::string("/"),
+            Value::list(vec![
+                Value::symbol("page"),
+                Value::string("1"),
+            ]),
+        ]),
+    ]));
     
     let schematic = Value::list(schematic_elements);
     lexpr::to_string(&schematic).unwrap()
