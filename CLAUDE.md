@@ -164,6 +164,10 @@ pip install -e .
 # /generate-validated-circuit "ESP32 development board" - Generate circuit with quality assurance
 # /validate-existing-circuit - Validate and improve existing circuit code
 
+# Quality Assurance commands (NEW!)
+# /analyze-fmea my_circuit.py - Run FMEA analysis on circuit
+# /generate-fmea-report my_circuit.py --comprehensive - Generate 50+ page FMEA report
+
 # Development slash commands (for contributors)
 # /dev-run-tests - Run comprehensive test suite
 # /dev-update-and-commit "description" - Update docs and commit changes
