@@ -1,214 +1,117 @@
-# Rust KiCad Schematic Writer
+# KiCad Schematic Editor (Rust)
 
-[![CI](https://github.com/circuit-synth/circuit-synth/actions/workflows/ci.yml/badge.svg)](https://github.com/circuit-synth/circuit-synth/actions)
-[![Documentation](https://docs.rs/rust_kicad_schematic_writer/badge.svg)](https://docs.rs/rust_kicad_schematic_writer)
-[![Crates.io](https://img.shields.io/crates/v/rust_kicad_schematic_writer.svg)](https://crates.io/crates/rust_kicad_schematic_writer)
-
-High-performance Rust library for generating and editing KiCad schematic files with optional Python bindings.
+A Rust library for programmatically creating and manipulating KiCad schematic files.
 
 ## Features
 
-- 🚀 **High Performance** - Written in Rust for maximum speed and safety
-- 📝 **Simple API** - Easy-to-use functions for creating schematics quickly
-- 🔧 **Component Management** - Full support for component placement and configuration
-- ⚡ **Net Connections** - Define electrical connections between components
-- 📊 **Hierarchical Design** - Support for complex multi-level circuit designs
-- 🎯 **Clean S-expressions** - Proper KiCad-compatible output without dotted pairs
-- 🐍 **Python Bindings** - Optional PyO3 integration for Python users
-- 📏 **Multiple Paper Sizes** - A4, A3, A2, A1, A0, Letter, Legal
-- ✅ **Well Tested** - Comprehensive unit and integration tests
-- 📈 **Benchmarked** - Performance benchmarks for critical paths
+- ✅ Create KiCad schematics programmatically
+- ✅ Add/remove/update components
+- ✅ Support for hierarchical labels
+- ✅ Handle extended symbols (inheritance)
+- ✅ Multi-unit component support
+- ✅ Preserve KiCad metadata and UUIDs
+- ✅ Python bindings available
 
 ## Installation
 
-### As a Rust Library
-
-Add to your `Cargo.toml`:
-
+### Rust
 ```toml
 [dependencies]
-rust_kicad_schematic_writer = "0.1"
+kicad-schematic-editor = "0.1.0"
 ```
 
-### With Python Bindings
-
+### Python
 ```bash
-# Build from source with Python support
-cd rust_modules/rust_kicad_integration
-maturin build --release -F python
-pip install target/wheels/*.whl
+pip install kicad-schematic-editor
 ```
 
-## Quick Start
+## Usage
 
-### Rust Usage
-
+### Rust Example
 ```rust
-use rust_kicad_schematic_writer::schematic_api::*;
+use kicad_schematic_editor::{SchematicEditor, SimpleComponent};
 
-// Create minimal A4 schematic
-let schematic = create_minimal_schematic();
-
-// Create schematic with specific paper size
-let schematic = create_empty_schematic("A3");
-
-// Save to file
-std::fs::write("my_schematic.kicad_sch", schematic)?;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Load a schematic
+    let mut editor = SchematicEditor::load_from_file("my_schematic.kicad_sch")?;
+    
+    // Add a component
+    let resistor = SimpleComponent {
+        reference: "R1".to_string(),
+        lib_id: "Device:R".to_string(),
+        value: "10k".to_string(),
+        position: (100.0, 50.0),
+        footprint: Some("Resistor_SMD:R_0603_1608Metric".to_string()),
+    };
+    editor.add_component(&resistor)?;
+    
+    // Save the result
+    editor.save_to_file("output.kicad_sch")?;
+    Ok(())
+}
 ```
 
-### Python Usage
-
+### Python Example
 ```python
-import rust_kicad_schematic_writer as kicad
+import kicad_schematic_editor as kicad
 
-# Create minimal A4 schematic
+# Create a new schematic
 schematic = kicad.create_minimal_schematic()
 
+# Add a resistor
+schematic = kicad.add_component_to_schematic(
+    schematic,
+    reference="R1",
+    lib_id="Device:R",
+    value="10k",
+    x=100.0,
+    y=50.0,
+    rotation=0.0,
+    footprint="Resistor_SMD:R_0603_1608Metric"
+)
+
+# Add a hierarchical label
+schematic = kicad.add_hierarchical_label_to_schematic(
+    schematic,
+    name="VCC",
+    shape="input",
+    x=100.0,
+    y=30.0,
+    rotation=90.0
+)
+
 # Save to file
-with open("my_schematic.kicad_sch", "w") as f:
+with open("output.kicad_sch", "w") as f:
     f.write(schematic)
 ```
 
-### Advanced Circuit Generation
+## API Reference
 
-```rust
-use rust_kicad_schematic_writer::{
-    CircuitData, Component, Net, PinConnection, Pin, Position,
-    RustSchematicWriter, SchematicConfig,
-};
+### Core Functions
 
-// Create circuit with components and nets
-let circuit = CircuitData {
-    name: "voltage_divider".to_string(),
-    components: vec![
-        Component {
-            reference: "R1".to_string(),
-            lib_id: "Device:R".to_string(),
-            value: "10k".to_string(),
-            position: Position { x: 100.0, y: 50.0 },
-            rotation: 90.0,
-            pins: vec![/* ... */],
-        },
-    ],
-    nets: vec![
-        Net {
-            name: "VCC".to_string(),
-            connected_pins: vec![/* ... */],
-        },
-    ],
-    subcircuits: vec![],
-};
+#### `create_minimal_schematic() -> str`
+Creates a minimal valid KiCad schematic.
 
-// Generate schematic
-let config = SchematicConfig::default();
-let writer = RustSchematicWriter::new(circuit, config);
-writer.write_to_file("output.kicad_sch")?;
-```
+#### `add_component_to_schematic(schematic, reference, lib_id, value, x, y, rotation, footprint) -> str`
+Adds a component to the schematic.
 
-## Project Structure
+#### `remove_component_from_schematic(schematic, reference) -> str`
+Removes a component by reference.
 
-```
-rust_kicad_integration/
-├── src/                    # Source code
-│   ├── lib.rs             # Main library interface
-│   ├── schematic_api.rs   # Simple API functions
-│   ├── types.rs           # Core data structures
-│   ├── s_expression.rs    # S-expression generation
-│   ├── hierarchical_labels.rs # Hierarchical label support
-│   └── python_bindings.rs # Optional Python interface
-├── examples/              # Example programs
-│   ├── basic_schematic.rs
-│   ├── circuit_with_components.rs
-│   └── hierarchical_design.rs
-├── tests/                 # Integration tests
-│   └── integration_test.rs
-├── benches/              # Performance benchmarks
-│   └── schematic_generation.rs
-└── .github/workflows/    # CI/CD pipeline
-    └── ci.yml
-```
+#### `add_hierarchical_label_to_schematic(schematic, name, shape, x, y, rotation) -> str`
+Adds a hierarchical label.
 
-## Examples
-
-Run the examples:
-
-```bash
-# Create output directory
-mkdir -p examples/output
-
-# Run basic schematic example
-cargo run --example basic_schematic
-
-# Run circuit with components
-cargo run --example circuit_with_components
-
-# Run hierarchical design
-cargo run --example hierarchical_design
-```
-
-## Development
-
-### Running Tests
-
-```bash
-# Run all tests
-cargo test
-
-# Run without Python features
-cargo test --no-default-features
-
-# Run with Python features
-cargo test --features python
-
-# Run benchmarks
-cargo bench
-```
-
-### Building Documentation
-
-```bash
-# Build and open documentation
-cargo doc --open
-```
-
-### Code Quality
-
-```bash
-# Format code
-cargo fmt
-
-# Run linter
-cargo clippy -- -D warnings
-```
-
-## Best Practices
-
-This crate follows Rust best practices:
-
-- ✅ **Comprehensive Documentation** - All public APIs are documented
-- ✅ **Error Handling** - Custom error types with `thiserror`
-- ✅ **Testing** - Unit tests, integration tests, and benchmarks
-- ✅ **CI/CD** - Automated testing on multiple platforms
-- ✅ **Examples** - Clear examples for common use cases
-- ✅ **Modular Design** - Clean separation of concerns
-- ✅ **Optional Features** - Python bindings are optional
+#### `update_component_by_uuid(schematic, uuid, updates) -> str`
+Updates a component by UUID (planned).
 
 ## Contributing
 
-This module is part of the circuit-synth project. When contributing:
-
-1. **Write tests first** - Follow TDD practices
-2. **Document your code** - Add rustdoc comments for public APIs
-3. **Maintain compatibility** - Test generated files in KiCad
-4. **Keep it simple** - Simple API should remain simple
-5. **Run CI locally** - `cargo test && cargo clippy && cargo fmt`
+Contributions are welcome! Please see CONTRIBUTING.md for details.
 
 ## License
 
 MIT OR Apache-2.0
 
-## Links
+## Acknowledgments
 
-- [Documentation](https://docs.rs/rust_kicad_schematic_writer)
-- [Crates.io](https://crates.io/crates/rust_kicad_schematic_writer)
-- [GitHub Repository](https://github.com/circuit-synth/circuit-synth)
+Originally developed as part of the [circuit-synth](https://github.com/circuit-synth/circuit-synth) project.
