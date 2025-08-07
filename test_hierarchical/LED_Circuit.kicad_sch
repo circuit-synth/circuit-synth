@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid e7d66488-c872-4313-8ce5-16dab339684b)
+	(uuid 6f31d54a-30a6-4407-8754-6e37dd5594af)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:LED"
@@ -14,23 +14,25 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "D"
-				(at 0 0 0)
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(hide no)
 				)
 			)
 			(property "Value" "LED"
-				(at 0 -2.54 0)
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(hide no)
 				)
 			)
 			(property "Footprint" ""
-				(at 0 -5.08 0)
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -39,7 +41,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0 -7.62 0)
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -48,7 +50,7 @@
 				)
 			)
 			(property "Description" "Light emitting diode"
-				(at 0 -10.16 0)
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -56,8 +58,26 @@
 					(hide yes)
 				)
 			)
+			(property "Sim.Pins" "1=K 2=A"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
 			(property "ki_keywords" "LED diode"
-				(at 0 -12.7 0)
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "LED* LED_SMD:* LED_THT:*"
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -144,7 +164,7 @@
 				(pin
 					passive
 					line
-					(at -3.81 0.0 0.0)
+					(at -3.81 0.0 0)
 					(length 2.54)
 					(name
 						K
@@ -166,7 +186,7 @@
 				(pin
 					passive
 					line
-					(at 3.81 0.0 180.0)
+					(at 3.81 0.0 180)
 					(length 2.54)
 					(name
 						A
@@ -186,7 +206,6 @@
 					)
 				)
 			)
-			(embedded_fonts no)
 		)
 		(symbol "Device:R"
 			(pin_numbers hide)
@@ -197,23 +216,25 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "R"
-				(at 0 0 0)
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(hide no)
 				)
 			)
 			(property "Value" "R"
-				(at 0 -2.54 0)
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(hide no)
 				)
 			)
 			(property "Footprint" ""
-				(at 0 -5.08 0)
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -222,7 +243,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0 -7.62 0)
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -231,7 +252,7 @@
 				)
 			)
 			(property "Description" "Resistor"
-				(at 0 -10.16 0)
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -240,7 +261,16 @@
 				)
 			)
 			(property "ki_keywords" "R res resistor"
-				(at 0 -12.7 0)
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "R_*"
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -265,7 +295,7 @@
 				(pin
 					passive
 					line
-					(at 0.0 3.81 270.0)
+					(at 0.0 3.81 270)
 					(length 1.27)
 					(name
 						~
@@ -287,7 +317,7 @@
 				(pin
 					passive
 					line
-					(at 0.0 -3.81 90.0)
+					(at 0.0 -3.81 90)
 					(length 1.27)
 					(name
 						~
@@ -307,11 +337,10 @@
 					)
 				)
 			)
-			(embedded_fonts no)
 		)
 	)
 	(title_block
-		(title LED_Blinker)
+		(title LED_Circuit)
 		(date 2025-08-06)
 		(company Circuit-Synth)
 	)
@@ -324,8 +353,8 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 4da16b03-5867-45a4-b75b-a9880fbd48d0)
-		(property "Reference" "D3"
+		(uuid e2fb4609-c003-46e3-af11-ee2ab9a8f315)
+		(property "Reference" "D1"
 			(at 45.72 40.72 0)
 			(effects
 				(font
@@ -334,19 +363,10 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
-			(at 45.72 55.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(instances
-			(project "ESP32_C6_Dev_Board"
-				(path "/"
-					(reference "D3")
+			(project "test_hierarchical"
+				(path "/a2f473ef-07de-42c4-9ac8-bacb8adaa513/894ec187-67c5-4dde-b140-39a246c65948"
+					(reference "D1")
 					(unit 1)
 				)
 			)
@@ -354,16 +374,16 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 68.58 45.72 0)
+		(at 68.58 68.58 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 740a38ef-14d0-4fed-9eec-2c30bf925709)
+		(uuid ba52aded-aeec-4f54-b9df-6cca17caee97)
 		(property "Reference" "R3"
-			(at 68.58 40.72 0)
+			(at 68.58 63.58 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -372,7 +392,7 @@
 			)
 		)
 		(property "Value" "330"
-			(at 68.58 50.72 0)
+			(at 68.58 73.58 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -380,18 +400,9 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 68.58 55.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(instances
-			(project "ESP32_C6_Dev_Board"
-				(path "/"
+			(project "test_hierarchical"
+				(path "/a2f473ef-07de-42c4-9ac8-bacb8adaa513/894ec187-67c5-4dde-b140-39a246c65948"
 					(reference "R3")
 					(unit 1)
 				)
@@ -408,22 +419,10 @@
 			)
 			(justify right)
 		)
-		(uuid c98b486d-5599-40ae-b844-408070629eb5)
+		(uuid 70c74bad-4794-4b4a-80df-ffb006bd046a)
 	)
 	(hierarchical_label
-		GND
-		(shape input)
-		(at 41.91 45.72 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 11cd9d9d-4871-4b3a-b167-885c4333843c)
-	)
-	(hierarchical_label
-		N$3
+		LED_NET
 		(shape input)
 		(at 49.53 45.72 0)
 		(effects
@@ -432,34 +431,67 @@
 			)
 			(justify left)
 		)
-		(uuid e4baa2eb-2994-46db-a2a6-765b3235602d)
+		(uuid e59be106-7e30-4029-a8b5-6acb3939087b)
 	)
 	(hierarchical_label
-		N$3
+		LED_NET
 		(shape input)
-		(at 68.58 49.53 270)
+		(at 68.58 72.39 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right)
 		)
-		(uuid c0e896f6-1e60-4437-a627-1e12c88602f3)
+		(uuid ab87b9fa-84dd-435f-be64-4ef6b85f37d1)
 	)
 	(hierarchical_label
-		LED_CONTROL
+		VOUT
 		(shape input)
-		(at 68.58 41.91 90)
+		(at 68.58 64.77 90)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid 1b2f050d-29f6-467b-9080-ad9ed86093b8)
+		(uuid 0f657701-f13d-4d81-ab10-1dc6069992a2)
+	)
+	(text_box
+		"Simple LED subcircuit"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid d51ed3f6-fea3-4cc4-9817-d50f56d71524)
 	)
 	(sheet_instances
-		(path "/"
+		(path "/a2f473ef-07de-42c4-9ac8-bacb8adaa513/894ec187-67c5-4dde-b140-39a246c65948"
 			(page "1")
 		)
 	)

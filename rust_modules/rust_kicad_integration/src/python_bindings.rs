@@ -545,65 +545,12 @@ fn convert_circuit_data_from_python(py_dict: &PyDict) -> PyResult<CircuitData> {
                                         debug!("🔄 PYTHON->RUST: Converted subcircuit #{} '{}' with {} components, {} nets",
                                               subcircuit_index + 1, subcircuit.name, subcircuit.components.len(), subcircuit.nets.len());
 
-                                        // CRITICAL FIX: Extract and flatten components from subcircuit
-                                        debug!("🔧 PYTHON->RUST: FLATTENING subcircuit '{}' components into main circuit...", subcircuit.name);
-                                        let mut flattened_components = 0;
-                                        for component in subcircuit.components.iter() {
-                                            // Create unique reference to avoid conflicts
-                                            let unique_ref = format!(
-                                                "{}_{}",
-                                                subcircuit.name, component.reference
-                                            );
-                                            debug!(
-                                                "  - Flattening component: {} -> {}",
-                                                component.reference, unique_ref
-                                            );
+                                        // DO NOT FLATTEN - Subcircuits should remain separate for hierarchical designs
+                                        // Components in subcircuits are handled when generating their own schematic files
+                                        debug!("🔧 PYTHON->RUST: Preserving subcircuit '{}' hierarchy (NOT flattening components)", subcircuit.name);
 
-                                            // Clone the component with new reference
-                                            let mut flattened_component = component.clone();
-                                            flattened_component.reference = unique_ref.clone();
-
-                                            circuit_data.add_component(flattened_component);
-                                            flattened_components += 1;
-                                        }
-                                        debug!("✅ PYTHON->RUST: Flattened {} components from subcircuit '{}'", flattened_components, subcircuit.name);
-
-                                        // CRITICAL FIX: Extract and flatten nets from subcircuit
-                                        debug!("🔧 PYTHON->RUST: FLATTENING subcircuit '{}' nets into main circuit...", subcircuit.name);
-                                        let mut flattened_nets = 0;
-                                        for net in subcircuit.nets.iter() {
-                                            // Create unique net name to avoid conflicts
-                                            let unique_net_name =
-                                                format!("{}_{}", subcircuit.name, net.name);
-                                            debug!(
-                                                "  - Flattening net: {} -> {}",
-                                                net.name, unique_net_name
-                                            );
-
-                                            // Clone the net with updated component references
-                                            let mut flattened_net = net.clone();
-                                            flattened_net.name = unique_net_name.clone();
-
-                                            // Update component references in net connections
-                                            for connection in
-                                                flattened_net.connected_pins.iter_mut()
-                                            {
-                                                let old_comp_ref = connection.component_ref.clone();
-                                                connection.component_ref =
-                                                    format!("{}_{}", subcircuit.name, old_comp_ref);
-                                                debug!(
-                                                    "    - Updated connection: {}.{} -> {}.{}",
-                                                    old_comp_ref,
-                                                    connection.pin_id,
-                                                    connection.component_ref,
-                                                    connection.pin_id
-                                                );
-                                            }
-
-                                            circuit_data.add_net(flattened_net);
-                                            flattened_nets += 1;
-                                        }
-                                        debug!("✅ PYTHON->RUST: Flattened {} nets from subcircuit '{}'", flattened_nets, subcircuit.name);
+                                        // DO NOT FLATTEN - Nets in subcircuits are handled separately
+                                        debug!("🔧 PYTHON->RUST: Preserving subcircuit '{}' nets (NOT flattening)", subcircuit.name);
 
                                         // Store subcircuit name before moving it
                                         let subcircuit_name = subcircuit.name.clone();

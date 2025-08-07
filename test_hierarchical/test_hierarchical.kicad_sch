@@ -1,0 +1,282 @@
+(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(generator_version "9.0")
+	(uuid a2f473ef-07de-42c4-9ac8-bacb8adaa513)
+	(paper "A4")
+	(lib_symbols)
+	(title_block
+		(title Main)
+		(date 2025-08-06)
+		(company Circuit-Synth)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 77.31 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid ef2be672-a46a-4086-9831-d7d8df172cc1)
+	)
+	(hierarchical_label
+		VIN
+		(shape input)
+		(at 77.31 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 48f5f1ba-a57c-4dde-8587-81a677351db1)
+	)
+	(hierarchical_label
+		VOUT
+		(shape input)
+		(at 77.31 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 2d29ab0c-34b2-4f81-b1f8-a5780ac78389)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 135.73 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid b2d7e31d-2b33-46d7-957d-8b6fb162460f)
+	)
+	(hierarchical_label
+		LED_NET
+		(shape input)
+		(at 135.73 41.910000000000004 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid c80c409b-3bcb-439b-9780-1a3946294148)
+	)
+	(hierarchical_label
+		VOUT
+		(shape input)
+		(at 135.73 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid dd6c4794-c9ec-454b-a76f-3e10b603cf76)
+	)
+	(sheet
+		(at 36.83 36.83)
+		(size 40.48 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 3aa877e9-fa5f-4ca2-97d8-16b4252f9361)
+		(property "Sheetname" "PowerSupply"
+			(at 36.83 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "PowerSupply.kicad_sch"
+			(at 36.83 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 76.04 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 299410a3-f27d-47f7-8b9d-166ad5651754)
+		)
+		(pin
+			VIN
+			passive
+			(at 76.04 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid a06a2c47-a361-4792-bf08-434b6a7bb7a1)
+		)
+		(pin
+			VOUT
+			passive
+			(at 76.04 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid c402183c-0e56-47c0-9370-30c63521353f)
+		)
+		(instances
+			(project "test_hierarchical"
+				(path "/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 91.44 36.83)
+		(size 44.29 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 894ec187-67c5-4dde-b140-39a246c65948)
+		(property "Sheetname" "LED_Circuit"
+			(at 91.44 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "LED_Circuit.kicad_sch"
+			(at 91.44 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 134.45999999999998 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid c1bbff34-5a67-4471-b624-2591f6c66015)
+		)
+		(pin
+			LED_NET
+			passive
+			(at 134.45999999999998 41.910000000000004 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 49312099-dd40-4da3-aeca-d3004362b3ad)
+		)
+		(pin
+			VOUT
+			passive
+			(at 134.45999999999998 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid d59df233-3678-4031-9388-ac963268191d)
+		)
+		(instances
+			(project "test_hierarchical"
+				(path "/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Main circuit with two subcircuits"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid 5ac03f0d-2f5e-48ae-a24e-d2b0e92b9c0d)
+	)
+	(sheet_instances
+		(path "/a2f473ef-07de-42c4-9ac8-bacb8adaa513"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
