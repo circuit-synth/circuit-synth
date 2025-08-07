@@ -11,6 +11,14 @@ from .cache import (
     cached_jlcpcb_search,
     get_jlcpcb_cache,
 )
+from .fast_search import (
+    FastJLCSearch,
+    FastSearchResult,
+    fast_jlc_search,
+    find_cheapest_jlc,
+    find_most_available_jlc,
+    get_fast_searcher,
+)
 from .jlc_parts_lookup import (
     JlcPartsInterface,
     _calculate_manufacturability_score,
@@ -30,14 +38,6 @@ from .smart_component_finder import (
     find_component,
     find_components,
     print_component_recommendation,
-)
-from .fast_search import (
-    FastJLCSearch,
-    FastSearchResult,
-    fast_jlc_search,
-    find_cheapest_jlc,
-    find_most_available_jlc,
-    get_fast_searcher,
 )
 
 __all__ = [

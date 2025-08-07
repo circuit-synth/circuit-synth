@@ -185,13 +185,17 @@ class SpiceConverter:
 
         # Add transistor (collector, base, emitter)
         self.spice_circuit.Q(ref, nodes[0], nodes[1], nodes[2], model=model_name)
-        logger.debug(f"Added BJT {ref}: C={nodes[0]}, B={nodes[1]}, E={nodes[2]}, model={model_name}")
+        logger.debug(
+            f"Added BJT {ref}: C={nodes[0]}, B={nodes[1]}, E={nodes[2]}, model={model_name}"
+        )
 
     def _add_mosfet(self, component, ref: str, value: str):
         """Add MOSFET to SPICE circuit."""
         nodes = self._get_component_nodes(component)
         if len(nodes) < 3:
-            logger.warning(f"MOSFET {ref} needs at least 3 connections (D,G,S), got {len(nodes)}")
+            logger.warning(
+                f"MOSFET {ref} needs at least 3 connections (D,G,S), got {len(nodes)}"
+            )
             return
 
         # Determine NMOS or PMOS from symbol or value
@@ -201,43 +205,59 @@ class SpiceConverter:
 
         # Add MOSFET (drain, gate, source, bulk - bulk defaults to source if not provided)
         if len(nodes) >= 4:
-            self.spice_circuit.M(ref, nodes[0], nodes[1], nodes[2], nodes[3], model=model_name)
-            logger.debug(f"Added MOSFET {ref}: D={nodes[0]}, G={nodes[1]}, S={nodes[2]}, B={nodes[3]}")
+            self.spice_circuit.M(
+                ref, nodes[0], nodes[1], nodes[2], nodes[3], model=model_name
+            )
+            logger.debug(
+                f"Added MOSFET {ref}: D={nodes[0]}, G={nodes[1]}, S={nodes[2]}, B={nodes[3]}"
+            )
         else:
             # Bulk connected to source
-            self.spice_circuit.M(ref, nodes[0], nodes[1], nodes[2], nodes[2], model=model_name)
-            logger.debug(f"Added MOSFET {ref}: D={nodes[0]}, G={nodes[1]}, S={nodes[2]} (bulk=source)")
+            self.spice_circuit.M(
+                ref, nodes[0], nodes[1], nodes[2], nodes[2], model=model_name
+            )
+            logger.debug(
+                f"Added MOSFET {ref}: D={nodes[0]}, G={nodes[1]}, S={nodes[2]} (bulk=source)"
+            )
 
     def _add_voltage_source(self, component, ref: str, value: str):
         """Add voltage source to SPICE circuit."""
         nodes = self._get_component_nodes(component)
         if len(nodes) < 2:
-            logger.warning(f"Voltage source {ref} needs 2 connections, got {len(nodes)}")
+            logger.warning(
+                f"Voltage source {ref} needs 2 connections, got {len(nodes)}"
+            )
             return
 
         # Parse voltage value
         voltage = self._convert_value_to_spice(value or "5V", "V")
-        
+
         # Add to list of voltage sources for tracking
         self.voltage_sources.append(ref)
-        
+
         # Add voltage source (positive, negative, voltage)
         self.spice_circuit.V(ref, nodes[0], nodes[1], voltage)
-        logger.debug(f"Added voltage source {ref}: {nodes[0]} -> {nodes[1]} = {voltage}V")
+        logger.debug(
+            f"Added voltage source {ref}: {nodes[0]} -> {nodes[1]} = {voltage}V"
+        )
 
     def _add_current_source(self, component, ref: str, value: str):
         """Add current source to SPICE circuit."""
         nodes = self._get_component_nodes(component)
         if len(nodes) < 2:
-            logger.warning(f"Current source {ref} needs 2 connections, got {len(nodes)}")
+            logger.warning(
+                f"Current source {ref} needs 2 connections, got {len(nodes)}"
+            )
             return
 
         # Parse current value
         current = self._convert_value_to_spice(value or "1mA", "I")
-        
+
         # Add current source (positive, negative, current)
         self.spice_circuit.I(ref, nodes[0], nodes[1], current)
-        logger.debug(f"Added current source {ref}: {nodes[0]} -> {nodes[1]} = {current}A")
+        logger.debug(
+            f"Added current source {ref}: {nodes[0]} -> {nodes[1]} = {current}A"
+        )
 
     def _get_component_nodes(self, component) -> List[str]:
         """Get the SPICE nodes connected to a component."""

@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from circuit_synth import Circuit, Component, Net
+from circuit_synth import Circuit, Component, Net, circuit
 from circuit_synth.tools.utilities.python_code_generator import PythonCodeGenerator
 
 
@@ -107,23 +107,20 @@ class TestPythonCodeGeneratorEdgeCases:
     @pytest.mark.skip(reason="Hierarchical generation API changed - needs test update")
     def test_dual_hierarchy_no_shared_nets(self, generator, temp_output_dir):
         """Test generation of separate files for hierarchical circuits with no shared nets"""
-        main_circuit = Circuit(
-            name="main",
-            components=[Component(symbol="Device:R", ref="R1", value="1k")],
-            nets=[
-                Net(name="VCC_MAIN", connections=[]),
-                Net(name="GND_MAIN", connections=[]),
-            ],
-        )
+        @circuit(name="main")
+        def main():
+            r1 = Component(symbol="Device:R", ref="R1", value="1k")
+            vcc_main = Net("VCC_MAIN")
+            gnd_main = Net("GND_MAIN")
 
-        child_circuit = Circuit(
-            name="child1",
-            components=[Component(symbol="Device:R", ref="R2", value="2k")],
-            nets=[
-                Net(name="VCC_CHILD", connections=[]),
-                Net(name="GND_CHILD", connections=[]),
-            ],
-        )
+        @circuit(name="child1")
+        def child1():
+            r2 = Component(symbol="Device:R", ref="R2", value="2k")
+            vcc_child = Net("VCC_CHILD")
+            gnd_child = Net("GND_CHILD")
+
+        main_circuit = main()
+        child_circuit = child1()
 
         circuits = {"main": main_circuit, "child1": child_circuit}
         main_file = temp_output_dir / "main.py"
@@ -146,25 +143,22 @@ class TestPythonCodeGeneratorEdgeCases:
     @pytest.mark.skip(reason="Hierarchical generation API changed - needs test update")
     def test_dual_hierarchy_with_shared_nets(self, generator, temp_output_dir):
         """Test generation of separate files for hierarchical circuits with shared nets"""
-        main_circuit = Circuit(
-            name="main",
-            components=[Component(symbol="Device:R", ref="R1", value="1k")],
-            nets=[
-                Net(name="VCC", connections=[]),
-                Net(name="GND", connections=[]),
-                Net(name="UNIQUE_MAIN", connections=[]),
-            ],
-        )
+        @circuit(name="main")
+        def main():
+            r1 = Component(symbol="Device:R", ref="R1", value="1k")
+            vcc = Net("VCC")
+            gnd = Net("GND")
+            unique_main = Net("UNIQUE_MAIN")
 
-        child_circuit = Circuit(
-            name="child1",
-            components=[Component(symbol="Device:R", ref="R2", value="2k")],
-            nets=[
-                Net(name="VCC", connections=[]),
-                Net(name="GND", connections=[]),
-                Net(name="UNIQUE_CHILD", connections=[]),
-            ],
-        )
+        @circuit(name="child1")
+        def child1():
+            r2 = Component(symbol="Device:R", ref="R2", value="2k")
+            vcc2 = Net("VCC")
+            gnd2 = Net("GND")
+            unique_child = Net("UNIQUE_CHILD")
+
+        main_circuit = main()
+        child_circuit = child1()
 
         circuits = {"main": main_circuit, "child1": child_circuit}
         main_file = temp_output_dir / "main.py"
@@ -202,24 +196,19 @@ class TestPythonCodeGeneratorEdgeCases:
     @pytest.mark.skip(reason="Hierarchical generation API changed - needs test update")
     def test_partially_shared_nets_detection(self, generator, temp_output_dir):
         """Test detection and handling of partially shared nets"""
-        main_circuit = Circuit(
-            name="main",
-            components=[],
-            nets=[
-                Net(name="VCC", connections=[]),
-                Net(name="GND", connections=[]),
-                Net(name="UNIQUE_A", connections=[]),
-            ],
-        )
+        @circuit(name="main")
+        def main():
+            vcc = Net("VCC")
+            gnd = Net("GND")
+            unique_a = Net("UNIQUE_A")
 
-        child_circuit = Circuit(
-            name="child1",
-            components=[],
-            nets=[
-                Net(name="VCC", connections=[]),
-                Net(name="UNIQUE_B", connections=[]),
-            ],  # Only shares VCC
-        )
+        @circuit(name="child1")
+        def child1():
+            vcc2 = Net("VCC")
+            unique_b = Net("UNIQUE_B")
+
+        main_circuit = main()
+        child_circuit = child1()  # Only shares VCC
 
         circuits = {"main": main_circuit, "child1": child_circuit}
         main_file = temp_output_dir / "main.py"
@@ -241,33 +230,25 @@ class TestPythonCodeGeneratorEdgeCases:
         self, generator, temp_output_dir
     ):
         """Test handling of multiple subcircuits with different shared net patterns"""
-        main_circuit = Circuit(
-            name="main",
-            components=[],
-            nets=[
-                Net(name="VCC", connections=[]),
-                Net(name="GND", connections=[]),
-                Net(name="SIGNAL", connections=[]),
-            ],
-        )
+        @circuit(name="main")
+        def main():
+            vcc = Net("VCC")
+            gnd = Net("GND")
+            signal = Net("SIGNAL")
 
-        child1_circuit = Circuit(
-            name="child1",
-            components=[],
-            nets=[
-                Net(name="VCC", connections=[]),
-                Net(name="GND", connections=[]),
-            ],  # Shares VCC, GND
-        )
+        @circuit(name="child1")
+        def child1():
+            vcc1 = Net("VCC")
+            gnd1 = Net("GND")
 
-        child2_circuit = Circuit(
-            name="child2",
-            components=[],
-            nets=[
-                Net(name="SIGNAL", connections=[]),
-                Net(name="VCC", connections=[]),
-            ],  # Shares SIGNAL, VCC
-        )
+        @circuit(name="child2")
+        def child2():
+            signal2 = Net("SIGNAL")
+            vcc2 = Net("VCC")
+
+        main_circuit = main()
+        child1_circuit = child1()  # Shares VCC, GND
+        child2_circuit = child2()  # Shares SIGNAL, VCC
 
         circuits = {
             "main": main_circuit,
@@ -304,13 +285,21 @@ class TestPythonCodeGeneratorEdgeCases:
     @pytest.mark.skip(reason="Hierarchical generation API changed - needs test update")
     def test_hierarchical_detection_logic(self, generator):
         """Test the logic that determines if a design is hierarchical"""
+        @circuit(name="main")
+        def main():
+            pass
+
+        @circuit(name="child1")
+        def child1():
+            pass
+
         # Single circuit - not hierarchical
-        single_circuits = {"main": Circuit(name="main", components=[], nets=[])}
+        single_circuits = {"main": main()}
 
         # Multiple circuits - hierarchical
         multi_circuits = {
-            "main": Circuit(name="main", components=[], nets=[]),
-            "child1": Circuit(name="child1", components=[], nets=[]),
+            "main": main(),
+            "child1": child1(),
         }
 
         # The hierarchical detection happens in update_python_file
@@ -331,20 +320,15 @@ class TestPythonCodeGeneratorEdgeCases:
 
     def test_component_reference_sanitization(self, generator):
         """Test that component references are properly sanitized"""
-        circuit = Circuit(
-            name="main",
-            components=[
-                Component(
-                    reference="R+1", lib_id="Device:R", value="10k"
-                ),  # Invalid reference
-                Component(
-                    reference="123C", lib_id="Device:C", value="1uF"
-                ),  # Starts with number
-            ],
-            nets=[],
-        )
+        @circuit(name="main")
+        def main():
+            # Note: Component class uses 'ref' not 'reference', and 'symbol' not 'lib_id'
+            r1 = Component(symbol="Device:R", ref="R+1", value="10k")  # Invalid reference
+            c1 = Component(symbol="Device:C", ref="123C", value="1uF")  # Starts with number
 
-        code = generator._generate_flat_code(circuit)
+        test_circuit = main()
+
+        code = generator._generate_flat_code(test_circuit)
 
         # References should be sanitized
         assert "rp1 = Component(" in code  # R+1 -> rp1
@@ -352,17 +336,22 @@ class TestPythonCodeGeneratorEdgeCases:
 
     def test_net_connection_generation(self, generator):
         """Test generation of net connection statements"""
-        circuit = Circuit(
-            name="main",
-            components=[Component(symbol="Device:R", ref="R1", value="10k")],
-            nets=[
-                Net(name="VCC", connections=[("R1", "1")]),
-                Net(name="GND", connections=[("R1", "2")]),
-                Net(name="SIGNAL", connections=[("R1", "A")]),  # Named pin
-            ],
-        )
+        @circuit(name="main")
+        def main():
+            r1 = Component(symbol="Device:R", ref="R1", value="10k")
+            
+            vcc = Net("VCC")
+            gnd = Net("GND")
+            signal = Net("SIGNAL")
+            
+            # Make the connections
+            r1[1] += vcc
+            r1[2] += gnd
+            r1['A'] += signal  # Named pin
 
-        code = generator._generate_flat_code(circuit)
+        test_circuit = main()
+
+        code = generator._generate_flat_code(test_circuit)
 
         # Should generate proper connection statements
         assert "r1[1] += vcc" in code
@@ -371,18 +360,20 @@ class TestPythonCodeGeneratorEdgeCases:
 
     def test_unconnected_nets_filtering(self, generator):
         """Test that unconnected nets are properly filtered out"""
-        circuit = Circuit(
-            name="main",
-            components=[Component(symbol="Device:R", ref="R1", value="10k")],
-            nets=[
-                Net(name="VCC", connections=[("R1", "1")]),
-                Net(
-                    name="unconnected-(R1-Pad2)", connections=[("R1", "2")]
-                ),  # Should be filtered
-            ],
-        )
+        @circuit(name="main")
+        def main():
+            r1 = Component(symbol="Device:R", ref="R1", value="10k")
+            
+            vcc = Net("VCC")
+            unconnected = Net("unconnected-(R1-Pad2)")
+            
+            # Make the connections
+            r1[1] += vcc
+            r1[2] += unconnected  # Should be filtered
 
-        code = generator._generate_flat_code(circuit)
+        test_circuit = main()
+
+        code = generator._generate_flat_code(test_circuit)
 
         # Connected net should be included
         assert "vcc = Net('VCC')" in code

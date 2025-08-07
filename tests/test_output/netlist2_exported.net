@@ -1,9 +1,9 @@
 (export (version "E")
     (design
       (source "test_schematic.kicad_sch")
-      (date "2025-08-06T18:36:46-0700")
+      (date "2025-08-07T00:14:46-0700")
       (tool "Circuit-Synth Exporter v0.1.0")
-      (sheet (number "1") (name "root") (tstamps "/2425b85e-fc4a-4ce1-850e-d954f8ee1efa/")
+      (sheet (number "1") (name "root") (tstamps "/daa0da65-df4a-47b4-8566-ff913fe65af5/")
       (title_block
         (title)
         (company)
@@ -34,7 +34,7 @@
       (property (name "ki_keywords") (value "LED diode"))
       (property (name "ki_fp_filters") (value "LED* LED_SMD:* LED_THT:*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "6766c201-cb57-433e-90ac-d6bd1c98380e"))
+      (tstamps "69e4006f-259d-47d2-8c76-f98dda5a1a8a"))
     (comp (ref "R1")
       (value "10k")
       (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -49,7 +49,7 @@
       (property (name "ki_keywords") (value "R res resistor"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "53cd8a0e-62ac-4f6a-975c-1b6ce89eb2b6"))
+      (tstamps "c25651a6-21b2-46c6-9856-6c938f118452"))
     (comp (ref "U1")
       (value "ESP32-C6-MINI-1")
       (footprint "RF_Module:ESP32-C6-MINI-1")
@@ -64,7 +64,7 @@
       (property (name "ki_keywords") (value "Radio BT ESP Espressif"))
       (property (name "ki_fp_filters") (value "ESP32?C6?MINI?1*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "d7d2fab7-777d-49b3-98d3-ca7f79c01c75")))
+      (tstamps "e80eb3d1-3d5d-43ff-8980-9e419bebdff6")))
     (libparts
     (libpart (lib "Device") (part "LED")
       (description "Light emitting diode")
