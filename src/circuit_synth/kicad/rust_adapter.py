@@ -312,10 +312,17 @@ class RustSchematicAdapter:
             logger.debug(f"  Subcircuit count: {len(circuit_data['subcircuits'])}")
             
             # Call Rust to generate schematic
-            logger.info("  Calling Rust module to generate schematic...")
+            logger.info("  🦀 RUST CALL: Calling rust_kicad_schematic_writer.generate_schematic_from_python()")
+            logger.info(f"  🦀 RUST CALL: Circuit name: '{circuit_data['name']}'")
+            logger.info(f"  🦀 RUST CALL: Components: {len(circuit_data['components'])} items")
+            logger.info(f"  🦀 RUST CALL: Nets: {len(circuit_data['nets'])} items")
+            logger.info(f"  🦀 RUST CALL: Subcircuits: {len(circuit_data['subcircuits'])} items")
+            
             schematic_content = rust_kicad_schematic_writer.generate_schematic_from_python(
                 circuit_data, config
             )
+            
+            logger.info(f"  🦀 RUST RETURN: Generated {len(schematic_content)} bytes")
             
             logger.info(f"  ✅ Rust generated {len(schematic_content)} bytes of schematic data")
             

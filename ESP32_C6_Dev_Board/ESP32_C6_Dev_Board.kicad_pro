@@ -15,9 +15,7 @@
     "layer_presets": [],
     "viewports": []
   },
-  "boards": [
-    "ESP32_C6_Dev_Board.kicad_pcb"
-  ],
+  "boards": [],
   "cvpcb": {
     "equivalence_files": []
   },
@@ -416,27 +414,27 @@
   },
   "sheets": [
     [
-      "35b301a6-c0a5-4d70-9a97-033817878ef9",
+      "64040887-7131-4d27-b046-c53ce09b2a16",
       ""
     ],
     [
-      "0829d51d-0f02-4c04-8c3d-46052c9e0451",
+      "4fdc80db-2b27-4b36-b80b-460c682e5f00",
       "USB_Port"
     ],
     [
-      "a2229c45-37ca-4d0b-923f-5fdf50bccdd9",
+      "ea3314bf-3c1b-4901-bf03-a5c6b39064e0",
       "Power_Supply"
     ],
     [
-      "2bbdef1d-ea26-447d-a9d0-466bd1f5b223",
+      "ab885206-06c9-42c6-a29c-3222bc6fd8ab",
       "ESP32_C6_MCU"
     ],
     [
-      "e1974c5b-e0f7-41cf-9dbd-a542a56e28c0",
+      "7bb982c2-ea87-4931-a1b2-f8a62210192c",
       "Debug_Header"
     ],
     [
-      "4bf893cd-2d4f-42b9-9199-b9a6451d4232",
+      "b00683f5-fcf9-46a3-9c74-3cfa5c15c7fc",
       "LED_Blinker"
     ]
   ],

@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid 4623d261-1c43-4d3e-a7b0-62b8eb7e114a)
+	(uuid 9fd66abd-eb8b-4abd-bf57-9a84da752c96)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:C"
@@ -285,7 +285,7 @@
 	)
 	(title_block
 		(title PowerSupply)
-		(date 2025-08-06)
+		(date 2025-08-07)
 		(company Circuit-Synth)
 	)
 	(symbol
@@ -297,7 +297,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 840cd1ad-39cc-4677-a8b2-26644f22d5cd)
+		(uuid 200541f8-49bf-4e76-ac0b-e9f0ce1d24c5)
 		(property "Reference" "R1"
 			(at 58.42 40.72 0)
 			(effects
@@ -316,9 +316,18 @@
 				(justify left)
 			)
 		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 58.42 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(instances
 			(project "test_hierarchical"
-				(path "/a2f473ef-07de-42c4-9ac8-bacb8adaa513/3aa877e9-fa5f-4ca2-97d8-16b4252f9361"
+				(path "/814f090a-bd18-46fa-be4b-2840dc319894/4f474f23-1555-4fba-89b9-ad114b1802f0"
 					(reference "R1")
 					(unit 1)
 				)
@@ -334,7 +343,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid c5224eb2-e0c0-4e16-aad5-578194067dd8)
+		(uuid 885b7759-6173-4fa0-84f7-6ccd291bcf59)
 		(property "Reference" "R2"
 			(at 76.2 40.72 0)
 			(effects
@@ -353,9 +362,18 @@
 				(justify left)
 			)
 		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 76.2 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(instances
 			(project "test_hierarchical"
-				(path "/a2f473ef-07de-42c4-9ac8-bacb8adaa513/3aa877e9-fa5f-4ca2-97d8-16b4252f9361"
+				(path "/814f090a-bd18-46fa-be4b-2840dc319894/4f474f23-1555-4fba-89b9-ad114b1802f0"
 					(reference "R2")
 					(unit 1)
 				)
@@ -371,7 +389,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid f30402dc-1e7b-4a57-aeda-15904561f88e)
+		(uuid c43b2d66-31e9-4867-9017-85b7761d3dfa)
 		(property "Reference" "C1"
 			(at 38.1 40.72 0)
 			(effects
@@ -390,122 +408,26 @@
 				(justify left)
 			)
 		)
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
+			(at 38.1 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(instances
 			(project "test_hierarchical"
-				(path "/a2f473ef-07de-42c4-9ac8-bacb8adaa513/3aa877e9-fa5f-4ca2-97d8-16b4252f9361"
+				(path "/814f090a-bd18-46fa-be4b-2840dc319894/4f474f23-1555-4fba-89b9-ad114b1802f0"
 					(reference "C1")
 					(unit 1)
 				)
 			)
 		)
 	)
-	(hierarchical_label
-		VIN
-		(shape input)
-		(at 58.42 41.91 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid be2c1d9b-2128-4107-9320-5b598fdc61ce)
-	)
-	(hierarchical_label
-		VOUT
-		(shape input)
-		(at 58.42 49.53 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 7c24ecce-fb83-4a51-9ce5-c317cb8d5fd7)
-	)
-	(hierarchical_label
-		VOUT
-		(shape input)
-		(at 76.2 41.91 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid f1ca1597-55ab-48ca-8fb9-53a960b47e1e)
-	)
-	(hierarchical_label
-		VOUT
-		(shape input)
-		(at 38.1 41.91 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 82bd186a-6201-4c00-84c3-9e11c4ee768b)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 76.2 49.53 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 9afe1176-5289-486d-81b1-efd27b68ba18)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 38.1 49.53 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid e0b1b915-d069-4bb3-99e2-715340c0d200)
-	)
-	(text_box
-		"Simple power supply subcircuit"
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid 1dbeb694-fb47-4df2-a050-ea634f0447c0)
-	)
 	(sheet_instances
-		(path "/a2f473ef-07de-42c4-9ac8-bacb8adaa513/3aa877e9-fa5f-4ca2-97d8-16b4252f9361"
+		(path "/814f090a-bd18-46fa-be4b-2840dc319894/4f474f23-1555-4fba-89b9-ad114b1802f0"
 			(page "1")
 		)
 	)

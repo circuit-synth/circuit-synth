@@ -41,7 +41,7 @@ pub fn generate_schematic_sexp(
 
     // Add components
     for component in &circuit_data.components {
-        let component_sexp = generate_component_sexp(component)?;
+        let component_sexp = generate_component_sexp(component, config)?;
         schematic_parts.push(component_sexp);
     }
 
@@ -76,7 +76,7 @@ pub fn generate_schematic_sexp(
 }
 
 /// Generate S-expression for a component using lexpr
-fn generate_component_sexp(component: &Component) -> Result<Value, SchematicError> {
+fn generate_component_sexp(component: &Component, config: &SchematicConfig) -> Result<Value, SchematicError> {
     debug!(
         "🔧 Generating component S-expression: {} ({})",
         component.reference, component.lib_id
@@ -139,8 +139,9 @@ fn generate_component_sexp(component: &Component) -> Result<Value, SchematicErro
 
     // Add instances
     let ref_for_instances = component.reference.clone();
+    let project_name = config.title.clone();
     component_parts.push(sexp!((instances
-        (project "circuit_synth_project"
+        (project ,project_name
             (path "/"
                 (reference ,ref_for_instances)
                 (unit 1)
@@ -302,7 +303,8 @@ mod tests {
             orientation: 270.0,
         });
 
-        let sexp = generate_component_sexp(&component).unwrap();
+        let config = SchematicConfig::default();
+        let sexp = generate_component_sexp(&component, &config).unwrap();
         let sexp_str = lexpr::to_string(&sexp).unwrap();
 
         assert!(sexp_str.contains("Device:R"));

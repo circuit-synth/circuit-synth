@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid 6f31d54a-30a6-4407-8754-6e37dd5594af)
+	(uuid 1131c02a-53c0-490d-af16-7760457c64a8)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:LED"
@@ -341,7 +341,7 @@
 	)
 	(title_block
 		(title LED_Circuit)
-		(date 2025-08-06)
+		(date 2025-08-07)
 		(company Circuit-Synth)
 	)
 	(symbol
@@ -353,7 +353,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid e2fb4609-c003-46e3-af11-ee2ab9a8f315)
+		(uuid e5b4b5bb-a350-4280-a9cf-31668c2652be)
 		(property "Reference" "D1"
 			(at 45.72 40.72 0)
 			(effects
@@ -363,9 +363,18 @@
 				(justify left)
 			)
 		)
+		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
+			(at 45.72 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(instances
 			(project "test_hierarchical"
-				(path "/a2f473ef-07de-42c4-9ac8-bacb8adaa513/894ec187-67c5-4dde-b140-39a246c65948"
+				(path "/814f090a-bd18-46fa-be4b-2840dc319894/4d7b4255-a402-4cf7-9bc3-2cf1f23a2123"
 					(reference "D1")
 					(unit 1)
 				)
@@ -374,16 +383,16 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 68.58 68.58 0)
+		(at 68.58 45.72 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid ba52aded-aeec-4f54-b9df-6cca17caee97)
+		(uuid 748797bb-05c7-4d89-bb63-488c2691fcfd)
 		(property "Reference" "R3"
-			(at 68.58 63.58 0)
+			(at 68.58 40.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -392,7 +401,7 @@
 			)
 		)
 		(property "Value" "330"
-			(at 68.58 73.58 0)
+			(at 68.58 50.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -400,98 +409,26 @@
 				(justify left)
 			)
 		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 68.58 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(instances
 			(project "test_hierarchical"
-				(path "/a2f473ef-07de-42c4-9ac8-bacb8adaa513/894ec187-67c5-4dde-b140-39a246c65948"
+				(path "/814f090a-bd18-46fa-be4b-2840dc319894/4d7b4255-a402-4cf7-9bc3-2cf1f23a2123"
 					(reference "R3")
 					(unit 1)
 				)
 			)
 		)
 	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 41.91 45.72 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 70c74bad-4794-4b4a-80df-ffb006bd046a)
-	)
-	(hierarchical_label
-		LED_NET
-		(shape input)
-		(at 49.53 45.72 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid e59be106-7e30-4029-a8b5-6acb3939087b)
-	)
-	(hierarchical_label
-		LED_NET
-		(shape input)
-		(at 68.58 72.39 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid ab87b9fa-84dd-435f-be64-4ef6b85f37d1)
-	)
-	(hierarchical_label
-		VOUT
-		(shape input)
-		(at 68.58 64.77 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 0f657701-f13d-4d81-ab10-1dc6069992a2)
-	)
-	(text_box
-		"Simple LED subcircuit"
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid d51ed3f6-fea3-4cc4-9817-d50f56d71524)
-	)
 	(sheet_instances
-		(path "/a2f473ef-07de-42c4-9ac8-bacb8adaa513/894ec187-67c5-4dde-b140-39a246c65948"
+		(path "/814f090a-bd18-46fa-be4b-2840dc319894/4d7b4255-a402-4cf7-9bc3-2cf1f23a2123"
 			(page "1")
 		)
 	)

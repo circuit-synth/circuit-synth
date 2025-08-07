@@ -80,27 +80,8 @@ class RustIntegratedSchematicGenerator(OriginalSchematicGenerator):
         
         if self.use_rust:
             try:
-                # For Rust backend, we'll process the circuit with Python
-                # then use Rust just for S-expression generation
-                logger.info(f"  Using hybrid approach: Python processing + Rust S-expression generation")
+                logger.info(f"  🚀 RUST BACKEND ACTIVATED: Using FULL Rust backend for schematic generation")
                 
-                # Use the parent class to handle all the complex logic
-                # but we'll intercept the schematic writing to use Rust
-                from .rust_schematic_writer import enable_rust_acceleration
-                
-                # Enable Rust acceleration for this session
-                # enable_rust_acceleration()  # TODO: Uncomment when ready
-                
-                # For now, fall back to parent implementation
-                return super().generate_project(
-                    json_file,
-                    force_regenerate=force_regenerate,
-                    generate_pcb=generate_pcb,
-                    placement_algorithm=placement_algorithm,
-                    schematic_placement=schematic_placement,
-                    draw_bounding_boxes=draw_bounding_boxes,
-                    **pcb_kwargs
-                )
                 # Load circuit from JSON
                 logger.info(f"  Loading circuit from: {json_file}")
                 with open(json_file, 'r') as f:
@@ -109,14 +90,53 @@ class RustIntegratedSchematicGenerator(OriginalSchematicGenerator):
                 # Create project directory
                 self.project_dir.mkdir(parents=True, exist_ok=True)
                 
-                # Load circuit hierarchy (for compatibility with existing code)
-                circuit_dict, sub_dict = load_circuit_hierarchy(json_file)
+                # Use RustSchematicAdapter to generate schematics
+                from circuit_synth.core.circuit import Circuit
                 
-                # For now, we'll generate the main circuit only
-                # TODO: Handle hierarchical circuits
-                main_circuit_name = circuit_data.get('name', 'main')
+                # Reconstruct circuit from JSON
+                circuit = Circuit._from_json(circuit_data)
+                circuit.name = circuit_data.get('name', self.project_name)
                 
-                # Convert to Python Circuit object format
+                # Create Rust adapter and generate
+                logger.info(f"  🦀 Creating RustSchematicAdapter for main circuit: '{circuit.name}'")
+                adapter = RustSchematicAdapter(circuit)
+                
+                # Generate main schematic
+                main_output = self.project_dir / f"{self.project_name}.kicad_sch"
+                logger.info(f"  🦀 Generating main schematic: {main_output}")
+                adapter.generate_schematic(str(main_output))
+                
+                # Generate subcircuit schematics if hierarchical
+                if circuit_data.get('subcircuits'):
+                    logger.info(f"  🦀 Processing {len(circuit_data['subcircuits'])} subcircuits")
+                    for subcircuit in circuit_data['subcircuits']:
+                        sub_output = self.project_dir / f"{subcircuit['name']}.kicad_sch"
+                        logger.info(f"  🦀 Generating subcircuit schematic: {subcircuit['name']} -> {sub_output}")
+                        # Create adapter for subcircuit
+                        sub_circuit = Circuit._from_json(subcircuit)
+                        sub_circuit.name = subcircuit['name']
+                        sub_adapter = RustSchematicAdapter(sub_circuit)
+                        sub_adapter.generate_schematic(str(sub_output))
+                
+                # Generate project file
+                self._generate_project_file()
+                
+                # Generate PCB if requested (still uses Python)
+                if generate_pcb:
+                    logger.info("  Generating PCB with Python backend")
+                    return super().generate_project(
+                        json_file,
+                        force_regenerate=force_regenerate,
+                        generate_pcb=True,
+                        placement_algorithm=placement_algorithm,
+                        schematic_placement=schematic_placement,
+                        draw_bounding_boxes=draw_bounding_boxes,
+                        **pcb_kwargs
+                    )
+                
+                logger.info("✅ Rust schematic generation complete!")
+                return
+                # This code block is now unreachable after the return above
                 # This is a simplified conversion - full implementation would handle all cases
                 from circuit_synth import Circuit, Component, Net
                 
@@ -168,8 +188,9 @@ class RustIntegratedSchematicGenerator(OriginalSchematicGenerator):
                 logger.info(f"✅ Project generation complete: {self.project_dir}")
                 
             except Exception as e:
-                logger.error(f"❌ Rust backend failed: {e}")
-                logger.info("  Falling back to Python implementation...")
+                logger.error(f"❌ RUST BACKEND FAILED: {e}")
+                logger.warning("  ⚠️ FALLBACK: Switching to Python S-expression generation...")
+                logger.warning("  ⚠️ FALLBACK: This is the OLD Python implementation, not Rust!")
                 self.use_rust = False
                 return super().generate_project(
                     json_file,
@@ -182,6 +203,8 @@ class RustIntegratedSchematicGenerator(OriginalSchematicGenerator):
                 )
         else:
             # Use original Python implementation
+            logger.warning("  ⚠️ PYTHON BACKEND: Using OLD Python S-expression generation (not Rust)")
+            logger.warning("  ⚠️ PYTHON BACKEND: This is the legacy implementation")
             return super().generate_project(
                 json_file,
                 force_regenerate=force_regenerate,

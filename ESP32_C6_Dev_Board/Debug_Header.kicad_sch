@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid e1974c5b-e0f7-41cf-9dbd-a542a56e28c0)
+	(uuid 7bb982c2-ea87-4931-a1b2-f8a62210192c)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_02x03_Odd_Even"
@@ -293,7 +293,7 @@
 	)
 	(title_block
 		(title Debug_Header)
-		(date 2025-08-06)
+		(date 2025-08-07)
 		(company Circuit-Synth)
 	)
 	(symbol
@@ -305,7 +305,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 99c599c5-ba36-4a36-a2e1-0a237ece9824)
+		(uuid d594f907-bc8a-405e-ba97-caec81be5d7d)
 		(property "Reference" "J2"
 			(at 58.42 40.72 0)
 			(effects
@@ -326,7 +326,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/35b301a6-c0a5-4d70-9a97-033817878ef9/8691ec0f-332c-472b-b726-9484fce4bf7b/d2035f37-6c83-40e4-bef5-65007053134c"
+				(path "/64040887-7131-4d27-b046-c53ce09b2a16/37053fb7-35b7-4ccc-807a-d89a97cb7c95/b39e0f61-e3e1-43fa-8643-5235de0a7876"
 					(reference "J2")
 					(unit 1)
 				)
@@ -343,7 +343,7 @@
 			)
 			(justify right)
 		)
-		(uuid 4b18b6da-aecd-41cd-8d09-9d6991b972ba)
+		(uuid f3795a75-fef8-456b-aa01-20a11ba916ea)
 	)
 	(hierarchical_label
 		DEBUG_TX
@@ -355,7 +355,7 @@
 			)
 			(justify right)
 		)
-		(uuid 41430156-94d6-456b-9aa9-f13afa9526a4)
+		(uuid 876c5e4f-cf37-41de-a98b-9e6b8b6935fd)
 	)
 	(hierarchical_label
 		DEBUG_RX
@@ -367,7 +367,7 @@
 			)
 			(justify right)
 		)
-		(uuid d6758deb-8ffb-4130-aa8f-1315d1f949e4)
+		(uuid c7c02f5f-16c8-41fa-90f8-c6b6084af4d1)
 	)
 	(hierarchical_label
 		VCC_3V3
@@ -379,7 +379,7 @@
 			)
 			(justify left)
 		)
-		(uuid 3da72e8c-3bc8-4f50-abc5-f2f1c5bbe5ea)
+		(uuid b9334622-adc1-417b-8506-2c4130df865b)
 	)
 	(hierarchical_label
 		GND
@@ -391,7 +391,7 @@
 			)
 			(justify left)
 		)
-		(uuid 3b094a4a-127a-4c75-8361-1f12734a1d5c)
+		(uuid 1505c675-dfd4-4d08-bc3d-543ff5d3924b)
 	)
 	(hierarchical_label
 		DEBUG_IO0
@@ -403,7 +403,7 @@
 			)
 			(justify left)
 		)
-		(uuid 3d6eeda2-cf19-4a30-9f49-6f952d8abf5a)
+		(uuid 51f547b7-4cbf-4b51-a1ca-10e591f39d38)
 	)
 	(text_box
 		"Debug header for programming and debugging"
@@ -436,10 +436,10 @@
 			)
 			(justify left top)
 		)
-		(uuid cf9bffa5-577d-4591-a3d7-4055d65ee56f)
+		(uuid 42d4457a-1c55-4d5b-ae3d-aeacca4e1b29)
 	)
 	(sheet_instances
-		(path "/35b301a6-c0a5-4d70-9a97-033817878ef9/8691ec0f-332c-472b-b726-9484fce4bf7b/d2035f37-6c83-40e4-bef5-65007053134c"
+		(path "/64040887-7131-4d27-b046-c53ce09b2a16/37053fb7-35b7-4ccc-807a-d89a97cb7c95/b39e0f61-e3e1-43fa-8643-5235de0a7876"
 			(page "1")
 		)
 	)

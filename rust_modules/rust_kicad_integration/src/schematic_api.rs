@@ -217,7 +217,7 @@ pub fn create_schematic_with_components(paper_size: &str, components: Vec<Simple
                 Value::symbol("instances"),
                 Value::list(vec![
                     Value::symbol("project"),
-                    Value::string("circuit_synth"),
+                    Value::string("circuit_synth"),  // TODO: Fix this - needs to use actual project name
                     Value::list(vec![
                         Value::symbol("path"),
                         Value::string(format!("/{}", uuid)),
