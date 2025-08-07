@@ -411,6 +411,26 @@ export DIGIKEY_CLIENT_SECRET="your_client_secret"
 
 circuit-synth provides integrated access to multiple component distributors for real-time availability, pricing, and specifications.
 
+### Unified Multi-Source Search (Recommended)
+Search across all suppliers with one interface:
+```python
+from circuit_synth.manufacturing import find_parts
+
+# Search all suppliers
+results = find_parts("0.1uF 0603 X7R", sources="all")
+
+# Search specific supplier
+jlc_results = find_parts("STM32F407", sources="jlcpcb")
+dk_results = find_parts("LM358", sources="digikey")
+
+# Compare across suppliers
+comparison = find_parts("3.3V regulator", sources="all", compare=True)
+print(comparison)  # Shows price/availability comparison table
+
+# Filter by requirements
+high_stock = find_parts("10k resistor", min_stock=10000, max_price=0.10)
+```
+
 ### JLCPCB Integration
 Best for PCB assembly and production:
 ```python
