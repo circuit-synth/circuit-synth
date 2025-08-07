@@ -35,14 +35,16 @@ def should_use_rust_backend(json_file: str) -> bool:
         # Check component count (Rust is optimized for larger circuits)
         component_count = len(data.get('components', {}))
         
-        # For now, only use Rust for non-hierarchical circuits
-        # TODO: Enable for hierarchical once support is complete
+        # Enable Rust for both simple and hierarchical circuits
+        # Note: Rust has S-expression syntax issues that need fixing, but core functionality works
         if has_subcircuits:
-            logger.info(f"  Circuit is hierarchical - using Python backend")
-            return False
+            logger.info(f"  Circuit is hierarchical ({len(data.get('subcircuits', []))} subcircuits) - using Rust backend")
+            logger.warning(f"  ⚠️ Rust backend has S-expression syntax issues - output may not load in KiCad")
+            return True
             
         # Use Rust for simple circuits
         logger.info(f"  Circuit is simple ({component_count} components) - using Rust backend")
+        logger.warning(f"  ⚠️ Rust backend has S-expression syntax issues - output may not load in KiCad")
         return True
         
     except Exception as e:

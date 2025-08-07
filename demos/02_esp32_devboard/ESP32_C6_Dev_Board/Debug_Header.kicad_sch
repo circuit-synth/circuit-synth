@@ -13,35 +13,24 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "{'value': 'J', 'position': {'x': 1.27, 'y': 5.08, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Reference" "J"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
-			(property "Value" "{'value': 'Conn_02x03_Odd_Even', 'position': {'x': 1.27, 'y': -5.08, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Value" "Conn_02x03_Odd_Even"
+				(at 0 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
-			(property "Footprint" "{'value': '', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Footprint" ""
+				(at 0 -5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -49,8 +38,8 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "{'value': 'Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Datasheet" "~"
+				(at 0 -7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -58,8 +47,8 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "{'value': 'connector', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Description" "Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -67,8 +56,8 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "{'value': 'Connector*:*_2x??_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "ki_keywords" "connector"
+				(at 0 -12.7 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -159,7 +148,7 @@
 				(pin
 					passive
 					line
-					(at -5.08 2.54 0)
+					(at -5.08 2.54 0.0)
 					(length 3.81)
 					(name
 						Pin_1
@@ -181,7 +170,7 @@
 				(pin
 					passive
 					line
-					(at -5.08 0.0 0)
+					(at -5.08 0.0 0.0)
 					(length 3.81)
 					(name
 						Pin_3
@@ -203,7 +192,7 @@
 				(pin
 					passive
 					line
-					(at -5.08 -2.54 0)
+					(at -5.08 -2.54 0.0)
 					(length 3.81)
 					(name
 						Pin_5
@@ -225,7 +214,7 @@
 				(pin
 					passive
 					line
-					(at 7.62 2.54 180)
+					(at 7.62 2.54 180.0)
 					(length 3.81)
 					(name
 						Pin_2
@@ -247,7 +236,7 @@
 				(pin
 					passive
 					line
-					(at 7.62 0.0 180)
+					(at 7.62 0.0 180.0)
 					(length 3.81)
 					(name
 						Pin_4
@@ -269,7 +258,7 @@
 				(pin
 					passive
 					line
-					(at 7.62 -2.54 180)
+					(at 7.62 -2.54 180.0)
 					(length 3.81)
 					(name
 						Pin_6
@@ -289,6 +278,7 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 	)
 	(title_block
@@ -326,7 +316,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/9a05a165-f19d-4725-87e8-e48282ca2b96/92a1db31-3504-4626-9590-04c4327d21d3"
+				(path "/"
 					(reference "J2")
 					(unit 1)
 				)
@@ -405,41 +395,8 @@
 		)
 		(uuid 4121f56a-f5a3-4fa1-a13d-8e43ac775256)
 	)
-	(text_box
-		"Debug header for programming and debugging"
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid 1fdd5e5e-ee46-4645-a1ee-90855049e982)
-	)
 	(sheet_instances
-		(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/9a05a165-f19d-4725-87e8-e48282ca2b96/92a1db31-3504-4626-9590-04c4327d21d3"
+		(path "/"
 			(page "1")
 		)
 	)
