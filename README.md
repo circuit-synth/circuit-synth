@@ -80,6 +80,7 @@ if __name__ == "__main__":
 - **Hierarchical Design**: Modular subcircuits with clean Python syntax
 - **Component Intelligence**: JLCPCB availability and footprint verification
 - **AI Assistance**: Claude Code agents for design automation
+- **FMEA Analysis**: Comprehensive reliability analysis with physics-based failure models
 - **Test Generation**: Automated test plans for validation
 - **Version Control**: Git-friendly text-based circuit definitions
 
@@ -99,6 +100,9 @@ if __name__ == "__main__":
 
 # JLCPCB integration
 /jlc-search "voltage regulator 3.3V"
+
+# FMEA analysis
+/analyze-fmea my_circuit.py     # Run FMEA analysis on circuit
 ```
 
 ### Specialized AI Agents
@@ -112,7 +116,53 @@ When working with Claude Code, these agents provide domain expertise:
 - **jlc-parts-finder**: Real-time JLCPCB availability checking
 - **stm32-mcu-finder**: STM32 peripheral search and selection
 - **test-plan-creator**: Automated test plan generation
+- **fmea-analyzer**: Reliability analysis and failure prediction
 
+## FMEA and Quality Assurance
+
+Circuit-synth includes comprehensive failure analysis capabilities to ensure your designs are reliable:
+
+### Automated FMEA Analysis
+
+```python
+from circuit_synth.quality_assurance import EnhancedFMEAAnalyzer
+from circuit_synth.quality_assurance import ComprehensiveFMEAReportGenerator
+
+# Analyze your circuit for failures
+analyzer = EnhancedFMEAAnalyzer()
+circuit_context = {
+    'environment': 'industrial',    # Set operating environment
+    'safety_critical': True,        # Affects severity ratings
+    'production_volume': 'high'     # Influences detection ratings
+}
+
+# Generate comprehensive PDF report (50+ pages)
+generator = ComprehensiveFMEAReportGenerator("My Project")
+report_path = generator.generate_comprehensive_report(
+    analysis_results,
+    output_path="FMEA_Report.pdf"
+)
+```
+
+### What Gets Analyzed
+
+- **300+ Failure Modes**: Component failures, solder joints, environmental stress
+- **Physics-Based Models**: Arrhenius, Coffin-Manson, Black's equation
+- **IPC Class 3 Compliance**: High-reliability assembly standards
+- **Risk Assessment**: RPN (Risk Priority Number) calculations
+- **Mitigation Strategies**: Specific recommendations for each failure mode
+
+### Command Line FMEA
+
+```bash
+# Quick FMEA analysis
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli analyze my_circuit.py
+
+# Generate comprehensive report
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli analyze my_circuit.py --comprehensive
+```
+
+See [FMEA Guide](docs/FMEA_GUIDE.md) for detailed documentation.
 
 ## Project Structure
 
@@ -146,6 +196,7 @@ my_circuit_project/
 | Visual net verification | Explicit Python connections |
 | GUI-based editing | Version-controlled Python files |
 | Copy-paste patterns | Reusable circuit functions |
+| Manual FMEA documentation | Automated 50+ page reliability analysis |
 
 ## Resources
 
