@@ -30,9 +30,14 @@ except ImportError:
 except Exception as e:
     logger.warning(f"⚠️ Error loading Rust symbol cache: {e}")
 
-# Fallback to Python implementation
-if not _RUST_SYMBOL_CACHE_AVAILABLE:
+# Import Python implementation for fallback
+try:
     from ..kicad.kicad_symbol_cache import SymbolLibCache as _PythonSymbolLibCache
+except ImportError:
+    from .kicad_symbol_cache import SymbolLibCache as _PythonSymbolLibCache
+
+# Log fallback status    
+if not _RUST_SYMBOL_CACHE_AVAILABLE:
     logger.info("🐍 Using Python SymbolLibCache (Rust not available)")
 
 
@@ -162,6 +167,35 @@ class RustAcceleratedSymbolLibCache:
                 else "baseline"
             ),
         }
+
+    @classmethod
+    def get_symbol_data(cls, symbol_id: str) -> Dict[str, Any]:
+        """
+        Get symbol data by symbol ID (LibraryName:SymbolName).
+        
+        This is a class method for compatibility with the original SymbolLibCache.
+        
+        Args:
+            symbol_id: Symbol identifier in format "Library:Symbol"
+            
+        Returns:
+            Symbol data dictionary
+        """
+        # Create an instance and delegate to the instance method
+        instance = cls()
+        
+        # Parse the symbol_id to get library and symbol names
+        if ":" not in symbol_id:
+            raise ValueError(f"Invalid symbol ID format: {symbol_id}. Expected 'Library:Symbol'")
+        
+        library_name, symbol_name = symbol_id.split(":", 1)
+        
+        # If using Python fallback, call its class method directly
+        if not _RUST_SYMBOL_CACHE_AVAILABLE:
+            return _PythonSymbolLibCache.get_symbol_data(symbol_id)
+        
+        # Otherwise use the instance method
+        return instance.get_symbol(library_name, symbol_name) or {}
 
 
 # Alias for drop-in replacement

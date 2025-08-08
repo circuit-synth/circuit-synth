@@ -15,29 +15,29 @@ from .symbol_geometry import SymbolGeometry
 
 # Import Rust force-directed placement with defensive fallback
 _rust_placement_module = None
+RUST_PLACEMENT_AVAILABLE = False
 
+# Try to import the Rust force-directed placement module
+import os
+import sys
+
+import_start = time.perf_counter()
+
+# Optional Rust placement module
 try:
-    # Try to import the Rust force-directed placement module
-    import os
-    import sys
-
-    import_start = time.perf_counter()
-    
-    # Optional Rust placement module
-    try:
-        import rust_force_directed_placement
-        RUST_PLACEMENT_AVAILABLE = True
-        logging.getLogger(__name__).debug("🦀 RUST_PLACEMENT: Rust force-directed placement available")
-    except ImportError as e:
-        RUST_PLACEMENT_AVAILABLE = False
-        logging.getLogger(__name__).info(
-            f"🐍 RUST_PLACEMENT: Rust force-directed placement not available ({e}), using Python fallback"
-        )
-    except Exception as e:
-        RUST_PLACEMENT_AVAILABLE = False
-        logging.getLogger(__name__).warning(
-            f"⚠️ RUST_PLACEMENT: Unexpected error loading Rust placement module ({e}), using Python fallback"
-        )
+    import rust_force_directed_placement
+    RUST_PLACEMENT_AVAILABLE = True
+    logging.getLogger(__name__).debug("🦀 RUST_PLACEMENT: Rust force-directed placement available")
+except ImportError as e:
+    RUST_PLACEMENT_AVAILABLE = False
+    logging.getLogger(__name__).info(
+        f"🐍 RUST_PLACEMENT: Rust force-directed placement not available ({e}), using Python fallback"
+    )
+except Exception as e:
+    RUST_PLACEMENT_AVAILABLE = False
+    logging.getLogger(__name__).warning(
+        f"⚠️ RUST_PLACEMENT: Unexpected error loading Rust placement module ({e}), using Python fallback"
+    )
 
 logger = logging.getLogger(__name__)
 

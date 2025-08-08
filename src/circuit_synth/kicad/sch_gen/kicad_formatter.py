@@ -16,15 +16,6 @@ from sexpdata import Symbol
 # Import the new API's S-expression parser
 from circuit_synth.kicad.core.s_expression import SExpressionParser
 
-# Import Rust S-expression module (REQUIRED - no fallback)
-_RUST_SEXP_AVAILABLE = True  # Always true - Rust is mandatory
-_rust_sexp_module = None
-
-try:
-    # Import the Rust KiCad integration module (REQUIRED)
-    import importlib.util
-    import os
-    import sys
 # Make Rust module optional - use Python fallback if not available
 _rust_sexp_module = None
 try:
