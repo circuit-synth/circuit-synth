@@ -70,7 +70,7 @@ Generates:
 ## Integration
 
 This command integrates with:
-- FMEA knowledge base at `/fmea_knowledge_base/`
+- FMEA knowledge base at `/knowledge_base/fmea/`
 - Specialized FMEA agents
 - Circuit-synth design files
 - Manufacturing databases

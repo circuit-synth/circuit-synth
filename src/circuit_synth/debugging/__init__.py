@@ -6,45 +6,36 @@ including schematic analysis, test data interpretation, and troubleshooting guid
 """
 
 from .analyzer import (
-    CircuitDebugger, 
-    DebugSession,
+    CircuitDebugger,
     DebugCategory,
+    DebugIssue,
+    DebugSession,
     IssueSeverity,
-    DebugIssue
 )
+from .knowledge_base import ComponentFailure, DebugKnowledgeBase, DebugPattern
 from .symptoms import (
-    SymptomAnalyzer, 
-    TestMeasurement,
     MeasurementType,
-    OscilloscopeTrace
+    OscilloscopeTrace,
+    SymptomAnalyzer,
+    TestMeasurement,
 )
-from .knowledge_base import (
-    DebugKnowledgeBase, 
-    DebugPattern,
-    ComponentFailure
-)
-from .test_guidance import (
-    TestGuidance, 
-    TroubleshootingTree,
-    TestStep,
-    TestEquipment
-)
+from .test_guidance import TestEquipment, TestGuidance, TestStep, TroubleshootingTree
 
 __all__ = [
-    'CircuitDebugger',
-    'DebugSession',
-    'DebugCategory',
-    'IssueSeverity',
-    'DebugIssue',
-    'SymptomAnalyzer',
-    'TestMeasurement',
-    'MeasurementType',
-    'OscilloscopeTrace',
-    'DebugKnowledgeBase',
-    'DebugPattern',
-    'ComponentFailure',
-    'TestGuidance',
-    'TroubleshootingTree',
-    'TestStep',
-    'TestEquipment',
+    "CircuitDebugger",
+    "DebugSession",
+    "DebugCategory",
+    "IssueSeverity",
+    "DebugIssue",
+    "SymptomAnalyzer",
+    "TestMeasurement",
+    "MeasurementType",
+    "OscilloscopeTrace",
+    "DebugKnowledgeBase",
+    "DebugPattern",
+    "ComponentFailure",
+    "TestGuidance",
+    "TroubleshootingTree",
+    "TestStep",
+    "TestEquipment",
 ]

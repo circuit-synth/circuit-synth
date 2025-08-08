@@ -1,0 +1,533 @@
+{
+  "bga_specific_defects": {
+    "head_in_pillow": {
+      "failure_modes": [
+        {
+          "id": "ASM-BGA-HIP-001",
+          "mechanism": "head_in_pillow_defect",
+          "description": "BGA ball sits on paste without coalescence",
+          "statistics": "99% occur on outermost rows, particularly corners",
+          "causes": [
+            "package_warpage_during_reflow",
+            "pcb_warpage",
+            "oxidized_ball_surface",
+            "insufficient_flux_activity",
+            "delta_t_across_component",
+            "placement_accuracy_issues"
+          ],
+          "physics": {
+            "warpage_threshold": ">200μm at reflow temperature",
+            "coplanarity_spec": "<150μm at room temperature",
+            "thermal_gradient": "ΔT >10°C across package",
+            "wetting_angle": "Contact angle >90° indicates non-wetting"
+          },
+          "detection": {
+            "methods": [
+              "3d_xray_inspection",
+              "endoscopic_inspection",
+              "boundary_scan_testing",
+              "cross_sectioning"
+            ],
+            "difficulty": 9,
+            "false_escape_rate": "30-50% with 2D X-ray"
+          },
+          "effects": {
+            "local": "No electrical connection despite physical contact",
+            "circuit": "Intermittent or open connection",
+            "system": "Field failure under stress"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "corner_ball_reinforcement": -2,
+              "increased_paste_volume_corners": -2,
+              "warpage_measurement_control": -3,
+              "large_bga_over_30mm": 3,
+              "high_ball_count_over_500": 2,
+              "lead_free_process": 1
+            }
+          },
+          "severity": {
+            "critical_signals": 10,
+            "power_connections": 9,
+            "redundant_connections": 6
+          },
+          "mitigation": [
+            "increase_solder_paste_volume_10_15_percent_corners",
+            "implement_warpage_measurement_incoming_inspection",
+            "use_step_stencils_for_outer_rows",
+            "optimize_thermal_profile_minimize_delta_t",
+            "consider_underfill_for_large_packages"
+          ]
+        }
+      ]
+    },
+    "non_wet_open": {
+      "failure_modes": [
+        {
+          "id": "ASM-BGA-NWO-001",
+          "mechanism": "non_wetting_open_circuit",
+          "description": "Solder fails to wet pad or ball surface",
+          "causes": [
+            "oxidized_pad_surface",
+            "contamination",
+            "insufficient_flux_activity",
+            "black_pad_syndrome_enig",
+            "excessive_intermetallic_thickness"
+          ],
+          "physics": {
+            "wetting_force": "F = γ × L × cos(θ)",
+            "critical_contact_angle": ">90° indicates non-wetting",
+            "intermetallic_thickness": ">4μm problematic"
+          },
+          "effects": {
+            "local": "Open circuit at assembly",
+            "circuit": "Missing connection",
+            "system": "Non-functional device"
+          },
+          "occurrence": {
+            "base": 3,
+            "modifiers": {
+              "fresh_pcb_surface_finish": -2,
+              "nitrogen_reflow": -1,
+              "enig_finish": 1,
+              "exceeded_shelf_life": 3
+            }
+          },
+          "severity": {
+            "all_connections": 10
+          },
+          "detection": {
+            "methods": [
+              "in_circuit_test",
+              "boundary_scan",
+              "flying_probe"
+            ],
+            "difficulty": 3
+          }
+        }
+      ]
+    },
+    "package_warpage_effects": {
+      "failure_modes": [
+        {
+          "id": "ASM-BGA-WARP-001",
+          "mechanism": "thermally_induced_warpage",
+          "description": "Package deformation during reflow causing connection issues",
+          "causes": [
+            "cte_mismatch_package_materials",
+            "moisture_absorption",
+            "asymmetric_package_construction",
+            "temperature_gradient"
+          ],
+          "physics": {
+            "warpage_equation": "w = α × L² × ΔT / (8×t)",
+            "critical_warpage": ">200μm for 0.8mm pitch BGA",
+            "moisture_effect": "Tg reduction ~20°C per 1% moisture"
+          },
+          "effects": {
+            "local": "Corner ball lifting, center ball compression",
+            "circuit": "Open corners, bridged center",
+            "system": "Assembly yield loss"
+          },
+          "occurrence": {
+            "base": 5,
+            "modifiers": {
+              "package_prebake": -2,
+              "coplanarity_screening": -2,
+              "thin_package_below_1mm": 2,
+              "large_package_over_35mm": 3
+            }
+          },
+          "severity": {
+            "fine_pitch_bga": 9,
+            "standard_pitch": 7
+          }
+        }
+      ]
+    }
+  },
+  "smt_defects_class_3": {
+    "tombstoning_class_3": {
+      "failure_modes": [
+        {
+          "id": "ASM-SMT-TOMB-001",
+          "mechanism": "component_tombstoning",
+          "description": "Component stands on one end - zero tolerance in Class 3",
+          "ipc_a_610_class_3": "Not acceptable - any occurrence is defect",
+          "causes": [
+            "uneven_paste_deposition",
+            "unequal_pad_sizes",
+            "rapid_heating_rate",
+            "component_placement_offset",
+            "unbalanced_thermal_mass"
+          ],
+          "physics": {
+            "torque_imbalance": "M = F1×L1 - F2×L2",
+            "critical_size": "Most common in 0201, 0402",
+            "heating_rate": ">3°C/sec increases risk"
+          },
+          "occurrence": {
+            "base": 3,
+            "modifiers": {
+              "matched_pad_design": -3,
+              "vapor_phase_reflow": -2,
+              "conveyor_speed_optimized": -1,
+              "miniaturized_components_0201": 3
+            }
+          },
+          "severity": {
+            "class_3_assembly": 10
+          },
+          "detection": {
+            "methods": [
+              "automated_optical_inspection",
+              "visual_inspection_per_ipc"
+            ],
+            "difficulty": 2
+          },
+          "dpmo_impact": "Single defect can exceed Class 3 DPMO limit"
+        }
+      ]
+    },
+    "insufficient_solder_class_3": {
+      "failure_modes": [
+        {
+          "id": "ASM-SMT-INSUF-001",
+          "mechanism": "insufficient_solder_joint",
+          "description": "Solder joint below Class 3 minimum requirements",
+          "ipc_requirements": {
+            "class_3_fillet": "Must meet 100% of land width",
+            "minimum_heel_fillet": "Required on all components",
+            "side_joint_height": "Minimum G + 0.25T (T=lead thickness)"
+          },
+          "causes": [
+            "insufficient_paste_volume",
+            "paste_slump",
+            "poor_wetting",
+            "excessive_standoff_height"
+          ],
+          "effects": {
+            "local": "Reduced mechanical strength",
+            "circuit": "Potential reliability issue",
+            "system": "Does not meet Class 3 requirements"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "solder_paste_inspection": -3,
+              "proper_stencil_design": -2,
+              "fine_pitch_components": 2
+            }
+          },
+          "severity": {
+            "class_3_medical": 10,
+            "class_3_aerospace": 10,
+            "class_3_military": 10
+          }
+        }
+      ]
+    }
+  },
+  "through_hole_class_3": {
+    "barrel_fill_requirements": {
+      "failure_modes": [
+        {
+          "id": "ASM-TH-FILL-001",
+          "mechanism": "insufficient_barrel_fill",
+          "description": "Through-hole barrel fill below 75% requirement",
+          "ipc_class_3_requirement": "Minimum 75% barrel fill required",
+          "causes": [
+            "insufficient_solder_volume",
+            "poor_wetting_in_barrel",
+            "thermal_insufficiency",
+            "flux_inadequacy",
+            "hole_size_to_lead_ratio"
+          ],
+          "physics": {
+            "capillary_action": "h = 2γcosθ/(ρgr)",
+            "thermal_requirement": "ΔT through board <10°C"
+          },
+          "effects": {
+            "local": "Reduced thermal and mechanical connection",
+            "circuit": "Potential thermal cycling failure",
+            "system": "Does not meet Class 3 spec"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "selective_wave_solder": -2,
+              "manual_soldering": 2,
+              "thick_board_over_2_4mm": 2
+            }
+          },
+          "severity": {
+            "class_3_applications": 10
+          },
+          "detection": {
+            "methods": [
+              "x_ray_inspection_required",
+              "cross_sectioning_sampling"
+            ],
+            "difficulty": 5
+          }
+        }
+      ]
+    },
+    "circumferential_wetting": {
+      "failure_modes": [
+        {
+          "id": "ASM-TH-WET-001",
+          "mechanism": "insufficient_circumferential_wetting",
+          "description": "Wetting below 270° requirement for Class 3",
+          "ipc_requirement": "Class 3 requires 270° minimum wetting",
+          "causes": [
+            "poor_solderability",
+            "inadequate_flux",
+            "contamination",
+            "thermal_issues"
+          ],
+          "effects": {
+            "local": "Incomplete solder connection",
+            "circuit": "Reduced reliability",
+            "system": "Class 3 rejection"
+          },
+          "occurrence": {
+            "base": 3,
+            "modifiers": {
+              "solderability_testing": -2,
+              "nitrogen_atmosphere": -1
+            }
+          },
+          "severity": {
+            "class_3_all": 10
+          }
+        }
+      ]
+    }
+  },
+  "moisture_related_defects": {
+    "popcorning": {
+      "failure_modes": [
+        {
+          "id": "ASM-MOIST-POP-001",
+          "mechanism": "moisture_induced_package_cracking",
+          "description": "Package cracking from rapid moisture vaporization",
+          "jedec_j_std_020": "MSL levels define safe exposure time",
+          "causes": [
+            "exceeded_floor_life",
+            "inadequate_baking",
+            "damaged_moisture_barrier_bag",
+            "high_reflow_temperature"
+          ],
+          "physics": {
+            "vapor_pressure": "P = P0 × exp(-ΔHvap/RT)",
+            "critical_pressure": ">Adhesion strength causes delamination",
+            "expansion_ratio": "Water to steam ~1:1700"
+          },
+          "effects": {
+            "local": "Package crack, delamination, die damage",
+            "circuit": "Immediate or latent failure",
+            "system": "Catastrophic device failure"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "proper_msl_handling": -3,
+              "humidity_indicator_monitoring": -2,
+              "automated_msd_tracking": -2,
+              "manual_handling": 2,
+              "exceeded_floor_life": 4
+            }
+          },
+          "severity": {
+            "all_plastic_packages": 10
+          },
+          "detection": {
+            "methods": [
+              "acoustic_microscopy_csam",
+              "visual_inspection_cracking"
+            ],
+            "difficulty": 6
+          }
+        }
+      ]
+    }
+  },
+  "cleanliness_defects_class_3": {
+    "flux_residue": {
+      "failure_modes": [
+        {
+          "id": "ASM-CLEAN-FLUX-001",
+          "mechanism": "excessive_flux_residue",
+          "description": "Flux contamination exceeding Class 3 limits",
+          "ipc_requirements": {
+            "ionic_contamination": "<1.56 μg/cm² NaCl equivalent",
+            "visual_cleanliness": "No visible residue under 10X"
+          },
+          "causes": [
+            "insufficient_cleaning",
+            "wrong_flux_type",
+            "excessive_flux_application",
+            "incompatible_cleaning_chemistry"
+          ],
+          "effects": {
+            "local": "Corrosion risk, dendritic growth",
+            "circuit": "Leakage current, electrochemical migration",
+            "system": "Long-term reliability failure"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "automated_cleaning": -2,
+              "no_clean_flux_properly_activated": -1,
+              "water_soluble_flux": 1,
+              "manual_application": 2
+            }
+          },
+          "severity": {
+            "high_impedance_circuits": 9,
+            "high_voltage_circuits": 9,
+            "conformal_coated": 7
+          }
+        }
+      ]
+    }
+  },
+  "workmanship_defects": {
+    "component_damage": {
+      "failure_modes": [
+        {
+          "id": "ASM-WORK-COMP-001",
+          "mechanism": "physical_component_damage",
+          "description": "Mechanical damage during assembly",
+          "class_3_tolerance": "Zero tolerance for any physical damage",
+          "causes": [
+            "excessive_placement_force",
+            "nozzle_misalignment",
+            "manual_handling_damage",
+            "thermal_shock",
+            "mechanical_shock"
+          ],
+          "types": [
+            "cracked_packages",
+            "bent_leads",
+            "marking_damage",
+            "seal_damage"
+          ],
+          "occurrence": {
+            "base": 3,
+            "modifiers": {
+              "automated_handling": -2,
+              "vision_system_verification": -1,
+              "manual_processes": 3
+            }
+          },
+          "severity": {
+            "hermetic_packages": 10,
+            "plastic_packages": 9,
+            "passive_components": 7
+          }
+        }
+      ]
+    },
+    "lifted_leads": {
+      "failure_modes": [
+        {
+          "id": "ASM-WORK-LIFT-001",
+          "mechanism": "lead_lifting_from_pad",
+          "description": "Component lead separated from solder pad",
+          "causes": [
+            "thermal_mismatch_stress",
+            "mechanical_stress_during_handling",
+            "poor_solder_joint_formation",
+            "warpage_induced_stress"
+          ],
+          "effects": {
+            "local": "Open connection",
+            "circuit": "Loss of functionality",
+            "system": "Immediate failure"
+          },
+          "occurrence": {
+            "base": 2,
+            "modifiers": {
+              "strain_relief_forming": -2,
+              "proper_thermal_profile": -1,
+              "manual_rework": 3
+            }
+          },
+          "severity": {
+            "all_applications": 10
+          }
+        }
+      ]
+    }
+  },
+  "quality_statistics": {
+    "dpmo_targets": {
+      "world_class": "<50 DPMO",
+      "class_3_typical": "<100 DPMO",
+      "class_2_typical": "<500 DPMO",
+      "class_1_typical": "<2000 DPMO"
+    },
+    "defect_reduction_with_ipc": {
+      "reported_improvement": "30% reduction in defect rates",
+      "roi_on_training": "Return within 6-12 months"
+    },
+    "common_defect_distribution": {
+      "solder_related": "60-70%",
+      "component_related": "15-20%",
+      "pcb_related": "10-15%",
+      "handling_process": "5-10%"
+    },
+    "inspection_effectiveness": {
+      "visual_inspection": "80-90% defect capture",
+      "aoi": "95-98% defect capture",
+      "axi_xray": "95-99% for hidden joints",
+      "ict": "95-98% for opens/shorts",
+      "boundary_scan": "95-99% for digital",
+      "combined_approach": ">99.5% capture rate"
+    }
+  },
+  "environmental_stress_screening": {
+    "thermal_cycling_ess": {
+      "parameters": {
+        "temperature_range": "-55°C to +125°C typical",
+        "ramp_rate": "10-15°C/min",
+        "dwell_time": "10-15 minutes",
+        "number_of_cycles": "10-20 for ESS"
+      },
+      "defects_precipitated": [
+        "marginal_solder_joints",
+        "component_infant_mortality",
+        "workmanship_issues"
+      ]
+    },
+    "vibration_screening": {
+      "parameters": {
+        "frequency_range": "10-2000 Hz",
+        "acceleration": "5-10 g typical",
+        "duration": "10 minutes per axis"
+      },
+      "defects_found": [
+        "loose_components",
+        "cracked_solder_joints",
+        "mechanical_assembly_issues"
+      ]
+    }
+  },
+  "reliability_testing_requirements": {
+    "class_3_specific": {
+      "thermal_shock": "Minimum 100 cycles -55/+125°C",
+      "vibration": "MIL-STD-810 Method 514",
+      "humidity": "85°C/85% RH for 1000 hours",
+      "salt_spray": "Per MIL-STD-810 Method 509",
+      "altitude": "Per MIL-STD-810 Method 500"
+    },
+    "acceptance_criteria": {
+      "zero_defects": "Required for Class 3 delivery",
+      "documentation": "100% traceability required",
+      "inspection_records": "Retained 7-10 years minimum"
+    }
+  }
+}

@@ -1,0 +1,540 @@
+{
+  "silicon_level_failures": {
+    "gate_oxide_breakdown": {
+      "failure_modes": [
+        {
+          "id": "IC-GATE-001",
+          "mechanism": "tddb_time_dependent_dielectric_breakdown",
+          "description": "Progressive gate oxide degradation",
+          "causes": [
+            "electric_field_stress",
+            "defects_in_oxide",
+            "charge_trapping",
+            "temperature_acceleration"
+          ],
+          "physics": {
+            "weibull_model": "t63 = A × exp(G/Eox) × exp(Ea/kT)",
+            "e_model": "MTTF ∝ exp(-γ×Eox)",
+            "power_law": "TBD = C × V^-n",
+            "typical_field": "5-10 MV/cm for modern nodes",
+            "activation_energy": "0.6-0.8 eV"
+          },
+          "effects": {
+            "local": "Gate leakage increase, short",
+            "circuit": "Logic failure, power increase",
+            "system": "Device malfunction"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "voltage_guard_banding": -2,
+              "thin_oxide_technology": 2,
+              "high_k_dielectric": -1,
+              "elevated_temperature": 2
+            }
+          },
+          "detection": {
+            "methods": [
+              "gate_leakage_monitoring",
+              "stress_testing",
+              "burn_in_testing"
+            ],
+            "difficulty": 6
+          },
+          "severity": {
+            "digital_logic": 9,
+            "analog_circuits": 8,
+            "power_management": 7
+          },
+          "jedec_standard": "JESD92"
+        },
+        {
+          "id": "IC-GATE-002",
+          "mechanism": "soft_breakdown_sbd",
+          "description": "Partial oxide breakdown",
+          "causes": [
+            "localized_defects",
+            "progressive_breakdown",
+            "charge_to_breakdown"
+          ],
+          "effects": {
+            "local": "Increased gate current",
+            "circuit": "Noise, parameter shift",
+            "system": "Performance degradation"
+          },
+          "occurrence": {
+            "base": 5
+          },
+          "severity": {
+            "analog_precision": 8,
+            "digital": 5
+          }
+        }
+      ]
+    },
+    "electromigration": {
+      "failure_modes": [
+        {
+          "id": "IC-EM-001",
+          "mechanism": "metal_migration",
+          "description": "Atom displacement in interconnects",
+          "causes": [
+            "high_current_density",
+            "elevated_temperature",
+            "dc_current_stress",
+            "grain_boundary_diffusion"
+          ],
+          "physics": {
+            "blacks_equation": "MTTF = A × J^-n × exp(Ea/kT)",
+            "current_density_exponent": "n = 1.5-2.0",
+            "activation_energy": "0.5-0.7 eV for Al, 0.8-1.0 eV for Cu",
+            "blech_length": "Critical length × current product"
+          },
+          "effects": {
+            "local": "Void formation, hillock growth",
+            "circuit": "Open circuit, resistance increase",
+            "system": "Signal loss, power failure"
+          },
+          "occurrence": {
+            "base": 5,
+            "modifiers": {
+              "current_density_below_1e5": -2,
+              "copper_interconnect": -1,
+              "aluminum_interconnect": 1,
+              "ac_vs_dc_current": -1
+            }
+          },
+          "severity": {
+            "power_rails": 9,
+            "signal_lines": 7,
+            "clock_distribution": 8
+          },
+          "jedec_standard": "JESD61"
+        },
+        {
+          "id": "IC-EM-002",
+          "mechanism": "stress_migration",
+          "description": "Mechanical stress induced migration",
+          "causes": [
+            "thermal_mismatch_stress",
+            "residual_stress",
+            "temperature_gradients"
+          ],
+          "effects": {
+            "local": "Void formation without current",
+            "circuit": "Resistance increase",
+            "system": "Reliability degradation"
+          },
+          "occurrence": {
+            "base": 3
+          },
+          "severity": {
+            "via_structures": 8,
+            "wide_metal_lines": 5
+          }
+        }
+      ]
+    },
+    "hot_carrier_injection": {
+      "failure_modes": [
+        {
+          "id": "IC-HCI-001",
+          "mechanism": "channel_hot_carrier",
+          "description": "Energetic carrier injection into oxide",
+          "causes": [
+            "high_drain_voltage",
+            "impact_ionization",
+            "high_electric_field",
+            "short_channel_effects"
+          ],
+          "physics": {
+            "lucky_electron_model": "Carriers gain energy > barrier",
+            "substrate_current": "Isub ∝ Id × exp(-λ/Vds)",
+            "lifetime_model": "τ = A × Isub^-n",
+            "degradation": "ΔVth, Δgm, ΔIds"
+          },
+          "effects": {
+            "local": "Threshold voltage shift",
+            "circuit": "Speed degradation, mismatch",
+            "system": "Timing failures"
+          },
+          "occurrence": {
+            "base": 5,
+            "modifiers": {
+              "ldd_structures": -2,
+              "voltage_scaling": -1,
+              "analog_operation": 1,
+              "switching_circuits": 2
+            }
+          },
+          "severity": {
+            "analog_circuits": 8,
+            "digital_circuits": 6,
+            "io_buffers": 7
+          }
+        }
+      ]
+    },
+    "bias_temperature_instability": {
+      "failure_modes": [
+        {
+          "id": "IC-BTI-001",
+          "mechanism": "nbti_negative_bias_temperature_instability",
+          "description": "PMOS degradation under negative bias",
+          "causes": [
+            "negative_gate_bias",
+            "elevated_temperature",
+            "hydrogen_reactions",
+            "interface_trap_generation"
+          ],
+          "physics": {
+            "reaction_diffusion_model": "Si-H bond breaking",
+            "power_law": "ΔVth = A × t^n",
+            "recovery_effect": "Partial recovery on stress removal",
+            "activation_energy": "0.1-0.2 eV"
+          },
+          "effects": {
+            "local": "Vth increase in PMOS",
+            "circuit": "Speed degradation, current reduction",
+            "system": "Timing margin loss"
+          },
+          "occurrence": {
+            "base": 6,
+            "modifiers": {
+              "duty_cycle_below_50": -1,
+              "continuous_stress": 2,
+              "low_temperature_operation": -2
+            }
+          },
+          "severity": {
+            "analog_references": 9,
+            "digital_paths": 6
+          }
+        },
+        {
+          "id": "IC-BTI-002",
+          "mechanism": "pbti_positive_bias_temperature_instability",
+          "description": "NMOS degradation under positive bias",
+          "causes": [
+            "positive_gate_bias",
+            "high_k_dielectrics",
+            "charge_trapping"
+          ],
+          "effects": {
+            "local": "Vth shift in NMOS",
+            "circuit": "Performance variation",
+            "system": "Circuit malfunction"
+          },
+          "occurrence": {
+            "base": 4
+          },
+          "severity": {
+            "high_k_technologies": 7,
+            "standard_oxide": 5
+          }
+        }
+      ]
+    },
+    "latchup": {
+      "failure_modes": [
+        {
+          "id": "IC-LATCH-001",
+          "mechanism": "parasitic_thyristor_triggering",
+          "description": "PNPN structure activation",
+          "causes": [
+            "voltage_overshoot",
+            "current_injection",
+            "power_supply_transients",
+            "radiation_effects"
+          ],
+          "physics": {
+            "holding_current": "Minimum current to sustain",
+            "trigger_current": "Current to initiate",
+            "gain_product": "βnpn × βpnp > 1",
+            "well_resistance": "Critical for triggering"
+          },
+          "effects": {
+            "local": "Low impedance path VDD-VSS",
+            "circuit": "High current, device destruction",
+            "system": "System failure, fire hazard"
+          },
+          "occurrence": {
+            "base": 3,
+            "modifiers": {
+              "guard_rings": -2,
+              "epi_substrate": -2,
+              "soi_technology": -3,
+              "io_stress": 2
+            }
+          },
+          "severity": {
+            "all_cmos_devices": 10
+          },
+          "jedec_standard": "JESD78"
+        }
+      ]
+    }
+  },
+  "package_level_failures": {
+    "wire_bond_failures": {
+      "failure_modes": [
+        {
+          "id": "IC-BOND-001",
+          "mechanism": "bond_wire_fatigue",
+          "description": "Wire breakage from cyclic stress",
+          "causes": [
+            "thermal_cycling",
+            "power_cycling",
+            "vibration",
+            "ultrasonic_effects"
+          ],
+          "physics": {
+            "coffin_manson": "Nf = A × (ΔT)^-n",
+            "power_cycling": "Nf = K × (ΔTj)^-α × ton^β"
+          },
+          "effects": {
+            "local": "Wire neck breakage, lift-off",
+            "circuit": "Open circuit",
+            "system": "Device failure"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "copper_wire": -1,
+              "gold_wire": 0,
+              "aluminum_wire": 1,
+              "low_loop_height": -1
+            }
+          },
+          "severity": {
+            "power_devices": 9,
+            "signal_devices": 8
+          }
+        },
+        {
+          "id": "IC-BOND-002",
+          "mechanism": "intermetallic_formation",
+          "description": "Brittle compound growth",
+          "causes": [
+            "au_al_interface",
+            "elevated_temperature",
+            "time"
+          ],
+          "physics": {
+            "kirkendall_voids": "Differential diffusion",
+            "purple_plague": "AuAl2 formation"
+          },
+          "effects": {
+            "local": "Brittle interface, voids",
+            "circuit": "Resistance increase, open",
+            "system": "Intermittent failure"
+          },
+          "occurrence": {
+            "base": 3,
+            "modifiers": {
+              "monometallic_system": -3,
+              "gold_aluminum_mix": 3
+            }
+          },
+          "severity": {
+            "high_temperature_operation": 9,
+            "room_temperature": 6
+          }
+        }
+      ]
+    },
+    "die_attach_failures": {
+      "failure_modes": [
+        {
+          "id": "IC-DIE-001",
+          "mechanism": "die_attach_delamination",
+          "description": "Separation at die-substrate interface",
+          "causes": [
+            "thermal_cycling_stress",
+            "moisture_ingress",
+            "void_formation",
+            "adhesion_loss"
+          ],
+          "effects": {
+            "local": "Thermal resistance increase",
+            "circuit": "Hot spots, performance loss",
+            "system": "Thermal failure"
+          },
+          "occurrence": {
+            "base": 3,
+            "modifiers": {
+              "void_free_process": -2,
+              "silver_sintering": -1,
+              "solder_attach": 0,
+              "adhesive_attach": 1
+            }
+          },
+          "severity": {
+            "power_devices": 9,
+            "low_power_devices": 5
+          }
+        }
+      ]
+    },
+    "mold_compound_failures": {
+      "failure_modes": [
+        {
+          "id": "IC-MOLD-001",
+          "mechanism": "popcorn_effect",
+          "description": "Moisture-induced package cracking",
+          "causes": [
+            "moisture_absorption",
+            "rapid_heating_reflow",
+            "exceeded_floor_life"
+          ],
+          "physics": {
+            "vapor_pressure": "P = P0 × exp(-ΔH/RT)",
+            "critical_stress": "σ > material_strength"
+          },
+          "effects": {
+            "local": "Package crack, delamination",
+            "circuit": "Wire sweep, die damage",
+            "system": "Catastrophic failure"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "proper_msl_handling": -3,
+              "pre_baking": -2,
+              "exceeded_floor_life": 3
+            }
+          },
+          "severity": {
+            "all_plastic_packages": 10
+          }
+        }
+      ]
+    }
+  },
+  "environmental_stress_failures": {
+    "radiation_effects": {
+      "failure_modes": [
+        {
+          "id": "IC-RAD-001",
+          "mechanism": "single_event_upset_seu",
+          "description": "Bit flip from particle strike",
+          "causes": [
+            "cosmic_rays",
+            "alpha_particles",
+            "neutron_radiation"
+          ],
+          "effects": {
+            "local": "Memory bit flip",
+            "circuit": "Data corruption",
+            "system": "System error, crash"
+          },
+          "occurrence": {
+            "base": 3,
+            "modifiers": {
+              "ecc_protection": -2,
+              "high_altitude": 2,
+              "rad_hard_design": -3
+            }
+          },
+          "severity": {
+            "memory_devices": 8,
+            "logic_devices": 6
+          }
+        },
+        {
+          "id": "IC-RAD-002",
+          "mechanism": "total_ionizing_dose_tid",
+          "description": "Cumulative radiation damage",
+          "causes": [
+            "space_radiation",
+            "x_ray_exposure",
+            "gamma_radiation"
+          ],
+          "effects": {
+            "local": "Threshold shifts, leakage",
+            "circuit": "Parameter degradation",
+            "system": "Functional failure"
+          },
+          "occurrence": {
+            "base": 2,
+            "modifiers": {
+              "radiation_hardened": -3,
+              "commercial_parts": 2
+            }
+          },
+          "severity": {
+            "space_applications": 10,
+            "medical_equipment": 8
+          }
+        }
+      ]
+    }
+  },
+  "reliability_metrics": {
+    "failure_rates_fit": {
+      "logic_ics": {
+        "commercial": "10-100",
+        "automotive": "5-50",
+        "military": "2-20",
+        "space": "1-10"
+      },
+      "memory_ics": {
+        "sram": "20-200",
+        "dram": "50-500",
+        "flash": "30-300"
+      },
+      "analog_ics": {
+        "op_amps": "10-100",
+        "references": "5-50",
+        "converters": "20-200"
+      },
+      "power_ics": {
+        "linear_regulators": "50-500",
+        "switching_regulators": "100-1000"
+      }
+    },
+    "acceleration_factors": {
+      "arrhenius_temperature": {
+        "formula": "AF = exp(Ea/k × (1/Tuse - 1/Tstress))",
+        "typical_ea": "0.7 eV"
+      },
+      "voltage_acceleration": {
+        "exponential": "AF = exp(β × (Vstress - Vuse))",
+        "power_law": "AF = (Vstress/Vuse)^n"
+      },
+      "humidity": {
+        "peck_model": "AF = (RH_stress/RH_use)^n"
+      }
+    },
+    "jedec_standards": {
+      "jesd22_series": "Component test methods",
+      "jesd47": "Stress test qualification",
+      "jesd91": "Life model methodology",
+      "jep122": "Failure mechanisms and models"
+    }
+  },
+  "mitigation_strategies": {
+    "design_techniques": [
+      "guard_ring_structures",
+      "esd_protection_circuits",
+      "redundancy_and_voting",
+      "thermal_management",
+      "voltage_derating",
+      "current_limiting"
+    ],
+    "process_improvements": [
+      "copper_interconnects",
+      "low_k_dielectrics",
+      "high_k_gate_dielectrics",
+      "strain_engineering",
+      "soi_technology"
+    ],
+    "testing_methods": [
+      "burn_in_testing",
+      "htol_high_temperature_operating_life",
+      "hast_highly_accelerated_stress_test",
+      "temperature_cycling",
+      "power_cycling"
+    ]
+  }
+}

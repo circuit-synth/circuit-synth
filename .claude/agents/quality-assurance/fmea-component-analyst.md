@@ -188,7 +188,7 @@ Where:
 ```python
 # Access component-specific failure modes
 def get_component_failure_modes(component):
-    kb_path = "/fmea_knowledge_base/failure_modes/component_specific/"
+    kb_path = "/knowledge_base/fmea/failure_modes/component_specific/"
     
     # Load relevant failure mode data
     if component.type == "capacitor":
@@ -240,9 +240,9 @@ Recommendations:
 ## 🎯 **Integration with Knowledge Base**
 
 Access these knowledge base resources:
-- `/fmea_knowledge_base/failure_modes/component_specific/`
-- `/fmea_knowledge_base/reliability_data/manufacturer_data/`
-- `/fmea_knowledge_base/mitigation_strategies/component_selection.yaml`
-- `/fmea_knowledge_base/standards/IPC_standards.yaml`
+- `/knowledge_base/fmea/failure_modes/component_specific/`
+- `/knowledge_base/fmea/reliability_data/manufacturer_data/`
+- `/knowledge_base/fmea/mitigation_strategies/component_selection.yaml`
+- `/knowledge_base/fmea/standards/IPC_standards.yaml`
 
 Your detailed component analysis is critical for identifying potential failure points before they become field issues. Focus on high-risk components and provide actionable recommendations for improving reliability.

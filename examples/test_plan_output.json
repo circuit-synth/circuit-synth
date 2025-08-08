@@ -1,0 +1,461 @@
+{
+  "circuit_name": "test_plan_demo_circuit",
+  "summary": {
+    "total_test_points": 8,
+    "total_procedures": 5,
+    "estimated_duration_minutes": 80,
+    "component_types": [
+      "power_regulator",
+      "microcontroller",
+      "timing",
+      "usb_interface"
+    ]
+  },
+  "test_points": [
+    {
+      "id": "TP_VCC_3V3",
+      "net_name": "VCC_3V3",
+      "component_ref": null,
+      "pin": null,
+      "signal_type": "power",
+      "nominal_value": 3.3,
+      "tolerance_percent": 5.0,
+      "test_equipment": "multimeter",
+      "accessibility": "probe_point"
+    },
+    {
+      "id": "TP_VCC_5V",
+      "net_name": "VCC_5V",
+      "component_ref": null,
+      "pin": null,
+      "signal_type": "power",
+      "nominal_value": 5.0,
+      "tolerance_percent": 5.0,
+      "test_equipment": "multimeter",
+      "accessibility": "probe_point"
+    },
+    {
+      "id": "TP_GND",
+      "net_name": "GND",
+      "component_ref": null,
+      "pin": null,
+      "signal_type": "ground",
+      "nominal_value": 0.0,
+      "tolerance_percent": 5.0,
+      "test_equipment": "multimeter",
+      "accessibility": "probe_point"
+    },
+    {
+      "id": "TP_MCU_RESET",
+      "net_name": "NRST",
+      "component_ref": "U1",
+      "pin": "NRST",
+      "signal_type": "digital",
+      "nominal_value": 3.3,
+      "tolerance_percent": 10.0,
+      "test_equipment": "oscilloscope",
+      "accessibility": "component_pin"
+    },
+    {
+      "id": "TP_MCU_CLOCK",
+      "net_name": "HSE_IN",
+      "component_ref": "U1",
+      "pin": "OSC_IN",
+      "signal_type": "analog",
+      "nominal_value": null,
+      "tolerance_percent": 2.0,
+      "test_equipment": "oscilloscope",
+      "accessibility": "component_pin"
+    },
+    {
+      "id": "TP_USB_VBUS",
+      "net_name": "VBUS",
+      "component_ref": "J1",
+      "pin": "VBUS",
+      "signal_type": "power",
+      "nominal_value": 5.0,
+      "tolerance_percent": 5.0,
+      "test_equipment": "multimeter",
+      "accessibility": "component_pin"
+    },
+    {
+      "id": "TP_USB_DP",
+      "net_name": "USB_DP",
+      "component_ref": "J1",
+      "pin": "D+",
+      "signal_type": "digital",
+      "nominal_value": null,
+      "tolerance_percent": 10.0,
+      "test_equipment": "oscilloscope",
+      "accessibility": "component_pin"
+    },
+    {
+      "id": "TP_USB_DM",
+      "net_name": "USB_DM",
+      "component_ref": "J1",
+      "pin": "D-",
+      "signal_type": "digital",
+      "nominal_value": null,
+      "tolerance_percent": 10.0,
+      "test_equipment": "oscilloscope",
+      "accessibility": "component_pin"
+    }
+  ],
+  "procedures": [
+    {
+      "test_id": "PWR-001",
+      "name": "Power-On Sequence Test",
+      "category": "functional",
+      "description": "Verify proper power-on sequence and voltage levels",
+      "equipment": [
+        "multimeter",
+        "oscilloscope",
+        "power_supply"
+      ],
+      "setup": [
+        "Connect power supply to input connector",
+        "Set current limit to 500mA initially",
+        "Connect oscilloscope to power rail test points",
+        "Connect multimeter for DC measurements"
+      ],
+      "steps": [
+        "Apply input voltage slowly from 0V to nominal",
+        "Monitor inrush current (should be < 2A peak)",
+        "Verify power rail sequencing timing",
+        "Measure each power rail voltage: VCC_3V3, VCC_5V, VBUS",
+        "Check for oscillation or instability",
+        "Measure ripple voltage on each rail"
+      ],
+      "measurements": [
+        {
+          "parameter": "VCC_3V3",
+          "nominal": 3.3,
+          "tolerance": "\u00b15.0%",
+          "equipment": "multimeter"
+        },
+        {
+          "parameter": "VCC_5V",
+          "nominal": 5.0,
+          "tolerance": "\u00b15.0%",
+          "equipment": "multimeter"
+        },
+        {
+          "parameter": "VBUS",
+          "nominal": 5.0,
+          "tolerance": "\u00b15.0%",
+          "equipment": "multimeter"
+        }
+      ],
+      "pass_criteria": {
+        "voltages_in_spec": true,
+        "ripple_max_mv": 50,
+        "sequencing_correct": true,
+        "no_oscillation": true
+      },
+      "fail_actions": [
+        "Check power supply connections",
+        "Verify input voltage and current limit",
+        "Inspect voltage regulator components",
+        "Check decoupling capacitors"
+      ],
+      "safety_warnings": [
+        "Ensure current limit is set before power-on",
+        "Check for hot components during test"
+      ],
+      "duration_minutes": 10
+    },
+    {
+      "test_id": "FUNC-001",
+      "name": "Microcontroller Functional Test",
+      "category": "functional",
+      "description": "Verify microcontroller basic functionality",
+      "equipment": [
+        "oscilloscope",
+        "logic_analyzer"
+      ],
+      "setup": [
+        "Power on the circuit",
+        "Connect programmer/debugger",
+        "Load test firmware"
+      ],
+      "steps": [
+        "Verify reset functionality (pull NRST low, then release)",
+        "Check crystal oscillator frequency",
+        "Test GPIO toggle on all available pins",
+        "Verify UART communication at 115200 baud",
+        "Test I2C/SPI interfaces if present"
+      ],
+      "measurements": [
+        {
+          "parameter": "Crystal frequency",
+          "nominal": "8MHz/16MHz/25MHz",
+          "tolerance": "\u00b150ppm",
+          "equipment": "oscilloscope"
+        },
+        {
+          "parameter": "GPIO high level",
+          "nominal": 3.3,
+          "tolerance": "\u00b110%",
+          "equipment": "multimeter"
+        }
+      ],
+      "pass_criteria": {
+        "reset_works": true,
+        "clock_stable": true,
+        "gpio_functional": true,
+        "communication_works": true
+      },
+      "fail_actions": [
+        "Check crystal and loading capacitors",
+        "Verify power supply to MCU",
+        "Check reset circuit components",
+        "Verify programmer connections"
+      ],
+      "safety_warnings": [],
+      "duration_minutes": 15
+    },
+    {
+      "test_id": "FUNC-002",
+      "name": "USB Interface Test",
+      "category": "functional",
+      "description": "Verify USB communication and compliance",
+      "equipment": [
+        "oscilloscope",
+        "multimeter"
+      ],
+      "setup": [
+        "Connect USB cable to host computer",
+        "Install USB protocol analyzer software",
+        "Connect oscilloscope to D+ and D- lines"
+      ],
+      "steps": [
+        "Measure VBUS voltage (should be 5V \u00b15%)",
+        "Verify device enumeration on host",
+        "Check D+ pull-up resistor (1.5k\u03a9 for full-speed)",
+        "Measure differential signal quality",
+        "Test data transfer at maximum speed"
+      ],
+      "measurements": [
+        {
+          "parameter": "VBUS voltage",
+          "nominal": 5.0,
+          "tolerance": "\u00b15%",
+          "equipment": "multimeter"
+        },
+        {
+          "parameter": "D+/D- differential",
+          "nominal": "400mV",
+          "tolerance": "\u00b110%",
+          "equipment": "oscilloscope"
+        }
+      ],
+      "pass_criteria": {
+        "enumeration_success": true,
+        "vbus_in_spec": true,
+        "signal_quality_good": true,
+        "data_transfer_works": true
+      },
+      "fail_actions": [
+        "Check USB connector soldering",
+        "Verify series resistors on data lines",
+        "Check ESD protection components",
+        "Verify firmware USB stack"
+      ],
+      "safety_warnings": [],
+      "duration_minutes": 10
+    },
+    {
+      "test_id": "SAFE-001",
+      "name": "ESD Protection Test",
+      "category": "safety",
+      "description": "Verify ESD protection per IEC 61000-4-2",
+      "equipment": [
+        "esd_gun",
+        "oscilloscope"
+      ],
+      "setup": [
+        "Configure ESD gun for contact discharge",
+        "Set initial voltage to \u00b12kV",
+        "Connect oscilloscope to monitor critical signals",
+        "Ensure proper grounding of test setup"
+      ],
+      "steps": [
+        "Apply \u00b12kV contact discharge to exposed connectors",
+        "Apply \u00b14kV contact discharge to ground planes",
+        "Apply \u00b18kV air discharge to plastic enclosure",
+        "Verify circuit functionality after each discharge",
+        "Check for latch-up conditions"
+      ],
+      "measurements": [
+        {
+          "parameter": "Recovery time",
+          "nominal": "<1s",
+          "tolerance": "N/A",
+          "equipment": "oscilloscope"
+        },
+        {
+          "parameter": "Functionality",
+          "nominal": "Normal operation",
+          "tolerance": "No permanent damage",
+          "equipment": "functional_test"
+        }
+      ],
+      "pass_criteria": {
+        "no_permanent_damage": true,
+        "auto_recovery": true,
+        "data_integrity": true
+      },
+      "fail_actions": [
+        "Add TVS diodes on exposed signals",
+        "Improve PCB grounding",
+        "Add ferrite beads on cables",
+        "Review ESD protection components"
+      ],
+      "safety_warnings": [
+        "ESD testing can damage unprotected circuits",
+        "Ensure proper PPE when using ESD gun",
+        "Keep sensitive equipment away from test area"
+      ],
+      "duration_minutes": 30
+    },
+    {
+      "test_id": "SAFE-002",
+      "name": "Overvoltage Protection Test",
+      "category": "safety",
+      "description": "Verify circuit protection against overvoltage",
+      "equipment": [
+        "power_supply",
+        "multimeter",
+        "oscilloscope"
+      ],
+      "setup": [
+        "Connect variable power supply",
+        "Set current limit to safe value",
+        "Monitor critical component voltages"
+      ],
+      "steps": [
+        "Gradually increase input voltage to 110% of maximum",
+        "Monitor protection circuit activation",
+        "Verify no damage to downstream components",
+        "Test auto-recovery when voltage returns to normal",
+        "Check protection response time"
+      ],
+      "measurements": [
+        {
+          "parameter": "Protection threshold",
+          "nominal": "110% of Vmax",
+          "tolerance": "\u00b15%",
+          "equipment": "multimeter"
+        },
+        {
+          "parameter": "Response time",
+          "nominal": "<100\u00b5s",
+          "tolerance": "N/A",
+          "equipment": "oscilloscope"
+        }
+      ],
+      "pass_criteria": {
+        "protection_activates": true,
+        "no_component_damage": true,
+        "auto_recovery_works": true
+      },
+      "fail_actions": [
+        "Check TVS diode specifications",
+        "Verify crowbar circuit operation",
+        "Review input protection design",
+        "Add redundant protection"
+      ],
+      "safety_warnings": [
+        "Overvoltage testing may damage components",
+        "Use current limiting for safety",
+        "Have replacement components ready"
+      ],
+      "duration_minutes": 15
+    }
+  ],
+  "equipment_required": {
+    "multimeter": {
+      "name": "Digital Multimeter",
+      "type": "multimeter",
+      "specifications": {
+        "voltage_range": "0-1000V DC/AC",
+        "current_range": "0-10A",
+        "resistance_range": "0-100M\u03a9",
+        "accuracy": "0.5%",
+        "resolution": "6.5 digits"
+      },
+      "required": true,
+      "alternatives": [
+        "Fluke 87V",
+        "Keysight 34461A",
+        "Rigol DM3068"
+      ]
+    },
+    "oscilloscope": {
+      "name": "Digital Oscilloscope",
+      "type": "oscilloscope",
+      "specifications": {
+        "bandwidth": "100MHz minimum",
+        "channels": "4",
+        "sample_rate": "1GSa/s",
+        "memory_depth": "10Mpts",
+        "probes": "10:1 passive probes"
+      },
+      "required": true,
+      "alternatives": [
+        "Rigol DS1054Z",
+        "Keysight DSOX1204A",
+        "Tektronix TBS1104"
+      ]
+    },
+    "power_supply": {
+      "name": "Programmable Power Supply",
+      "type": "power_supply",
+      "specifications": {
+        "channels": "2-3",
+        "voltage_range": "0-30V",
+        "current_range": "0-5A",
+        "resolution": "1mV/1mA",
+        "ripple": "<5mVpp"
+      },
+      "required": true,
+      "alternatives": [
+        "Rigol DP832",
+        "Keysight E36313A",
+        "Siglent SPD3303X"
+      ]
+    },
+    "logic_analyzer": {
+      "name": "Logic Analyzer",
+      "type": "logic_analyzer",
+      "specifications": {
+        "channels": "16 minimum",
+        "sample_rate": "100MSa/s",
+        "memory": "1M samples/channel",
+        "protocol_decode": "I2C, SPI, UART, CAN"
+      },
+      "required": true,
+      "alternatives": [
+        "Saleae Logic Pro 16",
+        "Keysight 16850A",
+        "Digilent Digital Discovery"
+      ]
+    },
+    "esd_gun": {
+      "name": "ESD Simulator",
+      "type": "esd_gun",
+      "specifications": {
+        "voltage_range": "\u00b130kV",
+        "discharge_modes": "Contact and Air",
+        "standards": "IEC 61000-4-2",
+        "discharge_network": "150pF/330\u03a9"
+      },
+      "required": false,
+      "alternatives": [
+        "Teseq NSG 435",
+        "EM Test Dito",
+        "NoiseKen ESS-2000"
+      ]
+    }
+  }
+}

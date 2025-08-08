@@ -56,7 +56,7 @@ class TestHierarchicalSynchronizer(unittest.TestCase):
 
         # Should have main + 2 sub sheets
         sheet_count = 1  # main
-        for sheet in sync.root.children:
+        for sheet in sync.root_sheet.children:
             sheet_count += 1
 
         self.assertEqual(sheet_count, 3, "Should detect main + 2 sub sheets")
@@ -89,12 +89,22 @@ class TestHierarchicalSynchronizer(unittest.TestCase):
 
         # Run synchronization
         sync = HierarchicalSynchronizer(str(project_path))
-        sub_dict = {"branch": branch(), "leaf": leaf(Net("A"), Net("B"))}
-        report = sync.synchronize(root(), sub_dict)
+        # Create dummy circuits for sub_dict
+        # These need to be actual circuit instances
+        @circuit(name="branch_instance")
+        def branch_instance():
+            pass
+        
+        @circuit(name="leaf_instance")
+        def leaf_instance():
+            pass
+        
+        sub_dict = {"branch": branch_instance(), "leaf": leaf_instance()}
+        report = sync.sync_with_circuit(root(), sub_dict)
 
         # Check that components were matched
         total_matched = sum(
-            sheet_report.get("matched", 0) for sheet_report in report["sheets"].values()
+            sheet_report.get("matched", 0) for sheet_report in report.get("sheet_reports", {}).values()
         )
 
         self.assertGreater(total_matched, 0, "Should match some components")
@@ -130,7 +140,7 @@ class TestHierarchicalSynchronizer(unittest.TestCase):
         sync = HierarchicalSynchronizer(
             str(project_path), preserve_user_components=True
         )
-        report = sync.synchronize(simple(), {})
+        report = sync.sync_with_circuit(simple(), {})
 
         # Read back and check position
         # TODO: SchematicParser not implemented yet - skip this check for now
@@ -177,15 +187,24 @@ class TestHierarchicalSynchronizer(unittest.TestCase):
         project_path = self.create_test_project("test_deep", level1)
 
         sync = HierarchicalSynchronizer(str(project_path))
+        # Create dummy circuit instances for sub_dict
+        @circuit(name="level2_instance")
+        def level2_instance():
+            pass
+        
+        @circuit(name="level3_instance")
+        def level3_instance():
+            pass
+        
         sub_dict = {
-            "level2": level2(Net("V"), Net("G")),
-            "level3": level3(Net("A"), Net("B")),
+            "level2": level2_instance(),
+            "level3": level3_instance(),
         }
-        report = sync.synchronize(level1(), sub_dict)
+        report = sync.sync_with_circuit(level1(), sub_dict)
 
         # Should handle all levels
-        self.assertIn("sheets", report)
-        sheet_count = len(report["sheets"])
+        self.assertIn("sheet_reports", report)
+        sheet_count = len(report["sheet_reports"])
         self.assertGreaterEqual(sheet_count, 3, "Should process all hierarchy levels")
 
 

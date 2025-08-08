@@ -36,41 +36,53 @@ def cli():
 @click.argument("query")
 @click.option("--min-stock", "-s", default=0, help="Minimum stock required")
 @click.option("--max-results", "-n", default=10, help="Maximum results to show")
-@click.option("--sort", "-o", type=click.Choice(['relevance', 'price', 'stock']), default='relevance')
+@click.option(
+    "--sort",
+    "-o",
+    type=click.Choice(["relevance", "price", "stock"]),
+    default="relevance",
+)
 @click.option("--basic-only", "-b", is_flag=True, help="Show only basic parts")
 @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
-def search(query: str, min_stock: int, max_results: int, sort: str, basic_only: bool, output_json: bool):
+def search(
+    query: str,
+    min_stock: int,
+    max_results: int,
+    sort: str,
+    basic_only: bool,
+    output_json: bool,
+):
     """
     Search for JLCPCB components.
-    
+
     Examples:
         jlc-fast search STM32G4
         jlc-fast search "0.1uF 0603" --min-stock 1000
         jlc-fast search LM358 --sort price
     """
     start_time = time.time()
-    
+
     if not output_json:
         console.print(f"\n🔍 Searching JLCPCB for: [bold blue]{query}[/bold blue]\n")
-    
+
     # Perform search
     results = fast_jlc_search(
         query=query,
         min_stock=min_stock,
         max_results=max_results,
         sort_by=sort,
-        prefer_basic=basic_only
+        prefer_basic=basic_only,
     )
-    
+
     elapsed = time.time() - start_time
-    
+
     if output_json:
         # JSON output for scripting
         output = {
-            'query': query,
-            'elapsed_seconds': elapsed,
-            'result_count': len(results),
-            'results': [r.to_dict() for r in results]
+            "query": query,
+            "elapsed_seconds": elapsed,
+            "result_count": len(results),
+            "results": [r.to_dict() for r in results],
         }
         print(json.dumps(output, indent=2))
     else:
@@ -78,7 +90,7 @@ def search(query: str, min_stock: int, max_results: int, sort: str, basic_only: 
         if not results:
             console.print("[red]No results found[/red]")
             return
-        
+
         # Create results table
         table = Table(title=f"Found {len(results)} components in {elapsed:.2f}s")
         table.add_column("Part #", style="cyan")
@@ -88,18 +100,18 @@ def search(query: str, min_stock: int, max_results: int, sort: str, basic_only: 
         table.add_column("Package", style="magenta")
         table.add_column("Type", style="blue")
         table.add_column("Score", justify="right", style="dim")
-        
+
         for result in results:
             stock_str = f"{result.stock:,}" if result.stock > 0 else "OOS"
             price_str = f"${result.price:.4f}" if result.price > 0 else "-"
             type_str = "Basic" if result.basic_part else "Ext"
             score_str = f"{result.match_score:.2f}"
-            
+
             # Truncate long descriptions
             desc = result.description
             if len(desc) > 40:
                 desc = desc[:37] + "..."
-            
+
             table.add_row(
                 result.part_number,
                 desc,
@@ -107,9 +119,9 @@ def search(query: str, min_stock: int, max_results: int, sort: str, basic_only: 
                 price_str,
                 result.package,
                 type_str,
-                score_str
+                score_str,
             )
-        
+
         console.print(table)
 
 
@@ -119,16 +131,16 @@ def search(query: str, min_stock: int, max_results: int, sort: str, basic_only: 
 def cheapest(query: str, min_stock: int):
     """
     Find the cheapest component matching the query.
-    
+
     Example:
         jlc-fast cheapest "10uF 0805"
     """
     start_time = time.time()
     console.print(f"\n💰 Finding cheapest: [bold blue]{query}[/bold blue]\n")
-    
+
     result = find_cheapest_jlc(query, min_stock)
     elapsed = time.time() - start_time
-    
+
     if result:
         panel = Panel(
             f"[bold]{result.part_number}[/bold]\n"
@@ -138,7 +150,7 @@ def cheapest(query: str, min_stock: int):
             f"Package: [magenta]{result.package}[/magenta]\n"
             f"Type: [blue]{'Basic' if result.basic_part else 'Extended'}[/blue]",
             title=f"Cheapest Match (found in {elapsed:.2f}s)",
-            border_style="green"
+            border_style="green",
         )
         console.print(panel)
     else:
@@ -150,16 +162,16 @@ def cheapest(query: str, min_stock: int):
 def most_available(query: str):
     """
     Find the component with the highest stock.
-    
+
     Example:
         jlc-fast most-available STM32F103
     """
     start_time = time.time()
     console.print(f"\n📦 Finding most available: [bold blue]{query}[/bold blue]\n")
-    
+
     result = find_most_available_jlc(query)
     elapsed = time.time() - start_time
-    
+
     if result:
         panel = Panel(
             f"[bold]{result.part_number}[/bold]\n"
@@ -169,7 +181,7 @@ def most_available(query: str):
             f"Package: [magenta]{result.package}[/magenta]\n"
             f"Type: [blue]{'Basic' if result.basic_part else 'Extended'}[/blue]",
             title=f"Highest Stock (found in {elapsed:.2f}s)",
-            border_style="green"
+            border_style="green",
         )
         console.print(panel)
     else:
@@ -182,21 +194,23 @@ def most_available(query: str):
 def alternatives(part_number: str, max_results: int):
     """
     Find alternative components for a given part.
-    
+
     Example:
         jlc-fast alternatives C123456
     """
     start_time = time.time()
-    console.print(f"\n🔄 Finding alternatives for: [bold blue]{part_number}[/bold blue]\n")
-    
+    console.print(
+        f"\n🔄 Finding alternatives for: [bold blue]{part_number}[/bold blue]\n"
+    )
+
     searcher = get_fast_searcher()
     results = searcher.find_alternatives(part_number, max_results)
     elapsed = time.time() - start_time
-    
+
     if not results:
         console.print("[red]No alternatives found[/red]")
         return
-    
+
     # Create results table
     table = Table(title=f"Found {len(results)} alternatives in {elapsed:.2f}s")
     table.add_column("Part #", style="cyan")
@@ -204,24 +218,18 @@ def alternatives(part_number: str, max_results: int):
     table.add_column("Stock", justify="right", style="green")
     table.add_column("Price", justify="right", style="yellow")
     table.add_column("Package", style="magenta")
-    
+
     for result in results:
         stock_str = f"{result.stock:,}" if result.stock > 0 else "OOS"
         price_str = f"${result.price:.4f}" if result.price > 0 else "-"
-        
+
         # Truncate long descriptions
         desc = result.description
         if len(desc) > 45:
             desc = desc[:42] + "..."
-        
-        table.add_row(
-            result.part_number,
-            desc,
-            stock_str,
-            price_str,
-            result.package
-        )
-    
+
+        table.add_row(result.part_number, desc, stock_str, price_str, result.package)
+
     console.print(table)
 
 
@@ -229,36 +237,32 @@ def alternatives(part_number: str, max_results: int):
 def benchmark():
     """
     Benchmark search performance vs agent-based search.
-    
+
     Shows the performance improvement of direct search.
     """
     console.print("\n⏱️  [bold]Performance Benchmark[/bold]\n")
-    
-    test_queries = [
-        "STM32G4",
-        "0.1uF 0603",
-        "LM358",
-        "USB-C connector",
-        "10k resistor"
-    ]
-    
+
+    test_queries = ["STM32G4", "0.1uF 0603", "LM358", "USB-C connector", "10k resistor"]
+
     total_time = 0
     for query in test_queries:
         start = time.time()
         results = fast_jlc_search(query, max_results=5)
         elapsed = time.time() - start
         total_time += elapsed
-        
+
         status = "✅" if results else "❌"
         console.print(f"{status} '{query}': {elapsed:.3f}s ({len(results)} results)")
-    
+
     avg_time = total_time / len(test_queries)
-    
+
     console.print(f"\n[bold]Results:[/bold]")
     console.print(f"  Average search time: [green]{avg_time:.3f}s[/green]")
     console.print(f"  Total time: [green]{total_time:.3f}s[/green]")
     console.print(f"  vs Agent estimate: [red]~30s per search[/red]")
-    console.print(f"  [bold green]Speed improvement: {30/avg_time:.1f}x faster![/bold green]")
+    console.print(
+        f"  [bold green]Speed improvement: {30/avg_time:.1f}x faster![/bold green]"
+    )
     console.print(f"  [bold blue]Token usage: 0 (vs ~500 per agent search)[/bold blue]")
 
 
@@ -266,7 +270,7 @@ def benchmark():
 def clear_cache():
     """Clear the JLCPCB search cache."""
     cache_dir = Path.home() / ".circuit-synth" / "cache" / "jlcpcb"
-    
+
     if cache_dir.exists():
         count = 0
         for cache_file in cache_dir.glob("*.json"):

@@ -1,11 +1,11 @@
 ---
-allowed-tools: Bash(uv*), Bash(pytest*), Bash(open*), Bash(cargo*), Bash(./scripts/*)
-description: Comprehensive test suite with Python, Rust, and integration testing
+allowed-tools: Bash(uv*), Bash(pytest*), Bash(open*), Bash(cargo*), Bash(./scripts/*), Bash(./tools/*)
+description: Orchestrates existing test tools for comprehensive testing
 ---
 
 # Comprehensive Test Runner
 
-**Purpose:** Complete testing pipeline with Python tests, Rust modules, circuit validation, and performance benchmarking.
+**Purpose:** Orchestrates all existing test tools for complete testing coverage, including full regression tests, Rust modules, and performance benchmarking.
 
 ## Usage
 ```bash
@@ -13,297 +13,291 @@ description: Comprehensive test suite with Python, Rust, and integration testing
 ```
 
 ## Options
-- `--suite=all` - Test suite: `python`, `rust`, `integration`, `examples`, `performance`, `all` (default: all)
-- `--coverage=true` - Generate coverage reports (default: true)
+- `--suite=standard` - Test suite: `quick`, `standard`, `full`, `regression` (default: standard)
+- `--skip-install` - Skip dependency reinstallation (faster, for development)
+- `--keep-outputs` - Don't delete generated test files
+- `--verbose` - Show detailed output
 - `--format=true` - Auto-format code before testing (default: true)
 - `--fail-fast=false` - Stop on first failure (default: false)
-- `--verbose=false` - Verbose output (default: false)
-- `--benchmark=false` - Run performance benchmarks (default: false)
 
-## What This Does
+## Test Suites
 
-### 1. Pre-Test Setup and Validation
-- **Environment check** - Verify uv, Python, and dependencies
-- **Auto-formatting** - Format code with black/isort before testing
-- **Dependency validation** - Ensure dev dependencies are installed
-- **KiCad availability** - Check for KiCad integration testing
+### 🚀 Quick Suite (~30 seconds)
+Fast development testing:
+```bash
+./tools/testing/run_all_tests.sh --python-only --fail-fast
+```
 
-### 2. Python Test Suite
-- **Unit tests** - Core functionality testing
-- **Integration tests** - Component interaction testing  
-- **Circuit validation** - Test actual circuit generation
-- **Coverage analysis** - Generate detailed coverage reports
-- **Type checking** - MyPy static analysis (informational only)
+### 📋 Standard Suite - Default (~2 minutes)
+Comprehensive testing without environment rebuild:
+```bash
+# Auto-format if requested
+uv run black src/ tests/ examples/ --quiet
+uv run isort src/ tests/ examples/ --quiet
 
-### 3. Rust Module Testing
-- **Rust compilation** - Build all Rust modules
-- **Rust unit tests** - Native Rust test suite
-- **Python-Rust integration** - Cross-language bindings
-- **Performance validation** - Rust module benchmarks
+# Run all tests
+./tools/testing/run_all_tests.sh --verbose
+```
 
-### 4. Example and Circuit Testing
-- **Example execution** - Run all examples/\*.py files
-- **Circuit generation** - Validate KiCad output
-- **Component verification** - Check all components are valid
-- **File output validation** - Ensure generated files are correct
+### 🔬 Full Suite (~5 minutes)
+Complete testing with Rust modules and examples:
+```bash
+# Run comprehensive tests
+./tools/testing/run_all_tests.sh --verbose
 
-### 5. Performance Benchmarking
-- **Circuit generation speed** - Time key operations
-- **Memory usage profiling** - Track memory consumption
-- **KiCad integration performance** - File generation benchmarks
-- **Regression detection** - Compare against baselines
+# Test Rust modules specifically
+./tools/testing/test_rust_modules.sh --verbose
+
+# Test all examples
+for example in examples/*.py; do
+    uv run python "$example"
+done
+```
+
+### 🏗️ Regression Suite (~10 minutes)
+**CRITICAL for releases** - complete environment reconstruction:
+```bash
+./tools/testing/run_full_regression_tests.py --verbose
+```
+
+## What Each Tool Does
+
+### 1. `run_all_tests.sh`
+Main test orchestrator:
+- 🐍 **Python Tests** - Unit tests via pytest
+- 🦀 **Rust Tests** - Cargo tests for all modules
+- 🔗 **Integration Tests** - Python-Rust bindings
+- ⚙️ **Core Tests** - End-to-end functionality
+
+### 2. `run_full_regression_tests.py` 
+**MANDATORY for releases**:
+- 🗑️ **Clears ALL caches** (Python, Rust, system)
+- 📦 **Reinstalls all dependencies** from scratch
+- 🔨 **Rebuilds all Rust modules** with Python bindings
+- 🧪 **Runs comprehensive test suite**
+- ✅ **Validates generated outputs**
+
+### 3. `test_rust_modules.sh`
+Dedicated Rust testing:
+- 🦀 **Module discovery** - Finds all Rust modules
+- 🔨 **Compilation checks** - Ensures all modules build
+- 🧪 **Cargo tests** - Runs native Rust tests
+- 📊 **Python bindings** - Validates PyO3 integration
 
 ## Implementation
 
-### Pre-Test Setup
+The command orchestrates existing test tools rather than duplicating functionality:
+
 ```bash
-# Check environment
-echo "🔍 Checking test environment..."
-uv --version >/dev/null || { echo "❌ uv not found"; exit 1; }
-python --version
-kicad-cli version >/dev/null 2>&1 && echo "✅ KiCad available" || echo "⚠️  KiCad not found"
+#!/bin/bash
 
-# Install dependencies if needed
-echo "📦 Ensuring dev dependencies..."
-uv pip install -e ".[dev]" --quiet
+# Parse arguments
+SUITE="standard"
+SKIP_INSTALL=false
+KEEP_OUTPUTS=false
+VERBOSE=false
+FORMAT=true
+FAIL_FAST=false
 
-# Auto-format code (if enabled)
-if [[ "$format" == "true" ]]; then
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --suite=*)
+            SUITE="${1#*=}"
+            shift
+            ;;
+        --skip-install)
+            SKIP_INSTALL=true
+            shift
+            ;;
+        --keep-outputs)
+            KEEP_OUTPUTS=true
+            shift
+            ;;
+        --verbose)
+            VERBOSE=true
+            shift
+            ;;
+        --format=*)
+            FORMAT="${1#*=}"
+            shift
+            ;;
+        --fail-fast)
+            FAIL_FAST=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
+# Build test command arguments
+TEST_ARGS=""
+[[ "$VERBOSE" == "true" ]] && TEST_ARGS="$TEST_ARGS --verbose"
+[[ "$FAIL_FAST" == "true" ]] && TEST_ARGS="$TEST_ARGS --fail-fast"
+[[ "$SKIP_INSTALL" == "true" ]] && TEST_ARGS="$TEST_ARGS --skip-install"
+[[ "$KEEP_OUTPUTS" == "true" ]] && TEST_ARGS="$TEST_ARGS --keep-outputs"
+
+# Pre-test formatting
+if [[ "$FORMAT" == "true" ]]; then
     echo "🎨 Auto-formatting code..."
     uv run black src/ tests/ examples/ --quiet
     uv run isort src/ tests/ examples/ --quiet
     echo "✅ Code formatted"
 fi
-```
 
-### Python Test Execution
-```bash
-# Core test suite with coverage
-echo "🐍 Running Python test suite..."
-test_args=""
-[[ "$fail_fast" == "true" ]] && test_args="$test_args -x"
-[[ "$verbose" == "true" ]] && test_args="$test_args -v"
-
-if [[ "$coverage" == "true" ]]; then
-    uv run pytest tests/ --cov=circuit_synth --cov-report=term-missing --cov-report=html $test_args || {
-        echo "❌ Python tests failed"
-        exit 1
-    }
-    echo "📊 Coverage report: htmlcov/index.html"
-else
-    uv run pytest tests/ $test_args || {
-        echo "❌ Python tests failed"  
-        exit 1
-    }
-fi
-
-# Type checking (informational)
-echo "🔍 Running type checks..."
-uv run mypy src/ --ignore-missing-imports --no-error-summary || echo "⚠️  Type checking issues found (non-blocking)"
-```
-
-### Rust Module Testing
-```bash
-# Check for Rust modules
-rust_modules=($(find . -name "Cargo.toml" -exec dirname {} \; 2>/dev/null))
-
-if [ ${#rust_modules[@]} -gt 0 ]; then
-    echo "🦀 Testing Rust modules..."
-    for module in "${rust_modules[@]}"; do
-        echo "  Testing $module..."
-        cd "$module"
+# Execute test suite based on selection
+case $SUITE in
+    quick)
+        echo "🚀 Running quick test suite..."
+        ./tools/testing/run_all_tests.sh --python-only --fail-fast
+        ;;
         
-        # Build and test
-        cargo build --release || {
-            echo "❌ Rust build failed in $module"
+    standard)
+        echo "📋 Running standard test suite..."
+        ./tools/testing/run_all_tests.sh $TEST_ARGS
+        ;;
+        
+    full)
+        echo "🔬 Running full test suite..."
+        
+        # Main tests
+        ./tools/testing/run_all_tests.sh $TEST_ARGS || exit 1
+        
+        # Rust module specific tests
+        echo "🦀 Testing Rust modules in detail..."
+        ./tools/testing/test_rust_modules.sh $TEST_ARGS || exit 1
+        
+        # Example validation
+        echo "📚 Testing all examples..."
+        failed_examples=()
+        for example in examples/*.py; do
+            [ -f "$example" ] || continue
+            echo "  Testing $(basename "$example")..."
+            if uv run python "$example" >/dev/null 2>&1; then
+                echo "    ✅ $(basename "$example")"
+            else
+                echo "    ❌ $(basename "$example")"
+                failed_examples+=("$(basename "$example")")
+            fi
+        done
+        
+        if [ ${#failed_examples[@]} -gt 0 ]; then
+            echo "❌ ${#failed_examples[@]} examples failed"
             exit 1
-        }
-        
-        cargo test || {
-            echo "❌ Rust tests failed in $module"
-            exit 1
-        }
-        
-        # Benchmark if requested
-        if [[ "$benchmark" == "true" ]]; then
-            cargo bench --no-run 2>/dev/null && cargo bench || echo "⚠️  No benchmarks in $module"
         fi
+        ;;
         
-        cd - >/dev/null
-    done
-    echo "✅ All Rust modules passed"
-else
-    echo "ℹ️  No Rust modules found"
-fi
+    regression)
+        echo "🏗️ Running full regression suite (this will take several minutes)..."
+        echo "⚠️  WARNING: This will clear all caches and rebuild everything!"
+        echo ""
+        
+        # Run the comprehensive regression test
+        ./tools/testing/run_full_regression_tests.py $TEST_ARGS
+        ;;
+        
+    *)
+        echo "❌ Unknown suite: $SUITE"
+        echo "Available suites: quick, standard, full, regression"
+        exit 1
+        ;;
+esac
 ```
 
-### Example and Circuit Testing
-```bash
-# Test all examples
-echo "📋 Testing examples..."
-example_count=0
-failed_examples=()
+## Test Results Interpretation
 
-for example in examples/*.py; do
-    [ -f "$example" ] || continue
-    echo "  Testing $(basename "$example")..."
-    
-    if uv run python "$example" >/dev/null 2>&1; then
-        echo "    ✅ $(basename "$example")"
-        ((example_count++))
-    else
-        echo "    ❌ $(basename "$example")"
-        failed_examples+=("$(basename "$example")")
-    fi
-done
+### Expected Results by Suite
 
-if [ ${#failed_examples[@]} -eq 0 ]; then
-    echo "✅ All $example_count examples passed"
-else
-    echo "❌ ${#failed_examples[@]} examples failed:"
-    printf '  - %s\n' "${failed_examples[@]}"
-    [[ "$fail_fast" == "true" ]] && exit 1
-fi
+**Quick Suite** (~30 seconds):
+- Python tests only
+- ~300 tests, expect 13 failures (known issues)
+- Good for rapid development iteration
 
-# Circuit generation validation
-echo "🔌 Testing circuit generation..."
-temp_dir=$(mktemp -d)
-cd "$temp_dir"
+**Standard Suite** (~2 minutes):
+- Python + Rust + Integration tests
+- Full test coverage without environment rebuild
+- Recommended for pre-commit checks
 
-uv run python -c "
-from circuit_synth import Circuit, Component, Net
-import tempfile
-import os
+**Full Suite** (~5 minutes):
+- Everything in Standard plus:
+- All examples validated
+- Detailed Rust module testing
+- Recommended for branch merges
 
-# Test basic circuit generation
-@circuit(name='test_circuit')
-def test_circuit():
-    vcc = Net('VCC')
-    gnd = Net('GND')
-    r1 = Component(symbol='Device:R', ref='R', value='1k', footprint='Resistor_SMD:R_0603_1608Metric')
-    r1[1] += vcc
-    r1[2] += gnd
+**Regression Suite** (~10 minutes):
+- Complete environment reconstruction
+- **MANDATORY before PyPI releases**
+- Ensures clean slate testing
+- Validates all dependencies
 
-# Test KiCad generation
-if test_circuit.generate_kicad():
-    print('✅ Circuit generation successful')
-else:
-    print('❌ Circuit generation failed')
-    exit(1)
-" || {
-    echo "❌ Circuit generation test failed"
-    exit 1
-}
+## Known Issues
 
-cd - >/dev/null
-rm -rf "$temp_dir"
-```
+Currently failing tests (not blockers for most development):
+1. **Net constructor API** (5 failures) - Breaking change needs fix
+2. **JLCPCB integration** (3 failures) - API reliability issues
+3. **Hierarchical synchronizer** (4 failures) - Incomplete implementation
+4. **DigiKey config** (1 failure) - Test assumption issue
 
-### Performance Benchmarking
-```bash
-if [[ "$benchmark" == "true" ]]; then
-    echo "⚡ Running performance benchmarks..."
-    
-    # Circuit generation benchmark
-    echo "  Benchmarking circuit generation..."
-    python -c "
-import time
-from circuit_synth import Circuit, Component, Net
-
-# Benchmark component creation
-start_time = time.time()
-for i in range(100):
-    Component(symbol='Device:R', ref='R', value=f'{i}k', footprint='Resistor_SMD:R_0603_1608Metric')
-component_time = time.time() - start_time
-
-# Benchmark net connections  
-start_time = time.time()
-vcc = Net('VCC')
-for i in range(100):
-    r = Component(symbol='Device:R', ref='R', value='1k', footprint='Resistor_SMD:R_0603_1608Metric')
-    r[1] += vcc
-connection_time = time.time() - start_time
-
-print(f'📊 Component creation: {component_time:.3f}s for 100 components')
-print(f'📊 Net connections: {connection_time:.3f}s for 100 connections')
-"
-    
-    # Memory usage profiling
-    if command -v memory_profiler >/dev/null 2>&1; then
-        echo "  Memory profiling main example..."
-        uv run python -m memory_profiler examples/example_kicad_project.py 2>/dev/null || echo "⚠️  Memory profiling failed"
-    fi
-fi
-```
-
-### Test Results Summary
-```bash
-# Generate test summary
-echo ""
-echo "📊 Test Results Summary"
-echo "======================"
-echo "Python Tests: $([ $python_tests_passed -eq 1 ] && echo "✅ PASSED" || echo "❌ FAILED")"
-echo "Rust Tests: $([ ${#rust_modules[@]} -eq 0 ] && echo "ℹ️  N/A" || echo "✅ PASSED")"
-echo "Examples: $([ ${#failed_examples[@]} -eq 0 ] && echo "✅ PASSED ($example_count)" || echo "❌ FAILED (${#failed_examples[@]}/$example_count)")"
-echo "Circuit Generation: ✅ PASSED"
-[[ "$coverage" == "true" ]] && echo "Coverage Report: htmlcov/index.html"
-[[ "$benchmark" == "true" ]] && echo "Benchmarks: Completed"
-
-# Exit with appropriate code
-total_failures=$((${#failed_examples[@]} + (1 - python_tests_passed)))
-if [ $total_failures -eq 0 ]; then
-    echo ""
-    echo "🎉 All tests passed successfully!"
-    exit 0
-else
-    echo ""
-    echo "❌ $total_failures test suite(s) failed"
-    exit 1
-fi
-```
-
-## Expected Results
-
-**Healthy Repository:**
-- ✅ Python tests: ~158 tests passing, ~3 skipped
-- ✅ Rust tests: All modules compile and pass
-- ✅ Examples: All examples execute without errors
-- ✅ Circuit generation: KiCad files generated successfully
-- 📊 Coverage: Detailed HTML report generated
-- ⚡ Performance: Baseline benchmarks established
-
-**Known Issues (Non-blocking):**
-- ⚠️ Flake8: Style warnings (cosmetic)
-- ⚠️ MyPy: Type checking errors (improving)
-- 📊 Coverage: ~24% (target: >60%)
-
-## Example Usage
+## Usage Examples
 
 ```bash
-# Full test suite
+# Quick development check
+/dev-run-tests --suite=quick
+
+# Standard pre-commit validation
 /dev-run-tests
 
-# Quick Python-only tests
-/dev-run-tests --suite=python --coverage=false
+# Full validation before merge
+/dev-run-tests --suite=full --verbose
 
-# Performance focused testing
-/dev-run-tests --suite=all --benchmark=true
+# Release preparation (MANDATORY)
+/dev-run-tests --suite=regression --verbose
 
-# Development workflow (fast)
-/dev-run-tests --suite=python --fail-fast=true --verbose=true
+# Debug specific failures
+/dev-run-tests --suite=standard --verbose --fail-fast
 
-# CI/CD pipeline testing
-/dev-run-tests --format=false --coverage=true --fail-fast=true
+# Fast iteration during debugging
+/dev-run-tests --suite=quick --skip-install --format=false
 ```
 
-## Integration with Development Workflow
+## CI/CD Integration
 
-This command integrates with:
-- **Pre-commit hooks** - Run quick tests before commits
-- **Branch reviews** - Full test suite validation
-- **Release pipeline** - Comprehensive testing before PyPI
-- **Performance monitoring** - Track regression over time
+```yaml
+# GitHub Actions example
+- name: Quick Tests
+  run: /dev-run-tests --suite=quick --fail-fast
+  
+- name: Full Tests (on PR)
+  run: /dev-run-tests --suite=full
+  
+- name: Regression Tests (on release)
+  run: /dev-run-tests --suite=regression
+```
+
+## Best Practices
+
+1. **Development**: Use `--suite=quick` for rapid iteration
+2. **Pre-commit**: Run `--suite=standard` before committing
+3. **Pre-merge**: Run `--suite=full` before merging branches
+4. **Pre-release**: **ALWAYS** run `--suite=regression` before PyPI release
+5. **Debugging**: Use `--verbose --fail-fast` to isolate issues
+
+## Troubleshooting
+
+**If tests fail:**
+1. Check known issues above
+2. Run with `--verbose` for details
+3. Use `--fail-fast` to stop at first failure
+4. Check `test_outputs/` directory for artifacts
+
+**If regression suite fails:**
+1. Ensure clean git working directory
+2. Check network connection (for dependency downloads)
+3. Verify KiCad is installed (for integration tests)
+4. Review environment requirements in `pyproject.toml`
 
 ---
 
-**This comprehensive test runner ensures code quality, functionality, and performance across the entire circuit-synth ecosystem.**
+**This command orchestrates all existing test infrastructure, providing a single entry point for comprehensive testing while preserving the power of specialized test tools.**
