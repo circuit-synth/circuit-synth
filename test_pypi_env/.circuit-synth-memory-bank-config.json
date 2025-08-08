@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "project_name": "circuit-synth",
+  "boards": [
+    "circuit-synth-v1"
+  ],
+  "created": "2025-08-08T15:25:29.844150",
+  "version": "1.0"
+}
