@@ -1,12 +1,14 @@
 (kicad_sch
 	(version 20250114)
-	(generator "circuit_synth")
+	(generator "eeschema")
 	(generator_version "9.0")
-	(uuid 9fd66abd-eb8b-4abd-bf57-9a84da752c96)
+	(uuid "02d7f802-483d-49cf-8375-f5d7aced54aa")
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:C"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
 				(offset 0.254)
 			)
@@ -14,25 +16,25 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "C"
-				(at 0.0 0.0 0)
+				(at 0.635 2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
+					(justify left)
 				)
 			)
 			(property "Value" "C"
-				(at 0.0 0.0 0)
+				(at 0.635 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
+					(justify left)
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at 0.9652 -3.81 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -41,7 +43,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -50,7 +52,7 @@
 				)
 			)
 			(property "Description" "Unpolarized capacitor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -59,7 +61,7 @@
 				)
 			)
 			(property "ki_keywords" "cap capacitor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -68,7 +70,7 @@
 				)
 			)
 			(property "ki_fp_filters" "C_*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -79,8 +81,7 @@
 			(symbol "C_0_1"
 				(polyline
 					(pts
-						(xy -2.032 0.762)
-						(xy 2.032 0.762)
+						(xy -2.032 0.762) (xy 2.032 0.762)
 					)
 					(stroke
 						(width 0.508)
@@ -92,8 +93,7 @@
 				)
 				(polyline
 					(pts
-						(xy -2.032 -0.762)
-						(xy 2.032 -0.762)
+						(xy -2.032 -0.762) (xy 2.032 -0.762)
 					)
 					(stroke
 						(width 0.508)
@@ -105,21 +105,17 @@
 				)
 			)
 			(symbol "C_1_1"
-				(pin
-					passive
-					line
-					(at 0.0 3.81 270)
+				(pin passive line
+					(at 0 3.81 270)
 					(length 2.794)
-					(name
-						~
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number
-						"1"
+					(number "1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -127,21 +123,17 @@
 						)
 					)
 				)
-				(pin
-					passive
-					line
-					(at 0.0 -3.81 90)
+				(pin passive line
+					(at 0 -3.81 90)
 					(length 2.794)
-					(name
-						~
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number
-						"2"
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -150,35 +142,36 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 		(symbol "Device:R"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "R"
-				(at 0.0 0.0 0)
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Value" "R"
-				(at 0.0 0.0 0)
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -187,7 +180,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -196,7 +189,7 @@
 				)
 			)
 			(property "Description" "Resistor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -205,7 +198,7 @@
 				)
 			)
 			(property "ki_keywords" "R res resistor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -214,7 +207,7 @@
 				)
 			)
 			(property "ki_fp_filters" "R_*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -236,21 +229,17 @@
 				)
 			)
 			(symbol "R_1_1"
-				(pin
-					passive
-					line
-					(at 0.0 3.81 270)
+				(pin passive line
+					(at 0 3.81 270)
 					(length 1.27)
-					(name
-						~
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number
-						"1"
+					(number "1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -258,21 +247,17 @@
 						)
 					)
 				)
-				(pin
-					passive
-					line
-					(at 0.0 -3.81 90)
+				(pin passive line
+					(at 0 -3.81 90)
 					(length 1.27)
-					(name
-						~
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number
-						"2"
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -281,117 +266,87 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 	)
-	(title_block
-		(title PowerSupply)
-		(date 2025-08-07)
-		(company Circuit-Synth)
+	(hierarchical_label "GND"
+		(shape input)
+		(at 91.44 67.31 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "04f8bce0-9f79-464d-9073-bd592894ee89")
 	)
-	(symbol
-		(lib_id "Device:R")
-		(at 58.42 45.72 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid 200541f8-49bf-4e76-ac0b-e9f0ce1d24c5)
-		(property "Reference" "R1"
-			(at 58.42 40.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
+	(hierarchical_label "GND"
+		(shape input)
+		(at 128.27 85.09 180)
+		(effects
+			(font
+				(size 1.27 1.27)
 			)
+			(justify right)
 		)
-		(property "Value" "10k"
-			(at 58.42 50.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 58.42 55.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project "test_hierarchical"
-				(path "/814f090a-bd18-46fa-be4b-2840dc319894/4f474f23-1555-4fba-89b9-ad114b1802f0"
-					(reference "R1")
-					(unit 1)
-				)
-			)
-		)
+		(uuid "09d31b72-1d38-44b1-a76b-487ede91bbed")
 	)
-	(symbol
-		(lib_id "Device:R")
-		(at 76.2 45.72 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid 885b7759-6173-4fa0-84f7-6ccd291bcf59)
-		(property "Reference" "R2"
-			(at 76.2 40.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
+	(hierarchical_label "3V3"
+		(shape input)
+		(at 102.87 59.69 90)
+		(effects
+			(font
+				(size 1.27 1.27)
 			)
+			(justify left)
 		)
-		(property "Value" "20k"
-			(at 76.2 50.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
+		(uuid "28dea03d-b911-4466-bd88-3ba2e965c10e")
+	)
+	(hierarchical_label "3V3"
+		(shape input)
+		(at 91.44 59.69 90)
+		(effects
+			(font
+				(size 1.27 1.27)
 			)
+			(justify left)
 		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 76.2 55.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
+		(uuid "b45e7f14-d114-4be6-8a65-f00129591dac")
+	)
+	(hierarchical_label "GND"
+		(shape input)
+		(at 102.87 67.31 270)
+		(effects
+			(font
+				(size 1.27 1.27)
 			)
+			(justify right)
 		)
-		(instances
-			(project "test_hierarchical"
-				(path "/814f090a-bd18-46fa-be4b-2840dc319894/4f474f23-1555-4fba-89b9-ad114b1802f0"
-					(reference "R2")
-					(unit 1)
-				)
+		(uuid "b51aef23-7f6f-4fa5-970f-f6a66414d406")
+	)
+	(hierarchical_label "3V3"
+		(shape input)
+		(at 128.27 82.55 180)
+		(effects
+			(font
+				(size 1.27 1.27)
 			)
+			(justify right)
 		)
+		(uuid "d266ed3b-6e0a-44d3-9985-0aa9607e5309")
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 38.1 45.72 0)
+		(at 102.87 63.5 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid c43b2d66-31e9-4867-9017-85b7761d3dfa)
+		(uuid "3278ceac-3068-46de-93fe-f04082ef2ef8")
 		(property "Reference" "C1"
-			(at 38.1 40.72 0)
+			(at 106.68 62.2299 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -399,8 +354,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100nF"
-			(at 38.1 50.72 0)
+		(property "Value" "10uF"
+			(at 106.68 64.7699 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -409,7 +364,7 @@
 			)
 		)
 		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
-			(at 38.1 55.72 0)
+			(at 103.8352 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -417,17 +372,173 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" "~"
+			(at 102.87 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 102.87 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e9295e36-ad43-4405-b15b-4fc4c838cb09")
+		)
+		(pin "2"
+			(uuid "2a205a28-e57c-4f08-a74e-c0c7cbefbe81")
+		)
 		(instances
-			(project "test_hierarchical"
-				(path "/814f090a-bd18-46fa-be4b-2840dc319894/4f474f23-1555-4fba-89b9-ad114b1802f0"
+			(project "reference_project"
+				(path "/02d7f802-483d-49cf-8375-f5d7aced54aa"
 					(reference "C1")
 					(unit 1)
 				)
 			)
 		)
 	)
+	(symbol
+		(lib_id "Device:R")
+		(at 91.44 63.5 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d22a97a4-a836-406e-9b6c-3cd4513c50f7")
+		(property "Reference" "R1"
+			(at 93.98 62.2299 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10k"
+			(at 93.98 64.7699 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 89.662 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 91.44 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 91.44 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "36166073-dd9c-4ba0-acc9-40de5cbc5b80")
+		)
+		(pin "2"
+			(uuid "5ff8facb-7133-447d-b03f-9f8bccbce5a8")
+		)
+		(instances
+			(project "reference_project"
+				(path "/02d7f802-483d-49cf-8375-f5d7aced54aa"
+					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet
+		(at 128.27 77.47)
+		(size 20.32 17.78)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "96832371-9fbd-4f17-910c-abdc4f672a36")
+		(property "Sheetname" "child1"
+			(at 128.27 76.7584 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "child1.kicad_sch"
+			(at 128.27 95.8346 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "3V3" input
+			(at 128.27 82.55 180)
+			(uuid "c64714a0-a2e2-4179-a20a-981651745789")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "GND" input
+			(at 128.27 85.09 180)
+			(uuid "f31ea452-3ab6-4212-9cf4-93f4fd12e9dc")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "reference_project"
+				(path "/02d7f802-483d-49cf-8375-f5d7aced54aa"
+					(page "2")
+				)
+			)
+		)
+	)
 	(sheet_instances
-		(path "/814f090a-bd18-46fa-be4b-2840dc319894/4f474f23-1555-4fba-89b9-ad114b1802f0"
+		(path "/"
 			(page "1")
 		)
 	)

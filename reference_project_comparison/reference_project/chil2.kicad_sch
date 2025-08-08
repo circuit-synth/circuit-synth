@@ -1,12 +1,14 @@
 (kicad_sch
 	(version 20250114)
-	(generator "circuit_synth")
+	(generator "eeschema")
 	(generator_version "9.0")
-	(uuid 13669d76-745f-40f5-b839-01e30f56c31a)
+	(uuid "0cc1a066-6e61-4839-9bd4-433d9d57210c")
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:C"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
 				(offset 0.254)
 			)
@@ -14,25 +16,25 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "C"
-				(at 0.0 0.0 0)
+				(at 0.635 2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
+					(justify left)
 				)
 			)
 			(property "Value" "C"
-				(at 0.0 0.0 0)
+				(at 0.635 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
+					(justify left)
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at 0.9652 -3.81 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -41,7 +43,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -50,7 +52,7 @@
 				)
 			)
 			(property "Description" "Unpolarized capacitor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -59,7 +61,7 @@
 				)
 			)
 			(property "ki_keywords" "cap capacitor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -68,7 +70,7 @@
 				)
 			)
 			(property "ki_fp_filters" "C_*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -79,8 +81,7 @@
 			(symbol "C_0_1"
 				(polyline
 					(pts
-						(xy -2.032 0.762)
-						(xy 2.032 0.762)
+						(xy -2.032 0.762) (xy 2.032 0.762)
 					)
 					(stroke
 						(width 0.508)
@@ -92,8 +93,7 @@
 				)
 				(polyline
 					(pts
-						(xy -2.032 -0.762)
-						(xy 2.032 -0.762)
+						(xy -2.032 -0.762) (xy 2.032 -0.762)
 					)
 					(stroke
 						(width 0.508)
@@ -105,21 +105,17 @@
 				)
 			)
 			(symbol "C_1_1"
-				(pin
-					passive
-					line
-					(at 0.0 3.81 270)
+				(pin passive line
+					(at 0 3.81 270)
 					(length 2.794)
-					(name
-						~
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number
-						"1"
+					(number "1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -127,21 +123,17 @@
 						)
 					)
 				)
-				(pin
-					passive
-					line
-					(at 0.0 -3.81 90)
+				(pin passive line
+					(at 0 -3.81 90)
 					(length 2.794)
-					(name
-						~
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number
-						"2"
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -150,35 +142,36 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 		(symbol "Device:R"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "R"
-				(at 0.0 0.0 0)
+				(at 2.032 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Value" "R"
-				(at 0.0 0.0 0)
+				(at 0 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at -1.778 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -187,7 +180,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -196,7 +189,7 @@
 				)
 			)
 			(property "Description" "Resistor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -205,7 +198,7 @@
 				)
 			)
 			(property "ki_keywords" "R res resistor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -214,7 +207,7 @@
 				)
 			)
 			(property "ki_fp_filters" "R_*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -236,21 +229,17 @@
 				)
 			)
 			(symbol "R_1_1"
-				(pin
-					passive
-					line
-					(at 0.0 3.81 270)
+				(pin passive line
+					(at 0 3.81 270)
 					(length 1.27)
-					(name
-						~
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number
-						"1"
+					(number "1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -258,21 +247,17 @@
 						)
 					)
 				)
-				(pin
-					passive
-					line
-					(at 0.0 -3.81 90)
+				(pin passive line
+					(at 0 -3.81 90)
 					(length 1.27)
-					(name
-						~
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number
-						"2"
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -281,25 +266,65 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 	)
-	(title_block
-		(title test_basic)
-		(date 2025-08-06)
-		(company Circuit-Synth)
+	(hierarchical_label "GND"
+		(shape input)
+		(at 127 88.9 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "24b51d63-ffb4-497b-b423-e1fd126de912")
+	)
+	(hierarchical_label "GND"
+		(shape input)
+		(at 138.43 88.9 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "2ac35d37-3770-49cf-97d1-9450373618b8")
+	)
+	(hierarchical_label "3V3"
+		(shape input)
+		(at 138.43 81.28 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a9f3b65f-9c5e-4491-9826-4d46e0e86af8")
+	)
+	(hierarchical_label "3V3"
+		(shape input)
+		(at 127 81.28 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e76b5818-2670-4955-8645-35eb76ddd6c2")
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 58.42 45.72 0)
+		(at 127 85.09 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 5e2a99c1-edbe-4b1a-bf27-4ee054f2d862)
-		(property "Reference" "R1"
-			(at 58.42 40.72 0)
+		(uuid "962e063a-ec30-4594-9ed6-b21fecb8cfa8")
+		(property "Reference" "R3"
+			(at 129.54 83.8199 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -308,7 +333,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 58.42 50.72 0)
+			(at 129.54 86.3599 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -316,10 +341,43 @@
 				(justify left)
 			)
 		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 125.222 85.09 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 127 85.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 127 85.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "7e46a9f6-b2f9-45af-84e2-3bfdb4a6517b")
+		)
+		(pin "2"
+			(uuid "0a38b126-820e-4cc8-8216-68277a769d70")
+		)
 		(instances
-			(project ""
-				(path "/13669d76-745f-40f5-b839-01e30f56c31a"
-					(reference "R1")
+			(project "reference_project"
+				(path "/02d7f802-483d-49cf-8375-f5d7aced54aa/96832371-9fbd-4f17-910c-abdc4f672a36/b63cccbe-076a-4d64-844f-4217dcdbd372"
+					(reference "R3")
 					(unit 1)
 				)
 			)
@@ -327,16 +385,16 @@
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 38.1 45.72 0)
+		(at 138.43 85.09 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid bba46713-5589-4129-a5b8-3a7ba29269dc)
-		(property "Reference" "C1"
-			(at 38.1 40.72 0)
+		(uuid "bee328c0-67ad-4dc2-891d-c02e3f435be6")
+		(property "Reference" "C3"
+			(at 142.24 83.8199 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -344,109 +402,55 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100nF"
-			(at 38.1 50.72 0)
+		(property "Value" "10uF"
+			(at 142.24 86.3599 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
+			(at 139.3952 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 138.43 85.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 138.43 85.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "ea0aec50-9e66-431f-a8ce-d0c8e39b7e0b")
+		)
+		(pin "2"
+			(uuid "68751eed-757c-45e2-a25f-5de3cc80a392")
 		)
 		(instances
-			(project ""
-				(path "/13669d76-745f-40f5-b839-01e30f56c31a"
-					(reference "C1")
+			(project "reference_project"
+				(path "/02d7f802-483d-49cf-8375-f5d7aced54aa/96832371-9fbd-4f17-910c-abdc4f672a36/b63cccbe-076a-4d64-844f-4217dcdbd372"
+					(reference "C3")
 					(unit 1)
 				)
 			)
 		)
 	)
-	(hierarchical_label
-		VCC
-		(shape input)
-		(at 58.42 41.91 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 45b867fc-8a37-45c0-9ce7-44662b31e758)
-	)
-	(hierarchical_label
-		VCC
-		(shape input)
-		(at 38.1 41.91 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid ec79de8b-db0c-4457-bcb1-e05c6bf41096)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 58.42 49.53 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid b537308f-a3a5-4128-a0af-c30f7632a1fd)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 38.1 49.53 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid 256256c9-3a3c-4f5c-9190-3d695dcb1076)
-	)
-	(text_box
-		"Test circuit for integration."
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid 613a02be-2073-47e9-a7cc-dc0fc2769753)
-	)
-	(sheet_instances
-		(path "/13669d76-745f-40f5-b839-01e30f56c31a"
-			(page "1")
-		)
-	)
-	(embedded_fonts no)
 )
