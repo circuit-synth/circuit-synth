@@ -13,6 +13,10 @@
       "description": "Specialized agent for finding manufacturable components by searching JLCPCB availability and verifying KiCad symbol compatibility",
       "file": "agents/manufacturing/jlc-parts-finder.md"
     },
+    "dfm-agent": {
+      "description": "Design for Manufacturing (DFM) analysis and optimization specialist using real supplier data",
+      "file": "agents/manufacturing/dfm-agent.md"
+    },
     "circuit-architect": {
       "description": "Master circuit design coordinator and architecture expert",
       "file": "agents/circuit-design/circuit-architect.md"
