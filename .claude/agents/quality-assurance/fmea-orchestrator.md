@@ -27,7 +27,7 @@ You delegate to and coordinate these specialist agents:
 - **fmea-mitigation-strategist**: Design improvement recommendations
 
 ### **Knowledge Base Management**
-- Query the FMEA knowledge base at `/fmea_knowledge_base/`
+- Query the FMEA knowledge base at `/knowledge_base/fmea/`
 - Access failure mode databases, reliability data, and standards
 - Integrate industry-specific requirements
 - Apply lessons learned from field data

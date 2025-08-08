@@ -276,9 +276,9 @@ Confidence: 90% bounds [250, 350] FIT
 ## 🎯 **Knowledge Base Integration**
 
 Access these resources:
-- `/fmea_knowledge_base/reliability_data/mil_hdbk_217f/`
-- `/fmea_knowledge_base/reliability_data/field_data/`
-- `/fmea_knowledge_base/standards/IEC_62380.yaml`
-- `/fmea_knowledge_base/reliability_data/test_data/`
+- `/knowledge_base/fmea/reliability_data/mil_hdbk_217f/`
+- `/knowledge_base/fmea/reliability_data/field_data/`
+- `/knowledge_base/fmea/standards/IEC_62380.yaml`
+- `/knowledge_base/fmea/reliability_data/test_data/`
 
 Your quantitative analysis provides the statistical foundation for reliability decisions. Transform complex calculations into actionable insights that drive design improvements and predict field performance.

@@ -23,7 +23,7 @@ class TestEnhancedFMEAAnalyzer(unittest.TestCase):
         """Set up test analyzer with mock knowledge base"""
         # Create temporary knowledge base for testing
         self.temp_dir = tempfile.mkdtemp()
-        self.kb_path = Path(self.temp_dir) / "fmea_knowledge_base"
+        self.kb_path = Path(self.temp_dir) / "knowledge_base" / "fmea"
 
         # Create minimal knowledge base structure
         self._create_test_knowledge_base()
@@ -336,7 +336,7 @@ class TestKnowledgeBaseIntegration(unittest.TestCase):
     def test_yaml_structure_validation(self):
         """Test that YAML knowledge base files have correct structure"""
         # This would validate actual KB files if they exist
-        kb_path = Path("fmea_knowledge_base")
+        kb_path = Path("knowledge_base") / "fmea"
 
         if not kb_path.exists():
             self.skipTest("Knowledge base not found")

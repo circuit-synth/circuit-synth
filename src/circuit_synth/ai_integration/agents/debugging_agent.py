@@ -27,7 +27,7 @@ class CircuitDebuggingAgent:
         """Initialize the debugging agent with knowledge bases"""
         self.knowledge_base_path = (
             Path(__file__).parent.parent.parent.parent.parent
-            / "debugging_knowledge_base"
+            / "knowledge_base" / "debugging"
         )
         self.component_failures = self._load_knowledge("component_failure_modes.json")
         self.debugging_techniques = self._load_knowledge("debugging_techniques.json")

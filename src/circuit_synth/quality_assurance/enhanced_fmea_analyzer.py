@@ -33,7 +33,7 @@ class EnhancedFMEAAnalyzer(UniversalFMEAAnalyzer):
             "standards": {},
         }
 
-        kb_path = Path("fmea_knowledge_base")
+        kb_path = Path("knowledge_base") / "fmea"
         if not kb_path.exists():
             print(f"Warning: Knowledge base not found at {kb_path}")
             return kb

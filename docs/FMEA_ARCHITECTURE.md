@@ -9,7 +9,7 @@ The FMEA (Failure Mode and Effects Analysis) system for circuit-synth requires a
 ### 1.1 Directory Structure
 ```
 circuit-synth/
-├── fmea_knowledge_base/
+├── knowledge_base/fmea/
 │   ├── failure_modes/
 │   │   ├── component_specific/
 │   │   │   ├── capacitors.yaml

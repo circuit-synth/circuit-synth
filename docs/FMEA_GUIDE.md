@@ -115,7 +115,7 @@ cs-new-project my-project
 The FMEA knowledge base is organized into categories:
 
 ```
-fmea_knowledge_base/
+knowledge_base/fmea/
 ├── failure_modes/
 │   ├── component_specific/
 │   │   ├── capacitors.yaml        # Ceramic, electrolytic, tantalum failures
@@ -293,7 +293,7 @@ report_path = generator.generate_comprehensive_report(
 ### No Failure Modes Detected
 - Verify component information includes 'symbol' or 'type' fields
 - Check that circuit file is properly formatted
-- Ensure knowledge base files are present in fmea_knowledge_base/
+- Ensure knowledge base files are present in knowledge_base/fmea/
 
 ### Report Generation Fails
 - Install reportlab: `uv pip install reportlab`
@@ -301,7 +301,7 @@ report_path = generator.generate_comprehensive_report(
 - Verify all required fields in analysis_results
 
 ### Knowledge Base Not Loading
-- Check fmea_knowledge_base/ directory exists
+- Check knowledge_base/fmea/ directory exists
 - Verify YAML files are properly formatted
 - Look for error messages during analyzer initialization
 

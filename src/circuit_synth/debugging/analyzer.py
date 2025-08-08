@@ -136,9 +136,9 @@ class CircuitDebugger:
         if knowledge_base_path:
             self.knowledge_base_path = knowledge_base_path
         else:
-            # Check for debugging_knowledge_base first (new comprehensive KB)
+            # Check for debugging knowledge base in new location
             project_root = Path(__file__).parent.parent.parent.parent
-            debug_kb = project_root / "debugging_knowledge_base"
+            debug_kb = project_root / "knowledge_base" / "debugging"
             if debug_kb.exists():
                 self.knowledge_base_path = debug_kb
             else:
