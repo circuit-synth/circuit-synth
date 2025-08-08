@@ -99,7 +99,14 @@ class RustAcceleratedSymbolLibCache:
             Symbol data dictionary or None if not found
         """
         if self._impl:
-            return self._impl.get_symbol(library_name, symbol_name)
+            # Python SymbolLibCache doesn't have get_symbol method
+            # It uses get_symbol_data with "Library:Symbol" format
+            if hasattr(self._impl, 'get_symbol'):
+                return self._impl.get_symbol(library_name, symbol_name)
+            else:
+                # Use get_symbol_data for Python implementation
+                symbol_id = f"{library_name}:{symbol_name}"
+                return self._impl.get_symbol_data(symbol_id)
         return None
 
     def get_all_symbols(self, library_name: str) -> Dict[str, Any]:
@@ -182,21 +189,13 @@ class RustAcceleratedSymbolLibCache:
         Returns:
             Symbol data dictionary
         """
-        # Create an instance and delegate to the instance method
-        instance = cls()
-        
-        # Parse the symbol_id to get library and symbol names
+        # Validate symbol_id format
         if ":" not in symbol_id:
             raise ValueError(f"Invalid symbol ID format: {symbol_id}. Expected 'Library:Symbol'")
         
-        library_name, symbol_name = symbol_id.split(":", 1)
-        
-        # If using Python fallback, call its class method directly
-        if not _RUST_SYMBOL_CACHE_AVAILABLE:
-            return _PythonSymbolLibCache.get_symbol_data(symbol_id)
-        
-        # Otherwise use the instance method
-        return instance.get_symbol(library_name, symbol_name) or {}
+        # Always use the Python class method directly since it's what the code expects
+        # The Python SymbolLibCache has get_symbol_data as a class method
+        return _PythonSymbolLibCache.get_symbol_data(symbol_id)
 
 
 # Alias for drop-in replacement
