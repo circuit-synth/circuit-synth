@@ -13,9 +13,17 @@
       "description": "Specialized agent for finding manufacturable components by searching JLCPCB availability and verifying KiCad symbol compatibility",
       "file": "agents/manufacturing/jlc-parts-finder.md"
     },
-    "circuit-synth-legacy": {
-      "description": "Legacy circuit-synth code generation specialist",
-      "file": "agents/circuit-design/circuit-synth-legacy.md"
+    "dfm-agent": {
+      "description": "Design for Manufacturing (DFM) analysis and optimization specialist using real supplier data",
+      "file": "agents/manufacturing/dfm-agent.md"
+    },
+    "circuit-architect": {
+      "description": "Master circuit design coordinator and architecture expert",
+      "file": "agents/circuit-design/circuit-architect.md"
+    },
+    "component-guru": {
+      "description": "Component sourcing and manufacturing optimization specialist",
+      "file": "agents/manufacturing/component-guru.md"
     },
     "simulation-expert": {
       "description": "SPICE simulation and circuit validation specialist",

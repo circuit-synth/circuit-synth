@@ -1,88 +1,117 @@
-# Rust KiCad Schematic Writer
+# KiCad Schematic Editor (Rust)
 
-High-performance Rust implementation for generating KiCad schematic files with hierarchical labels.
+A Rust library for programmatically creating and manipulating KiCad schematic files.
 
 ## Features
 
-- ⚡ **High Performance**: 500%+ faster than Python implementation
-- 🏷️ **Hierarchical Labels**: Automatic generation with proper positioning
-- 🎯 **Grid Alignment**: Precise KiCad 1.27mm grid snapping
-- 🔧 **Python Integration**: PyO3 bindings for seamless Python integration
-- 📐 **Geometry Calculations**: Advanced pin positioning and label orientation
-- 🦀 **Memory Safe**: Written in Rust for reliability and performance
+- ✅ Create KiCad schematics programmatically
+- ✅ Add/remove/update components
+- ✅ Support for hierarchical labels
+- ✅ Handle extended symbols (inheritance)
+- ✅ Multi-unit component support
+- ✅ Preserve KiCad metadata and UUIDs
+- ✅ Python bindings available
 
 ## Installation
 
-```bash
-# Install maturin if not already installed
-pip install maturin
+### Rust
+```toml
+[dependencies]
+kicad-schematic-editor = "0.1.0"
+```
 
-# Build and install the Python extension
-maturin develop --release
+### Python
+```bash
+pip install kicad-schematic-editor
 ```
 
 ## Usage
 
-### Python Integration
+### Rust Example
+```rust
+use kicad_schematic_editor::{SchematicEditor, SimpleComponent};
 
-```python
-from rust_kicad_schematic_writer import PyRustSchematicWriter
-
-# Create circuit data
-circuit_data = {
-    'name': 'my_circuit',
-    'components': [...],
-    'nets': [...]
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Load a schematic
+    let mut editor = SchematicEditor::load_from_file("my_schematic.kicad_sch")?;
+    
+    // Add a component
+    let resistor = SimpleComponent {
+        reference: "R1".to_string(),
+        lib_id: "Device:R".to_string(),
+        value: "10k".to_string(),
+        position: (100.0, 50.0),
+        footprint: Some("Resistor_SMD:R_0603_1608Metric".to_string()),
+    };
+    editor.add_component(&resistor)?;
+    
+    // Save the result
+    editor.save_to_file("output.kicad_sch")?;
+    Ok(())
 }
-
-# Create writer and generate labels
-writer = PyRustSchematicWriter(circuit_data)
-labels = writer.generate_hierarchical_labels()
-
-# Generate complete schematic
-schematic_content = writer.generate_schematic_sexp()
-writer.write_to_file('output.kicad_sch')
 ```
 
-### Standalone Functions
-
+### Python Example
 ```python
-from rust_kicad_schematic_writer import generate_hierarchical_labels_from_python
+import kicad_schematic_editor as kicad
 
-labels = generate_hierarchical_labels_from_python(circuit_data)
+# Create a new schematic
+schematic = kicad.create_minimal_schematic()
+
+# Add a resistor
+schematic = kicad.add_component_to_schematic(
+    schematic,
+    reference="R1",
+    lib_id="Device:R",
+    value="10k",
+    x=100.0,
+    y=50.0,
+    rotation=0.0,
+    footprint="Resistor_SMD:R_0603_1608Metric"
+)
+
+# Add a hierarchical label
+schematic = kicad.add_hierarchical_label_to_schematic(
+    schematic,
+    name="VCC",
+    shape="input",
+    x=100.0,
+    y=30.0,
+    rotation=90.0
+)
+
+# Save to file
+with open("output.kicad_sch", "w") as f:
+    f.write(schematic)
 ```
 
-## Performance
+## API Reference
 
-The Rust implementation provides significant performance improvements:
+### Core Functions
 
-- **Label Generation**: 500%+ faster than Python
-- **Memory Usage**: 70% reduction in memory footprint
-- **Grid Alignment**: Precise floating-point calculations
-- **Concurrent Processing**: Multi-threaded label generation
+#### `create_minimal_schematic() -> str`
+Creates a minimal valid KiCad schematic.
 
-## Integration with Circuit-Synth
+#### `add_component_to_schematic(schematic, reference, lib_id, value, x, y, rotation, footprint) -> str`
+Adds a component to the schematic.
 
-This crate is designed to integrate seamlessly with the Circuit-Synth Python pipeline:
+#### `remove_component_from_schematic(schematic, reference) -> str`
+Removes a component by reference.
 
-1. **Replace Python Label Generation**: Drop-in replacement for existing hierarchical label logic
-2. **Maintain API Compatibility**: Same input/output format as Python implementation
-3. **Enhanced Accuracy**: Improved pin positioning and label orientation calculations
-4. **Better Performance**: Faster generation for large circuits
+#### `add_hierarchical_label_to_schematic(schematic, name, shape, x, y, rotation) -> str`
+Adds a hierarchical label.
 
-## Development
+#### `update_component_by_uuid(schematic, uuid, updates) -> str`
+Updates a component by UUID (planned).
 
-```bash
-# Run tests
-cargo test
+## Contributing
 
-# Run with logging
-RUST_LOG=debug cargo test
-
-# Build for Python
-maturin develop --release
-```
+Contributions are welcome! Please see CONTRIBUTING.md for details.
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT OR Apache-2.0
+
+## Acknowledgments
+
+Originally developed as part of the [circuit-synth](https://github.com/circuit-synth/circuit-synth) project.

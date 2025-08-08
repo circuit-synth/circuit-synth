@@ -13,8 +13,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from ..kicad.kicad_symbol_parser import parse_kicad_sym_file
 from ..kicad.core.types import Point, SchematicPin
+from ..kicad.kicad_symbol_parser import parse_kicad_sym_file
 
 logger = logging.getLogger(__name__)
 

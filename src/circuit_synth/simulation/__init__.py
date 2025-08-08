@@ -27,7 +27,14 @@ Example Usage:
 
 from .analysis import ACAnalysis, DCAnalysis, TransientAnalysis
 from .converter import SpiceConverter
+from .manufacturer_models import ManufacturerModels, get_manufacturer_models
+from .models import ModelLibrary, SpiceModel, get_model_library
 from .simulator import CircuitSimulator, SimulationResult
+from .testbench import TestBenchGenerator, generate_testbench_for_circuit
+from .visualization import SimulationVisualizer, enhance_simulation_result
+
+# Enhance SimulationResult with export capabilities
+SimulationResult = enhance_simulation_result(SimulationResult)
 
 __all__ = [
     "CircuitSimulator",
@@ -36,4 +43,12 @@ __all__ = [
     "DCAnalysis",
     "ACAnalysis",
     "TransientAnalysis",
+    "ModelLibrary",
+    "SpiceModel",
+    "get_model_library",
+    "ManufacturerModels",
+    "get_manufacturer_models",
+    "TestBenchGenerator",
+    "generate_testbench_for_circuit",
+    "SimulationVisualizer",
 ]

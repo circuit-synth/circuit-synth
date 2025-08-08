@@ -7,6 +7,7 @@ use pyo3::types::{PyDict, PyList};
 
 use crate::types::*;
 use crate::RustSchematicWriter;
+use crate::schematic_api::{self, SimpleComponent};
 use log::{debug, info};
 
 /// Initialize logging for the Python module using pyo3-log
@@ -156,6 +157,80 @@ impl PyRustSchematicWriter {
             Ok(dict.into())
         })
     }
+}
+
+/// Create an empty KiCad schematic with specified paper size
+#[pyfunction]
+#[pyo3(signature = (paper_size="A4"))]
+pub fn create_empty_schematic(paper_size: &str) -> PyResult<String> {
+    Ok(schematic_api::create_empty_schematic(paper_size))
+}
+
+/// Create a minimal KiCad schematic with default A4 paper
+#[pyfunction]
+pub fn create_minimal_schematic() -> PyResult<String> {
+    init_logging();
+    info!("🐍 Python calling create_minimal_schematic");
+    let result = schematic_api::create_minimal_schematic();
+    info!("✅ Minimal schematic created, {} bytes", result.len());
+    Ok(result)
+}
+
+/// Python-visible simple component class
+#[pyclass]
+#[derive(Clone)]
+pub struct PySimpleComponent {
+    #[pyo3(get, set)]
+    reference: String,
+    #[pyo3(get, set)]
+    lib_id: String,
+    #[pyo3(get, set)]
+    value: String,
+    #[pyo3(get, set)]
+    x: f64,
+    #[pyo3(get, set)]
+    y: f64,
+    #[pyo3(get, set)]
+    rotation: f64,
+    #[pyo3(get, set)]
+    footprint: Option<String>,
+}
+
+#[pymethods]
+impl PySimpleComponent {
+    #[new]
+    #[pyo3(signature = (reference, lib_id, value, x, y, rotation=None, footprint=None))]
+    fn new(reference: String, lib_id: String, value: String, x: f64, y: f64, rotation: Option<f64>, footprint: Option<String>) -> Self {
+        Self {
+            reference,
+            lib_id,
+            value,
+            x,
+            y,
+            rotation: rotation.unwrap_or(0.0),
+            footprint,
+        }
+    }
+}
+
+/// Create a KiCad schematic with components
+#[pyfunction]
+pub fn create_schematic_with_components(paper_size: &str, components: Vec<PySimpleComponent>) -> PyResult<String> {
+    // Convert Python components to Rust components
+    let rust_components: Vec<SimpleComponent> = components
+        .into_iter()
+        .map(|py_comp| SimpleComponent {
+            reference: py_comp.reference,
+            lib_id: py_comp.lib_id,
+            value: py_comp.value,
+            x: py_comp.x,
+            y: py_comp.y,
+            rotation: py_comp.rotation,
+            footprint: py_comp.footprint,
+        })
+        .collect();
+    
+    Ok(schematic_api::create_schematic_with_components(paper_size, rust_components))
 }
 
 /// Standalone function to generate hierarchical labels from Python data
@@ -470,65 +545,12 @@ fn convert_circuit_data_from_python(py_dict: &PyDict) -> PyResult<CircuitData> {
                                         debug!("🔄 PYTHON->RUST: Converted subcircuit #{} '{}' with {} components, {} nets",
                                               subcircuit_index + 1, subcircuit.name, subcircuit.components.len(), subcircuit.nets.len());
 
-                                        // CRITICAL FIX: Extract and flatten components from subcircuit
-                                        debug!("🔧 PYTHON->RUST: FLATTENING subcircuit '{}' components into main circuit...", subcircuit.name);
-                                        let mut flattened_components = 0;
-                                        for component in subcircuit.components.iter() {
-                                            // Create unique reference to avoid conflicts
-                                            let unique_ref = format!(
-                                                "{}_{}",
-                                                subcircuit.name, component.reference
-                                            );
-                                            debug!(
-                                                "  - Flattening component: {} -> {}",
-                                                component.reference, unique_ref
-                                            );
+                                        // DO NOT FLATTEN - Subcircuits should remain separate for hierarchical designs
+                                        // Components in subcircuits are handled when generating their own schematic files
+                                        debug!("🔧 PYTHON->RUST: Preserving subcircuit '{}' hierarchy (NOT flattening components)", subcircuit.name);
 
-                                            // Clone the component with new reference
-                                            let mut flattened_component = component.clone();
-                                            flattened_component.reference = unique_ref.clone();
-
-                                            circuit_data.add_component(flattened_component);
-                                            flattened_components += 1;
-                                        }
-                                        debug!("✅ PYTHON->RUST: Flattened {} components from subcircuit '{}'", flattened_components, subcircuit.name);
-
-                                        // CRITICAL FIX: Extract and flatten nets from subcircuit
-                                        debug!("🔧 PYTHON->RUST: FLATTENING subcircuit '{}' nets into main circuit...", subcircuit.name);
-                                        let mut flattened_nets = 0;
-                                        for net in subcircuit.nets.iter() {
-                                            // Create unique net name to avoid conflicts
-                                            let unique_net_name =
-                                                format!("{}_{}", subcircuit.name, net.name);
-                                            debug!(
-                                                "  - Flattening net: {} -> {}",
-                                                net.name, unique_net_name
-                                            );
-
-                                            // Clone the net with updated component references
-                                            let mut flattened_net = net.clone();
-                                            flattened_net.name = unique_net_name.clone();
-
-                                            // Update component references in net connections
-                                            for connection in
-                                                flattened_net.connected_pins.iter_mut()
-                                            {
-                                                let old_comp_ref = connection.component_ref.clone();
-                                                connection.component_ref =
-                                                    format!("{}_{}", subcircuit.name, old_comp_ref);
-                                                debug!(
-                                                    "    - Updated connection: {}.{} -> {}.{}",
-                                                    old_comp_ref,
-                                                    connection.pin_id,
-                                                    connection.component_ref,
-                                                    connection.pin_id
-                                                );
-                                            }
-
-                                            circuit_data.add_net(flattened_net);
-                                            flattened_nets += 1;
-                                        }
-                                        debug!("✅ PYTHON->RUST: Flattened {} nets from subcircuit '{}'", flattened_nets, subcircuit.name);
+                                        // DO NOT FLATTEN - Nets in subcircuits are handled separately
+                                        debug!("🔧 PYTHON->RUST: Preserving subcircuit '{}' nets (NOT flattening)", subcircuit.name);
 
                                         // Store subcircuit name before moving it
                                         let subcircuit_name = subcircuit.name.clone();
@@ -869,6 +891,140 @@ fn convert_config_from_python(py_dict: &PyDict) -> PyResult<SchematicConfig> {
     Ok(config)
 }
 
+/// Load a schematic from file and return as a string handle
+#[pyfunction]
+fn load_schematic(filepath: &str) -> PyResult<String> {
+    use crate::schematic_editor::SchematicEditor;
+    
+    let editor = SchematicEditor::load_from_file(filepath)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyIOError, _>(format!("Failed to load schematic: {}", e)))?;
+    
+    Ok(editor.to_string())
+}
+
+/// Add a component to a schematic string and return the modified schematic
+#[pyfunction]
+fn remove_component_from_schematic(
+    schematic_str: &str,
+    reference: &str,
+) -> PyResult<String> {
+    use crate::schematic_editor::SchematicEditor;
+    
+    init_logging();
+    info!("🐍 Python calling remove_component_from_schematic");
+    info!("  Removing component: {}", reference);
+    
+    debug!("  Loading schematic from string ({} bytes)", schematic_str.len());
+    
+    // Load schematic
+    let mut editor = SchematicEditor::load_from_string(schematic_str)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to load schematic: {}", e)))?;
+    
+    // Remove component
+    editor.remove_component(reference)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to remove component: {}", e)))?;
+    
+    // Convert back to string
+    let result = editor.to_string();
+    info!("✅ Component removed successfully");
+    debug!("  Output size: {} bytes", result.len());
+    
+    Ok(result)
+}
+
+#[pyfunction]
+fn add_hierarchical_label_to_schematic(
+    schematic_str: &str,
+    name: &str,
+    shape: &str,
+    x: f64,
+    y: f64,
+    rotation: f64,
+) -> PyResult<String> {
+    use crate::schematic_editor::SchematicEditor;
+    
+    init_logging();
+    info!("🐍 Python calling add_hierarchical_label_to_schematic");
+    info!("  Label: name={}, shape={}", name, shape);
+    info!("  Position: ({}, {}), rotation={}", x, y, rotation);
+    
+    debug!("  Loading schematic from string ({} bytes)", schematic_str.len());
+    
+    // Load schematic
+    let mut editor = SchematicEditor::load_from_string(schematic_str)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to load schematic: {}", e)))?;
+    
+    // Add hierarchical label
+    editor.add_hierarchical_label(name, shape, x, y, rotation)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to add label: {}", e)))?;
+    
+    // Convert back to string
+    let result = editor.to_string();
+    info!("✅ Hierarchical label added successfully");
+    debug!("  Output size: {} bytes", result.len());
+    
+    Ok(result)
+}
+
+#[pyfunction]
+#[pyo3(signature = (schematic_str, reference, lib_id, value, x, y, rotation, footprint=None))]
+fn add_component_to_schematic(
+    schematic_str: &str,
+    reference: &str,
+    lib_id: &str,
+    value: &str,
+    x: f64,
+    y: f64,
+    rotation: f64,
+    footprint: Option<String>,
+) -> PyResult<String> {
+    use crate::schematic_editor::SchematicEditor;
+    
+    init_logging();
+    info!("🐍 Python calling add_component_to_schematic");
+    info!("  Component: ref={}, lib_id={}, value={}", reference, lib_id, value);
+    info!("  Position: ({}, {}), rotation={}", x, y, rotation);
+    if let Some(ref fp) = footprint {
+        info!("  Footprint: {}", fp);
+    }
+    
+    debug!("  Loading schematic from string ({} bytes)", schematic_str.len());
+    let mut editor = SchematicEditor::load_from_string(schematic_str)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to parse schematic: {}", e)))?;
+    
+    let component = SimpleComponent {
+        reference: reference.to_string(),
+        lib_id: lib_id.to_string(),
+        value: value.to_string(),
+        x,
+        y,
+        rotation,
+        footprint,
+    };
+    
+    debug!("  Adding component to schematic editor");
+    editor.add_component(&component)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Failed to add component: {}", e)))?;
+    
+    let result = editor.to_string();
+    info!("✅ Component added successfully, returning {} bytes to Python", result.len());
+    Ok(result)
+}
+
+/// Test function to verify Rust-Python logging integration
+#[pyfunction]
+fn test_logging() -> PyResult<()> {
+    // Test all logging levels to ensure proper integration
+    log::trace!("🔍 RUST->PYTHON: Trace level logging test");
+    log::debug!("🐛 RUST->PYTHON: Debug level logging test");
+    log::info!("ℹ️ RUST->PYTHON: Info level logging test");
+    log::warn!("⚠️ RUST->PYTHON: Warning level logging test");
+    log::error!("❌ RUST->PYTHON: Error level logging test");
+    
+    info!("✅ Rust-Python logging integration is working correctly!");
+    Ok(())
+}
+
 /// Initialize the Python module
 #[pymodule]
 fn rust_kicad_schematic_writer(_py: Python, m: &PyModule) -> PyResult<()> {
@@ -879,14 +1035,27 @@ fn rust_kicad_schematic_writer(_py: Python, m: &PyModule) -> PyResult<()> {
 
     // Add classes
     m.add_class::<PyRustSchematicWriter>()?;
+    m.add_class::<PySimpleComponent>()?;
 
     // Add standalone functions
+    m.add_function(wrap_pyfunction!(test_logging, m)?)?; // Logging test function
     m.add_function(wrap_pyfunction!(
         generate_hierarchical_labels_from_python,
         m
     )?)?;
     m.add_function(wrap_pyfunction!(generate_schematic_from_python, m)?)?;
     m.add_function(wrap_pyfunction!(generate_component_sexp, m)?)?;
+    
+    // Add simple schematic creation functions
+    m.add_function(wrap_pyfunction!(create_empty_schematic, m)?)?;
+    m.add_function(wrap_pyfunction!(create_minimal_schematic, m)?)?;
+    m.add_function(wrap_pyfunction!(create_schematic_with_components, m)?)?;
+    
+    // Add schematic editing functions
+    m.add_function(wrap_pyfunction!(load_schematic, m)?)?;
+    m.add_function(wrap_pyfunction!(add_component_to_schematic, m)?)?;
+    m.add_function(wrap_pyfunction!(add_hierarchical_label_to_schematic, m)?)?;
+    m.add_function(wrap_pyfunction!(remove_component_from_schematic, m)?)?;
 
     info!("✅ Python module initialized successfully");
     Ok(())

@@ -1363,33 +1363,15 @@ class SExpressionParser:
             sexp.append(instances_sexp)
             logger.debug(f"  Instances S-expression added to symbol")
         else:
-            # During synchronization, symbols from existing schematics might not have
-            # instances data populated. This is acceptable during parsing.
-            logger.warning(
-                f"Symbol {symbol.reference} has no instances information - creating default instances"
+            # CRITICAL: We must NEVER create default instances
+            # All instance information must come from parsed KiCad libraries
+            error_msg = (
+                f"CRITICAL ERROR: Symbol {symbol.reference} has no instances information. "
+                f"This is a fatal error - instances must be parsed from KiCad library files. "
+                f"Default instances are NOT allowed as they can cause incorrect circuit generation."
             )
-            # Create proper instances data with project information
-            instances_sexp = [sexpdata.Symbol("instances")]
-
-            # Get project name from context or use default
-            project_name = getattr(symbol, "_project_name", "preservation_test")
-
-            # Create a default instance block
-            instance_block = [
-                sexpdata.Symbol("project"),
-                project_name,
-                [
-                    sexpdata.Symbol("path"),
-                    "/",  # Root path
-                    [sexpdata.Symbol("reference"), symbol.reference],
-                    [sexpdata.Symbol("unit"), symbol.unit if symbol.unit else 1],
-                ],
-            ]
-            instances_sexp.append(instance_block)
-            sexp.append(instances_sexp)
-            logger.debug(
-                f"  Added default instances S-expression for {symbol.reference} with project {project_name}"
-            )
+            logger.error(error_msg)
+            raise ValueError(error_msg)
 
         return sexp
 

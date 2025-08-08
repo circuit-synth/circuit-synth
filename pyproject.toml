@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "circuit_synth"
-version = "0.7.2"
+version = "0.8.0"
 description = "Pythonic circuit design for production-ready KiCad projects"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -103,6 +103,9 @@ cs-setup-kicad-plugins = "circuit_synth.tools.development.setup_kicad_plugins:ma
 cs-memory-bank-init = "circuit_synth.ai_integration.memory_bank.cli:init_cli"
 cs-memory-bank-remove = "circuit_synth.ai_integration.memory_bank.cli:remove_cli"
 
+# Quality Assurance Tools
+cs-fmea = "circuit_synth.tools.quality_assurance.fmea_cli:main"
+
 # Test Plan Generation - DISABLED: Files don't exist yet
 # create-test-plan = "circuit_synth.tools.test_plan_commands:create_test_plan"
 # generate-manufacturing-tests = "circuit_synth.tools.test_plan_commands:generate_manufacturing_tests"
@@ -180,6 +183,13 @@ members = [
     "example_project",
     "test_project",
     "test_uv",
+    "cs_test",
+    "test_agent_setup/fresh_agent_test",
+    "test_agent_setup/validation_test",
+    "test_agent_setup/final_test",
+    "agent_validation_test/agent_test",
+    "test_generation/format_test",
+    "test_8_agents/test_project",
 ]
 
 [dependency-groups]

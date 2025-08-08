@@ -13,35 +13,24 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "{'value': 'D', 'position': {'x': 0.0, 'y': 2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Reference" "D"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
-			(property "Value" "{'value': 'LED', 'position': {'x': 0.0, 'y': -2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Value" "LED"
+				(at 0 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
-			(property "Footprint" "{'value': '', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Footprint" ""
+				(at 0 -5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -49,8 +38,8 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "{'value': 'Light emitting diode', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Datasheet" "~"
+				(at 0 -7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -58,17 +47,8 @@
 					(hide yes)
 				)
 			)
-			(property "Sim.Pins" "{'value': '1=K 2=A', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
-				)
-			)
-			(property "ki_keywords" "{'value': 'LED diode', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Description" "Light emitting diode"
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -76,8 +56,8 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "{'value': 'LED* LED_SMD:* LED_THT:*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "ki_keywords" "LED diode"
+				(at 0 -12.7 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -164,7 +144,7 @@
 				(pin
 					passive
 					line
-					(at -3.81 0.0 0)
+					(at -3.81 0.0 0.0)
 					(length 2.54)
 					(name
 						K
@@ -186,7 +166,7 @@
 				(pin
 					passive
 					line
-					(at 3.81 0.0 180)
+					(at 3.81 0.0 180.0)
 					(length 2.54)
 					(name
 						A
@@ -206,6 +186,7 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 		(symbol "Device:R"
 			(pin_numbers hide)
@@ -215,35 +196,24 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "{'value': 'R', 'position': {'x': 2.032, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Reference" "R"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
-			(property "Value" "{'value': 'R', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Value" "R"
+				(at 0 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
-			(property "Footprint" "{'value': '', 'position': {'x': -1.778, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Footprint" ""
+				(at 0 -5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -251,8 +221,8 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "{'value': 'Resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Datasheet" "~"
+				(at 0 -7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -260,8 +230,8 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "{'value': 'R res resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Description" "Resistor"
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -269,8 +239,8 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "{'value': 'R_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "ki_keywords" "R res resistor"
+				(at 0 -12.7 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -295,7 +265,7 @@
 				(pin
 					passive
 					line
-					(at 0.0 3.81 270)
+					(at 0.0 3.81 270.0)
 					(length 1.27)
 					(name
 						~
@@ -317,7 +287,7 @@
 				(pin
 					passive
 					line
-					(at 0.0 -3.81 90)
+					(at 0.0 -3.81 90.0)
 					(length 1.27)
 					(name
 						~
@@ -337,6 +307,7 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 	)
 	(title_block
@@ -374,7 +345,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/9a05a165-f19d-4725-87e8-e48282ca2b96/76e35d56-17f6-4541-8c67-dbb7b38fe44f"
+				(path "/"
 					(reference "D3")
 					(unit 1)
 				)
@@ -420,7 +391,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/9a05a165-f19d-4725-87e8-e48282ca2b96/76e35d56-17f6-4541-8c67-dbb7b38fe44f"
+				(path "/"
 					(reference "R3")
 					(unit 1)
 				)
@@ -487,41 +458,8 @@
 		)
 		(uuid f93731f4-d6c3-4566-b982-7eae959485a1)
 	)
-	(text_box
-		"LED with current limiting resistor - Correct circuit topology"
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid 358decef-f0a5-4f57-bb70-eb03a6346d76)
-	)
 	(sheet_instances
-		(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/9a05a165-f19d-4725-87e8-e48282ca2b96/76e35d56-17f6-4541-8c67-dbb7b38fe44f"
+		(path "/"
 			(page "1")
 		)
 	)

@@ -47,6 +47,57 @@ class Circuit:
         self._subcircuits.append(subcirc)
         # NEW: Link reference managers
         subcirc._reference_manager.set_parent(self._reference_manager)
+    
+    @staticmethod
+    def _from_json(json_data):
+        """Create a Circuit from JSON data (for Rust integration)."""
+        circuit = Circuit(name=json_data.get('name', 'unnamed'))
+        
+        # Add components
+        if 'components' in json_data:
+            for comp_data in json_data['components']:
+                # Create simplified component for Rust
+                from .component import Component
+                comp = Component(
+                    symbol=comp_data.get('symbol', 'Device:R'),
+                    ref=comp_data.get('reference', comp_data.get('ref', 'U')),
+                    value=comp_data.get('value', ''),
+                    footprint=comp_data.get('footprint', '')
+                )
+                circuit._components[comp.ref] = comp
+                circuit._component_list.append(comp)
+        
+        # Add nets
+        if 'nets' in json_data:
+            from .net import Net
+            for net_data in json_data['nets']:
+                net = Net(net_data.get('name', 'unnamed'))
+                circuit._nets[net.name] = net
+        
+        # Add subcircuits recursively
+        if 'subcircuits' in json_data:
+            for sub_data in json_data['subcircuits']:
+                subcircuit = Circuit._from_json(sub_data)
+                circuit.add_subcircuit(subcircuit)
+        
+        return circuit
+    
+    @property
+    def components(self):
+        """Get components dictionary for compatibility."""
+        return self._components
+    
+    @property
+    def nets(self):
+        """Get nets dictionary for compatibility."""
+        return self._nets
+    
+    @property
+    def subcircuits(self):
+        """Get subcircuits list."""
+        return self._subcircuits
+
+    def add_subcircuit_old(self, subcirc: "Circuit"):
         context_logger.debug(
             "Added subcircuit to parent",
             component="CIRCUIT",
@@ -425,8 +476,10 @@ class Circuit:
             >>> circuit.generate_kicad_project("esp32s3_simple")
         """
         try:
-            # Import KiCad schematic generator directly
+            # Import KiCad schematic generator (intelligently selects Rust or Python)
             from ..kicad.sch_gen.main_generator import SchematicGenerator
+            # Note: Rust backend is automatically used for simple circuits,
+            # Python backend is used for hierarchical circuits
 
             # Finalize references before generation
             self.finalize_references()

@@ -181,6 +181,7 @@ def copy_complete_claude_setup(
         circuit_agents = []
         manufacturing_agents = []
         development_agents = []
+        quality_agents = []
 
         for agent_file in (dest_claude_dir / "agents").rglob("*.md"):
             agent_name = agent_file.stem
@@ -190,6 +191,8 @@ def copy_complete_claude_setup(
                 manufacturing_agents.append(agent_name)
             elif "development" in agent_file.parent.name:
                 development_agents.append(agent_name)
+            elif "quality" in agent_file.parent.name:
+                quality_agents.append(agent_name)
 
         if circuit_agents:
             console.print(
@@ -199,6 +202,10 @@ def copy_complete_claude_setup(
             console.print(
                 f"🏭 Manufacturing agents: {', '.join(manufacturing_agents)}",
                 style="cyan",
+            )
+        if quality_agents:
+            console.print(
+                f"✅ Quality agents: {', '.join(quality_agents)}", style="cyan"
             )
         if development_agents and developer_mode:
             console.print(
@@ -1184,10 +1191,10 @@ def main(skip_kicad_check: bool, minimal: bool, developer: bool, no_memory_bank:
             + Text(f"\n\n📁 Location: {project_path}")
             + Text(f"\n🚀 Get started: uv run python circuit-synth/main.py")
             + Text(
-                f"\n🤖 AI agents: {len(list((project_path / '.claude' / 'agents').glob('*.md')))} agents available in Claude Code"
+                f"\n🤖 AI agents: {len(list((project_path / '.claude' / 'agents').rglob('*.md')))} agents available in Claude Code"
             )
             + Text(
-                f"\n⚡ Commands: {len(list((project_path / '.claude' / 'commands').glob('*.md')))} slash commands available"
+                f"\n⚡ Commands: {len(list((project_path / '.claude' / 'commands').rglob('*.md')))} slash commands available"
             )
             + Text(f"\n📖 Documentation: See README.md"),
             title="🎉 Success!",

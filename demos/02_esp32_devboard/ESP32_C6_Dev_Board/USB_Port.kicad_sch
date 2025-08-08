@@ -13,35 +13,24 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "{'value': 'J', 'position': {'x': 0.0, 'y': 22.225, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Reference" "J"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
-			(property "Value" "{'value': 'USB_C_Receptacle_USB2.0_16P', 'position': {'x': 0.0, 'y': 19.685, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Value" "USB_C_Receptacle_USB2.0_16P"
+				(at 0 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
-			(property "Footprint" "{'value': '', 'position': {'x': 3.81, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "{'value': 'https://www.usb.org/sites/default/files/documents/usb_type-c.zip', 'position': {'x': 3.81, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Footprint" ""
+				(at 0 -5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -49,8 +38,8 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "{'value': 'USB 2.0-only 16P Type-C Receptacle connector', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Datasheet" "https://www.usb.org/sites/default/files/documents/usb_type-c.zip"
+				(at 0 -7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -58,8 +47,8 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "{'value': 'usb universal serial bus type-C USB2.0', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Description" "USB 2.0-only 16P Type-C Receptacle connector"
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -67,8 +56,8 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "{'value': 'USB*C*Receptacle*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "ki_keywords" "usb universal serial bus type-C USB2.0"
+				(at 0 -12.7 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -230,6 +219,9 @@
 						(width 0.254)
 						(type default)
 					)
+					(fill
+						(type none)
+					)
 				)
 				(arc
 					(start -7.62 3.81)
@@ -238,6 +230,9 @@
 					(stroke
 						(width 0.254)
 						(type default)
+					)
+					(fill
+						(type outline)
 					)
 				)
 				(arc
@@ -248,6 +243,9 @@
 						(width 0.508)
 						(type default)
 					)
+					(fill
+						(type none)
+					)
 				)
 				(arc
 					(start -5.08 -3.81)
@@ -257,14 +255,8 @@
 						(width 0.508)
 						(type default)
 					)
-				)
-				(arc
-					(start -6.35 -3.81)
-					(mid -6.985 -4.4423)
-					(end -7.62 -3.81)
-					(stroke
-						(width 0.254)
-						(type default)
+					(fill
+						(type none)
 					)
 				)
 				(arc
@@ -274,6 +266,21 @@
 					(stroke
 						(width 0.254)
 						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -6.35 -3.81)
+					(mid -6.985 -4.4423)
+					(end -7.62 -3.81)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type outline)
 					)
 				)
 				(polyline
@@ -383,7 +390,7 @@
 				(pin
 					passive
 					line
-					(at -7.62 -22.86 90)
+					(at -7.62 -22.86 90.0)
 					(length 5.08)
 					(name
 						SHIELD
@@ -405,7 +412,7 @@
 				(pin
 					passive
 					line
-					(at 0.0 -22.86 90)
+					(at 0.0 -22.86 90.0)
 					(length 5.08)
 					(name
 						GND
@@ -427,7 +434,8 @@
 				(pin
 					passive
 					line
-					(at 0.0 -22.86 90)
+					(hide yes)
+					(at 0.0 -22.86 90.0)
 					(length 5.08)
 					(name
 						GND
@@ -449,7 +457,8 @@
 				(pin
 					passive
 					line
-					(at 0.0 -22.86 90)
+					(hide yes)
+					(at 0.0 -22.86 90.0)
 					(length 5.08)
 					(name
 						GND
@@ -471,7 +480,8 @@
 				(pin
 					passive
 					line
-					(at 0.0 -22.86 90)
+					(hide yes)
+					(at 0.0 -22.86 90.0)
 					(length 5.08)
 					(name
 						GND
@@ -493,7 +503,7 @@
 				(pin
 					passive
 					line
-					(at 15.24 15.24 180)
+					(at 15.24 15.24 180.0)
 					(length 5.08)
 					(name
 						VBUS
@@ -515,7 +525,8 @@
 				(pin
 					passive
 					line
-					(at 15.24 15.24 180)
+					(hide yes)
+					(at 15.24 15.24 180.0)
 					(length 5.08)
 					(name
 						VBUS
@@ -537,7 +548,8 @@
 				(pin
 					passive
 					line
-					(at 15.24 15.24 180)
+					(hide yes)
+					(at 15.24 15.24 180.0)
 					(length 5.08)
 					(name
 						VBUS
@@ -559,7 +571,8 @@
 				(pin
 					passive
 					line
-					(at 15.24 15.24 180)
+					(hide yes)
+					(at 15.24 15.24 180.0)
 					(length 5.08)
 					(name
 						VBUS
@@ -579,9 +592,9 @@
 					)
 				)
 				(pin
-					bidirectional
+					passive
 					line
-					(at 15.24 10.16 180)
+					(at 15.24 10.16 180.0)
 					(length 5.08)
 					(name
 						CC1
@@ -601,9 +614,9 @@
 					)
 				)
 				(pin
-					bidirectional
+					passive
 					line
-					(at 15.24 7.62 180)
+					(at 15.24 7.62 180.0)
 					(length 5.08)
 					(name
 						CC2
@@ -623,9 +636,9 @@
 					)
 				)
 				(pin
-					bidirectional
+					passive
 					line
-					(at 15.24 2.54 180)
+					(at 15.24 2.54 180.0)
 					(length 5.08)
 					(name
 						D-
@@ -645,9 +658,9 @@
 					)
 				)
 				(pin
-					bidirectional
+					passive
 					line
-					(at 15.24 0.0 180)
+					(at 15.24 0.0 180.0)
 					(length 5.08)
 					(name
 						D-
@@ -667,9 +680,9 @@
 					)
 				)
 				(pin
-					bidirectional
+					passive
 					line
-					(at 15.24 -2.54 180)
+					(at 15.24 -2.54 180.0)
 					(length 5.08)
 					(name
 						D+
@@ -689,9 +702,9 @@
 					)
 				)
 				(pin
-					bidirectional
+					passive
 					line
-					(at 15.24 -5.08 180)
+					(at 15.24 -5.08 180.0)
 					(length 5.08)
 					(name
 						D+
@@ -711,9 +724,9 @@
 					)
 				)
 				(pin
-					bidirectional
+					passive
 					line
-					(at 15.24 -12.7 180)
+					(at 15.24 -12.7 180.0)
 					(length 5.08)
 					(name
 						SBU1
@@ -733,9 +746,9 @@
 					)
 				)
 				(pin
-					bidirectional
+					passive
 					line
-					(at 15.24 -15.24 180)
+					(at 15.24 -15.24 180.0)
 					(length 5.08)
 					(name
 						SBU2
@@ -755,152 +768,7 @@
 					)
 				)
 			)
-		)
-		(symbol "Device:C"
-			(pin_numbers hide)
-			(pin_names
-				(offset 0.254)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "{'value': 'C', 'position': {'x': 0.635, 'y': 2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
-				)
-			)
-			(property "Value" "{'value': 'C', 'position': {'x': 0.635, 'y': -2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27], 'justify': ['left']}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide no)
-				)
-			)
-			(property "Footprint" "{'value': '', 'position': {'x': 0.9652, 'y': -3.81, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "{'value': 'Unpolarized capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "{'value': 'cap capacitor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "{'value': 'C_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "C_0_1"
-				(polyline
-					(pts
-						(xy -2.032 0.762)
-						(xy 2.032 0.762)
-					)
-					(stroke
-						(width 0.508)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.032 -0.762)
-						(xy 2.032 -0.762)
-					)
-					(stroke
-						(width 0.508)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "C_1_1"
-				(pin
-					passive
-					line
-					(at 0.0 3.81 270)
-					(length 2.794)
-					(name
-						~
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number
-						"1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin
-					passive
-					line
-					(at 0.0 -3.81 90)
-					(length 2.794)
-					(name
-						~
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number
-						"2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
+			(embedded_fonts no)
 		)
 		(symbol "Device:R"
 			(pin_numbers hide)
@@ -910,35 +778,24 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "{'value': 'R', 'position': {'x': 2.032, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Reference" "R"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
-			(property "Value" "{'value': 'R', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Value" "R"
+				(at 0 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
-			(property "Footprint" "{'value': '', 'position': {'x': -1.778, 'y': 0.0, 'rotation': 90.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "{'value': '~', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Footprint" ""
+				(at 0 -5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -946,8 +803,8 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "{'value': 'Resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Datasheet" "~"
+				(at 0 -7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -955,8 +812,8 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "{'value': 'R res resistor', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Description" "Resistor"
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -964,8 +821,8 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "{'value': 'R_*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "ki_keywords" "R res resistor"
+				(at 0 -12.7 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -990,7 +847,7 @@
 				(pin
 					passive
 					line
-					(at 0.0 3.81 270)
+					(at 0.0 3.81 270.0)
 					(length 1.27)
 					(name
 						~
@@ -1012,7 +869,7 @@
 				(pin
 					passive
 					line
-					(at 0.0 -3.81 90)
+					(at 0.0 -3.81 90.0)
 					(length 1.27)
 					(name
 						~
@@ -1032,6 +889,7 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 		(symbol "Diode:ESD5Zxx"
 			(pin_numbers hide)
@@ -1041,35 +899,24 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "{'value': 'D', 'position': {'x': 0.0, 'y': 2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Reference" "D"
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
-			(property "Value" "{'value': 'ESD5Zxx', 'position': {'x': 0.0, 'y': -2.54, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Value" "ESD5Zxx"
+				(at 0 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
-			(property "Footprint" "{'value': 'Diode_SMD:D_SOD-523', 'position': {'x': 0.0, 'y': -4.445, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "{'value': 'https://www.onsemi.com/pdf/datasheet/esd5z2.5t1-d.pdf', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Footprint" ""
+				(at 0 -5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1077,8 +924,8 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "{'value': 'ESD Protection Diode, SOD-523', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Datasheet" "https://www.onsemi.com/pdf/datasheet/esd5z2.5t1-d.pdf"
+				(at 0 -7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1086,8 +933,8 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "{'value': 'esd tvs unidirectional diode', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "Description" "ESD Protection Diode, SOD-523"
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1095,8 +942,8 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "{'value': 'D?SOD?523*', 'position': {'x': 0.0, 'y': 0.0, 'rotation': 0.0}, 'effects': {'font_size': [1.27, 1.27]}}"
-				(at 0.0 0.0 0)
+			(property "ki_keywords" "esd tvs unidirectional diode"
+				(at 0 -12.7 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1152,7 +999,7 @@
 				(pin
 					passive
 					line
-					(at -3.81 0.0 0)
+					(at -3.81 0.0 0.0)
 					(length 2.54)
 					(name
 						K
@@ -1174,7 +1021,7 @@
 				(pin
 					passive
 					line
-					(at 3.81 0.0 180)
+					(at 3.81 0.0 180.0)
 					(length 2.54)
 					(name
 						A
@@ -1194,6 +1041,143 @@
 					)
 				)
 			)
+			(embedded_fonts no)
+		)
+		(symbol "Device:C"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "C"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "C"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 -7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Unpolarized capacitor"
+				(at 0 -10.16 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "cap capacitor"
+				(at 0 -12.7 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "C_0_1"
+				(polyline
+					(pts
+						(xy -2.032 0.762)
+						(xy 2.032 0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.032 -0.762)
+						(xy 2.032 -0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "C_1_1"
+				(pin
+					passive
+					line
+					(at 0.0 3.81 270.0)
+					(length 2.794)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 0.0 -3.81 90.0)
+					(length 2.794)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
 		)
 	)
 	(title_block
@@ -1230,7 +1214,7 @@
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board"
+			(project "b7723a2a-a62f-4d4b-ba05-2cd14f395e7c"
 				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/965f9aa0-87a0-4779-a8ee-b6c4c54bbb07"
 					(reference "J1")
 					(unit 1)
@@ -1276,7 +1260,7 @@
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board"
+			(project "b7723a2a-a62f-4d4b-ba05-2cd14f395e7c"
 				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/965f9aa0-87a0-4779-a8ee-b6c4c54bbb07"
 					(reference "R1")
 					(unit 1)
@@ -1322,7 +1306,7 @@
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board"
+			(project "b7723a2a-a62f-4d4b-ba05-2cd14f395e7c"
 				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/965f9aa0-87a0-4779-a8ee-b6c4c54bbb07"
 					(reference "R2")
 					(unit 1)
@@ -1359,7 +1343,7 @@
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board"
+			(project "b7723a2a-a62f-4d4b-ba05-2cd14f395e7c"
 				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/965f9aa0-87a0-4779-a8ee-b6c4c54bbb07"
 					(reference "D1")
 					(unit 1)
@@ -1396,7 +1380,7 @@
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board"
+			(project "b7723a2a-a62f-4d4b-ba05-2cd14f395e7c"
 				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/965f9aa0-87a0-4779-a8ee-b6c4c54bbb07"
 					(reference "D2")
 					(unit 1)
@@ -1442,7 +1426,7 @@
 			)
 		)
 		(instances
-			(project "ESP32_C6_Dev_Board"
+			(project "b7723a2a-a62f-4d4b-ba05-2cd14f395e7c"
 				(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/965f9aa0-87a0-4779-a8ee-b6c4c54bbb07"
 					(reference "C1")
 					(unit 1)
@@ -1786,41 +1770,8 @@
 		)
 		(uuid 277935e7-f990-45ff-8f20-0a94cec58d44)
 	)
-	(text_box
-		"USB-C port with CC resistors, ESD protection, and proper grounding"
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid 7753a39b-3b35-40e9-91cd-e394ae2208cf)
-	)
 	(sheet_instances
-		(path "/b7723a2a-a62f-4d4b-ba05-2cd14f395e7c/965f9aa0-87a0-4779-a8ee-b6c4c54bbb07"
+		(path "/"
 			(page "1")
 		)
 	)

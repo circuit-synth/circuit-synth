@@ -7,6 +7,12 @@ use crate::types::*;
 use lexpr::{sexp, Value};
 use log::{debug, info};
 
+/// Round a floating point number to 4 decimal places
+/// This prevents floating point precision issues like 117.94999999999999
+fn round_coord(value: f64) -> f64 {
+    (value * 10000.0).round() / 10000.0
+}
+
 /// Generate a complete KiCad schematic S-expression using lexpr
 pub fn generate_schematic_sexp(
     circuit_data: &CircuitData,
@@ -26,11 +32,14 @@ pub fn generate_schematic_sexp(
         sexp!((version 20250114)),
         sexp!((generator "rust_kicad_schematic_writer")),
         sexp!((generator_version "0.1.0")),
-        Value::cons(Value::symbol("uuid"), Value::string(config.uuid.clone())),
-        Value::cons(
+        Value::list(vec![
+            Value::symbol("uuid"),
+            Value::string(config.uuid.clone()),
+        ]),
+        Value::list(vec![
             Value::symbol("paper"),
             Value::string(config.paper_size.clone()),
-        ),
+        ]),
     ];
 
     // Add lib_symbols section (empty for now)
@@ -38,7 +47,7 @@ pub fn generate_schematic_sexp(
 
     // Add components
     for component in &circuit_data.components {
-        let component_sexp = generate_component_sexp(component)?;
+        let component_sexp = generate_component_sexp(component, config)?;
         schematic_parts.push(component_sexp);
     }
 
@@ -73,7 +82,7 @@ pub fn generate_schematic_sexp(
 }
 
 /// Generate S-expression for a component using lexpr
-fn generate_component_sexp(component: &Component) -> Result<Value, SchematicError> {
+fn generate_component_sexp(component: &Component, config: &SchematicConfig) -> Result<Value, SchematicError> {
     debug!(
         "🔧 Generating component S-expression: {} ({})",
         component.reference, component.lib_id
@@ -82,19 +91,22 @@ fn generate_component_sexp(component: &Component) -> Result<Value, SchematicErro
     let component_uuid = uuid::Uuid::new_v4().to_string();
 
     // Extract values to avoid field access in sexp! macro
-    let pos_x = component.position.x;
-    let pos_y = component.position.y;
-    let rotation = component.rotation;
+    let pos_x = round_coord(component.position.x);
+    let pos_y = round_coord(component.position.y);
+    let rotation = round_coord(component.rotation);
     let lib_id = component.lib_id.clone();
     let reference = component.reference.clone();
     let value = component.value.clone();
-    let ref_y = pos_y - 2.54;
-    let val_y = pos_y + 2.54;
+    let ref_y = round_coord(pos_y - 2.54);
+    let val_y = round_coord(pos_y + 2.54);
 
     // Build the component S-expression using Value::list
     let mut component_parts = vec![
         Value::symbol("symbol"),
-        Value::cons(Value::symbol("lib_id"), Value::string(lib_id)),
+        Value::list(vec![
+            Value::symbol("lib_id"),
+            Value::string(lib_id),
+        ]),
         sexp!((at, pos_x, pos_y, rotation)),
         sexp!((unit 1)),
         sexp!((exclude_from_sim no)),
@@ -102,12 +114,15 @@ fn generate_component_sexp(component: &Component) -> Result<Value, SchematicErro
         sexp!((on_board yes)),
         sexp!((dnp no)),
         sexp!((fields_autoplaced yes)),
-        Value::cons(Value::symbol("uuid"), Value::string(component_uuid.clone())),
+        Value::list(vec![
+            Value::symbol("uuid"),
+            Value::string(component_uuid.clone()),
+        ]),
         sexp!((property "Reference" ,reference
             (at ,pos_x ,ref_y 0)
             (effects (font (size 1.27 1.27)))
         )),
-        sexp!((property "Value" ,value.clone()
+        sexp!((property "Value" ,value
             (at ,pos_x ,val_y 0)
             (effects (font (size 1.27 1.27)))
         )),
@@ -117,14 +132,22 @@ fn generate_component_sexp(component: &Component) -> Result<Value, SchematicErro
     for pin in &component.pins {
         let pin_number = pin.number.clone();
         let pin_uuid = uuid::Uuid::new_v4().to_string();
-        let pin_sexp = sexp!((pin, pin_number(uuid, pin_uuid)));
+        let pin_sexp = Value::list(vec![
+            Value::symbol("pin"),
+            Value::string(pin_number),
+            Value::list(vec![
+                Value::symbol("uuid"),
+                Value::string(pin_uuid),
+            ]),
+        ]);
         component_parts.push(pin_sexp);
     }
 
     // Add instances
     let ref_for_instances = component.reference.clone();
+    let project_name = config.title.clone();
     component_parts.push(sexp!((instances
-        (project "circuit_synth_project"
+        (project ,project_name
             (path "/"
                 (reference ,ref_for_instances)
                 (unit 1)
@@ -151,19 +174,46 @@ fn generate_hierarchical_label_sexp(label: &HierarchicalLabel) -> Result<Value, 
     // Extract values to avoid field access in sexp! macro
     let name = label.name.clone();
     let shape = label.shape.to_kicad_string();
-    let pos_x = label.position.x;
-    let pos_y = label.position.y;
-    let orientation = label.orientation;
-    let font_size = label.effects.font_size;
+    let pos_x = round_coord(label.position.x);
+    let pos_y = round_coord(label.position.y);
+    let orientation = round_coord(label.orientation);
+    let font_size = round_coord(label.effects.font_size);
     let justify = label.effects.justify.clone();
     let uuid = label.uuid.clone();
 
-    let label_sexp = sexp!((
-        hierarchical_label,
-        name(shape, shape)(at, pos_x, pos_y, orientation)(effects(font(
-            size, font_size, font_size
-        ))(justify, justify))(uuid, uuid)
-    ));
+    let label_sexp = Value::list(vec![
+        Value::symbol("hierarchical_label"),
+        Value::string(name),
+        Value::list(vec![
+            Value::symbol("shape"),
+            Value::symbol(shape),
+        ]),
+        Value::list(vec![
+            Value::symbol("at"),
+            Value::from(pos_x),
+            Value::from(pos_y),
+            Value::from(orientation),
+        ]),
+        Value::list(vec![
+            Value::symbol("effects"),
+            Value::list(vec![
+                Value::symbol("font"),
+                Value::list(vec![
+                    Value::symbol("size"),
+                    Value::from(font_size),
+                    Value::from(font_size),
+                ]),
+            ]),
+            Value::list(vec![
+                Value::symbol("justify"),
+                Value::symbol(&*justify),
+            ]),
+        ]),
+        Value::list(vec![
+            Value::symbol("uuid"),
+            Value::string(uuid),
+        ]),
+    ]);
 
     debug!(
         "✅ Hierarchical label S-expression generated for '{}'",
@@ -259,7 +309,8 @@ mod tests {
             orientation: 270.0,
         });
 
-        let sexp = generate_component_sexp(&component).unwrap();
+        let config = SchematicConfig::default();
+        let sexp = generate_component_sexp(&component, &config).unwrap();
         let sexp_str = lexpr::to_string(&sexp).unwrap();
 
         assert!(sexp_str.contains("Device:R"));

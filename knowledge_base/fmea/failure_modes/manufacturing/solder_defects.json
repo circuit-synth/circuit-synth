@@ -1,0 +1,487 @@
+{
+  "solder_joint_defects": {
+    "bridging": {
+      "failure_modes": [
+        {
+          "id": "MFG-SOLDER-001",
+          "mechanism": "solder_bridging",
+          "description": "Unintended solder connection between pads",
+          "causes": [
+            "excessive_solder_paste",
+            "poor_stencil_design",
+            "incorrect_reflow_profile",
+            "component_misalignment",
+            "inadequate_solder_mask"
+          ],
+          "physics": {
+            "surface_tension": "γ = force/length",
+            "wetting_angle": "θ < 90° for good wetting",
+            "capillary_action": "In fine pitch components"
+          },
+          "effects": {
+            "local": "Electrical short",
+            "circuit": "Functional failure, current leakage",
+            "system": "Device malfunction"
+          },
+          "occurrence": {
+            "base": 5,
+            "modifiers": {
+              "fine_pitch_below_0_5mm": 2,
+              "proper_stencil_design": -2,
+              "nitrogen_reflow": -1,
+              "paste_inspection": -2,
+              "wave_soldering": 1
+            }
+          },
+          "detection": {
+            "methods": [
+              "automated_optical_inspection",
+              "in_circuit_test",
+              "x_ray_inspection",
+              "visual_inspection"
+            ],
+            "difficulty": 3
+          },
+          "severity": {
+            "power_circuits": 9,
+            "signal_circuits": 8,
+            "test_points": 3
+          },
+          "industry_standards": {
+            "IPC_A_610": "Class 2/3 defect",
+            "IPC_7095": "BGA inspection criteria"
+          }
+        }
+      ]
+    },
+    "insufficient_solder": {
+      "failure_modes": [
+        {
+          "id": "MFG-SOLDER-002",
+          "mechanism": "cold_solder_joint",
+          "description": "Incomplete solder joint formation",
+          "causes": [
+            "low_reflow_temperature",
+            "insufficient_flux",
+            "oxidized_surfaces",
+            "poor_wetting",
+            "rapid_cooling"
+          ],
+          "physics": {
+            "intermetallic_formation": "Cu6Sn5 + Cu3Sn layers",
+            "grain_structure": "Large, irregular grains",
+            "joint_strength": "Reduced by 30-50%"
+          },
+          "effects": {
+            "local": "High resistance, poor mechanical strength",
+            "circuit": "Intermittent connection",
+            "system": "Random failures"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "profile_optimization": -2,
+              "lead_free_solder": 1,
+              "nitrogen_atmosphere": -1,
+              "old_components": 2
+            }
+          },
+          "severity": {
+            "bga_joints": 9,
+            "through_hole": 6,
+            "surface_mount": 7
+          }
+        },
+        {
+          "id": "MFG-SOLDER-003",
+          "mechanism": "insufficient_wetting",
+          "description": "Poor solder flow on pad surfaces",
+          "causes": [
+            "contaminated_surfaces",
+            "inadequate_flux_activity",
+            "incorrect_temperature",
+            "oxidation",
+            "poor_pad_design"
+          ],
+          "effects": {
+            "local": "Weak joint, dewetting",
+            "circuit": "Open or high resistance",
+            "system": "Early field failure"
+          },
+          "occurrence": {
+            "base": 5,
+            "modifiers": {
+              "surface_finish_HASL": 0,
+              "surface_finish_ENIG": -1,
+              "surface_finish_OSP": 1,
+              "cleaning_process": -2
+            }
+          },
+          "severity": {
+            "fine_pitch_components": 8,
+            "power_components": 7,
+            "passive_components": 5
+          }
+        }
+      ]
+    },
+    "void_formation": {
+      "failure_modes": [
+        {
+          "id": "MFG-SOLDER-004",
+          "mechanism": "solder_voids",
+          "description": "Gas bubbles trapped in solder",
+          "causes": [
+            "flux_outgassing",
+            "moisture_in_paste",
+            "poor_reflow_profile",
+            "contamination",
+            "via_in_pad_design"
+          ],
+          "physics": {
+            "void_percentage": "Area_void/Area_total × 100%",
+            "critical_void_size": ">25% for BGA",
+            "thermal_resistance_increase": "ΔRth = f(void%)"
+          },
+          "effects": {
+            "local": "Reduced heat transfer, weak joint",
+            "circuit": "Thermal stress, intermittent",
+            "system": "Reliability degradation"
+          },
+          "occurrence": {
+            "base": 6,
+            "modifiers": {
+              "vacuum_reflow": -3,
+              "proper_paste_storage": -1,
+              "via_in_pad": 2,
+              "qfn_packages": 1
+            }
+          },
+          "detection": {
+            "methods": [
+              "x_ray_inspection",
+              "acoustic_microscopy",
+              "cross_sectioning"
+            ],
+            "difficulty": 5
+          },
+          "severity": {
+            "power_devices": 9,
+            "bga_center_balls": 8,
+            "signal_joints": 5
+          }
+        }
+      ]
+    },
+    "tombstoning": {
+      "failure_modes": [
+        {
+          "id": "MFG-SOLDER-005",
+          "mechanism": "component_tombstoning",
+          "description": "Component stands on one end",
+          "causes": [
+            "uneven_paste_volume",
+            "unequal_pad_sizes",
+            "rapid_heating",
+            "component_weight_imbalance",
+            "poor_pad_design"
+          ],
+          "physics": {
+            "torque_imbalance": "M = F1×L1 - F2×L2",
+            "surface_tension_force": "F = γ × L × sin(θ)"
+          },
+          "effects": {
+            "local": "Open circuit on lifted side",
+            "circuit": "Missing component function",
+            "system": "Circuit malfunction"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "small_components_0201": 2,
+              "balanced_pad_design": -2,
+              "slower_ramp_rate": -1,
+              "nitrogen_reflow": -1
+            }
+          },
+          "severity": {
+            "critical_components": 9,
+            "passive_components": 7,
+            "test_components": 4
+          }
+        }
+      ]
+    },
+    "head_in_pillow": {
+      "failure_modes": [
+        {
+          "id": "MFG-SOLDER-006",
+          "mechanism": "hip_defect",
+          "description": "BGA ball doesn't coalesce with paste",
+          "causes": [
+            "pcb_warpage",
+            "component_warpage",
+            "oxidized_balls",
+            "insufficient_flux",
+            "poor_placement_accuracy"
+          ],
+          "physics": {
+            "warpage_specification": "<0.5% diagonal",
+            "coplanarity": "<0.1mm for BGA"
+          },
+          "effects": {
+            "local": "No electrical connection",
+            "circuit": "Open circuit",
+            "system": "Device failure"
+          },
+          "occurrence": {
+            "base": 3,
+            "modifiers": {
+              "warpage_control": -2,
+              "support_pins": -1,
+              "large_bga": 2,
+              "thin_pcb": 1
+            }
+          },
+          "detection": {
+            "methods": [
+              "3d_x_ray",
+              "boundary_scan",
+              "cross_section"
+            ],
+            "difficulty": 8
+          },
+          "severity": {
+            "all_applications": 10
+          }
+        }
+      ]
+    }
+  },
+  "paste_printing_defects": {
+    "insufficient_paste": {
+      "failure_modes": [
+        {
+          "id": "MFG-PASTE-001",
+          "mechanism": "insufficient_paste_volume",
+          "description": "Less than required solder paste",
+          "causes": [
+            "blocked_stencil_apertures",
+            "poor_paste_release",
+            "incorrect_pressure",
+            "worn_squeegee",
+            "high_paste_viscosity"
+          ],
+          "physics": {
+            "transfer_efficiency": "Volume_on_pad/Aperture_volume",
+            "target_efficiency": ">75%"
+          },
+          "effects": {
+            "local": "Weak joints, opens",
+            "circuit": "Intermittent connections",
+            "system": "Field failures"
+          },
+          "occurrence": {
+            "base": 5,
+            "modifiers": {
+              "automatic_cleaning": -2,
+              "spi_inspection": -2,
+              "manual_printing": 2
+            }
+          },
+          "severity": {
+            "fine_pitch": 8,
+            "standard_pitch": 6
+          }
+        }
+      ]
+    },
+    "paste_slump": {
+      "failure_modes": [
+        {
+          "id": "MFG-PASTE-002",
+          "mechanism": "solder_paste_slumping",
+          "description": "Paste spreads before reflow",
+          "causes": [
+            "low_viscosity_paste",
+            "high_temperature_storage",
+            "excessive_humidity",
+            "long_delay_before_reflow",
+            "vibration"
+          ],
+          "effects": {
+            "local": "Bridging risk, poor joint shape",
+            "circuit": "Potential shorts",
+            "system": "Assembly defects"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "controlled_environment": -2,
+              "immediate_reflow": -1,
+              "hot_humid_environment": 2
+            }
+          },
+          "severity": {
+            "fine_pitch": 8,
+            "standard_components": 5
+          }
+        }
+      ]
+    }
+  },
+  "reflow_process_defects": {
+    "thermal_damage": {
+      "failure_modes": [
+        {
+          "id": "MFG-REFLOW-001",
+          "mechanism": "component_thermal_damage",
+          "description": "Excessive temperature exposure",
+          "causes": [
+            "profile_exceeds_component_rating",
+            "extended_time_above_liquidus",
+            "multiple_reflow_cycles",
+            "inadequate_temperature_control"
+          ],
+          "physics": {
+            "peak_temperature": "Tpeak < Tmax_component",
+            "time_above_liquidus": "TAL < 90 seconds",
+            "j_std_020_compliance": "MSL requirements"
+          },
+          "effects": {
+            "local": "Package damage, die damage",
+            "circuit": "Parameter shift, failure",
+            "system": "Immediate or latent failure"
+          },
+          "occurrence": {
+            "base": 3,
+            "modifiers": {
+              "profile_verification": -2,
+              "temperature_monitoring": -1,
+              "lead_free_process": 1
+            }
+          },
+          "severity": {
+            "moisture_sensitive_devices": 9,
+            "plastic_packages": 7,
+            "ceramic_packages": 4
+          }
+        }
+      ]
+    },
+    "popcorning": {
+      "failure_modes": [
+        {
+          "id": "MFG-REFLOW-002",
+          "mechanism": "moisture_induced_cracking",
+          "description": "Package cracking from moisture expansion",
+          "causes": [
+            "inadequate_baking",
+            "exceeded_floor_life",
+            "damaged_moisture_barrier_bag",
+            "high_reflow_temperature"
+          ],
+          "physics": {
+            "vapor_pressure": "P = P0 × exp(-ΔH/RT)",
+            "critical_stress": "σ > σ_fracture"
+          },
+          "effects": {
+            "local": "Package crack, delamination",
+            "circuit": "Wire bond damage, die damage",
+            "system": "Device failure"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "proper_msl_handling": -3,
+              "humidity_control": -2,
+              "exceeded_floor_life": 3
+            }
+          },
+          "severity": {
+            "all_moisture_sensitive": 10
+          }
+        }
+      ]
+    }
+  },
+  "wave_soldering_defects": {
+    "icicles": {
+      "failure_modes": [
+        {
+          "id": "MFG-WAVE-001",
+          "mechanism": "solder_icicle_formation",
+          "description": "Excess solder forming spikes",
+          "causes": [
+            "incorrect_conveyor_angle",
+            "high_solder_temperature",
+            "slow_conveyor_speed",
+            "poor_flux_activity"
+          ],
+          "effects": {
+            "local": "Potential shorts",
+            "circuit": "Bridging risk",
+            "system": "Assembly defects"
+          },
+          "occurrence": {
+            "base": 4,
+            "modifiers": {
+              "optimized_parameters": -2,
+              "nitrogen_atmosphere": -1
+            }
+          },
+          "severity": {
+            "dense_assemblies": 7,
+            "standard_assemblies": 5
+          }
+        }
+      ]
+    }
+  },
+  "quality_metrics": {
+    "dpmo_targets": {
+      "world_class": 50,
+      "industry_average": 500,
+      "acceptable": 2000
+    },
+    "ipc_standards": {
+      "class_1_general": "Consumer products",
+      "class_2_dedicated": "Industrial, computers",
+      "class_3_high_reliability": "Medical, aerospace"
+    },
+    "inspection_levels": {
+      "aql_sampling": "0.065% to 1.0%",
+      "100_percent_inspection": "Critical components"
+    },
+    "common_escape_rates": {
+      "visual_inspection": "10-30%",
+      "aoi": "2-5%",
+      "in_circuit_test": "1-3%",
+      "functional_test": "0.5-1%"
+    }
+  },
+  "mitigation_strategies": {
+    "process_controls": [
+      "solder_paste_inspection_spi",
+      "automated_optical_inspection_aoi",
+      "in_circuit_testing_ict",
+      "x_ray_inspection_axi",
+      "nitrogen_reflow_atmosphere",
+      "profile_optimization_tools"
+    ],
+    "design_for_manufacturing": [
+      "proper_pad_design_ratios",
+      "adequate_spacing_rules",
+      "thermal_relief_patterns",
+      "component_orientation_optimization",
+      "panelization_considerations"
+    ],
+    "material_controls": [
+      "paste_storage_management",
+      "moisture_sensitive_handling",
+      "first_in_first_out_fifo",
+      "regular_stencil_cleaning",
+      "flux_residue_management"
+    ]
+  }
+}

@@ -1,0 +1,708 @@
+{
+  "copper_trace_failures": {
+    "failure_modes": [
+      {
+        "id": "PCB-TRACE-001",
+        "mechanism": "trace_necking",
+        "description": "Trace width reduction causing current density increase",
+        "causes": [
+          "over_etching_during_fabrication",
+          "design_rule_violations",
+          "aggressive_cost_reduction",
+          "manufacturing_tolerance_stackup"
+        ],
+        "physics": {
+          "current_density": "J = I/A where A = width × thickness",
+          "fusing_current": "I_fuse = k × A^0.725 for t < 10s",
+          "temperature_rise": "ΔT = (I/k×A)^2 × R_thermal",
+          "mil_std_275": "I = k × ΔT^0.44 × A^0.725"
+        },
+        "effects": {
+          "local": "Hot spot formation, trace discoloration",
+          "circuit": "Voltage drop, signal integrity loss",
+          "system": "Trace fusing, open circuit"
+        },
+        "occurrence": {
+          "base": 4,
+          "modifiers": {
+            "proper_drc_checking": -2,
+            "manual_layout_review": -1,
+            "high_current_density": 2,
+            "thin_copper_weight": 1
+          }
+        },
+        "detection": {
+          "methods": [
+            "thermal_imaging",
+            "resistance_measurement",
+            "microsection_analysis",
+            "automated_optical_inspection"
+          ],
+          "difficulty": 6
+        },
+        "severity": {
+          "power_traces": 9,
+          "signal_traces": 7,
+          "ground_traces": 5
+        },
+        "mitigation": [
+          "use_appropriate_trace_width_calculator",
+          "apply_ipc_2152_thermal_guidelines",
+          "implement_redundant_power_paths",
+          "use_thicker_copper_for_high_current"
+        ]
+      },
+      {
+        "id": "PCB-TRACE-002",
+        "mechanism": "electrochemical_migration",
+        "description": "Dendritic growth between conductors",
+        "causes": [
+          "moisture_presence",
+          "ionic_contamination",
+          "voltage_gradient",
+          "flux_residue"
+        ],
+        "physics": {
+          "migration_rate": "v = μ × E × exp(-Ea/kT)",
+          "critical_humidity": ">60% RH",
+          "voltage_threshold": ">5V typically",
+          "time_to_failure": "TTF = A × V^-n × exp(Ea/kT)"
+        },
+        "effects": {
+          "local": "Dendrite formation, leakage current",
+          "circuit": "Short circuit between traces",
+          "system": "Catastrophic failure, fire risk"
+        },
+        "occurrence": {
+          "base": 3,
+          "modifiers": {
+            "conformal_coating": -3,
+            "cleaning_process": -2,
+            "high_humidity_environment": 3,
+            "narrow_spacing": 2
+          }
+        },
+        "severity": {
+          "high_voltage_circuits": 10,
+          "logic_circuits": 8,
+          "low_voltage_analog": 6
+        }
+      },
+      {
+        "id": "PCB-TRACE-003",
+        "mechanism": "copper_dissolution",
+        "description": "Copper erosion during assembly",
+        "causes": [
+          "multiple_reflow_cycles",
+          "aggressive_flux_chemistry",
+          "extended_time_above_liquidus",
+          "thin_copper_plating"
+        ],
+        "physics": {
+          "dissolution_rate": "Rate ∝ temperature × time × flux_activity",
+          "critical_thickness_loss": ">25% reduction"
+        },
+        "effects": {
+          "local": "Trace thinning, resistance increase",
+          "circuit": "Signal degradation, open circuit",
+          "system": "Field failure"
+        },
+        "occurrence": {
+          "base": 3,
+          "modifiers": {
+            "single_reflow_process": -2,
+            "lead_free_process": 1,
+            "multiple_rework_cycles": 2
+          }
+        },
+        "severity": {
+          "fine_pitch_traces": 8,
+          "power_traces": 7,
+          "standard_traces": 5
+        }
+      }
+    ]
+  },
+  "via_failures": {
+    "failure_modes": [
+      {
+        "id": "PCB-VIA-001",
+        "mechanism": "barrel_crack",
+        "description": "Via barrel fracture from thermal stress",
+        "causes": [
+          "z_axis_cte_mismatch",
+          "thermal_cycling",
+          "poor_plating_quality",
+          "high_aspect_ratio"
+        ],
+        "physics": {
+          "stress": "σ = E × α × ΔT",
+          "strain_per_cycle": "Δε = αz × ΔT × (h/d)",
+          "coffin_manson": "Nf = A × (Δε)^-c",
+          "critical_aspect_ratio": ">10:1 high risk"
+        },
+        "effects": {
+          "local": "Intermittent connection",
+          "circuit": "Signal loss, power interruption",
+          "system": "Random failures"
+        },
+        "occurrence": {
+          "base": 5,
+          "modifiers": {
+            "aspect_ratio_below_6": -2,
+            "filled_vias": -1,
+            "microvias": 1,
+            "thick_board": 2
+          }
+        },
+        "detection": {
+          "methods": [
+            "interconnect_stress_test",
+            "microsection_analysis",
+            "daisy_chain_monitoring",
+            "thermal_cycling_test"
+          ],
+          "difficulty": 7
+        },
+        "severity": {
+          "power_vias": 9,
+          "signal_vias": 7,
+          "thermal_vias": 4
+        }
+      },
+      {
+        "id": "PCB-VIA-002",
+        "mechanism": "via_voiding",
+        "description": "Incomplete via fill or plating voids",
+        "causes": [
+          "poor_plating_chemistry",
+          "contamination",
+          "outgassing_during_plating",
+          "high_aspect_ratio"
+        ],
+        "effects": {
+          "local": "Increased resistance, hot spots",
+          "circuit": "Signal integrity issues",
+          "system": "Premature failure"
+        },
+        "occurrence": {
+          "base": 4,
+          "modifiers": {
+            "pulse_plating": -2,
+            "proper_chemistry_control": -1,
+            "blind_buried_vias": 1
+          }
+        },
+        "severity": {
+          "high_current_vias": 8,
+          "signal_vias": 5
+        }
+      },
+      {
+        "id": "PCB-VIA-003",
+        "mechanism": "pad_cratering",
+        "description": "Pad lifting from via stress",
+        "causes": [
+          "mechanical_shock",
+          "assembly_stress",
+          "brittle_resin_system",
+          "poor_adhesion"
+        ],
+        "physics": {
+          "fracture_toughness": "KIC = Y × σ × √(πa)",
+          "critical_stress": "σc = KIC / (Y × √(πa))"
+        },
+        "effects": {
+          "local": "Pad separation, open circuit",
+          "circuit": "Component disconnection",
+          "system": "Assembly failure"
+        },
+        "occurrence": {
+          "base": 3,
+          "modifiers": {
+            "proper_pad_design": -2,
+            "thin_laminate": 1,
+            "bga_components": 2
+          }
+        },
+        "severity": {
+          "bga_pads": 9,
+          "component_pads": 8,
+          "test_pads": 3
+        }
+      }
+    ]
+  },
+  "laminate_failures": {
+    "failure_modes": [
+      {
+        "id": "PCB-LAM-001",
+        "mechanism": "delamination",
+        "description": "Layer separation in multilayer PCB",
+        "causes": [
+          "moisture_absorption",
+          "thermal_stress",
+          "contamination_between_layers",
+          "poor_lamination_process"
+        ],
+        "physics": {
+          "moisture_diffusion": "Fick's law: J = -D × ∇C",
+          "glass_transition": "Tg degradation with moisture",
+          "peel_strength": "Critical: <1.0 N/mm",
+          "pressure_cooker_test": "121°C, 100% RH, 2 atm"
+        },
+        "effects": {
+          "local": "Blistering, measling, layer separation",
+          "circuit": "Impedance change, crosstalk",
+          "system": "Reliability degradation"
+        },
+        "occurrence": {
+          "base": 4,
+          "modifiers": {
+            "high_tg_material": -2,
+            "proper_baking": -1,
+            "lead_free_assembly": 1,
+            "thick_multilayer": 2
+          }
+        },
+        "detection": {
+          "methods": [
+            "c_sam_scanning",
+            "cross_section_analysis",
+            "peel_strength_test",
+            "thermal_stress_test"
+          ],
+          "difficulty": 6
+        },
+        "severity": {
+          "high_speed_signals": 9,
+          "power_planes": 7,
+          "general_routing": 5
+        }
+      },
+      {
+        "id": "PCB-LAM-002",
+        "mechanism": "conductive_anodic_filament",
+        "description": "CAF growth through glass fibers",
+        "causes": [
+          "moisture_ingress",
+          "voltage_bias",
+          "glass_fiber_exposure",
+          "ionic_contamination"
+        ],
+        "physics": {
+          "caf_model": "t = A × V^-n × exp(Ea/kT)",
+          "critical_voltage": ">100V/mm",
+          "activation_energy": "0.5-0.9 eV"
+        },
+        "effects": {
+          "local": "Leakage current, short circuit",
+          "circuit": "Signal coupling, power loss",
+          "system": "Catastrophic failure"
+        },
+        "occurrence": {
+          "base": 3,
+          "modifiers": {
+            "caf_resistant_material": -3,
+            "proper_drill_parameters": -1,
+            "high_voltage_design": 2,
+            "tight_pitch": 2
+          }
+        },
+        "severity": {
+          "high_voltage": 10,
+          "dense_routing": 8,
+          "standard_design": 5
+        }
+      },
+      {
+        "id": "PCB-LAM-003",
+        "mechanism": "resin_recession",
+        "description": "Dielectric material pullback from copper",
+        "causes": [
+          "thermal_decomposition",
+          "chemical_attack",
+          "plasma_cleaning",
+          "laser_drilling"
+        ],
+        "effects": {
+          "local": "Exposed glass fibers, wicking",
+          "circuit": "Contamination pathway",
+          "system": "Insulation resistance loss"
+        },
+        "occurrence": {
+          "base": 3,
+          "modifiers": {
+            "controlled_processes": -2,
+            "aggressive_cleaning": 2
+          }
+        },
+        "severity": {
+          "high_reliability": 7,
+          "standard": 4
+        }
+      },
+      {
+        "id": "PCB-LAM-004",
+        "mechanism": "measling_and_crazing",
+        "description": "White spots and cracks in laminate",
+        "causes": [
+          "thermal_shock",
+          "mechanical_stress",
+          "moisture_thermal_interaction",
+          "material_incompatibility"
+        ],
+        "effects": {
+          "local": "Cosmetic defects, strength reduction",
+          "circuit": "Potential delamination sites",
+          "system": "Long-term reliability concern"
+        },
+        "occurrence": {
+          "base": 5,
+          "modifiers": {
+            "matched_cte_materials": -2,
+            "proper_cure_cycle": -1,
+            "multiple_thermal_cycles": 2
+          }
+        },
+        "severity": {
+          "military_aerospace": 6,
+          "commercial": 3
+        }
+      }
+    ]
+  },
+  "plating_failures": {
+    "failure_modes": [
+      {
+        "id": "PCB-PLAT-001",
+        "mechanism": "black_pad",
+        "description": "Nickel corrosion under gold (ENIG)",
+        "causes": [
+          "excessive_phosphorus_content",
+          "aggressive_gold_plating",
+          "hyperactive_gold_bath",
+          "grain_boundary_corrosion"
+        ],
+        "physics": {
+          "phosphorus_content": "Target 7-9%, >10% problematic",
+          "gold_thickness": "0.05-0.08μm optimal"
+        },
+        "effects": {
+          "local": "Non-solderable pad, brittle joint",
+          "circuit": "Open connection",
+          "system": "Assembly failure"
+        },
+        "occurrence": {
+          "base": 3,
+          "modifiers": {
+            "process_control": -2,
+            "enig_finish": 1,
+            "multiple_suppliers": 1
+          }
+        },
+        "severity": {
+          "bga_assembly": 10,
+          "fine_pitch": 9,
+          "standard_assembly": 7
+        }
+      },
+      {
+        "id": "PCB-PLAT-002",
+        "mechanism": "whisker_growth",
+        "description": "Tin whisker formation",
+        "causes": [
+          "compressive_stress",
+          "intermetallic_formation",
+          "temperature_cycling",
+          "pure_tin_plating"
+        ],
+        "physics": {
+          "growth_rate": "0.03-9 mm/year",
+          "stress_threshold": ">10 MPa compressive",
+          "mitigation_thickness": ">2% Pb or Bi addition"
+        },
+        "effects": {
+          "local": "Conductive filaments",
+          "circuit": "Short circuits",
+          "system": "Catastrophic failure"
+        },
+        "occurrence": {
+          "base": 4,
+          "modifiers": {
+            "matte_tin_finish": -1,
+            "pure_tin": 2,
+            "conformal_coating": -2,
+            "high_stress_assembly": 2
+          }
+        },
+        "severity": {
+          "fine_pitch": 10,
+          "high_voltage": 8,
+          "low_voltage": 6
+        }
+      },
+      {
+        "id": "PCB-PLAT-003",
+        "mechanism": "immersion_tin_degradation",
+        "description": "Tin oxide growth preventing soldering",
+        "causes": [
+          "extended_storage",
+          "high_temperature_exposure",
+          "humidity_exposure",
+          "handling_contamination"
+        ],
+        "physics": {
+          "oxide_growth": "d = k × t^n where n ≈ 0.3-0.5",
+          "shelf_life": "6-12 months typical"
+        },
+        "effects": {
+          "local": "Non-wettable surface",
+          "circuit": "Poor solder joints",
+          "system": "Assembly defects"
+        },
+        "occurrence": {
+          "base": 5,
+          "modifiers": {
+            "nitrogen_storage": -2,
+            "vacuum_packaging": -2,
+            "exceeded_shelf_life": 3
+          }
+        },
+        "severity": {
+          "fine_pitch_assembly": 8,
+          "standard_assembly": 5
+        }
+      }
+    ]
+  },
+  "thermal_mechanical_failures": {
+    "failure_modes": [
+      {
+        "id": "PCB-TM-001",
+        "mechanism": "warpage",
+        "description": "Board deformation from thermal stress",
+        "causes": [
+          "asymmetric_copper_distribution",
+          "cte_mismatch",
+          "improper_stackup",
+          "moisture_absorption"
+        ],
+        "physics": {
+          "warpage": "δ = (α1-α2) × L² × ΔT / (8×t)",
+          "ipc_limit": "<0.75% for standard boards"
+        },
+        "effects": {
+          "local": "Component stress, solder joint strain",
+          "circuit": "Open connections, component damage",
+          "system": "Assembly yield loss"
+        },
+        "occurrence": {
+          "base": 5,
+          "modifiers": {
+            "balanced_stackup": -2,
+            "symmetric_copper": -1,
+            "large_board_size": 2,
+            "thin_board": 2
+          }
+        },
+        "severity": {
+          "bga_assembly": 9,
+          "fine_pitch": 8,
+          "through_hole": 4
+        }
+      },
+      {
+        "id": "PCB-TM-002",
+        "mechanism": "twist",
+        "description": "Diagonal board deformation",
+        "causes": [
+          "non_uniform_heating",
+          "material_anisotropy",
+          "handling_stress",
+          "panel_singulation_stress"
+        ],
+        "effects": {
+          "local": "Corner lifting, component stress",
+          "circuit": "Connection reliability",
+          "system": "Assembly difficulties"
+        },
+        "occurrence": {
+          "base": 3,
+          "modifiers": {
+            "proper_support": -2,
+            "manual_handling": 1
+          }
+        },
+        "severity": {
+          "large_boards": 7,
+          "small_boards": 4
+        }
+      }
+    ]
+  },
+  "environmental_degradation": {
+    "failure_modes": [
+      {
+        "id": "PCB-ENV-001",
+        "mechanism": "moisture_absorption",
+        "description": "Water uptake by PCB material",
+        "causes": [
+          "high_humidity_exposure",
+          "temperature_cycling",
+          "material_porosity",
+          "inadequate_sealing"
+        ],
+        "physics": {
+          "diffusion": "M(t) = M∞ × (1 - exp(-Dt/h²))",
+          "typical_absorption": "0.1-0.5% by weight",
+          "tg_depression": "~20°C per 1% moisture"
+        },
+        "effects": {
+          "local": "Dimensional changes, Tg reduction",
+          "circuit": "Impedance changes, delamination",
+          "system": "Performance degradation"
+        },
+        "occurrence": {
+          "base": 6,
+          "modifiers": {
+            "low_moisture_material": -2,
+            "conformal_coating": -2,
+            "tropical_environment": 3
+          }
+        },
+        "severity": {
+          "high_frequency": 8,
+          "power_electronics": 6,
+          "digital": 4
+        }
+      },
+      {
+        "id": "PCB-ENV-002",
+        "mechanism": "fungal_growth",
+        "description": "Biological contamination on PCB",
+        "causes": [
+          "organic_contamination",
+          "high_humidity",
+          "moderate_temperature",
+          "nutrient_presence"
+        ],
+        "effects": {
+          "local": "Surface contamination, corrosion",
+          "circuit": "Leakage paths, resistance changes",
+          "system": "Malfunction"
+        },
+        "occurrence": {
+          "base": 2,
+          "modifiers": {
+            "fungicidal_coating": -3,
+            "clean_assembly": -1,
+            "tropical_deployment": 3
+          }
+        },
+        "severity": {
+          "high_impedance_circuits": 8,
+          "power_circuits": 5
+        }
+      }
+    ]
+  },
+  "quality_defects": {
+    "failure_modes": [
+      {
+        "id": "PCB-QC-001",
+        "mechanism": "registration_error",
+        "description": "Layer-to-layer misalignment",
+        "causes": [
+          "artwork_scaling",
+          "material_movement",
+          "temperature_variation",
+          "tooling_wear"
+        ],
+        "effects": {
+          "local": "Via-pad misalignment, annular ring loss",
+          "circuit": "Open connections, impedance variation",
+          "system": "Yield loss, reliability issues"
+        },
+        "occurrence": {
+          "base": 4,
+          "modifiers": {
+            "optical_registration": -2,
+            "manual_process": 2,
+            "high_layer_count": 2
+          }
+        },
+        "severity": {
+          "fine_pitch": 9,
+          "standard_pitch": 5
+        }
+      },
+      {
+        "id": "PCB-QC-002",
+        "mechanism": "etchback_issues",
+        "description": "Excessive or insufficient etchback",
+        "causes": [
+          "process_control_variation",
+          "chemistry_problems",
+          "time_temperature_issues"
+        ],
+        "effects": {
+          "local": "Poor hole wall quality",
+          "circuit": "Via reliability issues",
+          "system": "Field failures"
+        },
+        "occurrence": {
+          "base": 3,
+          "modifiers": {
+            "automated_process": -2,
+            "manual_control": 1
+          }
+        },
+        "severity": {
+          "high_reliability": 8,
+          "commercial": 5
+        }
+      }
+    ]
+  },
+  "accelerated_testing": {
+    "test_methods": {
+      "interconnect_stress_test": {
+        "standard": "IPC-TM-650 2.6.26",
+        "conditions": "Temperature cycling -55 to +125°C",
+        "cycles": "200-500 typical"
+      },
+      "caf_resistance": {
+        "standard": "IPC-TM-650 2.6.25",
+        "conditions": "85°C/85% RH with bias",
+        "duration": "500-1000 hours"
+      },
+      "thermal_stress": {
+        "standard": "IPC-TM-650 2.6.8",
+        "conditions": "288°C float or 260°C reflow"
+      },
+      "pressure_cooker": {
+        "standard": "JEDEC JESD22-A102",
+        "conditions": "121°C, 100% RH, 2 atm",
+        "duration": "96-168 hours"
+      }
+    }
+  },
+  "design_guidelines": {
+    "trace_width": {
+      "ipc_2152": "Thermal-based sizing",
+      "current_capacity": "Consider ambient, altitude, copper weight",
+      "derating": "50-80% of calculated maximum"
+    },
+    "via_design": {
+      "aspect_ratio": "Keep below 8:1 for reliability",
+      "annular_ring": "Minimum 0.05mm for Class 2",
+      "thermal_relief": "Required for soldering heat dissipation"
+    },
+    "stackup": {
+      "symmetry": "Balance copper distribution",
+      "thickness_ratio": "Adjacent layers <3:1",
+      "controlled_impedance": "±10% tolerance typical"
+    }
+  }
+}

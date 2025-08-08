@@ -164,6 +164,14 @@ def is_rust_available():
     """Check if the Rust implementation is available."""
     return _RUST_AVAILABLE
 
+def test_logging():
+    """Call the Rust test_logging function if available."""
+    if _RUST_AVAILABLE and hasattr(_rust_module, 'test_logging'):
+        return _rust_module.test_logging()
+    else:
+        logger.debug("test_logging not available in Rust module")
+        return None
+
 def test_rust_integration_logging():
     """
     Test function to verify Rust integration and logging works correctly.
