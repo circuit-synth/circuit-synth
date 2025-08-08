@@ -14,7 +14,6 @@ from ..core.types import Point, Schematic, SchematicSymbol, Sheet
 from .symbol_geometry import SymbolGeometry
 
 # Import Rust force-directed placement with defensive fallback
-_RUST_PLACEMENT_AVAILABLE = False
 _rust_placement_module = None
 
 try:
@@ -29,29 +28,18 @@ try:
 # Optional Rust placement module
 try:
     import rust_force_directed_placement
-    RUST_PLACEMENT_AVAILABLE = True
 except ImportError:
-    RUST_PLACEMENT_AVAILABLE = False
-# Optional Rust placement module
 try:
     import rust_force_directed_placement
-    RUST_PLACEMENT_AVAILABLE = True
 except ImportError:
-    RUST_PLACEMENT_AVAILABLE = False
             ForceDirectedPlacer as RustForceDirectedPlacer,
         )
-# Optional Rust placement module
 try:
     import rust_force_directed_placement
-    RUST_PLACEMENT_AVAILABLE = True
 except ImportError:
-    RUST_PLACEMENT_AVAILABLE = False
-# Optional Rust placement module
 try:
     import rust_force_directed_placement
-    RUST_PLACEMENT_AVAILABLE = True
 except ImportError:
-    RUST_PLACEMENT_AVAILABLE = False
             create_component,
             create_point,
             validate_placement_inputs,
@@ -66,12 +54,9 @@ except ImportError:
         if rust_placement_path not in sys.path:
             sys.path.insert(0, rust_placement_path)
 
-# Optional Rust placement module
 try:
     import rust_force_directed_placement
-    RUST_PLACEMENT_AVAILABLE = True
 except ImportError:
-    RUST_PLACEMENT_AVAILABLE = False
 except ImportError as e:
     logging.getLogger(__name__).info(
         f"🐍 RUST_PLACEMENT: Rust force-directed placement not available ({e}), using Python fallback"

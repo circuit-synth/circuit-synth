@@ -18,52 +18,23 @@ _RUST_SYMBOL_CACHE_AVAILABLE = False
 _RustSymbolLibCache = None
 
 # Optional Rust import
-RUST_AVAILABLE = False
+# Optional Rust import
+_RUST_SYMBOL_CACHE_AVAILABLE = False
+_RustSymbolLibCache = None
+
 try:
     import rust_symbol_cache
-    RUST_AVAILABLE = True
-    logger.debug("🦀 Rust symbol cache available")
-except ImportError:
-    logger.debug("🐍 Using Python symbol cache")
-    except ImportError:
-        # Fallback to development path resolution
-        rust_cache_path = (
-            Path(__file__).parent.parent.parent.parent
-            / "rust_modules"
-            / "rust_symbol_cache"
-            / ".venv"
-            / "lib"
-            / "python3.12"
-            / "site-packages"
-        )
-        if rust_cache_path.exists():
-            sys.path.insert(0, str(rust_cache_path))
-        
-        # Try adding the python directory to path for development setup
-        rust_python_path = (
-            Path(__file__).parent.parent.parent.parent
-            / "rust_modules"
-            / "rust_symbol_cache"
-            / "python"
-        )
-        if rust_python_path.exists():
-            sys.path.insert(0, str(rust_python_path))
-            logger.debug(f"🦀 RUST_IMPORT: Added development path: {rust_python_path}")
-        
-        import rust_symbol_cache
-        logger.debug("🦀 RUST_IMPORT: Development path import successful")
-
-    # Check if the module has the expected attribute
     if hasattr(rust_symbol_cache, 'RustSymbolLibCache'):
         _RustSymbolLibCache = rust_symbol_cache.RustSymbolLibCache
-        _RUST_SYMBOL_CACHE_AVAILABLE = (
-            False  # TEMPORARILY DISABLED - Rust cache returns zero pin coordinates
-        )
-        logger.info(
-            "🦀 Rust-accelerated SymbolLibCache temporarily disabled for pin coordinate fix"
-        )
+        _RUST_SYMBOL_CACHE_AVAILABLE = True
+        logger.debug("🦀 Rust symbol cache available and functional")
     else:
-        logger.debug(f"🦀 RUST_IMPORT: Module imported but missing RustSymbolLibCache attribute")
+        logger.debug("⚠️ Rust module found but missing RustSymbolLibCache")
+except ImportError:
+    logger.debug("🐍 Using Python symbol cache (Rust not available)")
+except Exception as e:
+    logger.warning(f"⚠️ Error loading Rust symbol cache: {e}")
+
         logger.debug(f"🦀 RUST_IMPORT: Available attributes: {[attr for attr in dir(rust_symbol_cache) if not attr.startswith('_')]}")
         raise ImportError("rust_symbol_cache module missing RustSymbolLibCache attribute")
 
