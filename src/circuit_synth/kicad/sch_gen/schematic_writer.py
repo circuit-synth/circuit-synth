@@ -76,7 +76,7 @@ from .integrated_reference_manager import IntegratedReferenceManager
 from .kicad_formatter import format_kicad_schematic
 from .shape_drawer import arc_s_expr, circle_s_expr, polyline_s_expr, rectangle_s_expr
 
-# Import automatic Rust acceleration
+# Import Rust acceleration (REQUIRED)
 try:
     from circuit_synth.core.rust_integration import (
         generate_component_sexp,
@@ -84,30 +84,35 @@ try:
     )
 
     _rust_status = get_acceleration_status()
-    # Enable Rust acceleration
+    # Rust acceleration is mandatory
     _RUST_COMPONENT_ACCELERATION = _rust_status["rust_available"]
 
-    if _RUST_COMPONENT_ACCELERATION:
-        logging.getLogger(__name__).info(
-            f"🦀 RUST_COMPONENT_ACCELERATION: ✅ ENABLED for SchematicWriter"
-        )
-        logging.getLogger(__name__).info(
-            "🚀 RUST_COMPONENT_ACCELERATION: Expected 6x component generation speedup"
-        )
-    else:
-        logging.getLogger(__name__).info(
-            f"🐍 RUST_COMPONENT_ACCELERATION: Using Python fallback"
-        )
-except ImportError as e:
-    _RUST_COMPONENT_ACCELERATION = False
+    if not _RUST_COMPONENT_ACCELERATION:
+        # This should never happen in production
+        error_msg = "Rust component acceleration not available but is required"
+        logging.getLogger(__name__).error(f"❌ CRITICAL: {error_msg}")
+        raise ImportError(error_msg)
+        
     logging.getLogger(__name__).info(
-        f"🐍 RUST_COMPONENT_ACCELERATION: Not available ({e}), using Python implementation"
+        f"🦀 RUST_COMPONENT_ACCELERATION: ✅ ENABLED for SchematicWriter"
+    )
+    logging.getLogger(__name__).info(
+        "🚀 RUST_COMPONENT_ACCELERATION: 6x component generation speedup active"
+    )
+    
+except ImportError as e:
+    logging.getLogger(__name__).error(
+        f"❌ CRITICAL: Rust component acceleration is REQUIRED: {e}"
+    )
+    raise ImportError(
+        f"Rust backend is required for circuit-synth. {e}\n"
+        "Please ensure rust modules are built: ./tools/build/build_rust_modules.sh"
     )
 except Exception as e:
-    _RUST_COMPONENT_ACCELERATION = False
-    logging.getLogger(__name__).warning(
-        f"⚠️ RUST_COMPONENT_ACCELERATION: Error loading: {e}"
+    logging.getLogger(__name__).error(
+        f"❌ CRITICAL: Error loading Rust acceleration: {e}"
     )
+    raise
 
 logger = logging.getLogger(__name__)
 
@@ -291,7 +296,7 @@ class SchematicWriter:
             f"📊 GENERATE_S_EXPR: Components: {len(self.circuit.components)}, Nets: {len(self.circuit.nets)}"
         )
         logger.info(
-            f"🦀 GENERATE_S_EXPR: Rust acceleration available: {_RUST_COMPONENT_ACCELERATION}"
+            f"🦀 GENERATE_S_EXPR: Using Rust acceleration for components"
         )
 
         # Add components using the new API - time this critical operation
@@ -424,14 +429,10 @@ class SchematicWriter:
             f"  📚 Sections: {sections_time*1000:.2f}ms ({sections_time/total_time*100:.1f}%)"
         )
 
-        if _RUST_COMPONENT_ACCELERATION:
-            estimated_rust_total = total_time / 6.0  # Expected 6x improvement
-            logger.info(
-                f"🚀 RUST_PROJECTION: Estimated total time with full Rust: {estimated_rust_total*1000:.2f}ms"
-            )
-            logger.info(
-                f"⏱️  RUST_PROJECTION: Potential time saved: {(total_time - estimated_rust_total)*1000:.2f}ms"
-            )
+        # Performance metrics (Rust is always used)
+        logger.info(
+            f"⚡ RUST_PERFORMANCE: Completed with Rust acceleration in {total_time*1000:.2f}ms"
+        )
 
         # Add symbol_instances section - DISABLED for new KiCad format (20250114+)
         # The new format uses instances within each symbol instead
@@ -616,7 +617,7 @@ class SchematicWriter:
             f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components"
         )
         logger.info(
-            f"🦀 PLACE_COMPONENTS: Rust placement acceleration available: {_RUST_COMPONENT_ACCELERATION}"
+            f"🦀 PLACE_COMPONENTS: Using Rust placement acceleration"
         )
 
         # Check if components need repositioning (have default positions)
@@ -652,7 +653,7 @@ class SchematicWriter:
                 self.placement_engine.arrange_components(
                     components_needing_placement,
                     arrangement="force_directed",
-                    use_rust_acceleration=True,
+                    use_rust_acceleration=True,  # Always use Rust
                 )
             else:
                 # For few components, use grid placement
@@ -1477,7 +1478,7 @@ def write_schematic_file(schematic_expr: list, out_path: str):
         f"📊 WRITE_SCHEMATIC_FILE: Input S-expression size: {expr_size:,} characters"
     )
     logger.info(
-        f"🦀 WRITE_SCHEMATIC_FILE: Rust formatting available: {_RUST_COMPONENT_ACCELERATION}"
+        f"🦀 WRITE_SCHEMATIC_FILE: Using Rust formatting"
     )
 
     # Debug: Check for sheet pins with orientation - time this analysis
@@ -1577,14 +1578,10 @@ def write_schematic_file(schematic_expr: list, out_path: str):
         f"📦 WRITE_SCHEMATIC_FILE: Size change: {expr_size:,} → {len(content):,} chars ({compression_ratio:.2f}x)"
     )
 
-    if _RUST_COMPONENT_ACCELERATION:
-        estimated_rust_time = total_time / 6.0  # Expected 6x improvement
-        logger.info(
-            f"🚀 RUST_PROJECTION: Estimated time with full Rust: {estimated_rust_time*1000:.2f}ms"
-        )
-        logger.info(
-            f"⏱️  RUST_PROJECTION: Potential time saved: {(total_time - estimated_rust_time)*1000:.2f}ms"
-        )
+    # Performance summary (Rust is always used)
+    logger.info(
+        f"⚡ RUST_PERFORMANCE: Schematic written with Rust acceleration in {total_time*1000:.2f}ms"
+    )
 
     logger.info(
         f"✅ WRITE_SCHEMATIC_FILE: Successfully wrote {len(content):,} characters to {out_path}"

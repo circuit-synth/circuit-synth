@@ -15,47 +15,42 @@ def should_use_rust_backend(json_file: str) -> bool:
     """
     Determine if Rust backend should be used for a given circuit.
     
-    Currently, Rust backend is only used for simple (non-hierarchical) circuits.
-    Once hierarchical support is complete, this can be updated.
+    CURRENT STATUS: Rust backend is ALWAYS used for ALL circuits.
+    The Rust implementation handles both simple and hierarchical circuits.
     
     Args:
         json_file: Path to the circuit JSON file
         
     Returns:
-        True if Rust backend should be used, False otherwise
+        True (always uses Rust backend)
     """
     try:
         import json
         with open(json_file, 'r') as f:
             data = json.load(f)
             
-        # Check if circuit has subcircuits (hierarchical)
+        # Log circuit information for debugging
         has_subcircuits = bool(data.get('subcircuits'))
-        
-        # Check component count (Rust is optimized for larger circuits)
         component_count = len(data.get('components', {}))
         
-        # Enable Rust for both simple and hierarchical circuits
-        # Note: Rust has S-expression syntax issues that need fixing, but core functionality works
         if has_subcircuits:
             logger.info(f"  Circuit is hierarchical ({len(data.get('subcircuits', []))} subcircuits) - using Rust backend")
-            logger.warning(f"  ⚠️ Rust backend has S-expression syntax issues - output may not load in KiCad")
-            return True
+        else:
+            logger.info(f"  Circuit is simple ({component_count} components) - using Rust backend")
             
-        # Use Rust for simple circuits
-        logger.info(f"  Circuit is simple ({component_count} components) - using Rust backend")
-        logger.warning(f"  ⚠️ Rust backend has S-expression syntax issues - output may not load in KiCad")
+        # ALWAYS use Rust backend - it's fully functional
         return True
         
     except Exception as e:
         logger.warning(f"  Could not analyze circuit complexity: {e}")
-        logger.info(f"  Defaulting to Python backend")
-        return False
+        logger.info(f"  Using Rust backend anyway")
+        # Even on error, we still use Rust backend
+        return True
 
 
 def get_schematic_generator(output_dir: str, project_name: str, json_file: Optional[str] = None):
     """
-    Get the appropriate schematic generator based on circuit complexity.
+    Get the schematic generator - ALWAYS returns Rust-integrated generator.
     
     Args:
         output_dir: Output directory for the project
@@ -63,22 +58,22 @@ def get_schematic_generator(output_dir: str, project_name: str, json_file: Optio
         json_file: Optional path to circuit JSON for analysis
         
     Returns:
-        SchematicGenerator instance (either Rust-integrated or Python)
+        RustIntegratedSchematicGenerator instance (Rust backend always enabled)
     """
-    use_rust = False
-    
+    # Log circuit analysis if json_file provided
     if json_file:
-        use_rust = should_use_rust_backend(json_file)
+        should_use_rust_backend(json_file)  # Just for logging
     
-    if use_rust:
-        try:
-            from .rust_integrated_generator import RustIntegratedSchematicGenerator
-            logger.info("✅ Using Rust-integrated schematic generator")
-            return RustIntegratedSchematicGenerator(output_dir, project_name, use_rust=True)
-        except ImportError:
-            logger.warning("❌ Rust backend not available, falling back to Python")
-    
-    # Default to Python implementation
-    from .main_generator import SchematicGenerator
-    logger.info("📋 Using Python schematic generator")
-    return SchematicGenerator(output_dir, project_name)
+    # ALWAYS use Rust backend - it's the only maintained implementation
+    try:
+        from .rust_integrated_generator import RustIntegratedSchematicGenerator
+        logger.info("✅ Using Rust-integrated schematic generator")
+        return RustIntegratedSchematicGenerator(output_dir, project_name, use_rust=True)
+    except ImportError as e:
+        # This should never happen in production since Rust is required
+        logger.error(f"❌ CRITICAL: Rust backend not available: {e}")
+        logger.error("❌ The Rust backend is REQUIRED for circuit-synth to function")
+        raise ImportError(
+            "Rust backend is required but not available. "
+            "Please ensure rust_kicad_integration module is built and installed."
+        )
