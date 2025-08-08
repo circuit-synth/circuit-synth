@@ -68,7 +68,7 @@ except ImportError as e:
     print(f"❌ Failed to import circuit_synth: {e}")
     sys.exit(1)
 
-# Test Rust module imports
+# Test Rust module imports (optional - pure Python fallbacks should work)
 rust_modules = [
     "rust_kicad_integration",
     "rust_core_circuit_engine", 
@@ -76,12 +76,17 @@ rust_modules = [
     "rust_netlist_processor"
 ]
 
+rust_available = False
 for module in rust_modules:
     try:
         __import__(module)
         print(f"✅ {module} imported successfully")
+        rust_available = True
     except ImportError as e:
-        print(f"⚠️  {module} import failed: {e}")
+        print(f"ℹ️  {module} not available (using Python fallback): {e}")
+
+if not rust_available:
+    print("ℹ️  No Rust modules available - using pure Python implementation (this is expected for PyPI release)")
 
 # Test circuit creation
 try:

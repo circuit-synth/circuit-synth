@@ -584,13 +584,13 @@ if __name__ == "__main__":
     print("📋 Creating circuit...")
     circuit = main_circuit()
     
-    # Generate KiCad netlist (required for ratsnest display) - save to kicad project folder
+    # Generate KiCad netlist (required for ratsnest display)
     print("🔌 Generating KiCad netlist...")
-    circuit.generate_kicad_netlist("ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.net")
+    circuit.generate_kicad_netlist("ESP32_C6_Dev_Board.net")
     
-    # Generate JSON netlist (for debugging and analysis) - save to circuit-synth folder
+    # Generate JSON netlist (for debugging and analysis)
     print("📄 Generating JSON netlist...")
-    circuit.generate_json_netlist("circuit-synth/ESP32_C6_Dev_Board.json")
+    circuit.generate_json_netlist("ESP32_C6_Dev_Board.json")
     
     # Create KiCad project with hierarchical sheets
     print("🏗️  Generating KiCad project...")
