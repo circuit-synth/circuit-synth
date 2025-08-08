@@ -72,7 +72,8 @@ class RustAcceleratedSymbolLibCache:
         
         # Fallback to Python implementation
         if self._impl is None:
-            self._impl = _PythonSymbolLibCache(cache_dir)
+            # Python SymbolLibCache is a singleton that doesn't accept arguments
+            self._impl = _PythonSymbolLibCache()
             logger.debug("Using Python symbol cache implementation")
 
     def parse_library(self, lib_path: str, force_refresh: bool = False) -> None:
