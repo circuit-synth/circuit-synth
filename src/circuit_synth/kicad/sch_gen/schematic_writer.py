@@ -84,8 +84,8 @@ try:
     )
 
     _rust_status = get_acceleration_status()
-    # DISABLE FOR DEBUGGING
-    _RUST_COMPONENT_ACCELERATION = False  # _rust_status["rust_available"]
+    # Enable Rust acceleration
+    _RUST_COMPONENT_ACCELERATION = _rust_status["rust_available"]
 
     if _RUST_COMPONENT_ACCELERATION:
         logging.getLogger(__name__).info(

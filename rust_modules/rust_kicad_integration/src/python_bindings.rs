@@ -1011,6 +1011,20 @@ fn add_component_to_schematic(
     Ok(result)
 }
 
+/// Test function to verify Rust-Python logging integration
+#[pyfunction]
+fn test_logging() -> PyResult<()> {
+    // Test all logging levels to ensure proper integration
+    log::trace!("🔍 RUST->PYTHON: Trace level logging test");
+    log::debug!("🐛 RUST->PYTHON: Debug level logging test");
+    log::info!("ℹ️ RUST->PYTHON: Info level logging test");
+    log::warn!("⚠️ RUST->PYTHON: Warning level logging test");
+    log::error!("❌ RUST->PYTHON: Error level logging test");
+    
+    info!("✅ Rust-Python logging integration is working correctly!");
+    Ok(())
+}
+
 /// Initialize the Python module
 #[pymodule]
 fn rust_kicad_schematic_writer(_py: Python, m: &PyModule) -> PyResult<()> {
@@ -1024,6 +1038,7 @@ fn rust_kicad_schematic_writer(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PySimpleComponent>()?;
 
     // Add standalone functions
+    m.add_function(wrap_pyfunction!(test_logging, m)?)?; // Logging test function
     m.add_function(wrap_pyfunction!(
         generate_hierarchical_labels_from_python,
         m

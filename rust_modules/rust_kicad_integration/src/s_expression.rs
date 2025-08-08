@@ -7,6 +7,12 @@ use crate::types::*;
 use lexpr::{sexp, Value};
 use log::{debug, info};
 
+/// Round a floating point number to 4 decimal places
+/// This prevents floating point precision issues like 117.94999999999999
+fn round_coord(value: f64) -> f64 {
+    (value * 10000.0).round() / 10000.0
+}
+
 /// Generate a complete KiCad schematic S-expression using lexpr
 pub fn generate_schematic_sexp(
     circuit_data: &CircuitData,
@@ -85,14 +91,14 @@ fn generate_component_sexp(component: &Component, config: &SchematicConfig) -> R
     let component_uuid = uuid::Uuid::new_v4().to_string();
 
     // Extract values to avoid field access in sexp! macro
-    let pos_x = component.position.x;
-    let pos_y = component.position.y;
-    let rotation = component.rotation;
+    let pos_x = round_coord(component.position.x);
+    let pos_y = round_coord(component.position.y);
+    let rotation = round_coord(component.rotation);
     let lib_id = component.lib_id.clone();
     let reference = component.reference.clone();
     let value = component.value.clone();
-    let ref_y = pos_y - 2.54;
-    let val_y = pos_y + 2.54;
+    let ref_y = round_coord(pos_y - 2.54);
+    let val_y = round_coord(pos_y + 2.54);
 
     // Build the component S-expression using Value::list
     let mut component_parts = vec![
@@ -168,10 +174,10 @@ fn generate_hierarchical_label_sexp(label: &HierarchicalLabel) -> Result<Value, 
     // Extract values to avoid field access in sexp! macro
     let name = label.name.clone();
     let shape = label.shape.to_kicad_string();
-    let pos_x = label.position.x;
-    let pos_y = label.position.y;
-    let orientation = label.orientation;
-    let font_size = label.effects.font_size;
+    let pos_x = round_coord(label.position.x);
+    let pos_y = round_coord(label.position.y);
+    let orientation = round_coord(label.orientation);
+    let font_size = round_coord(label.effects.font_size);
     let justify = label.effects.justify.clone();
     let uuid = label.uuid.clone();
 

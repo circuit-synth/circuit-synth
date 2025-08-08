@@ -49,11 +49,11 @@ try:
     import_time = time.perf_counter() - import_start
 
     if is_rust_available():
-        # DISABLE RUST to test Python formatting fixes
-        _RUST_SEXP_AVAILABLE = False
-        _rust_sexp_module = None
+        # Enable Rust backend
+        _RUST_SEXP_AVAILABLE = True
+        _rust_sexp_module = rust_module
         logging.getLogger(__name__).info(
-            f"🦀 RUST_INTEGRATION: DISABLED FOR DEBUGGING - using Python fallback"
+            f"🦀 RUST_INTEGRATION: Rust backend ENABLED for S-expression generation"
         )
     else:
         logging.getLogger(__name__).info(
