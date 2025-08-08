@@ -25,68 +25,19 @@ try:
     import importlib.util
     import os
     import sys
-
-    import_start = time.perf_counter()
-    
-    # Try direct import first (works when installed from PyPI)
-    try:
-        import rust_kicad_integration as rust_module
-        logging.getLogger(__name__).debug("🦀 RUST_IMPORT: Direct import successful (PyPI package)")
-    except ImportError:
-        # Fallback to development path resolution
-        current_file_dir = os.path.dirname(os.path.abspath(__file__))
-        rust_kicad_path = os.path.join(
-            current_file_dir, "../../../../rust_modules/rust_kicad_integration"
-        )
-        rust_kicad_path = os.path.abspath(rust_kicad_path)
-
-        if not os.path.exists(os.path.join(rust_kicad_path, "__init__.py")):
-            raise ImportError(f"rust_kicad_integration module not found at {rust_kicad_path}")
-
-        if rust_kicad_path not in sys.path:
-            sys.path.insert(0, rust_kicad_path)
-
-        # Use direct module loading for development setup
-        spec = importlib.util.spec_from_file_location(
-            "rust_kicad_integration", os.path.join(rust_kicad_path, "__init__.py")
-        )
-        rust_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(rust_module)
-        logging.getLogger(__name__).debug("🦀 RUST_IMPORT: Development path import successful")
-
-    rust_generate_component_sexp = rust_module.generate_component_sexp
-    is_rust_available = rust_module.is_rust_available
-    import_time = time.perf_counter() - import_start
-
-    if not is_rust_available():
-        # Rust module loaded but not compiled - this is a fatal error
-        error_msg = (
-            f"Rust module loaded but not functional (loaded in {import_time*1000:.2f}ms). "
-            "Please rebuild: cd rust_modules/rust_kicad_integration && maturin develop"
-        )
-        logging.getLogger(__name__).error(f"❌ CRITICAL: {error_msg}")
-        raise ImportError(error_msg)
-    
-    # Rust backend is available and functional
-    _rust_sexp_module = rust_module
-    logging.getLogger(__name__).info(
-        f"🦀 RUST_INTEGRATION: Rust backend ENABLED (loaded in {import_time*1000:.2f}ms)"
-    )
-    
-except ImportError as e:
-    logging.getLogger(__name__).error(
-        f"❌ CRITICAL: Rust S-expression module is REQUIRED but not available: {e}"
-    )
-    raise ImportError(
-        f"Rust backend is required for circuit-synth. {e}\n"
-        "Please ensure rust_kicad_integration module is built: "
-        "cd rust_modules/rust_kicad_integration && maturin develop"
-    )
+# Make Rust module optional - use Python fallback if not available
+_rust_sexp_module = None
+try:
+    import rust_kicad_integration
+    if hasattr(rust_kicad_integration, 'is_rust_available') and rust_kicad_integration.is_rust_available():
+        _rust_sexp_module = rust_kicad_integration
+        logging.getLogger(__name__).info("🦀 RUST: KiCad S-expression generation accelerated")
+    else:
+        logging.getLogger(__name__).warning("⚠️ Rust module found but not functional")
+except ImportError:
+    logging.getLogger(__name__).info("🐍 Using Python implementation for KiCad formatting")
 except Exception as e:
-    logging.getLogger(__name__).error(
-        f"❌ CRITICAL: Unexpected error loading Rust module: {e}"
-    )
-    raise
+    logging.getLogger(__name__).warning(f"⚠️ Error loading Rust module: {e}, using Python fallback")
 
 logger = logging.getLogger(__name__)
 

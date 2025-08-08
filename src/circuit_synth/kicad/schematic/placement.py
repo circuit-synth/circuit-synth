@@ -26,12 +26,32 @@ try:
     
     # Try direct import first (works when installed from PyPI)
     try:
-        from rust_force_directed_placement import Component as RustComponent
-        from rust_force_directed_placement import (
+# Optional Rust placement module
+try:
+    import rust_force_directed_placement
+    RUST_PLACEMENT_AVAILABLE = True
+except ImportError:
+    RUST_PLACEMENT_AVAILABLE = False
+# Optional Rust placement module
+try:
+    import rust_force_directed_placement
+    RUST_PLACEMENT_AVAILABLE = True
+except ImportError:
+    RUST_PLACEMENT_AVAILABLE = False
             ForceDirectedPlacer as RustForceDirectedPlacer,
         )
-        from rust_force_directed_placement import Point as RustPoint
-        from rust_force_directed_placement import (
+# Optional Rust placement module
+try:
+    import rust_force_directed_placement
+    RUST_PLACEMENT_AVAILABLE = True
+except ImportError:
+    RUST_PLACEMENT_AVAILABLE = False
+# Optional Rust placement module
+try:
+    import rust_force_directed_placement
+    RUST_PLACEMENT_AVAILABLE = True
+except ImportError:
+    RUST_PLACEMENT_AVAILABLE = False
             create_component,
             create_point,
             validate_placement_inputs,
@@ -46,29 +66,12 @@ try:
         if rust_placement_path not in sys.path:
             sys.path.insert(0, rust_placement_path)
 
-        from rust_force_directed_placement import Component as RustComponent
-        from rust_force_directed_placement import (
-            ForceDirectedPlacer as RustForceDirectedPlacer,
-        )
-        from rust_force_directed_placement import Point as RustPoint
-        from rust_force_directed_placement import (
-            create_component,
-            create_point,
-            validate_placement_inputs,
-        )
-        logging.getLogger(__name__).debug("🦀 RUST_PLACEMENT: Development path import successful")
-
-    import_time = time.perf_counter() - import_start
-
-    _RUST_PLACEMENT_AVAILABLE = True
-    _rust_placement_module = True
-    logging.getLogger(__name__).info(
-        f"🦀 RUST_PLACEMENT: ✅ RUST FORCE-DIRECTED PLACEMENT MODULE LOADED in {import_time*1000:.2f}ms"
-    )
-    logging.getLogger(__name__).info(
-        f"🚀 RUST_PLACEMENT: Expected 40-60% placement performance improvement"
-    )
-
+# Optional Rust placement module
+try:
+    import rust_force_directed_placement
+    RUST_PLACEMENT_AVAILABLE = True
+except ImportError:
+    RUST_PLACEMENT_AVAILABLE = False
 except ImportError as e:
     logging.getLogger(__name__).info(
         f"🐍 RUST_PLACEMENT: Rust force-directed placement not available ({e}), using Python fallback"

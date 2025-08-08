@@ -17,11 +17,14 @@ logger = logging.getLogger(__name__)
 _RUST_SYMBOL_CACHE_AVAILABLE = False
 _RustSymbolLibCache = None
 
+# Optional Rust import
+RUST_AVAILABLE = False
 try:
-    # Try direct import first (works when installed from PyPI)
-    try:
-        import rust_symbol_cache
-        logger.debug("🦀 RUST_IMPORT: Direct import successful (PyPI package)")
+    import rust_symbol_cache
+    RUST_AVAILABLE = True
+    logger.debug("🦀 Rust symbol cache available")
+except ImportError:
+    logger.debug("🐍 Using Python symbol cache")
     except ImportError:
         # Fallback to development path resolution
         rust_cache_path = (
