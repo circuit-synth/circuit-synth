@@ -12,13 +12,20 @@ try:
     import os
     import sys
 
-    rust_core_path = os.path.join(
-        os.path.dirname(__file__), "../../rust_modules/rust_core_circuit_engine/python"
-    )
-    if rust_core_path not in sys.path:
-        sys.path.insert(0, rust_core_path)
+    # Try direct import first (works when installed from PyPI)
+    try:
+        from rust_core_circuit_engine import create_capacitor, create_resistor
+        context_logger.debug("🦀 RUST_COMPONENTS: Direct import successful (PyPI package)")
+    except ImportError:
+        # Fallback to development path resolution
+        rust_core_path = os.path.join(
+            os.path.dirname(__file__), "../../rust_modules/rust_core_circuit_engine/python"
+        )
+        if rust_core_path not in sys.path:
+            sys.path.insert(0, rust_core_path)
 
-    from rust_core_circuit_engine import create_capacitor, create_resistor
+        from rust_core_circuit_engine import create_capacitor, create_resistor
+        context_logger.debug("🦀 RUST_COMPONENTS: Development path import successful")
 
     _RUST_COMPONENTS_AVAILABLE = True
     context_logger.info(

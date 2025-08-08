@@ -33,21 +33,56 @@ Functions:
 from typing import Dict, List, Any, Optional
 
 try:
-    from ._rust_netlist_processor import (
-        RustNetlistProcessor,
-        RustCircuit, 
-        RustComponent,
-        convert_json_to_netlist,
-        benchmark_netlist_generation,
-        __version__,
-        __author__,
-    )
+    # The compiled module is named rust_netlist_processor (matching the #[pymodule] function name)
+    # Import it directly from the current package
+    from . import rust_netlist_processor as rust_module
+    
+    # The Rust module already exports classes with "Rust" prefix
+    RustNetlistProcessor = rust_module.RustNetlistProcessor
+    RustCircuit = rust_module.RustCircuit
+    RustComponent = rust_module.RustComponent
+    convert_json_to_netlist = rust_module.convert_json_to_netlist
+    benchmark_netlist_generation = rust_module.benchmark_netlist_generation
+    __version__ = getattr(rust_module, '__version__', '0.8.2')
+    __author__ = getattr(rust_module, '__author__', 'Circuit Synth Team')
+    
 except ImportError as e:
-    raise ImportError(
-        "Failed to import Rust netlist processor. "
-        "Please ensure the package was built correctly with maturin. "
-        f"Original error: {e}"
-    ) from e
+    # Fallback: Try to load the binary directly if the import fails
+    import importlib.util
+    import os
+    
+    binary_path = os.path.join(os.path.dirname(__file__), 'rust_netlist_processor.abi3.so')
+    
+    if os.path.exists(binary_path):
+        try:
+            # The module name must match the PyInit function exported by the binary
+            spec = importlib.util.spec_from_file_location('rust_netlist_processor', binary_path)
+            if spec and spec.loader:
+                rust_module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(rust_module)
+                
+                # The classes are already named correctly in the Rust module
+                RustNetlistProcessor = rust_module.RustNetlistProcessor
+                RustCircuit = rust_module.RustCircuit
+                RustComponent = rust_module.RustComponent
+                convert_json_to_netlist = rust_module.convert_json_to_netlist
+                benchmark_netlist_generation = rust_module.benchmark_netlist_generation
+                __version__ = getattr(rust_module, '__version__', '0.8.2')
+                __author__ = getattr(rust_module, '__author__', 'Circuit Synth Team')
+            else:
+                raise ImportError("Could not load compiled Rust module")
+        except Exception as fallback_error:
+            raise ImportError(
+                f"Failed to import Rust netlist processor. "
+                f"Direct import error: {e}, "
+                f"Fallback import error: {fallback_error}"
+            ) from e
+    else:
+        raise ImportError(
+            f"Failed to import Rust netlist processor. "
+            f"Module not found and binary not at {binary_path}. "
+            f"Original error: {e}"
+        ) from e
 
 # Re-export main classes and functions
 __all__ = [

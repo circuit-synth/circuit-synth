@@ -22,25 +22,41 @@ try:
     import os
     import sys
 
-    # Add rust force-directed placement module to path
-    rust_placement_path = os.path.join(
-        os.path.dirname(__file__),
-        "../../../rust_modules/rust_force_directed_placement/python",
-    )
-    if rust_placement_path not in sys.path:
-        sys.path.insert(0, rust_placement_path)
-
     import_start = time.perf_counter()
-    from rust_force_directed_placement import Component as RustComponent
-    from rust_force_directed_placement import (
-        ForceDirectedPlacer as RustForceDirectedPlacer,
-    )
-    from rust_force_directed_placement import Point as RustPoint
-    from rust_force_directed_placement import (
-        create_component,
-        create_point,
-        validate_placement_inputs,
-    )
+    
+    # Try direct import first (works when installed from PyPI)
+    try:
+        from rust_force_directed_placement import Component as RustComponent
+        from rust_force_directed_placement import (
+            ForceDirectedPlacer as RustForceDirectedPlacer,
+        )
+        from rust_force_directed_placement import Point as RustPoint
+        from rust_force_directed_placement import (
+            create_component,
+            create_point,
+            validate_placement_inputs,
+        )
+        logging.getLogger(__name__).debug("🦀 RUST_PLACEMENT: Direct import successful (PyPI package)")
+    except ImportError:
+        # Fallback to development path resolution
+        rust_placement_path = os.path.join(
+            os.path.dirname(__file__),
+            "../../../rust_modules/rust_force_directed_placement/python",
+        )
+        if rust_placement_path not in sys.path:
+            sys.path.insert(0, rust_placement_path)
+
+        from rust_force_directed_placement import Component as RustComponent
+        from rust_force_directed_placement import (
+            ForceDirectedPlacer as RustForceDirectedPlacer,
+        )
+        from rust_force_directed_placement import Point as RustPoint
+        from rust_force_directed_placement import (
+            create_component,
+            create_point,
+            validate_placement_inputs,
+        )
+        logging.getLogger(__name__).debug("🦀 RUST_PLACEMENT: Development path import successful")
 
     import_time = time.perf_counter() - import_start
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "circuit_synth"
-version = "0.8.0"
+version = "0.8.3"
 description = "Pythonic circuit design for production-ready KiCad projects"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -122,6 +122,7 @@ Issues = "https://github.com/circuit-synth/circuit-synth/issues"
 [tool.setuptools]
 package-dir = {"" = "src"}
 
+# Include all packages from src (including symlinked Rust modules)
 [tool.setuptools.packages.find]
 where = ["src"]
 
@@ -136,6 +137,12 @@ circuit_synth = [
     "data/templates/example_project/.claude/*",
     "data/templates/example_project/.claude/agents/*/*",
     "data/templates/example_project/.claude/commands/*/*"
+]
+
+# Include all Rust module files (Python wrappers and compiled binaries)
+"*" = [
+    "*.so", "*.dylib", "*.dll", "*.pyd",  # Compiled Rust binaries
+    "__init__.py", "*.py",                 # Python wrappers
 ]
 
 [tool.black]

@@ -26,23 +26,33 @@ try:
     import os
     import sys
 
-    # Add rust modules to path using absolute path resolution
-    current_file_dir = os.path.dirname(os.path.abspath(__file__))
-    rust_kicad_path = os.path.join(
-        current_file_dir, "../../../../rust_modules/rust_kicad_integration"
-    )
-    rust_kicad_path = os.path.abspath(rust_kicad_path)
-
-    if rust_kicad_path not in sys.path:
-        sys.path.insert(0, rust_kicad_path)
-
     import_start = time.perf_counter()
-    # Use direct module loading to ensure we get the right module
-    spec = importlib.util.spec_from_file_location(
-        "rust_kicad_integration", os.path.join(rust_kicad_path, "__init__.py")
-    )
-    rust_module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(rust_module)
+    
+    # Try direct import first (works when installed from PyPI)
+    try:
+        import rust_kicad_integration as rust_module
+        logging.getLogger(__name__).debug("🦀 RUST_IMPORT: Direct import successful (PyPI package)")
+    except ImportError:
+        # Fallback to development path resolution
+        current_file_dir = os.path.dirname(os.path.abspath(__file__))
+        rust_kicad_path = os.path.join(
+            current_file_dir, "../../../../rust_modules/rust_kicad_integration"
+        )
+        rust_kicad_path = os.path.abspath(rust_kicad_path)
+
+        if not os.path.exists(os.path.join(rust_kicad_path, "__init__.py")):
+            raise ImportError(f"rust_kicad_integration module not found at {rust_kicad_path}")
+
+        if rust_kicad_path not in sys.path:
+            sys.path.insert(0, rust_kicad_path)
+
+        # Use direct module loading for development setup
+        spec = importlib.util.spec_from_file_location(
+            "rust_kicad_integration", os.path.join(rust_kicad_path, "__init__.py")
+        )
+        rust_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rust_module)
+        logging.getLogger(__name__).debug("🦀 RUST_IMPORT: Development path import successful")
 
     rust_generate_component_sexp = rust_module.generate_component_sexp
     is_rust_available = rust_module.is_rust_available

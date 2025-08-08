@@ -18,28 +18,51 @@ _RUST_SYMBOL_CACHE_AVAILABLE = False
 _RustSymbolLibCache = None
 
 try:
-    # Add Rust symbol cache to path
-    rust_cache_path = (
-        Path(__file__).parent.parent.parent.parent
-        / "rust_modules"
-        / "rust_symbol_cache"
-        / ".venv"
-        / "lib"
-        / "python3.12"
-        / "site-packages"
-    )
-    if rust_cache_path.exists():
-        sys.path.insert(0, str(rust_cache_path))
+    # Try direct import first (works when installed from PyPI)
+    try:
+        import rust_symbol_cache
+        logger.debug("🦀 RUST_IMPORT: Direct import successful (PyPI package)")
+    except ImportError:
+        # Fallback to development path resolution
+        rust_cache_path = (
+            Path(__file__).parent.parent.parent.parent
+            / "rust_modules"
+            / "rust_symbol_cache"
+            / ".venv"
+            / "lib"
+            / "python3.12"
+            / "site-packages"
+        )
+        if rust_cache_path.exists():
+            sys.path.insert(0, str(rust_cache_path))
+        
+        # Try adding the python directory to path for development setup
+        rust_python_path = (
+            Path(__file__).parent.parent.parent.parent
+            / "rust_modules"
+            / "rust_symbol_cache"
+            / "python"
+        )
+        if rust_python_path.exists():
+            sys.path.insert(0, str(rust_python_path))
+            logger.debug(f"🦀 RUST_IMPORT: Added development path: {rust_python_path}")
+        
+        import rust_symbol_cache
+        logger.debug("🦀 RUST_IMPORT: Development path import successful")
 
-    import rust_symbol_cache
-
-    _RustSymbolLibCache = rust_symbol_cache.RustSymbolLibCache
-    _RUST_SYMBOL_CACHE_AVAILABLE = (
-        False  # TEMPORARILY DISABLED - Rust cache returns zero pin coordinates
-    )
-    logger.info(
-        "🦀 Rust-accelerated SymbolLibCache temporarily disabled for pin coordinate fix"
-    )
+    # Check if the module has the expected attribute
+    if hasattr(rust_symbol_cache, 'RustSymbolLibCache'):
+        _RustSymbolLibCache = rust_symbol_cache.RustSymbolLibCache
+        _RUST_SYMBOL_CACHE_AVAILABLE = (
+            False  # TEMPORARILY DISABLED - Rust cache returns zero pin coordinates
+        )
+        logger.info(
+            "🦀 Rust-accelerated SymbolLibCache temporarily disabled for pin coordinate fix"
+        )
+    else:
+        logger.debug(f"🦀 RUST_IMPORT: Module imported but missing RustSymbolLibCache attribute")
+        logger.debug(f"🦀 RUST_IMPORT: Available attributes: {[attr for attr in dir(rust_symbol_cache) if not attr.startswith('_')]}")
+        raise ImportError("rust_symbol_cache module missing RustSymbolLibCache attribute")
 
 except ImportError as e:
     logger.info(f"🐍 Rust SymbolLibCache not available, using Python fallback: {e}")
