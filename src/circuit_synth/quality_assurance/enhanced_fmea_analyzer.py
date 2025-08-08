@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-import yaml
+# import yaml  # No longer needed, using JSON
 
 from .fmea_analyzer import ComponentType, FailureMode, UniversalFMEAAnalyzer
 from .fmea_report_generator import FMEAReportGenerator
@@ -41,46 +41,46 @@ class EnhancedFMEAAnalyzer(UniversalFMEAAnalyzer):
         # Load component-specific failure modes
         component_path = kb_path / "failure_modes" / "component_specific"
         if component_path.exists():
-            for yaml_file in component_path.glob("*.yaml"):
+            for json_file in component_path.glob("*.json"):
                 try:
-                    with open(yaml_file, "r") as f:
-                        component_type = yaml_file.stem
-                        kb["component_specific"][component_type] = yaml.safe_load(f)
+                    with open(json_file, "r") as f:
+                        component_type = json_file.stem
+                        kb["component_specific"][component_type] = json.load(f)
                 except Exception as e:
-                    print(f"Error loading {yaml_file}: {e}")
+                    print(f"Error loading {json_file}: {e}")
 
         # Load environmental failure modes
         env_path = kb_path / "failure_modes" / "environmental"
         if env_path.exists():
-            for yaml_file in env_path.glob("*.yaml"):
+            for json_file in env_path.glob("*.json"):
                 try:
-                    with open(yaml_file, "r") as f:
-                        env_type = yaml_file.stem
-                        kb["environmental"][env_type] = yaml.safe_load(f)
+                    with open(json_file, "r") as f:
+                        env_type = json_file.stem
+                        kb["environmental"][env_type] = json.load(f)
                 except Exception as e:
-                    print(f"Error loading {yaml_file}: {e}")
+                    print(f"Error loading {json_file}: {e}")
 
         # Load manufacturing defects
         mfg_path = kb_path / "failure_modes" / "manufacturing"
         if mfg_path.exists():
-            for yaml_file in mfg_path.glob("*.yaml"):
+            for json_file in mfg_path.glob("*.json"):
                 try:
-                    with open(yaml_file, "r") as f:
-                        mfg_type = yaml_file.stem
-                        kb["manufacturing"][mfg_type] = yaml.safe_load(f)
+                    with open(json_file, "r") as f:
+                        mfg_type = json_file.stem
+                        kb["manufacturing"][mfg_type] = json.load(f)
                 except Exception as e:
-                    print(f"Error loading {yaml_file}: {e}")
+                    print(f"Error loading {json_file}: {e}")
 
         # Load standards
         standards_path = kb_path / "standards"
         if standards_path.exists():
-            for yaml_file in standards_path.glob("*.yaml"):
+            for json_file in standards_path.glob("*.json"):
                 try:
-                    with open(yaml_file, "r") as f:
-                        standard_type = yaml_file.stem
-                        kb["standards"][standard_type] = yaml.safe_load(f)
+                    with open(json_file, "r") as f:
+                        standard_type = json_file.stem
+                        kb["standards"][standard_type] = json.load(f)
                 except Exception as e:
-                    print(f"Error loading {yaml_file}: {e}")
+                    print(f"Error loading {json_file}: {e}")
 
         return kb
 

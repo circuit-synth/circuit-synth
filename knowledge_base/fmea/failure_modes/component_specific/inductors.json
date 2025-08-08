@@ -1,0 +1,535 @@
+{
+  "ferrite_core_inductors": {
+    "failure_modes": [
+      {
+        "id": "IND-FERR-001",
+        "mechanism": "core_saturation",
+        "description": "Magnetic core saturation reducing inductance",
+        "causes": [
+          "excessive_dc_current",
+          "high_peak_currents",
+          "temperature_effects",
+          "improper_core_selection"
+        ],
+        "physics": {
+          "permeability_reduction": "μr drops with H field",
+          "saturation_flux_density": "Bsat = 0.3-0.5T typical",
+          "inductance_rolloff": "L(I) = L0/(1 + (I/Isat)^α)",
+          "temperature_coefficient": "Bsat decreases ~0.2%/°C"
+        },
+        "effects": {
+          "local": "Inductance drops, heating increases",
+          "circuit": "Regulation loss, ripple increase",
+          "system": "Power supply instability"
+        },
+        "occurrence": {
+          "base": 5,
+          "modifiers": {
+            "proper_derating": -2,
+            "distributed_gap_core": -1,
+            "peak_current_limiting": -1,
+            "undersized_inductor": 2
+          }
+        },
+        "detection": {
+          "methods": [
+            "inductance_vs_current_test",
+            "ripple_current_measurement",
+            "thermal_imaging",
+            "efficiency_testing"
+          ],
+          "difficulty": 5
+        },
+        "severity": {
+          "switching_regulators": 8,
+          "emi_filters": 6,
+          "energy_storage": 9
+        }
+      },
+      {
+        "id": "IND-FERR-002",
+        "mechanism": "core_cracking",
+        "description": "Mechanical fracture of ferrite core",
+        "causes": [
+          "thermal_shock",
+          "mechanical_stress",
+          "mounting_pressure",
+          "vibration_fatigue"
+        ],
+        "physics": {
+          "thermal_stress": "σ = E × α × ΔT",
+          "crack_propagation": "Griffith criterion",
+          "fracture_toughness": "KIC ~ 1 MPa√m"
+        },
+        "effects": {
+          "local": "Inductance change, increased losses",
+          "circuit": "EMI increase, efficiency loss",
+          "system": "Performance degradation"
+        },
+        "occurrence": {
+          "base": 3,
+          "modifiers": {
+            "potted_assembly": -2,
+            "proper_mounting": -1,
+            "thermal_cycling": 2,
+            "mechanical_shock": 2
+          }
+        },
+        "severity": {
+          "emi_critical_applications": 9,
+          "power_applications": 7,
+          "signal_applications": 5
+        }
+      },
+      {
+        "id": "IND-FERR-003",
+        "mechanism": "core_loss_heating",
+        "description": "Excessive power dissipation in core",
+        "causes": [
+          "high_frequency_operation",
+          "large_flux_swing",
+          "improper_material_selection",
+          "temperature_rise"
+        ],
+        "physics": {
+          "steinmetz_equation": "Pv = k × f^α × B^β",
+          "typical_coefficients": "α=1.2-1.7, β=2.0-2.5",
+          "loss_components": "Hysteresis + Eddy current"
+        },
+        "effects": {
+          "local": "Temperature rise, thermal runaway",
+          "circuit": "Efficiency loss, drift",
+          "system": "Thermal damage, failure"
+        },
+        "occurrence": {
+          "base": 4,
+          "modifiers": {
+            "low_loss_material": -2,
+            "proper_flux_density": -1,
+            "high_frequency_operation": 2,
+            "poor_cooling": 2
+          }
+        },
+        "severity": {
+          "high_power_converters": 8,
+          "low_power_circuits": 5
+        }
+      }
+    ]
+  },
+  "wirewound_inductors": {
+    "failure_modes": [
+      {
+        "id": "IND-WIRE-001",
+        "mechanism": "winding_insulation_breakdown",
+        "description": "Turn-to-turn short circuit",
+        "causes": [
+          "voltage_stress",
+          "thermal_degradation",
+          "mechanical_abrasion",
+          "corona_discharge"
+        ],
+        "physics": {
+          "paschen_law": "Vbreakdown = f(pressure × gap)",
+          "partial_discharge_inception": "PDIV voltage",
+          "insulation_life": "L = A × exp(-B/T) × V^-n"
+        },
+        "effects": {
+          "local": "Shorted turns, inductance drop",
+          "circuit": "Q factor reduction, heating",
+          "system": "Circuit malfunction"
+        },
+        "occurrence": {
+          "base": 4,
+          "modifiers": {
+            "vacuum_impregnation": -2,
+            "quality_wire_coating": -1,
+            "high_voltage_stress": 2,
+            "elevated_temperature": 2
+          }
+        },
+        "detection": {
+          "methods": [
+            "insulation_resistance_test",
+            "partial_discharge_test",
+            "inductance_measurement",
+            "surge_testing"
+          ],
+          "difficulty": 6
+        },
+        "severity": {
+          "power_inductors": 9,
+          "rf_inductors": 8,
+          "filter_inductors": 7
+        }
+      },
+      {
+        "id": "IND-WIRE-002",
+        "mechanism": "wire_bond_failure",
+        "description": "Connection break at termination",
+        "causes": [
+          "thermal_cycling",
+          "vibration",
+          "corrosion",
+          "poor_welding_soldering"
+        ],
+        "effects": {
+          "local": "Open circuit",
+          "circuit": "Loss of inductance function",
+          "system": "Circuit failure"
+        },
+        "occurrence": {
+          "base": 3,
+          "modifiers": {
+            "welded_connections": -1,
+            "soldered_connections": 0,
+            "crimped_connections": 1,
+            "vibration_environment": 2
+          }
+        },
+        "severity": {
+          "all_applications": 10
+        }
+      },
+      {
+        "id": "IND-WIRE-003",
+        "mechanism": "dcr_increase",
+        "description": "DC resistance increase over time",
+        "causes": [
+          "wire_corrosion",
+          "connection_degradation",
+          "temperature_effects",
+          "mechanical_stress"
+        ],
+        "physics": {
+          "resistance_temperature": "R(T) = R0(1 + α×ΔT)",
+          "copper_tempco": "α = 0.00393/°C"
+        },
+        "effects": {
+          "local": "Power loss increase",
+          "circuit": "Efficiency reduction",
+          "system": "Thermal issues"
+        },
+        "occurrence": {
+          "base": 4,
+          "modifiers": {
+            "sealed_construction": -2,
+            "copper_wire": 0,
+            "aluminum_wire": 1,
+            "high_current_density": 2
+          }
+        },
+        "severity": {
+          "high_current_applications": 8,
+          "low_current_applications": 4
+        }
+      }
+    ]
+  },
+  "multilayer_chip_inductors": {
+    "failure_modes": [
+      {
+        "id": "IND-MLCI-001",
+        "mechanism": "delamination",
+        "description": "Layer separation in multilayer structure",
+        "causes": [
+          "thermal_stress",
+          "mechanical_stress",
+          "moisture_absorption",
+          "manufacturing_defects"
+        ],
+        "physics": {
+          "stress_at_interface": "τ = G × γ",
+          "moisture_diffusion": "Fick's law"
+        },
+        "effects": {
+          "local": "Inductance change, cracking",
+          "circuit": "Parameter drift",
+          "system": "Performance variation"
+        },
+        "occurrence": {
+          "base": 3,
+          "modifiers": {
+            "automotive_grade": -2,
+            "proper_handling": -1,
+            "high_temperature_cycling": 2
+          }
+        },
+        "severity": {
+          "rf_circuits": 8,
+          "power_circuits": 6,
+          "general_circuits": 5
+        }
+      },
+      {
+        "id": "IND-MLCI-002",
+        "mechanism": "electrode_migration",
+        "description": "Silver migration between layers",
+        "causes": [
+          "moisture_presence",
+          "dc_bias_voltage",
+          "contamination",
+          "electric_field"
+        ],
+        "physics": {
+          "migration_rate": "v = μ × E",
+          "activation_energy": "0.5-0.8 eV"
+        },
+        "effects": {
+          "local": "Short circuit between layers",
+          "circuit": "Inductance loss",
+          "system": "Circuit failure"
+        },
+        "occurrence": {
+          "base": 2,
+          "modifiers": {
+            "conformal_coating": -2,
+            "low_voltage_operation": -1,
+            "high_humidity": 2
+          }
+        },
+        "severity": {
+          "all_applications": 9
+        }
+      }
+    ]
+  },
+  "air_core_inductors": {
+    "failure_modes": [
+      {
+        "id": "IND-AIR-001",
+        "mechanism": "mechanical_deformation",
+        "description": "Coil shape distortion",
+        "causes": [
+          "mechanical_shock",
+          "vibration",
+          "handling_damage",
+          "thermal_expansion"
+        ],
+        "effects": {
+          "local": "Inductance change",
+          "circuit": "Tuning drift",
+          "system": "Performance deviation"
+        },
+        "occurrence": {
+          "base": 4,
+          "modifiers": {
+            "rigid_mounting": -1,
+            "potting_compound": -2,
+            "exposed_coils": 2
+          }
+        },
+        "severity": {
+          "rf_tuned_circuits": 9,
+          "general_circuits": 5
+        }
+      },
+      {
+        "id": "IND-AIR-002",
+        "mechanism": "self_resonance_shift",
+        "description": "Parasitic capacitance effects",
+        "causes": [
+          "dielectric_changes",
+          "winding_movement",
+          "moisture_effects",
+          "contamination"
+        ],
+        "physics": {
+          "srf": "f = 1/(2π√(L×C))",
+          "q_factor": "Q = 2πfL/R"
+        },
+        "effects": {
+          "local": "Frequency response change",
+          "circuit": "Filter characteristic shift",
+          "system": "Out of specification"
+        },
+        "occurrence": {
+          "base": 3,
+          "modifiers": {
+            "controlled_winding": -1,
+            "environmental_protection": -2
+          }
+        },
+        "severity": {
+          "rf_filters": 9,
+          "broadband_circuits": 5
+        }
+      }
+    ]
+  },
+  "powdered_iron_inductors": {
+    "failure_modes": [
+      {
+        "id": "IND-IRON-001",
+        "mechanism": "thermal_aging",
+        "description": "Permeability degradation at temperature",
+        "causes": [
+          "sustained_high_temperature",
+          "oxidation",
+          "binder_degradation",
+          "magnetic_aging"
+        ],
+        "physics": {
+          "curie_temperature": "Tc ~ 770°C for iron",
+          "permeability_temp_coefficient": "-500 to +500 ppm/°C"
+        },
+        "effects": {
+          "local": "Inductance drift",
+          "circuit": "Frequency shift",
+          "system": "Detuning"
+        },
+        "occurrence": {
+          "base": 4,
+          "modifiers": {
+            "temperature_stable_material": -2,
+            "operation_below_100C": -1,
+            "operation_above_125C": 2
+          }
+        },
+        "severity": {
+          "tuned_circuits": 8,
+          "broadband_applications": 5
+        }
+      }
+    ]
+  },
+  "common_failure_modes": [
+    {
+      "id": "IND-COM-001",
+      "mechanism": "thermal_runaway",
+      "description": "Uncontrolled temperature rise",
+      "causes": [
+        "excessive_losses",
+        "poor_heat_dissipation",
+        "current_overload",
+        "ambient_temperature_rise"
+      ],
+      "physics": {
+        "power_dissipation": "P = I²R + Pcore",
+        "thermal_equilibrium": "Tj = Ta + P×Rth"
+      },
+      "effects": {
+        "local": "Insulation damage, core damage",
+        "circuit": "Smoke, fire risk",
+        "system": "Safety hazard"
+      },
+      "occurrence": {
+        "base": 3,
+        "modifiers": {
+          "thermal_protection": -3,
+          "proper_derating": -2,
+          "enclosed_environment": 2
+        }
+      },
+      "severity": {
+        "all_applications": 10
+      }
+    },
+    {
+      "id": "IND-COM-002",
+      "mechanism": "parasitic_oscillation",
+      "description": "Unwanted resonance with parasitic C",
+      "causes": [
+        "high_dv_dt",
+        "parasitic_capacitance",
+        "layout_issues",
+        "inadequate_damping"
+      ],
+      "effects": {
+        "local": "Voltage spikes, ringing",
+        "circuit": "EMI, overvoltage stress",
+        "system": "Interference, component damage"
+      },
+      "occurrence": {
+        "base": 4,
+        "modifiers": {
+          "snubber_circuit": -2,
+          "proper_layout": -1,
+          "fast_switching": 2
+        }
+      },
+      "severity": {
+        "switching_converters": 7,
+        "sensitive_circuits": 8
+      }
+    }
+  ],
+  "reliability_parameters": {
+    "failure_rates_fit": {
+      "ferrite_power": "20-100",
+      "ferrite_signal": "10-50",
+      "wirewound_power": "50-200",
+      "wirewound_precision": "20-100",
+      "multilayer_chip": "5-30",
+      "air_core": "10-50",
+      "powdered_iron": "30-150"
+    },
+    "derating_guidelines": {
+      "current": {
+        "commercial": 0.8,
+        "automotive": 0.7,
+        "military": 0.6,
+        "space": 0.5
+      },
+      "temperature": {
+        "commercial": "Tmax - 20°C",
+        "automotive": "Tmax - 30°C",
+        "military": "Tmax - 40°C"
+      },
+      "core_flux_density": {
+        "steady_state": 0.5,
+        "transient": 0.7
+      }
+    },
+    "key_parameters": {
+      "saturation_current": {
+        "definition": "Current causing 10-30% L reduction",
+        "measurement": "Per manufacturer specification"
+      },
+      "temperature_rise_current": {
+        "definition": "Current causing ΔT = 40°C",
+        "measurement": "Thermal equilibrium test"
+      },
+      "self_resonant_frequency": {
+        "definition": "Frequency where XL = XC",
+        "impact": "Inductor becomes capacitive above SRF"
+      }
+    },
+    "environmental_ratings": {
+      "temperature_range": {
+        "commercial": "-20 to +85°C",
+        "automotive": "-40 to +125°C",
+        "military": "-55 to +125°C"
+      },
+      "vibration": {
+        "commercial": "5G, 10-500Hz",
+        "automotive": "20G, 10-2000Hz"
+      },
+      "moisture": {
+        "standard": "85°C/85% RH"
+      }
+    }
+  },
+  "mitigation_strategies": {
+    "design": [
+      "proper_current_derating",
+      "thermal_management_design",
+      "distributed_gap_cores",
+      "parallel_inductors_current_sharing",
+      "snubber_circuits_for_spikes"
+    ],
+    "materials": [
+      "low_loss_core_materials",
+      "high_temperature_wire_insulation",
+      "vacuum_impregnation",
+      "thermal_interface_materials"
+    ],
+    "testing": [
+      "saturation_current_verification",
+      "temperature_rise_testing",
+      "insulation_resistance_testing",
+      "vibration_testing",
+      "surge_voltage_testing"
+    ]
+  }
+}
