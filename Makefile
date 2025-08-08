@@ -1,66 +1,198 @@
-.PHONY: format format-python format-rust format-check setup-hooks clean help
+# Circuit-Synth Makefile for Release Management
 
-# Default target
-help: ## Show this help message
-	@echo "🔧 Circuit-Synth Formatting Commands"
-	@echo "=================================="
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "%-20s %s\n", $$1, $$2}'
+.PHONY: help clean build test test-release test-local test-docker upload-testpypi upload-pypi release
 
-format: ## Format all code (Python + Rust) - One command does it all!
-	@./scripts/format_all.sh
+VERSION ?= $(shell python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
 
-format-python: ## Format Python code with Black and isort
-	@echo "🐍 Formatting Python code..."
-	@uv run black src/
-	@uv run isort src/
-	@echo "✅ Python formatting complete"
+help:
+	@echo "Circuit-Synth Release Management"
+	@echo "================================"
+	@echo ""
+	@echo "Available targets:"
+	@echo "  make clean           - Clean build artifacts"
+	@echo "  make build           - Build distribution files"
+	@echo "  make test            - Run unit tests"
+	@echo "  make test-release    - Run comprehensive release tests"
+	@echo "  make test-local      - Test local wheel installation"
+	@echo "  make test-docker     - Test in Docker containers"
+	@echo "  make upload-testpypi - Upload to TestPyPI"
+	@echo "  make upload-pypi     - Upload to PyPI (CAUTION!)"
+	@echo "  make release         - Full release process"
+	@echo ""
+	@echo "Current version: $(VERSION)"
 
-format-rust: ## Format all Rust code
-	@echo "🦀 Formatting Rust code..."
-	@for dir in rust_modules/*/; do \
-		if [ -f "$$dir/Cargo.toml" ]; then \
-			echo "  Formatting $$dir"; \
-			cd "$$dir" && cargo fmt && cd - > /dev/null; \
-		fi \
-	done
-	@echo "✅ Rust formatting complete"
+clean:
+	@echo "🧹 Cleaning build artifacts..."
+	rm -rf dist/ build/ *.egg-info src/*.egg-info
+	rm -rf .pytest_cache/ .coverage htmlcov/
+	rm -rf test_env/ final_test/ debug_env/
+	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name "*.pyc" -delete
+	find . -type f -name "*.pyo" -delete
+	@echo "✅ Clean complete"
 
-format-check: ## Check if code is properly formatted (CI-friendly)
-	@echo "🔍 Checking Python formatting..."
-	@uv run black --check src/
-	@uv run isort --check-only src/
-	@echo "🔍 Checking Rust formatting..."
-	@for dir in rust_modules/*/; do \
-		if [ -f "$$dir/Cargo.toml" ]; then \
-			echo "  Checking $$dir"; \
-			cd "$$dir" && cargo fmt --check && cd - > /dev/null; \
-		fi \
-	done
-	@echo "✅ All formatting checks passed\!"
+build-rust:
+	@echo "🦀 Building Rust modules..."
+	@if [ -f "tools/build/build_all_rust_for_packaging.sh" ]; then \
+		chmod +x tools/build/build_all_rust_for_packaging.sh && \
+		./tools/build/build_all_rust_for_packaging.sh; \
+	else \
+		for module in rust_netlist_processor rust_symbol_cache rust_core_circuit_engine rust_symbol_search rust_force_directed_placement rust_kicad_integration; do \
+			echo "Building $$module..."; \
+			if [ -d "rust_modules/$$module" ]; then \
+				cd rust_modules/$$module && \
+				maturin develop --release && \
+				cd ../..; \
+			fi; \
+		done; \
+	fi
+	@echo "✅ Rust modules built"
 
-setup-hooks: ## Install pre-commit hooks for automatic formatting
-	@./scripts/setup_formatting.sh
+build: clean build-rust
+	@echo "📦 Building distribution..."
+	uv build
+	@echo "✅ Distribution built"
+	@echo ""
+	@echo "📋 Distribution contents:"
+	@ls -lah dist/
 
-install-git-hooks: ## Install git hooks for auto-formatting on commit  
-	@./scripts/install_git_hooks.sh
+test:
+	@echo "🧪 Running unit tests..."
+	uv run pytest tests/unit/ -v
+	@echo "✅ Unit tests passed"
 
-lint: ## Run all linting checks
-	@echo "🔍 Running Python lints..."
-	@uv run flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics --extend-ignore=F821
-	@echo "✅ Linting complete"
+test-local: build
+	@echo "🧪 Testing local wheel installation..."
+	@rm -rf test_env
+	python -m venv test_env
+	@echo "📦 Installing wheel..."
+	test_env/bin/pip install dist/*.whl
+	@echo "🔬 Testing imports..."
+	test_env/bin/python -c "import circuit_synth; print('✅ circuit_synth imports successfully')"
+	test_env/bin/python -c "import rust_netlist_processor; print('✅ rust_netlist_processor imports')"
+	test_env/bin/python -c "import rust_symbol_cache; print('✅ rust_symbol_cache imports')"
+	test_env/bin/python -c "import rust_core_circuit_engine; print('✅ rust_core_circuit_engine imports')"
+	@echo "⚡ Testing circuit functionality..."
+	test_env/bin/python -c "from circuit_synth import Component, Net, circuit; print('✅ Circuit creation works')"
+	@rm -rf test_env
+	@echo "✅ Local wheel test passed"
 
-test: ## Run test suite
-	@echo "🧪 Running test suite..."
-	@uv run pytest --cov=circuit_synth --cov-report=term-missing -v
-	@echo "✅ Tests complete"
+test-docker: build
+	@echo "🐳 Testing in Docker containers..."
+	@if command -v docker >/dev/null 2>&1; then \
+		for version in 3.10 3.11 3.12; do \
+			echo "Testing Python $$version..."; \
+			echo "FROM python:$$version-slim" > Dockerfile.test; \
+			echo "WORKDIR /test" >> Dockerfile.test; \
+			echo "COPY dist/*.whl /test/" >> Dockerfile.test; \
+			echo "RUN pip install /test/*.whl" >> Dockerfile.test; \
+			echo "RUN python -c \"import circuit_synth; print('✅ Python $$version test passed')\"" >> Dockerfile.test; \
+			docker build -f Dockerfile.test -t circuit-synth-test:py$$version . && \
+			docker run --rm circuit-synth-test:py$$version && \
+			docker rmi circuit-synth-test:py$$version; \
+		done; \
+		rm -f Dockerfile.test; \
+		echo "✅ Docker tests passed"; \
+	else \
+		echo "⚠️  Docker not available, skipping Docker tests"; \
+	fi
 
-clean: ## Clean up temporary files
-	@echo "🧹 Cleaning up..."
-	@find . -type f -name "*.pyc" -delete
-	@find . -type d -name "__pycache__" -exec rm -rf {} +
-	@find . -type d -name ".pytest_cache" -exec rm -rf {} +
-	@find . -type f -name ".coverage" -delete
-	@echo "✅ Cleanup complete"
+test-release: build
+	@echo "🚀 Running comprehensive release tests..."
+	@if [ -f "tools/testing/test_release.py" ]; then \
+		chmod +x tools/testing/test_release.py && \
+		python tools/testing/test_release.py $(VERSION) --skip-docker; \
+	else \
+		echo "⚠️  test_release.py not found, running basic tests..."; \
+		$(MAKE) test-local; \
+	fi
 
-ci-check: format-check lint ## Run all CI checks locally
-	@echo "🚀 All CI checks passed\! Ready to push."
+upload-testpypi: test-release
+	@echo "📤 Uploading to TestPyPI..."
+	@echo "⚠️  Make sure you have configured ~/.pypirc with TestPyPI credentials"
+	uv run twine upload --repository testpypi dist/*
+	@echo "✅ Uploaded to TestPyPI"
+	@echo ""
+	@echo "Test installation with:"
+	@echo "  pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ circuit-synth==$(VERSION)"
+
+test-from-testpypi:
+	@echo "🧪 Testing installation from TestPyPI..."
+	@rm -rf test_env
+	python -m venv test_env
+	test_env/bin/pip install --index-url https://test.pypi.org/simple/ \
+		--extra-index-url https://pypi.org/simple/ \
+		circuit-synth==$(VERSION)
+	test_env/bin/python -c "import circuit_synth; print('✅ TestPyPI package works!')"
+	@rm -rf test_env
+
+upload-pypi: test-release
+	@echo "⚠️  WARNING: About to upload to production PyPI!"
+	@echo "Version: $(VERSION)"
+	@echo ""
+	@read -p "Are you SURE you want to upload to PyPI? (type 'yes' to confirm): " confirm && \
+	if [ "$$confirm" = "yes" ]; then \
+		echo "📤 Uploading to PyPI..."; \
+		uv run twine upload dist/*; \
+		echo "✅ Uploaded to PyPI"; \
+		echo ""; \
+		echo "Package available at: https://pypi.org/project/circuit-synth/$(VERSION)/"; \
+	else \
+		echo "❌ Upload cancelled"; \
+		exit 1; \
+	fi
+
+verify-pypi:
+	@echo "🔍 Verifying PyPI release..."
+	@rm -rf verify_env
+	python -m venv verify_env
+	verify_env/bin/pip install circuit-synth==$(VERSION)
+	verify_env/bin/python -c "import circuit_synth; v = circuit_synth.__version__; print(f'✅ Installed version: {v}')"
+	verify_env/bin/python -c "import rust_netlist_processor; print('✅ Rust modules work')"
+	@rm -rf verify_env
+	@echo "✅ PyPI release verified"
+
+release: clean build test-release
+	@echo "🚀 Starting full release process for version $(VERSION)"
+	@echo ""
+	@echo "Step 1: Upload to TestPyPI"
+	$(MAKE) upload-testpypi
+	@echo ""
+	@echo "Step 2: Test from TestPyPI"
+	@sleep 30  # Wait for TestPyPI to update
+	$(MAKE) test-from-testpypi
+	@echo ""
+	@echo "Step 3: Upload to PyPI"
+	$(MAKE) upload-pypi
+	@echo ""
+	@echo "Step 4: Verify PyPI release"
+	@sleep 30  # Wait for PyPI to update
+	$(MAKE) verify-pypi
+	@echo ""
+	@echo "🎉 Release $(VERSION) complete!"
+	@echo ""
+	@echo "Next steps:"
+	@echo "  1. Create GitHub release: gh release create v$(VERSION)"
+	@echo "  2. Update CHANGELOG.md"
+	@echo "  3. Announce release"
+
+# Development helpers
+dev-install:
+	uv pip install -e ".[dev]"
+
+format:
+	black src/ tests/
+	isort src/ tests/
+
+lint:
+	flake8 src/ tests/
+	mypy src/
+
+# CI/CD helpers
+ci-test:
+	@echo "Running CI tests..."
+	$(MAKE) build
+	$(MAKE) test
+	$(MAKE) test-local
+
+.PHONY: build-rust dev-install format lint ci-test verify-pypi test-from-testpypi

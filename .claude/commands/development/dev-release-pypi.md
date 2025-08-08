@@ -36,11 +36,12 @@ This command handles the complete release process:
 - **Update CHANGELOG** - Add release notes
 - **Commit version changes** - Clean commit for version bump
 
-### 4. Testing and Validation
+### 4. Testing and Validation - COMPREHENSIVE REGRESSION TESTING
 - **Run full test suite** - All tests must pass
 - **Validate examples** - Core examples must work
 - **Check imports** - Ensure package imports correctly
 - **Build documentation** - Generate fresh docs
+- **CRITICAL: Run comprehensive regression testing** - Prevent PyPI release failures
 
 ### 5. Git Operations and Release Management
 - **Create GitHub PR** - Create PR to merge develop into main (if releasing from develop)
@@ -233,6 +234,196 @@ coverage_result=$(uv run pytest --cov=circuit_synth --cov-report=term-missing | 
 echo "📊 $coverage_result"
 
 echo "✅ All tests passed"
+```
+
+### CRITICAL: Comprehensive Regression Testing
+
+**⚠️ THIS IS THE MOST IMPORTANT STEP - PREVENTS BROKEN PyPI RELEASES**
+
+Run the full regression test suite that simulates EXACTLY what users will experience when installing from PyPI:
+
+```bash
+# OPTION 1: Quick regression test (5-10 minutes)
+echo "🚀 Running quick regression tests..."
+./tools/testing/run_regression_tests.py --quick || {
+    echo "❌ REGRESSION TESTS FAILED - DO NOT RELEASE!"
+    echo "Fix all issues before proceeding"
+    exit 1
+}
+
+# OPTION 2: Full regression test with clean environment (15-20 minutes)
+# RECOMMENDED BEFORE ANY PyPI RELEASE
+echo "🔥 Running FULL regression test suite..."
+./tools/testing/run_full_regression_tests.py || {
+    echo "❌ FULL REGRESSION TESTS FAILED - DO NOT RELEASE!"
+    echo "This means the package WILL BE BROKEN on PyPI"
+    exit 1
+}
+
+# OPTION 3: Release-specific testing (10-15 minutes)
+# Tests the exact wheel that will be uploaded
+echo "📦 Testing release package..."
+./tools/testing/test_release.py $version --skip-docker || {
+    echo "❌ RELEASE TESTS FAILED - DO NOT RELEASE!"
+    exit 1
+}
+```
+
+#### What the Regression Tests Do:
+
+**1. Environment Reconstruction (run_full_regression_tests.py)**
+- Clears ALL caches (Python __pycache__, Rust target/, pip cache)
+- Creates fresh virtual environment from scratch
+- Installs package as users would (pip install circuit-synth)
+- Rebuilds all Rust modules with proper Python bindings
+- Tests comprehensive functionality
+
+**2. Package Distribution Testing (test_release.py)**
+- Builds the actual wheel/sdist that will go to PyPI
+- Installs in isolated virtual environment
+- Tests on multiple Python versions (3.10, 3.11, 3.12)
+- Validates all Rust modules import correctly
+- Tests actual circuit creation functionality
+- Optionally tests in Docker containers
+- Can upload to TestPyPI for staging test
+
+**3. Core Functionality Testing (run_regression_tests.py)**
+- Tests all major circuit creation patterns
+- Validates KiCad generation
+- Tests component libraries
+- Validates manufacturing integrations (JLCPCB, DigiKey)
+- Tests all Rust accelerations work
+
+#### When to Use Each Test:
+
+| Test Type | When to Use | Duration | Command |
+|-----------|------------|----------|---------|
+| Quick Test | During development | 5 min | `./tools/testing/run_regression_tests.py --quick` |
+| Full Test | Before ANY release | 15-20 min | `./tools/testing/run_full_regression_tests.py` |
+| Release Test | Final validation | 10-15 min | `./tools/testing/test_release.py VERSION` |
+| All Tests | Maximum safety | 30-40 min | All three above |
+
+#### Critical Test Points:
+
+```bash
+# 1. Test local wheel installation
+echo "🧪 Testing local wheel..."
+python -m venv test_env
+source test_env/bin/activate
+pip install dist/*.whl
+python -c "import circuit_synth; import rust_netlist_processor; print('✅ Local wheel works')"
+deactivate
+rm -rf test_env
+
+# 2. Test from TestPyPI (staging)
+echo "📤 Uploading to TestPyPI for staging test..."
+uv run twine upload --repository testpypi dist/*
+sleep 30  # Wait for propagation
+
+echo "🧪 Testing from TestPyPI..."
+python -m venv testpypi_env
+source testpypi_env/bin/activate
+pip install --index-url https://test.pypi.org/simple/ \
+            --extra-index-url https://pypi.org/simple/ \
+            circuit-synth==$version
+python -c "import circuit_synth; print('✅ TestPyPI package works')"
+deactivate
+rm -rf testpypi_env
+
+# 3. Rust Module Validation
+echo "🦀 Validating Rust modules..."
+python -c "
+import sys
+import importlib
+
+rust_modules = [
+    'rust_netlist_processor',
+    'rust_symbol_cache', 
+    'rust_core_circuit_engine',
+    'rust_symbol_search',
+    'rust_force_directed_placement',
+    'rust_kicad_integration'
+]
+
+failed = []
+for module in rust_modules:
+    try:
+        importlib.import_module(module)
+        print(f'✅ {module} imports successfully')
+    except ImportError as e:
+        print(f'❌ {module} failed: {e}')
+        failed.append(module)
+
+if failed:
+    print(f'\\n❌ CRITICAL: {len(failed)} Rust modules failed!')
+    print('DO NOT RELEASE - Rust integration is broken')
+    sys.exit(1)
+else:
+    print('\\n✅ All Rust modules working!')
+"
+
+# 4. Circuit Functionality Test
+echo "⚡ Testing circuit creation..."
+python -c "
+from circuit_synth import Component, Net, circuit
+
+@circuit
+def test():
+    r1 = Component('Device:R', 'R', value='10k')
+    c1 = Component('Device:C', 'C', value='100nF')
+    vcc = Net('VCC')
+    gnd = Net('GND')
+    r1[1] += vcc
+    r1[2] += gnd
+    c1[1] += vcc
+    c1[2] += gnd
+
+try:
+    circuit_obj = test()
+    json_data = circuit_obj.to_dict()
+    assert 'components' in json_data
+    assert 'nets' in json_data
+    print('✅ Circuit creation works!')
+except Exception as e:
+    print(f'❌ Circuit creation failed: {e}')
+    exit(1)
+"
+```
+
+#### Common Regression Test Failures and Fixes:
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| "No module named rust_*" | Rust modules not packaged | Run `./tools/build/build_all_rust_for_packaging.sh` |
+| "Symbol not found" | Wrong binary architecture | Rebuild with `maturin develop --release` |
+| "ImportError: PyInit_*" | Module name mismatch | Check Rust #[pymodule] matches Python import |
+| "FileNotFoundError" | Missing __init__.py | Ensure all Rust module dirs have __init__.py |
+| "Circuit creation failed" | Core functionality broken | Run unit tests, check recent changes |
+
+#### Emergency Test Commands:
+
+```bash
+# If regression tests keep failing, debug with:
+
+# 1. Clean EVERYTHING and start fresh
+./tools/maintenance/clear_all_caches.sh
+rm -rf dist/ build/ *.egg-info/
+rm -rf rust_modules/*/target/
+
+# 2. Rebuild all Rust modules
+for module in rust_modules/*/; do
+    cd $module
+    maturin develop --release
+    cd ../..
+done
+
+# 3. Test in completely isolated environment
+docker run --rm -it -v $(pwd):/app python:3.12 bash
+cd /app
+pip install uv
+uv build
+pip install dist/*.whl
+python -c "import circuit_synth; print('Docker test:', circuit_synth.__version__)"
 ```
 
 ### Git Operations and Release PR Management
@@ -552,6 +743,150 @@ git push origin :refs/tags/v1.0.0
 
 # Revert version commit
 git reset --hard HEAD~1
+```
+
+## NON-GITHUB WORKFLOW Testing Process
+
+For releases without GitHub Actions, follow this manual but thorough process:
+
+### Pre-Release Testing Sequence
+
+```bash
+# 1. MANDATORY: Full Regression Test (20 minutes)
+# This catches 99% of PyPI packaging issues
+./tools/testing/run_full_regression_tests.py || exit 1
+
+# 2. Build Distribution Files
+uv build
+
+# 3. Test Local Wheel (5 minutes)
+python -m venv local_test
+source local_test/bin/activate
+pip install dist/circuit_synth-*.whl
+python -c "
+import circuit_synth
+import rust_netlist_processor
+from circuit_synth import Component, Net, circuit
+print('✅ Local wheel test passed')
+"
+deactivate
+rm -rf local_test
+
+# 4. Test on Multiple Python Versions (10 minutes)
+for version in 3.10 3.11 3.12; do
+    if command -v python$version >/dev/null; then
+        echo "Testing Python $version..."
+        python$version -m venv test_$version
+        test_$version/bin/pip install dist/*.whl
+        test_$version/bin/python -c "import circuit_synth; print('✅ Python $version OK')"
+        rm -rf test_$version
+    fi
+done
+
+# 5. TestPyPI Staging (15 minutes)
+# Upload to TestPyPI first
+uv run twine upload --repository testpypi dist/*
+
+# Wait for propagation
+sleep 60
+
+# Test from TestPyPI
+python -m venv testpypi_test
+source testpypi_test/bin/activate
+pip install --index-url https://test.pypi.org/simple/ \
+            --extra-index-url https://pypi.org/simple/ \
+            circuit-synth==$version
+            
+# Comprehensive functionality test
+python -c "
+from circuit_synth import Component, Net, circuit
+import rust_netlist_processor
+import rust_symbol_cache
+import rust_core_circuit_engine
+
+@circuit
+def test():
+    r1 = Component('Device:R', 'R', value='10k')
+    c1 = Component('Device:C', 'C', value='100nF')
+    vcc = Net('VCC')
+    gnd = Net('GND')
+    r1[1] += vcc
+    r1[2] += gnd
+    c1[1] += vcc
+    c1[2] += gnd
+    return locals()
+
+circuit_obj = test()
+json_data = circuit_obj.to_dict()
+assert len(json_data['components']) == 2
+assert len(json_data['nets']) == 2
+print('✅ TestPyPI validation complete')
+"
+deactivate
+rm -rf testpypi_test
+
+# 6. Final Docker Test (Optional but Recommended)
+if command -v docker >/dev/null; then
+    echo "FROM python:3.12-slim" > Dockerfile.test
+    echo "COPY dist/*.whl /tmp/" >> Dockerfile.test
+    echo "RUN pip install /tmp/*.whl" >> Dockerfile.test
+    echo "RUN python -c 'import circuit_synth; import rust_netlist_processor'" >> Dockerfile.test
+    
+    docker build -f Dockerfile.test -t circuit-test .
+    docker run --rm circuit-test && echo "✅ Docker test passed"
+    docker rmi circuit-test
+    rm Dockerfile.test
+fi
+
+# 7. ONLY IF ALL TESTS PASS - Upload to PyPI
+echo "🎯 All tests passed! Ready for PyPI release."
+echo "Run: uv run twine upload dist/*"
+```
+
+### Test Failure Decision Tree
+
+```
+┌─────────────────────────┐
+│ Run Full Regression Test│
+└───────────┬─────────────┘
+            │
+            ▼
+        ┌───────┐
+        │ Pass? │
+        └───┬───┘
+            │
+     ┌──────┴──────┐
+     │             │
+     ▼ No          ▼ Yes
+ ┌─────────┐   ┌──────────────┐
+ │  STOP!  │   │ Test Wheel   │
+ │ Fix bugs│   │ Locally      │
+ └─────────┘   └──────┬───────┘
+                      │
+                      ▼
+                  ┌───────┐
+                  │ Pass? │
+                  └───┬───┘
+                      │
+               ┌──────┴──────┐
+               │             │
+               ▼ No          ▼ Yes
+           ┌─────────┐   ┌──────────────┐
+           │  Debug  │   │Test TestPyPI │
+           │ Locally │   └──────┬───────┘
+           └─────────┘          │
+                                ▼
+                            ┌───────┐
+                            │ Pass? │
+                            └───┬───┘
+                                │
+                         ┌──────┴──────┐
+                         │             │
+                         ▼ No          ▼ Yes
+                     ┌─────────┐   ┌─────────────┐
+                     │ DO NOT  │   │ SAFE TO     │
+                     │ RELEASE │   │ RELEASE!    │
+                     └─────────┘   └─────────────┘
 ```
 
 ---
