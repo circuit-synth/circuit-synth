@@ -1,0 +1,283 @@
+name: Test Release Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to test (e.g., 0.8.3)'
+        required: true
+        type: string
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pyproject.toml'
+      - 'src/**'
+      - 'rust_modules/**'
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  test-matrix:
+    name: Test on ${{ matrix.os }} Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.10', '3.11', '3.12']
+        
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/requirements*.txt
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            rust_modules/rust_netlist_processor
+            rust_modules/rust_symbol_cache
+            rust_modules/rust_core_circuit_engine
+            rust_modules/rust_symbol_search
+            rust_modules/rust_force_directed_placement
+            rust_modules/rust_kicad_integration
+      
+      - name: Build Rust modules
+        run: |
+          for module in rust_netlist_processor rust_symbol_cache rust_core_circuit_engine rust_symbol_search rust_force_directed_placement rust_kicad_integration; do
+            echo "Building $module..."
+            cd rust_modules/$module
+            maturin develop --release
+            cd ../..
+          done
+      
+      - name: Build distribution
+        run: uv build
+      
+      - name: Test wheel installation
+        run: |
+          # Create test environment
+          python -m venv test_env
+          
+          # Activate and install
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            test_env/Scripts/activate
+            test_env/Scripts/pip install dist/*.whl
+          else
+            source test_env/bin/activate
+            test_env/bin/pip install dist/*.whl
+          fi
+          
+          # Test imports
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            test_env/Scripts/python -c "import circuit_synth; from circuit_synth import Component, Net, circuit; print('✅ Imports work!')"
+          else
+            test_env/bin/python -c "import circuit_synth; from circuit_synth import Component, Net, circuit; print('✅ Imports work!')"
+          fi
+        shell: bash
+      
+      - name: Test Rust modules
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            test_env/Scripts/python -c "
+import rust_netlist_processor
+import rust_symbol_cache
+import rust_core_circuit_engine
+print('✅ All Rust modules import successfully!')
+"
+          else
+            test_env/bin/python -c "
+import rust_netlist_processor
+import rust_symbol_cache
+import rust_core_circuit_engine
+print('✅ All Rust modules import successfully!')
+"
+          fi
+        shell: bash
+      
+      - name: Test circuit functionality
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            test_env/Scripts/python -c "
+from circuit_synth import Component, Net, circuit
+
+@circuit
+def test():
+    r1 = Component('Device:R', 'R', value='1k')
+    c1 = Component('Device:C', 'C', value='100nF')
+    vcc = Net('VCC')
+    gnd = Net('GND')
+    r1[1] += vcc
+    r1[2] += gnd
+    c1[1] += vcc
+    c1[2] += gnd
+
+circuit_obj = test()
+json_data = circuit_obj.to_dict()
+assert 'components' in json_data
+assert 'nets' in json_data
+print('✅ Circuit functionality works!')
+"
+          else
+            test_env/bin/python -c "
+from circuit_synth import Component, Net, circuit
+
+@circuit
+def test():
+    r1 = Component('Device:R', 'R', value='1k')
+    c1 = Component('Device:C', 'C', value='100nF')
+    vcc = Net('VCC')
+    gnd = Net('GND')
+    r1[1] += vcc
+    r1[2] += gnd
+    c1[1] += vcc
+    c1[2] += gnd
+
+circuit_obj = test()
+json_data = circuit_obj.to_dict()
+assert 'components' in json_data
+assert 'nets' in json_data
+print('✅ Circuit functionality works!')
+"
+          fi
+        shell: bash
+
+  test-docker:
+    name: Test in Docker
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Build Rust modules
+        run: |
+          for module in rust_netlist_processor rust_symbol_cache rust_core_circuit_engine rust_symbol_search rust_force_directed_placement rust_kicad_integration; do
+            echo "Building $module..."
+            cd rust_modules/$module
+            maturin develop --release
+            cd ../..
+          done
+      
+      - name: Build distribution
+        run: uv build
+      
+      - name: Test in Python Docker containers
+        run: |
+          for version in 3.10 3.11 3.12; do
+            echo "Testing Python $version in Docker..."
+            
+            cat > Dockerfile.test <<EOF
+          FROM python:$version-slim
+          WORKDIR /test
+          COPY dist/*.whl /test/
+          RUN pip install /test/*.whl
+          RUN python -c "import circuit_synth; print('✅ Python $version Docker test passed!')"
+          RUN python -c "import rust_netlist_processor, rust_symbol_cache, rust_core_circuit_engine; print('✅ Rust modules work!')"
+          EOF
+            
+            docker build -f Dockerfile.test -t circuit-synth-test:py$version .
+            docker run --rm circuit-synth-test:py$version
+          done
+
+  test-testpypi:
+    name: Test TestPyPI Upload
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          pip install uv twine
+      
+      - name: Build distribution
+        run: uv build
+      
+      - name: Upload to TestPyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: |
+          twine upload --repository testpypi dist/* || echo "TestPyPI upload failed (may already exist)"
+      
+      - name: Wait for TestPyPI
+        run: sleep 60
+      
+      - name: Test installation from TestPyPI
+        run: |
+          python -m venv test_env
+          source test_env/bin/activate
+          pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ circuit-synth
+          python -c "import circuit_synth; print('✅ TestPyPI package works!')"
+
+  comprehensive-test:
+    name: Comprehensive Release Test
+    runs-on: ubuntu-latest
+    needs: [test-matrix, test-docker]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          pip install uv
+      
+      - name: Get version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Run comprehensive test suite
+        run: |
+          chmod +x tools/testing/test_release.py
+          python tools/testing/test_release.py ${{ steps.version.outputs.version }} --skip-docker
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            test-results.json
+            test-summary.txt
