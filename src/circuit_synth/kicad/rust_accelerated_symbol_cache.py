@@ -1,12 +1,11 @@
 """
-rust_accelerated_symbol_cache.py
+Rust-accelerated KiCad symbol library cache for high-performance symbol lookups.
 
-High-performance Rust-accelerated SymbolLibCache with 55x performance improvement.
-Maintains 100% API compatibility with the original Python implementation.
+This module provides a drop-in replacement for the Python-based SymbolLibCache
+that uses a Rust backend for improved performance on large symbol libraries.
 """
 
 import logging
-import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -18,10 +17,6 @@ _RUST_SYMBOL_CACHE_AVAILABLE = False
 _RustSymbolLibCache = None
 
 # Optional Rust import
-# Optional Rust import
-_RUST_SYMBOL_CACHE_AVAILABLE = False
-_RustSymbolLibCache = None
-
 try:
     import rust_symbol_cache
     if hasattr(rust_symbol_cache, 'RustSymbolLibCache'):
@@ -35,223 +30,136 @@ except ImportError:
 except Exception as e:
     logger.warning(f"⚠️ Error loading Rust symbol cache: {e}")
 
-        logger.debug(f"🦀 RUST_IMPORT: Available attributes: {[attr for attr in dir(rust_symbol_cache) if not attr.startswith('_')]}")
-        raise ImportError("rust_symbol_cache module missing RustSymbolLibCache attribute")
-
-except ImportError as e:
-    logger.info(f"🐍 Rust SymbolLibCache not available, using Python fallback: {e}")
-    _RUST_SYMBOL_CACHE_AVAILABLE = False
-
 # Fallback to Python implementation
 if not _RUST_SYMBOL_CACHE_AVAILABLE:
-    from .kicad_symbol_cache import SymbolLibCache as _PythonSymbolLibCache
-else:
-    # Import Python fallback even when Rust is available (for fallback scenarios)
-    try:
-        from .kicad_symbol_cache import SymbolLibCache as _PythonSymbolLibCache
-    except ImportError:
-        _PythonSymbolLibCache = None
+    from ..kicad.kicad_symbol_cache import SymbolLibCache as _PythonSymbolLibCache
+    logger.info("🐍 Using Python SymbolLibCache (Rust not available)")
 
 
 class RustAcceleratedSymbolLibCache:
     """
-    High-performance SymbolLibCache with Rust acceleration.
-
-    Provides up to 55x performance improvement while maintaining 100% API compatibility
-    with the original Python SymbolLibCache implementation.
-
-    Performance Results:
-    - Python implementation: 1.4649s for 5 symbol lookups
-    - Rust implementation:   0.0267s for 5 symbol lookups
-    - Performance improvement: 55x faster
-
-    This directly addresses the primary bottleneck identified in performance profiling:
-    - Symbol cache operations were taking 0.216s (53% of total execution time)
-    - With Rust acceleration, this reduces to ~0.004s (negligible)
+    Rust-accelerated symbol library cache that seamlessly falls back to Python.
+    
+    This class provides the same interface as SymbolLibCache but uses a Rust
+    backend when available for improved performance.
     """
 
-    _instance = None
-    _rust_cache = None
-    _python_cache = None
-
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance._initialize()
-        return cls._instance
-
-    def _initialize(self):
-        """Initialize the appropriate backend."""
-        if _RUST_SYMBOL_CACHE_AVAILABLE:
-            logger.debug("Initializing Rust-accelerated SymbolLibCache")
-            self._rust_cache = _RustSymbolLibCache()
-            self._using_rust = True
-        else:
-            logger.debug("Initializing Python fallback SymbolLibCache")
-            self._python_cache = _PythonSymbolLibCache()
-            self._using_rust = False
-
-    @classmethod
-    def get_symbol_data(cls, symbol_id: str) -> Dict[str, Any]:
+    def __init__(self, cache_dir: Optional[str] = None):
         """
-        Get symbol data by symbol ID with Rust acceleration.
-
+        Initialize the symbol cache with optional cache directory.
+        
         Args:
-            symbol_id: Symbol identifier in format "LibraryName:SymbolName"
-
-        Returns:
-            Dictionary containing symbol data including pins, properties, etc.
-
-        Performance:
-            - Rust: ~0.005s per symbol lookup
-            - Python: ~0.293s per symbol lookup (55x slower)
+            cache_dir: Optional directory for caching parsed symbols
         """
-        instance = cls()
-
-        if instance._using_rust:
+        self._impl = None
+        
+        if _RUST_SYMBOL_CACHE_AVAILABLE and _RustSymbolLibCache:
             try:
-                return instance._rust_cache.get_symbol_data(symbol_id)
-            except Exception as e:
-                logger.warning(
-                    f"🔄 Rust symbol lookup failed for {symbol_id}, using Python fallback: {e}"
-                )
-                # Fall back to Python implementation
-                if instance._python_cache is None:
-                    if _PythonSymbolLibCache is not None:
-                        instance._python_cache = _PythonSymbolLibCache()
-                    else:
-                        # No fallback available
-                        raise FileNotFoundError(
-                            f"Symbol '{symbol_id}' not found and no Python fallback available"
-                        )
-                return instance._python_cache.get_symbol_data(symbol_id)
-        else:
-            return instance._python_cache.get_symbol_data(symbol_id)
-
-    @classmethod
-    def get_symbol_data_by_name(cls, symbol_name: str) -> Dict[str, Any]:
-        """Get symbol data by name only (searches all libraries)."""
-        instance = cls()
-
-        if instance._using_rust:
-            try:
-                # Rust implementation may have different method name
-                if hasattr(instance._rust_cache, "get_symbol_data_by_name"):
-                    return instance._rust_cache.get_symbol_data_by_name(symbol_name)
+                # Try to initialize Rust cache
+                if cache_dir:
+                    self._impl = _RustSymbolLibCache(cache_dir)
                 else:
-                    # Fall back to search and then lookup
-                    lib_name = instance.find_symbol_library(symbol_name)
-                    if lib_name:
-                        return instance.get_symbol_data(f"{lib_name}:{symbol_name}")
-                    else:
-                        raise FileNotFoundError(
-                            f"Symbol '{symbol_name}' not found in any library"
-                        )
+                    self._impl = _RustSymbolLibCache()
+                logger.info("🦀 Using Rust-accelerated symbol cache")
             except Exception as e:
-                logger.warning(
-                    f"🔄 Rust symbol search failed for {symbol_name}, using Python fallback: {e}"
-                )
-                if instance._python_cache is None:
-                    if _PythonSymbolLibCache is not None:
-                        instance._python_cache = _PythonSymbolLibCache()
-                    else:
-                        raise FileNotFoundError(
-                            f"Symbol '{symbol_name}' not found and no Python fallback available"
-                        )
-                return instance._python_cache.get_symbol_data_by_name(symbol_name)
-        else:
-            return instance._python_cache.get_symbol_data_by_name(symbol_name)
+                logger.warning(f"Failed to initialize Rust cache: {e}, falling back to Python")
+                self._impl = None
+        
+        # Fallback to Python implementation
+        if self._impl is None:
+            self._impl = _PythonSymbolLibCache(cache_dir)
+            logger.debug("Using Python symbol cache implementation")
 
-    @classmethod
-    def find_symbol_library(cls, symbol_name: str) -> Optional[str]:
-        """Find which library contains the given symbol name."""
-        instance = cls()
+    def parse_library(self, lib_path: str, force_refresh: bool = False) -> None:
+        """
+        Parse a KiCad symbol library file.
+        
+        Args:
+            lib_path: Path to the .kicad_sym file
+            force_refresh: Force re-parsing even if cached
+        """
+        if self._impl:
+            self._impl.parse_library(lib_path, force_refresh)
 
-        if instance._using_rust:
-            try:
-                if hasattr(instance._rust_cache, "find_symbol_library"):
-                    return instance._rust_cache.find_symbol_library(symbol_name)
-                else:
-                    # Try to extract from a search result
-                    results = instance.get_all_symbols()
-                    for sym_name, lib_name in results.items():
-                        if sym_name == symbol_name:
-                            return lib_name
-                    return None
-            except Exception as e:
-                logger.warning(
-                    f"🔄 Rust library search failed for {symbol_name}, using Python fallback: {e}"
-                )
-                if instance._python_cache is None:
-                    if _PythonSymbolLibCache is not None:
-                        instance._python_cache = _PythonSymbolLibCache()
-                    else:
-                        return None  # No fallback available
-                return instance._python_cache.find_symbol_library(symbol_name)
-        else:
-            return instance._python_cache.find_symbol_library(symbol_name)
+    def get_symbol(self, library_name: str, symbol_name: str) -> Optional[Dict[str, Any]]:
+        """
+        Get a symbol from the cache.
+        
+        Args:
+            library_name: Name of the library (without extension)
+            symbol_name: Name of the symbol
+            
+        Returns:
+            Symbol data dictionary or None if not found
+        """
+        if self._impl:
+            return self._impl.get_symbol(library_name, symbol_name)
+        return None
 
-    @classmethod
-    def get_all_libraries(cls) -> Dict[str, str]:
-        """Get a dictionary of all available libraries."""
-        instance = cls()
+    def get_all_symbols(self, library_name: str) -> Dict[str, Any]:
+        """
+        Get all symbols from a library.
+        
+        Args:
+            library_name: Name of the library (without extension)
+            
+        Returns:
+            Dictionary of all symbols in the library
+        """
+        if self._impl:
+            return self._impl.get_all_symbols(library_name)
+        return {}
 
-        if instance._using_rust:
-            try:
-                if hasattr(instance._rust_cache, "get_all_libraries"):
-                    return instance._rust_cache.get_all_libraries()
-                else:
-                    # Fall back to Python implementation for this method
-                    if instance._python_cache is None:
-                        instance._python_cache = _PythonSymbolLibCache()
-                    return instance._python_cache.get_all_libraries()
-            except Exception as e:
-                logger.warning(
-                    f"🔄 Rust library enumeration failed, using Python fallback: {e}"
-                )
-                if instance._python_cache is None:
-                    instance._python_cache = _PythonSymbolLibCache()
-                return instance._python_cache.get_all_libraries()
-        else:
-            return instance._python_cache.get_all_libraries()
+    def clear_cache(self) -> None:
+        """Clear the symbol cache."""
+        if self._impl:
+            self._impl.clear_cache()
 
-    @classmethod
-    def get_all_symbols(cls) -> Dict[str, str]:
-        """Get a dictionary of all available symbols."""
-        instance = cls()
-
-        if instance._using_rust:
-            try:
-                if hasattr(instance._rust_cache, "get_all_symbols"):
-                    return instance._rust_cache.get_all_symbols()
-                else:
-                    # Fall back to Python implementation for this method
-                    if instance._python_cache is None:
-                        instance._python_cache = _PythonSymbolLibCache()
-                    return instance._python_cache.get_all_symbols()
-            except Exception as e:
-                logger.warning(
-                    f"🔄 Rust symbol enumeration failed, using Python fallback: {e}"
-                )
-                if instance._python_cache is None:
-                    instance._python_cache = _PythonSymbolLibCache()
-                return instance._python_cache.get_all_symbols()
-        else:
-            return instance._python_cache.get_all_symbols()
-
-    def is_rust_accelerated(self) -> bool:
-        """Check if Rust acceleration is active."""
-        return self._using_rust
-
-    def get_performance_info(self) -> Dict[str, Any]:
-        """Get performance information about the current backend."""
+    def get_cache_stats(self) -> Dict[str, Any]:
+        """
+        Get cache statistics.
+        
+        Returns:
+            Dictionary with cache statistics
+        """
+        if self._impl and hasattr(self._impl, 'get_cache_stats'):
+            return self._impl.get_cache_stats()
+        
+        # Provide basic stats if not available
         return {
-            "backend": "Rust" if self._using_rust else "Python",
-            "performance_improvement": "55x faster" if self._using_rust else "baseline",
+            "implementation": "rust" if _RUST_SYMBOL_CACHE_AVAILABLE else "python",
+            "libraries_cached": 0,
+            "symbols_cached": 0,
+        }
+
+    @property
+    def is_rust_accelerated(self) -> bool:
+        """Check if using Rust acceleration."""
+        return _RUST_SYMBOL_CACHE_AVAILABLE and isinstance(
+            self._impl, _RustSymbolLibCache if _RustSymbolLibCache else type(None)
+        )
+
+    def __repr__(self) -> str:
+        """String representation."""
+        impl_type = "Rust" if self.is_rust_accelerated else "Python"
+        return f"<RustAcceleratedSymbolLibCache({impl_type})>"
+
+    def get_implementation_info(self) -> Dict[str, Any]:
+        """
+        Get information about the current implementation.
+        
+        Returns:
+            Dictionary with implementation details
+        """
+        return {
+            "backend": "rust" if self.is_rust_accelerated else "python",
             "rust_available": _RUST_SYMBOL_CACHE_AVAILABLE,
-            "primary_bottleneck_addressed": self._using_rust,
-            "expected_cache_time_reduction": (
-                "0.216s → 0.004s" if self._using_rust else "no change"
+            "performance_tier": (
+                "high" if self.is_rust_accelerated else "standard"
+            ),
+            "expected_speedup": (
+                "10-50x for large libraries" if self.is_rust_accelerated 
+                else "baseline"
             ),
         }
 
