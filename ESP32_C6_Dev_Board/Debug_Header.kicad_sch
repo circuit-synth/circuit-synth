@@ -1,0 +1,131 @@
+(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(symbol
+		(lib_id "Connector_Generic:Conn_02x03_Odd_Even")
+		(at 58.42 45.72 0.0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid ba22e3dc-6df1-4d98-9f39-0431a4c1bb41)
+		(property
+			"Reference"
+			"J2"
+			(at 58.42 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"Connector_IDC:IDC-Header_2x03_P2.54mm_Vertical"
+			(at 58.42 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/a9266cd0-d7ea-468a-8c6a-d93e98021226/dd7e888c-021f-4666-8b90-6f6fe8cdfa64/85189aff-a6b8-44d9-b5e1-cbcc5b1ea836"
+					(reference "J2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		"DEBUG_EN"
+		(shape
+			input
+		)
+		(at 53.34 43.18 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 0e0f5041-85cc-4cf2-a542-c0b7c407545b)
+	)
+	(hierarchical_label
+		"DEBUG_TX"
+		(shape
+			input
+		)
+		(at 53.34 45.72 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid ca3edd28-addc-47a4-94ed-19aee88707f2)
+	)
+	(hierarchical_label
+		"DEBUG_RX"
+		(shape
+			input
+		)
+		(at 53.34 48.26 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 6aa1cde0-7938-454f-ac6a-5c4f980feef7)
+	)
+	(hierarchical_label
+		"VCC_3V3"
+		(shape
+			input
+		)
+		(at 66.04 43.18 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid c5d5cc7a-8b90-410c-96e4-8ad3d13148e6)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 66.04 45.72 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 603aef40-22cb-4ae5-927a-2eb598c5f643)
+	)
+	(hierarchical_label
+		"DEBUG_IO0"
+		(shape
+			input
+		)
+		(at 66.04 48.26 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 9684f077-eafc-4a69-b244-803debaa587e)
+	)
+)

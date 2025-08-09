@@ -1,0 +1,250 @@
+(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(symbol
+		(lib_id "Device:R")
+		(at 40.64 86.36)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 4e73601c-acfd-43c9-8ee1-90c15a893ccc)
+		(property
+			"Reference"
+			"R1"
+			(at 40.64 81.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Value"
+			"10k"
+			(at 40.64 91.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"Resistor_SMD:R_0603_1608Metric"
+			(at 40.64 96.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				""
+				(path
+					"/b98a22ae-0f3d-44d4-b18f-54bd8106ae0c"
+					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 38.1 45.72)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid a9e318d7-e6ef-4add-909b-05927c3e771a)
+		(property
+			"Reference"
+			"R2"
+			(at 38.1 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Value"
+			"22k"
+			(at 38.1 50.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"Resistor_SMD:R_0603_1608Metric"
+			(at 38.1 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				""
+				(path
+					"/b98a22ae-0f3d-44d4-b18f-54bd8106ae0c"
+					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 60.96 68.58)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid cd68c08a-88f2-4665-a838-6614b153b058)
+		(property
+			"Reference"
+			"C1"
+			(at 60.96 63.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Value"
+			"100nF"
+			(at 60.96 73.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"Capacitor_SMD:C_0603_1608Metric"
+			(at 60.96 78.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				""
+				(path
+					"/b98a22ae-0f3d-44d4-b18f-54bd8106ae0c"
+					(reference "C1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		"VCC"
+		(shape
+			input
+		)
+		(at 40.64 82.55 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 62789312-3a5d-4971-a07f-3835fc78464d)
+	)
+	(hierarchical_label
+		"N$1"
+		(shape
+			input
+		)
+		(at 40.64 90.17 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 544fb621-ed83-4a44-bc7e-a2c7a3e4633e)
+	)
+	(hierarchical_label
+		"N$1"
+		(shape
+			input
+		)
+		(at 38.1 41.91 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid bdd8e899-b5a9-4bde-b40b-1031b3764e76)
+	)
+	(hierarchical_label
+		"N$2"
+		(shape
+			input
+		)
+		(at 38.1 49.53 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid d3952b6c-1e8c-4211-b434-e22ee3481735)
+	)
+	(hierarchical_label
+		"N$2"
+		(shape
+			input
+		)
+		(at 60.96 64.77 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 181ad82e-2521-47ca-96eb-8f8a7e03b196)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 60.96 72.39 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 69922f45-8559-4db4-96c7-50122456dd64)
+	)
+)

@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid e16fe701-4c98-4501-a7b5-a2b0a1d7d8ab)
+	(uuid 06c4e9ac-280a-45e8-bc71-fda632350484)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Connector:USB_C_Plug_USB2.0"
@@ -14,25 +14,23 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "P"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Value" "USB_C_Plug_USB2.0"
-				(at 0.0 0.0 0)
+				(at 0 -2.54 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide no)
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at 0 -5.08 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -41,7 +39,7 @@
 				)
 			)
 			(property "Datasheet" "https://www.usb.org/sites/default/files/documents/usb_type-c.zip"
-				(at 0.0 0.0 0)
+				(at 0 -7.62 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -50,7 +48,7 @@
 				)
 			)
 			(property "Description" "USB 2.0-only Type-C Plug connector"
-				(at 0.0 0.0 0)
+				(at 0 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -59,16 +57,7 @@
 				)
 			)
 			(property "ki_keywords" "usb universal serial bus type-C USB2.0"
-				(at 0.0 0.0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "USB*C*Plug*"
-				(at 0.0 0.0 0)
+				(at 0 -12.7 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -186,6 +175,9 @@
 						(width 0.254)
 						(type default)
 					)
+					(fill
+						(type none)
+					)
 				)
 				(arc
 					(start -7.62 3.81)
@@ -194,6 +186,9 @@
 					(stroke
 						(width 0.254)
 						(type default)
+					)
+					(fill
+						(type outline)
 					)
 				)
 				(arc
@@ -204,6 +199,9 @@
 						(width 0.508)
 						(type default)
 					)
+					(fill
+						(type none)
+					)
 				)
 				(arc
 					(start -5.08 -3.81)
@@ -213,14 +211,8 @@
 						(width 0.508)
 						(type default)
 					)
-				)
-				(arc
-					(start -6.35 -3.81)
-					(mid -6.985 -4.4423)
-					(end -7.62 -3.81)
-					(stroke
-						(width 0.254)
-						(type default)
+					(fill
+						(type none)
 					)
 				)
 				(arc
@@ -230,6 +222,21 @@
 					(stroke
 						(width 0.254)
 						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -6.35 -3.81)
+					(mid -6.985 -4.4423)
+					(end -7.62 -3.81)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type outline)
 					)
 				)
 				(polyline
@@ -339,7 +346,7 @@
 				(pin
 					passive
 					line
-					(at -7.62 -22.86 90)
+					(at -7.62 -22.86 90.0)
 					(length 5.08)
 					(name
 						SHIELD
@@ -361,7 +368,7 @@
 				(pin
 					passive
 					line
-					(at 0.0 -22.86 90)
+					(at 0.0 -22.86 90.0)
 					(length 5.08)
 					(name
 						GND
@@ -383,7 +390,8 @@
 				(pin
 					passive
 					line
-					(at 0.0 -22.86 90)
+					(hide yes)
+					(at 0.0 -22.86 90.0)
 					(length 5.08)
 					(name
 						GND
@@ -405,7 +413,8 @@
 				(pin
 					passive
 					line
-					(at 0.0 -22.86 90)
+					(hide yes)
+					(at 0.0 -22.86 90.0)
 					(length 5.08)
 					(name
 						GND
@@ -427,7 +436,8 @@
 				(pin
 					passive
 					line
-					(at 0.0 -22.86 90)
+					(hide yes)
+					(at 0.0 -22.86 90.0)
 					(length 5.08)
 					(name
 						GND
@@ -449,7 +459,7 @@
 				(pin
 					passive
 					line
-					(at 15.24 15.24 180)
+					(at 15.24 15.24 180.0)
 					(length 5.08)
 					(name
 						VBUS
@@ -471,7 +481,8 @@
 				(pin
 					passive
 					line
-					(at 15.24 15.24 180)
+					(hide yes)
+					(at 15.24 15.24 180.0)
 					(length 5.08)
 					(name
 						VBUS
@@ -493,7 +504,8 @@
 				(pin
 					passive
 					line
-					(at 15.24 15.24 180)
+					(hide yes)
+					(at 15.24 15.24 180.0)
 					(length 5.08)
 					(name
 						VBUS
@@ -515,7 +527,8 @@
 				(pin
 					passive
 					line
-					(at 15.24 15.24 180)
+					(hide yes)
+					(at 15.24 15.24 180.0)
 					(length 5.08)
 					(name
 						VBUS
@@ -535,9 +548,9 @@
 					)
 				)
 				(pin
-					bidirectional
+					passive
 					line
-					(at 15.24 10.16 180)
+					(at 15.24 10.16 180.0)
 					(length 5.08)
 					(name
 						CC
@@ -557,9 +570,9 @@
 					)
 				)
 				(pin
-					bidirectional
+					passive
 					line
-					(at 15.24 7.62 180)
+					(at 15.24 7.62 180.0)
 					(length 5.08)
 					(name
 						VCONN
@@ -579,9 +592,9 @@
 					)
 				)
 				(pin
-					bidirectional
+					passive
 					line
-					(at 15.24 2.54 180)
+					(at 15.24 2.54 180.0)
 					(length 5.08)
 					(name
 						D-
@@ -601,9 +614,9 @@
 					)
 				)
 				(pin
-					bidirectional
+					passive
 					line
-					(at 15.24 -2.54 180)
+					(at 15.24 -2.54 180.0)
 					(length 5.08)
 					(name
 						D+
@@ -623,6 +636,7 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 	)
 	(title_block
@@ -639,7 +653,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 2b5731d2-0177-4e4f-a967-3c95286bd62d)
+		(uuid d7082ac7-e2c7-4bae-869c-3cdc104adf85)
 		(property "Reference" "P1"
 			(at 58.42 61.040000000000006 0)
 			(effects
@@ -659,8 +673,8 @@
 			)
 		)
 		(instances
-			(project "reference_generated"
-				(path "/e54f82e6-12e8-4c3f-acea-b4b89cde6221/371757ae-7c19-4fd8-b5b8-0cdb4581d496"
+			(project "a5811dcc-4bd3-46a6-b247-f8f8ae0667ae"
+				(path "/a5811dcc-4bd3-46a6-b247-f8f8ae0667ae/ab156568-911d-4c92-962e-68ce032c2d20"
 					(reference "P1")
 					(unit 1)
 				)
@@ -677,7 +691,7 @@
 			)
 			(justify right)
 		)
-		(uuid d329fe72-b30d-4720-bd09-a386518397b2)
+		(uuid a2206b98-94d8-4ea4-b5f7-f09ee9e29039)
 	)
 	(hierarchical_label
 		GND
@@ -689,7 +703,7 @@
 			)
 			(justify right)
 		)
-		(uuid e5f6ba33-c73a-4b93-9f8b-781ebb15dedc)
+		(uuid 8efe12fc-ec02-4c90-a437-5d6e7cf2d43e)
 	)
 	(hierarchical_label
 		GND
@@ -701,7 +715,7 @@
 			)
 			(justify right)
 		)
-		(uuid 2d6889a6-2622-469f-94f3-72257bb84b9f)
+		(uuid 7feffee1-6fd7-4f0d-bcb6-93e7aff8fa02)
 	)
 	(hierarchical_label
 		GND
@@ -713,7 +727,7 @@
 			)
 			(justify right)
 		)
-		(uuid 55250c4d-b532-40d1-a840-de1af911238c)
+		(uuid a867d006-40f2-4eb3-a4fe-6edc28e9edce)
 	)
 	(hierarchical_label
 		GND
@@ -725,110 +739,10 @@
 			)
 			(justify right)
 		)
-		(uuid 34b7b2d2-89ed-4f30-80a3-836d80620d13)
-	)
-	(hierarchical_label
-		GND
-		(shape input)
-		(at 120.49000000000001 59.69 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid 5fbbd726-0907-4175-a15d-d7657edda3c3)
-	)
-	(sheet
-		(at 81.28 57.15)
-		(size 39.21 20.32)
-		(stroke
-			(width 0.12)
-			(type solid)
-		)
-		(fill
-			(color
-				0
-				0
-				0
-				0.0
-			)
-		)
-		(uuid 522d50fa-4d60-4aa7-8e1c-a609a8efd582)
-		(property "Sheetname" "child2"
-			(at 81.28 55.879999999999995 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Sheetfile" "child2.kicad_sch"
-			(at 81.28 78.74 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-				(hide yes)
-			)
-		)
-		(pin
-			GND
-			passive
-			(at 119.22000000000001 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-			(uuid dbb70756-dfd1-4623-a408-1453f8cc2e29)
-		)
-		(instances
-			(project "reference_generated"
-				(path "/"
-					(page "1")
-				)
-			)
-		)
-	)
-	(text_box
-		"child1 subcircuit\n    Parameters: GND"
-		(exclude_from_sim yes)
-		(at 184.0 110.0 0)
-		(size 80.0 30.0)
-		(margins
-			1.0
-			1.0
-			1.0
-			1.0
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill
-			(type color)
-			(color
-				255
-				255
-				224
-				1
-			)
-		)
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.254)
-			)
-			(justify left top)
-		)
-		(uuid 4d7875a3-462d-4ace-8393-995d8f6ca4c9)
+		(uuid aec344e6-8d14-4b57-8abb-e39be928a3b1)
 	)
 	(sheet_instances
-		(path "/e54f82e6-12e8-4c3f-acea-b4b89cde6221/371757ae-7c19-4fd8-b5b8-0cdb4581d496"
+		(path "/"
 			(page "1")
 		)
 	)

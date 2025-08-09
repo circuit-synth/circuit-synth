@@ -1,0 +1,171 @@
+(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(symbol
+		(lib_id "Device:LED")
+		(at 45.72 45.72 0.0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 7057a958-2b1e-4700-b7d3-46b9a725334c)
+		(property
+			"Reference"
+			"D3"
+			(at 45.72 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"LED_SMD:LED_0805_2012Metric"
+			(at 45.72 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/a9266cd0-d7ea-468a-8c6a-d93e98021226/dd7e888c-021f-4666-8b90-6f6fe8cdfa64/ec244a1e-5a81-4e6e-a5f7-1e647e499a44"
+					(reference "D3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 68.58 45.72 0.0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 3a371537-ede4-4f8c-8f88-d63a92bedef8)
+		(property
+			"Reference"
+			"R3"
+			(at 68.58 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Value"
+			"330"
+			(at 68.58 50.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"Resistor_SMD:R_0805_2012Metric"
+			(at 68.58 55.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/a9266cd0-d7ea-468a-8c6a-d93e98021226/dd7e888c-021f-4666-8b90-6f6fe8cdfa64/ec244a1e-5a81-4e6e-a5f7-1e647e499a44"
+					(reference "R3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		"LED_CONTROL"
+		(shape
+			input
+		)
+		(at 41.91 45.72 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid eabc967f-c001-4690-9bf8-446397c65aba)
+	)
+	(hierarchical_label
+		"LED_CONTROL"
+		(shape
+			input
+		)
+		(at 41.91 45.72 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 4bc886fa-9e85-4468-837d-2bc40b31f88e)
+	)
+	(hierarchical_label
+		"N$3"
+		(shape
+			input
+		)
+		(at 49.53 45.72 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid d3396cf7-caad-43e5-94a0-b0dc0f5c8c44)
+	)
+	(hierarchical_label
+		"N$3"
+		(shape
+			input
+		)
+		(at 68.58 49.53 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid c0dafb02-a446-4e12-b2ed-943138265c5c)
+	)
+	(hierarchical_label
+		"VCC_3V3"
+		(shape
+			input
+		)
+		(at 68.58 41.91 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 41b7b3c6-5ae2-4b95-a943-6f567c7c63ae)
+	)
+)

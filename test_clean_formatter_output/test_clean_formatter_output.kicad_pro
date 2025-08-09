@@ -4,9 +4,7 @@
       "defaults": {}
     }
   },
-  "boards": [
-    "reference_generated.kicad_pcb"
-  ],
+  "boards": [],
   "cvpcb": {},
   "erc": {},
   "libraries": {
@@ -14,7 +12,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "reference_generated.kicad_pro",
+    "filename": "test_clean_formatter_output.kicad_pro",
     "version": 1
   },
   "net_settings": {},
@@ -59,12 +57,8 @@
   },
   "sheets": [
     [
-      "a5811dcc-4bd3-46a6-b247-f8f8ae0667ae",
+      "b98a22ae-0f3d-44d4-b18f-54bd8106ae0c",
       ""
-    ],
-    [
-      "06c4e9ac-280a-45e8-bc71-fda632350484",
-      "child1"
     ]
   ],
   "text_variables": {}

@@ -1,0 +1,1147 @@
+(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(symbol
+		(lib_id "RF_Module:ESP32-C6-MINI-1")
+		(at 58.42 76.2 0.0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid d3853dd9-05b9-4fd5-9d7b-f9e70ad66b05)
+		(property
+			"Reference"
+			"U2"
+			(at 58.42 71.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"RF_Module:ESP32-C6-MINI-1"
+			(at 58.42 86.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/a9266cd0-d7ea-468a-8c6a-d93e98021226/dd7e888c-021f-4666-8b90-6f6fe8cdfa64"
+					(reference "U2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 91.44 76.2 0.0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid ba4a9b8c-6f11-48c9-8329-4126bc8ea09a)
+		(property
+			"Reference"
+			"C4"
+			(at 91.44 71.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Value"
+			"100nF"
+			(at 91.44 81.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"Capacitor_SMD:C_0603_1608Metric"
+			(at 91.44 86.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/a9266cd0-d7ea-468a-8c6a-d93e98021226/dd7e888c-021f-4666-8b90-6f6fe8cdfa64"
+					(reference "C4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 111.76 76.2 0.0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid f528d563-646f-401a-bd83-446eb52083c7)
+		(property
+			"Reference"
+			"R4"
+			(at 111.76 71.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Value"
+			"22"
+			(at 111.76 81.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"Resistor_SMD:R_0603_1608Metric"
+			(at 111.76 86.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/a9266cd0-d7ea-468a-8c6a-d93e98021226/dd7e888c-021f-4666-8b90-6f6fe8cdfa64"
+					(reference "R4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 132.08 76.2 0.0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 2db4125a-3040-4f39-a016-4c96589d94ad)
+		(property
+			"Reference"
+			"R5"
+			(at 132.08 71.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Value"
+			"22"
+			(at 132.08 81.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Footprint"
+			"Resistor_SMD:R_0603_1608Metric"
+			(at 132.08 86.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/a9266cd0-d7ea-468a-8c6a-d93e98021226/dd7e888c-021f-4666-8b90-6f6fe8cdfa64"
+					(reference "R5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		"DEBUG_EN"
+		(shape
+			input
+		)
+		(at 43.18 55.88 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 0e6ca71e-84bb-4208-8152-523cb3162c2b)
+	)
+	(hierarchical_label
+		"DEBUG_EN"
+		(shape
+			input
+		)
+		(at 43.18 55.88 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid b9949609-35d3-43af-a5bc-4f42141674f4)
+	)
+	(hierarchical_label
+		"DEBUG_IO0"
+		(shape
+			input
+		)
+		(at 43.18 60.96 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid b617c08c-e029-4d1b-bea7-1353cd05dd66)
+	)
+	(hierarchical_label
+		"DEBUG_IO0"
+		(shape
+			input
+		)
+		(at 43.18 60.96 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 90004116-8122-4c2c-b6c7-63dc0e5df65f)
+	)
+	(hierarchical_label
+		"LED_CONTROL"
+		(shape
+			input
+		)
+		(at 43.18 81.28 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid baa84a9b-af1e-4c21-9397-8c074344eeee)
+	)
+	(hierarchical_label
+		"LED_CONTROL"
+		(shape
+			input
+		)
+		(at 43.18 81.28 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 03c0026f-75a2-4522-a535-101b82480b76)
+	)
+	(hierarchical_label
+		"VCC_3V3"
+		(shape
+			input
+		)
+		(at 58.42 50.800000000000004 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 2e18f615-bb33-4c2a-8196-f5d238df59fa)
+	)
+	(hierarchical_label
+		"VCC_3V3"
+		(shape
+			input
+		)
+		(at 58.42 50.800000000000004 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 8afea93c-47f1-4fe0-98b2-626c2e2d23d9)
+	)
+	(hierarchical_label
+		"VCC_3V3"
+		(shape
+			input
+		)
+		(at 91.44 72.39 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 77f849cb-c386-47ba-82e8-4cbe04623a40)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 47e350c6-4a43-4b0b-a381-5a2f89833c11)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 0039ab65-04c6-4f33-9b38-6ecfc44aad55)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 88e824cb-548e-4d15-a01b-053d7ee3808e)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid b020b305-f5b4-4898-9d8e-51faeb4b9796)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 1d4f89ad-ee0d-4949-a75b-042a3e8562d6)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 4acda46e-4c99-450d-9d4f-a0cc27ba0c47)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 711ccdc0-ab86-4f83-8722-be62384d9876)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 1a24fe7f-e312-4a3b-88e9-b9de7172cce4)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 8eea0e61-5c84-475d-8433-689bbfb01a82)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid e9bce91d-6cfc-487f-becf-4da454535bc1)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid dc88533e-633e-4f48-a058-2edbc7ae5b03)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid fe80405c-b80c-44a7-8540-a762fa07eda7)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid d689b70e-b09d-4c71-a5b9-74bb180e96fe)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid c0db63d8-4491-447f-b756-07c867760a7a)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 7ffcb561-0281-416e-bbab-55ee5a06c137)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 753f43d5-9be7-4e50-bf39-588c61fc6eed)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid e392b2e3-515b-44db-8885-5728b63a2f26)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid bd6449fd-df68-4a5c-b2b4-7ce4e18ae2ba)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid fc006d00-097b-4e79-8637-2903e5b562a6)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 583fd369-9195-468b-8bf8-185525d3d6fc)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 2de648db-5735-4e53-906d-4636d720805d)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 101.6 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 6f61cf69-fa9a-4be2-9c42-79207679b21e)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 91.44 80.01 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 63d113cf-cf64-4697-add5-d8922ba3f030)
+	)
+	(hierarchical_label
+		"DEBUG_TX"
+		(shape
+			input
+		)
+		(at 73.66 55.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 8601942c-6555-4609-b697-edc4a4571b9c)
+	)
+	(hierarchical_label
+		"DEBUG_TX"
+		(shape
+			input
+		)
+		(at 73.66 55.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 4e58b334-1e8d-49fb-a08e-85bec711a2d3)
+	)
+	(hierarchical_label
+		"DEBUG_RX"
+		(shape
+			input
+		)
+		(at 73.66 58.42 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 8e7df335-2ada-42a6-81b9-f44b654da271)
+	)
+	(hierarchical_label
+		"DEBUG_RX"
+		(shape
+			input
+		)
+		(at 73.66 58.42 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 61b43244-0747-47a3-aa45-53f5d8b538f3)
+	)
+	(hierarchical_label
+		"USB_DP_MCU"
+		(shape
+			input
+		)
+		(at 73.66 76.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 18ff824d-4179-4a11-82cc-42f689ddc67b)
+	)
+	(hierarchical_label
+		"USB_DP_MCU"
+		(shape
+			input
+		)
+		(at 73.66 76.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid eed6b9c2-6887-42bd-87be-1ec73feb1d16)
+	)
+	(hierarchical_label
+		"USB_DP_MCU"
+		(shape
+			input
+		)
+		(at 111.76 80.01 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid c6e61226-3c5f-4b77-9bc1-c399d00093d1)
+	)
+	(hierarchical_label
+		"USB_DM_MCU"
+		(shape
+			input
+		)
+		(at 73.66 78.74000000000001 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid c81879d8-03fb-4e82-8fe0-cf26c42c5429)
+	)
+	(hierarchical_label
+		"USB_DM_MCU"
+		(shape
+			input
+		)
+		(at 73.66 78.74000000000001 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 3bfbff59-739c-4c33-8ba6-68e3dbc7d317)
+	)
+	(hierarchical_label
+		"USB_DM_MCU"
+		(shape
+			input
+		)
+		(at 132.08 80.01 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 6bdeffb8-89a4-4366-a825-2cafca32f218)
+	)
+	(hierarchical_label
+		"USB_DP"
+		(shape
+			input
+		)
+		(at 111.76 72.39 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid cc8d18b1-46b9-48f4-b931-a543d0ef8081)
+	)
+	(hierarchical_label
+		"USB_DM"
+		(shape
+			input
+		)
+		(at 132.08 72.39 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 74e82741-24d0-4bc5-80a2-b45ad45817d8)
+	)
+	(hierarchical_label
+		"DEBUG_EN"
+		(shape
+			input
+		)
+		(at 81.12 153.67000000000002 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 16b2ee4a-34a8-4e88-ada6-4b0fda8076c8)
+	)
+	(hierarchical_label
+		"DEBUG_IO0"
+		(shape
+			input
+		)
+		(at 81.12 156.21 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 6060070a-0a03-4c7b-be3a-c8dd2dbb8cb0)
+	)
+	(hierarchical_label
+		"DEBUG_RX"
+		(shape
+			input
+		)
+		(at 81.12 158.75 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 52961fd2-9f7a-42ba-99c2-0cee55c3d902)
+	)
+	(hierarchical_label
+		"DEBUG_TX"
+		(shape
+			input
+		)
+		(at 81.12 161.29 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 0b1ff8aa-fb8c-4dcb-886c-e501437839c8)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 81.12 163.83 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 29e15334-8dd6-4a2f-b7ae-43da58738810)
+	)
+	(hierarchical_label
+		"VCC_3V3"
+		(shape
+			input
+		)
+		(at 81.12 166.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid fc51f758-c5bc-4174-a7ad-8f491db63083)
+	)
+	(hierarchical_label
+		"LED_CONTROL"
+		(shape
+			input
+		)
+		(at 143.35 156.21 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid ab97caa5-f5f0-49a7-8fd0-e1e6b5aa3f20)
+	)
+	(hierarchical_label
+		"N$3"
+		(shape
+			input
+		)
+		(at 143.35 158.75 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 7a4be8bb-e94d-4eec-b008-0ca55b21579e)
+	)
+	(hierarchical_label
+		"VCC_3V3"
+		(shape
+			input
+		)
+		(at 143.35 161.29 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 3dec57bc-06d8-4347-a994-6d5fd3d1b0bd)
+	)
+	(sheet
+		(at 34.29 151.13)
+		(size 46.83 25.4)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0)
+		)
+		(uuid 85189aff-a6b8-44d9-b5e1-cbcc5b1ea836)
+		(property
+			"Sheetname"
+			"Debug_Header"
+			(at 34.29 149.85999999999999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"Debug_Header.kicad_sch"
+			(at 34.29 177.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			DEBUG_EN
+			passive
+			(at 79.85000000000001 153.67000000000002 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 8a463a25-b282-4290-8a09-5ddb18a67a37)
+		)
+		(pin
+			DEBUG_IO0
+			passive
+			(at 79.85000000000001 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 1c18614b-4690-438d-ba15-a13e3c696dc6)
+		)
+		(pin
+			DEBUG_RX
+			passive
+			(at 79.85000000000001 158.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid d03d8780-158d-4a51-88e7-64dd7070cafe)
+		)
+		(pin
+			DEBUG_TX
+			passive
+			(at 79.85000000000001 161.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 34d46b5b-16f8-48dc-9868-ce00d9da0c22)
+		)
+		(pin
+			GND
+			passive
+			(at 79.85000000000001 163.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid ee8ca6e0-4fab-4722-aed6-8e5fd2742641)
+		)
+		(pin
+			VCC_3V3
+			passive
+			(at 79.85000000000001 166.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 9f9342e0-3af0-4db4-9b6d-a241c7c74c5d)
+		)
+		(instances
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 93.98 153.67000000000002)
+		(size 49.37 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0)
+		)
+		(uuid ec244a1e-5a81-4e6e-a5f7-1e647e499a44)
+		(property
+			"Sheetname"
+			"LED_Blinker"
+			(at 93.98 152.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property
+			"Sheetfile"
+			"LED_Blinker.kicad_sch"
+			(at 93.98 175.26000000000002 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			LED_CONTROL
+			passive
+			(at 142.07999999999998 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid a90c0608-49cd-459a-9d0b-0f1d04195c4f)
+		)
+		(pin
+			N$3
+			passive
+			(at 142.07999999999998 158.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 158f4bb1-bfa4-4d1e-9e1d-f80a4db40361)
+		)
+		(pin
+			VCC_3V3
+			passive
+			(at 142.07999999999998 161.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 011a50d4-5ce8-427c-bf5a-6fdea09beebd)
+		)
+		(instances
+			(project
+				"ESP32_C6_Dev_Board"
+				(path
+					"/"
+					(page "1")
+				)
+			)
+		)
+	)
+)
