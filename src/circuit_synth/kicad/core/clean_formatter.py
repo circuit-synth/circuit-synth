@@ -50,11 +50,11 @@ class FormattingRules:
         self.rules["uuid"] = FormatRule(inline=True)
         self.rules["paper"] = FormatRule(inline=True, quote_indices={1})
 
-        # Properties - special handling
+        # Properties - special KiCad format: (property "Name" "Value" ...)
         self.rules["property"] = FormatRule(
             inline=False,
             quote_indices={1, 2},  # Quote property name and value
-            custom_handler=self._format_property,
+            custom_handler=self._format_property_kicad,
         )
 
         # Position and geometry - inline
@@ -144,11 +144,16 @@ class FormattingRules:
         """
         return self.rules.get(tag, FormatRule())
 
-    def _format_property(self, sexp: List, indent: int, formatter) -> str:
-        """Custom handler for property formatting.
+    def _format_property_kicad(self, sexp: List, indent: int, formatter) -> str:
+        """Custom handler for KiCad property formatting.
 
-        Properties have special structure:
-        (property "Name" "Value" (at x y angle) (effects ...))
+        KiCad properties have this specific format:
+        (property "Name" "Value"
+            (at x y angle)
+            (effects ...)
+        )
+        
+        Name and Value go on the same line as 'property'.
         """
         if len(sexp) < 3:
             return formatter._format_default(sexp, indent)
@@ -156,20 +161,10 @@ class FormattingRules:
         lines = []
         indent_str = formatter._get_indent(indent)
 
-        # Start with property tag and name
-        lines.append(f"{indent_str}(property")
+        # Start with property tag, name, and value on same line (KiCad format)
+        lines.append(f'{indent_str}(property "{sexp[1]}" "{sexp[2]}"')
 
-        # Property name (always quoted)
-        lines.append(
-            f"{formatter._get_indent(indent + 1)}\"{sexp[1]}\""
-        )
-
-        # Property value (always quoted)
-        lines.append(
-            f"{formatter._get_indent(indent + 1)}\"{sexp[2]}\""
-        )
-
-        # Format remaining elements (at, effects, etc.)
+        # Format remaining elements (at, effects, etc.) on subsequent lines
         for elem in sexp[3:]:
             if isinstance(elem, list):
                 lines.append(formatter.format(elem, indent + 1))

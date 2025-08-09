@@ -15,9 +15,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property
-				"Reference"
-				"P"
+			(property "Reference" "P"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -26,9 +24,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Value"
-				"USB_C_Plug_USB2.0"
+			(property "Value" "USB_C_Plug_USB2.0"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -37,9 +33,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Footprint"
-				""
+			(property "Footprint" ""
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -48,9 +42,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Datasheet"
-				"https://www.usb.org/sites/default/files/documents/usb_type-c.zip"
+			(property "Datasheet" "https://www.usb.org/sites/default/files/documents/usb_type-c.zip"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -59,9 +51,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Description"
-				"USB 2.0-only Type-C Plug connector"
+			(property "Description" "USB 2.0-only Type-C Plug connector"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -70,9 +60,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_keywords"
-				"usb universal serial bus type-C USB2.0"
+			(property "ki_keywords" "usb universal serial bus type-C USB2.0"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -81,9 +69,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_fp_filters"
-				"USB*C*Plug*"
+			(property "ki_fp_filters" "USB*C*Plug*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -650,10 +636,8 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 9314b0cd-e365-4715-887c-a4b6c48d27f9)
-		(property
-			"Reference"
-			"P1"
+		(uuid 22ba4acc-ab39-4dd4-bab0-94170b453ead)
+		(property "Reference" "P1"
 			(at 58.42 61.040000000000006 0)
 			(effects
 				(font
@@ -662,9 +646,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Value"
-			"USB_C_Plug_USB2.0"
+		(property "Value" "USB_C_Plug_USB2.0"
 			(at 58.42 71.04 0)
 			(effects
 				(font
@@ -677,7 +659,7 @@
 			(project
 				"reference_generated"
 				(path
-					"/a76c6303-a165-42de-9243-f441b61d8d4d/14e1dd35-aa35-4f6b-aedd-5a75e81b602e"
+					"/8bb09509-90e1-4d19-bcbe-444481f99078/37ee9299-7423-4550-a2f9-9b324025340a"
 					(reference "P1")
 					(unit 1)
 				)
@@ -696,7 +678,7 @@
 			)
 			(justify right)
 		)
-		(uuid e8f7ecec-84c8-4503-884a-d387be1883d5)
+		(uuid 4b7a8a69-f0cc-402f-9517-f2353ae9f9eb)
 	)
 	(hierarchical_label
 		"GND"
@@ -710,7 +692,7 @@
 			)
 			(justify right)
 		)
-		(uuid 5455f39d-6d8a-4776-bb2d-87bd8cdf258e)
+		(uuid 57f87dfa-09ab-481e-a4a8-bfe7e6d94d26)
 	)
 	(hierarchical_label
 		"GND"
@@ -724,7 +706,7 @@
 			)
 			(justify right)
 		)
-		(uuid eba74cbe-2d38-488a-b3e6-8d3b3b1a572b)
+		(uuid 90bd07d2-38d2-424f-b0e4-c6d5f0181832)
 	)
 	(hierarchical_label
 		"GND"
@@ -738,7 +720,7 @@
 			)
 			(justify right)
 		)
-		(uuid 3d7921ee-1e69-4ec3-83f8-be77322dcd9b)
+		(uuid a06999ce-5635-4e8d-9ad8-cd13cc1ffa53)
 	)
 	(hierarchical_label
 		"GND"
@@ -752,8 +734,12 @@
 			)
 			(justify right)
 		)
-		(uuid 4a6d3184-900f-4b4c-84c7-c4850eb1e801)
+		(uuid 3908726c-41a7-461f-8b91-7112e331773d)
 	)
 	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
 	)
 )

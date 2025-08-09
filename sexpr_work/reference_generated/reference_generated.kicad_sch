@@ -15,9 +15,7 @@
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property
-				"Reference"
-				"R"
+			(property "Reference" "R"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -26,9 +24,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Value"
-				"R"
+			(property "Value" "R"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -37,9 +33,7 @@
 					(hide no)
 				)
 			)
-			(property
-				"Footprint"
-				""
+			(property "Footprint" ""
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -48,9 +42,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Datasheet"
-				"~"
+			(property "Datasheet" "~"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -59,9 +51,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"Description"
-				"Resistor"
+			(property "Description" "Resistor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -70,9 +60,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_keywords"
-				"R res resistor"
+			(property "ki_keywords" "R res resistor"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -81,9 +69,7 @@
 					(hide yes)
 				)
 			)
-			(property
-				"ki_fp_filters"
-				"R_*"
+			(property "ki_fp_filters" "R_*"
 				(at 0.0 0.0 0)
 				(effects
 					(font
@@ -162,10 +148,8 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 860d6100-5c66-45a5-8234-b7bdfa33d834)
-		(property
-			"Reference"
-			"R1"
+		(uuid ff9a36e4-d1d3-4b23-952a-d85af582f547)
+		(property "Reference" "R1"
 			(at 38.1 40.72 0)
 			(effects
 				(font
@@ -174,9 +158,7 @@
 				(justify left)
 			)
 		)
-		(property
-			"Value"
-			"R"
+		(property "Value" "R"
 			(at 38.1 50.72 0)
 			(effects
 				(font
@@ -189,7 +171,7 @@
 			(project
 				""
 				(path
-					"/a76c6303-a165-42de-9243-f441b61d8d4d"
+					"/8bb09509-90e1-4d19-bcbe-444481f99078"
 					(reference "R1")
 					(unit 1)
 				)
@@ -208,7 +190,7 @@
 			)
 			(justify right)
 		)
-		(uuid 753a4c92-e0d4-4b5e-bb3f-7e14519a2a98)
+		(uuid defc875a-0c3d-4e32-a957-24a52e93ce5b)
 	)
 	(hierarchical_label
 		"GND"
@@ -222,7 +204,7 @@
 			)
 			(justify left)
 		)
-		(uuid 96e52bf3-d869-4833-8c7f-71457a334f76)
+		(uuid d375aaf1-e008-4820-bf3d-5bbd6269ce6c)
 	)
 	(sheet
 		(at 58.42 36.83)
@@ -234,10 +216,8 @@
 		(fill
 			(color 0 0 0 0.0)
 		)
-		(uuid 14e1dd35-aa35-4f6b-aedd-5a75e81b602e)
-		(property
-			"Sheetname"
-			"child1"
+		(uuid 37ee9299-7423-4550-a2f9-9b324025340a)
+		(property "Sheetname" "child1"
 			(at 58.42 35.559999999999995 0)
 			(effects
 				(font
@@ -246,9 +226,7 @@
 				(justify left bottom)
 			)
 		)
-		(property
-			"Sheetfile"
-			"child1.kicad_sch"
+		(property "Sheetfile" "child1.kicad_sch"
 			(at 58.42 58.42 0)
 			(effects
 				(font
@@ -268,7 +246,7 @@
 				)
 				(justify right)
 			)
-			(uuid aa284518-e0f8-4713-9848-0a676c05d933)
+			(uuid b085a0c1-f673-4c4a-a006-60b8a2662a47)
 		)
 		(instances
 			(project
@@ -281,5 +259,9 @@
 		)
 	)
 	(sheet_instances
+		(path
+			"/"
+			(page "1")
+		)
 	)
 )

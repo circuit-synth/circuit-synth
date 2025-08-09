@@ -85,11 +85,25 @@ from sexpdata import Symbol
 # Python implementation for generate_component_sexp
 def generate_component_sexp(component_data):
     """Python implementation for component S-expression generation"""
-    # This is a simplified version - the full implementation would be more complex
-    ref = component_data.get("ref", "U?")
-    lib_id = component_data.get("lib_id", "Device:R")
+    # CRITICAL DEBUG: Log all component data to identify reference issue
+    logger.debug(f"🔍 GENERATE_COMPONENT_SEXP: Input component_data keys: {list(component_data.keys())}")
+    logger.debug(f"🔍 GENERATE_COMPONENT_SEXP: Full component_data: {component_data}")
+    
+    # CRITICAL FIX: Never use hard-coded fallbacks - always preserve original reference
+    ref = component_data.get("ref")
+    if not ref:
+        logger.error(f"❌ GENERATE_COMPONENT_SEXP: NO REFERENCE found in component_data!")
+        logger.error(f"❌ GENERATE_COMPONENT_SEXP: This indicates a bug in component processing")
+        # Don't use hard-coded fallback - this masks the real issue
+        ref = "REF_ERROR"  # Make it obvious when this happens
+    else:
+        logger.debug(f"✅ GENERATE_COMPONENT_SEXP: Found reference: '{ref}'")
+    
+    lib_id = component_data.get("lib_id", "Device:UNKNOWN")  # More descriptive fallback
     at = component_data.get("at", [0, 0, 0])
     uuid = component_data.get("uuid", "00000000-0000-0000-0000-000000000000")
+    
+    logger.debug(f"🔍 GENERATE_COMPONENT_SEXP: Using ref='{ref}', lib_id='{lib_id}', at={at}")
 
     # Build basic S-expression
     sexp = [
@@ -379,10 +393,10 @@ class SchematicWriter:
         self._add_symbol_definitions(schematic_sexpr)
         libsym_time = time.perf_counter() - libsym_start
 
-        # sheet_instances is now added by the parser, so we don't need to add it again
+        # Add sheet_instances section - CRITICAL for proper reference assignment
         sheetinst_start = time.perf_counter()
-        # self._add_sheet_instances(schematic_sexpr)  # Removed to avoid duplicate
-        sheetinst_time = 0  # No sheet instances processing time
+        self._add_sheet_instances(schematic_sexpr)
+        sheetinst_time = time.perf_counter() - sheetinst_start
 
         sections_time = time.perf_counter() - sections_start
         logger.info(
@@ -1418,11 +1432,26 @@ class SchematicWriter:
         return symbol_block
 
     def _add_sheet_instances(self, schematic_expr: list):
-        """Add sheet_instances section."""
+        """Add sheet_instances section or replace empty one."""
         sheet_instances = [
             Symbol("sheet_instances"),
             [Symbol("path"), "/", [Symbol("page"), "1"]],
         ]
+
+        # Check if sheet_instances already exists
+        for i, item in enumerate(schematic_expr):
+            if (
+                isinstance(item, list)
+                and item
+                and item[0] == Symbol("sheet_instances")
+            ):
+                # Replace empty sheet_instances with proper one
+                if len(item) <= 1:  # Empty or header-only
+                    schematic_expr[i] = sheet_instances
+                    return
+                else:
+                    # Already has content, don't duplicate
+                    return
 
         # Find where to insert (before symbol_instances if it exists)
         insert_pos = len(schematic_expr)
