@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid 51dd1522-d8d9-44c5-ae29-8dba42c98415)
+	(uuid bfa40f08-576a-415b-ad02-b3fb98f592db)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:LED"
@@ -332,7 +332,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 0fb12a54-00f6-49ad-9702-fe41ad3a1d69)
+		(uuid 042ca6ad-0332-4b42-92de-85fe3019afad)
 		(property "Reference" "D3"
 			(at 45.72 40.72 0)
 			(effects
@@ -353,7 +353,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/774407b8-61da-4bcc-a232-504a2137dfb8/99c8a1ea-6ec4-4719-ad34-7552101871ac/f5fb059e-61be-4caf-bb9b-482e0dc08499"
+				(path "/f9a72efa-bb87-484a-afb1-0ec0333383c3/02a8de8e-2ab9-4a31-bad8-1a10d2062887/379a6ca2-c150-4d01-81cf-f13a85ad147e"
 					(reference "D3")
 					(unit 1)
 				)
@@ -369,7 +369,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 0c41a491-c864-4802-9853-f6275784622c)
+		(uuid 6480ecb8-0541-45ba-81b7-d0cce1cd5f3e)
 		(property "Reference" "R3"
 			(at 68.58 40.72 0)
 			(effects
@@ -399,7 +399,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/774407b8-61da-4bcc-a232-504a2137dfb8/99c8a1ea-6ec4-4719-ad34-7552101871ac/f5fb059e-61be-4caf-bb9b-482e0dc08499"
+				(path "/f9a72efa-bb87-484a-afb1-0ec0333383c3/02a8de8e-2ab9-4a31-bad8-1a10d2062887/379a6ca2-c150-4d01-81cf-f13a85ad147e"
 					(reference "R3")
 					(unit 1)
 				)
@@ -418,7 +418,7 @@
 			)
 			(justify right)
 		)
-		(uuid b11885ee-e40e-4ece-936c-f21a73f91b7c)
+		(uuid ffeecaf7-7fa8-4042-ba04-07869ace11a6)
 	)
 	(hierarchical_label
 		"LED_CONTROL"
@@ -432,7 +432,7 @@
 			)
 			(justify right)
 		)
-		(uuid d0e21c60-f591-4243-8d56-a78eb0c76940)
+		(uuid f1b05c5b-599e-40ee-bdbb-d4f14df29fed)
 	)
 	(hierarchical_label
 		"N$3"
@@ -446,7 +446,7 @@
 			)
 			(justify left)
 		)
-		(uuid 0292a2fc-bcd5-423d-83a3-eceddfd608cf)
+		(uuid ca3c2440-4a64-4e67-b71e-ea0dfc393252)
 	)
 	(hierarchical_label
 		"N$3"
@@ -460,7 +460,7 @@
 			)
 			(justify right)
 		)
-		(uuid e3754488-f67f-4707-9df3-b61b3b9be69e)
+		(uuid 5c2c71da-1b93-4d51-af91-d00f2682d5cc)
 	)
 	(hierarchical_label
 		"VCC_3V3"
@@ -474,7 +474,7 @@
 			)
 			(justify left)
 		)
-		(uuid bd87acf7-a1c9-4f34-b9e5-9b2faf584954)
+		(uuid de3ca979-4737-4451-b75b-bef7c90790cb)
 	)
 	(sheet_instances
 		(path "/"

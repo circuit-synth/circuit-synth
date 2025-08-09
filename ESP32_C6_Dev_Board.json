@@ -1,7 +1,7 @@
 {
   "name": "ESP32_C6_Dev_Board_Main",
   "description": "Main hierarchical circuit - ESP32-C6 development board",
-  "tstamps": "/esp32_c6_dev_board_main-4303731648/",
+  "tstamps": "/esp32_c6_dev_board_main-4378078640/",
   "source_file": "ESP32_C6_Dev_Board_Main.kicad_sch",
   "components": {},
   "nets": {},
@@ -9,7 +9,7 @@
     {
       "name": "USB_Port",
       "description": "USB-C port with CC resistors, ESD protection, and proper grounding",
-      "tstamps": "/usb_port-4303731984/",
+      "tstamps": "/usb_port-4378078832/",
       "source_file": "USB_Port.kicad_sch",
       "components": {
         "J1": {
@@ -677,14 +677,14 @@
           "border_color": "black",
           "justify": "center center",
           "rotation": 0,
-          "uuid": "e4004516-9cf4-4298-a7d6-25c6d5ced046"
+          "uuid": "ae54e0a4-666e-4151-afee-82a13b6e23c2"
         }
       ]
     },
     {
       "name": "Power_Supply",
       "description": "5V to 3.3V power regulation subcircuit",
-      "tstamps": "/power_supply-4302313264/",
+      "tstamps": "/power_supply-4469139472/",
       "source_file": "Power_Supply.kicad_sch",
       "components": {
         "U1": {
@@ -954,14 +954,14 @@
           "border_color": "black",
           "justify": "center center",
           "rotation": 0,
-          "uuid": "95235807-a9d4-44f5-b4b4-cdeea5299762"
+          "uuid": "447213f3-280b-434f-ae6d-a8fc88975ce3"
         }
       ]
     },
     {
       "name": "ESP32_C6_MCU",
       "description": "\n    ESP32-C6 microcontroller subcircuit with decoupling and connections\n    \n    Args:\n        vcc_3v3: 3.3V power supply net\n        gnd: Ground net\n        usb_dp: USB Data+ net\n        usb_dm: USB Data- net\n    ",
-      "tstamps": "/esp32_c6_mcu-4306972656/",
+      "tstamps": "/esp32_c6_mcu-4380303984/",
       "source_file": "ESP32_C6_MCU.kicad_sch",
       "components": {
         "U2": {
@@ -2079,7 +2079,7 @@
         {
           "name": "Debug_Header",
           "description": "Debug header for programming and debugging",
-          "tstamps": "/debug_header-4369615616/",
+          "tstamps": "/debug_header-4416517568/",
           "source_file": "Debug_Header.kicad_sch",
           "components": {
             "J2": {
@@ -2251,14 +2251,14 @@
               "border_color": "black",
               "justify": "center center",
               "rotation": 0,
-              "uuid": "a3568be8-e105-4beb-bd3b-8ee5de61f01f"
+              "uuid": "e68e980f-e70e-4afc-8eef-d547103fa7be"
             }
           ]
         },
         {
           "name": "LED_Blinker",
           "description": "LED with current limiting resistor",
-          "tstamps": "/led_blinker-4652923408/",
+          "tstamps": "/led_blinker-4562696240/",
           "source_file": "LED_Blinker.kicad_sch",
           "components": {
             "D3": {
@@ -2422,7 +2422,7 @@
               "border_color": "black",
               "justify": "center center",
               "rotation": 0,
-              "uuid": "34b03a33-f30d-45b1-8541-57c36f6c9224"
+              "uuid": "5b504123-9665-499a-b9d8-3e98e2154db8"
             }
           ]
         }
@@ -2456,7 +2456,7 @@
           "border_color": "black",
           "justify": "center center",
           "rotation": 0,
-          "uuid": "0e220d64-1a3c-4e35-bfa6-3b972fddc6e3"
+          "uuid": "e557fe72-31ae-4e26-98a2-ed60d0f49aeb"
         }
       ]
     }
@@ -2490,7 +2490,7 @@
       "border_color": "black",
       "justify": "center center",
       "rotation": 0,
-      "uuid": "abb85518-e65b-47e5-b1ed-50c1c4814e12"
+      "uuid": "c99f98f1-3c4e-4b28-b4db-cacc8bf344a8"
     }
   ]
 }
