@@ -153,7 +153,9 @@ class EnhancedNetlistExporter(NetlistExporter):
             generation_time = (time.perf_counter() - start_time) * 1000  # ms
 
             # Get file size
-            file_size = os.path.getsize(output_path) if os.path.exists(output_path) else 0
+            file_size = (
+                os.path.getsize(output_path) if os.path.exists(output_path) else 0
+            )
 
             # Create metrics
             metrics = NetlistMetrics(
@@ -235,7 +237,7 @@ class EnhancedNetlistExporter(NetlistExporter):
     def get_generation_statistics(self) -> Dict[str, Any]:
         """Get cumulative generation statistics."""
         stats = self._generation_stats.copy()
-        
+
         # Add usage rates
         if stats["total_generations"] > 0:
             stats["python_backend_usage_rate"] = 100.0  # Always Python now
@@ -264,6 +266,4 @@ def export_netlist_with_analytics(
         NetlistMetrics with generation performance data
     """
     exporter = EnhancedNetlistExporter(circuit)
-    return exporter.generate_kicad_netlist(
-        output_path, enable_optimization
-    )
+    return exporter.generate_kicad_netlist(output_path, enable_optimization)

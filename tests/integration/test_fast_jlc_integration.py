@@ -4,6 +4,7 @@ Tests the complete flow including web scraping and caching.
 """
 
 import time
+
 import pytest
 
 from circuit_synth.manufacturing.jlcpcb import (

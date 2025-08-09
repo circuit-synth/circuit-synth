@@ -14,7 +14,7 @@ Or in Python:
     setup_claude_integration()
 """
 
-__version__ = "0.8.13"
+__version__ = "0.8.14"
 
 # Plugin integration
 from .ai_integration.plugins import AIDesignBridge
@@ -59,7 +59,6 @@ from .core.netlist_exporter import NetlistExporter
 
 # Reference manager and netlist exporters
 from .core.reference_manager import ReferenceManager
-
 
 # Removed unused interface abstractions and unified integration
 
