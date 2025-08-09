@@ -1,0 +1,58 @@
+(export (version "E")
+    (design
+      (source "simple_resistor.kicad_sch")
+      (date "2025-08-09T09:46:10-0700")
+      (tool "Circuit-Synth Exporter v0.1.0")
+      (sheet (number "1") (name "root") (tstamps "/7f415b14-b189-46b9-9ebf-0659715ef457/")
+      (title_block
+        (title )
+        (company )
+        (rev )
+        (date )
+        (source "root.kicad_sch")
+        (comment (number "1") (value ""))
+        (comment (number "2") (value ""))
+        (comment (number "3") (value ""))
+        (comment (number "4") (value ""))
+        (comment (number "5") (value ""))
+        (comment (number "6") (value ""))
+        (comment (number "7") (value ""))
+        (comment (number "8") (value ""))
+        (comment (number "9") (value "")))))
+    (components
+    (comp (ref "R1")
+      (value "10k")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (description "Resistor")
+      (fields
+        (field (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field (name "Datasheet") "~")
+        (field (name "Description") "Resistor"))
+      (libsource (lib "Device") (part "R") (description "Resistor"))
+      (property (name "Sheetname") (value "Root"))
+      (property (name "Sheetfile") (value "circuit.kicad_sch"))
+      (property (name "ki_fp_filters") (value "R_*"))
+      (sheetpath (names "/") (tstamps "/"))
+      (tstamps "ae6325a9-2ee7-4e57-b39c-9fde6a99590a")))
+    (libparts
+    (libpart (lib "Device") (part "R")
+      (description "Resistor")
+      (docs "~")
+      (footprints
+        (fp "R_*"))
+      (fields
+        (field (name "Reference") "U")
+        (field (name "Value") "10k")
+        (field (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field (name "Datasheet") ""))
+      (pins
+        (pin (num "?") (name "~") (type "passive"))
+        (pin (num "?") (name "~") (type "passive")))))
+    (libraries
+    (library (logical "Device")
+      (uri "/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/Device.kicad_sym")))
+    (nets
+    (net (code "1") (name "VCC")
+          (node (ref "R1") (pin "1") (pintype "passive")))
+    (net (code "2") (name "GND")
+          (node (ref "R1") (pin "2") (pintype "passive")))))
