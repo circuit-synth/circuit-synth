@@ -46,9 +46,9 @@ class FormattingRules:
         # Version and metadata - inline
         self.rules["version"] = FormatRule(inline=True)
         self.rules["generator"] = FormatRule(inline=True, quote_indices={1})
-        self.rules["generator_version"] = FormatRule(inline=True)
+        self.rules["generator_version"] = FormatRule(inline=True, quote_indices={1})
         self.rules["uuid"] = FormatRule(inline=True)
-        self.rules["paper"] = FormatRule(inline=True)
+        self.rules["paper"] = FormatRule(inline=True, quote_indices={1})
 
         # Properties - special handling
         self.rules["property"] = FormatRule(
@@ -112,7 +112,7 @@ class FormattingRules:
         self.rules["comment"] = FormatRule(inline=False, quote_indices={2})
 
         # Symbol definitions
-        self.rules["symbol"] = FormatRule(inline=False)
+        self.rules["symbol"] = FormatRule(inline=False, custom_handler=self._format_symbol)
         self.rules["lib_symbols"] = FormatRule(inline=False)
 
         # Wire and junction
@@ -127,7 +127,7 @@ class FormattingRules:
         self.rules["instances"] = FormatRule(inline=False)
         self.rules["project"] = FormatRule(inline=False, quote_indices={1})
         self.rules["path"] = FormatRule(inline=False, quote_indices={1})
-        self.rules["reference"] = FormatRule(inline=False, quote_indices={1})
+        self.rules["reference"] = FormatRule(inline=True, quote_indices={1})  # Should be inline
 
         # Sheet instances
         self.rules["sheet_instances"] = FormatRule(inline=False)
@@ -159,14 +159,14 @@ class FormattingRules:
         # Start with property tag and name
         lines.append(f"{indent_str}(property")
 
-        # Property name (quoted)
+        # Property name (always quoted)
         lines.append(
-            f"{formatter._get_indent(indent + 1)}{formatter._quote_if_needed(sexp[1])}"
+            f"{formatter._get_indent(indent + 1)}\"{sexp[1]}\""
         )
 
-        # Property value (quoted)
+        # Property value (always quoted)
         lines.append(
-            f"{formatter._get_indent(indent + 1)}{formatter._quote_if_needed(sexp[2])}"
+            f"{formatter._get_indent(indent + 1)}\"{sexp[2]}\""
         )
 
         # Format remaining elements (at, effects, etc.)
@@ -215,18 +215,61 @@ class FormattingRules:
         lines.append(f"{indent_str})")
 
         return "\n".join(lines)
+    
+    def _format_symbol(self, sexp: List, indent: int, formatter) -> str:
+        """Custom handler for symbol formatting.
+        
+        Symbols in lib_symbols have their ID on the same line as 'symbol':
+        (symbol "Device:R" ...)
+        
+        Regular symbols have lib_id as a separate element:
+        (symbol
+            (lib_id "Device:R")
+            ...)
+        """
+        if len(sexp) < 2:
+            return formatter._format_default(sexp, indent)
+        
+        indent_str = formatter._get_indent(indent)
+        
+        # Check if this is a lib_symbols symbol (second element is a string, not a list)
+        if isinstance(sexp[1], str):
+            # This is a lib_symbols definition: (symbol "Device:R" ...)
+            # Format with ID on same line
+            lines = [f'{indent_str}(symbol "{sexp[1]}"']
+            
+            # Format remaining elements
+            for elem in sexp[2:]:
+                if isinstance(elem, list):
+                    lines.append(formatter.format(elem, indent + 1))
+                else:
+                    lines.append(f"{formatter._get_indent(indent + 1)}{elem}")
+        else:
+            # This is a regular symbol instance
+            lines = [f"{indent_str}(symbol"]
+            
+            # Format all elements normally
+            for elem in sexp[1:]:
+                if isinstance(elem, list):
+                    lines.append(formatter.format(elem, indent + 1))
+                else:
+                    lines.append(f"{formatter._get_indent(indent + 1)}{elem}")
+        
+        lines.append(f"{indent_str})")
+        return "\n".join(lines)
 
 
 class CleanSExprFormatter:
     """Clean S-expression formatter using rule-based approach."""
 
-    def __init__(self, indent_width: int = 2):
+    def __init__(self, use_tabs: bool = True):
         """Initialize formatter.
 
         Args:
-            indent_width: Number of spaces per indent level
+            use_tabs: If True, use tabs for indentation (KiCad default), else use spaces
         """
-        self.indent_width = indent_width
+        self.use_tabs = use_tabs
+        self.indent_char = "\t" if use_tabs else "  "
         self.rules = FormattingRules()
 
     def format(self, sexp: Union[List, str, int, float], indent: int = 0) -> str:
@@ -382,9 +425,8 @@ class CleanSExprFormatter:
         if isinstance(value, bool):
             return "yes" if value else "no"
         elif isinstance(value, (int, float)):
-            # Format numbers consistently
-            if isinstance(value, float) and value.is_integer():
-                return str(int(value))
+            # Keep floats as floats for KiCad compatibility
+            # This matches the old formatter behavior
             return str(value)
         else:
             return str(value)
@@ -412,11 +454,13 @@ class CleanSExprFormatter:
             or "\t" in s
             or s == ""
             or s.startswith("#")
+            or ":" in s  # Library IDs like "Device:R" need quotes
+            or "/" in s  # Path separators need quotes
         )
 
         if needs_quote:
-            # Escape quotes and backslashes
-            s = s.replace("\\", "\\\\").replace('"', '\\"')
+            # Escape special characters for KiCad format
+            s = s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
             return f'"{s}"'
 
         return s
@@ -430,7 +474,7 @@ class CleanSExprFormatter:
         Returns:
             Indentation string
         """
-        return " " * (level * self.indent_width)
+        return self.indent_char * level
 
     def format_schematic(self, circuit_data: Dict) -> str:
         """Format a complete schematic from circuit data.
