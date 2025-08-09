@@ -230,6 +230,13 @@ class SExpressionParser:
         # Add generator
         if schematic.generator:
             result.append([sexpdata.Symbol("generator"), schematic.generator])
+        
+        # Add generator_version (required for KiCad 9)
+        result.append([sexpdata.Symbol("generator_version"), "9.0"])
+        
+        # Add UUID (required for proper reference assignment)
+        if hasattr(schematic, 'uuid') and schematic.uuid:
+            result.append([sexpdata.Symbol("uuid"), schematic.uuid])
 
         # Add paper size (required for lib_symbols insertion point)
         result.append([sexpdata.Symbol("paper"), "A4"])
@@ -564,14 +571,14 @@ class SExpressionParser:
         sexp = [sexpdata.Symbol("symbol"), symbol_def.lib_id]
 
         # Add basic properties
-        # For KiCad compatibility, pin_numbers uses special format: (pin_numbers hide)
+        # For KiCad compatibility, pin_numbers uses special format: (pin_numbers (hide yes))
         sexp.append(
             [
                 sexpdata.Symbol("pin_numbers"),
-                sexpdata.Symbol("hide"),  # Not a list, just the symbol
+                [sexpdata.Symbol("hide"), sexpdata.Symbol("yes")],
             ]
         )
-        sexp.append([sexpdata.Symbol("pin_names"), [sexpdata.Symbol("offset"), 0.254]])
+        sexp.append([sexpdata.Symbol("pin_names"), [sexpdata.Symbol("offset"), 0]])
         sexp.append([sexpdata.Symbol("exclude_from_sim"), sexpdata.Symbol("no")])
         sexp.append([sexpdata.Symbol("in_bom"), sexpdata.Symbol("yes")])
         sexp.append([sexpdata.Symbol("on_board"), sexpdata.Symbol("yes")])

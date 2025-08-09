@@ -1,6 +1,8 @@
 (kicad_sch
 	(version 20250114)
 	(generator "circuit_synth")
+	(generator_version "9.0")
+	(uuid b360da2a-27bb-4452-9f7c-24b9f080489d)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
@@ -136,7 +138,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid b9730fd9-dbe6-4c69-b111-31c0a1dee24e)
+		(uuid e86e9439-9e16-41a5-b5a3-f6185aa33282)
 		(property "Reference" "R1"
 			(at 38.1 40.72 0)
 			(effects
@@ -157,7 +159,7 @@
 		)
 		(instances
 			(project "reference_generated"
-				(path "/a6a926b1-30af-4e72-bc5f-ddaec37a510f"
+				(path "/b360da2a-27bb-4452-9f7c-24b9f080489d"
 					(reference "R1")
 					(unit 1)
 				)
@@ -168,5 +170,8 @@
 		(path "/"
 			(page "1")
 		)
+	)
+	(embedded_fonts
+		no
 	)
 )

@@ -397,6 +397,9 @@ class SchematicWriter:
         sheetinst_start = time.perf_counter()
         self._add_sheet_instances(schematic_sexpr)
         sheetinst_time = time.perf_counter() - sheetinst_start
+        
+        # Add embedded_fonts no at the end (required for KiCad 9)
+        schematic_sexpr.append([Symbol("embedded_fonts"), Symbol("no")])
 
         sections_time = time.perf_counter() - sections_start
         logger.info(
@@ -564,19 +567,11 @@ class SchematicWriter:
                 api_component.instances.clear()
 
                 # Create the instance
-                # Determine project name based on hierarchy level:
-                # - Root level (hierarchical_path has only 1 UUID - the root): empty string ""
-                # - Nested levels (hierarchical_path has more than 1 UUID): actual project name
-                if self.hierarchical_path and len(self.hierarchical_path) > 1:
-                    # We're in a nested schematic (path has more than just root UUID) - use project name
-                    instance_project = self.project_name
-                    logger.debug(
-                        f"  Using project name for nested component: {instance_project}"
-                    )
-                else:
-                    # We're in the root schematic (path has only root UUID or is empty) - use empty string
-                    instance_project = ""
-                    logger.debug(f"  Using empty project name for root component")
+                # CRITICAL FIX: Use consistent project naming for ALL components
+                # The inconsistency between component and sheet instances causes KiCad GUI annotation issues
+                # UNIVERSAL SOLUTION: Always use the actual project name for consistency
+                instance_project = self.project_name or "default_project"
+                logger.debug(f"🔧 UNIVERSAL_PROJECT_NAMING: Using consistent project name: '{instance_project}'")
 
                 instance = SymbolInstance(
                     project=instance_project,
@@ -1274,7 +1269,7 @@ class SchematicWriter:
             Symbol("symbol"),
             lib_id,
             [Symbol("pin_numbers"), Symbol("hide")],
-            [Symbol("pin_names"), [Symbol("offset"), 0.254]],
+            [Symbol("pin_names"), [Symbol("offset"), 0]],
             [Symbol("exclude_from_sim"), Symbol("no")],
             [Symbol("in_bom"), Symbol("yes")],
             [Symbol("on_board"), Symbol("yes")],

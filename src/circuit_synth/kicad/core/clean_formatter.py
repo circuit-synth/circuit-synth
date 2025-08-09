@@ -114,6 +114,9 @@ class FormattingRules:
         # Symbol definitions
         self.rules["symbol"] = FormatRule(inline=False, custom_handler=self._format_symbol)
         self.rules["lib_symbols"] = FormatRule(inline=False)
+        self.rules["pin_numbers"] = FormatRule(inline=True, custom_handler=self._format_pin_numbers)
+        self.rules["pin_names"] = FormatRule(inline=False)
+        self.rules["offset"] = FormatRule(inline=True)
 
         # Wire and junction
         self.rules["wire"] = FormatRule(inline=False)
@@ -123,10 +126,10 @@ class FormattingRules:
         self.rules["label"] = FormatRule(inline=False, quote_indices={1})
         self.rules["global_label"] = FormatRule(inline=False, quote_indices={1})
 
-        # Instances
-        self.rules["instances"] = FormatRule(inline=False)
-        self.rules["project"] = FormatRule(inline=False, quote_indices={1})
-        self.rules["path"] = FormatRule(inline=False, quote_indices={1})
+        # Instances - CRITICAL: Proper formatting for KiCad reference display
+        self.rules["instances"] = FormatRule(inline=False, custom_handler=self._format_instances)
+        self.rules["project"] = FormatRule(inline=False, custom_handler=self._format_project)
+        self.rules["path"] = FormatRule(inline=False, custom_handler=self._format_path)
         self.rules["reference"] = FormatRule(inline=True, quote_indices={1})  # Should be inline
 
         # Sheet instances
@@ -177,39 +180,67 @@ class FormattingRules:
 
     def _format_pin(self, sexp: List, indent: int, formatter) -> str:
         """Custom handler for pin formatting.
-
-        Pins have complex structure with type, direction, shape, etc.
+        
+        CRITICAL: KiCad expects: (pin passive line
+        All on ONE line!
         """
         if len(sexp) < 2:
             return formatter._format_default(sexp, indent)
 
-        lines = []
         indent_str = formatter._get_indent(indent)
-
-        # Start with pin tag
-        lines.append(f"{indent_str}(pin")
-
-        # Pin attributes (type, direction, etc.) on separate lines
-        for elem in sexp[1:]:
+        lines = []
+        
+        # Collect pin type, direction, and shape for first line
+        first_line_parts = ["pin"]
+        i = 1
+        while i < len(sexp) and not isinstance(sexp[i], list):
+            first_line_parts.append(str(sexp[i]))
+            i += 1
+        
+        # Format first line with all keywords
+        lines.append(f"{indent_str}({' '.join(first_line_parts)}")
+        
+        # Format remaining elements (at, length, name, number)
+        for elem in sexp[i:]:
             if isinstance(elem, list):
-                lines.append(formatter.format(elem, indent + 1))
-            elif elem in [
-                "input",
-                "output",
-                "bidirectional",
-                "power_in",
-                "passive",
-                "line",
-                "inverted",
-            ]:
-                # Pin types/shapes on their own line
-                lines.append(f"{formatter._get_indent(indent + 1)}{elem}")
-            else:
-                lines.append(f"{formatter._get_indent(indent + 1)}{elem}")
-
+                # Special handling for name and number - should be on same line
+                if elem[0] == "name" and len(elem) >= 2:
+                    lines.append(f'{formatter._get_indent(indent + 1)}(name "{elem[1]}"')
+                    # Format effects if present
+                    for sub in elem[2:]:
+                        if isinstance(sub, list):
+                            lines.append(formatter.format(sub, indent + 2))
+                    lines.append(f"{formatter._get_indent(indent + 1)})")
+                elif elem[0] == "number" and len(elem) >= 2:
+                    lines.append(f'{formatter._get_indent(indent + 1)}(number "{elem[1]}"')
+                    # Format effects if present
+                    for sub in elem[2:]:
+                        if isinstance(sub, list):
+                            lines.append(formatter.format(sub, indent + 2))
+                    lines.append(f"{formatter._get_indent(indent + 1)})")
+                else:
+                    lines.append(formatter.format(elem, indent + 1))
+        
         lines.append(f"{indent_str})")
-
         return "\n".join(lines)
+    
+    def _format_pin_numbers(self, sexp: List, indent: int, formatter) -> str:
+        """Custom handler for pin_numbers.
+        
+        CRITICAL: Must be (pin_numbers hide) on ONE line for KiCad
+        """
+        indent_str = formatter._get_indent(indent)
+        if len(sexp) == 2:
+            # Check if it's a symbol or string "hide"
+            elem = str(sexp[1])
+            if elem == "hide" or elem == "yes":
+                return f"{indent_str}(pin_numbers {elem})"
+            else:
+                # Default format
+                return f'{indent_str}(pin_numbers "{elem}")'
+        else:
+            # Just pin_numbers with no args
+            return f"{indent_str}(pin_numbers)"
     
     def _format_symbol(self, sexp: List, indent: int, formatter) -> str:
         """Custom handler for symbol formatting.
@@ -249,6 +280,89 @@ class FormattingRules:
                     lines.append(formatter.format(elem, indent + 1))
                 else:
                     lines.append(f"{formatter._get_indent(indent + 1)}{elem}")
+        
+        lines.append(f"{indent_str})")
+        return "\n".join(lines)
+    
+    def _format_instances(self, sexp: List, indent: int, formatter) -> str:
+        """Custom handler for instances block.
+        
+        Standard format for instances block in components.
+        """
+        if len(sexp) < 2:
+            return formatter._format_default(sexp, indent)
+        
+        lines = []
+        indent_str = formatter._get_indent(indent)
+        
+        # Start with instances tag
+        lines.append(f"{indent_str}(instances")
+        
+        # Format project blocks
+        for elem in sexp[1:]:
+            if isinstance(elem, list):
+                lines.append(formatter.format(elem, indent + 1))
+            else:
+                lines.append(f"{formatter._get_indent(indent + 1)}{elem}")
+        
+        lines.append(f"{indent_str})")
+        return "\n".join(lines)
+    
+    def _format_project(self, sexp: List, indent: int, formatter) -> str:
+        """Custom handler for project element in instances.
+        
+        CRITICAL: Project name MUST be on same line as 'project':
+        (project "reference_generated"
+            (path ...))
+        """
+        if len(sexp) < 2:
+            return formatter._format_default(sexp, indent)
+        
+        indent_str = formatter._get_indent(indent)
+        
+        # Project name on same line as 'project'
+        project_name = sexp[1] if len(sexp) > 1 else ""
+        if isinstance(project_name, str) and project_name:
+            lines = [f'{indent_str}(project "{project_name}"']
+        else:
+            lines = [f'{indent_str}(project']
+        
+        # Format path block (should be the next element)
+        for elem in sexp[2:]:
+            if isinstance(elem, list):
+                lines.append(formatter.format(elem, indent + 1))
+            else:
+                lines.append(f"{formatter._get_indent(indent + 1)}{elem}")
+        
+        lines.append(f"{indent_str})")
+        return "\n".join(lines)
+    
+    def _format_path(self, sexp: List, indent: int, formatter) -> str:
+        """Custom handler for path element in instances.
+        
+        CRITICAL: Path UUID MUST be on same line as 'path':
+        (path "/7992fcb0-e3cc-44bb-8801-36d85754f2fc"
+            (reference "R1")
+            (unit 1))
+        """
+        if len(sexp) < 2:
+            return formatter._format_default(sexp, indent)
+        
+        indent_str = formatter._get_indent(indent)
+        
+        # Path UUID on same line as 'path'
+        path_uuid = sexp[1] if len(sexp) > 1 else "/"
+        if isinstance(path_uuid, str):
+            lines = [f'{indent_str}(path "{path_uuid}"']
+        else:
+            lines = [f'{indent_str}(path']
+        
+        # Format reference and unit (should be the next elements)
+        for elem in sexp[2:]:
+            if isinstance(elem, list):
+                lines.append(formatter.format(elem, indent + 1))
+            else:
+                lines.append(f"{formatter._get_indent(indent + 1)}{elem}")
         
         lines.append(f"{indent_str})")
         return "\n".join(lines)
@@ -419,9 +533,16 @@ class CleanSExprFormatter:
         """
         if isinstance(value, bool):
             return "yes" if value else "no"
-        elif isinstance(value, (int, float)):
-            # Keep floats as floats for KiCad compatibility
-            # This matches the old formatter behavior
+        elif isinstance(value, float):
+            # Format floats without unnecessary decimals
+            # 0.0 -> 0, 45.72 -> 45.72
+            if value == int(value):
+                return str(int(value))
+            else:
+                # Remove trailing zeros
+                formatted = f"{value:.10f}".rstrip('0').rstrip('.')
+                return formatted
+        elif isinstance(value, int):
             return str(value)
         else:
             return str(value)
