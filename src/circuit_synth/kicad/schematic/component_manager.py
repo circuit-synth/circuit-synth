@@ -17,16 +17,18 @@ logger = logging.getLogger(__name__)
 
 # Performance debugging
 import time
+
 try:
-    from ..sch_gen.debug_performance import timed_operation, log_symbol_lookup
+    from ..sch_gen.debug_performance import log_symbol_lookup, timed_operation
+
     PERF_DEBUG = True
 except ImportError:
     PERF_DEBUG = False
     from contextlib import contextmanager
+
     @contextmanager
     def timed_operation(*args, **kwargs):
         yield
-
 
 
 class ComponentManager:
