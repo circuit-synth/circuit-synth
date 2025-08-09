@@ -275,15 +275,6 @@ class ComprehensiveRegressionSuite:
                 f"Cleared {pycache_count} bytecode files/directories", "SUCCESS", 1
             )
 
-                if target_dir.is_dir():
-                    try:
-                        shutil.rmtree(target_dir)
-                        caches_cleared.append(str(target_dir))
-                        self.log(f"Cleared: {target_dir}", "SUCCESS", 1)
-                    except Exception as e:
-                        caches_failed.append((str(target_dir), str(e)))
-                        self.log(f"Failed to clear {target_dir}: {e}", "WARNING", 1)
-
         # 4. Test outputs from previous runs
         test_artifacts = [
             self.example_dir / "ESP32_C6_Dev_Board",
@@ -425,75 +416,6 @@ except Exception as e:
             self.log("Agent registration not available (optional)", "INFO", 1)
 
         return True
-
-        self.log("=" * 60, "HEADER")
-        self.log("=" * 60, "HEADER")
-
-
-        if test_script.exists():
-            self.log(
-            )
-
-            # Cargo cache clearing no longer needed - pure Python project
-                except:
-                    pass
-
-            # Run the test script with increased timeout
-            success, stdout, stderr = self.run_command(
-                [str(test_script), "--verbose"],
-                timeout=1200,  # 20 minutes for all modules
-                check=False,
-            )
-
-            # Maturin no longer needed - pure Python project
-                                2,
-                            )
-
-            if success:
-
-                # Parse output to show module status
-                if "✅" in stdout:
-                    for line in stdout.split("\n"):
-                        if "✅" in line and "module" in line.lower():
-                            self.log(line.strip(), "SUCCESS", 1)
-            else:
-
-                # Show detailed error
-                if stderr:
-                    self.log("Error details:", "ERROR", 1)
-                    for line in stderr.split("\n")[-20:]:  # Last 20 lines
-                        if line.strip():
-                            self.log(line.strip(), "ERROR", 2)
-
-                return False
-
-            return success
-
-        else:
-            # Fallback to manual building if script not found
-
-            # Cargo build no longer needed - pure Python project
-            return True
-
-                if success:
-                    self.log(f"✅ Built: {module_name}", "SUCCESS", 2)
-                    built_count += 1
-                else:
-                    self.log(f"❌ Failed to build: {module_name}", "ERROR", 2)
-
-                    # Show full error
-                    if stderr:
-                        error_lines = stderr.split("\n")
-                        for line in error_lines[-30:]:  # Show last 30 lines
-                            if line.strip():
-                                self.log(line.strip(), "ERROR", 3)
-
-                    failed_modules.append(module_name)
-
-            # Summary
-
-            if failed_modules:
-                self.log(f"Failed modules: {', '.join(failed_modules)}", "ERROR")
 
 
     # ========== PART 4: Core Test Methods ==========
@@ -935,8 +857,6 @@ print(f'✅ Symbol library works: Resistor has {len(symbol.pins)} pins')
             if not self.reinstall_python_environment():
                 self.log("Failed to reinstall Python environment", "ERROR")
                 return False
-
-        if not self.args.skip_install:
 
         # Step 5: Run core tests
         core_passed = self.test_core_functionality()
