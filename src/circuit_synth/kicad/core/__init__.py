@@ -9,8 +9,10 @@ This module contains fundamental components:
 
 from .s_expression import SExpressionParser
 from .symbol_cache import SymbolDefinition, SymbolLibraryCache, get_symbol_cache
-from .types import (  # Enums; Core data structures; Search types; Connection types
-    BoundingBox,
+from .types import (
+    BoundingBox,  # Enums; Core data structures; Search types; Connection types
+)
+from .types import (
     ConnectionEdge,
     ConnectionNode,
     ElementType,

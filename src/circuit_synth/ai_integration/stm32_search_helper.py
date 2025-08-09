@@ -92,9 +92,7 @@ def find_stm32_with_peripherals(
             search_jlc_components_web,
         )
 
-        from .component_info.microcontrollers import (
-            search_by_peripherals,
-        )
+        from .component_info.microcontrollers import search_by_peripherals
 
         # Step 1: Search for STM32s with required peripherals
         required_peripherals = list(peripheral_requirements.keys())

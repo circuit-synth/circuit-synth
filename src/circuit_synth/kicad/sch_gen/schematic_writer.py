@@ -11,18 +11,26 @@
 # Performance debugging imports
 try:
     from .debug_performance import (
-        timed_operation, log_symbol_lookup, log_net_label_creation,
-        log_component_processing, print_performance_summary
+        log_component_processing,
+        log_net_label_creation,
+        log_symbol_lookup,
+        print_performance_summary,
+        timed_operation,
     )
+
     PERF_DEBUG = True
 except ImportError:
     PERF_DEBUG = False
+
     def timed_operation(*args, **kwargs):
         from contextlib import contextmanager
+
         @contextmanager
         def dummy():
             yield
+
         return dummy()
+
 
 import datetime
 import logging
@@ -86,10 +94,7 @@ from circuit_synth.kicad.kicad_symbol_cache import (
     SymbolLibCache as PythonSymbolLibCache,
 )
 from circuit_synth.kicad.schematic.component_manager import ComponentManager
-from circuit_synth.kicad.schematic.placement import (
-    PlacementEngine,
-    PlacementStrategy,
-)
+from circuit_synth.kicad.schematic.placement import PlacementEngine, PlacementStrategy
 
 from .collision_manager import SHEET_MARGIN
 
@@ -109,24 +114,32 @@ from sexpdata import Symbol
 def generate_component_sexp(component_data):
     """Python implementation for component S-expression generation"""
     # CRITICAL DEBUG: Log all component data to identify reference issue
-    logger.debug(f"🔍 GENERATE_COMPONENT_SEXP: Input component_data keys: {list(component_data.keys())}")
+    logger.debug(
+        f"🔍 GENERATE_COMPONENT_SEXP: Input component_data keys: {list(component_data.keys())}"
+    )
     logger.debug(f"🔍 GENERATE_COMPONENT_SEXP: Full component_data: {component_data}")
-    
+
     # CRITICAL FIX: Never use hard-coded fallbacks - always preserve original reference
     ref = component_data.get("ref")
     if not ref:
-        logger.error(f"❌ GENERATE_COMPONENT_SEXP: NO REFERENCE found in component_data!")
-        logger.error(f"❌ GENERATE_COMPONENT_SEXP: This indicates a bug in component processing")
+        logger.error(
+            f"❌ GENERATE_COMPONENT_SEXP: NO REFERENCE found in component_data!"
+        )
+        logger.error(
+            f"❌ GENERATE_COMPONENT_SEXP: This indicates a bug in component processing"
+        )
         # Don't use hard-coded fallback - this masks the real issue
         ref = "REF_ERROR"  # Make it obvious when this happens
     else:
         logger.debug(f"✅ GENERATE_COMPONENT_SEXP: Found reference: '{ref}'")
-    
+
     lib_id = component_data.get("lib_id", "Device:UNKNOWN")  # More descriptive fallback
     at = component_data.get("at", [0, 0, 0])
     uuid = component_data.get("uuid", "00000000-0000-0000-0000-000000000000")
-    
-    logger.debug(f"🔍 GENERATE_COMPONENT_SEXP: Using ref='{ref}', lib_id='{lib_id}', at={at}")
+
+    logger.debug(
+        f"🔍 GENERATE_COMPONENT_SEXP: Using ref='{ref}', lib_id='{lib_id}', at={at}"
+    )
 
     # Build basic S-expression
     sexp = [
@@ -420,7 +433,7 @@ class SchematicWriter:
         sheetinst_start = time.perf_counter()
         self._add_sheet_instances(schematic_sexpr)
         sheetinst_time = time.perf_counter() - sheetinst_start
-        
+
         # Add embedded_fonts no at the end (required for KiCad 9)
         schematic_sexpr.append([Symbol("embedded_fonts"), Symbol("no")])
 
@@ -496,11 +509,11 @@ class SchematicWriter:
         for idx, comp in enumerate(self.circuit.components):
             comp_start = time.perf_counter()
             comp_details = {
-                'reference': comp.reference,
-                'lib_id': comp.lib_id,
-                'circuit': self.circuit.name
+                "reference": comp.reference,
+                "lib_id": comp.lib_id,
+                "circuit": self.circuit.name,
             }
-            
+
             logger.debug(
                 f"  [{idx}] Processing component: {comp.reference} ({comp.lib_id})"
             )
@@ -530,15 +543,17 @@ class SchematicWriter:
 
             # Add component using the API
             # Time the component manager operation
-            with timed_operation(f'add_component[{comp.lib_id}]', threshold_ms=20, details=comp_details):
+            with timed_operation(
+                f"add_component[{comp.lib_id}]", threshold_ms=20, details=comp_details
+            ):
                 api_component = self.component_manager.add_component(
-                library_id=comp.lib_id,
-                reference=new_ref,
-                value=comp.value,
-                position=(comp.position.x, comp.position.y),
-                placement_strategy=PlacementStrategy.AUTO,
-                footprint=comp.footprint,
-            )
+                    library_id=comp.lib_id,
+                    reference=new_ref,
+                    value=comp.value,
+                    position=(comp.position.x, comp.position.y),
+                    placement_strategy=PlacementStrategy.AUTO,
+                    footprint=comp.footprint,
+                )
 
             if api_component:
                 # Update our mapping
@@ -603,7 +618,9 @@ class SchematicWriter:
                 # The inconsistency between component and sheet instances causes KiCad GUI annotation issues
                 # UNIVERSAL SOLUTION: Always use the actual project name for consistency
                 instance_project = self.project_name or "default_project"
-                logger.debug(f"🔧 UNIVERSAL_PROJECT_NAMING: Using consistent project name: '{instance_project}'")
+                logger.debug(
+                    f"🔧 UNIVERSAL_PROJECT_NAMING: Using consistent project name: '{instance_project}'"
+                )
 
                 instance = SymbolInstance(
                     project=instance_project,
@@ -755,11 +772,11 @@ class SchematicWriter:
             for comp_ref, pin_identifier in net.connections:
                 label_start = time.perf_counter()
                 label_details = {
-                    'net': net_name,
-                    'component': comp_ref,
-                    'pin': str(pin_identifier)
+                    "net": net_name,
+                    "component": comp_ref,
+                    "pin": str(pin_identifier),
                 }
-                
+
                 # Don't use reference mapping here - net connections have already been updated
                 actual_ref = comp_ref
 
@@ -776,8 +793,10 @@ class SchematicWriter:
                 lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
                 sym_time = (time.perf_counter() - sym_start) * 1000
                 if PERF_DEBUG and sym_time > 10:
-                    log_symbol_lookup(comp.lib_id, lib_data is not None, sym_time, 'SymbolLibCache')
-                
+                    log_symbol_lookup(
+                        comp.lib_id, lib_data is not None, sym_time, "SymbolLibCache"
+                    )
+
                 if not lib_data or "pins" not in lib_data:
                     logger.warning(
                         f"No pin data found for component {comp_ref} ({comp.lib_id})"
@@ -823,7 +842,9 @@ class SchematicWriter:
                 self.schematic.add_label(label)
                 label_time = (time.perf_counter() - label_start) * 1000
                 if PERF_DEBUG and label_time > 5:
-                    log_net_label_creation(net_name, actual_ref, str(pin_identifier), label_time)
+                    log_net_label_creation(
+                        net_name, actual_ref, str(pin_identifier), label_time
+                    )
                 logger.debug(
                     f"Added hierarchical label for net {net_name} at component {actual_ref}.{pin_identifier}"
                 )
@@ -1210,8 +1231,10 @@ class SchematicWriter:
         """
         Add symbol definitions to the lib_symbols section.
         """
-        logger.info(f"🔍 _add_symbol_definitions: Starting with {len(self.schematic.components)} components")
-        
+        logger.info(
+            f"🔍 _add_symbol_definitions: Starting with {len(self.schematic.components)} components"
+        )
+
         # Find or create lib_symbols block
         lib_symbols_block = None
         for item in schematic_expr:
@@ -1222,7 +1245,9 @@ class SchematicWriter:
                 and item[0].value() == "lib_symbols"
             ):
                 lib_symbols_block = item
-                logger.info(f"✅ Found existing lib_symbols block at position {schematic_expr.index(item)}")
+                logger.info(
+                    f"✅ Found existing lib_symbols block at position {schematic_expr.index(item)}"
+                )
                 break
 
         if not lib_symbols_block:
@@ -1232,13 +1257,17 @@ class SchematicWriter:
             for i, item in enumerate(schematic_expr):
                 if isinstance(item, list) and item and item[0] == Symbol("paper"):
                     schematic_expr.insert(i + 1, lib_symbols_block)
-                    logger.info(f"✅ Inserted lib_symbols block after paper at position {i+1}")
+                    logger.info(
+                        f"✅ Inserted lib_symbols block after paper at position {i+1}"
+                    )
                     break
 
         # Clear any existing symbols in the lib_symbols block
         # Keep only the first element which is the Symbol("lib_symbols")
         if lib_symbols_block and len(lib_symbols_block) > 1:
-            logger.info(f"🧹 Clearing {len(lib_symbols_block)-1} existing items from lib_symbols block")
+            logger.info(
+                f"🧹 Clearing {len(lib_symbols_block)-1} existing items from lib_symbols block"
+            )
             lib_symbols_block[:] = [lib_symbols_block[0]]
 
         # Gather all lib_ids
@@ -1247,8 +1276,10 @@ class SchematicWriter:
             symbol_ids.add(comp.lib_id)
             logger.debug(f"  Component {comp.reference}: lib_id = {comp.lib_id}")
 
-        logger.info(f"📚 Processing {len(symbol_ids)} unique lib_ids: {sorted(symbol_ids)}")
-        
+        logger.info(
+            f"📚 Processing {len(symbol_ids)} unique lib_ids: {sorted(symbol_ids)}"
+        )
+
         for sym_id in sorted(symbol_ids):
             logger.info(f"📚 SCHEMATIC_WRITER: Fetching symbol data for '{sym_id}'")
             lib_data = SymbolLibCache.get_symbol_data(sym_id)
@@ -1294,20 +1325,28 @@ class SchematicWriter:
                 logger.info(f"🔨 Building symbol definition from JSON for {sym_id}")
                 new_sym_def = self._create_symbol_definition(sym_id, lib_data)
                 if new_sym_def:
-                    logger.info(f"✅ Created symbol definition for {sym_id}, adding to lib_symbols")
+                    logger.info(
+                        f"✅ Created symbol definition for {sym_id}, adding to lib_symbols"
+                    )
                     if isinstance(new_sym_def[0], Symbol):
                         lib_symbols_block.append(new_sym_def)
                     else:
                         lib_symbols_block.extend(new_sym_def)
                 else:
                     logger.error(f"❌ Failed to create symbol definition for {sym_id}")
-        
-        logger.info(f"📦 lib_symbols block now has {len(lib_symbols_block)} items (including header)")
+
+        logger.info(
+            f"📦 lib_symbols block now has {len(lib_symbols_block)} items (including header)"
+        )
         # Only show error if we have components but no symbols
         if len(lib_symbols_block) <= 1 and len(self.schematic.components) > 0:
-            logger.error("❌❌❌ lib_symbols block is EMPTY - no symbol definitions added!")
+            logger.error(
+                "❌❌❌ lib_symbols block is EMPTY - no symbol definitions added!"
+            )
         elif len(lib_symbols_block) <= 1 and len(self.schematic.components) == 0:
-            logger.info("📋 No components in this sheet (hierarchical sheet with sub-sheets only)")
+            logger.info(
+                "📋 No components in this sheet (hierarchical sheet with sub-sheets only)"
+            )
 
     def _create_symbol_definition(self, lib_id: str, lib_data: dict):
         """
@@ -1486,11 +1525,7 @@ class SchematicWriter:
 
         # Check if sheet_instances already exists
         for i, item in enumerate(schematic_expr):
-            if (
-                isinstance(item, list)
-                and item
-                and item[0] == Symbol("sheet_instances")
-            ):
+            if isinstance(item, list) and item and item[0] == Symbol("sheet_instances"):
                 # Replace empty sheet_instances with proper one
                 if len(item) <= 1:  # Empty or header-only
                     schematic_expr[i] = sheet_instances

@@ -17,7 +17,6 @@ from .fmea_report_generator import FMEAReportGenerator
 # import yaml  # No longer needed, using JSON
 
 
-
 class EnhancedFMEAAnalyzer(UniversalFMEAAnalyzer):
     """Enhanced FMEA analyzer that uses the comprehensive knowledge base"""
 

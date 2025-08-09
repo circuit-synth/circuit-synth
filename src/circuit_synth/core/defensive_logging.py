@@ -49,9 +49,11 @@ class ComponentMetrics:
     operations: list[OperationMetrics] = field(default_factory=list)
 
     @property
-
-    @property
+    def avg_total_time(self) -> float:
+        """Average total operation time"""
         return (
+            self.total_python_time / self.total_operations
+            if self.total_operations > 0
             else 0.0
         )
 
@@ -96,11 +98,10 @@ class DefensiveLogger:
 
         # Safety thresholds
         self.max_failure_rate = float(
+            os.environ.get("CIRCUIT_SYNTH_MAX_FAILURE_RATE", "0.1")
         )  # 10%
         self.min_operations_for_disable = int(
             os.environ.get("CIRCUIT_SYNTH_MIN_OPS_FOR_DISABLE", "10")
-        )
-
         )
 
         self.logger.info(f"🛡️  DEFENSIVE LOGGER INITIALIZED [{component_name}]")
@@ -109,22 +110,22 @@ class DefensiveLogger:
             f"   📊 Min operations for auto-disable: {self.min_operations_for_disable}"
         )
 
-            return False
-
+    def should_use_python_fallback(self) -> bool:
+        """Determine if we should use Python fallback due to poor performance."""
+        if self.metrics.total_operations < self.min_operations_for_disable:
             return False
 
         # Check if we should auto-disable due to high failure rate
-        if (
-            self.metrics.total_operations >= self.min_operations_for_disable
-        ):
-
+        failure_rate = 1.0 - (self.metrics.python_operations / self.metrics.total_operations)
+        if failure_rate >= self.max_failure_rate:
             self.logger.warning(
+                f"🚨 HIGH FAILURE RATE DETECTED: {failure_rate:.1%} >= {self.max_failure_rate:.1%}"
             )
             self.logger.warning(f"   📊 Operations: {self.metrics.total_operations}")
             self.logger.warning(f"   🔄 All future operations will use Python fallback")
-            return False
+            return True
 
-        return True
+        return False
 
     def log_operation_start(self, operation: str, **kwargs) -> OperationMetrics:
         """Log the start of an operation and return metrics tracker"""
@@ -176,6 +177,7 @@ class DefensiveLogger:
         self.metrics.total_operations += 1
         self.metrics.operations.append(metrics)
 
+    def log_operation_success(
         self,
         metrics: OperationMetrics,
         result: Any,
@@ -221,6 +223,7 @@ class DefensiveLogger:
         self.metrics.total_operations += 1
         self.metrics.operations.append(metrics)
 
+    def log_operation_failure(
         self, metrics: OperationMetrics, error: Exception, **kwargs
     ) -> None:
         metrics.end_time = time.perf_counter()
