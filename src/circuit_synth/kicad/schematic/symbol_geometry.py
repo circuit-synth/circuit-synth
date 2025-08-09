@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from ...kicad.kicad_symbol_parser import parse_kicad_sym_file
-from ..core.symbol_cache import SymbolLibraryCache
+from ..core.symbol_cache import get_symbol_cache
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class SymbolGeometry:
 
     def __init__(self):
         self._cache = {}
-        self._symbol_lib_cache = SymbolLibraryCache()
+        self._symbol_lib_cache = get_symbol_cache()
 
     def get_symbol_bounds(self, lib_id: str) -> Tuple[float, float]:
         """
