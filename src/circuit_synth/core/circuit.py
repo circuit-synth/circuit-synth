@@ -479,7 +479,6 @@ class Circuit:
             from ..kicad.sch_gen.main_generator import SchematicGenerator
 
             # Python backend is used for hierarchical circuits
-
             # Finalize references before generation
             self.finalize_references()
 

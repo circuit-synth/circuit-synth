@@ -14,6 +14,27 @@ uv add circuit-synth
 pip install circuit-synth
 ```
 
+## Configuration
+
+### Logging Control
+
+By default, circuit-synth runs with minimal logging output (WARNING level). To enable detailed logs for debugging:
+
+```bash
+# Enable verbose logging via environment variable
+export CIRCUIT_SYNTH_LOG_LEVEL=INFO
+
+# Or set it in your Python script
+import os
+os.environ['CIRCUIT_SYNTH_LOG_LEVEL'] = 'INFO'
+```
+
+Available log levels:
+- `ERROR`: Only show errors
+- `WARNING`: Show warnings and errors (default)
+- `INFO`: Show informational messages, progress updates
+- `DEBUG`: Show detailed debugging information
+
 ## Quick Start
 
 ```bash

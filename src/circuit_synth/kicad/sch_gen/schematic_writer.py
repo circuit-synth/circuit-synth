@@ -11,15 +11,22 @@
 import datetime
 import logging
 import math
+
+# Configure logging for this module
 import os
 import time
 import uuid as uuid_module
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-# Configure logging for this module
+log_level = os.environ.get("CIRCUIT_SYNTH_LOG_LEVEL", "WARNING")
+try:
+    level = getattr(logging, log_level.upper())
+except AttributeError:
+    level = logging.WARNING
+
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+    level=level, format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 )
 
 from sexpdata import Symbol, dumps
