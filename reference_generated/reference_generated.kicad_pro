@@ -244,7 +244,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "ESP32_C6_Dev_Board.kicad_pro",
+    "filename": "reference_generated.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -414,28 +414,12 @@
   },
   "sheets": [
     [
-      "0f7fcaf2-b742-4888-9113-8f66be7c8090",
+      "a76c6303-a165-42de-9243-f441b61d8d4d",
       ""
     ],
     [
-      "34cec521-86fa-459e-aa12-07f99ebaf402",
-      "USB_Port"
-    ],
-    [
-      "b1c13561-169d-4968-b91b-c56999f3b51e",
-      "Power_Supply"
-    ],
-    [
-      "43f6b6ef-8132-47d8-9820-f8379a9f5160",
-      "ESP32_C6_MCU"
-    ],
-    [
-      "4ccba811-9956-43a1-bd29-0d06ac6323a0",
-      "Debug_Header"
-    ],
-    [
-      "1acb673c-8ddd-458b-8275-60949770caa5",
-      "LED_Blinker"
+      "f867b8ec-4a4b-4654-bd18-410e0adb928c",
+      "child1"
     ]
   ],
   "text_variables": {}

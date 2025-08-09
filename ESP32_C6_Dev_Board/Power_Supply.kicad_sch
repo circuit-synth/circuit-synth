@@ -1,6 +1,344 @@
 (kicad_sch
 	(version 20250114)
 	(generator "circuit_synth")
+	(paper "A4")
+	(lib_symbols
+		(symbol "Device:C"
+			(pin_numbers
+				hide
+			)
+			(pin_names
+				(offset
+					0.254
+				)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"C"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"C"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				""
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"~"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"Unpolarized capacitor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"cap capacitor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"C_*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "C_0_1"
+				(polyline
+					(pts
+						(xy -2.032 0.762)
+						(xy 2.032 0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.032 -0.762)
+						(xy 2.032 -0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "C_1_1"
+				(pin
+					passive
+					line
+					(at 0.0 3.81 270)
+					(length 2.794)
+					(name
+						"~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 0.0 -3.81 90)
+					(length 2.794)
+					(name
+						"~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+		(symbol "Regulator_Linear:AMS1117-3.3"
+			(pin_numbers
+				hide
+			)
+			(pin_names
+				(offset
+					0.254
+				)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"U"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"AMS1117-3.3"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				"Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"http://www.advanced-monolithic.com/pdf/ds1117.pdf"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"linear regulator ldo fixed positive"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"SOT?223*TabPin2*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "AMS1117-3.3_0_1"
+				(rectangle
+					(start -5.08 -5.08)
+					(end 5.08 1.905)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "AMS1117-3.3_1_1"
+				(pin
+					power_in
+					line
+					(at -7.62 0.0 0)
+					(length 2.54)
+					(name
+						"VI"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					power_in
+					line
+					(at 0.0 -7.62 90)
+					(length 2.54)
+					(name
+						"GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					power_out
+					line
+					(at 7.62 0.0 180)
+					(length 2.54)
+					(name
+						"VO"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+	)
 	(symbol
 		(lib_id "Regulator_Linear:AMS1117-3.3")
 		(at 45.72 58.42 0.0)
@@ -10,7 +348,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 56512614-ea48-41c8-9960-182bddafe102)
+		(uuid b9906749-3f01-4b64-a867-6ab7cb867038)
 		(property
 			"Reference"
 			"U1"
@@ -37,7 +375,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a9266cd0-d7ea-468a-8c6a-d93e98021226/d6bd3494-47fb-48d2-8281-a9323f703b5a"
+					"/0f7fcaf2-b742-4888-9113-8f66be7c8090/cd482aeb-1836-426d-8988-ab5d88c952cc"
 					(reference "U1")
 					(unit 1)
 				)
@@ -53,7 +391,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid f4ff4c40-871b-47a0-8dfe-1036685ef2dc)
+		(uuid d52342d7-8725-4da9-80e7-b81bacc4e6a1)
 		(property
 			"Reference"
 			"C2"
@@ -91,7 +429,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a9266cd0-d7ea-468a-8c6a-d93e98021226/d6bd3494-47fb-48d2-8281-a9323f703b5a"
+					"/0f7fcaf2-b742-4888-9113-8f66be7c8090/cd482aeb-1836-426d-8988-ab5d88c952cc"
 					(reference "C2")
 					(unit 1)
 				)
@@ -107,7 +445,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 07b49e9a-6ae8-4a6f-99f9-a334bc1df655)
+		(uuid f4173bfe-ef20-41f3-84ee-04d96b2aa0f4)
 		(property
 			"Reference"
 			"C3"
@@ -145,7 +483,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a9266cd0-d7ea-468a-8c6a-d93e98021226/d6bd3494-47fb-48d2-8281-a9323f703b5a"
+					"/0f7fcaf2-b742-4888-9113-8f66be7c8090/cd482aeb-1836-426d-8988-ab5d88c952cc"
 					(reference "C3")
 					(unit 1)
 				)
@@ -164,7 +502,7 @@
 			)
 			(justify right)
 		)
-		(uuid 628f72d9-96e1-4b39-b497-7598b67b4772)
+		(uuid 1bbc1772-d4b0-419b-bf66-72f68e20f9ab)
 	)
 	(hierarchical_label
 		"VBUS"
@@ -178,7 +516,7 @@
 			)
 			(justify right)
 		)
-		(uuid f263434c-56f7-4962-b927-c1697cbb6ee7)
+		(uuid a04b0f46-f42f-455f-abde-d89bec586c30)
 	)
 	(hierarchical_label
 		"VBUS"
@@ -192,7 +530,7 @@
 			)
 			(justify left)
 		)
-		(uuid 55430726-473d-46f7-a592-d868ba09f7e6)
+		(uuid 87035b75-14f7-473b-b811-462764108bbb)
 	)
 	(hierarchical_label
 		"GND"
@@ -206,7 +544,7 @@
 			)
 			(justify right)
 		)
-		(uuid 3ffe2e92-0557-4688-86b1-76c77251498f)
+		(uuid b5505478-f9e4-420a-b036-7e8709f95785)
 	)
 	(hierarchical_label
 		"GND"
@@ -220,7 +558,7 @@
 			)
 			(justify right)
 		)
-		(uuid d60531ba-125f-45b5-9d20-7a3c97593cf6)
+		(uuid 34844cbc-cd92-4f10-bfe0-d2247a46fa4a)
 	)
 	(hierarchical_label
 		"GND"
@@ -234,7 +572,7 @@
 			)
 			(justify right)
 		)
-		(uuid 6a81c106-616a-459c-bce4-843aa36b3264)
+		(uuid 42f45e80-eefe-40b3-bfb7-f56b06023c69)
 	)
 	(hierarchical_label
 		"GND"
@@ -248,7 +586,7 @@
 			)
 			(justify right)
 		)
-		(uuid 7eb0072b-0fec-43a9-bb8f-258b2582cac9)
+		(uuid 56c229d2-95a9-4fa7-89fa-6e692c7cd3ff)
 	)
 	(hierarchical_label
 		"VCC_3V3"
@@ -262,7 +600,7 @@
 			)
 			(justify left)
 		)
-		(uuid be73da7d-9f45-4f72-9695-77e0093d9817)
+		(uuid 51b9a79c-b505-47be-acc3-d1be4eef3f68)
 	)
 	(hierarchical_label
 		"VCC_3V3"
@@ -276,7 +614,7 @@
 			)
 			(justify left)
 		)
-		(uuid 47b5b71c-b8cf-46ab-81b7-07af6f3cf90b)
+		(uuid 91139940-0032-4320-ae73-bb039819c8dc)
 	)
 	(hierarchical_label
 		"VCC_3V3"
@@ -290,6 +628,8 @@
 			)
 			(justify left)
 		)
-		(uuid 4b2d645e-ec71-475d-b90e-66038c535566)
+		(uuid 5aacfab8-b29e-4f15-8ed8-bfa599b1408e)
+	)
+	(sheet_instances
 	)
 )

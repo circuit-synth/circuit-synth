@@ -650,7 +650,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid a7bb791d-db3a-40a9-8813-ffba22d5ca4b)
+		(uuid 9314b0cd-e365-4715-887c-a4b6c48d27f9)
 		(property
 			"Reference"
 			"P1"
@@ -677,7 +677,7 @@
 			(project
 				"reference_generated"
 				(path
-					"/a2642601-3cef-41e9-a654-ec36e9238345/3955c852-9b8a-47b6-84be-b5b228043d33"
+					"/a76c6303-a165-42de-9243-f441b61d8d4d/14e1dd35-aa35-4f6b-aedd-5a75e81b602e"
 					(reference "P1")
 					(unit 1)
 				)
@@ -696,7 +696,7 @@
 			)
 			(justify right)
 		)
-		(uuid def5e089-32a7-4bc5-8303-56504c4016f9)
+		(uuid e8f7ecec-84c8-4503-884a-d387be1883d5)
 	)
 	(hierarchical_label
 		"GND"
@@ -710,7 +710,7 @@
 			)
 			(justify right)
 		)
-		(uuid 9b453285-ad2d-4685-983e-476c4be9c07b)
+		(uuid 5455f39d-6d8a-4776-bb2d-87bd8cdf258e)
 	)
 	(hierarchical_label
 		"GND"
@@ -724,7 +724,7 @@
 			)
 			(justify right)
 		)
-		(uuid 1c80270f-d3f6-4b40-837c-d5390c5d63f9)
+		(uuid eba74cbe-2d38-488a-b3e6-8d3b3b1a572b)
 	)
 	(hierarchical_label
 		"GND"
@@ -738,7 +738,7 @@
 			)
 			(justify right)
 		)
-		(uuid f1fd64d9-7590-43fa-8904-b9d8da4eda5d)
+		(uuid 3d7921ee-1e69-4ec3-83f8-be77322dcd9b)
 	)
 	(hierarchical_label
 		"GND"
@@ -752,7 +752,7 @@
 			)
 			(justify right)
 		)
-		(uuid a7f1ce5e-7ee2-4525-ae35-b13a720e9bc5)
+		(uuid 4a6d3184-900f-4b4c-84c7-c4850eb1e801)
 	)
 	(sheet_instances
 	)

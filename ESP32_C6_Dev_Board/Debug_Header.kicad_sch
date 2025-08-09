@@ -1,6 +1,312 @@
 (kicad_sch
 	(version 20250114)
 	(generator "circuit_synth")
+	(paper "A4")
+	(lib_symbols
+		(symbol "Connector_Generic:Conn_02x03_Odd_Even"
+			(pin_numbers
+				hide
+			)
+			(pin_names
+				(offset
+					0.254
+				)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property
+				"Reference"
+				"J"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Value"
+				"Conn_02x03_Odd_Even"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property
+				"Footprint"
+				""
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Datasheet"
+				"~"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"connector"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"Connector*:*_2x??_*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Conn_02x03_Odd_Even_0_1"
+				(rectangle
+					(start -1.27 3.81)
+					(end 3.81 -3.81)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 2.667)
+					(end 0.0 2.413)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0.0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -2.413)
+					(end 0.0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 3.81 2.667)
+					(end 2.54 2.413)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 3.81 0.127)
+					(end 2.54 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 3.81 -2.413)
+					(end 2.54 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Conn_02x03_Odd_Even_1_1"
+				(pin
+					passive
+					line
+					(at -5.08 2.54 0)
+					(length 3.81)
+					(name
+						"Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at -5.08 0.0 0)
+					(length 3.81)
+					(name
+						"Pin_3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name
+						"Pin_5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 7.62 2.54 180)
+					(length 3.81)
+					(name
+						"Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 7.62 0.0 180)
+					(length 3.81)
+					(name
+						"Pin_4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 7.62 -2.54 180)
+					(length 3.81)
+					(name
+						"Pin_6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_02x03_Odd_Even")
 		(at 58.42 45.72 0.0)
@@ -10,7 +316,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid ba22e3dc-6df1-4d98-9f39-0431a4c1bb41)
+		(uuid 4a8732b2-e9a8-4fee-849e-fd42d40ce966)
 		(property
 			"Reference"
 			"J2"
@@ -37,7 +343,7 @@
 			(project
 				"ESP32_C6_Dev_Board"
 				(path
-					"/a9266cd0-d7ea-468a-8c6a-d93e98021226/dd7e888c-021f-4666-8b90-6f6fe8cdfa64/85189aff-a6b8-44d9-b5e1-cbcc5b1ea836"
+					"/0f7fcaf2-b742-4888-9113-8f66be7c8090/eb9d43e1-efb9-4897-b056-de901130dad6/31d7882d-71e1-4136-9a27-c653881e1535"
 					(reference "J2")
 					(unit 1)
 				)
@@ -56,7 +362,7 @@
 			)
 			(justify right)
 		)
-		(uuid 0e0f5041-85cc-4cf2-a542-c0b7c407545b)
+		(uuid ffdc8dc4-0e41-4b1e-88dd-7e87975f3963)
 	)
 	(hierarchical_label
 		"DEBUG_TX"
@@ -70,7 +376,7 @@
 			)
 			(justify right)
 		)
-		(uuid ca3edd28-addc-47a4-94ed-19aee88707f2)
+		(uuid 0f019652-be10-441c-ba92-cc5926329b91)
 	)
 	(hierarchical_label
 		"DEBUG_RX"
@@ -84,7 +390,7 @@
 			)
 			(justify right)
 		)
-		(uuid 6aa1cde0-7938-454f-ac6a-5c4f980feef7)
+		(uuid f272dd06-225c-40e9-96a1-e8b3f64bbbae)
 	)
 	(hierarchical_label
 		"VCC_3V3"
@@ -98,7 +404,7 @@
 			)
 			(justify left)
 		)
-		(uuid c5d5cc7a-8b90-410c-96e4-8ad3d13148e6)
+		(uuid 27f74079-7f7b-4d7a-a85b-facd37692fac)
 	)
 	(hierarchical_label
 		"GND"
@@ -112,7 +418,7 @@
 			)
 			(justify left)
 		)
-		(uuid 603aef40-22cb-4ae5-927a-2eb598c5f643)
+		(uuid b6493a71-95aa-4fc5-967f-6990fa837781)
 	)
 	(hierarchical_label
 		"DEBUG_IO0"
@@ -126,6 +432,8 @@
 			)
 			(justify left)
 		)
-		(uuid 9684f077-eafc-4a69-b244-803debaa587e)
+		(uuid c39f46bc-b7a2-4b0a-9d8b-1d20ef3f2acd)
+	)
+	(sheet_instances
 	)
 )

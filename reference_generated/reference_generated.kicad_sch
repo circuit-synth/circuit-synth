@@ -162,7 +162,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid bfa347a7-6f0e-42ba-bb34-6babde98d224)
+		(uuid 860d6100-5c66-45a5-8234-b7bdfa33d834)
 		(property
 			"Reference"
 			"R1"
@@ -189,7 +189,7 @@
 			(project
 				""
 				(path
-					"/a2642601-3cef-41e9-a654-ec36e9238345"
+					"/a76c6303-a165-42de-9243-f441b61d8d4d"
 					(reference "R1")
 					(unit 1)
 				)
@@ -208,7 +208,7 @@
 			)
 			(justify right)
 		)
-		(uuid c9279171-cf49-4d61-b26b-b7f39f985118)
+		(uuid 753a4c92-e0d4-4b5e-bb3f-7e14519a2a98)
 	)
 	(hierarchical_label
 		"GND"
@@ -222,7 +222,7 @@
 			)
 			(justify left)
 		)
-		(uuid 57850f2b-9a3f-4407-99c5-a3b40c72a1ec)
+		(uuid 96e52bf3-d869-4833-8c7f-71457a334f76)
 	)
 	(sheet
 		(at 58.42 36.83)
@@ -234,7 +234,7 @@
 		(fill
 			(color 0 0 0 0.0)
 		)
-		(uuid 3955c852-9b8a-47b6-84be-b5b228043d33)
+		(uuid 14e1dd35-aa35-4f6b-aedd-5a75e81b602e)
 		(property
 			"Sheetname"
 			"child1"
@@ -268,7 +268,7 @@
 				)
 				(justify right)
 			)
-			(uuid c057d8e9-c218-4d7f-bb84-fedbe4466863)
+			(uuid aa284518-e0f8-4713-9848-0a676c05d933)
 		)
 		(instances
 			(project

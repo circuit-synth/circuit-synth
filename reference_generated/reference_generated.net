@@ -1,9 +1,9 @@
 (export (version "E")
     (design
       (source "main.kicad_sch")
-      (date "2025-08-08T22:16:58-0700")
+      (date "2025-08-08T22:27:39-0700")
       (tool "Circuit-Synth Exporter v0.1.0")
-      (sheet (number "1") (name "root") (tstamps "/44474416-189f-4e9b-890e-ff6b3ade1802/")
+      (sheet (number "1") (name "root") (tstamps "/13595da7-269e-4ed8-8797-558e114ae441/")
       (title_block
         (title )
         (company )
@@ -19,7 +19,7 @@
         (comment (number "7") (value ""))
         (comment (number "8") (value ""))
         (comment (number "9") (value ""))))
-      (sheet (number "2") (name "root/child1") (tstamps "/d6034370-1a5e-4712-815c-247593736f84/")
+      (sheet (number "2") (name "root/child1") (tstamps "/e21bc444-fd94-4830-812c-cffb831a0ce6/")
       (title_block
         (title )
         (company )
@@ -47,7 +47,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "8a97db00-a7ef-43e1-9a6b-caf5bd7eef19"))
+      (tstamps "d6efa791-0475-4f2e-98be-dc7f1f9705da"))
     (comp (ref "P1")
       (value "USB_C_Plug_USB2.0")
       (description "USB 2.0-only Type-C Plug connector")
@@ -59,7 +59,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "USB*C*Plug*"))
       (sheetpath (names "/child1/") (tstamps "/child1/"))
-      (tstamps "dc43e004-c129-4354-a054-236d823e5d51")))
+      (tstamps "b62ba1f4-15bb-4bfa-b1e3-af584062e643")))
     (libparts
     (libpart (lib "Device") (part "R")
       (description "Resistor")
