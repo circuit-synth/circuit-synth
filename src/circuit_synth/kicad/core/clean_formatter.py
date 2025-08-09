@@ -312,7 +312,7 @@ class CleanSExprFormatter:
         elements = []
         for i, elem in enumerate(sexp):
             if i in rule.quote_indices:
-                elements.append(self._quote_if_needed(elem))
+                elements.append(self._quote_if_needed(elem, force_quote=True))
             elif isinstance(elem, list):
                 # Recursively format nested lists
                 elements.append(self.format(elem, 0))
@@ -344,7 +344,7 @@ class CleanSExprFormatter:
             for i, elem in enumerate(sexp[1:], 1):
                 if i in rule.quote_indices:
                     lines.append(
-                        f"{self._get_indent(indent + 1)}{self._quote_if_needed(elem)}"
+                        f"{self._get_indent(indent + 1)}{self._quote_if_needed(elem, force_quote=True)}"
                     )
                 elif isinstance(elem, list):
                     lines.append(self.format(elem, indent + 1))
@@ -389,11 +389,12 @@ class CleanSExprFormatter:
         else:
             return str(value)
 
-    def _quote_if_needed(self, value: Any) -> str:
+    def _quote_if_needed(self, value: Any, force_quote: bool = False) -> str:
         """Quote a value if it needs quoting.
 
         Args:
             value: Value to potentially quote
+            force_quote: Always quote regardless of content
 
         Returns:
             Quoted or unquoted string
@@ -402,7 +403,8 @@ class CleanSExprFormatter:
 
         # Check if quoting is needed
         needs_quote = (
-            " " in s
+            force_quote
+            or " " in s
             or "(" in s
             or ")" in s
             or '"' in s

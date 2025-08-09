@@ -6,6 +6,7 @@ built on top of the sexpdata library.
 """
 
 import logging
+import os
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -31,6 +32,11 @@ from .symbol_cache import get_symbol_cache
 
 logger = logging.getLogger(__name__)
 
+# Shadow mode configuration
+# Set environment variable CIRCUIT_SYNTH_USE_CLEAN_FORMATTER=1 to enable
+USE_CLEAN_FORMATTER = os.getenv("CIRCUIT_SYNTH_USE_CLEAN_FORMATTER", "0") == "1"
+SHADOW_MODE = os.getenv("CIRCUIT_SYNTH_SHADOW_MODE", "0") == "1"  # Compare outputs
+
 
 class SExpressionParser:
     """
@@ -40,9 +46,30 @@ class SExpressionParser:
     providing conversion between S-expressions and our internal data structures.
     """
 
-    def __init__(self):
-        """Initialize the parser."""
-        pass
+    def __init__(self, use_clean_formatter: Optional[bool] = None):
+        """Initialize the parser.
+        
+        Args:
+            use_clean_formatter: Override global setting for clean formatter usage.
+                                If None, uses environment variable setting.
+        """
+        self.use_clean_formatter = (
+            use_clean_formatter if use_clean_formatter is not None 
+            else USE_CLEAN_FORMATTER
+        )
+        self.shadow_mode = SHADOW_MODE
+        
+        # Lazy import clean formatter when needed
+        self._clean_formatter = None
+        
+        if self.use_clean_formatter or self.shadow_mode:
+            self._init_clean_formatter()
+    
+    def _init_clean_formatter(self):
+        """Initialize the clean formatter."""
+        from .clean_formatter import CleanSExprFormatter
+        self._clean_formatter = CleanSExprFormatter()
+        logger.info("Clean S-expression formatter initialized")
 
     def parse_file(self, filepath: Union[str, Path]) -> Schematic:
         """
@@ -110,8 +137,119 @@ class SExpressionParser:
         Returns:
             S-expression string
         """
-        # Format with proper indentation
-        return self._format_sexp(data)
+        if self.shadow_mode:
+            # Run both formatters and compare
+            return self._shadow_mode_format(data)
+        elif self.use_clean_formatter:
+            # Use clean formatter
+            return self._format_with_clean(data)
+        else:
+            # Use legacy formatter
+            return self._format_sexp(data)
+    
+    def _format_with_clean(self, data: Any) -> str:
+        """Format using the clean formatter.
+        
+        Args:
+            data: Data to format
+            
+        Returns:
+            Formatted S-expression string
+        """
+        if not self._clean_formatter:
+            self._init_clean_formatter()
+        
+        # Convert sexpdata format to plain lists if needed
+        converted = self._convert_to_plain_lists(data)
+        return self._clean_formatter.format(converted)
+    
+    def _shadow_mode_format(self, data: Any) -> str:
+        """Run both formatters and compare outputs.
+        
+        Args:
+            data: Data to format
+            
+        Returns:
+            Formatted S-expression string (uses old formatter result)
+        """
+        # Format with old formatter
+        old_result = self._format_sexp(data)
+        
+        # Format with new formatter
+        try:
+            new_result = self._format_with_clean(data)
+            
+            # Compare results (normalize for comparison)
+            if self._normalize_sexpr(old_result) != self._normalize_sexpr(new_result):
+                logger.warning("Shadow mode: Formatters produced different outputs!")
+                # Log differences for debugging
+                self._log_differences(old_result, new_result)
+            else:
+                logger.debug("Shadow mode: Formatters produced identical outputs")
+        except Exception as e:
+            logger.error(f"Shadow mode: Clean formatter failed: {e}")
+        
+        # Always return old formatter result in shadow mode
+        return old_result
+    
+    def _convert_to_plain_lists(self, data: Any) -> Any:
+        """Convert sexpdata format to plain Python lists.
+        
+        Args:
+            data: Data in sexpdata format
+            
+        Returns:
+            Data as plain Python lists/values
+        """
+        if isinstance(data, sexpdata.Symbol):
+            return str(data)
+        elif isinstance(data, (list, tuple)):
+            return [self._convert_to_plain_lists(item) for item in data]
+        else:
+            return data
+    
+    def _normalize_sexpr(self, sexpr_str: str) -> str:
+        """Normalize S-expression string for comparison.
+        
+        Args:
+            sexpr_str: S-expression string
+            
+        Returns:
+            Normalized string (no extra whitespace, consistent formatting)
+        """
+        # Remove extra whitespace and normalize
+        import re
+        # Remove comments
+        lines = [line.split(';')[0] for line in sexpr_str.split('\n')]
+        text = ' '.join(lines)
+        # Normalize whitespace
+        text = re.sub(r'\s+', ' ', text)
+        text = re.sub(r'\s*\(\s*', '(', text)
+        text = re.sub(r'\s*\)\s*', ')', text)
+        return text.strip()
+    
+    def _log_differences(self, old_result: str, new_result: str):
+        """Log differences between formatter outputs.
+        
+        Args:
+            old_result: Output from old formatter
+            new_result: Output from new formatter
+        """
+        import difflib
+        
+        old_lines = old_result.splitlines()
+        new_lines = new_result.splitlines()
+        
+        diff = difflib.unified_diff(
+            old_lines, new_lines,
+            fromfile='old_formatter',
+            tofile='clean_formatter',
+            lineterm=''
+        )
+        
+        diff_text = '\n'.join(list(diff)[:50])  # First 50 lines of diff
+        if diff_text:
+            logger.debug(f"Formatter differences:\n{diff_text}")
 
     def _format_sexp(
         self,
