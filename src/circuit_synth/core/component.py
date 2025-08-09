@@ -20,34 +20,17 @@ from .exception import (
 from .pin import Pin
 from .simple_pin_access import PinGroup, SimplifiedPinAccess
 
-# Import the ultra-high-performance Rust-accelerated symbol cache (55x faster)
+# Import the Python symbol cache implementation
 try:
-    from ..kicad.rust_accelerated_symbol_cache import SymbolLibCache
+    from ..kicad.kicad_symbol_cache import SymbolLibCache
+except ImportError:
+    # Last resort - simple fallback
+    context_logger.error("No symbol cache available", component="COMPONENT")
 
-    context_logger.info(
-        "🦀 Rust-accelerated SymbolLibCache loaded (55x performance improvement)",
-        component="COMPONENT",
-    )
-    RUST_SYMBOL_CACHE_AVAILABLE = True
-except ImportError as e:
-    context_logger.warning(
-        f"🔄 Rust symbol cache not available, using Python fallback: {e}",
-        component="COMPONENT",
-    )
-    try:
-        from ..kicad.kicad_symbol_cache import SymbolLibCache
-
-        RUST_SYMBOL_CACHE_AVAILABLE = False
-    except ImportError:
-        # Last resort - simple fallback
-        context_logger.error("No symbol cache available", component="COMPONENT")
-
-        class SymbolLibCache:
-            @staticmethod
-            def get_symbol_data(symbol_id: str):
-                return {}
-
-        RUST_SYMBOL_CACHE_AVAILABLE = False
+    class SymbolLibCache:
+        @staticmethod
+        def get_symbol_data(symbol_id: str):
+            return {}
 
 
 @dataclass
