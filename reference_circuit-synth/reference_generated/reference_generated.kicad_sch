@@ -1,6 +1,9 @@
 (kicad_sch
 	(version 20250114)
 	(generator "circuit_synth")
+	(paper "A4")
+	(lib_symbols
+	)
 	(symbol
 		(lib_id "Device:R")
 		(at 38.1 40.64 0.0)
@@ -10,7 +13,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 140e2ff6-89df-49eb-a698-34719e92cb2b)
+		(uuid c588248e-d785-4ddb-807b-ba9c749dc3c8)
 		(property
 			"Reference"
 			"R1"
@@ -43,5 +46,7 @@
 				)
 			)
 		)
+	)
+	(sheet_instances
 	)
 )

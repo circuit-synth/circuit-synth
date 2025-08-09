@@ -231,6 +231,12 @@ class SExpressionParser:
         if schematic.generator:
             result.append([sexpdata.Symbol("generator"), schematic.generator])
 
+        # Add paper size (required for lib_symbols insertion point)
+        result.append([sexpdata.Symbol("paper"), "A4"])
+
+        # Add lib_symbols placeholder (will be populated later)
+        result.append([sexpdata.Symbol("lib_symbols")])
+
         # Add components (symbols) - only if they have content
         for component in schematic.components:
             sexp = self._symbol_to_sexp(component)
@@ -261,6 +267,9 @@ class SExpressionParser:
             sexp = self._sheet_to_sexp(sheet)
             if sexp and len(sexp) > 1:
                 result.append(sexp)
+
+        # Add sheet_instances placeholder (will be populated later)
+        result.append([sexpdata.Symbol("sheet_instances")])
 
         return result
 

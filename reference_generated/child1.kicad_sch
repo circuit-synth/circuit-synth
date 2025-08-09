@@ -1,0 +1,117 @@
+(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(symbol
+		(lib_id "Connector:USB_C_Plug_USB2.0")
+		(at 58.42 66.04 0.0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 0f83151f-f1ff-4666-b8de-095b8a9b7691)
+		(property
+			"Reference"
+			"P1"
+			(at 58.42 61.040000000000006 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			"Value"
+			"USB_C_Plug_USB2.0"
+			(at 58.42 71.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project
+				"reference_generated"
+				(path
+					"/869dcdc6-17e8-41ca-b3e4-ee04c9a45bd4/e91dc0bf-14e5-43fa-83cc-411e64676bce"
+					(reference "P1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 50.800000000000004 88.9 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 9cec4911-4572-4a51-90d1-b5cf9d103cf5)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 88.9 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 4823d0c0-850a-47a9-a76f-de3b5ce4b314)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 88.9 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid eb0da9c6-9a63-43c9-aca2-915b0619516c)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 88.9 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 6df20d22-8a24-41c0-9299-ee4191971a88)
+	)
+	(hierarchical_label
+		"GND"
+		(shape
+			input
+		)
+		(at 58.42 88.9 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 5939bb07-b6b0-46e6-b266-d71f122f5efc)
+	)
+)
