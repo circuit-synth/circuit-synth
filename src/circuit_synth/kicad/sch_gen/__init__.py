@@ -1,6 +1,5 @@
 # Import main generator
 from .main_generator import SchematicGenerator
-
 from .schematic_writer import write_schematic_file
 
 __all__ = [

@@ -294,7 +294,7 @@ class SchematicWriter:
         """
         Create the full top-level (kicad_sch ...) list structure for this circuit.
 
-        PERFORMANCE MONITORING: Times each major operation and reports Rust acceleration status.
+        PERFORMANCE MONITORING: Times each major operation.
         """
         start_time = time.perf_counter()
         logger.info(
@@ -303,7 +303,7 @@ class SchematicWriter:
         logger.info(
             f"📊 GENERATE_S_EXPR: Components: {len(self.circuit.components)}, Nets: {len(self.circuit.nets)}"
         )
-        logger.info(f"🦀 GENERATE_S_EXPR: Using Rust acceleration for components")
+        logger.info(f"🐍 GENERATE_S_EXPR: Using Python implementation for components")
 
         # Add components using the new API - time this critical operation
         comp_start = time.perf_counter()
@@ -354,11 +354,9 @@ class SchematicWriter:
         # Add text annotations (TextBox, TextProperty, etc.)
         self._add_annotations()
 
-        # Convert to S-expression format using the parser - CRITICAL RUST ACCELERATION POINT
+        # Convert to S-expression format using the parser
         sexpr_start = time.perf_counter()
-        logger.info(
-            "⚡ STEP 6/8: Converting to S-expression format (RUST ACCELERATION POINT)..."
-        )
+        logger.info("⚡ STEP 6/8: Converting to S-expression format...")
         schematic_sexpr = self.parser.from_schematic(self.schematic)
         sexpr_time = time.perf_counter() - sexpr_start
         logger.info(
@@ -435,10 +433,8 @@ class SchematicWriter:
             f"  📚 Sections: {sections_time*1000:.2f}ms ({sections_time/total_time*100:.1f}%)"
         )
 
-        # Performance metrics (Rust is always used)
-        logger.info(
-            f"⚡ RUST_PERFORMANCE: Completed with Rust acceleration in {total_time*1000:.2f}ms"
-        )
+        # Performance metrics
+        logger.info(f"⚡ PERFORMANCE: Completed in {total_time*1000:.2f}ms")
 
         # Add symbol_instances section - DISABLED for new KiCad format (20250114+)
         # The new format uses instances within each symbol instead
@@ -610,9 +606,9 @@ class SchematicWriter:
 
     def _place_components(self):
         """
-        Use the PlacementEngine to arrange components with Rust acceleration when available.
+        Use the PlacementEngine to arrange components.
 
-        PERFORMANCE OPTIMIZATION: Attempts Rust force-directed placement for 40-60% speedup.
+        PERFORMANCE OPTIMIZATION: Uses force-directed placement algorithms.
         """
         if not self.schematic.components:
             logger.debug("No components to place")
@@ -622,7 +618,7 @@ class SchematicWriter:
         logger.info(
             f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components"
         )
-        logger.info(f"🦀 PLACE_COMPONENTS: Using Rust placement acceleration")
+        logger.info(f"🐍 PLACE_COMPONENTS: Using Python placement engine")
 
         # Check if components need repositioning (have default positions)
         components_needing_placement = []
@@ -643,11 +639,11 @@ class SchematicWriter:
             f"🔧 PLACE_COMPONENTS: {len(components_needing_placement)} components need placement"
         )
 
-        # Use the PlacementEngine with Rust acceleration
+        # Use the PlacementEngine
         try:
             placement_start = time.perf_counter()
 
-            # Try Rust force-directed placement first for optimal results
+            # Try force-directed placement for optimal results
             if (
                 len(components_needing_placement) >= 3
             ):  # Force-directed works best with multiple components
@@ -657,7 +653,7 @@ class SchematicWriter:
                 self.placement_engine.arrange_components(
                     components_needing_placement,
                     arrangement="force_directed",
-                    use_rust_acceleration=True,  # Always use Rust
+                    use_rust_acceleration=False,  # Python implementation
                 )
             else:
                 # For few components, use grid placement
@@ -1200,7 +1196,7 @@ class SchematicWriter:
                 f"    ✅ SCHEMATIC_WRITER: Got symbol data for '{sym_id}' with properties: {list(lib_data.get('properties', {}).keys()) if isinstance(lib_data, dict) else 'N/A'}"
             )
 
-            # Check if graphics data is missing from Rust cache - if so, use Python fallback
+            # Check if graphics data is missing from cache - if so, use Python fallback
             if "graphics" not in lib_data or not lib_data["graphics"]:
                 logger.info(
                     f"Graphics data missing for {sym_id}, using Python fallback"
@@ -1208,7 +1204,7 @@ class SchematicWriter:
                 try:
                     python_lib_data = PythonSymbolLibCache.get_symbol_data(sym_id)
                     if python_lib_data and "graphics" in python_lib_data:
-                        # Merge graphics data from Python cache into Rust cache data
+                        # Merge graphics data from Python cache into cache data
                         lib_data["graphics"] = python_lib_data["graphics"]
                         logger.info(
                             f"Added {len(python_lib_data['graphics'])} graphics elements from Python cache"
@@ -1471,8 +1467,8 @@ def write_schematic_file(schematic_expr: list, out_path: str):
     """
     Helper to serialize the final S-expression to a .kicad_sch file.
 
-    PERFORMANCE OPTIMIZATION: Uses Rust-accelerated formatting when available.
-    This is the final step where the Rust S-expression formatter provides maximum benefit.
+    PERFORMANCE OPTIMIZATION: Uses optimized S-expression formatting.
+    This is the final step where the S-expression formatter is applied.
     """
     start_time = time.perf_counter()
     expr_size = len(str(schematic_expr)) if schematic_expr else 0
@@ -1481,7 +1477,7 @@ def write_schematic_file(schematic_expr: list, out_path: str):
     logger.info(
         f"📊 WRITE_SCHEMATIC_FILE: Input S-expression size: {expr_size:,} characters"
     )
-    logger.info(f"🦀 WRITE_SCHEMATIC_FILE: Using Rust formatting")
+    logger.info(f"🐍 WRITE_SCHEMATIC_FILE: Using Python formatting")
 
     # Debug: Check for sheet pins with orientation - time this analysis
     debug_start = time.perf_counter()
@@ -1527,11 +1523,9 @@ def write_schematic_file(schematic_expr: list, out_path: str):
         f"🔍 WRITE_SCHEMATIC_FILE: Debug analysis completed in {debug_time*1000:.2f}ms, found {sheet_pin_count} sheet pins"
     )
 
-    # This now uses the Rust-accelerated format_kicad_schematic function internally
+    # This uses the Python format_kicad_schematic function
     parser_start = time.perf_counter()
-    logger.info(
-        "⚡ WRITE_SCHEMATIC_FILE: Starting S-expression parsing and formatting (RUST ACCELERATION POINT)"
-    )
+    logger.info("⚡ WRITE_SCHEMATIC_FILE: Starting S-expression parsing and formatting")
 
     from circuit_synth.kicad.core.s_expression import SExpressionParser
 
@@ -1580,10 +1574,8 @@ def write_schematic_file(schematic_expr: list, out_path: str):
         f"📦 WRITE_SCHEMATIC_FILE: Size change: {expr_size:,} → {len(content):,} chars ({compression_ratio:.2f}x)"
     )
 
-    # Performance summary (Rust is always used)
-    logger.info(
-        f"⚡ RUST_PERFORMANCE: Schematic written with Rust acceleration in {total_time*1000:.2f}ms"
-    )
+    # Performance summary
+    logger.info(f"⚡ PERFORMANCE: Schematic written in {total_time*1000:.2f}ms")
 
     logger.info(
         f"✅ WRITE_SCHEMATIC_FILE: Successfully wrote {len(content):,} characters to {out_path}"

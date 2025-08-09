@@ -1,9 +1,9 @@
 (export (version "E")
     (design
       (source "main.kicad_sch")
-      (date "2025-08-08T20:01:48-0700")
+      (date "2025-08-08T20:24:13-0700")
       (tool "Circuit-Synth Exporter v0.1.0")
-      (sheet (number "1") (name "root") (tstamps "/67edcaf3-de1c-4163-84c3-9396045bcf19/")
+      (sheet (number "1") (name "root") (tstamps "/b6de5df5-af6f-458c-953a-f038bff65835/")
       (title_block
         (title )
         (company )
@@ -19,7 +19,7 @@
         (comment (number "7") (value ""))
         (comment (number "8") (value ""))
         (comment (number "9") (value ""))))
-      (sheet (number "2") (name "root/child1") (tstamps "/1c590eeb-3c1a-4245-b536-f7aa3580d54c/")
+      (sheet (number "2") (name "root/child1") (tstamps "/e44abcbc-237f-4114-8fa4-4fa8ab8be233/")
       (title_block
         (title )
         (company )
@@ -35,7 +35,7 @@
         (comment (number "7") (value ""))
         (comment (number "8") (value ""))
         (comment (number "9") (value ""))))
-      (sheet (number "3") (name "root/child1/child2") (tstamps "/5cf532e6-5364-45dc-a2dc-ea8fa285da24/")
+      (sheet (number "3") (name "root/child1/child2") (tstamps "/c033dbfa-19e1-43ef-9664-1754939cc26b/")
       (title_block
         (title )
         (company )
@@ -63,7 +63,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "7a0abce2-a817-4c45-a7a5-21926059c3ba"))
+      (tstamps "b297c020-2be2-4a43-9eb9-fb8eb8c5e8c1"))
     (comp (ref "P1")
       (value "USB_C_Plug_USB2.0")
       (description "USB 2.0-only Type-C Plug connector")
@@ -75,7 +75,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "USB*C*Plug*"))
       (sheetpath (names "/child1/") (tstamps "/child1/"))
-      (tstamps "602377a7-249e-44b5-a689-a4d6dc1684cb"))
+      (tstamps "757a136e-40dc-415c-a5d7-e50bba7f3f6a"))
     (comp (ref "U1")
       (value "LM324")
       (description "Low-Power, Quad-Operational Amplifiers, DIP-14/SOIC-14/SSOP-14")
@@ -87,7 +87,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "SOIC*3.9x8.7mm*P1.27mm* DIP*W7.62mm* TSSOP*4.4x5mm*P0.65mm* SSOP*5.3x6.2mm*P0.65mm* MSOP*3x3mm*P0.5mm*"))
       (sheetpath (names "/child1/child2/") (tstamps "/child1/child2/"))
-      (tstamps "1d26b428-2262-4a2d-992c-69ab25bc84ff")))
+      (tstamps "a97881c9-540f-4d48-ac51-6258c01ef859")))
     (libparts
     (libpart (lib "Device") (part "R")
       (description "Resistor")

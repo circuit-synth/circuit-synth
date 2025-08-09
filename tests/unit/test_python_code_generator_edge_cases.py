@@ -107,6 +107,7 @@ class TestPythonCodeGeneratorEdgeCases:
     @pytest.mark.skip(reason="Hierarchical generation API changed - needs test update")
     def test_dual_hierarchy_no_shared_nets(self, generator, temp_output_dir):
         """Test generation of separate files for hierarchical circuits with no shared nets"""
+
         @circuit(name="main")
         def main():
             r1 = Component(symbol="Device:R", ref="R1", value="1k")
@@ -143,6 +144,7 @@ class TestPythonCodeGeneratorEdgeCases:
     @pytest.mark.skip(reason="Hierarchical generation API changed - needs test update")
     def test_dual_hierarchy_with_shared_nets(self, generator, temp_output_dir):
         """Test generation of separate files for hierarchical circuits with shared nets"""
+
         @circuit(name="main")
         def main():
             r1 = Component(symbol="Device:R", ref="R1", value="1k")
@@ -196,6 +198,7 @@ class TestPythonCodeGeneratorEdgeCases:
     @pytest.mark.skip(reason="Hierarchical generation API changed - needs test update")
     def test_partially_shared_nets_detection(self, generator, temp_output_dir):
         """Test detection and handling of partially shared nets"""
+
         @circuit(name="main")
         def main():
             vcc = Net("VCC")
@@ -230,6 +233,7 @@ class TestPythonCodeGeneratorEdgeCases:
         self, generator, temp_output_dir
     ):
         """Test handling of multiple subcircuits with different shared net patterns"""
+
         @circuit(name="main")
         def main():
             vcc = Net("VCC")
@@ -285,6 +289,7 @@ class TestPythonCodeGeneratorEdgeCases:
     @pytest.mark.skip(reason="Hierarchical generation API changed - needs test update")
     def test_hierarchical_detection_logic(self, generator):
         """Test the logic that determines if a design is hierarchical"""
+
         @circuit(name="main")
         def main():
             pass
@@ -320,11 +325,16 @@ class TestPythonCodeGeneratorEdgeCases:
 
     def test_component_reference_sanitization(self, generator):
         """Test that component references are properly sanitized"""
+
         @circuit(name="main")
         def main():
             # Note: Component class uses 'ref' not 'reference', and 'symbol' not 'lib_id'
-            r1 = Component(symbol="Device:R", ref="R+1", value="10k")  # Invalid reference
-            c1 = Component(symbol="Device:C", ref="123C", value="1uF")  # Starts with number
+            r1 = Component(
+                symbol="Device:R", ref="R+1", value="10k"
+            )  # Invalid reference
+            c1 = Component(
+                symbol="Device:C", ref="123C", value="1uF"
+            )  # Starts with number
 
         test_circuit = main()
 
@@ -336,18 +346,19 @@ class TestPythonCodeGeneratorEdgeCases:
 
     def test_net_connection_generation(self, generator):
         """Test generation of net connection statements"""
+
         @circuit(name="main")
         def main():
             r1 = Component(symbol="Device:R", ref="R1", value="10k")
-            
+
             vcc = Net("VCC")
             gnd = Net("GND")
             signal = Net("SIGNAL")
-            
+
             # Make the connections
             r1[1] += vcc
             r1[2] += gnd
-            r1['A'] += signal  # Named pin
+            r1["A"] += signal  # Named pin
 
         test_circuit = main()
 
@@ -360,13 +371,14 @@ class TestPythonCodeGeneratorEdgeCases:
 
     def test_unconnected_nets_filtering(self, generator):
         """Test that unconnected nets are properly filtered out"""
+
         @circuit(name="main")
         def main():
             r1 = Component(symbol="Device:R", ref="R1", value="10k")
-            
+
             vcc = Net("VCC")
             unconnected = Net("unconnected-(R1-Pad2)")
-            
+
             # Make the connections
             r1[1] += vcc
             r1[2] += unconnected  # Should be filtered

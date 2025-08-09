@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid 13dad5d0-037f-43c9-afec-6c2326e887db)
+	(uuid e16fe701-4c98-4501-a7b5-a2b0a1d7d8ab)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Connector:USB_C_Plug_USB2.0"
@@ -639,7 +639,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 8438739b-4f6c-4fe0-b12d-c72ef7ef9d60)
+		(uuid 2b5731d2-0177-4e4f-a967-3c95286bd62d)
 		(property "Reference" "P1"
 			(at 58.42 61.040000000000006 0)
 			(effects
@@ -660,7 +660,7 @@
 		)
 		(instances
 			(project "reference_generated"
-				(path "/cd36dd17-8d4d-4370-8603-09176eebfb1a/71ed6cf3-01e0-4b1e-9251-8bfa4073cd92"
+				(path "/e54f82e6-12e8-4c3f-acea-b4b89cde6221/371757ae-7c19-4fd8-b5b8-0cdb4581d496"
 					(reference "P1")
 					(unit 1)
 				)
@@ -677,7 +677,7 @@
 			)
 			(justify right)
 		)
-		(uuid 067e0ee0-34de-409c-a33e-fc88b9d8c2a3)
+		(uuid d329fe72-b30d-4720-bd09-a386518397b2)
 	)
 	(hierarchical_label
 		GND
@@ -689,7 +689,7 @@
 			)
 			(justify right)
 		)
-		(uuid 43f9894b-80f1-4592-a39e-99c6958a1209)
+		(uuid e5f6ba33-c73a-4b93-9f8b-781ebb15dedc)
 	)
 	(hierarchical_label
 		GND
@@ -701,7 +701,7 @@
 			)
 			(justify right)
 		)
-		(uuid f63351d7-12c3-492b-81f8-eb2e7ae40753)
+		(uuid 2d6889a6-2622-469f-94f3-72257bb84b9f)
 	)
 	(hierarchical_label
 		GND
@@ -713,7 +713,7 @@
 			)
 			(justify right)
 		)
-		(uuid 6ff3e4d2-a635-4a72-93f7-26b42abe5c47)
+		(uuid 55250c4d-b532-40d1-a840-de1af911238c)
 	)
 	(hierarchical_label
 		GND
@@ -725,7 +725,7 @@
 			)
 			(justify right)
 		)
-		(uuid 38fbaedc-b152-4e9d-be48-11e9b633181b)
+		(uuid 34b7b2d2-89ed-4f30-80a3-836d80620d13)
 	)
 	(hierarchical_label
 		GND
@@ -737,7 +737,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9b257b92-aafe-4835-816c-6a37ab577ba0)
+		(uuid 5fbbd726-0907-4175-a15d-d7657edda3c3)
 	)
 	(sheet
 		(at 81.28 57.15)
@@ -754,7 +754,7 @@
 				0.0
 			)
 		)
-		(uuid 40a718cf-48cf-422b-8211-de9058fcd218)
+		(uuid 522d50fa-4d60-4aa7-8e1c-a609a8efd582)
 		(property "Sheetname" "child2"
 			(at 81.28 55.879999999999995 0)
 			(effects
@@ -784,7 +784,7 @@
 				)
 				(justify right)
 			)
-			(uuid 87bcebd3-cddd-45da-b55a-2893151acad4)
+			(uuid dbb70756-dfd1-4623-a408-1453f8cc2e29)
 		)
 		(instances
 			(project "reference_generated"
@@ -825,10 +825,10 @@
 			)
 			(justify left top)
 		)
-		(uuid 0359d96a-8418-44d6-8a0b-f7f863a62c1c)
+		(uuid 4d7875a3-462d-4ace-8393-995d8f6ca4c9)
 	)
 	(sheet_instances
-		(path "/cd36dd17-8d4d-4370-8603-09176eebfb1a/71ed6cf3-01e0-4b1e-9251-8bfa4073cd92"
+		(path "/e54f82e6-12e8-4c3f-acea-b4b89cde6221/371757ae-7c19-4fd8-b5b8-0cdb4581d496"
 			(page "1")
 		)
 	)

@@ -13,10 +13,11 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Python implementation for symbol cache
-
 # Import the parser
 from .kicad_symbol_parser import parse_kicad_sym_file
+
+# Python implementation for symbol cache
+
 
 # Add performance timing
 try:

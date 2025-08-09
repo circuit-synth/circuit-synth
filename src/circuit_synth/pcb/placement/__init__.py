@@ -3,10 +3,10 @@
 from .base import ComponentWrapper
 from .connection_centric import ConnectionCentricPlacement
 from .connectivity_driven import ConnectivityDrivenPlacer
-from .hierarchical_placement import HierarchicalPlacer
 
 # Python implementation
 from .force_directed import ForceDirectedPlacer
+from .hierarchical_placement import HierarchicalPlacer
 
 
 def apply_force_directed_placement(*args, **kwargs):

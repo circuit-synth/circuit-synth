@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid 2c89e9d8-21ce-4ef6-b04a-18c23522b5a0)
+	(uuid 6132af67-1e8b-4339-ad61-18f079cd4aad)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Amplifier_Operational:LM324"
@@ -473,7 +473,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 0beea281-764a-4c9a-a06e-02784164ec53)
+		(uuid 22bf16e8-45b3-4088-89fc-fed8f26a2b78)
 		(property "Reference" "U1"
 			(at 45.72 53.42 0)
 			(effects
@@ -494,7 +494,7 @@
 		)
 		(instances
 			(project "reference_generated"
-				(path "/cd36dd17-8d4d-4370-8603-09176eebfb1a/71ed6cf3-01e0-4b1e-9251-8bfa4073cd92/40a718cf-48cf-422b-8211-de9058fcd218"
+				(path "/e54f82e6-12e8-4c3f-acea-b4b89cde6221/371757ae-7c19-4fd8-b5b8-0cdb4581d496/522d50fa-4d60-4aa7-8e1c-a609a8efd582"
 					(reference "U1")
 					(unit 1)
 				)
@@ -511,7 +511,7 @@
 			)
 			(justify right)
 		)
-		(uuid 7a0b8fe9-e3b9-4ec2-93ad-38e016d0b071)
+		(uuid ec653d98-6026-458d-a9c3-590e520eba98)
 	)
 	(text_box
 		"child2 subcircuit\n    Parameters: GND"
@@ -544,10 +544,10 @@
 			)
 			(justify left top)
 		)
-		(uuid d0d81a90-cb79-4188-8bce-f25664bc0f3f)
+		(uuid dd0d62de-7a8a-45a2-859b-8baee0336ab6)
 	)
 	(sheet_instances
-		(path "/cd36dd17-8d4d-4370-8603-09176eebfb1a/71ed6cf3-01e0-4b1e-9251-8bfa4073cd92/40a718cf-48cf-422b-8211-de9058fcd218"
+		(path "/e54f82e6-12e8-4c3f-acea-b4b89cde6221/371757ae-7c19-4fd8-b5b8-0cdb4581d496/522d50fa-4d60-4aa7-8e1c-a609a8efd582"
 			(page "1")
 		)
 	)

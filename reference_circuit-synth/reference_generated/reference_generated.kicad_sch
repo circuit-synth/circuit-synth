@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid cd36dd17-8d4d-4370-8603-09176eebfb1a)
+	(uuid e54f82e6-12e8-4c3f-acea-b4b89cde6221)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
@@ -151,7 +151,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 572bd772-ad8f-489a-8520-115f12cf3b6b)
+		(uuid 2caab625-e079-4cb4-b6f0-43d4ded6af01)
 		(property "Reference" "R1"
 			(at 38.1 40.72 0)
 			(effects
@@ -172,7 +172,7 @@
 		)
 		(instances
 			(project ""
-				(path "/cd36dd17-8d4d-4370-8603-09176eebfb1a"
+				(path "/e54f82e6-12e8-4c3f-acea-b4b89cde6221"
 					(reference "R1")
 					(unit 1)
 				)
@@ -189,7 +189,7 @@
 			)
 			(justify right)
 		)
-		(uuid f34ace6c-75e4-4b9a-9fd8-1a4715107903)
+		(uuid 9b61ec5a-4fe0-4214-a5d7-e9b88145d965)
 	)
 	(hierarchical_label
 		GND
@@ -201,7 +201,7 @@
 			)
 			(justify left)
 		)
-		(uuid 6f6baf30-96f4-4503-a233-a910d3f9a18a)
+		(uuid ba63b71b-362e-4670-827b-a162c79ae5fc)
 	)
 	(sheet
 		(at 58.42 36.83)
@@ -218,7 +218,7 @@
 				0.0
 			)
 		)
-		(uuid 71ed6cf3-01e0-4b1e-9251-8bfa4073cd92)
+		(uuid 371757ae-7c19-4fd8-b5b8-0cdb4581d496)
 		(property "Sheetname" "child1"
 			(at 58.42 35.559999999999995 0)
 			(effects
@@ -248,7 +248,7 @@
 				)
 				(justify right)
 			)
-			(uuid 995b1731-6c3a-4655-874f-51d26d4b7482)
+			(uuid d9b14b96-2a54-4890-ac12-174eb4c44391)
 		)
 		(instances
 			(project "reference_generated"
@@ -289,10 +289,10 @@
 			)
 			(justify left top)
 		)
-		(uuid ba716671-c744-43fc-af13-6b189be42cb8)
+		(uuid 1c5817fb-eb13-4721-91f9-0b3b2efd1a6d)
 	)
 	(sheet_instances
-		(path "/cd36dd17-8d4d-4370-8603-09176eebfb1a"
+		(path "/e54f82e6-12e8-4c3f-acea-b4b89cde6221"
 			(page "1")
 		)
 	)
