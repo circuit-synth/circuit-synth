@@ -12,7 +12,6 @@ on:
     paths:
       - 'pyproject.toml'
       - 'src/**'
-      - 'rust_modules/**'
   push:
     tags:
       - 'v*'
@@ -43,29 +42,6 @@ jobs:
             **/pyproject.toml
             **/requirements*.txt
       
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: |
-            rust_modules/rust_netlist_processor
-            rust_modules/rust_symbol_cache
-            rust_modules/rust_core_circuit_engine
-            rust_modules/rust_symbol_search
-            rust_modules/rust_force_directed_placement
-            rust_modules/rust_kicad_integration
-      
-      - name: Build Rust modules
-        run: |
-          for module in rust_netlist_processor rust_symbol_cache rust_core_circuit_engine rust_symbol_search rust_force_directed_placement rust_kicad_integration; do
-            echo "Building $module..."
-            cd rust_modules/$module
-            maturin develop --release
-            cd ../..
-          done
-      
       - name: Build distribution
         run: uv build
       
@@ -91,30 +67,6 @@ jobs:
           fi
         shell: bash
       
-      - name: Test Rust modules
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            test_env/Scripts/python -c "
-import rust_netlist_processor
-import rust_symbol_cache
-import rust_core_circuit_engine
-print('✅ All Rust modules import successfully!')
-"
-          else
-            test_env/bin/python -c "
-import rust_netlist_processor
-import rust_symbol_cache
-import rust_core_circuit_engine
-print('✅ All Rust modules import successfully!')
-"
-          fi
-        shell: bash
-      
-      - name: Test circuit functionality
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            test_env/Scripts/python -c "
-from circuit_synth import Component, Net, circuit
 
 @circuit
 def test():
@@ -172,18 +124,6 @@ print('✅ Circuit functionality works!')
       - name: Install uv
         uses: astral-sh/setup-uv@v5
       
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-      
-      - name: Build Rust modules
-        run: |
-          for module in rust_netlist_processor rust_symbol_cache rust_core_circuit_engine rust_symbol_search rust_force_directed_placement rust_kicad_integration; do
-            echo "Building $module..."
-            cd rust_modules/$module
-            maturin develop --release
-            cd ../..
-          done
-      
       - name: Build distribution
         run: uv build
       
@@ -198,7 +138,6 @@ print('✅ Circuit functionality works!')
           COPY dist/*.whl /test/
           RUN pip install /test/*.whl
           RUN python -c "import circuit_synth; print('✅ Python $version Docker test passed!')"
-          RUN python -c "import rust_netlist_processor, rust_symbol_cache, rust_core_circuit_engine; print('✅ Rust modules work!')"
           EOF
             
             docker build -f Dockerfile.test -t circuit-synth-test:py$version .

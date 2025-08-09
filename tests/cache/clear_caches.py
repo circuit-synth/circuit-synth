@@ -2,8 +2,6 @@
 """
 Cache Clearing Utility for Circuit Synth Testing
 
-This script provides utilities to clear all caches (both Python and Rust)
-to ensure clean testing environments for validating the Rust cache integration.
 """
 
 import argparse
@@ -44,7 +42,6 @@ class CacheCleaner:
         locations = {
             'python_symbol_cache': [],
             'python_footprint_cache': [],
-            'rust_cache': [],
             'temp_caches': [],
             'kicad_caches': []
         }
@@ -59,12 +56,6 @@ class CacheCleaner:
             Path.home() / ".circuit_synth",
         ]
         
-        # Look for Rust cache directories (excluding rust_unified_cache)
-        rust_cache_dirs = [
-            self.project_root / "rust_symbol_cache" / "target",
-            self.project_root / "rust_symbol_search" / "target", 
-            self.project_root / "rust_reference_manager" / "target",
-            self.project_root / ".cache" / "rust_cache",
         ]
         
         # Look for KiCad project caches
@@ -80,9 +71,6 @@ class CacheCleaner:
             if cache_dir.exists():
                 locations['temp_caches'].append(cache_dir)
         
-        for rust_dir in rust_cache_dirs:
-            if rust_dir.exists():
-                locations['rust_cache'].append(rust_dir)
         
         # Find KiCad cache files
         for pattern in kicad_cache_patterns:
@@ -135,46 +123,24 @@ class CacheCleaner:
         
         return success
     
-    def clear_rust_caches(self) -> bool:
-        """Clear Rust-based caches"""
-        logger.info("Clearing Rust caches...")
         success = True
         
         try:
-            # Clear Rust target directories (build artifacts) - excluding rust_unified_cache
-            rust_targets = [
-                self.project_root / "rust_symbol_cache" / "target",
-                self.project_root / "rust_symbol_search" / "target",
-                self.project_root / "rust_reference_manager" / "target"
             ]
-            for rust_target in rust_targets:
-                if rust_target.exists():
-                    shutil.rmtree(rust_target, ignore_errors=True)
-                    logger.info(f"✓ Rust target directory cleared: {rust_target.parent.name}")
             
-            # Clear Rust cache directories
-            for cache_dir in self.cache_locations['rust_cache']:
                 if cache_dir.exists():
                     if cache_dir.is_file():
                         cache_dir.unlink()
                     else:
                         shutil.rmtree(cache_dir, ignore_errors=True)
-                    logger.info(f"✓ Rust cache cleared: {cache_dir}")
             
-            # Clear any Rust cache files in the project
-            rust_cache_files = list(self.project_root.glob("**/*.cache"))
-            rust_cache_files.extend(list(self.project_root.glob("**/*.bin")))
             
-            for cache_file in rust_cache_files:
-                if "rust" in str(cache_file).lower() or "cache" in cache_file.name:
                     try:
                         cache_file.unlink()
-                        logger.info(f"✓ Rust cache file removed: {cache_file}")
                     except Exception as e:
                         logger.warning(f"Could not remove {cache_file}: {e}")
         
         except Exception as e:
-            logger.error(f"Error clearing Rust caches: {e}")
             success = False
         
         return success
@@ -229,7 +195,6 @@ class CacheCleaner:
         
         results = []
         results.append(self.clear_python_caches())
-        results.append(self.clear_rust_caches())
         results.append(self.clear_kicad_caches())
         results.append(self.clear_temp_caches())
         
@@ -265,7 +230,6 @@ def main():
         epilog="""
 Examples:
   python clear_caches.py --all                 # Clear all caches
-  python clear_caches.py --python --rust       # Clear Python and Rust caches
   python clear_caches.py --list                # List cache locations
   python clear_caches.py --kicad               # Clear only KiCad caches
         """
@@ -275,8 +239,6 @@ Examples:
                        help='Clear all cache types')
     parser.add_argument('--python', action='store_true',
                        help='Clear Python caches')
-    parser.add_argument('--rust', action='store_true',
-                       help='Clear Rust caches')
     parser.add_argument('--kicad', action='store_true',
                        help='Clear KiCad caches')
     parser.add_argument('--temp', action='store_true',
@@ -302,7 +264,6 @@ Examples:
         return 0
     
     # If no specific cache type is specified, default to all
-    if not any([args.python, args.rust, args.kicad, args.temp]):
         args.all = True
     
     success = True
@@ -312,8 +273,6 @@ Examples:
     else:
         if args.python:
             success &= cleaner.clear_python_caches()
-        if args.rust:
-            success &= cleaner.clear_rust_caches()
         if args.kicad:
             success &= cleaner.clear_kicad_caches()
         if args.temp:

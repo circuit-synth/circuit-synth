@@ -254,15 +254,12 @@ In the `lib_symbols` section:
 
 ## Important Implementation Notes
 
-### For Rust Implementation with lexpr
 
 1. **Always use `Value::list`**, never `Value::cons`
 2. Build nested structures with `Vec<Value>`
 3. Order matters for some elements (e.g., `at` values)
 4. Maintain proper indentation for readability (though not required)
 
-### Example Rust Code (Correct)
-```rust
 // Correct: List notation
 let uuid_sexp = Value::list(vec![
     Value::symbol("uuid"),

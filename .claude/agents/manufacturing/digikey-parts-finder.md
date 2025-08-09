@@ -289,9 +289,7 @@ def evaluate_digikey_component(component):
         score += 5
     
     # Brand reliability
-    trusted_brands = ['TDK', 'Murata', 'Vishay', 'Texas Instruments', 
                      'Analog Devices', 'STMicroelectronics', 'Microchip']
-    if component.manufacturer in trusted_brands:
         score += 15
     
     return score

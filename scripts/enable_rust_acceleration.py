@@ -1,1 +1,0 @@
-../tools/maintenance/enable_rust_acceleration.py

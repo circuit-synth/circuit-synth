@@ -3,17 +3,10 @@
 
 ## Before Building Package
 
-- [ ] All Rust modules built successfully
   ```bash
-  ./tools/build/build_rust_modules.sh
   ```
 
-- [ ] Rust modules are functional
   ```bash  
-  python -c "import rust_kicad_integration; print('✅ rust_kicad_integration works')"
-  python -c "import rust_core_circuit_engine; print('✅ rust_core_circuit_engine works')"
-  python -c "import rust_force_directed_placement; print('✅ rust_force_directed_placement works')"
-  python -c "import rust_netlist_processor; print('✅ rust_netlist_processor works')"
   ```
 
 ## After Building Package
@@ -36,7 +29,6 @@
 
 - [ ] All tests pass in clean environment
 - [ ] No hardcoded development paths in imports
-- [ ] Rust modules included in wheel
 - [ ] Basic circuit generation works
 
 ## Release

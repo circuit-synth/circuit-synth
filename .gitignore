@@ -152,11 +152,6 @@ cython_debug/
 # macOS
 .DS_Store
 
-# Rust
-/target/
-Cargo.lock
-**/*.rs.bk
-
 # KiCad
 *.kicad_pcb-bak
 *.kicad_sch-bak

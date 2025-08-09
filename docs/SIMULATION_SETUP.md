@@ -150,7 +150,6 @@ NgSpiceShared.LIBRARY_PATH = r'C:\ngspice\bin_dll\ngspice.dll'
 
 ## Security Considerations
 
-- ngspice executes SPICE netlists - only simulate trusted circuits
 - PySpice loads native libraries - ensure clean ngspice installation
 - Simulation files are temporary and cleaned up automatically
 

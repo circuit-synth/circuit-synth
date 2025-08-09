@@ -1,11 +1,9 @@
 ---
-allowed-tools: Bash(uv*), Bash(pytest*), Bash(open*), Bash(cargo*), Bash(./scripts/*), Bash(./tools/*)
 description: Orchestrates existing test tools for comprehensive testing
 ---
 
 # Comprehensive Test Runner
 
-**Purpose:** Orchestrates all existing test tools for complete testing coverage, including full regression tests, Rust modules, and performance benchmarking.
 
 ## Usage
 ```bash
@@ -40,13 +38,10 @@ uv run isort src/ tests/ examples/ --quiet
 ```
 
 ### 🔬 Full Suite (~5 minutes)
-Complete testing with Rust modules and examples:
 ```bash
 # Run comprehensive tests
 ./tools/testing/run_all_tests.sh --verbose
 
-# Test Rust modules specifically
-./tools/testing/test_rust_modules.sh --verbose
 
 # Test all examples
 for example in examples/*.py; do
@@ -65,24 +60,16 @@ done
 ### 1. `run_all_tests.sh`
 Main test orchestrator:
 - 🐍 **Python Tests** - Unit tests via pytest
-- 🦀 **Rust Tests** - Cargo tests for all modules
-- 🔗 **Integration Tests** - Python-Rust bindings
 - ⚙️ **Core Tests** - End-to-end functionality
 
 ### 2. `run_full_regression_tests.py` 
 **MANDATORY for releases**:
-- 🗑️ **Clears ALL caches** (Python, Rust, system)
 - 📦 **Reinstalls all dependencies** from scratch
-- 🔨 **Rebuilds all Rust modules** with Python bindings
 - 🧪 **Runs comprehensive test suite**
 - ✅ **Validates generated outputs**
 
-### 3. `test_rust_modules.sh`
-Dedicated Rust testing:
-- 🦀 **Module discovery** - Finds all Rust modules
 - 🔨 **Compilation checks** - Ensures all modules build
-- 🧪 **Cargo tests** - Runs native Rust tests
-- 📊 **Python bindings** - Validates PyO3 integration
+- 📊 **Python modules** - Validates module imports and functionality
 
 ## Implementation
 
@@ -165,9 +152,6 @@ case $SUITE in
         # Main tests
         ./tools/testing/run_all_tests.sh $TEST_ARGS || exit 1
         
-        # Rust module specific tests
-        echo "🦀 Testing Rust modules in detail..."
-        ./tools/testing/test_rust_modules.sh $TEST_ARGS || exit 1
         
         # Example validation
         echo "📚 Testing all examples..."
@@ -216,14 +200,12 @@ esac
 - Good for rapid development iteration
 
 **Standard Suite** (~2 minutes):
-- Python + Rust + Integration tests
 - Full test coverage without environment rebuild
 - Recommended for pre-commit checks
 
 **Full Suite** (~5 minutes):
 - Everything in Standard plus:
 - All examples validated
-- Detailed Rust module testing
 - Recommended for branch merges
 
 **Regression Suite** (~10 minutes):

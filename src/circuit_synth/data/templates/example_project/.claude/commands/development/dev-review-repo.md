@@ -26,7 +26,6 @@ This command analyzes the entire repository and creates structured reports based
 
 ### 2. Code Quality and Migration Cleanup
 - **Code that works** vs code that doesn't
-- **Python/Rust transition artifacts** - leftover code from language switches
 - **Duplicate implementations** - same functionality in multiple places
 - **Dead code** from abandoned migrations
 - **Inconsistent patterns** - mixing old and new approaches
@@ -74,7 +73,6 @@ The command generates reports matching your existing repo-review structure:
 repo-review/
 ├── 00-executive-summary-and-recommendations.md  # What needs attention most
 ├── 01-core-functionality-analysis.md            # Does the main stuff work?
-├── 02-code-quality-and-cleanup.md               # Python/Rust migration mess
 ├── 03-security-analysis.md                      # Security problems found
 ├── 04-performance-analysis.md                   # Slow spots and bottlenecks
 ├── 05-testing-analysis.md                       # Test coverage and quality
@@ -122,15 +120,11 @@ find examples/ -name "*.py" -exec python -m py_compile {} \;
 kicad-cli version
 ```
 
-### 2. Find Python/Rust Migration Mess
 ```bash
 # Look for duplicate implementations
-find . -name "*.py" -exec grep -l "rust_modules\|rust_integration" {} \;
 find . -name "*.rs" 2>/dev/null
 
 # Find dead code patterns
-grep -r "TODO.*rust\|FIXME.*rust\|deprecated.*rust" --include="*.py" .
-grep -r "import.*rust\|from.*rust" --include="*.py" .
 
 # Look for inconsistent patterns
 grep -r "class.*Component" --include="*.py" src/ | wc -l
@@ -174,7 +168,6 @@ uv run pytest --cov=circuit_synth --cov-report=term-missing
 ### 6. Documentation Audit
 ```bash
 # Outdated docs
-find . -name "README.md" -exec grep -l "rust\|Rust" {} \;
 
 # Missing docs
 python -c "
@@ -203,19 +196,13 @@ pip list --outdated
 # Vulnerabilities
 pip-audit
 
-# Rust leftovers
 find . -name "Cargo.toml" -o -name "*.rs"
 ```
 
 ## Special Focus Areas for This Repo
 
-### Python/Rust Migration Cleanup
-Since this repo went Python → Rust → Python, it specifically looks for:
 - **Duplicate implementations** of the same functionality
-- **Dead Rust code** that's no longer used
 - **Inconsistent patterns** where some code uses old style, some new
-- **Import confusion** between Python and Rust versions
-- **Build artifacts** left over from Rust attempts
 
 ### Circuit-Synth Specific Issues
 - **KiCad integration breaks** - does it actually generate working files?
@@ -236,7 +223,6 @@ Since this repo went Python → Rust → Python, it specifically looks for:
 # Skip example testing (faster)
 /dev-review-repo --run-examples=false
 
-# Focus on Python/Rust cleanup
 /dev-review-repo --focus=code-quality
 ```
 
@@ -246,7 +232,6 @@ After running, you'll have a `repo-review/` directory with markdown files that t
 
 1. **What's broken** and needs immediate fixing
 2. **What's working well** and should be left alone  
-3. **Where the Python/Rust migration left a mess** that needs cleanup
 4. **Security issues** that need attention
 5. **Performance bottlenecks** slowing things down
 6. **Test gaps** where coverage is missing

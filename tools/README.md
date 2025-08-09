@@ -12,15 +12,10 @@ This directory contains all development tools and scripts for circuit-synth. The
 
 ### `build/`
 **Build and Compilation Tools**
-- `build_rust_modules.sh` - Build all Rust modules
-- `rebuild_all_rust.sh` - Clean rebuild of all Rust components
-- `format_all.sh` - Format all code (Python + Rust)
 - `setup_formatting.sh` - Set up code formatting tools
 
 ### `testing/`
 **Test Automation and Execution**
-- `run_all_tests.sh` - Run complete test suite (Python + Rust + Integration)
-- `test_rust_modules.sh` - Run Rust-specific tests
 - `run_regression_tests.py` - Execute regression test suite
 
 ### `release/`
@@ -35,7 +30,6 @@ This directory contains all development tools and scripts for circuit-synth. The
 ### `maintenance/`
 **Repository Maintenance Utilities**
 - `clear_all_caches.sh` - Clear all build and runtime caches
-- `enable_rust_acceleration.py` - Enable/configure Rust acceleration
 - `update_examples_with_stock.py` - Update examples with current stock info
 
 ## 🚀 Quick Reference
@@ -43,13 +37,11 @@ This directory contains all development tools and scripts for circuit-synth. The
 ### Build Operations
 ```bash
 # Build everything
-./tools/build/build_rust_modules.sh
 
 # Format all code
 ./tools/build/format_all.sh
 
 # Clean rebuild
-./tools/build/rebuild_all_rust.sh
 ```
 
 ### Testing
@@ -57,8 +49,6 @@ This directory contains all development tools and scripts for circuit-synth. The
 # Run complete test suite
 ./tools/testing/run_all_tests.sh
 
-# Test only Rust modules
-./tools/testing/test_rust_modules.sh
 
 # Run regression tests
 python3 tools/testing/run_regression_tests.py

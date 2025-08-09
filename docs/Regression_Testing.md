@@ -14,13 +14,9 @@ uv run python tools/testing/run_regression_tests.py
 python3 tools/testing/run_regression_tests.py
 ```
 
-### Test All Rust Modules
 ```bash
-# Test Rust components with Python integration
-./tools/testing/test_rust_modules.sh
 
 # Verbose output for debugging
-./tools/testing/test_rust_modules.sh --verbose
 ```
 
 ## 📋 Manual Regression Testing Before Major Release
@@ -827,8 +823,6 @@ The tests above cover the core functionality, but circuit-synth has many additio
 - Project template generation
 - Claude Code integration features
 
-#### **Rust Acceleration Features**
-- Rust-accelerated symbol caching
 - High-performance netlist processing
 - Force-directed placement algorithms
 - Reference management optimization

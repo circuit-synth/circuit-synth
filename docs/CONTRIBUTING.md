@@ -35,7 +35,6 @@ uv run register-agents
 ## Code Style
 
 - Python: Use `black`, `isort`, `mypy`, `flake8`
-- Rust: Use `cargo fmt`, `cargo clippy`
 - Write tests for new functionality
 - Update documentation as needed
 
@@ -63,8 +62,6 @@ def led_driver():
     led[2] += GND
 ```
 
-### 2. Performance Optimization with Rust
-High-impact areas needing Rust acceleration:
 - Component processing (Issue #40) - 97% of generation time
 - Netlist processing (Issue #36)
 - KiCad parsing (Issue #37)
@@ -86,9 +83,6 @@ uv sync
 # Run tests
 uv run pytest
 
-# Optional: Rust acceleration (6x faster)
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-./scripts/build_rust_modules.sh
 ```
 
 ## Development Workflow
@@ -156,16 +150,11 @@ Key directories:
 - `src/circuit_synth/core/` - Core circuit classes
 - `src/circuit_synth/kicad/` - KiCad file I/O
 - `src/circuit_synth/manufacturing/` - JLCPCB integration
-- `rust_modules/` - Performance acceleration
 
-### Rust Integration
 
-Add Rust acceleration for performance-critical operations:
 
-1. Create module in `rust_modules/`
-2. Use PyO3 for Python bindings
-3. Provide Python fallback for compatibility
-4. Test with `./scripts/test_rust_modules.sh`
+2. Use pure Python for all functionality
+3. Focus on readability and maintainability
 
 High-impact areas:
 - Component processing (97% of time)

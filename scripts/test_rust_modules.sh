@@ -1,1 +1,0 @@
-../tools/testing/test_rust_modules.sh

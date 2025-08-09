@@ -87,14 +87,14 @@ class PythonCodeGenerator:
 
         # Generate the component creation line
         # Use 'ref' attribute which is the actual field name in Component
-        comp_ref = getattr(comp, 'ref', None) or getattr(comp, 'reference', None) or ""
+        comp_ref = getattr(comp, "ref", None) or getattr(comp, "reference", None) or ""
         comp_var = self._sanitize_variable_name(comp_ref)
         comp_line = f"{indent}{comp_var} = Component("
 
         # Add parameters
         params = []
         # Check for both lib_id and symbol (different attributes used in different contexts)
-        comp_symbol = getattr(comp, 'lib_id', None) or getattr(comp, 'symbol', None)
+        comp_symbol = getattr(comp, "lib_id", None) or getattr(comp, "symbol", None)
         if comp_symbol:
             params.append(f'symbol="{comp_symbol}"')
         if comp_ref:

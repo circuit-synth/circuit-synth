@@ -15,30 +15,15 @@ repos:
       - id: isort
         args: [--profile=black]
 
-  # Rust formatting with rustfmt
   - repo: local
     hooks:
-      - id: rust-fmt
-        name: rust-fmt
-        entry: cargo fmt
         language: system
         files: \.rs$
         pass_filenames: false
-        args: [--all, --manifest-path=rust_modules/rust_symbol_search/Cargo.toml]
-      - id: rust-fmt-force-directed
-        name: rust-fmt-force-directed
-        entry: cargo fmt
         language: system
-        files: rust_modules/rust_force_directed_placement/.*\.rs$
         pass_filenames: false
-        args: [--all, --manifest-path=rust_modules/rust_force_directed_placement/Cargo.toml]
-      - id: rust-fmt-io-processor
-        name: rust-fmt-io-processor
-        entry: cargo fmt
         language: system
-        files: rust_modules/rust_io_processor/.*\.rs$
         pass_filenames: false
-        args: [--all, --manifest-path=rust_modules/rust_io_processor/Cargo.toml]
 
   # General formatting
   - repo: https://github.com/pre-commit/pre-commit-hooks

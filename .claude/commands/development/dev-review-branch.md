@@ -31,7 +31,6 @@ This command performs a comprehensive analysis of the current branch against the
 - **Circuit-synth core changes** (Circuit, Component, Net classes)
 - **KiCad integration modifications** (symbol/footprint handling, netlist generation)
 - **Memory bank and agent system** modifications
-- **Rust module integration** changes
 - **Plugin ecosystem** modifications (KiCad plugins, external integrations)
 
 ### 2. Risk Assessment Matrix
@@ -41,7 +40,6 @@ This command performs a comprehensive analysis of the current branch against the
 - KiCad integration breaking changes
 - Performance regressions >50% or affecting core workflows
 - Missing KiCad validation for new components
-- Rust module compilation failures
 
 **HIGH RISK** - Immediate attention required:
 - Breaking API changes without deprecation notices
@@ -131,7 +129,6 @@ This command performs a comprehensive analysis of the current branch against the
 - Unsafe deserialization patterns (pickle, eval)
 - Path traversal vulnerabilities
 - Input validation bypass
-- Buffer overflow potential in Rust modules
 
 **Dependency Security:**
 - New dependencies vulnerability scanning (npm audit, safety)
@@ -149,7 +146,6 @@ This command performs a comprehensive analysis of the current branch against the
 - Memory bank search and retrieval performance
 - Agent response time and context management
 - Plugin load time and memory usage
-- Rust module integration overhead
 
 **General Performance Analysis:**
 - Large file additions/modifications (>1MB files)
@@ -176,7 +172,6 @@ This command performs a comprehensive analysis of the current branch against the
   - **Quick Start** (`quickstart.rst`) - Ensure examples and workflows are current
   - **Contributing Guide** (`contributing.rst`, `CONTRIBUTING.md`) - Update development processes
   - **Integration Guides** (`integration/CLAUDE_INTEGRATION.md`) - Validate AI integration docs
-  - **Technical References** (`PROJECT_STRUCTURE.md`, `RUST_PYPI_INTEGRATION.md`, `SCRIPT_REFERENCE.md`) - Update technical specifications
   - **Testing Documentation** (`TESTING.md`) - Ensure test procedures are current
   - **Simulation Setup** (`SIMULATION_SETUP.md`) - Validate SPICE and simulation docs
 - **Agent files** in `.claude/agents/` - Verify if agent knowledge, capabilities, prompts, or tools need updates
@@ -426,9 +421,7 @@ def check_documentation_quality(file_path):
 - Optional dependency modifications
 - Development dependency updates
 
-**Rust Dependencies:**
 - Cargo.toml modifications
-- Rust module compilation requirements
 - Performance-critical dependency changes
 - Cross-platform compatibility
 
@@ -475,7 +468,6 @@ The command generates a comprehensive markdown report with:
 
 ## 📊 Change Metrics  
 - Files changed: +X, -Y (breakdown by category)
-- Lines of code: +X, -Y (Python, Rust, docs, tests)
 - Commits analyzed: X with Y authors
 - Test coverage: X% (change from baseline)
 - Complexity score: X/10 (McCabe, Halstead)
@@ -601,8 +593,6 @@ find memory-bank/ -name "*.md" -exec wc -l {} \; | sort -nr
 black src/ tests/ examples/
 isort src/ tests/ examples/
 
-# Format Rust code (if applicable)
-find rust_modules/ -name "*.rs" -exec rustfmt {} \;
 
 # Format configuration files
 prettier --write "*.{json,yml,yaml,md}" --ignore-path .gitignore
@@ -613,7 +603,6 @@ prettier --write "*.{json,yml,yaml,md}" --ignore-path .gitignore
 # Test execution
 uv run pytest --cov=circuit_synth --cov-report=term-missing
 uv run pytest tests/unit/test_core_circuit.py -v
-uv run pytest tests/rust_integration/ -v
 
 # Code formatting validation (after auto-format)
 black --check --diff src/

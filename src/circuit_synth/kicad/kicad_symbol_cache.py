@@ -2,7 +2,6 @@
 kicad_symbol_cache.py
 
 Provides a caching mechanism for KiCad symbol libraries.
-Now using high-performance Rust implementation with fallback to Python.
 """
 
 import hashlib
@@ -15,8 +14,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 # Use Python implementation for symbol cache (Infrastructure Preservation Strategy)
-# Rust modules are preserved as standalone components for future integration
-RUST_SYMBOL_CACHE_AVAILABLE = False
 
 # Import the parser
 from .kicad_symbol_parser import parse_kicad_sym_file
@@ -581,4 +578,3 @@ class SymbolLibCache:
 
 
 # Module-level flag for checking availability (already defined above)
-# RUST_SYMBOL_CACHE_AVAILABLE = False

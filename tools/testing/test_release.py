@@ -7,7 +7,6 @@ This tool performs exhaustive testing of the package before releasing to PyPI:
 2. Tests from TestPyPI first
 3. Tests on multiple Python versions
 4. Tests with Docker containers (if available)
-5. Validates all Rust modules work correctly
 6. Tests actual circuit creation and KiCad generation
 """
 
@@ -83,8 +82,6 @@ class ReleaseTestSuite:
         if not self.skip_docker and shutil.which("docker"):
             all_passed &= self._test_in_docker()
         
-        # 7. Test Rust modules specifically
-        all_passed &= self._test_rust_modules()
         
         # 8. Test actual circuit functionality
         all_passed &= self._test_circuit_functionality()
@@ -175,10 +172,6 @@ class ReleaseTestSuite:
 import circuit_synth
 from circuit_synth import Component, Net, circuit
 
-# Test Rust modules
-import rust_netlist_processor
-import rust_symbol_cache
-import rust_core_circuit_engine
 
 # Create simple circuit
 @circuit
@@ -449,17 +442,8 @@ RUN python -c "import circuit_synth; from circuit_synth import Component, Net, c
                 logger.error(f"❌ Docker test failed: {e}")
                 return False
     
-    def _test_rust_modules(self) -> bool:
-        """Test all Rust modules specifically"""
-        logger.info("\n🦀 Testing Rust modules...")
         start_time = time.time()
         
-        rust_modules = [
-            "rust_netlist_processor",
-            "rust_symbol_cache",
-            "rust_core_circuit_engine",
-            "rust_symbol_search",
-            "rust_force_directed_placement"
         ]
         
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -483,9 +467,7 @@ RUN python -c "import circuit_synth; from circuit_synth import Component, Net, c
                     capture_output=True
                 )
                 
-                # Test each Rust module
                 all_passed = True
-                for module in rust_modules:
                     test_script = f'''
 import {module}
 print(f"✅ {module} imported successfully")
@@ -510,9 +492,7 @@ if not attrs:
                 
                 duration = time.time() - start_time
                 self.results.append(TestResult(
-                    "Rust Modules",
                     all_passed,
-                    "All Rust modules tested" if all_passed else "Some Rust modules failed",
                     duration
                 ))
                 return all_passed
@@ -520,12 +500,10 @@ if not attrs:
             except Exception as e:
                 duration = time.time() - start_time
                 self.results.append(TestResult(
-                    "Rust Modules",
                     False,
                     str(e),
                     duration
                 ))
-                logger.error(f"❌ Rust module test failed: {e}")
                 return False
     
     def _test_circuit_functionality(self) -> bool:

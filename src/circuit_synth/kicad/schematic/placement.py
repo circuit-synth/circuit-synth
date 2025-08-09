@@ -1,8 +1,6 @@
 """
 Component placement engine for KiCad schematics.
 Provides automatic placement strategies and collision detection.
-
-PERFORMANCE OPTIMIZATION: Integrated Rust force-directed placement with defensive fallback.
 """
 
 import logging
@@ -13,31 +11,7 @@ from typing import List, Optional, Tuple
 from ..core.types import Point, Schematic, SchematicSymbol, Sheet
 from .symbol_geometry import SymbolGeometry
 
-# Import Rust force-directed placement with defensive fallback
-_rust_placement_module = None
-RUST_PLACEMENT_AVAILABLE = False
-
-# Try to import the Rust force-directed placement module
-import os
-import sys
-
-import_start = time.perf_counter()
-
-# Optional Rust placement module
-try:
-    import rust_force_directed_placement
-    RUST_PLACEMENT_AVAILABLE = True
-    logging.getLogger(__name__).debug("🦀 RUST_PLACEMENT: Rust force-directed placement available")
-except ImportError as e:
-    RUST_PLACEMENT_AVAILABLE = False
-    logging.getLogger(__name__).info(
-        f"🐍 RUST_PLACEMENT: Rust force-directed placement not available ({e}), using Python fallback"
-    )
-except Exception as e:
-    RUST_PLACEMENT_AVAILABLE = False
-    logging.getLogger(__name__).warning(
-        f"⚠️ RUST_PLACEMENT: Unexpected error loading Rust placement module ({e}), using Python fallback"
-    )
+# Python-only implementation
 
 logger = logging.getLogger(__name__)
 
@@ -764,19 +738,10 @@ class PlacementEngine:
 
         start_time = time.perf_counter()
         logger.info(
-            f"🚀 ARRANGE_COMPONENTS: Starting arrangement of {len(components)} components using '{arrangement}' strategy"
-        )
-        logger.info(
-            f"🦀 ARRANGE_COMPONENTS: Rust acceleration available: {_RUST_PLACEMENT_AVAILABLE}"
+            f"ARRANGE_COMPONENTS: Starting arrangement of {len(components)} components using '{arrangement}' strategy"
         )
 
-        if (
-            arrangement == "force_directed"
-            and use_rust_acceleration
-            and _RUST_PLACEMENT_AVAILABLE
-        ):
-            self._arrange_force_directed_rust(components)
-        elif arrangement == "grid":
+        if arrangement == "grid":
             self._arrange_grid(components)
         elif arrangement == "vertical":
             self._arrange_vertical(components)
@@ -785,10 +750,8 @@ class PlacementEngine:
         elif arrangement == "circular":
             self._arrange_circular(components)
         elif arrangement == "force_directed":
-            # Fallback to Python force-directed if Rust not available
-            logger.info(
-                "🐍 ARRANGE_COMPONENTS: Using Python force-directed placement (Rust not available)"
-            )
+            # Python force-directed implementation
+            logger.info("ARRANGE_COMPONENTS: Using Python force-directed placement")
             self._arrange_force_directed_python(components)
         else:
             # Default to grid
@@ -796,161 +759,18 @@ class PlacementEngine:
 
         total_time = time.perf_counter() - start_time
         logger.info(
-            f"✅ ARRANGE_COMPONENTS: Component arrangement completed in {total_time*1000:.2f}ms"
+            f"ARRANGE_COMPONENTS: Component arrangement completed in {total_time*1000:.2f}ms"
         )
-
-        if _RUST_PLACEMENT_AVAILABLE and arrangement == "force_directed":
-            estimated_python_time = (
-                total_time * 2.5
-            )  # Expected 40-60% improvement means 2.5x slower Python
-            logger.info(
-                f"🚀 RUST_PERFORMANCE: Estimated Python time: {estimated_python_time*1000:.2f}ms"
-            )
-            logger.info(
-                f"⏱️  RUST_PERFORMANCE: Time saved: {(estimated_python_time - total_time)*1000:.2f}ms"
-            )
-
-    def _arrange_force_directed_rust(self, components: List[SchematicSymbol]) -> None:
-        """
-        Arrange components using Rust force-directed placement algorithm.
-
-        This provides 40-60% performance improvement over Python implementation
-        and better placement quality through advanced force calculations.
-        """
-        start_time = time.perf_counter()
-        logger.info(
-            f"🦀 RUST_FORCE_DIRECTED: ⚡ STARTING RUST FORCE-DIRECTED PLACEMENT"
-        )
-        logger.info(f"🔧 RUST_FORCE_DIRECTED: Processing {len(components)} components")
-
-        try:
-            # Convert components to Rust format
-            conversion_start = time.perf_counter()
-            rust_components = []
-            connections = []  # TODO: Extract from schematic nets
-
-            for comp in components:
-                # Estimate component size for Rust
-                comp_size = self._estimate_component_size(comp)
-
-                # Create Rust component
-                rust_comp = create_component(
-                    comp.reference,
-                    comp.lib_id.split(":")[-1] if ":" in comp.lib_id else comp.lib_id,
-                    comp.value or "",
-                )
-
-                # Set initial position and size
-                rust_comp.with_position(comp.position.x, comp.position.y)
-                rust_comp.with_size(comp_size[0], comp_size[1])
-
-                rust_components.append(rust_comp)
-
-            conversion_time = time.perf_counter() - conversion_start
-            logger.debug(
-                f"🔄 RUST_FORCE_DIRECTED: Component conversion completed in {conversion_time*1000:.2f}ms"
-            )
-
-            # Create Rust placer with optimized settings
-            placer_creation_start = time.perf_counter()
-            placer = RustForceDirectedPlacer(
-                component_spacing=5.08,  # 200 mil spacing
-                attraction_strength=1.5,
-                repulsion_strength=50.0,
-                iterations_per_level=100,
-                damping=0.8,
-                initial_temperature=10.0,
-                cooling_rate=0.95,
-                enable_rotation=False,  # Keep components upright for schematics
-                internal_force_multiplier=2.0,
-            )
-            placer_creation_time = time.perf_counter() - placer_creation_start
-            logger.debug(
-                f"🔧 RUST_FORCE_DIRECTED: Placer created in {placer_creation_time*1000:.3f}ms"
-            )
-
-            # Perform placement
-            placement_start = time.perf_counter()
-            result = placer.place(
-                rust_components,
-                connections,
-                self.sheet_size[0] - 2 * self.margin,  # Available width
-                self.sheet_size[1] - 2 * self.margin,  # Available height
-            )
-            placement_time = time.perf_counter() - placement_start
-
-            logger.info(
-                f"✅ RUST_FORCE_DIRECTED: Core placement completed in {placement_time*1000:.2f}ms"
-            )
-            logger.info(
-                f"📊 RUST_FORCE_DIRECTED: Final energy: {result.final_energy:.2f}"
-            )
-            logger.info(
-                f"🔄 RUST_FORCE_DIRECTED: Iterations used: {result.iterations_used}"
-            )
-
-            # Apply results back to components
-            update_start = time.perf_counter()
-            for comp in components:
-                if comp.reference in result.positions:
-                    rust_pos = result.positions[comp.reference]
-                    # Snap to grid and add margin offset
-                    new_x = self.margin + rust_pos.x
-                    new_y = self.margin + rust_pos.y
-                    comp.position = Point(*self._snap_to_grid((new_x, new_y)))
-
-                    logger.debug(
-                        f"🔧 Updated {comp.reference}: ({comp.position.x:.1f}, {comp.position.y:.1f})"
-                    )
-
-            update_time = time.perf_counter() - update_start
-            logger.debug(
-                f"🔄 RUST_FORCE_DIRECTED: Position updates completed in {update_time*1000:.2f}ms"
-            )
-
-            total_rust_time = time.perf_counter() - start_time
-            logger.info(
-                f"🏁 RUST_FORCE_DIRECTED: ✅ RUST PLACEMENT COMPLETE in {total_rust_time*1000:.2f}ms"
-            )
-
-            # Performance breakdown
-            logger.info("📈 RUST_PERFORMANCE_BREAKDOWN:")
-            logger.info(
-                f"  🔄 Conversion: {conversion_time*1000:.2f}ms ({conversion_time/total_rust_time*100:.1f}%)"
-            )
-            logger.info(
-                f"  🔧 Placer setup: {placer_creation_time*1000:.2f}ms ({placer_creation_time/total_rust_time*100:.1f}%)"
-            )
-            logger.info(
-                f"  🦀 Core Rust placement: {placement_time*1000:.2f}ms ({placement_time/total_rust_time*100:.1f}%)"
-            )
-            logger.info(
-                f"  📊 Position updates: {update_time*1000:.2f}ms ({update_time/total_rust_time*100:.1f}%)"
-            )
-
-        except Exception as e:
-            rust_error_time = time.perf_counter() - start_time
-            logger.error(
-                f"❌ RUST_FORCE_DIRECTED: RUST PLACEMENT FAILED after {rust_error_time*1000:.2f}ms: {e}"
-            )
-            logger.warning(
-                "🔄 RUST_FORCE_DIRECTED: 🐍 FALLING BACK TO PYTHON IMPLEMENTATION"
-            )
-            self._arrange_force_directed_python(components)
 
     def _arrange_force_directed_python(self, components: List[SchematicSymbol]) -> None:
         """
-        Python fallback for force-directed placement.
+        Python force-directed placement algorithm.
 
-        This is a simplified force-directed algorithm for when Rust is not available.
+        This is a simplified force-directed algorithm for automatic component placement.
         """
         start_time = time.perf_counter()
-        logger.info(
-            f"🐍 PYTHON_FORCE_DIRECTED: ⚡ STARTING PYTHON FORCE-DIRECTED PLACEMENT"
-        )
-        logger.info(
-            f"🔧 PYTHON_FORCE_DIRECTED: Processing {len(components)} components"
-        )
+        logger.info(f"PYTHON_FORCE_DIRECTED: Starting Python force-directed placement")
+        logger.info(f"PYTHON_FORCE_DIRECTED: Processing {len(components)} components")
 
         # Simple iterative placement with force calculations
         iterations = 50

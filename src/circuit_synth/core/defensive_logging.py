@@ -1,12 +1,9 @@
 # FILE: src/circuit_synth/core/defensive_logging.py
 """
-Ultra-defensive logging framework for Rust integration safety.
 
 This module provides comprehensive logging, validation, and safety mechanisms
-for gradually integrating Rust optimizations while maintaining 100% Python
 compatibility and graceful fallback behavior.
 
-Philosophy: "Log everything, trust nothing, fail safely"
 """
 
 import hashlib
@@ -35,7 +32,6 @@ class OperationMetrics:
     end_time: Optional[float] = None
     success: bool = False
     error_message: Optional[str] = None
-    rust_used: bool = False
     python_fallback: bool = False
     input_size: Optional[int] = None
     output_size: Optional[int] = None
@@ -48,25 +44,14 @@ class ComponentMetrics:
 
     component_name: str
     total_operations: int = 0
-    rust_successes: int = 0
-    rust_failures: int = 0
     python_operations: int = 0
-    total_rust_time: float = 0.0
     total_python_time: float = 0.0
     operations: list[OperationMetrics] = field(default_factory=list)
 
     @property
-    def rust_failure_rate(self) -> float:
-        """Calculate Rust failure rate"""
-        total_rust = self.rust_successes + self.rust_failures
-        return self.rust_failures / total_rust if total_rust > 0 else 0.0
 
     @property
-    def avg_rust_time(self) -> float:
-        """Average Rust operation time"""
         return (
-            self.total_rust_time / self.rust_successes
-            if self.rust_successes > 0
             else 0.0
         )
 
@@ -81,21 +66,16 @@ class ComponentMetrics:
 
     @property
     def performance_improvement(self) -> float:
-        """Performance improvement ratio (Python time / Rust time)"""
-        if self.avg_rust_time > 0 and self.avg_python_time > 0:
-            return self.avg_python_time / self.avg_rust_time
         return 1.0
 
 
 class DefensiveLogger:
     """
-    Ultra-defensive logger for Rust integration safety.
 
     Features:
     - Comprehensive operation logging with timing
     - Automatic checksum validation
     - Performance metrics collection
-    - Automatic Rust disable on high failure rates
     - Safe fallback mechanisms
     """
 
@@ -116,43 +96,29 @@ class DefensiveLogger:
 
         # Safety thresholds
         self.max_failure_rate = float(
-            os.environ.get("CIRCUIT_SYNTH_MAX_RUST_FAILURE_RATE", "0.1")
         )  # 10%
         self.min_operations_for_disable = int(
             os.environ.get("CIRCUIT_SYNTH_MIN_OPS_FOR_DISABLE", "10")
         )
 
-        # Rust availability check
-        self.rust_globally_disabled = (
-            os.environ.get("CIRCUIT_SYNTH_DISABLE_RUST", "false").lower() == "true"
         )
-        self.rust_auto_disabled = False
 
         self.logger.info(f"🛡️  DEFENSIVE LOGGER INITIALIZED [{component_name}]")
         self.logger.info(f"   📊 Max failure rate: {self.max_failure_rate:.1%}")
         self.logger.info(
             f"   📊 Min operations for auto-disable: {self.min_operations_for_disable}"
         )
-        self.logger.info(f"   🦀 Rust globally disabled: {self.rust_globally_disabled}")
 
-    def is_rust_available(self) -> bool:
-        """Check if Rust should be used for operations"""
-        if self.rust_globally_disabled:
             return False
 
-        if self.rust_auto_disabled:
             return False
 
         # Check if we should auto-disable due to high failure rate
         if (
             self.metrics.total_operations >= self.min_operations_for_disable
-            and self.metrics.rust_failure_rate > self.max_failure_rate
         ):
 
-            self.rust_auto_disabled = True
-            self.logger.warning(f"🚨 AUTO-DISABLING RUST [{self.component_name}]")
             self.logger.warning(
-                f"   📈 Failure rate: {self.metrics.rust_failure_rate:.1%} > {self.max_failure_rate:.1%}"
             )
             self.logger.warning(f"   📊 Operations: {self.metrics.total_operations}")
             self.logger.warning(f"   🔄 All future operations will use Python fallback")
@@ -185,7 +151,6 @@ class DefensiveLogger:
         """Log successful Python operation"""
         metrics.end_time = time.perf_counter()
         metrics.success = True
-        metrics.rust_used = False
 
         duration = metrics.end_time - metrics.start_time
 
@@ -211,17 +176,14 @@ class DefensiveLogger:
         self.metrics.total_operations += 1
         self.metrics.operations.append(metrics)
 
-    def log_rust_success(
         self,
         metrics: OperationMetrics,
         result: Any,
         python_result: Any = None,
         **kwargs,
     ) -> None:
-        """Log successful Rust operation with optional validation against Python"""
         metrics.end_time = time.perf_counter()
         metrics.success = True
-        metrics.rust_used = True
 
         duration = metrics.end_time - metrics.start_time
 
@@ -239,17 +201,14 @@ class DefensiveLogger:
             if checksum == python_checksum:
                 validation_status = "VALIDATED_IDENTICAL"
                 self.logger.info(
-                    f"🔍 VALIDATION PASSED: Rust output identical to Python"
                 )
             else:
                 validation_status = "VALIDATION_FAILED"
                 self.logger.error(f"❌ VALIDATION FAILED: Output mismatch!")
                 self.logger.error(f"   🐍 Python checksum: {python_checksum[:16]}...")
-                self.logger.error(f"   🦀 Rust checksum:   {checksum[:16]}...")
                 # This should trigger a fallback in the calling code
 
         self.logger.info(
-            f"✅ RUST SUCCESS [{self.component_name}] {metrics.operation_name}"
         )
         self.logger.info(f"   ⏱️  Duration: {duration:.4f}s")
         self.logger.info(f"   📏 Output size: {result_size} bytes")
@@ -259,15 +218,11 @@ class DefensiveLogger:
             self.logger.info(f"   📈 {key}: {value}")
 
         # Update metrics
-        self.metrics.rust_successes += 1
-        self.metrics.total_rust_time += duration
         self.metrics.total_operations += 1
         self.metrics.operations.append(metrics)
 
-    def log_rust_fallback(
         self, metrics: OperationMetrics, error: Exception, **kwargs
     ) -> None:
-        """Log Rust operation failure and fallback to Python"""
         metrics.end_time = time.perf_counter()
         metrics.success = False
         metrics.error_message = str(error)
@@ -276,7 +231,6 @@ class DefensiveLogger:
         duration = metrics.end_time - metrics.start_time
 
         self.logger.warning(
-            f"⚠️  RUST FALLBACK [{self.component_name}] {metrics.operation_name}"
         )
         self.logger.warning(f"   ⏱️  Failed after: {duration:.4f}s")
         self.logger.warning(f"   🔴 Error type: {type(error).__name__}")
@@ -286,7 +240,6 @@ class DefensiveLogger:
         self.logger.warning(f"   🔄 Falling back to Python implementation")
 
         # Update metrics
-        self.metrics.rust_failures += 1
         self.metrics.total_operations += 1
         self.metrics.operations.append(metrics)
 
@@ -333,18 +286,11 @@ class DefensiveLogger:
         summary = {
             "component": self.component_name,
             "total_operations": self.metrics.total_operations,
-            "rust_operations": self.metrics.rust_successes + self.metrics.rust_failures,
             "python_operations": self.metrics.python_operations,
-            "rust_success_rate": (
-                1.0 - self.metrics.rust_failure_rate
-                if self.metrics.rust_successes + self.metrics.rust_failures > 0
                 else 0.0
             ),
             "performance_improvement": self.metrics.performance_improvement,
-            "avg_rust_time": self.metrics.avg_rust_time,
             "avg_python_time": self.metrics.avg_python_time,
-            "rust_available": self.is_rust_available(),
-            "rust_auto_disabled": self.rust_auto_disabled,
         }
 
         return summary
@@ -356,18 +302,14 @@ class DefensiveLogger:
 
             self.logger.info(f"📊 PERFORMANCE SUMMARY [{self.component_name}]")
             self.logger.info(f"   🔢 Total operations: {summary['total_operations']}")
-            self.logger.info(f"   🦀 Rust operations: {summary['rust_operations']}")
             self.logger.info(f"   🐍 Python operations: {summary['python_operations']}")
 
-            if summary["rust_operations"] > 0:
                 self.logger.info(
-                    f"   📈 Rust success rate: {summary['rust_success_rate']:.1%}"
                 )
                 self.logger.info(
                     f"   ⚡ Performance improvement: {summary['performance_improvement']:.1f}x"
                 )
                 self.logger.info(
-                    f"   ⏱️  Avg Rust time: {summary['avg_rust_time']:.4f}s"
                 )
 
             if summary["python_operations"] > 0:
@@ -375,9 +317,6 @@ class DefensiveLogger:
                     f"   ⏱️  Avg Python time: {summary['avg_python_time']:.4f}s"
                 )
 
-            self.logger.info(f"   🦀 Rust available: {summary['rust_available']}")
-            if summary["rust_auto_disabled"]:
-                self.logger.warning(f"   🚨 Rust auto-disabled due to failures")
         except (ValueError, OSError):
             # Ignore logging errors during shutdown (closed file descriptors)
             pass
@@ -389,7 +328,6 @@ class DefensiveLogger:
         try:
             yield metrics
         except Exception as e:
-            self.log_rust_fallback(metrics, e)
             raise
 
     def _calculate_size(self, obj: Any) -> int:

@@ -144,11 +144,6 @@ This command handles the complete release process:
 - **Validate version format** - Strict semantic versioning validation with interactive confirmation
 - **Check for uncommitted changes** - Ensure clean working directory
 
-### 2. Rust Build (If Needed)
-- **Check for Rust modules** - Look for Cargo.toml files
-- **Build Rust crates** - Compile if present
-- **Run Rust tests** - Ensure Rust components work
-- **Update Python bindings** - If Rust integration exists
 
 ### 3. Version Management
 - **Update pyproject.toml** - Set new version number
@@ -272,32 +267,18 @@ kicad-cli version >/dev/null 2>&1 || {
 }
 ```
 
-### Rust Build Process
 ```bash
-# Check for Rust modules
-rust_modules=()
-for cargo_file in $(find . -name "Cargo.toml" 2>/dev/null); do
-    rust_modules+=("$(dirname "$cargo_file")")
 done
 
-if [ ${#rust_modules[@]} -gt 0 ]; then
-    echo "🦀 Building Rust modules..."
-    for module in "${rust_modules[@]}"; do
         echo "  Building $module..."
         cd "$module"
-        cargo build --release || {
-            echo "❌ Rust build failed in $module"
             exit 1
         }
-        cargo test || {
-            echo "❌ Rust tests failed in $module"
             exit 1
         }
         cd - >/dev/null
     done
-    echo "✅ Rust modules built successfully"
 else
-    echo "ℹ️  No Rust modules found"
 fi
 ```
 
@@ -439,7 +420,6 @@ Before running this command, ensure you have:
 2. **Git credentials** set up for pushing
 3. **Clean working directory** (no uncommitted changes)
 4. **KiCad installed** (for integration tests)
-5. **Rust toolchain** (if Rust modules present)
 
 ### Setup PyPI Credentials
 ```bash
@@ -466,7 +446,6 @@ export TWINE_PASSWORD=pypi-your-api-token-here
 
 The release includes:
 - **Python package** with all source code
-- **Rust binaries** (if present and built)
 - **Documentation** and examples
 - **Git tag** marking the release
 - **CHANGELOG** entry for the version

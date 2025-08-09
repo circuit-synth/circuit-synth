@@ -8,8 +8,6 @@ After evaluating the `/tools` directory, here are the testing tools and their pu
 1. **run_full_regression_tests.py** (1267 lines) - Complete environment reconstruction and testing
 2. **test_release.py** (682 lines) - Comprehensive release testing with TestPyPI
 3. **run_regression_tests.py** (633 lines) - Standard regression testing
-4. **test_rust_modules.sh** (366 lines) - Rust-specific testing
-5. **run_all_tests.sh** (363 lines) - Combined Python + Rust test runner
 6. **test_pypi_package.py** (213 lines) - Quick PyPI package validation
 
 ## Consolidation Recommendations
@@ -31,13 +29,11 @@ These tools have significant overlap and should be merged:
 
 #### Merge Group 1: General Testing
 - **run_regression_tests.py** → Merge into **run_all_tests.sh**
-- **test_rust_modules.sh** → Merge into **run_all_tests.sh**
 
 Create unified: **run_tests.py** that replaces all three with:
 ```python
 # Unified test runner with options:
 ./tools/testing/run_tests.py --python  # Python tests only
-./tools/testing/run_tests.py --rust    # Rust tests only  
 ./tools/testing/run_tests.py --all     # Everything
 ./tools/testing/run_tests.py --quick   # Fast subset
 ```
@@ -73,19 +69,15 @@ tools/
 #!/usr/bin/env python3
 """
 Unified test runner for circuit-synth
-Replaces: run_regression_tests.py, run_all_tests.sh, test_rust_modules.sh
 """
 
 class UnifiedTestRunner:
     def __init__(self):
         self.python_tests = ["unit", "integration", "examples"]
-        self.rust_modules = ["rust_netlist_processor", "rust_symbol_cache", ...]
         
     def run_python_tests(self, quick=False):
         """Run Python test suite"""
         
-    def run_rust_tests(self, quick=False):
-        """Run Rust test suite"""
         
     def run_integration_tests(self):
         """Run cross-language integration tests"""
@@ -126,9 +118,7 @@ def quick_package_test(self):
 ./tools/testing/run_tests.py --all
 
 # Old
-./tools/testing/test_rust_modules.sh
 # New
-./tools/testing/run_tests.py --rust
 
 # Old
 ./tools/testing/test_pypi_package.py
@@ -146,9 +136,7 @@ def quick_package_test(self):
 These tools serve unique purposes and work well:
 
 - **clear_all_caches.sh** - Simple, focused utility
-- **build_all_rust_for_packaging.sh** - Packaging-specific
 - **release_to_pypi.sh** - Complete release automation
-- **enable_rust_acceleration.py** - User-facing utility
 - **dead-code-analysis.py** - Separate analysis concern
 
 ## Summary

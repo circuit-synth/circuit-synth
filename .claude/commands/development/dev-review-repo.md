@@ -18,7 +18,6 @@
 - `--generate-fixes=false` - Generate automated fix suggestions (default: false)
 - `--website-check=true` - Validate circuit-synth.com content accuracy (default: true)
 - `--feature-discovery=true` - Auto-discover features from codebase (default: true)
-- `--rust-analysis=true` - Analyze Rust modules and integration (default: true)
 - `--depth=standard` - Analysis depth: `quick`, `standard`, `deep` (default: standard)
 
 ## What This Does
@@ -119,21 +118,6 @@ Based on discovered features, performs targeted analysis:
   - Troubleshooting trees
   - Equipment guidance
 
-### 6. Rust Module Integration
-- **Active Rust Modules**
-  - rust_symbol_search
-  - rust_kicad_integration
-  - rust_core_circuit_engine
-  - rust_netlist_processor
-  - rust_reference_manager
-  - rust_symbol_cache
-  - rust_force_directed_placement
-  - rust_io_processor
-  - rust_pin_calculator
-- **Python Bindings**
-  - PyO3 integration
-  - Performance acceleration
-  - Cross-platform compatibility
 - **Build System**
   - Cargo integration
   - Maturin builds
@@ -144,11 +128,8 @@ Based on discovered features, performs targeted analysis:
   - Unit tests (pytest)
   - Integration tests
   - Regression tests
-  - Rust tests (cargo test)
   - Full regression suite
 - **Build Tools**
-  - build_rust_modules.sh
-  - rebuild_all_rust.sh
   - format_all.sh
 - **Analysis Tools**
   - Dead code analysis
@@ -226,7 +207,6 @@ repo-review/
 ├── 04-manufacturing-integration-analysis.md # JLCPCB, DigiKey, unified search
 ├── 05-agent-system-analysis.md              # All AI agents and capabilities
 ├── 06-quality-assurance-analysis.md         # FMEA, DFM, validation, debugging
-├── 07-rust-integration-analysis.md          # Rust modules and performance
 ├── 08-development-tools-analysis.md         # Testing, build, CI/CD tools
 ├── 09-component-systems-analysis.md         # MCU and component databases
 ├── 10-simulation-validation-analysis.md     # SPICE and electrical checks
@@ -236,14 +216,12 @@ repo-review/
 ├── 14-testing-coverage-analysis.md          # Test quality and coverage
 ├── 15-documentation-analysis.md             # Documentation accuracy and quality
 ├── 16-dependency-analysis.md                # Package health and updates
-├── 17-migration-cleanup-analysis.md         # Python/Rust transition artifacts
 ├── 18-website-validation-analysis.md        # circuit-synth.com accuracy
 ├── 19-recommendations-roadmap.md            # Prioritized action items
 └── findings/                                 # Raw data, logs, and detailed reports
     ├── discovered-features.json             # Auto-discovered feature list
     ├── agent-test-results/                  # Agent functionality tests
     ├── example-test-results/                # Example circuit tests
-    ├── rust-module-status/                  # Rust module analysis
     ├── security-scan-results/               # Security scan outputs
     ├── performance-profiles/                # Performance profiling data
     └── coverage-reports/                    # Test coverage reports
@@ -257,7 +235,6 @@ repo-review/
 def discover_features():
     features = {
         'core_modules': scan_python_modules('src/circuit_synth'),
-        'rust_modules': scan_rust_modules('rust_modules'),
         'agents': discover_agents('.claude/agents'),
         'commands': discover_commands('.claude/commands'),
         'tools': discover_tools('tools', 'src/circuit_synth/tools'),
@@ -286,7 +263,6 @@ def test_agent_functionality(agent_name):
 
 ```bash
 # Create output directory structure
-mkdir -p repo-review/findings/{agent-test-results,example-test-results,rust-module-status,security-scan-results,performance-profiles,coverage-reports}
 
 # Phase 1: Feature Discovery
 echo "=== Automatic Feature Discovery ==="
@@ -307,11 +283,6 @@ agents = []
 for agent_file in Path('.claude/agents').rglob('*.md'):
     agents.append(str(agent_file))
 
-# Discover Rust modules
-rust_modules = []
-if Path('rust_modules').exists():
-    for cargo_file in Path('rust_modules').rglob('Cargo.toml'):
-        rust_modules.append(str(cargo_file.parent))
 
 # Recent features from commits
 import subprocess
@@ -321,7 +292,6 @@ features = [line for line in commits.split('\n') if 'feat:' in line]
 discovery = {
     'python_modules': len(modules),
     'agents': len(agents),
-    'rust_modules': len(rust_modules),
     'recent_features': len(features),
     'timestamp': str(datetime.now())
 }
@@ -360,12 +330,7 @@ echo "=== Testing Quality Assurance Systems ==="
 uv run python -m circuit_synth.quality_assurance.fmea_cli --help
 uv run python -m circuit_synth.debugging.debug_cli --help
 
-# Phase 7: Test Rust Modules
-echo "=== Testing Rust Module Integration ==="
-cd rust_modules
 for module in */; do
-    echo "Testing Rust module: $module"
-    cd $module && cargo test --lib --no-default-features && cd ..
 done
 cd ..
 
@@ -403,7 +368,6 @@ pip-audit --format json > repo-review/findings/pip-audit.json
 
 ## Summary
 - Total Python modules: X
-- Total Rust modules: X
 - Total AI agents: X
 - Total CLI tools: X
 - Recent features (last 100 commits): X
@@ -477,8 +441,6 @@ When `--test-agents=true`:
 - Validates agent knowledge base
 - Checks MCP registration
 
-### Rust Module Analysis
-When `--rust-analysis=true`:
 - Checks compilation status
 - Tests Python bindings
 - Measures performance impact
@@ -510,8 +472,6 @@ When `--rust-analysis=true`:
 # Documentation and website validation
 /dev-review-repo --focus=docs --website-check=true
 
-# Rust module analysis
-/dev-review-repo --rust-analysis=true --focus=architecture
 ```
 
 ## Integration with Development Workflow

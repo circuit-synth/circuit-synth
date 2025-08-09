@@ -16,19 +16,7 @@ from sexpdata import Symbol
 # Import the new API's S-expression parser
 from circuit_synth.kicad.core.s_expression import SExpressionParser
 
-# Make Rust module optional - use Python fallback if not available
-_rust_sexp_module = None
-try:
-    import rust_kicad_integration
-    if hasattr(rust_kicad_integration, 'is_rust_available') and rust_kicad_integration.is_rust_available():
-        _rust_sexp_module = rust_kicad_integration
-        logging.getLogger(__name__).info("🦀 RUST: KiCad S-expression generation accelerated")
-    else:
-        logging.getLogger(__name__).warning("⚠️ Rust module found but not functional")
-except ImportError:
-    logging.getLogger(__name__).info("🐍 Using Python implementation for KiCad formatting")
-except Exception as e:
-    logging.getLogger(__name__).warning(f"⚠️ Error loading Rust module: {e}, using Python fallback")
+# Python-only implementation
 
 logger = logging.getLogger(__name__)
 
@@ -369,14 +357,6 @@ class KiCadFormatterNew:
 
 def format_kicad_schematic(schematic_expr: Any) -> str:
     """
-    Format a KiCad schematic S-expression using the new API with Rust acceleration.
-
-    This is a drop-in replacement for the old format_kicad_schematic function,
-    but uses the new KiCad API's S-expression parser with proper formatting.
-
-    PERFORMANCE OPTIMIZATION: Uses Rust S-expression generation when available
-    for 6x performance improvement, with automatic fallback to Python.
-
     Format a KiCad schematic S-expression using the new API.
 
     This is a drop-in replacement for the old format_kicad_schematic function,
@@ -395,27 +375,19 @@ def format_kicad_schematic(schematic_expr: Any) -> str:
     expr_size = len(str(schematic_expr)) if schematic_expr else 0
 
     logger.info(
-        f"🚀 FORMAT_KICAD_SCHEMATIC: Starting formatting of {expr_type} ({expr_size} chars)"
-    )
-    logger.info(
-        f"🦀 FORMAT_KICAD_SCHEMATIC: Using Rust S-expression generation"
+        f"FORMAT_KICAD_SCHEMATIC: Starting formatting of {expr_type} ({expr_size} chars)"
     )
 
-    # NOTE: Rust S-expression formatting is enabled but currently delegates to Python
-    # The Rust module handles component generation, but full schematic formatting
-    # still uses the Python KiCadFormatterNew for proper S-expression formatting
-    # This is intentional as the Python formatter handles complex nested structures correctly
-    
-    # Use Python implementation for formatting (Rust handles component generation)
+    # Use Python implementation for formatting
     python_start = time.perf_counter()
-    logger.info("🐍 PYTHON_FORMATTING: ⚡ STARTING PYTHON S-EXPRESSION FORMATTING")
+    logger.info("PYTHON_FORMATTING: Starting S-expression formatting")
 
     # Create formatter instance - time this critical step
     formatter_creation_start = time.perf_counter()
     formatter = KiCadFormatterNew()
     formatter_creation_time = time.perf_counter() - formatter_creation_start
     logger.debug(
-        f"🔧 PYTHON_FORMATTING: KiCadFormatterNew created in {formatter_creation_time*1000:.3f}ms"
+        f"PYTHON_FORMATTING: KiCadFormatterNew created in {formatter_creation_time*1000:.3f}ms"
     )
 
     # Format the expression with proper multi-line formatting - time the core operation
@@ -425,26 +397,21 @@ def format_kicad_schematic(schematic_expr: Any) -> str:
     python_total_time = time.perf_counter() - python_start
 
     logger.info(
-        f"✅ PYTHON_FORMATTING: Core formatting completed in {formatting_time*1000:.2f}ms"
+        f"PYTHON_FORMATTING: Core formatting completed in {formatting_time*1000:.2f}ms"
     )
     logger.info(
-        f"✅ PYTHON_FORMATTING: Total Python processing: {python_total_time*1000:.2f}ms"
+        f"PYTHON_FORMATTING: Total Python processing: {python_total_time*1000:.2f}ms"
     )
 
     total_time = time.perf_counter() - start_time
     chars_per_ms = len(result) / (total_time * 1000) if total_time > 0 else 0
 
-    logger.info(f"🏁 FORMAT_KICAD_SCHEMATIC: ✅ COMPLETED in {total_time*1000:.2f}ms")
+    logger.info(f"FORMAT_KICAD_SCHEMATIC: Completed in {total_time*1000:.2f}ms")
     logger.info(
-        f"📊 FORMAT_KICAD_SCHEMATIC: Generated {len(result):,} characters ({chars_per_ms:.1f} chars/ms)"
+        f"FORMAT_KICAD_SCHEMATIC: Generated {len(result):,} characters ({chars_per_ms:.1f} chars/ms)"
     )
     logger.info(
-        f"⚡ FORMAT_KICAD_SCHEMATIC: Throughput: {chars_per_ms*1000:.0f} chars/second"
-    )
-
-    # Performance metrics (Rust is always used, no need for projections)
-    logger.info(
-        f"⚡ RUST_PERFORMANCE: Completed with Rust backend in {total_time*1000:.2f}ms"
+        f"FORMAT_KICAD_SCHEMATIC: Throughput: {chars_per_ms*1000:.0f} chars/second"
     )
 
     return result

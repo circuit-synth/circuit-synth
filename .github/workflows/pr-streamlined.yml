@@ -40,32 +40,10 @@ jobs:
         echo "🧪 Running critical unit tests..."
         uv run pytest tests/unit/ -v --tb=short -x --maxfail=3
 
-  rust-checks:
-    name: Rust Code Quality  
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        components: rustfmt, clippy
-
-    - name: Rust Format Check
-      run: |
-        echo "🦀 Checking Rust code formatting..."
-        find rust_modules -name "*.rs" -path "*/src/*" | head -5 | xargs rustfmt --check || echo "Rust formatting check completed"
-
-    - name: Rust Clippy (Basic)
-      run: |
-        echo "🦀 Running basic Rust linting..."
-        cd rust_modules/rust_pin_calculator 2>/dev/null && cargo clippy --no-deps -- -W clippy::all || echo "Rust linting completed"
-
   comment-results:
     name: PR Status Comment
     runs-on: ubuntu-latest
-    needs: [quick-checks, rust-checks]
+    needs: [quick-checks]
     if: always()
     steps:
     - name: Comment PR Status
@@ -73,16 +51,13 @@ jobs:
       with:
         script: |
           const quickResult = '${{ needs.quick-checks.result }}';
-          const rustResult = '${{ needs.rust-checks.result }}';
           
           const quickEmoji = quickResult === 'success' ? '✅' : '❌';
-          const rustEmoji = rustResult === 'success' ? '✅' : '⚠️';
           
           let message = `## 🚀 Streamlined PR Check Results\n\n`;
           message += `${quickEmoji} **Code Quality & Tests**: ${quickResult}\n`;
-          message += `${rustEmoji} **Rust Code Quality**: ${rustResult}\n\n`;
           
-          if (quickResult === 'success' && rustResult === 'success') {
+          if (quickResult === 'success') {
             message += `✨ **All checks passed!** This PR is ready for review.\n\n`;
           } else {
             message += `🔧 **Some checks need attention.** Please review the failed jobs above.\n\n`;

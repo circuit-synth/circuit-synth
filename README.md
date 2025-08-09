@@ -378,19 +378,14 @@ uv run pytest
 uv run register-agents
 ```
 
-### Rust Acceleration (Optional)
 
 For 6x performance improvement:
 
 ```bash
-# Install Rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Build modules
-./scripts/build_rust_modules.sh
 
 # Test integration
-./scripts/test_rust_modules.sh
 ```
 
 ## Testing
@@ -443,7 +438,6 @@ uv run cs-setup-kicad-plugins
 
 ```bash
 # Optional performance settings
-export CIRCUIT_SYNTH_USE_RUST=true
 export CIRCUIT_SYNTH_PARALLEL_PROCESSING=true
 
 # KiCad path override (if needed)
@@ -546,8 +540,6 @@ kicad-cli version
 **Build Issues:**
 ```bash
 # Clean rebuild
-cargo clean
-./scripts/build_rust_modules.sh
 ```
 
 ## Contributing
@@ -558,7 +550,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
 ### Technical Stack
 - **Frontend**: Python 3.9+ with type hints
-- **Backend**: Rust modules for performance-critical operations
 - **KiCad Integration**: Direct file format support (.kicad_pro, .kicad_sch, .kicad_pcb)
 - **AI Integration**: Claude Code agents with specialized circuit design expertise
 
@@ -571,7 +562,6 @@ circuit-synth/
 │   ├── component_info/          # Component databases
 │   ├── manufacturing/           # JLCPCB, DigiKey, etc.
 │   └── simulation/              # SPICE integration
-├── rust_modules/                # Rust acceleration
 ├── examples/                    # Usage examples
 ├── tests/                       # Test suites
 └── scripts/                     # Build and development scripts
@@ -588,7 +578,6 @@ circuit-synth/
 
 ### Coding Standards
 - **Python**: Type hints, dataclasses, SOLID principles
-- **Rust**: Standard formatting with `cargo fmt`
 - **Documentation**: Clear docstrings and inline comments
 - **Testing**: Comprehensive test coverage for new features
 

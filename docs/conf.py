@@ -20,15 +20,6 @@ class Mock(MagicMock):
         return MagicMock()
 
 MOCK_MODULES = [
-    'rust_core_circuit_engine',
-    'rust_force_directed_placement',
-    'rust_io_processor',
-    'rust_kicad_schematic_writer',
-    'rust_netlist_processor',
-    'rust_pin_calculator',
-    'rust_reference_manager',
-    'rust_symbol_cache',
-    'rust_symbol_search',
     'kicad_cli',
     'pcbnew',
     'matplotlib',
@@ -127,15 +118,6 @@ autodoc_default_options = {
 
 # Handle import errors gracefully
 autodoc_mock_imports = [
-    'rust_core_circuit_engine',
-    'rust_force_directed_placement',
-    'rust_io_processor',
-    'rust_kicad_schematic_writer',
-    'rust_netlist_processor',
-    'rust_pin_calculator',
-    'rust_reference_manager',
-    'rust_symbol_cache',
-    'rust_symbol_search',
     'kicad_cli',
     'pcbnew',
     'matplotlib',

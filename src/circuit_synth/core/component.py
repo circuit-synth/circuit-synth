@@ -20,34 +20,17 @@ from .exception import (
 from .pin import Pin
 from .simple_pin_access import PinGroup, SimplifiedPinAccess
 
-# Import the ultra-high-performance Rust-accelerated symbol cache (55x faster)
+# Import symbol cache
 try:
-    from ..kicad.rust_accelerated_symbol_cache import SymbolLibCache
+    from ..kicad.kicad_symbol_cache import SymbolLibCache
+except ImportError:
+    # Symbol cache not available
+    context_logger.error("No symbol cache available", component="COMPONENT")
 
-    context_logger.info(
-        "🦀 Rust-accelerated SymbolLibCache loaded (55x performance improvement)",
-        component="COMPONENT",
-    )
-    RUST_SYMBOL_CACHE_AVAILABLE = True
-except ImportError as e:
-    context_logger.warning(
-        f"🔄 Rust symbol cache not available, using Python fallback: {e}",
-        component="COMPONENT",
-    )
-    try:
-        from ..kicad.kicad_symbol_cache import SymbolLibCache
-
-        RUST_SYMBOL_CACHE_AVAILABLE = False
-    except ImportError:
-        # Last resort - simple fallback
-        context_logger.error("No symbol cache available", component="COMPONENT")
-
-        class SymbolLibCache:
-            @staticmethod
-            def get_symbol_data(symbol_id: str):
-                return {}
-
-        RUST_SYMBOL_CACHE_AVAILABLE = False
+    class SymbolLibCache:
+        @staticmethod
+        def get_symbol_data(symbol_id: str):
+            return {}
 
 
 @dataclass
@@ -445,7 +428,6 @@ class Component(SimplifiedPinAccess):
             "description": self.description
             or "",  # Ensure empty string instead of None
             "properties": properties,  # Add standard properties dict
-            "tstamps": "",  # Use empty string for Rust compatibility
             "_extra_fields": dict(
                 self._extra_fields
             ),  # Keep original for now if needed elsewhere
@@ -467,7 +449,6 @@ class Component(SimplifiedPinAccess):
                 {
                     "pin_id": pin_num,  # Use pin number instead of index
                     "name": pin_obj.name,
-                    "number": pin_obj.num,  # Use "number" for Rust compatibility
                     "func": pin_obj.func,
                     "unit": pin_obj.unit,
                     "x": pin_obj.x,
@@ -514,7 +495,6 @@ class Component(SimplifiedPinAccess):
         comp._pins.clear()
         comp._pin_names.clear()
         for pinfo in data.get("pins", []):
-            # Handle both "num" (legacy) and "number" (Rust-compatible) fields
             pin_num = pinfo.get("number", pinfo.get("num", ""))
             if not pin_num:  # Skip pins without numbers
                 context_logger.warning(

@@ -76,64 +76,51 @@ from .integrated_reference_manager import IntegratedReferenceManager
 from .kicad_formatter import format_kicad_schematic
 from .shape_drawer import arc_s_expr, circle_s_expr, polyline_s_expr, rectangle_s_expr
 
-# Import Rust acceleration (optional with Python fallback)
-try:
-    from circuit_synth.core.rust_integration import (
-        generate_component_sexp,
-        get_acceleration_status,
-    )
+# Python-only implementation
+_RUST_COMPONENT_ACCELERATION = False
 
-    _rust_status = get_acceleration_status()
-    _RUST_COMPONENT_ACCELERATION = _rust_status["rust_available"]
-    
-    if _RUST_COMPONENT_ACCELERATION:
-        logging.getLogger(__name__).info(
-            f"🦀 RUST_COMPONENT_ACCELERATION: ✅ ENABLED for SchematicWriter"
-        )
-        logging.getLogger(__name__).info(
-            "🚀 RUST_COMPONENT_ACCELERATION: 6x component generation speedup active"
-        )
-    
-except ImportError as e:
-    logging.getLogger(__name__).info(
-        f"🐍 Using Python implementation for component generation (Rust not available: {e})"
-    )
-    _RUST_COMPONENT_ACCELERATION = False
-    
-    from sexpdata import Symbol
-    
-    # Python fallback for generate_component_sexp
-    def generate_component_sexp(component_data):
-        """Python fallback for component S-expression generation"""
-        # This is a simplified version - the full implementation would be more complex
-        ref = component_data.get("ref", "U?")
-        lib_id = component_data.get("lib_id", "Device:R")
-        at = component_data.get("at", [0, 0, 0])
-        uuid = component_data.get("uuid", "00000000-0000-0000-0000-000000000000")
-        
-        # Build basic S-expression
-        sexp = [
-            Symbol("symbol"),
-            [Symbol("lib_id"), lib_id],
-            [Symbol("at"), at[0], at[1], at[2]] if len(at) >= 3 else [Symbol("at"), at[0], at[1]],
-            [Symbol("uuid"), uuid],
-        ]
-        
-        # Add properties if present
-        if "properties" in component_data:
-            for prop in component_data["properties"]:
-                sexp.append(prop)
-        
-        # Add reference property
-        sexp.append([
+from sexpdata import Symbol
+
+
+# Python implementation for generate_component_sexp
+def generate_component_sexp(component_data):
+    """Python implementation for component S-expression generation"""
+    # This is a simplified version - the full implementation would be more complex
+    ref = component_data.get("ref", "U?")
+    lib_id = component_data.get("lib_id", "Device:R")
+    at = component_data.get("at", [0, 0, 0])
+    uuid = component_data.get("uuid", "00000000-0000-0000-0000-000000000000")
+
+    # Build basic S-expression
+    sexp = [
+        Symbol("symbol"),
+        [Symbol("lib_id"), lib_id],
+        (
+            [Symbol("at"), at[0], at[1], at[2]]
+            if len(at) >= 3
+            else [Symbol("at"), at[0], at[1]]
+        ),
+        [Symbol("uuid"), uuid],
+    ]
+
+    # Add properties if present
+    if "properties" in component_data:
+        for prop in component_data["properties"]:
+            sexp.append(prop)
+
+    # Add reference property
+    sexp.append(
+        [
             Symbol("property"),
             "Reference",
             ref,
             [Symbol("at"), 0, -5, 0],
-            [Symbol("effects"), [Symbol("font"), [Symbol("size"), 1.27, 1.27]]]
-        ])
-        
-        return sexp
+            [Symbol("effects"), [Symbol("font"), [Symbol("size"), 1.27, 1.27]]],
+        ]
+    )
+
+    return sexp
+
 
 logger = logging.getLogger(__name__)
 
@@ -316,9 +303,7 @@ class SchematicWriter:
         logger.info(
             f"📊 GENERATE_S_EXPR: Components: {len(self.circuit.components)}, Nets: {len(self.circuit.nets)}"
         )
-        logger.info(
-            f"🦀 GENERATE_S_EXPR: Using Rust acceleration for components"
-        )
+        logger.info(f"🦀 GENERATE_S_EXPR: Using Rust acceleration for components")
 
         # Add components using the new API - time this critical operation
         comp_start = time.perf_counter()
@@ -637,9 +622,7 @@ class SchematicWriter:
         logger.info(
             f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components"
         )
-        logger.info(
-            f"🦀 PLACE_COMPONENTS: Using Rust placement acceleration"
-        )
+        logger.info(f"🦀 PLACE_COMPONENTS: Using Rust placement acceleration")
 
         # Check if components need repositioning (have default positions)
         components_needing_placement = []
@@ -1498,9 +1481,7 @@ def write_schematic_file(schematic_expr: list, out_path: str):
     logger.info(
         f"📊 WRITE_SCHEMATIC_FILE: Input S-expression size: {expr_size:,} characters"
     )
-    logger.info(
-        f"🦀 WRITE_SCHEMATIC_FILE: Using Rust formatting"
-    )
+    logger.info(f"🦀 WRITE_SCHEMATIC_FILE: Using Rust formatting")
 
     # Debug: Check for sheet pins with orientation - time this analysis
     debug_start = time.perf_counter()

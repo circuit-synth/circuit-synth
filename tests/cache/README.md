@@ -1,6 +1,5 @@
 # Cache Testing Strategy
 
-This directory contains testing utilities for validating cache systems in the Circuit Synth project, focusing on the remaining Rust cache implementations.
 
 **Location:** `tests/cache/` (moved from `scripts/cache_testing/`)
 
@@ -27,10 +26,6 @@ tests/cache/
 ### Prerequisites
 
 1. **Python Environment**: Ensure Circuit Synth dependencies are installed
-2. **Rust Caches**: The remaining Rust cache systems should be built:
-   - `rust_symbol_cache`
-   - `rust_symbol_search` 
-   - `rust_reference_manager`
 3. **Project Structure**: Run from Circuit Synth root directory
 
 ### Running Tests
@@ -46,26 +41,11 @@ python tests/cache/run_cache_tests.py
 python tests/cache/run_cache_tests.py --verbose
 ```
 
-## 🔧 Building Rust Caches
 
-Before running tests, ensure the remaining Rust caches are properly built:
 
 ```bash
-# Build rust_symbol_cache
-cd rust_symbol_cache
-cargo build --features python-bindings
-pip install maturin
-maturin develop
 
-# Build rust_symbol_search
-cd ../rust_symbol_search
-cargo build --features python-bindings
-maturin develop
 
-# Build rust_reference_manager
-cd ../rust_reference_manager
-cargo build --features python-bindings
-maturin develop
 ```
 
 ## 📋 Detailed Usage
@@ -78,8 +58,6 @@ Clears all caches to ensure clean testing environments.
 # Clear all caches
 python tests/cache/clear_caches.py --all
 
-# Clear only Rust caches
-python tests/cache/clear_caches.py --rust
 
 # Clear only Python caches
 python tests/cache/clear_caches.py --python
@@ -90,7 +68,6 @@ python tests/cache/clear_caches.py --list
 
 **Features:**
 - Discovers cache locations automatically
-- Handles Python `__pycache__`, Rust `target/`, KiCad caches
 - Safe operation with error handling
 - Detailed logging of cleared items
 
@@ -145,7 +122,6 @@ python tests/cache/run_cache_tests.py --output-dir my_test_results
 
 **✅ Cache Systems Working:**
 - Python cache systems functional
-- Remaining Rust caches (symbol_cache, symbol_search, reference_manager) operational
 - No import or initialization errors
 
 **🚀 Performance Monitoring:**
@@ -170,14 +146,10 @@ cache_test_results/
 **Master Report Structure:**
 ```json
 {
-  "rust_cache_status": {
     "working": false,
-    "note": "rust_unified_cache removed from project"
   },
   "success_rate": 100.0,
   "recommendations": [
-    "ℹ️  Rust unified cache has been removed from the project.",
-    "✅ Other Rust cache systems remain available."
   ]
 }
 ```
@@ -190,32 +162,21 @@ The following cache systems remain available in the project:
 |--------|---------|--------|
 | **Python Symbol Cache** | KiCad symbol caching | ✅ Active |
 | **Python Footprint Cache** | KiCad footprint caching | ✅ Active |
-| **rust_symbol_cache** | Rust-based symbol caching | ✅ Active |
-| **rust_symbol_search** | Rust-based symbol search | ✅ Active |
-| **rust_reference_manager** | Rust-based reference management | ✅ Active |
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-**1. Rust Cache Import Error**
 ```
-ImportError: No module named 'rust_symbol_cache'
 ```
 **Solution:**
 ```bash
-cd rust_symbol_cache
-maturin develop
 ```
 
 **2. Compilation Errors**
 ```
-error: could not compile `rust_symbol_cache`
 ```
 **Solution:**
-- Check Rust installation: `rustc --version`
-- Update dependencies: `cargo update`
-- Clean build: `cargo clean && cargo build`
 
 **3. Example Project Fails**
 ```
@@ -232,7 +193,6 @@ Enable detailed logging for troubleshooting:
 
 ```bash
 # Set environment variable
-export RUST_LOG=debug
 
 # Run with verbose output
 python scripts/cache_testing/run_cache_tests.py --verbose
@@ -243,11 +203,7 @@ python scripts/cache_testing/run_cache_tests.py --verbose
 Test individual components:
 
 ```python
-# Test rust_symbol_cache
 python -c "
-import rust_symbol_cache
-cache = rust_symbol_cache.SymbolCache()
-print('rust_symbol_cache available')
 "
 
 # Test Python cache
@@ -274,11 +230,7 @@ print('Python cache available')
 
 ### After Making Changes
 
-1. **Rebuild Rust Caches:**
    ```bash
-   cd rust_symbol_cache && maturin develop
-   cd ../rust_symbol_search && maturin develop
-   cd ../rust_reference_manager && maturin develop
    ```
 
 2. **Run Validation:**
@@ -288,9 +240,6 @@ print('Python cache available')
 
 ## 📚 Additional Resources
 
-- **Rust Symbol Cache:** [`rust_symbol_cache/README.md`](../../rust_symbol_cache/README.md)
-- **Rust Symbol Search:** [`rust_symbol_search/README.md`](../../rust_symbol_search/README.md)
-- **Rust Reference Manager:** [`rust_reference_manager/README.md`](../../rust_reference_manager/README.md)
 - **Example Project:** [`examples/example_kicad_project.py`](../../examples/example_kicad_project.py)
 
 ## 🤝 Contributing
