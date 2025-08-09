@@ -4,36 +4,26 @@
 echo "🧹 Cleaning circuit_synth cache..."
 rm -rf ~/.cache/circuit_synth
 
-echo "🗑️  Removing existing reference_generated directory..."
-rm -rf reference_generated
+echo "🗑️  Removing existing test_multiunit directory..."
+rm -rf test_multiunit
 
-echo "🚀 Running reference circuit generation..."
-uv run python reference_circuit-synth/main.py
+echo "🚀 Running multi-unit test circuit generation..."
+uv run python test_multiunit.py
 
 echo "📄 Generating PDFs with KiCad CLI for visual verification..."
 
 # Generate PDF of main schematic
-if [ -f "reference_generated/reference_generated.kicad_sch" ]; then
+if [ -f "test_multiunit/test_multiunit.kicad_sch" ]; then
     kicad-cli sch export pdf \
-        --output reference_generated/reference_generated_main.pdf \
-        reference_generated/reference_generated.kicad_sch
-    echo "✅ Generated: reference_generated/reference_generated_main.pdf"
+        --output test_multiunit/test_multiunit_main.pdf \
+        test_multiunit/test_multiunit.kicad_sch
+    echo "✅ Generated: test_multiunit/test_multiunit_main.pdf"
 else
     echo "❌ Main schematic file not found!"
 fi
 
-# Generate PDF of child schematic  
-if [ -f "reference_generated/child1.kicad_sch" ]; then
-    kicad-cli sch export pdf \
-        --output reference_generated/child1.pdf \
-        reference_generated/child1.kicad_sch
-    echo "✅ Generated: reference_generated/child1.pdf"
-else
-    echo "❌ Child schematic file not found!"
-fi
-
 echo "📊 Generated files:"
-ls -la reference_generated/*.pdf 2>/dev/null || echo "No PDFs found"
+ls -la test_multiunit/*.pdf 2>/dev/null || echo "No PDFs found"
 
-open reference_generated/reference_generated.kicad_pro
+open test_multiunit/test_multiunit.kicad_pro
 echo "✅ Done!"

@@ -20,12 +20,16 @@ def test_multiunit():
     - Multiple instances of same multi-unit component
     """
     
-    opamp_dual = Component(
-        symbol="Amplifier_Operational:LM358",
+    # Test component - 74HC14 hex inverter with 7 units
+    u1 = Component(
+        symbol="74xx:74HC14",
         ref="U",
-        value="LM358",
-        footprint="Package_DIP:DIP-8_W7.62mm"
+        value="74HC14",
+        footprint="Package_SO:TSSOP-14_4.4x5mm_P0.65mm"
     )
+    
+    # The system should automatically detect this is a multi-unit component
+    # and create all 7 units (6 inverters + 1 power unit)
    
 
 
