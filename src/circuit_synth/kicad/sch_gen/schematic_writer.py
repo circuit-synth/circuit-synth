@@ -1303,8 +1303,11 @@ class SchematicWriter:
                     logger.error(f"❌ Failed to create symbol definition for {sym_id}")
         
         logger.info(f"📦 lib_symbols block now has {len(lib_symbols_block)} items (including header)")
-        if len(lib_symbols_block) <= 1:
+        # Only show error if we have components but no symbols
+        if len(lib_symbols_block) <= 1 and len(self.schematic.components) > 0:
             logger.error("❌❌❌ lib_symbols block is EMPTY - no symbol definitions added!")
+        elif len(lib_symbols_block) <= 1 and len(self.schematic.components) == 0:
+            logger.info("📋 No components in this sheet (hierarchical sheet with sub-sheets only)")
 
     def _create_symbol_definition(self, lib_id: str, lib_data: dict):
         """
