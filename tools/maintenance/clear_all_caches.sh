@@ -53,7 +53,6 @@ fi
 # 5. Clear any environment variables that might affect caching
 echo "  🌍 Clearing cache environment variables"
 unset CIRCUIT_SYNTH_CACHE_DIR
-unset RUST_LOG
 
 echo "
 🎯 CACHE CLEARING COMPLETE!

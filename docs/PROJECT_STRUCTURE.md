@@ -18,7 +18,6 @@ circuit-synth/
 ├── tools/                      # Development and CI tools
 ├── scripts/                    # Runtime utility scripts
 ├── docker/                     # Container definitions
-├── rust_modules/               # Rust accelerated modules
 ├── submodules/                 # Git submodules (external projects)
 ├── memory-bank/                # Project knowledge and decisions
 ├── logs/                       # Development logs
@@ -73,7 +72,6 @@ circuit-synth/
   - Docker Compose configurations
   - KiCad-integrated containers
 
-- **`rust_modules/`** - Performance-critical Rust modules
   - Symbol processing acceleration
   - Placement algorithms
   - File I/O optimization

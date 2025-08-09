@@ -16,7 +16,6 @@ Scripts have been reorganized into the `/tools/` directory for better organizati
 
 | Old Path | New Path |
 |----------|----------|
-| `./scripts/build_rust_modules.sh` | `./tools/build/build_rust_modules.sh` |
 | `./scripts/run_all_tests.sh` | `./tools/testing/run_all_tests.sh` |
 | `./scripts/release_to_pypi.sh` | `./tools/release/release_to_pypi.sh` |
 | `./scripts/dead-code-analysis.py` | `./tools/analysis/dead-code-analysis.py` |

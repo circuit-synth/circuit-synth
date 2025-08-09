@@ -45,7 +45,6 @@ Circuit-Synth is an open-source Python library that fits seamlessly into normal 
 
    CONTRIBUTING
    TESTING
-   RUST_PYPI_INTEGRATION
    SCRIPT_REFERENCE
 
 .. toctree::

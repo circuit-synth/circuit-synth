@@ -61,9 +61,7 @@ register-agents
 ./tools/testing/run_full_regression_tests.py
 
 # This performs COMPLETE environment reconstruction:
-# - Clears ALL caches (Python, Rust, system)
 # - Reinstalls Python environment from scratch
-# - Rebuilds all Rust modules with Python bindings
 # - Runs comprehensive functionality tests
 # - Takes ~2 minutes, prevents broken releases
 
@@ -73,7 +71,6 @@ register-agents
 
 **🚀 AUTOMATED TESTING (Recommended):**
 ```bash
-# Run all tests (Python + Rust + Integration + Core)
 ./tools/testing/run_all_tests.sh
 
 # Run with verbose output for debugging
@@ -82,24 +79,15 @@ register-agents
 # Run only Python tests (fast)
 ./tools/testing/run_all_tests.sh --python-only
 
-# Run only Rust tests
-./tools/testing/run_all_tests.sh --rust-only
 
 # Stop on first failure (for debugging)
 ./tools/testing/run_all_tests.sh --fail-fast
 ```
 
-**🦀 RUST TESTING:**
 ```bash
-# Test all Rust modules automatically
-./tools/testing/test_rust_modules.sh
 
 # Test with verbose output and Python integration
-./tools/testing/test_rust_modules.sh --verbose
 
-# Test specific Rust module manually
-cd rust_modules/rust_netlist_processor
-cargo test --lib --no-default-features
 ```
 
 **🐍 TRADITIONAL PYTHON TESTING:**
@@ -118,8 +106,6 @@ uv run pytest --cov=circuit_synth
 # Run specific test file
 uv run pytest tests/unit/test_core_circuit.py -v
 
-# Run Rust integration tests
-uv run pytest tests/rust_integration/ -v
 ```
 
 ### Building and Distribution
@@ -144,13 +130,9 @@ pip install -e .
 
 ### Build Tools
 ```bash
-# Build all Rust modules
-./tools/build/build_rust_modules.sh
 
 # Clean rebuild everything
-./tools/build/rebuild_all_rust.sh
 
-# Format all code (Python + Rust)
 ./tools/build/format_all.sh
 ```
 
@@ -516,7 +498,6 @@ Task(subagent_type="circuit-synth", description="Design power circuit", prompt="
 **Let Orchestrator Coordinate:**
 - Don't manually chain agents - let orchestrator manage the workflow
 - Orchestrator will delegate to architect → circuit-synth → code as needed
-- Trust the orchestrator to choose the right specialist for each subtask
 
 ### Example Workflows
 

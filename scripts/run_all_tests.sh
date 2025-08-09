@@ -1,1 +1,0 @@
-../tools/testing/run_all_tests.sh

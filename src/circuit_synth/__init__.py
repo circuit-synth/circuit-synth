@@ -14,7 +14,7 @@ Or in Python:
     setup_claude_integration()
 """
 
-__version__ = "0.8.11"
+__version__ = "0.8.15"
 
 # Plugin integration
 from .ai_integration.plugins import AIDesignBridge
@@ -60,7 +60,6 @@ from .core.netlist_exporter import NetlistExporter
 # Reference manager and netlist exporters
 from .core.reference_manager import ReferenceManager
 
-
 # Removed unused interface abstractions and unified integration
 
 
@@ -80,13 +79,7 @@ def setup_claude_integration():
 
 
 # KiCad API imports
-from .kicad.core.types import (
-    Junction,
-    Label,
-    Schematic,
-    SchematicSymbol,
-    Wire,
-)
+from .kicad.core.types import Junction, Label, Schematic, SchematicSymbol, Wire
 
 __all__ = [
     # Core

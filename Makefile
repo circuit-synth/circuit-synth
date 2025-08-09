@@ -31,31 +31,6 @@ clean:
 	find . -type f -name "*.pyo" -delete
 	@echo "✅ Clean complete"
 
-build-rust:
-	@echo "🦀 Building Rust modules..."
-	@if [ -f "tools/build/build_all_rust_for_packaging.sh" ]; then \
-		chmod +x tools/build/build_all_rust_for_packaging.sh && \
-		./tools/build/build_all_rust_for_packaging.sh; \
-	else \
-		for module in rust_netlist_processor rust_symbol_cache rust_core_circuit_engine rust_symbol_search rust_force_directed_placement rust_kicad_integration; do \
-			echo "Building $$module..."; \
-			if [ -d "rust_modules/$$module" ]; then \
-				cd rust_modules/$$module && \
-				maturin develop --release && \
-				cd ../..; \
-			fi; \
-		done; \
-	fi
-	@echo "✅ Rust modules built"
-
-build: clean build-rust
-	@echo "📦 Building distribution..."
-	uv build
-	@echo "✅ Distribution built"
-	@echo ""
-	@echo "📋 Distribution contents:"
-	@ls -lah dist/
-
 test:
 	@echo "🧪 Running unit tests..."
 	uv run pytest tests/unit/ -v
@@ -69,9 +44,6 @@ test-local: build
 	test_env/bin/pip install dist/*.whl
 	@echo "🔬 Testing imports..."
 	test_env/bin/python -c "import circuit_synth; print('✅ circuit_synth imports successfully')"
-	test_env/bin/python -c "import rust_netlist_processor; print('✅ rust_netlist_processor imports')"
-	test_env/bin/python -c "import rust_symbol_cache; print('✅ rust_symbol_cache imports')"
-	test_env/bin/python -c "import rust_core_circuit_engine; print('✅ rust_core_circuit_engine imports')"
 	@echo "⚡ Testing circuit functionality..."
 	test_env/bin/python -c "from circuit_synth import Component, Net, circuit; print('✅ Circuit creation works')"
 	@rm -rf test_env
@@ -148,7 +120,6 @@ verify-pypi:
 	python -m venv verify_env
 	verify_env/bin/pip install circuit-synth==$(VERSION)
 	verify_env/bin/python -c "import circuit_synth; v = circuit_synth.__version__; print(f'✅ Installed version: {v}')"
-	verify_env/bin/python -c "import rust_netlist_processor; print('✅ Rust modules work')"
 	@rm -rf verify_env
 	@echo "✅ PyPI release verified"
 
@@ -195,4 +166,4 @@ ci-test:
 	$(MAKE) test
 	$(MAKE) test-local
 
-.PHONY: build-rust dev-install format lint ci-test verify-pypi test-from-testpypi
+.PHONY: dev-install format lint ci-test verify-pypi test-from-testpypi

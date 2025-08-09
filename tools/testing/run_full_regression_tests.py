@@ -4,9 +4,7 @@ Comprehensive Regression Test Suite for Circuit-Synth
 ======================================================
 
 This script performs FULL environment reconstruction and testing:
-- Clears ALL caches (Python, Rust, system)
 - Reinstalls all Python dependencies from scratch
-- Rebuilds all Rust modules
 - Runs comprehensive test suite
 - Validates generated outputs
 
@@ -189,14 +187,7 @@ class ComprehensiveRegressionSuite:
         else:
             self.log("uv not found - will try to install", "WARNING")
 
-        # Check Rust/Cargo version
-        success, stdout, _ = self.run_command(
-            ["cargo", "--version"], "Cargo version", check=False
-        )
-        if success:
-            env_info["cargo_version"] = stdout.strip()
-        else:
-            self.log("Cargo not found - Rust modules may not build", "WARNING")
+        # Cargo no longer needed - pure Python project
 
         # Check KiCad installation
         success, stdout, _ = self.run_command(
@@ -217,7 +208,6 @@ class ComprehensiveRegressionSuite:
         self.log(f"Environment info saved to {env_file}", "SUCCESS")
 
     def clear_all_caches(self) -> bool:
-        """Clear ALL caches - Python, Rust, system, everything"""
         self.log("=" * 60, "HEADER")
         self.log("CLEARING ALL CACHES", "HEADER")
         self.log("=" * 60, "HEADER")
@@ -284,20 +274,6 @@ class ComprehensiveRegressionSuite:
             self.log(
                 f"Cleared {pycache_count} bytecode files/directories", "SUCCESS", 1
             )
-
-        # 3. Rust/Cargo caches
-        rust_targets = list(self.project_root.rglob("target"))
-        if rust_targets:
-            self.log(f"Clearing {len(rust_targets)} Rust target directories...", "INFO")
-            for target_dir in rust_targets:
-                if target_dir.is_dir():
-                    try:
-                        shutil.rmtree(target_dir)
-                        caches_cleared.append(str(target_dir))
-                        self.log(f"Cleared: {target_dir}", "SUCCESS", 1)
-                    except Exception as e:
-                        caches_failed.append((str(target_dir), str(e)))
-                        self.log(f"Failed to clear {target_dir}: {e}", "WARNING", 1)
 
         # 4. Test outputs from previous runs
         test_artifacts = [
@@ -441,156 +417,6 @@ except Exception as e:
 
         return True
 
-    def rebuild_rust_modules(self) -> bool:
-        """Rebuild all Rust modules from scratch"""
-        self.log("=" * 60, "HEADER")
-        self.log("REBUILDING RUST MODULES", "HEADER")
-        self.log("=" * 60, "HEADER")
-
-        # Use the existing test_rust_modules.sh script which is known to work
-        test_script = self.project_root / "tools" / "testing" / "test_rust_modules.sh"
-
-        if test_script.exists():
-            self.log(
-                "Using test_rust_modules.sh to build and test Rust modules...", "INFO"
-            )
-
-            # First, clear Rust caches more thoroughly
-            self.log("Clearing Cargo registry cache...", "INFO")
-            cargo_cache = Path.home() / ".cargo" / "registry" / "cache"
-            if cargo_cache.exists():
-                try:
-                    shutil.rmtree(cargo_cache)
-                    self.log("Cleared Cargo registry cache", "SUCCESS", 1)
-                except:
-                    pass
-
-            # Run the test script with increased timeout
-            success, stdout, stderr = self.run_command(
-                [str(test_script), "--verbose"],
-                "Build and test all Rust modules",
-                timeout=1200,  # 20 minutes for all modules
-                check=False,
-            )
-
-            # Also run maturin develop to ensure Python bindings are built
-            if success:
-                self.log("Building Python bindings with maturin...", "INFO")
-                for rust_module in self.project_root.glob("rust_modules/*/Cargo.toml"):
-                    module_dir = rust_module.parent
-                    module_name = module_dir.name
-
-                    # Check if this module has Python bindings (has pyproject.toml)
-                    if (module_dir / "pyproject.toml").exists():
-                        self.log(
-                            f"Building Python bindings for {module_name}...", "INFO", 1
-                        )
-                        success, _, _ = self.run_command(
-                            ["uv", "run", "maturin", "develop", "--release"],
-                            f"Build Python bindings for {module_name}",
-                            cwd=module_dir,
-                            timeout=300,
-                            check=False,
-                        )
-                        if success:
-                            self.log(
-                                f"✅ Python bindings built for {module_name}",
-                                "SUCCESS",
-                                2,
-                            )
-                        else:
-                            self.log(
-                                f"⚠️ Failed to build Python bindings for {module_name}",
-                                "WARNING",
-                                2,
-                            )
-
-            if success:
-                self.log("✅ All Rust modules built and tested successfully", "SUCCESS")
-
-                # Parse output to show module status
-                if "✅" in stdout:
-                    for line in stdout.split("\n"):
-                        if "✅" in line and "module" in line.lower():
-                            self.log(line.strip(), "SUCCESS", 1)
-            else:
-                self.log("❌ Some Rust modules failed to build", "ERROR")
-
-                # Show detailed error
-                if stderr:
-                    self.log("Error details:", "ERROR", 1)
-                    for line in stderr.split("\n")[-20:]:  # Last 20 lines
-                        if line.strip():
-                            self.log(line.strip(), "ERROR", 2)
-
-                # Since Rust is critical, return False
-                return False
-
-            return success
-
-        else:
-            # Fallback to manual building if script not found
-            self.log("test_rust_modules.sh not found, building manually...", "WARNING")
-
-            # Check if cargo is available
-            success, _, _ = self.run_command(
-                ["which", "cargo"], "Check cargo", check=False
-            )
-
-            if not success:
-                self.log("Cargo not found - Rust is required!", "ERROR")
-                return False
-
-            # Find all Rust modules
-            rust_modules = list(self.project_root.glob("rust_modules/*/Cargo.toml"))
-
-            if not rust_modules:
-                self.log("No Rust modules found", "WARNING")
-                return True
-
-            self.log(f"Found {len(rust_modules)} Rust modules to build", "INFO")
-
-            built_count = 0
-            failed_modules = []
-
-            for cargo_toml in rust_modules:
-                module_dir = cargo_toml.parent
-                module_name = module_dir.name
-
-                self.log(f"Building Rust module: {module_name}", "INFO", 1)
-
-                # Build with longer timeout and without --release for faster builds
-                success, stdout, stderr = self.run_command(
-                    ["cargo", "build"],
-                    f"Build {module_name}",
-                    cwd=module_dir,
-                    timeout=600,  # 10 minutes per module
-                    check=False,
-                )
-
-                if success:
-                    self.log(f"✅ Built: {module_name}", "SUCCESS", 2)
-                    built_count += 1
-                else:
-                    self.log(f"❌ Failed to build: {module_name}", "ERROR", 2)
-
-                    # Show full error
-                    if stderr:
-                        error_lines = stderr.split("\n")
-                        for line in error_lines[-30:]:  # Show last 30 lines
-                            if line.strip():
-                                self.log(line.strip(), "ERROR", 3)
-
-                    failed_modules.append(module_name)
-
-            # Summary
-            self.log(f"Built {built_count}/{len(rust_modules)} Rust modules", "INFO")
-
-            if failed_modules:
-                self.log(f"Failed modules: {', '.join(failed_modules)}", "ERROR")
-                return False  # Rust is critical
-
-            return built_count == len(rust_modules)
 
     # ========== PART 4: Core Test Methods ==========
 
@@ -1031,11 +857,6 @@ print(f'✅ Symbol library works: Resistor has {len(symbol.pins)} pins')
             if not self.reinstall_python_environment():
                 self.log("Failed to reinstall Python environment", "ERROR")
                 return False
-
-        # Step 4: Rebuild Rust modules (unless skipped)
-        if not self.args.skip_install:
-            if not self.rebuild_rust_modules():
-                self.log("Failed to rebuild Rust modules - continuing", "WARNING")
 
         # Step 5: Run core tests
         core_passed = self.test_core_functionality()

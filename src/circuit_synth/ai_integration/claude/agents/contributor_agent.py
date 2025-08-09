@@ -20,7 +20,6 @@ class ContributorAgent:
     This agent helps new and existing contributors:
     - Understand the project architecture and codebase
     - Follow coding conventions and best practices
-    - Navigate the Rust/Python integration
     - Write proper tests using TDD approach
     - Use development tools and commands effectively
     """
@@ -39,7 +38,6 @@ class ContributorAgent:
             "architecture_explanation",
             "coding_conventions",
             "testing_guidance",
-            "rust_integration_help",
             "development_workflow",
             "code_review_preparation",
             "issue_analysis",
@@ -52,16 +50,13 @@ class ContributorAgent:
 
         This prompt instructs Claude Code how to act as a contributor assistant.
         """
-        return """You are a specialized contributor agent for the circuit-synth project. Your role is to help developers contribute effectively to this EE design tool that combines Python simplicity with Rust performance.
-
-## Core Knowledge Base
+        return """## Core Knowledge Base
 
 ### Project Overview
 Circuit-synth is designed to make PCB design easier for electrical engineers by using Python code for circuit definition. Key principles:
 - **Adapt to current EE workflows** - enhance existing processes, don't force change
 - **Very simple Python syntax** - no complex DSL, just clear Python classes
 - **Test-driven development** - every feature needs comprehensive tests
-- **Python + Rust hybrid** - Python for API/flexibility, Rust for performance
 - **AI/LLM infrastructure** - extensive agent integration for developer productivity
 
 ### Essential Documentation to Reference
@@ -73,18 +68,10 @@ Always guide contributors to read these key documents (in order of importance):
 4. **Contributors/detailed/** - In-depth technical documentation folder
    - **Architecture-Overview.md** - How everything fits together technically
    - **Development-Setup.md** - Detailed environment configuration
-   - **Rust-Integration-Guide.md** - Working with our Rust modules
    - **Testing-Guidelines.md** - TDD approach and test patterns
 
 ### Current High-Priority Areas
 
-**Rust Integration (Perfect for High-Impact Contributions):**
-- Issue #36: rust_netlist_processor module missing (HIGH PRIORITY)
-- Issue #37: rust_kicad_integration not compiled (HIGH PRIORITY)  
-- Issue #38: rust_core_circuit_engine missing
-- Issue #39: rust_force_directed_placement missing
-- Issue #40: rust component acceleration missing (97% of generation time!)
-- Issue #41: rust S-expression formatting missing
 
 ### Development Infrastructure
 
@@ -98,15 +85,12 @@ Always guide contributors to read these key documents (in order of importance):
 **Testing Infrastructure:**
 ```bash
 ./scripts/run_all_tests.sh           # Complete test suite
-./scripts/run_all_tests.sh --python-only  # Skip Rust compilation
-./scripts/test_rust_modules.sh       # Rust module testing
 ```
 
 **Special Tools Available:**
 - **run_tests**: Execute tests directly with proper options
 - **check_branch_status**: Get git status and recent changes
 - **find_examples**: Locate relevant code examples for any topic
-- **rust_module_status**: Check which Rust modules need work
 - **documentation_lookup**: Find specific documentation sections
 
 **STM32 Integration Example:**
@@ -135,9 +119,7 @@ The `src/circuit_synth/data/memory-bank/` directory contains project context:
 6. **Explain our tooling**: Show them our automated development commands
 
 ### For Experienced Contributors:
-1. **Dive into Rust integration**: These are our highest-impact opportunities
 2. **Performance optimization**: Show them the profiling data and bottlenecks
-3. **Architecture decisions**: Help them understand the Python+Rust hybrid approach
 4. **Advanced testing**: Guide them through our TDD methodology
 
 ### For Any Contributor Questions:
@@ -167,7 +149,6 @@ The `src/circuit_synth/data/memory-bank/` directory contains project context:
 ## Key Phrases to Use
 
 - "Let's check the Contributors documentation for this..."
-- "This relates to our Python+Rust hybrid architecture because..."
 - "For testing this, our TDD approach suggests..."
 - "The automated tooling can help with this - try running..."
 - "This connects to our mission of making EE workflows easier by..."
@@ -203,21 +184,11 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
                     },
                 },
             },
-            "rust_module_status": {
-                "description": "Check status of Rust modules and compilation",
-                "parameters": {
-                    "module_name": {
-                        "type": "string",
-                        "description": "Specific Rust module to check",
-                    }
-                },
-            },
             "run_tests": {
                 "description": "Run circuit-synth tests with specific options",
                 "parameters": {
                     "test_type": {
                         "type": "string",
-                        "description": "Type of tests: 'all', 'python-only', 'rust', 'specific-file'",
                     },
                     "file_path": {
                         "type": "string",
@@ -245,7 +216,6 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
                 "parameters": {
                     "topic": {
                         "type": "string",
-                        "description": "What to find examples of (e.g., 'component creation', 'net connections', 'rust integration')",
                     }
                 },
             },
@@ -263,8 +233,6 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
             return self._lookup_documentation(
                 parameters.get("doc_path", ""), parameters.get("section")
             )
-        elif tool_name == "rust_module_status":
-            return self._check_rust_module_status(parameters.get("module_name"))
         elif tool_name == "run_tests":
             return self._run_tests(
                 parameters.get("test_type", "python-only"),
@@ -297,7 +265,6 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
             "architecture": "Contributors/Architecture-Overview.md",
             "setup": "Contributors/Development-Setup.md",
             "testing": "Contributors/Testing-Guidelines.md",
-            "rust": "Contributors/Rust-Integration-Guide.md",
             "conventions": "CLAUDE.md",
         }
 
@@ -313,29 +280,6 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
             "suggestion": "Use the Read tool to access the actual documentation content",
         }
 
-    def _check_rust_module_status(
-        self, module_name: Optional[str] = None
-    ) -> Dict[str, Any]:
-        """Check the status of Rust modules."""
-        rust_modules = [
-            "rust_core_circuit_engine",
-            "rust_kicad_integration",
-            "rust_netlist_processor",
-            "rust_force_directed_placement",
-            "rust_symbol_cache",
-        ]
-
-        return {
-            "available_modules": rust_modules,
-            "module_requested": module_name,
-            "high_priority_issues": [
-                "Issue #36: rust_netlist_processor module missing",
-                "Issue #37: rust_kicad_integration not compiled",
-                "Issue #40: rust component acceleration (97% performance impact)",
-            ],
-            "suggestion": "Use 'uv run python example_project/circuit-synth/main.py' to see current fallback status",
-        }
-
     def _run_tests(
         self,
         test_type: str = "python-only",
@@ -346,14 +290,13 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
         commands = {
             "all": "./scripts/run_all_tests.sh",
             "python-only": "./scripts/run_all_tests.sh --python-only",
-            "rust": "./scripts/test_rust_modules.sh",
             "specific-file": (
                 f"uv run pytest {file_path} -v" if file_path else "uv run pytest -v"
             ),
         }
 
         base_command = commands.get(test_type, commands["python-only"])
-        if verbose and test_type in ["all", "python-only", "rust"]:
+        if verbose:
             base_command += " --verbose"
 
         return {
@@ -399,14 +342,8 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
                 "src/circuit_synth/data/examples/example_kicad_project.py",
                 "src/circuit_synth/core/circuit.py",
             ],
-            "rust integration": [
-                "rust_modules/ directory",
-                "src/circuit_synth/core/rust_integration.py",
-                "src/circuit_synth/core/rust_components.py",
-            ],
             "testing patterns": [
                 "tests/unit/test_core_circuit.py",
-                "tests/rust_integration/",
                 "./scripts/run_all_tests.sh",
             ],
             "agent training": [
@@ -458,7 +395,6 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
                 "CLAUDE.md",
                 "Contributors/detailed/Architecture-Overview.md",
                 "Contributors/detailed/Development-Setup.md",
-                "Contributors/detailed/Rust-Integration-Guide.md",
                 "Contributors/detailed/Testing-Guidelines.md",
             ],
         }

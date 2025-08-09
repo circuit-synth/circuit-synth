@@ -11,10 +11,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-# import yaml  # No longer needed, using JSON
-
 from .fmea_analyzer import ComponentType, FailureMode, UniversalFMEAAnalyzer
 from .fmea_report_generator import FMEAReportGenerator
+
+# import yaml  # No longer needed, using JSON
 
 
 class EnhancedFMEAAnalyzer(UniversalFMEAAnalyzer):

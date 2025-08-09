@@ -122,11 +122,7 @@ The JSON format represents circuits as nested hierarchies:
 
 ## Performance Optimization
 
-The architecture includes optional Rust acceleration for JSON processing:
 
-- **rust_netlist_processor**: High-performance KiCad netlist generation
-- **rust_kicad_integration**: Accelerated file I/O and parsing
-- Falls back to Python implementation if Rust modules unavailable
 
 ## Benefits
 

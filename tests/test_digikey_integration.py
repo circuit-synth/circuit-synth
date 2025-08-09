@@ -46,15 +46,21 @@ class TestDigiKeyConfig(unittest.TestCase):
 
     def test_config_defaults(self):
         """Test config with minimal environment."""
-        from circuit_synth.manufacturing.digikey.config_manager import DigiKeyConfigManager
-        
+        from circuit_synth.manufacturing.digikey.config_manager import (
+            DigiKeyConfigManager,
+        )
+
         with patch.dict(os.environ, {}, clear=True):
             # Mock the config manager to return empty config (no file found)
-            with patch.object(DigiKeyConfigManager, 'get_config', return_value={
-                "client_id": "",
-                "client_secret": "",
-                "sandbox_mode": False
-            }):
+            with patch.object(
+                DigiKeyConfigManager,
+                "get_config",
+                return_value={
+                    "client_id": "",
+                    "client_secret": "",
+                    "sandbox_mode": False,
+                },
+            ):
                 config = DigiKeyConfig.from_environment()
 
                 self.assertEqual(config.client_id, "")

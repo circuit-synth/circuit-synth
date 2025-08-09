@@ -1,0 +1,526 @@
+# Comprehensive Repository Review Command
+
+**Purpose:** Complete repository analysis with automatic feature discovery to identify what's working, what's broken, and what needs attention. Automatically surveys the repository to ensure no features are missed.
+
+## Usage
+```bash
+/dev-review-repo [options]
+```
+
+## Options
+- `--focus=all` - Focus areas: `architecture`, `security`, `performance`, `testing`, `docs`, `circuit-synth`, `agents`, `manufacturing`, `all` (default: all)
+- `--output-dir=repo-review` - Directory for review outputs (default: repo-review)
+- `--run-tests=true` - Run test suites (default: true)
+- `--test-examples=true` - Test all example circuits (default: true)
+- `--test-agents=true` - Test all AI agents functionality (default: true)
+- `--check-security=true` - Security scanning (default: true)
+- `--format=true` - Auto-format code before analysis (default: true)
+- `--generate-fixes=false` - Generate automated fix suggestions (default: false)
+- `--website-check=true` - Validate circuit-synth.com content accuracy (default: true)
+- `--feature-discovery=true` - Auto-discover features from codebase (default: true)
+- `--depth=standard` - Analysis depth: `quick`, `standard`, `deep` (default: standard)
+
+## What This Does
+
+### Phase 1: Automatic Feature Discovery
+The command first performs automatic feature discovery to ensure nothing is missed:
+
+1. **Codebase Survey** - Scans all directories and modules to identify features
+2. **Commit Analysis** - Reviews recent commits for new/modified features
+3. **Agent Discovery** - Identifies all available AI agents and their capabilities
+4. **Tool Discovery** - Finds all CLI tools and development utilities
+5. **Integration Discovery** - Identifies external integrations (KiCad, JLCPCB, DigiKey, etc.)
+6. **Documentation Survey** - Maps all documentation and examples
+
+### Phase 2: Comprehensive Analysis
+Based on discovered features, performs targeted analysis:
+
+### 1. Core Circuit-Synth Functionality
+- **Circuit/Component/Net system** - Core object model validation
+- **Hierarchical circuits** - Subcircuit and sheet management
+- **Pin connections** - Connection validation and net routing
+- **Reference management** - Component reference designator handling
+- **Annotations system** - Docstring and manual annotations
+- **JSON serialization** - Round-trip conversion testing
+
+### 2. KiCad Integration
+- **Symbol library access** - Cross-platform symbol search
+- **Footprint validation** - Component footprint verification
+- **Schematic generation** - .kicad_sch file creation
+- **PCB generation** - .kicad_pcb file creation
+- **Project file generation** - Complete KiCad project structure
+- **S-expression formatting** - Proper KiCad file formatting
+- **Version compatibility** - KiCad 6/7/8 support
+
+### 3. Manufacturing Integration
+- **JLCPCB Integration**
+  - Component availability checking
+  - Fast search optimization
+  - Cache management
+  - API rate limiting
+- **DigiKey Integration**
+  - OAuth authentication
+  - Product search API
+  - Pricing and availability
+  - KiCad symbol mapping
+- **Unified Search System**
+  - Multi-source component search
+  - Comparison functionality
+  - Filtering and sorting
+- **OSHPark/PCBWay** (placeholder modules)
+
+### 4. AI Agent System
+- **Core Agents**
+  - circuit-architect (master coordinator)
+  - circuit-generation-agent (code generation)
+  - simulation-expert (SPICE simulation)
+  - test-plan-creator (validation)
+- **Manufacturing Agents**
+  - component-guru (sourcing optimization)
+  - component-search (multi-source search)
+  - dfm-agent (design for manufacturing)
+  - digikey-parts-finder
+  - jlc-parts-finder
+- **Quality Assurance Agents**
+  - fmea-orchestrator (failure analysis)
+  - fmea-analyst
+  - fmea-component-analyst
+  - fmea-reliability-engineer
+- **Specialized Agents**
+  - stm32-mcu-finder (MCU selection)
+  - circuit-debugger (PCB troubleshooting)
+  - contributor (development assistance)
+- **Agent Infrastructure**
+  - Memory bank system
+  - Knowledge management
+  - Agent registration (MCP)
+  - Prompt engineering
+
+### 5. Quality Assurance Systems
+- **FMEA (Failure Mode and Effects Analysis)**
+  - Component failure analysis
+  - System reliability assessment
+  - Risk prioritization
+  - Report generation (50+ pages)
+- **DFM (Design for Manufacturing)**
+  - Manufacturing constraints
+  - Component placement optimization
+  - Assembly complexity analysis
+  - Cost optimization
+- **Circuit Validation**
+  - Syntax validation
+  - Import verification
+  - Runtime execution testing
+  - Circuit structure validation
+- **Debugging System**
+  - Symptom analysis
+  - Pattern recognition
+  - Troubleshooting trees
+  - Equipment guidance
+
+- **Build System**
+  - Cargo integration
+  - Maturin builds
+  - CI/CD pipeline
+
+### 7. Development Tools
+- **Testing Infrastructure**
+  - Unit tests (pytest)
+  - Integration tests
+  - Regression tests
+  - Full regression suite
+- **Build Tools**
+  - format_all.sh
+- **Analysis Tools**
+  - Dead code analysis
+  - Performance profiling
+  - Memory profiling
+  - Coverage analysis
+- **CI/CD Tools**
+  - GitHub Actions setup
+  - PyPI release automation
+  - Documentation generation
+
+### 8. Component Information Systems
+- **Microcontrollers**
+  - STM32 (modm-devices integration)
+  - ESP32 (planned)
+  - PIC (planned)
+  - AVR (planned)
+- **Analog Components** (planned)
+  - Op-amps
+  - ADCs/DACs
+  - Voltage references
+- **Power Components** (planned)
+  - Regulators
+  - Power management ICs
+  - Protection circuits
+- **RF Components** (planned)
+  - Wireless modules
+  - Antennas
+  - RF transceivers
+
+### 9. Simulation and Validation
+- **SPICE Integration**
+  - PySpice backend
+  - Netlist generation
+  - Component models
+  - Simulation results
+- **Electrical Rules Check**
+  - Connection validation
+  - Power supply verification
+  - Signal integrity basics
+- **Design Rule Check**
+  - Component placement rules
+  - Routing constraints
+  - Manufacturing limits
+
+### 10. Documentation and Examples
+- **Core Documentation**
+  - README.md accuracy
+  - Contributors.md completeness
+  - API documentation (Sphinx)
+  - Installation guides
+- **Example Circuits**
+  - Basic examples
+  - Advanced examples
+  - Testing examples
+  - Tool examples
+- **Agent Documentation**
+  - Agent capabilities
+  - Command documentation
+  - Workflow examples
+- **Website Content**
+  - circuit-synth.com accuracy
+  - Feature descriptions
+  - Installation instructions
+  - Code examples
+
+## Output Structure
+
+```
+repo-review/
+├── 00-feature-discovery-report.md           # Auto-discovered features
+├── 01-executive-summary.md                  # High-level overview and priorities
+├── 02-core-functionality-analysis.md        # Circuit/Component/Net system
+├── 03-kicad-integration-analysis.md         # KiCad generation and compatibility
+├── 04-manufacturing-integration-analysis.md # JLCPCB, DigiKey, unified search
+├── 05-agent-system-analysis.md              # All AI agents and capabilities
+├── 06-quality-assurance-analysis.md         # FMEA, DFM, validation, debugging
+├── 08-development-tools-analysis.md         # Testing, build, CI/CD tools
+├── 09-component-systems-analysis.md         # MCU and component databases
+├── 10-simulation-validation-analysis.md     # SPICE and electrical checks
+├── 11-code-quality-analysis.md              # Code patterns, complexity, cleanup
+├── 12-security-analysis.md                  # Security vulnerabilities
+├── 13-performance-analysis.md               # Performance bottlenecks
+├── 14-testing-coverage-analysis.md          # Test quality and coverage
+├── 15-documentation-analysis.md             # Documentation accuracy and quality
+├── 16-dependency-analysis.md                # Package health and updates
+├── 18-website-validation-analysis.md        # circuit-synth.com accuracy
+├── 19-recommendations-roadmap.md            # Prioritized action items
+└── findings/                                 # Raw data, logs, and detailed reports
+    ├── discovered-features.json             # Auto-discovered feature list
+    ├── agent-test-results/                  # Agent functionality tests
+    ├── example-test-results/                # Example circuit tests
+    ├── security-scan-results/               # Security scan outputs
+    ├── performance-profiles/                # Performance profiling data
+    └── coverage-reports/                    # Test coverage reports
+```
+
+## Implementation Details
+
+### Feature Discovery Process
+
+```python
+def discover_features():
+    features = {
+        'core_modules': scan_python_modules('src/circuit_synth'),
+        'agents': discover_agents('.claude/agents'),
+        'commands': discover_commands('.claude/commands'),
+        'tools': discover_tools('tools', 'src/circuit_synth/tools'),
+        'examples': scan_examples('examples'),
+        'integrations': detect_integrations(),
+        'recent_features': analyze_recent_commits(100),
+    }
+    return features
+```
+
+### Agent Testing Framework
+
+```python
+def test_agent_functionality(agent_name):
+    """Test if an agent can be loaded and responds correctly"""
+    tests = {
+        'load_test': can_load_agent(agent_name),
+        'prompt_test': test_agent_prompt(agent_name),
+        'capability_test': verify_agent_capabilities(agent_name),
+        'knowledge_test': check_agent_knowledge(agent_name),
+    }
+    return tests
+```
+
+### Comprehensive Analysis Execution
+
+```bash
+# Create output directory structure
+
+# Phase 1: Feature Discovery
+echo "=== Automatic Feature Discovery ==="
+python -c "
+import os
+import json
+from pathlib import Path
+
+# Discover all Python modules
+modules = []
+for root, dirs, files in os.walk('src/circuit_synth'):
+    for file in files:
+        if file.endswith('.py'):
+            modules.append(os.path.join(root, file))
+
+# Discover all agents
+agents = []
+for agent_file in Path('.claude/agents').rglob('*.md'):
+    agents.append(str(agent_file))
+
+
+# Recent features from commits
+import subprocess
+commits = subprocess.check_output(['git', 'log', '--oneline', '-100']).decode()
+features = [line for line in commits.split('\n') if 'feat:' in line]
+
+discovery = {
+    'python_modules': len(modules),
+    'agents': len(agents),
+    'recent_features': len(features),
+    'timestamp': str(datetime.now())
+}
+
+with open('repo-review/findings/discovered-features.json', 'w') as f:
+    json.dump(discovery, f, indent=2)
+"
+
+# Phase 2: Test Core Functionality
+echo "=== Testing Core Circuit-Synth Features ==="
+uv run python -c "from circuit_synth import Circuit, Component, Net; print('Core imports: OK')"
+uv run python examples/example_kicad_project.py --validate
+
+# Phase 3: Test KiCad Integration
+echo "=== Testing KiCad Integration ==="
+kicad-cli version
+find /usr/share/kicad/symbols -name "*.kicad_sym" | head -5
+
+# Phase 4: Test Manufacturing Integration
+echo "=== Testing Manufacturing Integration ==="
+uv run python -c "
+from circuit_synth.manufacturing import find_parts
+results = find_parts('resistor 10k', sources='all')
+print(f'Unified search: {len(results)} results')
+"
+
+# Phase 5: Test Agent System
+echo "=== Testing AI Agent System ==="
+for agent in $(ls .claude/agents/**/*.md); do
+    echo "Testing agent: $(basename $agent .md)"
+    # Test agent loading and basic functionality
+done
+
+# Phase 6: Test Quality Assurance Systems
+echo "=== Testing Quality Assurance Systems ==="
+uv run python -m circuit_synth.quality_assurance.fmea_cli --help
+uv run python -m circuit_synth.debugging.debug_cli --help
+
+for module in */; do
+done
+cd ..
+
+# Phase 8: Run Test Suites
+echo "=== Running Test Suites ==="
+uv run pytest tests/unit/ -v --tb=short
+uv run pytest tests/integration/ -v --tb=short
+./tools/testing/run_full_regression_tests.py --quick
+
+# Phase 9: Security Analysis
+echo "=== Security Analysis ==="
+safety check
+bandit -r src/ -f json > repo-review/findings/bandit-report.json
+
+# Phase 10: Performance Analysis
+echo "=== Performance Analysis ==="
+python -m cProfile -o repo-review/findings/profile.stats examples/example_kicad_project.py
+
+# Phase 11: Documentation Validation
+echo "=== Documentation Validation ==="
+sphinx-build -b html docs/ docs/_build/html
+markdown-link-check README.md Contributors.md
+
+# Phase 12: Dependency Analysis
+echo "=== Dependency Analysis ==="
+pip list --outdated > repo-review/findings/outdated-packages.txt
+pip-audit --format json > repo-review/findings/pip-audit.json
+```
+
+## Report Templates
+
+### Feature Discovery Report
+```markdown
+# Automatic Feature Discovery Report
+
+## Summary
+- Total Python modules: X
+- Total AI agents: X
+- Total CLI tools: X
+- Recent features (last 100 commits): X
+
+## Discovered Features
+
+### Core Systems
+[List of discovered core modules and their purposes]
+
+### AI Agents
+[List of all agents with their capabilities]
+
+### Manufacturing Integrations
+[List of all supplier integrations]
+
+### Quality Assurance Systems
+[List of QA tools and systems]
+
+### Development Tools
+[List of all development utilities]
+
+## Features Not Yet Documented
+[Features found in code but not in documentation]
+
+## Features Not Yet Tested
+[Features without corresponding tests]
+```
+
+### Agent System Analysis Report
+```markdown
+# AI Agent System Analysis
+
+## Agent Inventory
+Total agents discovered: X
+
+### Functional Agents (Passing Tests)
+- agent_name: test_results
+
+### Non-Functional Agents (Failing Tests)
+- agent_name: failure_reason
+
+### Agent Categories
+- Circuit Design: X agents
+- Manufacturing: X agents
+- Quality Assurance: X agents
+- Development: X agents
+
+## Agent Infrastructure
+- Memory bank status: [OK/Issues]
+- MCP registration: [OK/Issues]
+- Knowledge management: [OK/Issues]
+
+## Recommendations
+[Specific fixes for non-functional agents]
+```
+
+## Advanced Features
+
+### Automatic Feature Survey
+When `--feature-discovery=true`:
+- Scans entire codebase for modules and classes
+- Analyzes git history for feature additions
+- Discovers all agents and tools
+- Maps integrations and dependencies
+- Creates comprehensive feature inventory
+
+### Agent Testing
+When `--test-agents=true`:
+- Loads each agent and verifies structure
+- Tests agent prompts and capabilities
+- Validates agent knowledge base
+- Checks MCP registration
+
+- Checks compilation status
+- Tests Python bindings
+- Measures performance impact
+- Identifies unused modules
+
+### Depth Levels
+- `quick`: Basic functionality tests only
+- `standard`: Full test suite and analysis
+- `deep`: Include performance profiling and security scanning
+
+## Usage Examples
+
+```bash
+# Full comprehensive review with all features
+/dev-review-repo
+
+# Quick review focusing on core functionality
+/dev-review-repo --depth=quick --focus=circuit-synth
+
+# Agent system review with testing
+/dev-review-repo --focus=agents --test-agents=true
+
+# Manufacturing integration review
+/dev-review-repo --focus=manufacturing
+
+# Security-focused review
+/dev-review-repo --focus=security --check-security=true
+
+# Documentation and website validation
+/dev-review-repo --focus=docs --website-check=true
+
+```
+
+## Integration with Development Workflow
+
+### Pre-Release Checklist
+Run before any release:
+```bash
+/dev-review-repo --depth=deep --generate-fixes=true
+```
+
+### Weekly Health Check
+Regular maintenance:
+```bash
+/dev-review-repo --depth=standard --focus=all
+```
+
+### Post-Feature Development
+After adding new features:
+```bash
+/dev-review-repo --feature-discovery=true --test-agents=true
+```
+
+## Customization
+
+Create `.repo-review-config.yml` for custom settings:
+```yaml
+feature_discovery:
+  include_paths:
+    - src/
+    - examples/
+    - tools/
+  exclude_patterns:
+    - __pycache__
+    - .git
+    - .venv
+
+testing:
+  test_timeout: 60
+  parallel_tests: true
+  
+analysis:
+  complexity_threshold: 10
+  coverage_threshold: 80
+  
+reports:
+  include_raw_data: true
+  generate_html: false
+```
+
+---
+
+**This comprehensive repository review command ensures complete coverage of all circuit-synth features through automatic discovery, preventing stale review configurations from missing new functionality.**

@@ -15,8 +15,10 @@ from threading import Lock
 from typing import Any, Callable, Dict, Generic, Optional, Type, TypeVar
 
 # Import all interfaces from local module
-from ._interfaces import (  # KiCad Integration; Circuit Models; Intelligence System
-    AgentFactory,
+from ._interfaces import (
+    AgentFactory,  # KiCad Integration; Circuit Models; Intelligence System
+)
+from ._interfaces import (
     CircuitModelFactory,
     ComponentModelFactory,
     IAgent,

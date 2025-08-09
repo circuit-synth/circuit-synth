@@ -79,7 +79,6 @@ print(f'Version: {circuit_synth.__version__}')
 from circuit_synth import Circuit, Component, Net
 print('Core imports work')
 
-from circuit_synth.kicad.rust_accelerated_symbol_cache import SymbolLibCache
 print('SymbolLibCache imports')
 
 # Test the class method that was broken
@@ -98,8 +97,6 @@ except Exception as e:
 from circuit_synth.kicad.sch_gen.kicad_formatter import format_kicad_schematic
 print('kicad_formatter imports')
 
-from circuit_synth.core.rust_components import create_rust_resistor
-print('rust_components imports')
 
 print('All imports successful!')
 """)
@@ -238,28 +235,15 @@ if __name__ == "__main__":
             else:
                 print(f"  ⚠️ {tool.split()[0]} not found")
         
-        # Test 5: Error handling for Rust modules
-        print("\n8️⃣ Testing Rust module fallbacks...")
-        rust_test = """
 import warnings
 warnings.filterwarnings('ignore')
 
-# These should all work even without Rust modules
-from circuit_synth.kicad.rust_accelerated_symbol_cache import RUST_SYMBOL_CACHE_AVAILABLE
-print(f'  Rust symbol cache available: {RUST_SYMBOL_CACHE_AVAILABLE}')
 
-from circuit_synth.core.rust_components import get_rust_component_status
-status = get_rust_component_status()
-print(f'  Rust components status: {status["rust_available"]}')
 
 # Test that components work regardless
-from circuit_synth.core.rust_components import create_rust_resistor
-r = create_rust_resistor(ref='R1', value='10k')
 print(f'  ✅ Resistor creation works: {r.ref}')
 
-print('✅ All Rust fallbacks working correctly')
 """
-        result = run_command(f"{python_cmd} -c '{rust_test}'")
         
         print("\n" + "="*60)
         print("✅ ALL TESTS PASSED!")
@@ -297,7 +281,6 @@ import circuit_synth
 print(f'✅ Installed version: {circuit_synth.__version__}')
 
 from circuit_synth import Circuit, Component, Net
-from circuit_synth.kicad.rust_accelerated_symbol_cache import SymbolLibCache
 
 # This is the critical test that was failing
 try:

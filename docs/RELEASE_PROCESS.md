@@ -63,8 +63,6 @@ This document describes the comprehensive release process for circuit-synth to e
    # Clean old builds
    rm -rf dist/
    
-   # Build with Rust modules
-   ./tools/build/build_all_rust_for_packaging.sh
    uv build
    ```
 
@@ -74,7 +72,6 @@ This document describes the comprehensive release process for circuit-synth to e
    python -m venv final_test
    source final_test/bin/activate
    pip install dist/circuit_synth-0.8.4-py3-none-any.whl
-   python -c "import circuit_synth; import rust_netlist_processor"
    deactivate
    ```
 
@@ -99,13 +96,11 @@ This document describes the comprehensive release process for circuit-synth to e
   - Tests in isolated virtual environments
   - Tests multiple Python versions
   - Tests Docker containers
-  - Validates Rust modules
   - Tests actual circuit functionality
 
 - **`test_pypi_package.py`**: Quick PyPI package test
   - Tests installation in clean environment
   - Validates imports work
-  - Checks Rust module availability
 
 ### GitHub Actions Workflows
 
@@ -142,33 +137,20 @@ This document describes the comprehensive release process for circuit-synth to e
    - `TEST_PYPI_API_TOKEN`: Your TestPyPI API token
    - `PYPI_API_TOKEN`: Your PyPI API token
 
-## 🦀 Rust Module Considerations
 
-### Building Rust Modules
 
-1. **Ensure all Rust modules are built**
    ```bash
-   ./tools/build/build_all_rust_for_packaging.sh
    ```
 
 2. **Verify compiled binaries are in place**
    ```bash
-   find rust_modules -name "*.so" -o -name "*.dylib" -o -name "*.pyd"
    ```
 
-3. **Test Rust imports locally**
    ```bash
    python -c "
-   import rust_netlist_processor
-   import rust_symbol_cache
-   import rust_core_circuit_engine
-   import rust_symbol_search
-   import rust_force_directed_placement
-   print('✅ All Rust modules import successfully!')
    "
    ```
 
-### Common Rust Module Issues
 
 1. **Import path mismatches**: Ensure import logic handles both development and PyPI environments
 2. **Binary naming**: Compiled binaries must match Python's expected module names

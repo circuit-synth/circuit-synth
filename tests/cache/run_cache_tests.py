@@ -2,7 +2,6 @@
 """
 Master Cache Test Runner
 
-This script orchestrates the complete Rust cache testing strategy,
 providing a single entry point for all cache validation and testing.
 """
 
@@ -20,7 +19,6 @@ from typing import Any, Dict, List, Optional
 # Add the current directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-# Removed rust_unified_cache imports
 from cache_monitor import CacheMonitor, create_monitored_example_runner
 
 # Import our testing modules
@@ -76,8 +74,6 @@ class MasterTestRunner:
             if clear_all:
                 success = self.cache_cleaner.clear_all_caches()
             else:
-                # Clear only Rust caches for targeted testing
-                success = self.cache_cleaner.clear_rust_caches()
             
             duration = time.time() - start_time
             
@@ -118,9 +114,7 @@ class MasterTestRunner:
         return result
     
     def run_integration_tests(self) -> TestSuiteResult:
-        """Run integration test suite - DISABLED (rust_unified_cache removed)"""
         logger.info("=" * 60)
-        logger.info("SKIPPING INTEGRATION TESTS (rust_unified_cache removed)")
         logger.info("=" * 60)
         
         start_time = time.time()
@@ -130,27 +124,21 @@ class MasterTestRunner:
             suite_name="integration_tests",
             success=True,  # Skip successfully
             duration_seconds=duration,
-            summary={"skipped": True, "reason": "rust_unified_cache removed"},
             output_files=[]
         )
         
         self.suite_results.append(result)
         return result
     
-    def run_rust_cache_validation(self) -> TestSuiteResult:
-        """Run Rust cache validation - DISABLED (rust_unified_cache removed)"""
         logger.info("=" * 60)
-        logger.info("SKIPPING RUST CACHE VALIDATION (rust_unified_cache removed)")
         logger.info("=" * 60)
         
         start_time = time.time()
         duration = time.time() - start_time
         
         result = TestSuiteResult(
-            suite_name="rust_cache_validation",
             success=True,  # Skip successfully
             duration_seconds=duration,
-            summary={"skipped": True, "reason": "rust_unified_cache removed"},
             output_files=[]
         )
         
@@ -219,11 +207,8 @@ class MasterTestRunner:
         start_time = time.time()
         
         try:
-            # Rust unified cache benchmarks removed
             benchmark_results = {
-                'rust_benchmarks': {
                     'success': False,
-                    'error': "rust_unified_cache removed from project"
                 }
             }
             
@@ -234,7 +219,6 @@ class MasterTestRunner:
             with open(benchmark_file, 'w') as f:
                 json.dump(benchmark_results, f, indent=2, default=str)
             
-            success = benchmark_results.get('rust_benchmarks', {}).get('success', False)
             
             result = TestSuiteResult(
                 suite_name="performance_benchmarks",
@@ -266,7 +250,6 @@ class MasterTestRunner:
                                run_benchmarks: bool = True) -> Dict[str, Any]:
         """Run the complete test suite"""
         logger.info("🚀" * 20)
-        logger.info("STARTING COMPLETE RUST CACHE TEST SUITE")
         logger.info("🚀" * 20)
         
         overall_start_time = time.time()
@@ -282,7 +265,6 @@ class MasterTestRunner:
             self.run_integration_tests()
         
         if run_validation:
-            self.run_rust_cache_validation()
         
         if run_monitoring:
             self.run_monitored_example()
@@ -312,13 +294,10 @@ class MasterTestRunner:
         failed_suites = total_suites - successful_suites
         
         # Extract key metrics
-        rust_cache_working = False
         performance_improvement = 0.0
         integration_success = False
         
         for result in self.suite_results:
-            if result.suite_name == "rust_cache_validation" and result.success:
-                rust_cache_working = True
                 performance_improvement = result.summary.get('performance_improvement', 0.0)
             elif result.suite_name == "integration_tests" and result.success:
                 integration_success = True
@@ -335,8 +314,6 @@ class MasterTestRunner:
             'successful_suites': successful_suites,
             'failed_suites': failed_suites,
             'success_rate': (successful_suites / total_suites * 100) if total_suites > 0 else 0,
-            'rust_cache_status': {
-                'working': rust_cache_working,
                 'performance_improvement': performance_improvement,
                 'integration_successful': integration_success
             },
@@ -351,19 +328,12 @@ class MasterTestRunner:
         """Generate recommendations based on test results"""
         recommendations = []
         
-        # Check if Rust cache is working
-        rust_validation = next((r for r in self.suite_results if r.suite_name == "rust_cache_validation"), None)
         
-        if not rust_validation or not rust_validation.success:
-            recommendations.append("ℹ️  Rust unified cache has been removed from the project.")
-            recommendations.append("✅ Other Rust cache systems (rust_symbol_cache, rust_symbol_search, rust_reference_manager) remain available.")
         else:
-            recommendations.append("ℹ️  Rust unified cache validation skipped (removed from project).")
         
         # Check integration
         integration = next((r for r in self.suite_results if r.suite_name == "integration_tests"), None)
         if integration and not integration.success:
-            recommendations.append("⚠️  Integration tests failed. Check Python-Rust interface compatibility.")
         
         # Check example execution
         example = next((r for r in self.suite_results if r.suite_name == "monitored_example"), None)
@@ -384,13 +354,7 @@ class MasterTestRunner:
         logger.info(f"Failed: {summary['failed_suites']}")
         logger.info(f"Success rate: {summary['success_rate']:.1f}%")
         
-        rust_status = summary['rust_cache_status']
-        if rust_status['working']:
-            logger.info("🎉 Rust cache is working!")
-            if rust_status['performance_improvement'] > 1:
-                logger.info(f"🚀 Performance improvement: {rust_status['performance_improvement']:.1f}x")
         else:
-            logger.warning("⚠️  Rust cache validation failed")
         
         logger.info("\nRecommendations:")
         for rec in summary['recommendations']:
@@ -404,7 +368,6 @@ class MasterTestRunner:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Run comprehensive Rust cache test suite",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -476,8 +439,6 @@ Examples:
         )
     
     # Return appropriate exit code
-    rust_working = summary['rust_cache_status']['working']
-    return 0 if rust_working else 1
 
 
 if __name__ == "__main__":

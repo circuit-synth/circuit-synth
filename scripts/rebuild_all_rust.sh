@@ -1,1 +1,0 @@
-../tools/build/rebuild_all_rust.sh

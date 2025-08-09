@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """
-Test script to verify PyPI package installation and Rust module imports.
 This should be run BEFORE releasing to PyPI to catch import issues.
 """
 
@@ -64,11 +63,7 @@ import sys
 import warnings
 import os
 
-# Suppress Rust module warnings since we have Python fallbacks
-warnings.filterwarnings("ignore", message="Rust SymbolLibCache not available")
-warnings.filterwarnings("ignore", message="rust_netlist_processor not available")
 
-# Redirect stderr to prevent Rust import errors from failing the test
 import io
 import contextlib
 
@@ -90,25 +85,14 @@ if captured_errors:
         if line:
             print(f"    {line}")
 
-# Test Rust module imports (optional - pure Python fallbacks should work)
-rust_modules = [
-    "rust_kicad_integration",
-    "rust_core_circuit_engine", 
-    "rust_force_directed_placement",
-    "rust_netlist_processor"
 ]
 
-rust_available = False
-for module in rust_modules:
     try:
         __import__(module)
         print(f"✅ {module} imported successfully")
-        rust_available = True
     except ImportError as e:
         print(f"ℹ️  {module} not available (using Python fallback): {e}")
 
-if not rust_available:
-    print("ℹ️  No Rust modules available - using pure Python implementation (this is expected for PyPI release)")
 
 # Test circuit creation
 try:
@@ -121,7 +105,6 @@ except Exception as e:
     print(f"❌ Circuit creation failed: {e}")
     sys.exit(1)
 
-# Test JSON netlist generation (this should work without Rust)
 try:
     json_netlist = circuit.generate_json_netlist()
     print("✅ JSON netlist generation successful")
@@ -140,10 +123,6 @@ print("🎉 All tests passed!")
         print("🔬 Running import tests...")
         success, output = run_command([str(python_exe), str(test_file)])
         
-        # Check if the test succeeded despite Rust warnings
-        # The Rust import failures are expected and have Python fallbacks
-        if "RUST NETLIST IMPORT FAILED" in output or "Rust SymbolLibCache not available" in output:
-            print("ℹ️  Rust module warnings detected (expected - Python fallbacks available)")
             # Check if the actual tests passed
             if "✅ Basic circuit creation successful" in output and "✅ JSON netlist generation successful" in output:
                 success = True
@@ -178,17 +157,10 @@ def create_pre_release_checklist():
 
 ## Before Building Package
 
-- [ ] All Rust modules built successfully
   ```bash
-  ./tools/build/build_rust_modules.sh
   ```
 
-- [ ] Rust modules are functional
   ```bash  
-  python -c "import rust_kicad_integration; print('✅ rust_kicad_integration works')"
-  python -c "import rust_core_circuit_engine; print('✅ rust_core_circuit_engine works')"
-  python -c "import rust_force_directed_placement; print('✅ rust_force_directed_placement works')"
-  python -c "import rust_netlist_processor; print('✅ rust_netlist_processor works')"
   ```
 
 ## After Building Package
@@ -211,7 +183,6 @@ def create_pre_release_checklist():
 
 - [ ] All tests pass in clean environment
 - [ ] No hardcoded development paths in imports
-- [ ] Rust modules included in wheel
 - [ ] Basic circuit generation works
 
 ## Release

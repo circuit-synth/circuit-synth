@@ -6,11 +6,7 @@ JLC PCB parts availability and pricing data. Supports both API-based and
 web scraping approaches for maximum flexibility.
 """
 
-from .cache import (
-    JLCPCBCache,
-    cached_jlcpcb_search,
-    get_jlcpcb_cache,
-)
+from .cache import JLCPCBCache, cached_jlcpcb_search, get_jlcpcb_cache
 from .fast_search import (
     FastJLCSearch,
     FastSearchResult,

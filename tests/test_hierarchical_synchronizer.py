@@ -89,22 +89,24 @@ class TestHierarchicalSynchronizer(unittest.TestCase):
 
         # Run synchronization
         sync = HierarchicalSynchronizer(str(project_path))
+
         # Create dummy circuits for sub_dict
         # These need to be actual circuit instances
         @circuit(name="branch_instance")
         def branch_instance():
             pass
-        
+
         @circuit(name="leaf_instance")
         def leaf_instance():
             pass
-        
+
         sub_dict = {"branch": branch_instance(), "leaf": leaf_instance()}
         report = sync.sync_with_circuit(root(), sub_dict)
 
         # Check that components were matched
         total_matched = sum(
-            sheet_report.get("matched", 0) for sheet_report in report.get("sheet_reports", {}).values()
+            sheet_report.get("matched", 0)
+            for sheet_report in report.get("sheet_reports", {}).values()
         )
 
         self.assertGreater(total_matched, 0, "Should match some components")
@@ -187,15 +189,16 @@ class TestHierarchicalSynchronizer(unittest.TestCase):
         project_path = self.create_test_project("test_deep", level1)
 
         sync = HierarchicalSynchronizer(str(project_path))
+
         # Create dummy circuit instances for sub_dict
         @circuit(name="level2_instance")
         def level2_instance():
             pass
-        
+
         @circuit(name="level3_instance")
         def level3_instance():
             pass
-        
+
         sub_dict = {
             "level2": level2_instance(),
             "level3": level3_instance(),

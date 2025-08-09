@@ -1,10 +1,19 @@
 """Simple logger for the open source circuit-synth package."""
 
 import logging
+import os
 from typing import Any, Dict
 
 # Create a simple logger for the circuit-synth package
 logger = logging.getLogger("circuit_synth")
+
+# Set default log level based on environment variable
+# Users can set CIRCUIT_SYNTH_LOG_LEVEL=INFO for verbose logs
+default_level = os.environ.get("CIRCUIT_SYNTH_LOG_LEVEL", "WARNING")
+try:
+    logger.setLevel(getattr(logging, default_level.upper()))
+except AttributeError:
+    logger.setLevel(logging.WARNING)
 
 
 class ContextLogger:

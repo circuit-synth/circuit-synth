@@ -5,16 +5,9 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from ..core.types import (
-    Junction,
-    Label,
-    Point,
-)
+from ..core.types import Junction, Label, Point
 from ..core.types import SchematicSymbol as Component
-from ..core.types import (
-    Text,
-    Wire,
-)
+from ..core.types import Text, Wire
 
 
 @dataclass

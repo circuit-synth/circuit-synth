@@ -3,7 +3,6 @@
 Cache Performance Monitor
 
 This module provides real-time monitoring and logging of cache usage,
-comparing Python vs Rust cache performance and tracking metrics.
 """
 
 import json
@@ -37,7 +36,6 @@ class CacheOperation:
     timestamp: float
     operation_type: str  # 'search', 'get', 'set', 'invalidate'
     cache_type: str     # 'symbol', 'footprint', 'component', 'knowledge'
-    implementation: str  # 'python', 'rust'
     duration_ms: float
     query: Optional[str] = None
     result_count: Optional[int] = None
@@ -194,33 +192,24 @@ class CacheMonitor:
     def get_performance_comparison(self) -> Dict[str, Any]:
         """Get performance comparison between implementations"""
         python_stats = self.stats_by_implementation.get('python', CacheStats())
-        rust_stats = self.stats_by_implementation.get('rust', CacheStats())
         
         comparison = {
             'python': asdict(python_stats),
-            'rust': asdict(rust_stats),
             'improvement_factor': 0.0,
             'memory_improvement': 0.0,
             'reliability_comparison': {
                 'python_error_rate': 0.0,
-                'rust_error_rate': 0.0
             }
         }
         
         # Calculate performance improvement
-        if rust_stats.avg_duration_ms > 0 and python_stats.avg_duration_ms > 0:
-            comparison['improvement_factor'] = python_stats.avg_duration_ms / rust_stats.avg_duration_ms
         
         # Calculate memory improvement
-        if rust_stats.memory_peak_mb > 0 and python_stats.memory_peak_mb > 0:
-            comparison['memory_improvement'] = python_stats.memory_peak_mb / rust_stats.memory_peak_mb
         
         # Calculate error rates
         if python_stats.total_operations > 0:
             comparison['reliability_comparison']['python_error_rate'] = python_stats.errors / python_stats.total_operations
         
-        if rust_stats.total_operations > 0:
-            comparison['reliability_comparison']['rust_error_rate'] = rust_stats.errors / rust_stats.total_operations
         
         return comparison
     
@@ -268,9 +257,7 @@ class CacheMonitor:
             print(f"  Peak memory: {stats.memory_peak_mb:.1f}MB")
         
         if comparison['improvement_factor'] > 1:
-            print(f"\n🚀 Rust is {comparison['improvement_factor']:.1f}x faster than Python!")
         elif comparison['improvement_factor'] > 0:
-            print(f"\n⚠️  Python is {1/comparison['improvement_factor']:.1f}x faster than Rust")
         
         print("\nCache Type Breakdown:")
         for cache_type, stats in self.stats_by_cache_type.items():
@@ -297,18 +284,14 @@ class CacheInstrumentor:
                 setattr(cache_obj, method_name, instrumented_method)
                 self.original_methods[f"python_{cache_type}_{method_name}"] = original_method
     
-    def instrument_rust_cache(self, cache_obj, cache_type: str):
-        """Instrument a Rust cache object"""
         methods_to_monitor = ['search_symbols', 'search_footprints', 'search_components', 'search_all']
         
         for method_name in methods_to_monitor:
             if hasattr(cache_obj, method_name):
                 original_method = getattr(cache_obj, method_name)
                 instrumented_method = self._create_instrumented_method(
-                    original_method, method_name, cache_type, 'rust'
                 )
                 setattr(cache_obj, method_name, instrumented_method)
-                self.original_methods[f"rust_{cache_type}_{method_name}"] = original_method
     
     def _create_instrumented_method(self, original_method, method_name, cache_type, implementation):
         """Create an instrumented version of a method"""
