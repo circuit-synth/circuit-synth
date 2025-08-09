@@ -108,11 +108,25 @@ from sexpdata import Symbol
 # Python implementation for generate_component_sexp
 def generate_component_sexp(component_data):
     """Python implementation for component S-expression generation"""
-    # This is a simplified version - the full implementation would be more complex
-    ref = component_data.get("ref", "U?")
-    lib_id = component_data.get("lib_id", "Device:R")
+    # CRITICAL DEBUG: Log all component data to identify reference issue
+    logger.debug(f"🔍 GENERATE_COMPONENT_SEXP: Input component_data keys: {list(component_data.keys())}")
+    logger.debug(f"🔍 GENERATE_COMPONENT_SEXP: Full component_data: {component_data}")
+    
+    # CRITICAL FIX: Never use hard-coded fallbacks - always preserve original reference
+    ref = component_data.get("ref")
+    if not ref:
+        logger.error(f"❌ GENERATE_COMPONENT_SEXP: NO REFERENCE found in component_data!")
+        logger.error(f"❌ GENERATE_COMPONENT_SEXP: This indicates a bug in component processing")
+        # Don't use hard-coded fallback - this masks the real issue
+        ref = "REF_ERROR"  # Make it obvious when this happens
+    else:
+        logger.debug(f"✅ GENERATE_COMPONENT_SEXP: Found reference: '{ref}'")
+    
+    lib_id = component_data.get("lib_id", "Device:UNKNOWN")  # More descriptive fallback
     at = component_data.get("at", [0, 0, 0])
     uuid = component_data.get("uuid", "00000000-0000-0000-0000-000000000000")
+    
+    logger.debug(f"🔍 GENERATE_COMPONENT_SEXP: Using ref='{ref}', lib_id='{lib_id}', at={at}")
 
     # Build basic S-expression
     sexp = [
@@ -317,7 +331,7 @@ class SchematicWriter:
         """
         Create the full top-level (kicad_sch ...) list structure for this circuit.
 
-        PERFORMANCE MONITORING: Times each major operation and reports Rust acceleration status.
+        PERFORMANCE MONITORING: Times each major operation.
         """
         start_time = time.perf_counter()
         logger.info(
@@ -326,7 +340,7 @@ class SchematicWriter:
         logger.info(
             f"📊 GENERATE_S_EXPR: Components: {len(self.circuit.components)}, Nets: {len(self.circuit.nets)}"
         )
-        logger.info(f"🦀 GENERATE_S_EXPR: Using Rust acceleration for components")
+        logger.info(f"🐍 GENERATE_S_EXPR: Using Python implementation for components")
 
         # Add components using the new API - time this critical operation
         comp_start = time.perf_counter()
@@ -377,11 +391,9 @@ class SchematicWriter:
         # Add text annotations (TextBox, TextProperty, etc.)
         self._add_annotations()
 
-        # Convert to S-expression format using the parser - CRITICAL RUST ACCELERATION POINT
+        # Convert to S-expression format using the parser
         sexpr_start = time.perf_counter()
-        logger.info(
-            "⚡ STEP 6/8: Converting to S-expression format (RUST ACCELERATION POINT)..."
-        )
+        logger.info("⚡ STEP 6/8: Converting to S-expression format...")
         schematic_sexpr = self.parser.from_schematic(self.schematic)
         sexpr_time = time.perf_counter() - sexpr_start
         logger.info(
@@ -404,10 +416,13 @@ class SchematicWriter:
         self._add_symbol_definitions(schematic_sexpr)
         libsym_time = time.perf_counter() - libsym_start
 
-        # sheet_instances is now added by the parser, so we don't need to add it again
+        # Add sheet_instances section - CRITICAL for proper reference assignment
         sheetinst_start = time.perf_counter()
-        # self._add_sheet_instances(schematic_sexpr)  # Removed to avoid duplicate
-        sheetinst_time = 0  # No sheet instances processing time
+        self._add_sheet_instances(schematic_sexpr)
+        sheetinst_time = time.perf_counter() - sheetinst_start
+        
+        # Add embedded_fonts no at the end (required for KiCad 9)
+        schematic_sexpr.append([Symbol("embedded_fonts"), Symbol("no")])
 
         sections_time = time.perf_counter() - sections_start
         logger.info(
@@ -458,10 +473,8 @@ class SchematicWriter:
             f"  📚 Sections: {sections_time*1000:.2f}ms ({sections_time/total_time*100:.1f}%)"
         )
 
-        # Performance metrics (Rust is always used)
-        logger.info(
-            f"⚡ RUST_PERFORMANCE: Completed with Rust acceleration in {total_time*1000:.2f}ms"
-        )
+        # Performance metrics
+        logger.info(f"⚡ PERFORMANCE: Completed in {total_time*1000:.2f}ms")
 
         # Add symbol_instances section - DISABLED for new KiCad format (20250114+)
         # The new format uses instances within each symbol instead
@@ -586,19 +599,11 @@ class SchematicWriter:
                 api_component.instances.clear()
 
                 # Create the instance
-                # Determine project name based on hierarchy level:
-                # - Root level (hierarchical_path has only 1 UUID - the root): empty string ""
-                # - Nested levels (hierarchical_path has more than 1 UUID): actual project name
-                if self.hierarchical_path and len(self.hierarchical_path) > 1:
-                    # We're in a nested schematic (path has more than just root UUID) - use project name
-                    instance_project = self.project_name
-                    logger.debug(
-                        f"  Using project name for nested component: {instance_project}"
-                    )
-                else:
-                    # We're in the root schematic (path has only root UUID or is empty) - use empty string
-                    instance_project = ""
-                    logger.debug(f"  Using empty project name for root component")
+                # CRITICAL FIX: Use consistent project naming for ALL components
+                # The inconsistency between component and sheet instances causes KiCad GUI annotation issues
+                # UNIVERSAL SOLUTION: Always use the actual project name for consistency
+                instance_project = self.project_name or "default_project"
+                logger.debug(f"🔧 UNIVERSAL_PROJECT_NAMING: Using consistent project name: '{instance_project}'")
 
                 instance = SymbolInstance(
                     project=instance_project,
@@ -642,9 +647,9 @@ class SchematicWriter:
 
     def _place_components(self):
         """
-        Use the PlacementEngine to arrange components with Rust acceleration when available.
+        Use the PlacementEngine to arrange components.
 
-        PERFORMANCE OPTIMIZATION: Attempts Rust force-directed placement for 40-60% speedup.
+        PERFORMANCE OPTIMIZATION: Uses force-directed placement algorithms.
         """
         if not self.schematic.components:
             logger.debug("No components to place")
@@ -654,7 +659,7 @@ class SchematicWriter:
         logger.info(
             f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components"
         )
-        logger.info(f"🦀 PLACE_COMPONENTS: Using Rust placement acceleration")
+        logger.info(f"🐍 PLACE_COMPONENTS: Using Python placement engine")
 
         # Check if components need repositioning (have default positions)
         components_needing_placement = []
@@ -675,11 +680,11 @@ class SchematicWriter:
             f"🔧 PLACE_COMPONENTS: {len(components_needing_placement)} components need placement"
         )
 
-        # Use the PlacementEngine with Rust acceleration
+        # Use the PlacementEngine
         try:
             placement_start = time.perf_counter()
 
-            # Try Rust force-directed placement first for optimal results
+            # Try force-directed placement for optimal results
             if (
                 len(components_needing_placement) >= 3
             ):  # Force-directed works best with multiple components
@@ -689,7 +694,7 @@ class SchematicWriter:
                 self.placement_engine.arrange_components(
                     components_needing_placement,
                     arrangement="force_directed",
-                    use_rust_acceleration=True,  # Always use Rust
+                    use_rust_acceleration=False,  # Python implementation
                 )
             else:
                 # For few components, use grid placement
@@ -1205,6 +1210,8 @@ class SchematicWriter:
         """
         Add symbol definitions to the lib_symbols section.
         """
+        logger.info(f"🔍 _add_symbol_definitions: Starting with {len(self.schematic.components)} components")
+        
         # Find or create lib_symbols block
         lib_symbols_block = None
         for item in schematic_expr:
@@ -1215,40 +1222,46 @@ class SchematicWriter:
                 and item[0].value() == "lib_symbols"
             ):
                 lib_symbols_block = item
+                logger.info(f"✅ Found existing lib_symbols block at position {schematic_expr.index(item)}")
                 break
 
         if not lib_symbols_block:
+            logger.warning("⚠️ No lib_symbols block found, creating new one")
             lib_symbols_block = [Symbol("lib_symbols")]
             # Insert after paper
             for i, item in enumerate(schematic_expr):
                 if isinstance(item, list) and item and item[0] == Symbol("paper"):
                     schematic_expr.insert(i + 1, lib_symbols_block)
+                    logger.info(f"✅ Inserted lib_symbols block after paper at position {i+1}")
                     break
 
         # Clear any existing symbols in the lib_symbols block
         # Keep only the first element which is the Symbol("lib_symbols")
         if lib_symbols_block and len(lib_symbols_block) > 1:
+            logger.info(f"🧹 Clearing {len(lib_symbols_block)-1} existing items from lib_symbols block")
             lib_symbols_block[:] = [lib_symbols_block[0]]
 
         # Gather all lib_ids
         symbol_ids = set()
         for comp in self.schematic.components:
             symbol_ids.add(comp.lib_id)
+            logger.debug(f"  Component {comp.reference}: lib_id = {comp.lib_id}")
 
+        logger.info(f"📚 Processing {len(symbol_ids)} unique lib_ids: {sorted(symbol_ids)}")
+        
         for sym_id in sorted(symbol_ids):
-            logger.debug(f"📚 SCHEMATIC_WRITER: Fetching symbol data for '{sym_id}'")
+            logger.info(f"📚 SCHEMATIC_WRITER: Fetching symbol data for '{sym_id}'")
             lib_data = SymbolLibCache.get_symbol_data(sym_id)
             if not lib_data:
-                logger.warning(
-                    "No symbol library data found for '%s'. Skipping definition.",
-                    sym_id,
+                logger.error(
+                    f"❌ No symbol library data found for '{sym_id}'. Skipping definition."
                 )
                 continue
             logger.debug(
                 f"    ✅ SCHEMATIC_WRITER: Got symbol data for '{sym_id}' with properties: {list(lib_data.get('properties', {}).keys()) if isinstance(lib_data, dict) else 'N/A'}"
             )
 
-            # Check if graphics data is missing from Rust cache - if so, use Python fallback
+            # Check if graphics data is missing from cache - if so, use Python fallback
             if "graphics" not in lib_data or not lib_data["graphics"]:
                 logger.info(
                     f"Graphics data missing for {sym_id}, using Python fallback"
@@ -1256,7 +1269,7 @@ class SchematicWriter:
                 try:
                     python_lib_data = PythonSymbolLibCache.get_symbol_data(sym_id)
                     if python_lib_data and "graphics" in python_lib_data:
-                        # Merge graphics data from Python cache into Rust cache data
+                        # Merge graphics data from Python cache into cache data
                         lib_data["graphics"] = python_lib_data["graphics"]
                         logger.info(
                             f"Added {len(python_lib_data['graphics'])} graphics elements from Python cache"
@@ -1274,15 +1287,24 @@ class SchematicWriter:
 
             if isinstance(lib_data, list):
                 # It's already an S-expression block
+                logger.info(f"✅ Adding S-expression symbol definition for {sym_id}")
                 lib_symbols_block.append(lib_data)
             else:
                 # Build from JSON-based library data
+                logger.info(f"🔨 Building symbol definition from JSON for {sym_id}")
                 new_sym_def = self._create_symbol_definition(sym_id, lib_data)
                 if new_sym_def:
+                    logger.info(f"✅ Created symbol definition for {sym_id}, adding to lib_symbols")
                     if isinstance(new_sym_def[0], Symbol):
                         lib_symbols_block.append(new_sym_def)
                     else:
                         lib_symbols_block.extend(new_sym_def)
+                else:
+                    logger.error(f"❌ Failed to create symbol definition for {sym_id}")
+        
+        logger.info(f"📦 lib_symbols block now has {len(lib_symbols_block)} items (including header)")
+        if len(lib_symbols_block) <= 1:
+            logger.error("❌❌❌ lib_symbols block is EMPTY - no symbol definitions added!")
 
     def _create_symbol_definition(self, lib_id: str, lib_data: dict):
         """
@@ -1295,7 +1317,7 @@ class SchematicWriter:
             Symbol("symbol"),
             lib_id,
             [Symbol("pin_numbers"), Symbol("hide")],
-            [Symbol("pin_names"), [Symbol("offset"), 0.254]],
+            [Symbol("pin_names"), [Symbol("offset"), 0]],
             [Symbol("exclude_from_sim"), Symbol("no")],
             [Symbol("in_bom"), Symbol("yes")],
             [Symbol("on_board"), Symbol("yes")],
@@ -1453,11 +1475,26 @@ class SchematicWriter:
         return symbol_block
 
     def _add_sheet_instances(self, schematic_expr: list):
-        """Add sheet_instances section."""
+        """Add sheet_instances section or replace empty one."""
         sheet_instances = [
             Symbol("sheet_instances"),
             [Symbol("path"), "/", [Symbol("page"), "1"]],
         ]
+
+        # Check if sheet_instances already exists
+        for i, item in enumerate(schematic_expr):
+            if (
+                isinstance(item, list)
+                and item
+                and item[0] == Symbol("sheet_instances")
+            ):
+                # Replace empty sheet_instances with proper one
+                if len(item) <= 1:  # Empty or header-only
+                    schematic_expr[i] = sheet_instances
+                    return
+                else:
+                    # Already has content, don't duplicate
+                    return
 
         # Find where to insert (before symbol_instances if it exists)
         insert_pos = len(schematic_expr)
@@ -1519,8 +1556,8 @@ def write_schematic_file(schematic_expr: list, out_path: str):
     """
     Helper to serialize the final S-expression to a .kicad_sch file.
 
-    PERFORMANCE OPTIMIZATION: Uses Rust-accelerated formatting when available.
-    This is the final step where the Rust S-expression formatter provides maximum benefit.
+    PERFORMANCE OPTIMIZATION: Uses optimized S-expression formatting.
+    This is the final step where the S-expression formatter is applied.
     """
     start_time = time.perf_counter()
     expr_size = len(str(schematic_expr)) if schematic_expr else 0
@@ -1529,7 +1566,7 @@ def write_schematic_file(schematic_expr: list, out_path: str):
     logger.info(
         f"📊 WRITE_SCHEMATIC_FILE: Input S-expression size: {expr_size:,} characters"
     )
-    logger.info(f"🦀 WRITE_SCHEMATIC_FILE: Using Rust formatting")
+    logger.info(f"🐍 WRITE_SCHEMATIC_FILE: Using Python formatting")
 
     # Debug: Check for sheet pins with orientation - time this analysis
     debug_start = time.perf_counter()
@@ -1575,11 +1612,9 @@ def write_schematic_file(schematic_expr: list, out_path: str):
         f"🔍 WRITE_SCHEMATIC_FILE: Debug analysis completed in {debug_time*1000:.2f}ms, found {sheet_pin_count} sheet pins"
     )
 
-    # This now uses the Rust-accelerated format_kicad_schematic function internally
+    # This uses the Python format_kicad_schematic function
     parser_start = time.perf_counter()
-    logger.info(
-        "⚡ WRITE_SCHEMATIC_FILE: Starting S-expression parsing and formatting (RUST ACCELERATION POINT)"
-    )
+    logger.info("⚡ WRITE_SCHEMATIC_FILE: Starting S-expression parsing and formatting")
 
     from circuit_synth.kicad.core.s_expression import SExpressionParser
 
@@ -1628,10 +1663,8 @@ def write_schematic_file(schematic_expr: list, out_path: str):
         f"📦 WRITE_SCHEMATIC_FILE: Size change: {expr_size:,} → {len(content):,} chars ({compression_ratio:.2f}x)"
     )
 
-    # Performance summary (Rust is always used)
-    logger.info(
-        f"⚡ RUST_PERFORMANCE: Schematic written with Rust acceleration in {total_time*1000:.2f}ms"
-    )
+    # Performance summary
+    logger.info(f"⚡ PERFORMANCE: Schematic written in {total_time*1000:.2f}ms")
 
     logger.info(
         f"✅ WRITE_SCHEMATIC_FILE: Successfully wrote {len(content):,} characters to {out_path}"
