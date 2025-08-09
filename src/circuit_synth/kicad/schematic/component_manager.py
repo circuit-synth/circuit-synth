@@ -15,6 +15,19 @@ from .placement import PlacementEngine, PlacementStrategy
 
 logger = logging.getLogger(__name__)
 
+# Performance debugging
+import time
+try:
+    from ..sch_gen.debug_performance import timed_operation, log_symbol_lookup
+    PERF_DEBUG = True
+except ImportError:
+    PERF_DEBUG = False
+    from contextlib import contextmanager
+    @contextmanager
+    def timed_operation(*args, **kwargs):
+        yield
+
+
 
 class ComponentManager:
     """
@@ -68,7 +81,14 @@ class ComponentManager:
         """
         # Validate library ID
         symbol_cache = get_symbol_cache()
+        # Time symbol cache lookup
+        sym_start = time.perf_counter()
         symbol_def = symbol_cache.get_symbol(library_id)
+        sym_time = (time.perf_counter() - sym_start) * 1000
+        if PERF_DEBUG and sym_time > 10:
+            logger.warning(f"🐌 SLOW: get_symbol({library_id}) took {sym_time:.2f}ms")
+            if sym_time > 50:
+                logger.error(f"🔴 VERY SLOW: {library_id} - investigating...")
         if not symbol_def:
             logger.error(f"Unknown library ID: {library_id}")
             return None

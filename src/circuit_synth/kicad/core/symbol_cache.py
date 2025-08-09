@@ -96,12 +96,85 @@ class SymbolLibraryCache:
 
         # Flag to track if we've built the complete index
         self._index_built: bool = False
+        
+        # Persistent index file path
+        self._index_file = self._cache_dir / "symbol_index.json"
+        self._index_metadata_file = self._cache_dir / "symbol_index_metadata.json"
+        
+        # Try to load persistent index
+        self._load_persistent_index()
 
         # Track loaded library files for lazy loading
         self._loaded_libraries: Set[Path] = set()
 
         # Load default libraries
         self._load_default_libraries()
+
+    def _load_persistent_index(self) -> bool:
+        """
+        Load the persistent symbol index from disk if available and valid.
+        
+        Returns:
+            True if index was loaded successfully, False otherwise
+        """
+        if not self._index_file.exists() or not self._index_metadata_file.exists():
+            logger.debug("No persistent symbol index found")
+            return False
+        
+        try:
+            import time
+            load_start = time.perf_counter()
+            
+            # Load metadata to check validity
+            with open(self._index_metadata_file, 'r') as f:
+                metadata = json.load(f)
+            
+            # Check if index is still valid
+            current_dirs = self._parse_kicad_symbol_dirs()
+            saved_dirs = [Path(d) for d in metadata.get("symbol_dirs", [])]
+            
+            # Invalidate if directories changed
+            if set(str(d) for d in current_dirs) != set(str(d) for d in saved_dirs):
+                logger.info("Symbol directories changed, invalidating index")
+                return False
+            
+            # Check if any directory was modified after index creation
+            index_timestamp = metadata.get("timestamp", 0)
+            for dir_path in current_dirs:
+                if dir_path.exists():
+                    dir_mtime = dir_path.stat().st_mtime
+                    if dir_mtime > index_timestamp:
+                        logger.info(f"Symbol directory {dir_path} modified, invalidating index")
+                        return False
+            
+            # Load the actual index
+            with open(self._index_file, 'r') as f:
+                index_data = json.load(f)
+            
+            # Restore symbol index
+            self._symbol_index = {}
+            for sym_name, info in index_data.get("symbol_index", {}).items():
+                self._symbol_index[sym_name] = {
+                    "lib_name": info["lib_name"],
+                    "lib_path": Path(info["lib_path"])
+                }
+            
+            # Restore library index
+            self._library_index = {}
+            for lib_name, lib_path in index_data.get("library_index", {}).items():
+                self._library_index[lib_name] = Path(lib_path)
+            
+            self._index_built = True
+            
+            load_time = (time.perf_counter() - load_start) * 1000
+            logger.info(f"Loaded persistent symbol index: {len(self._symbol_index)} symbols, "
+                       f"{len(self._library_index)} libraries in {load_time:.2f}ms")
+            
+            return True
+            
+        except Exception as e:
+            logger.warning(f"Failed to load persistent index: {e}")
+            return False
 
     def add_library_path(self, path: Path):
         """Add a path to search for symbol libraries."""
@@ -119,10 +192,17 @@ class SymbolLibraryCache:
         Returns:
             SymbolDefinition if found, None otherwise
         """
+        import time
+        get_start = time.perf_counter()
+        logger.debug(f'🔍 get_symbol called for: {lib_id}')
+        
         # First check if already loaded
         if lib_id in self._symbols:
+            get_time = (time.perf_counter() - get_start) * 1000
+            logger.debug(f'✅ Cache HIT for {lib_id} in {get_time:.2f}ms')
             return self._symbols[lib_id]
 
+        logger.debug(f'❌ Cache MISS for {lib_id}, trying lazy search...')
         # Try lazy symbol search first (much faster)
         symbol = self._lazy_symbol_search(lib_id)
         if symbol:
@@ -417,7 +497,66 @@ class SymbolLibraryCache:
         logger.debug(
             f"Symbol index built: {len(self._library_index)} libraries, {len(self._symbol_index)} symbols"
         )
+        
+        # Save the index to disk for future use
+        self._save_persistent_index()
 
+    def _save_persistent_index(self) -> bool:
+        """
+        Save the symbol index to disk for faster startup next time.
+        
+        Returns:
+            True if saved successfully, False otherwise
+        """
+        try:
+            import time
+            save_start = time.perf_counter()
+            
+            # Prepare index data with string paths for JSON serialization
+            symbol_index_data = {}
+            for sym_name, info in self._symbol_index.items():
+                symbol_index_data[sym_name] = {
+                    "lib_name": info["lib_name"],
+                    "lib_path": str(info["lib_path"])
+                }
+            
+            library_index_data = {}
+            for lib_name, lib_path in self._library_index.items():
+                library_index_data[lib_name] = str(lib_path)
+            
+            # Save the main index
+            index_data = {
+                "version": "1.0",
+                "symbol_index": symbol_index_data,
+                "library_index": library_index_data,
+                "symbol_count": len(self._symbol_index),
+                "library_count": len(self._library_index)
+            }
+            
+            with open(self._index_file, 'w') as f:
+                json.dump(index_data, f, indent=2)
+            
+            # Save metadata for validation
+            metadata = {
+                "timestamp": time.time(),
+                "symbol_dirs": [str(d) for d in self._parse_kicad_symbol_dirs()],
+                "kicad_version": os.environ.get("KICAD_VERSION", "unknown"),
+                "index_version": "1.0"
+            }
+            
+            with open(self._index_metadata_file, 'w') as f:
+                json.dump(metadata, f, indent=2)
+            
+            save_time = (time.perf_counter() - save_start) * 1000
+            logger.info(f"Saved persistent symbol index: {len(self._symbol_index)} symbols in {save_time:.2f}ms")
+            logger.debug(f"Index saved to: {self._index_file}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to save persistent index: {e}")
+            return False
+    
     def _parse_kicad_symbol_dirs(self) -> List[Path]:
         """
         Parse KICAD_SYMBOL_DIR environment variable which can contain multiple paths
