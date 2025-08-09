@@ -8,6 +8,22 @@
 # Writes a .kicad_sch file from in-memory circuit data using the new KiCad API
 #
 
+# Performance debugging imports
+try:
+    from .debug_performance import (
+        timed_operation, log_symbol_lookup, log_net_label_creation,
+        log_component_processing, print_performance_summary
+    )
+    PERF_DEBUG = True
+except ImportError:
+    PERF_DEBUG = False
+    def timed_operation(*args, **kwargs):
+        from contextlib import contextmanager
+        @contextmanager
+        def dummy():
+            yield
+        return dummy()
+
 import datetime
 import logging
 import math
@@ -458,6 +474,13 @@ class SchematicWriter:
         self.reference_mapping = {}
 
         for idx, comp in enumerate(self.circuit.components):
+            comp_start = time.perf_counter()
+            comp_details = {
+                'reference': comp.reference,
+                'lib_id': comp.lib_id,
+                'circuit': self.circuit.name
+            }
+            
             logger.debug(
                 f"  [{idx}] Processing component: {comp.reference} ({comp.lib_id})"
             )
@@ -486,7 +509,9 @@ class SchematicWriter:
             self.reference_mapping[original_ref] = new_ref
 
             # Add component using the API
-            api_component = self.component_manager.add_component(
+            # Time the component manager operation
+            with timed_operation(f'add_component[{comp.lib_id}]', threshold_ms=20, details=comp_details):
+                api_component = self.component_manager.add_component(
                 library_id=comp.lib_id,
                 reference=new_ref,
                 value=comp.value,
@@ -716,6 +741,13 @@ class SchematicWriter:
             )
 
             for comp_ref, pin_identifier in net.connections:
+                label_start = time.perf_counter()
+                label_details = {
+                    'net': net_name,
+                    'component': comp_ref,
+                    'pin': str(pin_identifier)
+                }
+                
                 # Don't use reference mapping here - net connections have already been updated
                 actual_ref = comp_ref
 
@@ -727,7 +759,13 @@ class SchematicWriter:
                     continue
 
                 # Get pin position from library data
+                # Time symbol data lookup
+                sym_start = time.perf_counter()
                 lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
+                sym_time = (time.perf_counter() - sym_start) * 1000
+                if PERF_DEBUG and sym_time > 10:
+                    log_symbol_lookup(comp.lib_id, lib_data is not None, sym_time, 'SymbolLibCache')
+                
                 if not lib_data or "pins" not in lib_data:
                     logger.warning(
                         f"No pin data found for component {comp_ref} ({comp.lib_id})"
@@ -771,6 +809,9 @@ class SchematicWriter:
                 )
 
                 self.schematic.add_label(label)
+                label_time = (time.perf_counter() - label_start) * 1000
+                if PERF_DEBUG and label_time > 5:
+                    log_net_label_creation(net_name, actual_ref, str(pin_identifier), label_time)
                 logger.debug(
                     f"Added hierarchical label for net {net_name} at component {actual_ref}.{pin_identifier}"
                 )
