@@ -14,7 +14,7 @@ Or in Python:
     setup_claude_integration()
 """
 
-__version__ = "0.8.14"
+__version__ = "0.9.0"
 
 # Plugin integration
 from .ai_integration.plugins import AIDesignBridge
