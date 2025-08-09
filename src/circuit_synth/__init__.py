@@ -14,7 +14,7 @@ Or in Python:
     setup_claude_integration()
 """
 
-__version__ = "0.8.3"
+__version__ = "0.8.11"
 
 # Plugin integration
 from .ai_integration.plugins import AIDesignBridge
@@ -60,12 +60,6 @@ from .core.netlist_exporter import NetlistExporter
 # Reference manager and netlist exporters
 from .core.reference_manager import ReferenceManager
 
-# Rust-accelerated component creation helpers
-from .core.rust_components import (
-    create_rust_capacitor,
-    create_rust_resistor,
-    get_rust_component_status,
-)
 
 # Removed unused interface abstractions and unified integration
 
@@ -128,10 +122,6 @@ __all__ = [
     "ReferenceManager",
     "NetlistExporter",
     "EnhancedNetlistExporter",
-    # Rust-accelerated component creation
-    "create_rust_resistor",
-    "create_rust_capacitor",
-    "get_rust_component_status",
     # KiCad integration and validation
     "validate_kicad_installation",
     "require_kicad",
