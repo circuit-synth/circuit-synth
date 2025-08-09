@@ -187,8 +187,132 @@ class SExpressionParser:
 
     def _parse_symbol(self, sexp: List) -> Optional[SchematicSymbol]:
         """Parse a symbol S-expression."""
-        # Placeholder implementation
-        return None
+        logger.debug("=" * 60)
+        logger.debug("PARSING SYMBOL - Starting")
+        logger.debug(f"  Input type: {type(sexp)}")
+        logger.debug(f"  Input length: {len(sexp) if isinstance(sexp, list) else 'N/A'}")
+        
+        try:
+            # Skip if this is not a symbol instance (could be lib_symbol definition)
+            if not isinstance(sexp, list) or len(sexp) < 2:
+                logger.debug("  SKIP: Not a list or too short")
+                return None
+                
+            # Check if first element is 'symbol' (without checking for Symbol type)
+            first_elem = str(sexp[0]) if sexp else None
+            logger.debug(f"  First element: '{first_elem}' (type: {type(sexp[0])})")
+            
+            if first_elem != "symbol":
+                logger.debug(f"  SKIP: First element is not 'symbol'")
+                return None
+            
+            # Look for lib_id to distinguish from lib_symbols definitions
+            lib_id = None
+            reference = None
+            value = None
+            footprint = None
+            position = Point(0, 0)
+            rotation = 0.0
+            unit = 1
+            in_bom = True
+            on_board = True
+            uuid_str = None
+            
+            logger.debug("  Scanning sub-elements...")
+            for item in sexp[1:]:
+                if not isinstance(item, list) or len(item) < 2:
+                    logger.debug(f"    Skipping non-list or short item: {item}")
+                    continue
+                    
+                tag = str(item[0]) if item else None
+                logger.debug(f"    Found tag: '{tag}'")
+                
+                if tag == "lib_id":
+                    lib_id = str(item[1]) if len(item) > 1 else None
+                    logger.debug(f"      lib_id = '{lib_id}'")
+                    
+                elif tag == "at":
+                    # Parse position: (at x y rotation)
+                    if len(item) >= 3:
+                        try:
+                            x = float(item[1])
+                            y = float(item[2])
+                            position = Point(x, y)
+                            if len(item) > 3:
+                                rotation = float(item[3])
+                            logger.debug(f"      position = ({x}, {y}), rotation = {rotation}")
+                        except (ValueError, TypeError) as e:
+                            logger.debug(f"      ERROR parsing position: {e}")
+                            
+                elif tag == "unit":
+                    if len(item) > 1:
+                        try:
+                            unit = int(item[1])
+                            logger.debug(f"      unit = {unit}")
+                        except (ValueError, TypeError):
+                            logger.debug(f"      ERROR parsing unit: {item[1]}")
+                            
+                elif tag == "uuid":
+                    uuid_str = str(item[1]) if len(item) > 1 else None
+                    logger.debug(f"      uuid = '{uuid_str}'")
+                    
+                elif tag == "in_bom":
+                    val = str(item[1]) if len(item) > 1 else "yes"
+                    in_bom = val == "yes"
+                    logger.debug(f"      in_bom = {in_bom}")
+                    
+                elif tag == "on_board":
+                    val = str(item[1]) if len(item) > 1 else "yes"
+                    on_board = val == "yes"
+                    logger.debug(f"      on_board = {on_board}")
+                    
+                elif tag == "property":
+                    # Parse properties: (property "Name" "Value" ...)
+                    if len(item) >= 3:
+                        prop_name = str(item[1])
+                        prop_value = str(item[2])
+                        logger.debug(f"      property '{prop_name}' = '{prop_value}'")
+                        
+                        if prop_name == "Reference":
+                            reference = prop_value
+                        elif prop_name == "Value":
+                            value = prop_value
+                        elif prop_name == "Footprint":
+                            footprint = prop_value
+            
+            # Only create symbol if we have a lib_id (indicates it's a component instance)
+            if lib_id:
+                logger.debug("  Creating SchematicSymbol:")
+                logger.debug(f"    lib_id: '{lib_id}'")
+                logger.debug(f"    reference: '{reference}'")
+                logger.debug(f"    value: '{value}'")
+                logger.debug(f"    footprint: '{footprint}'")
+                logger.debug(f"    position: {position}")
+                logger.debug(f"    unit: {unit}")
+                
+                symbol = SchematicSymbol(
+                    reference=reference or "",
+                    value=value or "",
+                    lib_id=lib_id,
+                    position=position,
+                    rotation=rotation,
+                    footprint=footprint,
+                    unit=unit,
+                    in_bom=in_bom,
+                    on_board=on_board,
+                    uuid=uuid_str or str(uuid.uuid4())
+                )
+                logger.debug(f"  SUCCESS: Created symbol {reference}")
+                return symbol
+            else:
+                logger.debug("  SKIP: No lib_id found, probably a lib_symbol definition")
+                return None
+                
+        except Exception as e:
+            logger.error(f"  ERROR parsing symbol: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return None
 
     def _parse_wire(self, sexp: List) -> Optional[Wire]:
         """Parse a wire S-expression."""
