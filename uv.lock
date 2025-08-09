@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 members = [
     "circuit-synth",
     "example-project",
+    "test-install",
 ]
 
 [[package]]
@@ -2132,6 +2133,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/3b/44/6716b257b0aa6bfd5
 wheels = [
     { url = "https://files.pythonhosted.org/packages/52/a7/d2782e4e3f77c8450f727ba74a8f12756d5ba823d81b941f1b04da9d033a/sphinxcontrib_serializinghtml-2.0.0-py3-none-any.whl", hash = "sha256:6e2cb0eef194e10c27ec0023bfeb25badbbb5868244cf5bc5bdc04e4464bf331", size = 92072, upload-time = "2024-07-29T01:10:08.203Z" },
 ]
+
+[[package]]
+name = "test-install"
+version = "0.1.0"
+source = { virtual = "test_install" }
 
 [[package]]
 name = "twine"

@@ -196,6 +196,7 @@ members = [
     "agent_validation_test/agent_test",
     "test_generation/format_test",
     "test_8_agents/test_project",
+    "test_install",
 ]
 
 [dependency-groups]

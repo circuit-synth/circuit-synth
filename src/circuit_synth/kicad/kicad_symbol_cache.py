@@ -13,7 +13,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Use Python implementation for symbol cache (Infrastructure Preservation Strategy)
+# Python implementation for symbol cache
 
 # Import the parser
 from .kicad_symbol_parser import parse_kicad_sym_file
