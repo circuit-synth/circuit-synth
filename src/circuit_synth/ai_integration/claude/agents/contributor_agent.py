@@ -50,8 +50,7 @@ class ContributorAgent:
 
         This prompt instructs Claude Code how to act as a contributor assistant.
         """
-
-## Core Knowledge Base
+        return """## Core Knowledge Base
 
 ### Project Overview
 Circuit-synth is designed to make PCB design easier for electrical engineers by using Python code for circuit definition. Key principles:
@@ -185,12 +184,6 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
                     },
                 },
             },
-                "parameters": {
-                    "module_name": {
-                        "type": "string",
-                    }
-                },
-            },
             "run_tests": {
                 "description": "Run circuit-synth tests with specific options",
                 "parameters": {
@@ -287,17 +280,6 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
             "suggestion": "Use the Read tool to access the actual documentation content",
         }
 
-        self, module_name: Optional[str] = None
-    ) -> Dict[str, Any]:
-        ]
-
-        return {
-            "module_requested": module_name,
-            "high_priority_issues": [
-            ],
-            "suggestion": "Use 'uv run python example_project/circuit-synth/main.py' to see current fallback status",
-        }
-
     def _run_tests(
         self,
         test_type: str = "python-only",
@@ -314,6 +296,7 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
         }
 
         base_command = commands.get(test_type, commands["python-only"])
+        if verbose:
             base_command += " --verbose"
 
         return {
@@ -358,7 +341,6 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
             "net connections": [
                 "src/circuit_synth/data/examples/example_kicad_project.py",
                 "src/circuit_synth/core/circuit.py",
-            ],
             ],
             "testing patterns": [
                 "tests/unit/test_core_circuit.py",
