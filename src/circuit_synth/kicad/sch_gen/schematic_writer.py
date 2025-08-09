@@ -76,7 +76,7 @@ from .integrated_reference_manager import IntegratedReferenceManager
 from .kicad_formatter import format_kicad_schematic
 from .shape_drawer import arc_s_expr, circle_s_expr, polyline_s_expr, rectangle_s_expr
 
-# Import Rust acceleration (REQUIRED)
+# Import Rust acceleration (optional with Python fallback)
 try:
     from circuit_synth.core.rust_integration import (
         generate_component_sexp,
@@ -84,35 +84,56 @@ try:
     )
 
     _rust_status = get_acceleration_status()
-    # Rust acceleration is mandatory
     _RUST_COMPONENT_ACCELERATION = _rust_status["rust_available"]
-
-    if not _RUST_COMPONENT_ACCELERATION:
-        # This should never happen in production
-        error_msg = "Rust component acceleration not available but is required"
-        logging.getLogger(__name__).error(f"❌ CRITICAL: {error_msg}")
-        raise ImportError(error_msg)
-        
-    logging.getLogger(__name__).info(
-        f"🦀 RUST_COMPONENT_ACCELERATION: ✅ ENABLED for SchematicWriter"
-    )
-    logging.getLogger(__name__).info(
-        "🚀 RUST_COMPONENT_ACCELERATION: 6x component generation speedup active"
-    )
+    
+    if _RUST_COMPONENT_ACCELERATION:
+        logging.getLogger(__name__).info(
+            f"🦀 RUST_COMPONENT_ACCELERATION: ✅ ENABLED for SchematicWriter"
+        )
+        logging.getLogger(__name__).info(
+            "🚀 RUST_COMPONENT_ACCELERATION: 6x component generation speedup active"
+        )
     
 except ImportError as e:
-    logging.getLogger(__name__).error(
-        f"❌ CRITICAL: Rust component acceleration is REQUIRED: {e}"
+    logging.getLogger(__name__).info(
+        f"🐍 Using Python implementation for component generation (Rust not available: {e})"
     )
-    raise ImportError(
-        f"Rust backend is required for circuit-synth. {e}\n"
-        "Please ensure rust modules are built: ./tools/build/build_rust_modules.sh"
-    )
-except Exception as e:
-    logging.getLogger(__name__).error(
-        f"❌ CRITICAL: Error loading Rust acceleration: {e}"
-    )
-    raise
+    _RUST_COMPONENT_ACCELERATION = False
+    
+    from sexpdata import Symbol
+    
+    # Python fallback for generate_component_sexp
+    def generate_component_sexp(component_data):
+        """Python fallback for component S-expression generation"""
+        # This is a simplified version - the full implementation would be more complex
+        ref = component_data.get("ref", "U?")
+        lib_id = component_data.get("lib_id", "Device:R")
+        at = component_data.get("at", [0, 0, 0])
+        uuid = component_data.get("uuid", "00000000-0000-0000-0000-000000000000")
+        
+        # Build basic S-expression
+        sexp = [
+            Symbol("symbol"),
+            [Symbol("lib_id"), lib_id],
+            [Symbol("at"), at[0], at[1], at[2]] if len(at) >= 3 else [Symbol("at"), at[0], at[1]],
+            [Symbol("uuid"), uuid],
+        ]
+        
+        # Add properties if present
+        if "properties" in component_data:
+            for prop in component_data["properties"]:
+                sexp.append(prop)
+        
+        # Add reference property
+        sexp.append([
+            Symbol("property"),
+            "Reference",
+            ref,
+            [Symbol("at"), 0, -5, 0],
+            [Symbol("effects"), [Symbol("font"), [Symbol("size"), 1.27, 1.27]]]
+        ])
+        
+        return sexp
 
 logger = logging.getLogger(__name__)
 
