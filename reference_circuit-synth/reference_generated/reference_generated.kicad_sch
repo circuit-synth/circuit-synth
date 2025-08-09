@@ -1,0 +1,300 @@
+(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(generator_version "9.0")
+	(uuid cd36dd17-8d4d-4370-8603-09176eebfb1a)
+	(paper "A4")
+	(lib_symbols
+		(symbol "Device:R"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "R"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property "Value" "R"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property "Footprint" ""
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Resistor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "R res resistor"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "R_*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
+				(pin
+					passive
+					line
+					(at 0.0 3.81 270)
+					(length 1.27)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					passive
+					line
+					(at 0.0 -3.81 90)
+					(length 1.27)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+	)
+	(title_block
+		(title main)
+		(date 2025-08-08)
+		(company Circuit-Synth)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 38.1 45.72 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 572bd772-ad8f-489a-8520-115f12cf3b6b)
+		(property "Reference" "R1"
+			(at 38.1 40.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "R"
+			(at 38.1 50.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project ""
+				(path "/cd36dd17-8d4d-4370-8603-09176eebfb1a"
+					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 38.1 49.53 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid f34ace6c-75e4-4b9a-9fd8-1a4715107903)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 97.63 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid 6f6baf30-96f4-4503-a233-a910d3f9a18a)
+	)
+	(sheet
+		(at 58.42 36.83)
+		(size 39.21 20.32)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill
+			(color
+				0
+				0
+				0
+				0.0
+			)
+		)
+		(uuid 71ed6cf3-01e0-4b1e-9251-8bfa4073cd92)
+		(property "Sheetname" "child1"
+			(at 58.42 35.559999999999995 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "child1.kicad_sch"
+			(at 58.42 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin
+			GND
+			passive
+			(at 96.36 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+			(uuid 995b1731-6c3a-4655-874f-51d26d4b7482)
+		)
+		(instances
+			(project "reference_generated"
+				(path "/"
+					(page "1")
+				)
+			)
+		)
+	)
+	(text_box
+		"Main circuit with hierarchical subcircuits"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid ba716671-c744-43fc-af13-6b189be42cb8)
+	)
+	(sheet_instances
+		(path "/cd36dd17-8d4d-4370-8603-09176eebfb1a"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

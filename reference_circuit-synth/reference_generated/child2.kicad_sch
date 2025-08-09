@@ -1,0 +1,555 @@
+(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(generator_version "9.0")
+	(uuid 2c89e9d8-21ce-4ef6-b04a-18c23522b5a0)
+	(paper "A4")
+	(lib_symbols
+		(symbol "Amplifier_Operational:LM324"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property "Value" "LM324"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(property "Footprint" ""
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "http://www.ti.com/lit/ds/symlink/lm2902-n.pdf"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Low-Power, Quad-Operational Amplifiers, DIP-14/SOIC-14/SSOP-14"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "quad opamp"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "SOIC*3.9x8.7mm*P1.27mm* DIP*W7.62mm* TSSOP*4.4x5mm*P0.65mm* SSOP*5.3x6.2mm*P0.65mm* MSOP*3x3mm*P0.5mm*"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide no)
+				)
+			)
+			(symbol "LM324_0_1"
+				(polyline
+					(pts
+						(xy -5.08 5.08)
+						(xy 5.08 0.0)
+						(xy -5.08 -5.08)
+						(xy -5.08 5.08)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.08 5.08)
+						(xy 5.08 0.0)
+						(xy -5.08 -5.08)
+						(xy -5.08 5.08)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.08 5.08)
+						(xy 5.08 0.0)
+						(xy -5.08 -5.08)
+						(xy -5.08 5.08)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.08 5.08)
+						(xy 5.08 0.0)
+						(xy -5.08 -5.08)
+						(xy -5.08 5.08)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "LM324_1_1"
+				(pin
+					input
+					line
+					(at -7.62 2.54 0)
+					(length 2.54)
+					(name
+						+
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					input
+					line
+					(at -7.62 -2.54 0)
+					(length 2.54)
+					(name
+						-
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					output
+					line
+					(at 7.62 0.0 180)
+					(length 2.54)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					input
+					line
+					(at -7.62 2.54 0)
+					(length 2.54)
+					(name
+						+
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					input
+					line
+					(at -7.62 -2.54 0)
+					(length 2.54)
+					(name
+						-
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					output
+					line
+					(at 7.62 0.0 180)
+					(length 2.54)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					input
+					line
+					(at -7.62 2.54 0)
+					(length 2.54)
+					(name
+						+
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"10"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					input
+					line
+					(at -7.62 -2.54 0)
+					(length 2.54)
+					(name
+						-
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"9"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					output
+					line
+					(at 7.62 0.0 180)
+					(length 2.54)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					input
+					line
+					(at -7.62 2.54 0)
+					(length 2.54)
+					(name
+						+
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"12"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					input
+					line
+					(at -7.62 -2.54 0)
+					(length 2.54)
+					(name
+						-
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"13"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					output
+					line
+					(at 7.62 0.0 180)
+					(length 2.54)
+					(name
+						~
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"14"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					power_in
+					line
+					(at -2.54 7.62 270)
+					(length 3.81)
+					(name
+						V+
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin
+					power_in
+					line
+					(at -2.54 -7.62 90)
+					(length 3.81)
+					(name
+						V-
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number
+						"11"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
+	)
+	(title_block
+		(title child2)
+		(date 2025-08-08)
+		(company Circuit-Synth)
+	)
+	(symbol
+		(lib_id "Amplifier_Operational:LM324")
+		(at 45.72 58.42 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 0beea281-764a-4c9a-a06e-02784164ec53)
+		(property "Reference" "U1"
+			(at 45.72 53.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "LM324"
+			(at 45.72 63.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "reference_generated"
+				(path "/cd36dd17-8d4d-4370-8603-09176eebfb1a/71ed6cf3-01e0-4b1e-9251-8bfa4073cd92/40a718cf-48cf-422b-8211-de9058fcd218"
+					(reference "U1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(hierarchical_label
+		GND
+		(shape input)
+		(at 43.18 66.04 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid 7a0b8fe9-e3b9-4ec2-93ad-38e016d0b071)
+	)
+	(text_box
+		"child2 subcircuit\n    Parameters: GND"
+		(exclude_from_sim yes)
+		(at 184.0 110.0 0)
+		(size 80.0 30.0)
+		(margins
+			1.0
+			1.0
+			1.0
+			1.0
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill
+			(type color)
+			(color
+				255
+				255
+				224
+				1
+			)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.254)
+			)
+			(justify left top)
+		)
+		(uuid d0d81a90-cb79-4188-8bce-f25664bc0f3f)
+	)
+	(sheet_instances
+		(path "/cd36dd17-8d4d-4370-8603-09176eebfb1a/71ed6cf3-01e0-4b1e-9251-8bfa4073cd92/40a718cf-48cf-422b-8211-de9058fcd218"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

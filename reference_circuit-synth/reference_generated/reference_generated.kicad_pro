@@ -1,0 +1,75 @@
+{
+  "board": {
+    "design_settings": {
+      "defaults": {}
+    }
+  },
+  "boards": [
+    "reference_generated.kicad_pcb"
+  ],
+  "cvpcb": {},
+  "erc": {},
+  "libraries": {
+    "pinned_footprint_libs": [],
+    "pinned_symbol_libs": []
+  },
+  "meta": {
+    "filename": "reference_generated.kicad_pro",
+    "version": 1
+  },
+  "net_settings": {},
+  "pcbnew": {},
+  "schematic": {
+    "annotate_start_num": 0,
+    "drawing": {
+      "default_line_thickness": 6.0,
+      "default_text_size": 50.0,
+      "field_names": [],
+      "intersheets_ref_own_page": false,
+      "intersheets_ref_prefix": "",
+      "intersheets_ref_short": false,
+      "intersheets_ref_show": false,
+      "intersheets_ref_suffix": "",
+      "junction_size_choice": 3,
+      "label_size_ratio": 0.25,
+      "pin_symbol_size": 0.0,
+      "text_offset_ratio": 0.08
+    },
+    "legacy_lib_dir": "",
+    "legacy_lib_list": [],
+    "meta": {
+      "version": 1
+    },
+    "net_format_name": "",
+    "ngspice": {
+      "fix_include_paths": true,
+      "fix_passive_vals": false,
+      "meta": {
+        "version": 0
+      },
+      "model_mode": 0,
+      "workbook_filename": ""
+    },
+    "page_layout_descr_file": "",
+    "plot_directory": "",
+    "spice_adjust_passive_values": false,
+    "spice_external_command": "spice \"%I\"",
+    "subpart_first_id": 65,
+    "subpart_id_separator": 0
+  },
+  "sheets": [
+    [
+      "cd36dd17-8d4d-4370-8603-09176eebfb1a",
+      ""
+    ],
+    [
+      "13dad5d0-037f-43c9-afec-6c2326e887db",
+      "child1"
+    ],
+    [
+      "2c89e9d8-21ce-4ef6-b04a-18c23522b5a0",
+      "child2"
+    ]
+  ],
+  "text_variables": {}
+}
