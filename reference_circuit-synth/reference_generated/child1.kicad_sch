@@ -1,54 +1,46 @@
 (kicad_sch
 	(version 20250114)
 	(generator "circuit_synth")
-	(generator_version "9.0")
-	(uuid 06c4e9ac-280a-45e8-bc71-fda632350484)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Connector:USB_C_Plug_USB2.0"
-			(pin_numbers hide)
+			(pin_numbers
+				hide
+			)
 			(pin_names
-				(offset 0.254)
+				(offset
+					0.254
+				)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "P"
-				(at 0 0 0)
+			(property
+				"Reference"
+				"P"
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(hide no)
 				)
 			)
-			(property "Value" "USB_C_Plug_USB2.0"
-				(at 0 -2.54 0)
+			(property
+				"Value"
+				"USB_C_Plug_USB2.0"
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(hide no)
 				)
 			)
-			(property "Footprint" ""
-				(at 0 -5.08 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "https://www.usb.org/sites/default/files/documents/usb_type-c.zip"
-				(at 0 -7.62 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "USB 2.0-only Type-C Plug connector"
-				(at 0 -10.16 0)
+			(property
+				"Footprint"
+				""
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -56,8 +48,43 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "usb universal serial bus type-C USB2.0"
-				(at 0 -12.7 0)
+			(property
+				"Datasheet"
+				"https://www.usb.org/sites/default/files/documents/usb_type-c.zip"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"Description"
+				"USB 2.0-only Type-C Plug connector"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_keywords"
+				"usb universal serial bus type-C USB2.0"
+				(at 0.0 0.0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property
+				"ki_fp_filters"
+				"USB*C*Plug*"
+				(at 0.0 0.0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -175,9 +202,6 @@
 						(width 0.254)
 						(type default)
 					)
-					(fill
-						(type none)
-					)
 				)
 				(arc
 					(start -7.62 3.81)
@@ -186,9 +210,6 @@
 					(stroke
 						(width 0.254)
 						(type default)
-					)
-					(fill
-						(type outline)
 					)
 				)
 				(arc
@@ -199,9 +220,6 @@
 						(width 0.508)
 						(type default)
 					)
-					(fill
-						(type none)
-					)
 				)
 				(arc
 					(start -5.08 -3.81)
@@ -211,9 +229,6 @@
 						(width 0.508)
 						(type default)
 					)
-					(fill
-						(type none)
-					)
 				)
 				(arc
 					(start -6.35 -3.81)
@@ -223,9 +238,6 @@
 						(width 0.254)
 						(type default)
 					)
-					(fill
-						(type none)
-					)
 				)
 				(arc
 					(start -6.35 -3.81)
@@ -234,9 +246,6 @@
 					(stroke
 						(width 0.254)
 						(type default)
-					)
-					(fill
-						(type outline)
 					)
 				)
 				(polyline
@@ -346,10 +355,10 @@
 				(pin
 					passive
 					line
-					(at -7.62 -22.86 90.0)
+					(at -7.62 -22.86 90)
 					(length 5.08)
 					(name
-						SHIELD
+						"SHIELD"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -357,7 +366,7 @@
 						)
 					)
 					(number
-						S1
+						"S1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -368,10 +377,10 @@
 				(pin
 					passive
 					line
-					(at 0.0 -22.86 90.0)
+					(at 0.0 -22.86 90)
 					(length 5.08)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -379,7 +388,7 @@
 						)
 					)
 					(number
-						A1
+						"A1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -390,11 +399,10 @@
 				(pin
 					passive
 					line
-					(hide yes)
-					(at 0.0 -22.86 90.0)
+					(at 0.0 -22.86 90)
 					(length 5.08)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -402,7 +410,7 @@
 						)
 					)
 					(number
-						A12
+						"A12"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -413,11 +421,10 @@
 				(pin
 					passive
 					line
-					(hide yes)
-					(at 0.0 -22.86 90.0)
+					(at 0.0 -22.86 90)
 					(length 5.08)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -425,7 +432,7 @@
 						)
 					)
 					(number
-						B1
+						"B1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -436,11 +443,10 @@
 				(pin
 					passive
 					line
-					(hide yes)
-					(at 0.0 -22.86 90.0)
+					(at 0.0 -22.86 90)
 					(length 5.08)
 					(name
-						GND
+						"GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -448,7 +454,7 @@
 						)
 					)
 					(number
-						B12
+						"B12"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -459,10 +465,10 @@
 				(pin
 					passive
 					line
-					(at 15.24 15.24 180.0)
+					(at 15.24 15.24 180)
 					(length 5.08)
 					(name
-						VBUS
+						"VBUS"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -470,7 +476,7 @@
 						)
 					)
 					(number
-						A4
+						"A4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -481,11 +487,10 @@
 				(pin
 					passive
 					line
-					(hide yes)
-					(at 15.24 15.24 180.0)
+					(at 15.24 15.24 180)
 					(length 5.08)
 					(name
-						VBUS
+						"VBUS"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -493,7 +498,7 @@
 						)
 					)
 					(number
-						A9
+						"A9"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -504,11 +509,10 @@
 				(pin
 					passive
 					line
-					(hide yes)
-					(at 15.24 15.24 180.0)
+					(at 15.24 15.24 180)
 					(length 5.08)
 					(name
-						VBUS
+						"VBUS"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -516,7 +520,7 @@
 						)
 					)
 					(number
-						B4
+						"B4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -527,11 +531,10 @@
 				(pin
 					passive
 					line
-					(hide yes)
-					(at 15.24 15.24 180.0)
+					(at 15.24 15.24 180)
 					(length 5.08)
 					(name
-						VBUS
+						"VBUS"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -539,7 +542,7 @@
 						)
 					)
 					(number
-						B9
+						"B9"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -548,12 +551,12 @@
 					)
 				)
 				(pin
-					passive
+					bidirectional
 					line
-					(at 15.24 10.16 180.0)
+					(at 15.24 10.16 180)
 					(length 5.08)
 					(name
-						CC
+						"CC"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -561,7 +564,7 @@
 						)
 					)
 					(number
-						A5
+						"A5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -570,12 +573,12 @@
 					)
 				)
 				(pin
-					passive
+					bidirectional
 					line
-					(at 15.24 7.62 180.0)
+					(at 15.24 7.62 180)
 					(length 5.08)
 					(name
-						VCONN
+						"VCONN"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -583,7 +586,7 @@
 						)
 					)
 					(number
-						B5
+						"B5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -592,12 +595,12 @@
 					)
 				)
 				(pin
-					passive
+					bidirectional
 					line
-					(at 15.24 2.54 180.0)
+					(at 15.24 2.54 180)
 					(length 5.08)
 					(name
-						D-
+						"D-"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -605,7 +608,7 @@
 						)
 					)
 					(number
-						A7
+						"A7"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -614,12 +617,12 @@
 					)
 				)
 				(pin
-					passive
+					bidirectional
 					line
-					(at 15.24 -2.54 180.0)
+					(at 15.24 -2.54 180)
 					(length 5.08)
 					(name
-						D+
+						"D+"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -627,7 +630,7 @@
 						)
 					)
 					(number
-						A6
+						"A6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -636,25 +639,21 @@
 					)
 				)
 			)
-			(embedded_fonts no)
 		)
-	)
-	(title_block
-		(title child1)
-		(date 2025-08-08)
-		(company Circuit-Synth)
 	)
 	(symbol
 		(lib_id "Connector:USB_C_Plug_USB2.0")
-		(at 58.42 66.04 0)
+		(at 58.42 66.04 0.0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid d7082ac7-e2c7-4bae-869c-3cdc104adf85)
-		(property "Reference" "P1"
+		(uuid a7bb791d-db3a-40a9-8813-ffba22d5ca4b)
+		(property
+			"Reference"
+			"P1"
 			(at 58.42 61.040000000000006 0)
 			(effects
 				(font
@@ -663,7 +662,9 @@
 				(justify left)
 			)
 		)
-		(property "Value" "USB_C_Plug_USB2.0"
+		(property
+			"Value"
+			"USB_C_Plug_USB2.0"
 			(at 58.42 71.04 0)
 			(effects
 				(font
@@ -673,8 +674,10 @@
 			)
 		)
 		(instances
-			(project "a5811dcc-4bd3-46a6-b247-f8f8ae0667ae"
-				(path "/a5811dcc-4bd3-46a6-b247-f8f8ae0667ae/ab156568-911d-4c92-962e-68ce032c2d20"
+			(project
+				"reference_generated"
+				(path
+					"/a2642601-3cef-41e9-a654-ec36e9238345/3955c852-9b8a-47b6-84be-b5b228043d33"
 					(reference "P1")
 					(unit 1)
 				)
@@ -682,8 +685,10 @@
 		)
 	)
 	(hierarchical_label
-		GND
-		(shape input)
+		"GND"
+		(shape
+			input
+		)
 		(at 50.800000000000004 88.9 270)
 		(effects
 			(font
@@ -691,11 +696,13 @@
 			)
 			(justify right)
 		)
-		(uuid a2206b98-94d8-4ea4-b5f7-f09ee9e29039)
+		(uuid def5e089-32a7-4bc5-8303-56504c4016f9)
 	)
 	(hierarchical_label
-		GND
-		(shape input)
+		"GND"
+		(shape
+			input
+		)
 		(at 58.42 88.9 270)
 		(effects
 			(font
@@ -703,11 +710,13 @@
 			)
 			(justify right)
 		)
-		(uuid 8efe12fc-ec02-4c90-a437-5d6e7cf2d43e)
+		(uuid 9b453285-ad2d-4685-983e-476c4be9c07b)
 	)
 	(hierarchical_label
-		GND
-		(shape input)
+		"GND"
+		(shape
+			input
+		)
 		(at 58.42 88.9 270)
 		(effects
 			(font
@@ -715,11 +724,13 @@
 			)
 			(justify right)
 		)
-		(uuid 7feffee1-6fd7-4f0d-bcb6-93e7aff8fa02)
+		(uuid 1c80270f-d3f6-4b40-837c-d5390c5d63f9)
 	)
 	(hierarchical_label
-		GND
-		(shape input)
+		"GND"
+		(shape
+			input
+		)
 		(at 58.42 88.9 270)
 		(effects
 			(font
@@ -727,11 +738,13 @@
 			)
 			(justify right)
 		)
-		(uuid a867d006-40f2-4eb3-a4fe-6edc28e9edce)
+		(uuid f1fd64d9-7590-43fa-8904-b9d8da4eda5d)
 	)
 	(hierarchical_label
-		GND
-		(shape input)
+		"GND"
+		(shape
+			input
+		)
 		(at 58.42 88.9 270)
 		(effects
 			(font
@@ -739,12 +752,8 @@
 			)
 			(justify right)
 		)
-		(uuid aec344e6-8d14-4b57-8abb-e39be928a3b1)
+		(uuid a7f1ce5e-7ee2-4525-ae35-b13a720e9bc5)
 	)
 	(sheet_instances
-		(path "/"
-			(page "1")
-		)
 	)
-	(embedded_fonts no)
 )

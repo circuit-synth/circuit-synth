@@ -1153,6 +1153,8 @@ class SchematicWriter:
         """
         Add symbol definitions to the lib_symbols section.
         """
+        logger.info(f"🔍 _add_symbol_definitions: Starting with {len(self.schematic.components)} components")
+        
         # Find or create lib_symbols block
         lib_symbols_block = None
         for item in schematic_expr:
@@ -1163,33 +1165,39 @@ class SchematicWriter:
                 and item[0].value() == "lib_symbols"
             ):
                 lib_symbols_block = item
+                logger.info(f"✅ Found existing lib_symbols block at position {schematic_expr.index(item)}")
                 break
 
         if not lib_symbols_block:
+            logger.warning("⚠️ No lib_symbols block found, creating new one")
             lib_symbols_block = [Symbol("lib_symbols")]
             # Insert after paper
             for i, item in enumerate(schematic_expr):
                 if isinstance(item, list) and item and item[0] == Symbol("paper"):
                     schematic_expr.insert(i + 1, lib_symbols_block)
+                    logger.info(f"✅ Inserted lib_symbols block after paper at position {i+1}")
                     break
 
         # Clear any existing symbols in the lib_symbols block
         # Keep only the first element which is the Symbol("lib_symbols")
         if lib_symbols_block and len(lib_symbols_block) > 1:
+            logger.info(f"🧹 Clearing {len(lib_symbols_block)-1} existing items from lib_symbols block")
             lib_symbols_block[:] = [lib_symbols_block[0]]
 
         # Gather all lib_ids
         symbol_ids = set()
         for comp in self.schematic.components:
             symbol_ids.add(comp.lib_id)
+            logger.debug(f"  Component {comp.reference}: lib_id = {comp.lib_id}")
 
+        logger.info(f"📚 Processing {len(symbol_ids)} unique lib_ids: {sorted(symbol_ids)}")
+        
         for sym_id in sorted(symbol_ids):
-            logger.debug(f"📚 SCHEMATIC_WRITER: Fetching symbol data for '{sym_id}'")
+            logger.info(f"📚 SCHEMATIC_WRITER: Fetching symbol data for '{sym_id}'")
             lib_data = SymbolLibCache.get_symbol_data(sym_id)
             if not lib_data:
-                logger.warning(
-                    "No symbol library data found for '%s'. Skipping definition.",
-                    sym_id,
+                logger.error(
+                    f"❌ No symbol library data found for '{sym_id}'. Skipping definition."
                 )
                 continue
             logger.debug(
@@ -1222,15 +1230,24 @@ class SchematicWriter:
 
             if isinstance(lib_data, list):
                 # It's already an S-expression block
+                logger.info(f"✅ Adding S-expression symbol definition for {sym_id}")
                 lib_symbols_block.append(lib_data)
             else:
                 # Build from JSON-based library data
+                logger.info(f"🔨 Building symbol definition from JSON for {sym_id}")
                 new_sym_def = self._create_symbol_definition(sym_id, lib_data)
                 if new_sym_def:
+                    logger.info(f"✅ Created symbol definition for {sym_id}, adding to lib_symbols")
                     if isinstance(new_sym_def[0], Symbol):
                         lib_symbols_block.append(new_sym_def)
                     else:
                         lib_symbols_block.extend(new_sym_def)
+                else:
+                    logger.error(f"❌ Failed to create symbol definition for {sym_id}")
+        
+        logger.info(f"📦 lib_symbols block now has {len(lib_symbols_block)} items (including header)")
+        if len(lib_symbols_block) <= 1:
+            logger.error("❌❌❌ lib_symbols block is EMPTY - no symbol definitions added!")
 
     def _create_symbol_definition(self, lib_id: str, lib_data: dict):
         """

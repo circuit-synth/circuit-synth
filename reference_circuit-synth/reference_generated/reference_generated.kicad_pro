@@ -4,9 +4,7 @@
       "defaults": {}
     }
   },
-  "boards": [
-    "reference_generated.kicad_pcb"
-  ],
+  "boards": [],
   "cvpcb": {},
   "erc": {},
   "libraries": {
@@ -59,11 +57,11 @@
   },
   "sheets": [
     [
-      "a5811dcc-4bd3-46a6-b247-f8f8ae0667ae",
+      "a2642601-3cef-41e9-a654-ec36e9238345",
       ""
     ],
     [
-      "06c4e9ac-280a-45e8-bc71-fda632350484",
+      "5130a793-522b-4519-a1f0-9cd6c4555d99",
       "child1"
     ]
   ],
