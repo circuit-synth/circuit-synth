@@ -50,9 +50,6 @@ uv pip install -e ".[dev]"
 
 # Sync dependencies
 uv sync
-
-# Register development agents (one-time setup)
-uv run register-agents
 ```
 
 ### Code Quality Checks (MUST RUN BEFORE COMMITS)
