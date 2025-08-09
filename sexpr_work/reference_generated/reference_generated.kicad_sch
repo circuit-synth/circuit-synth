@@ -4,19 +4,15 @@
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
-			(pin_numbers
-				hide
-			)
+			(pin_numbers hide)
 			(pin_names
-				(offset
-					0.254
-				)
+				(offset 0)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "R"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -25,7 +21,7 @@
 				)
 			)
 			(property "Value" "R"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -34,7 +30,7 @@
 				)
 			)
 			(property "Footprint" ""
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -43,7 +39,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -52,7 +48,7 @@
 				)
 			)
 			(property "Description" "Resistor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -61,7 +57,7 @@
 				)
 			)
 			(property "ki_keywords" "R res resistor"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -70,7 +66,7 @@
 				)
 			)
 			(property "ki_fp_filters" "R_*"
-				(at 0.0 0.0 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -92,21 +88,17 @@
 				)
 			)
 			(symbol "R_1_1"
-				(pin
-					passive
-					line
-					(at 0.0 3.81 270)
+				(pin passive line
+					(at 0 3.81 270)
 					(length 1.27)
-					(name
-						"~"
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number
-						"1"
+					(number "1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -114,21 +106,17 @@
 						)
 					)
 				)
-				(pin
-					passive
-					line
-					(at 0.0 -3.81 90)
+				(pin passive line
+					(at 0 -3.81 90)
 					(length 1.27)
-					(name
-						"~"
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number
-						"2"
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -141,14 +129,14 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 38.1 45.72 0.0)
+		(at 38.1 45.72 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid ff9a36e4-d1d3-4b23-952a-d85af582f547)
+		(uuid b9730fd9-dbe6-4c69-b111-31c0a1dee24e)
 		(property "Reference" "R1"
 			(at 38.1 40.72 0)
 			(effects
@@ -168,99 +156,16 @@
 			)
 		)
 		(instances
-			(project
-				""
-				(path
-					"/8bb09509-90e1-4d19-bcbe-444481f99078"
+			(project "reference_generated"
+				(path "/a6a926b1-30af-4e72-bc5f-ddaec37a510f"
 					(reference "R1")
 					(unit 1)
 				)
 			)
 		)
 	)
-	(hierarchical_label
-		"GND"
-		(shape
-			input
-		)
-		(at 38.1 49.53 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid defc875a-0c3d-4e32-a957-24a52e93ce5b)
-	)
-	(hierarchical_label
-		"GND"
-		(shape
-			input
-		)
-		(at 97.63 39.37 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid d375aaf1-e008-4820-bf3d-5bbd6269ce6c)
-	)
-	(sheet
-		(at 58.42 36.83)
-		(size 39.21 20.32)
-		(stroke
-			(width 0.12)
-			(type solid)
-		)
-		(fill
-			(color 0 0 0 0.0)
-		)
-		(uuid 37ee9299-7423-4550-a2f9-9b324025340a)
-		(property "Sheetname" "child1"
-			(at 58.42 35.559999999999995 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Sheetfile" "child1.kicad_sch"
-			(at 58.42 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-				(hide yes)
-			)
-		)
-		(pin
-			GND
-			passive
-			(at 96.36 39.37 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-			(uuid b085a0c1-f673-4c4a-a006-60b8a2662a47)
-		)
-		(instances
-			(project
-				"reference_generated"
-				(path
-					"/"
-					(page "1")
-				)
-			)
-		)
-	)
 	(sheet_instances
-		(path
-			"/"
+		(path "/"
 			(page "1")
 		)
 	)

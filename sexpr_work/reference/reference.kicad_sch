@@ -130,28 +130,6 @@
 			(embedded_fonts no)
 		)
 	)
-	(hierarchical_label "GND"
-		(shape input)
-		(at 58.42 69.85 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "c67e6ee8-f6d9-4aec-a6e5-cb1cbc80ab61")
-	)
-	(hierarchical_label "GND"
-		(shape input)
-		(at 87.63 132.08 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "fed242cb-d23d-46ba-a2fa-a4ecb570ed4f")
-	)
 	(symbol
 		(lib_id "Device:R")
 		(at 58.42 66.04 0)
@@ -218,58 +196,6 @@
 				(path "/fbddee53-7d8a-4d30-aeb0-71918b425bcf"
 					(reference "R1")
 					(unit 1)
-				)
-			)
-		)
-	)
-	(sheet
-		(at 60.96 125.73)
-		(size 26.67 19.05)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(fill
-			(color 0 0 0 0.0000)
-		)
-		(uuid "91406081-20e1-4669-95f5-fe7bd50534d9")
-		(property "Sheetname" "child1"
-			(at 60.96 125.0184 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Sheetfile" "child1.kicad_sch"
-			(at 60.96 145.3646 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-			)
-		)
-		(pin "GND" input
-			(at 87.63 132.08 0)
-			(uuid "911cfab4-96a0-425b-84db-280a522b1e94")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(instances
-			(project "reference"
-				(path "/fbddee53-7d8a-4d30-aeb0-71918b425bcf"
-					(page "2")
 				)
 			)
 		)
