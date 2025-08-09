@@ -50,13 +50,13 @@ class Circuit:
     
     @staticmethod
     def _from_json(json_data):
-        """Create a Circuit from JSON data (for Rust integration)."""
+        """Create a Circuit from JSON data."""
         circuit = Circuit(name=json_data.get('name', 'unnamed'))
         
         # Add components
         if 'components' in json_data:
             for comp_data in json_data['components']:
-                # Create simplified component for Rust
+                # Create component from JSON data
                 from .component import Component
                 comp = Component(
                     symbol=comp_data.get('symbol', 'Device:R'),
@@ -476,10 +476,8 @@ class Circuit:
             >>> circuit.generate_kicad_project("esp32s3_simple")
         """
         try:
-            # Import KiCad schematic generator (intelligently selects Rust or Python)
+            # Import KiCad schematic generator
             from ..kicad.sch_gen.main_generator import SchematicGenerator
-            # Note: Rust backend is automatically used for simple circuits,
-            # Python backend is used for hierarchical circuits
 
             # Finalize references before generation
             self.finalize_references()
