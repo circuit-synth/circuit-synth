@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <!-- Chip body -->
+  <rect x="14" y="14" width="20" height="20" fill="#2C2C2C" rx="1"/>
+  
+  <!-- Chip pins (left side) -->
+  <rect x="10" y="17" width="4" height="1.5" fill="#9E9E9E"/>
+  <rect x="10" y="20" width="4" height="1.5" fill="#9E9E9E"/>
+  <rect x="10" y="23" width="4" height="1.5" fill="#9E9E9E"/>
+  <rect x="10" y="26" width="4" height="1.5" fill="#9E9E9E"/>
+  <rect x="10" y="29" width="4" height="1.5" fill="#9E9E9E"/>
+  
+  <!-- Chip pins (right side) -->
+  <rect x="34" y="17" width="4" height="1.5" fill="#9E9E9E"/>
+  <rect x="34" y="20" width="4" height="1.5" fill="#9E9E9E"/>
+  <rect x="34" y="23" width="4" height="1.5" fill="#9E9E9E"/>
+  <rect x="34" y="26" width="4" height="1.5" fill="#9E9E9E"/>
+  <rect x="34" y="29" width="4" height="1.5" fill="#9E9E9E"/>
+  
+  <!-- Chip pins (top) -->
+  <rect x="17" y="10" width="1.5" height="4" fill="#9E9E9E"/>
+  <rect x="20" y="10" width="1.5" height="4" fill="#9E9E9E"/>
+  <rect x="23" y="10" width="1.5" height="4" fill="#9E9E9E"/>
+  <rect x="26" y="10" width="1.5" height="4" fill="#9E9E9E"/>
+  <rect x="29" y="10" width="1.5" height="4" fill="#9E9E9E"/>
+  
+  <!-- Chip pins (bottom) -->
+  <rect x="17" y="34" width="1.5" height="4" fill="#9E9E9E"/>
+  <rect x="20" y="34" width="1.5" height="4" fill="#9E9E9E"/>
+  <rect x="23" y="34" width="1.5" height="4" fill="#9E9E9E"/>
+  <rect x="26" y="34" width="1.5" height="4" fill="#9E9E9E"/>
+  <rect x="29" y="34" width="1.5" height="4" fill="#9E9E9E"/>
+  
+  <!-- Chip label -->
+  <rect x="16" y="16" width="16" height="16" fill="#1A1A1A" rx="0.5"/>
+  
+  <!-- Pin 1 indicator (small dot) -->
+  <circle cx="17" cy="17" r="0.8" fill="#FFD700"/>
+  
+  <!-- Text/branding area -->
+  <rect x="18" y="22" width="12" height="6" fill="#0D47A1" rx="0.5"/>
+  <rect x="19" y="23" width="10" height="4" fill="#1976D2" rx="0.3"/>
+</svg>

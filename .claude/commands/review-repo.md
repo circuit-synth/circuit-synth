@@ -18,10 +18,6 @@
 - `--generate-fixes=false` - Generate automated fix suggestions (default: false)
 - `--website-check=true` - Validate circuit-synth.com content accuracy (default: true)
 - `--feature-discovery=true` - Auto-discover features from codebase (default: true)
-- `--test-memory-bank=true` - Test memory-bank system for PCB design tracking (default: true)
-- `--test-plans=true` - Test circuit test plan generation features (default: true)
-- `--doc-accuracy=true` - Validate documentation accuracy against code (default: true)
-- `--find-undocumented=true` - Flag features in code but not in documentation (default: true)
 - `--depth=standard` - Analysis depth: `quick`, `standard`, `deep` (default: standard)
 
 ## What This Does
@@ -233,7 +229,6 @@ repo-review/
 ├── 14-testing-coverage-analysis.md          # Test quality and coverage
 ├── 15-documentation-analysis.md             # Documentation accuracy and quality
 ├── 16-dependency-analysis.md                # Package health and updates
-├── 17-memory-bank-analysis.md               # Memory bank system functionality
 ├── 18-website-validation-analysis.md        # circuit-synth.com accuracy
 ├── 19-undocumented-features-analysis.md     # Features in code but not documented
 ├── 20-test-plan-analysis.md                 # Test plan generation capabilities
@@ -382,43 +377,6 @@ echo "=== Testing Quality Assurance Systems ==="
 uv run python -m circuit_synth.quality_assurance.fmea_cli --help
 uv run python -m circuit_synth.debugging.debug_cli --help
 
-# Phase 6.1: Test Memory Bank System
-echo "=== Testing Memory Bank System ==="
-if [ -d "memory-bank" ]; then
-    echo "Memory bank directory exists"
-    ls -la memory-bank/
-    # Test memory bank operations
-    uv run python -c "
-    import os
-    from pathlib import Path
-    
-    # Test memory bank structure
-    expected_dirs = ['progress', 'decisions', 'patterns', 'issues', 'knowledge']
-    memory_bank = Path('memory-bank')
-    
-    if memory_bank.exists():
-        for dir_name in expected_dirs:
-            dir_path = memory_bank / dir_name
-            print(f'{dir_name}: {"OK" if dir_path.exists() else "MISSING"}')
-    else:
-        print('Memory bank directory not found')
-    "
-else
-    echo "Memory bank directory not found"
-fi
-
-# Phase 6.2: Test Test Plan Features
-echo "=== Testing Test Plan Generation ==="
-# Look for test plan related modules
-find src/ -name "*test*plan*" -o -name "*plan*test*" 2>/dev/null | head -10 || echo "No test plan modules found"
-# Check for test-plan-creator agent
-if [ -f ".claude/agents/test-plan-creator.md" ]; then
-    echo "test-plan-creator agent found"
-    grep -A 5 -B 5 "test.plan" .claude/agents/test-plan-creator.md || echo "Agent content check"
-else
-    echo "test-plan-creator agent not found"
-fi
-
 for module in */; do
 done
 cd ..
@@ -545,6 +503,14 @@ for example in code_examples[:5]:  # Check first 5
 print(f'Syntactically valid examples: {valid_examples}/{min(5, len(code_examples))}')
 " > repo-review/findings/doc-accuracy-checks/syntax-validation.txt
 
+# Check for broken example references after cleanup
+echo "=== Documentation Alignment Check ==="
+grep -r "examples/" README.md docs/ .claude/ --include="*.md" --include="*.rst" || echo "No examples/ references found"
+find . -name "*.md" -o -name "*.rst" | xargs grep -l "example_kicad_project.py" | while read file; do
+  echo "Checking: $file"
+  grep -n "example_kicad_project.py" "$file"
+done
+
 # Phase 12: Dependency Analysis
 echo "=== Dependency Analysis ==="
 pip list --outdated > repo-review/findings/outdated-packages.txt
@@ -652,34 +618,6 @@ When `--test-agents=true`:
 - Validates agent knowledge base
 - Checks MCP registration
 
-### Memory Bank Testing
-When `--test-memory-bank=true`:
-- Verifies memory-bank directory structure
-- Tests read/write operations for design tracking
-- Validates cross-session knowledge preservation
-- Checks technical decision recording functionality
-
-### Test Plan Feature Testing
-When `--test-plans=true`:
-- Identifies test plan generation modules
-- Tests test-plan-creator agent functionality
-- Validates circuit test case generation
-- Checks quality assurance framework integration
-
-### Undocumented Feature Discovery
-When `--find-undocumented=true`:
-- Scans codebase for classes, functions, and modules
-- Compares against all documentation sources
-- Identifies features missing from docs
-- Flags potential documentation gaps
-
-### Documentation Accuracy Validation
-When `--doc-accuracy=true`:
-- Extracts code examples from documentation
-- Validates syntax and imports against current codebase
-- Checks API examples for accuracy
-- Identifies outdated documentation sections
-
 - Checks compilation status
 - Tests Python bindings
 - Measures performance impact
@@ -710,12 +648,6 @@ When `--doc-accuracy=true`:
 
 # Documentation and website validation
 /dev-review-repo --focus=docs --website-check=true
-
-# Memory bank and test plan focused review
-/dev-review-repo --test-memory-bank=true --test-plans=true
-
-# Find undocumented features and validate documentation
-/dev-review-repo --find-undocumented=true --doc-accuracy=true
 
 ```
 
