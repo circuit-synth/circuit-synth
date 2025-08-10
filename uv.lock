@@ -2,12 +2,6 @@ version = 1
 revision = 2
 requires-python = ">=3.12"
 
-[manifest]
-members = [
-    "circuit-synth",
-    "example-project",
-]
-
 [[package]]
 name = "aiofiles"
 version = "24.1.0"
@@ -288,7 +282,7 @@ wheels = [
 
 [[package]]
 name = "circuit-synth"
-version = "0.8.15"
+version = "0.8.17"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
@@ -622,17 +616,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/ae/ed/aefcc8cd0ba62a056
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8f/d7/9322c609343d929e75e7e5e6255e614fcc67572cfd083959cdef3b7aad79/docutils-0.21.2-py3-none-any.whl", hash = "sha256:dafca5b9e384f0e419294eb4d2ff9fa826435bf15f15b7bd45723e8ad76811b2", size = 587408, upload-time = "2024-04-23T18:57:14.835Z" },
 ]
-
-[[package]]
-name = "example-project"
-version = "0.1.0"
-source = { virtual = "example_project" }
-dependencies = [
-    { name = "circuit-synth" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "circuit-synth", editable = "." }]
 
 [[package]]
 name = "filelock"
