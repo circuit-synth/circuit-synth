@@ -178,6 +178,33 @@ This command performs a comprehensive analysis of the current branch against the
 - **Command files** in `.claude/commands/` - Check if new commands, workflows, or development processes were added
 - **🌐 circuit-synth.com website** - Verify if public website needs updates to reflect changes
 
+#### Documentation Alignment Validation
+
+**CRITICAL: Check for broken references after code changes:**
+
+```bash
+# Check for broken file references in documentation
+grep -r "examples/" README.md docs/ .claude/ --include="*.md" --include="*.rst"
+
+# Validate example references point to actual files
+find . -name "*.md" -o -name "*.rst" | xargs grep -l "example_kicad_project.py" | while read file; do
+  echo "Checking: $file"
+  grep -n "example_kicad_project.py" "$file"
+done
+
+# Check for missing directories referenced in docs
+grep -r "examples/" README.md docs/ | grep -E "(directory|folder)" | while read line; do
+  echo "Directory reference: $line"
+done
+
+# Validate command references in documentation
+grep -r "uv run python examples/" . --include="*.md" --include="*.rst"
+```
+
+**Example Reference Update Pattern:**
+- **OLD**: `uv run python examples/example_kicad_project.py`
+- **NEW**: `uv run python example_project/circuit-synth/main.py`
+
 #### Documentation Quality Review
 
 **MANDATORY: Review ALL documentation (existing and new) for quality issues:**
@@ -570,8 +597,8 @@ python -m pip list --outdated
 
 ### 3. Circuit-Synth Specific Validation
 ```bash
-# Core functionality validation
-uv run python examples/example_kicad_project.py --validate
+# Core functionality validation  
+uv run python example_project/circuit-synth/main.py --validate
 uv run python -c "from circuit_synth import Circuit, Component, Net; print('Core imports OK')"
 
 # KiCad integration testing
@@ -590,8 +617,8 @@ find memory-bank/ -name "*.md" -exec wc -l {} \; | sort -nr
 ```bash
 # AUTOMATIC FORMATTING (runs by default)
 # Format Python code
-black src/ tests/ examples/
-isort src/ tests/ examples/
+black src/ tests/ example_project/
+isort src/ tests/ example_project/
 
 
 # Format configuration files
@@ -619,14 +646,14 @@ markdown-link-check README.md
 ```bash
 # File size analysis
 find . -name "*.py" -exec wc -c {} \; | sort -nr | head -20
-du -sh memory-bank/ examples/ src/
+du -sh memory-bank/ example_project/ src/
 
 # Performance profiling setup
-python -m cProfile -o profile.stats examples/example_kicad_project.py
+python -m cProfile -o profile.stats example_project/circuit-synth/main.py
 python -c "import pstats; pstats.Stats('profile.stats').sort_stats('tottime').print_stats(20)"
 
 # Memory usage analysis
-memory_profiler examples/example_kicad_project.py
+memory_profiler example_project/circuit-synth/main.py
 ```
 
 ### 7. Dependency and Security Analysis
@@ -647,7 +674,7 @@ pip-licenses --format=table
 ### 8. Circuit-Synth Domain Validation
 ```bash
 # Component validation
-python -m circuit_synth.tools.validate_components examples/
+python -m circuit_synth.tools.validate_components example_project/
 
 # KiCad library validation
 python -m circuit_synth.kicad.validate_libraries

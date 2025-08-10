@@ -303,7 +303,7 @@ with open('repo-review/findings/discovered-features.json', 'w') as f:
 # Phase 2: Test Core Functionality
 echo "=== Testing Core Circuit-Synth Features ==="
 uv run python -c "from circuit_synth import Circuit, Component, Net; print('Core imports: OK')"
-uv run python examples/example_kicad_project.py --validate
+uv run python example_project/circuit-synth/main.py --validate
 
 # Phase 3: Test KiCad Integration
 echo "=== Testing KiCad Integration ==="
@@ -347,12 +347,20 @@ bandit -r src/ -f json > repo-review/findings/bandit-report.json
 
 # Phase 10: Performance Analysis
 echo "=== Performance Analysis ==="
-python -m cProfile -o repo-review/findings/profile.stats examples/example_kicad_project.py
+python -m cProfile -o repo-review/findings/profile.stats example_project/circuit-synth/main.py
 
-# Phase 11: Documentation Validation
+# Phase 11: Documentation Validation  
 echo "=== Documentation Validation ==="
 sphinx-build -b html docs/ docs/_build/html
 markdown-link-check README.md Contributors.md
+
+# Check for broken example references after cleanup
+echo "=== Documentation Alignment Check ==="
+grep -r "examples/" README.md docs/ .claude/ --include="*.md" --include="*.rst" || echo "No examples/ references found"
+find . -name "*.md" -o -name "*.rst" | xargs grep -l "example_kicad_project.py" | while read file; do
+  echo "Checking: $file"
+  grep -n "example_kicad_project.py" "$file"
+done
 
 # Phase 12: Dependency Analysis
 echo "=== Dependency Analysis ==="
@@ -501,7 +509,7 @@ Create `.repo-review-config.yml` for custom settings:
 feature_discovery:
   include_paths:
     - src/
-    - examples/
+    - example_project/
     - tools/
   exclude_patterns:
     - __pycache__

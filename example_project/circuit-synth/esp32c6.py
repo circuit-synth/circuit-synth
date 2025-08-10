@@ -5,7 +5,6 @@ Professional ESP32-C6 microcontroller with USB signal integrity and support circ
 """
 
 from circuit_synth import *
-from debug_header import debug_header
 from led_blinker import led_blinker
 
 @circuit(name="ESP32_C6_MCU")
@@ -82,7 +81,21 @@ def esp32c6(vcc_3v3, gnd, usb_dp, usb_dm):
     cap_esp[2] += gnd
 
 
-    debug_header_circuit = debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0)
-    led_blinker_circuit = led_blinker(vcc_3v3, gnd, led_control)
+    # Debug header inline (6-pin programming header)
+    debug_conn = Component(
+        symbol="Connector_Generic:Conn_02x03_Odd_Even",
+        ref="J",
+        footprint="Connector_IDC:IDC-Header_2x03_P2.54mm_Vertical"
+    )
+    
+    # Standard ESP32 debug pinout
+    debug_conn[1] += debug_en     # EN/RST
+    debug_conn[2] += vcc_3v3      # 3.3V
+    debug_conn[3] += debug_tx     # TX
+    debug_conn[4] += gnd          # GND
+    debug_conn[5] += debug_rx     # RX
+    debug_conn[6] += debug_io0    # IO0/BOOT
+    
+    led_blinker_circuit = led_blinker(led_control, gnd)
 
 
