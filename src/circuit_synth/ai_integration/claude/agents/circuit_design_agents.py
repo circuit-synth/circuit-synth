@@ -338,6 +338,7 @@ If execution fails, MUST fix syntax errors before delivering code to user.
 Remember: Your reputation depends on generating circuits that work reliably in production. Never skip research, never violate critical design rules, and always verify manufacturing availability.""",
         allowed_tools=["*"],
         expertise_area="Production-Ready Circuit Code Generation",
+        model="haiku",
     )
 
     # STM32 Specialist Agent

@@ -48,29 +48,91 @@ def create_claude_directory_from_templates(
     )
 
     try:
-        # First register all agents (this creates agents and mcp_settings.json)
+        # Find the template directory
+        circuit_synth_dir = Path(
+            __file__
+        ).parent.parent.parent  # Get to circuit_synth directory
+        template_claude_dir = (
+            circuit_synth_dir / "data" / "templates" / "example_project" / ".claude"
+        )
+
+        if template_claude_dir.exists():
+            console.print(
+                f"📋 Copying templates from {template_claude_dir}", style="blue"
+            )
+
+            # Copy the entire template .claude directory structure
+            if dest_claude_dir.exists():
+                shutil.rmtree(dest_claude_dir)
+            shutil.copytree(template_claude_dir, dest_claude_dir)
+
+            # Handle developer mode filtering
+            commands_dir = dest_claude_dir / "commands"
+            agents_dir = dest_claude_dir / "agents"
+
+            if not developer_mode:
+                # Remove dev commands (not needed for end users)
+                dev_commands_to_remove = [
+                    "development/dev-release-pypi.md",
+                    "development/dev-review-branch.md",
+                    "development/dev-review-repo.md",
+                    "development/dev-run-tests.md",
+                    "development/dev-update-and-commit.md",
+                ]
+                # Remove setup commands directory entirely for end users
+                setup_dir = commands_dir / "setup"
+                if setup_dir.exists():
+                    shutil.rmtree(setup_dir)
+
+                # Remove development commands directory for end users
+                dev_commands_dir = commands_dir / "development"
+                if dev_commands_dir.exists():
+                    shutil.rmtree(dev_commands_dir)
+
+                for cmd_file in dev_commands_to_remove:
+                    cmd_path = commands_dir / cmd_file
+                    if cmd_path.exists():
+                        cmd_path.unlink()
+
+                # Remove development agents (not needed for end users)
+                dev_agents_to_remove = [
+                    "development/contributor.md",
+                    "development/first_setup_agent.md",
+                    "development/circuit_generation_agent.md",
+                ]
+                for agent_file in dev_agents_to_remove:
+                    agent_path = agents_dir / agent_file
+                    if agent_path.exists():
+                        agent_path.unlink()
+
+                # Remove development agents directory if empty
+                dev_agents_dir = agents_dir / "development"
+                if dev_agents_dir.exists() and not any(dev_agents_dir.iterdir()):
+                    dev_agents_dir.rmdir()
+
+            console.print("✅ Copied complete template structure", style="green")
+
+        else:
+            console.print(
+                "⚠️  Template directory not found, using basic setup", style="yellow"
+            )
+            # Fallback: just register agents
+            register_circuit_agents()
+
+        # Also register agents to update with any newer agent definitions
         register_circuit_agents()
 
-        # Create commands directory structure with basic commands
-        commands_dir = dest_claude_dir / "commands"
-        commands_dir.mkdir(exist_ok=True)
+        # Remove mcp_settings.json as it's not needed for user projects
+        mcp_settings_file = dest_claude_dir / "mcp_settings.json"
+        if mcp_settings_file.exists():
+            mcp_settings_file.unlink()
 
-        # Create circuit-design commands
-        circuit_design_dir = commands_dir / "circuit-design"
-        circuit_design_dir.mkdir(exist_ok=True)
+        # Count what was created
+        agents_count = len(list((dest_claude_dir / "agents").rglob("*.md")))
+        commands_count = len(list((dest_claude_dir / "commands").rglob("*.md")))
 
-        # Create manufacturing commands
-        manufacturing_dir = commands_dir / "manufacturing"
-        manufacturing_dir.mkdir(exist_ok=True)
-
-        if developer_mode:
-            # Create development commands
-            development_dir = commands_dir / "development"
-            development_dir.mkdir(exist_ok=True)
-
-            # Create setup commands
-            setup_dir = commands_dir / "setup"
-            setup_dir.mkdir(exist_ok=True)
+        console.print(f"📁 Agents available: {agents_count}", style="green")
+        console.print(f"🔧 Commands available: {commands_count}", style="green")
 
         console.print(
             "✅ Created Claude directory structure with templates", style="green"
