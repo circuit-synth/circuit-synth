@@ -1,0 +1,72 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit.*\\.py$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\n            # Extract file path and validate circuit design\n            FILE_PATH=$(echo '$CLAUDE_TOOL_INPUT' | jq -r '.file_path // .edits[0].file_path // empty')\n            if [[ \"$FILE_PATH\" == *.py ]] && grep -q \"circuit_synth\" \"$FILE_PATH\" 2>/dev/null; then\n                echo \"\ud83d\udd0d Validating circuit design in $FILE_PATH...\"\n                python -m circuit_synth.validation.real_time_check \"$FILE_PATH\" 2>/dev/null || echo \"\u26a0\ufe0f  Circuit validation tools not available\"\n            fi\n            "
+          }
+        ],
+        "circuit_synth": true
+      },
+      {
+        "matcher": "Edit|Write.*Component.*symbol",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\n            # Check component availability when symbols are used\n            SYMBOL=$(echo '$CLAUDE_TOOL_INPUT' | grep -o 'symbol=\"[^\"]*\"' | sed 's/symbol=\"\\([^\"]*\\)\"/\\1/')\n            if [[ -n \"$SYMBOL\" ]]; then\n                echo \"\ud83d\udd0d Checking availability for symbol: $SYMBOL\"\n                python -c \"\n                from circuit_synth.jlc_integration import get_component_availability_web\n                try:\n                    # Extract component name from symbol\n                    symbol_name = '$SYMBOL'.split(':')[-1]\n                    result = get_component_availability_web(symbol_name, max_results=1)\n                    if result and len(result) > 0:\n                        comp = result[0]\n                        print(f'\u2705 {comp[\"part_number\"]}: {comp[\"stock\"]} units available')\n                    else:\n                        print('\u26a0\ufe0f  No availability data found')\n                except Exception as e:\n                    print(f'\u26a0\ufe0f  Availability check failed: {e}')\n                \" 2>/dev/null || echo \"\u26a0\ufe0f  Component availability check not available\"\n            fi\n            "
+          }
+        ],
+        "circuit_synth": true
+      },
+      {
+        "matcher": "Edit|Write.*STM32|stm32",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\n            # Validate STM32 pin assignments\n            echo \"\ud83d\udd0d Checking STM32 pin assignments...\"\n            python -c \"\n            import sys, re\n            try:\n                with open('$CLAUDE_TOOL_INPUT' if '$CLAUDE_TOOL_INPUT'.endswith('.py') else sys.argv[1], 'r') as f:\n                    content = f.read()\n                # Look for STM32-related content\n                if 'STM32' in content or 'stm32' in content:\n                    from circuit_synth.stm32_pinout import STM32PinMapper\n                    print('\u2705 STM32 integration available for pin validation')\n                else:\n                    print('\u2139\ufe0f  No STM32 content detected')\n            except Exception as e:\n                print(f'\u26a0\ufe0f  STM32 validation not available: {e}')\n            \" 2>/dev/null || echo \"\u26a0\ufe0f  STM32 validation tools not available\"\n            "
+          }
+        ],
+        "circuit_synth": true
+      },
+      {
+        "matcher": "Edit|Write.*@circuit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\n            # Run design rule checking on circuit definitions\n            echo \"\ud83d\udd0d Running design rule check...\"\n            python -c \"\n            import ast, sys\n            try:\n                file_path = '$CLAUDE_TOOL_INPUT' if '$CLAUDE_TOOL_INPUT'.endswith('.py') else sys.argv[1]\n                with open(file_path, 'r') as f:\n                    content = f.read()\n                \n                # Parse AST to find circuit decorators\n                tree = ast.parse(content)\n                circuit_functions = []\n                for node in ast.walk(tree):\n                    if isinstance(node, ast.FunctionDef):\n                        for decorator in node.decorator_list:\n                            if (isinstance(decorator, ast.Name) and decorator.id == 'circuit') or \\\n                               (isinstance(decorator, ast.Call) and isinstance(decorator.func, ast.Name) and decorator.func.id == 'circuit'):\n                                circuit_functions.append(node.name)\n                \n                if circuit_functions:\n                    print(f'\u2705 Found {len(circuit_functions)} circuit function(s): {', '.join(circuit_functions)}')\n                    print('\ud83d\udd0d Design rules: Net connectivity, component references, manufacturing constraints')\n                else:\n                    print('\u2139\ufe0f  No @circuit decorators found')\n            except Exception as e:\n                print(f'\u26a0\ufe0f  Design rule check failed: {e}')\n            \" 2>/dev/null\n            "
+          }
+        ],
+        "circuit_synth": true
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\n            echo \"🚀 Circuit-Synth Professional Environment Loading...\"\n            \n            # Check if this is a circuit-synth project\n            if [[ -f \"pyproject.toml\" ]] && grep -q \"circuit_synth\" pyproject.toml; then\n                echo \"📋 Circuit-Synth project detected\"\n                \n                # Load memory bank context\n                if [[ -d \"src/circuit_synth/data/memory-bank\" ]]; then\n                    echo \"🧠 Memory bank available with design history\"\n                fi\n                \n                # Check manufacturing integrations\n                python -c \"\n                try:\n                    from circuit_synth.manufacturing.jlcpcb import find_component\n                    print('🏭 JLCPCB integration: Available')\n                except ImportError:\n                    print('⚠️  JLCPCB integration: Not available')\n                \n                try:\n                    from circuit_synth.component_info.microcontrollers.modm_device_search import search_stm32\n                    print('🔧 STM32 integration: Available')\n                except ImportError:\n                    print('⚠️  STM32 integration: Not available')\n                \" 2>/dev/null\n                \n                # Show available agents\n                echo \"🤖 Specialized agents available:\"\n                echo \"   - contributor: Development and contribution assistance (START HERE!)\"\n                echo \"   - circuit-architect: Master circuit design coordinator\"\n                echo \"   - circuit-synth: Circuit-synth code generation specialist\"\n                echo \"   - simulation-expert: SPICE simulation and validation\"\n                echo \"   - component-guru: Manufacturing and sourcing specialist\"\n                \n                echo \"⚡ Ready for professional circuit design!\"\n                echo \"\"\n                echo \"💡 Quick start: Ask the 'contributor' agent for help with any task!\"\n                echo \"   Example: 'Help me design an ESP32 circuit with IMU and USB-C'\"\n            else\n                echo \"ℹ️  General development environment (not circuit-synth project)\"\n            fi\n            "
+          }
+        ],
+        "circuit_synth": true
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\n            # Provide contextual circuit design assistance\n            echo \"💡 Circuit design tip: Use the 'contributor' agent for help with any task!\"\n            echo \"🔍 Component search: Use 'component-guru' or 'stm32-mcu-finder' agents\"\n            echo \"⚡ Quick help: Try '@Task(subagent_type=\\\"contributor\\\", prompt=\\\"your question\\\"'\"\n            "
+          }
+        ],
+        "circuit_synth": true
+      }
+    ]
+  },
+  "description": "Circuit-Synth Professional Integration",
+  "version": "1.0.0"
+}

@@ -96,10 +96,9 @@ from circuit_synth.kicad.kicad_symbol_cache import (
 from circuit_synth.kicad.schematic.component_manager import ComponentManager
 from circuit_synth.kicad.schematic.placement import PlacementEngine, PlacementStrategy
 
-from .collision_manager import SHEET_MARGIN
-
 # Import existing dependencies
 from ...core.circuit import Circuit
+from .collision_manager import SHEET_MARGIN
 from .integrated_reference_manager import IntegratedReferenceManager
 
 # from .kicad_formatter import format_kicad_schematic  # Removed - using integrated formatter
