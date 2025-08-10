@@ -55,12 +55,14 @@ class CircuitSubAgent:
         system_prompt: str,
         allowed_tools: List[str],
         expertise_area: str,
+        model: Optional[str] = None,
     ):
         self.name = name
         self.description = description
         self.system_prompt = system_prompt
         self.allowed_tools = allowed_tools
         self.expertise_area = expertise_area
+        self.model = model
 
     def to_markdown(self) -> str:
         """Convert agent to Claude Code markdown format"""
@@ -69,6 +71,10 @@ class CircuitSubAgent:
             "description": self.description,
             "tools": self.allowed_tools,
         }
+        
+        # Add model if specified
+        if self.model:
+            frontmatter["model"] = self.model
 
         yaml_header = "---\n"
         for key, value in frontmatter.items():
@@ -128,6 +134,7 @@ def get_circuit_agents() -> Dict[str, CircuitSubAgent]:
 Use your architectural expertise to coordinate complex designs and delegate specialized tasks to other agents when appropriate.""",
         allowed_tools=["*"],
         expertise_area="Circuit Architecture & System Coordination",
+        model="haiku",
     )
 
     # Component Guru - Advanced manufacturing optimization

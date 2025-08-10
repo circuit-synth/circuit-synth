@@ -16,7 +16,7 @@ def get_enhanced_circuit_agents() -> Dict[str, CircuitSubAgent]:
 
     agents = {}
 
-    # Enhanced Circuit-Synth Specialist with mandatory research
+    # Enhanced Circuit-Synth Specialist with mandatory research - Keep on Sonnet for code quality
     agents["circuit-generation/circuit-generation-agent"] = CircuitSubAgent(
         name="circuit-generation-agent",
         description="Specialized agent for generating complete circuit-synth Python code",
@@ -220,7 +220,14 @@ USB_DM = Net('USB_DM')
 
 ## OUTPUT FORMAT REQUIREMENTS
 
-### 1. Complete Working Code
+### 1. Hierarchical Project Structure (PREFERRED)
+For complex circuits, generate multiple files organized as subcircuits:
+- Main circuit file (nets and subcircuit connections only)
+- Separate files for each major functional block
+- Follow cs-new-project structure pattern (usb.py, power_supply.py, mcu.py, etc.)
+- Use proper import structure between files
+
+### 2. Complete Working Code
 Generate complete, executable circuit-synth Python code that:
 - Imports all required modules
 - Uses @circuit decorator
@@ -259,6 +266,36 @@ Include comprehensive manufacturing notes:
 
 ## ERROR HANDLING AND VALIDATION
 
+### CRITICAL: Circuit-Synth Syntax Validation
+
+**NEVER use these INVALID patterns:**
+```python
+# ❌ WRONG - These will cause AttributeError
+mcu.pins[11].connect_to(net)          # No .pins attribute
+component.pin[1] = net                # No .pin attribute  
+component.connect(pin, net)           # No .connect method
+component.pin["VDD"].connect_to(net)  # No .pin attribute
+
+# ❌ WRONG - Invalid net assignment
+net += component["VDD"]               # Backwards assignment
+net = component[1]                    # Assignment instead of connection
+```
+
+**ALWAYS use these CORRECT patterns:**
+```python
+# ✅ CORRECT - Pin connections with +=
+mcu["VDD"] += VCC_3V3                 # Named pins
+mcu[11] += VCC_3V3                    # Numbered pins
+resistor[1] += VCC_3V3                # Passive components
+resistor[2] += gnd                    # Pin-to-net connections
+
+# ✅ CORRECT - Net creation and naming
+VCC_3V3 = Net('VCC_3V3')              # Descriptive net names
+gnd = Net('GND')                      # Standard ground net
+```
+
+**MANDATORY: Validate every generated line against these patterns before output**
+
 ### Pre-generation Validation
 ```python
 def validate_design_before_generation():
@@ -269,15 +306,26 @@ def validate_design_before_generation():
     pass
 ```
 
-### Post-generation Testing
+### Post-generation Testing - MANDATORY EXECUTION TEST
 ```python
 def test_generated_circuit():
-    # Syntax validation of Python code
-    # Component reference uniqueness check
-    # Net connectivity verification
-    # Design rule compliance test
+    # CRITICAL: Must execute `uv run generated_circuit.py` successfully
+    # - Syntax validation of Python code
+    # - No .pins, .pin, .connect_to patterns  
+    # - All connections use component[pin] += net syntax
+    # - Component reference uniqueness check
+    # - Net connectivity verification
+    # - Design rule compliance test
+    # - MUST complete without AttributeError or syntax errors
     pass
 ```
+
+**WORKFLOW REQUIREMENT:**
+After code generation, MUST test with:
+```bash
+uv run generated_circuit_file.py
+```
+If execution fails, MUST fix syntax errors before delivering code to user.
 
 ## SUCCESS METRICS
 - 100% compliance with critical design rules
@@ -529,6 +577,7 @@ def create_stm32_circuit(mcu_part="STM32F407VET6", package="LQFP100"):
 Always prioritize manufacturability, cost-effectiveness, and design robustness. Your STM32 selections should be production-ready and well-documented.""",
         allowed_tools=["*"],
         expertise_area="STM32 Selection & Integration",
+        model="haiku",
     )
 
     # Component Sourcing Specialist
@@ -836,6 +885,7 @@ supply_chain_analysis = {
 Remember: Your goal is ensuring the circuit can actually be manufactured at scale with consistent quality and reasonable cost. Every component recommendation should be production-ready with verified availability.""",
         allowed_tools=["*"],
         expertise_area="Component Sourcing & Manufacturing",
+        model="haiku",
     )
 
     # Design for Manufacturing (DFM) Agent

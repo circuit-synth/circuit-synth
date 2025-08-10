@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuit-Synth - Professional Hierarchical Circuit Design</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3">
+    <link rel="alternate icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/favicon.svg?v=3">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="https://www.circuit-synth.com"><h1>circuit-synth</h1></a>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#get-started">Get Started</a></li>
+                    <li><a href="#community">Community</a></li>
+                    <li><a href="https://circuit-synth.readthedocs.io">Docs</a></li>
+                    <li><a href="https://github.com/circuit-synth/circuit-synth">GitHub</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Better Boards, Faster</h1>
+                <p class="hero-subtitle">Python-defined circuits with Claude Code as your intelligent design partner. Automatic error checking, design history tracking, and AI-powered review catch mistakes early and eliminate tedious tasks. Complete transparency and control - enhance your workflow without lock-in.</p>
+                <div class="hero-badges">
+                    <img src="https://readthedocs.org/projects/circuit-synth/badge/?version=latest" alt="Documentation">
+                    <img src="https://badge.fury.io/py/circuit-synth.svg" alt="PyPI version">
+                    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+                </div>
+            </div>
+        </section>
+
+        <section id="examples" class="section">
+            <div class="container">
+                <div class="example-content">
+                    <div class="code-block">
+                        <pre><code>from circuit_synth import *
+
+# Simple 3.3V voltage regulator
+@circuit(name="voltage_regulator")
+def voltage_regulator():
+    """3.3V voltage regulator with input/output caps"""
+    
+    # Create power nets
+    VIN = Net('VIN')
+    VOUT = Net('VOUT')
+    GND = Net('GND')
+    
+    # Voltage regulator
+    reg = Component(
+        symbol="Regulator_Linear:AMS1117-3.3",
+        ref="U",
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+    )
+    
+    # Input and output capacitors
+    c_in = Component(symbol="Device:C", ref="C", value="10uF")
+    c_out = Component(symbol="Device:C", ref="C", value="22uF")
+    
+    # Connect the circuit
+    reg["VIN"] += VIN
+    reg["VOUT"] += VOUT
+    reg["GND"] += GND
+    
+    c_in[1] += VIN
+    c_in[2] += GND
+    c_out[1] += VOUT
+    c_out[2] += GND
+
+# Generate KiCad project
+circuit = voltage_regulator()
+circuit.generate_kicad_project("voltage_regulator")</code></pre>
+                    </div>
+                    <div class="example-images">
+                        <div class="image-container">
+                            <img src="regulator_sch.png" alt="Generated KiCad Schematic" class="example-image">
+                            <p class="image-caption">Generated KiCad Schematic</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="regulator_pcb.png" alt="Generated PCB Layout" class="example-image">
+                            <p class="image-caption">Generated PCB Layout</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="section">
+            <div class="container">
+                <h2>Professional Circuit Design Features</h2>
+                <p class="section-subtitle">Built for real engineering teams who need professional, production-ready circuit design tools</p>
+                <div class="advanced-features-grid">
+                    <div class="advanced-feature">
+                        <div class="feature-icon">🏗️</div>
+                        <h3>Professional Workflow</h3>
+                        <p>Work in traditional KiCad or Python - your choice. Make changes in either environment, then sync when ready. One-to-one mapping: every Python component and connection becomes exactly one KiCad component and connection. You control when updates happen, KiCad remains the source of truth, and nothing is hidden or altered unexpectedly.</p>
+                        <div class="feature-example">
+                            <code>KiCad ↔ Python ↔ Transparent 1:1 mapping</code>
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-feature">
+                        <div class="feature-icon">↔️</div>
+                        <h3>Works With Existing Projects</h3>
+                        <p>Import your existing KiCad projects and enhance them with Python automation. No need to start from scratch - add new functionality to designs you've already invested time in.</p>
+                        <div class="feature-example">
+                            <code>Existing Design + Python Enhancement = Better Board</code>
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-feature">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI-Enhanced Workflow</h3>
+                        <p>A true AI assistant for every phase of professional EE workflow. Claude Code + Circuit-synth can generate complete circuits independently, assist with design and troubleshooting, automatically track progress and decisions, manage BOMs, and even help with FMEA analysis. From initial concept to production-ready design.</p>
+                        <div class="feature-example">
+                            <code>"Design an ESP32 IoT sensor" → Complete manufacturable design</code>
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-feature">
+                        <div class="feature-icon">🏭</div>
+                        <h3>Manufacturing Integration</h3>
+                        <p>Real-time JLCPCB component availability and pricing. Components are pre-verified for automated assembly, eliminating manufacturing surprises.</p>
+                        <div class="feature-example">
+                            <code>📊 Stock: 83,737 units | Price: $2.50@100pcs</code>
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-feature">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Automated SPICE Simulation</h3>
+                        <p>One-click simulation setup with automatic netlist generation. Get operating points, AC analysis, and transient response without manual SPICE file creation.</p>
+                        <div class="feature-example">
+                            <code>sim = circuit.simulator()<br>result = sim.operating_point()</code>
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-feature">
+                        <div class="feature-icon">🔧</div>
+                        <h3>Production Ready</h3>
+                        <p>Generates clean, human-readable Python files and professional KiCad projects. Not machine-generated gibberish - code you can understand, modify, and maintain.</p>
+                        <div class="feature-example">
+                            <code>Professional KiCad + Readable Python</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="claude-code-contributors" class="section">
+            <div class="container">
+                <h2>🤖 Built for Intelligent Automation</h2>
+                <p class="section-subtitle">Circuit-synth is built for intelligent automation. We chose Claude Code as our AI engine because it delivers the most advanced agentic coding experience available today</p>
+                
+                <div class="claude-code-grid">
+                    <div class="claude-code-feature">
+                        <div class="claude-code-content">
+                            <h3>AI-First Development</h3>
+                            <p>We've optimized the entire codebase for Claude Code workflows. CLAUDE.md provides comprehensive instructions, specialized agents handle complex tasks, and our todo system tracks progress automatically.</p>
+                            <ul class="claude-features">
+                                <li>✅ <strong>Comprehensive CLAUDE.md:</strong> Complete development guide with commands, patterns, and workflows</li>
+                                <li>✅ <strong>Specialized Agents:</strong> circuit-architect, power-expert, component-guru for domain expertise</li>
+                                <li>✅ <strong>Memory Bank System:</strong> Track complete board design history, debug sessions, failures, and design decisions in one persistent knowledge base that grows with every project</li>
+                                <li>✅ <strong>Contributor Focused:</strong> Claude Code + GitHub MCP = up and running in 5 minutes. We want to make it easy and fun to contribute to Circuit-Synth!</li>
+                            </ul>
+                        </div>
+                        <div class="claude-code-image">
+                            <img src="claude_code.png" alt="Claude Code Integration" class="claude-integration-image">
+                            <p class="image-caption">Claude Code handling circuit design from natural language to KiCad</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="claude-code-cta">
+                    <h3>Ready to Contribute?</h3>
+                    <p>Clone the repo and ask Claude Code: "Help me add a new feature to circuit-synth"</p>
+                    <div class="code-block">
+                        <pre><code>git clone https://github.com/circuit-synth/circuit-synth.git
+cd circuit-synth
+# Open in Claude Code and start contributing!</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="get-started" class="section">
+            <div class="container">
+                <h2>Get Started in Minutes</h2>
+                <p class="section-subtitle">Create a complete ESP32-C6 development board project with hierarchical design in under 2 minutes</p>
+                <div class="code-block">
+                    <pre><code># Install uv (Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create new project
+uv init my_circuit_project
+cd my_circuit_project
+
+# Add circuit-synth
+uv add circuit-synth
+
+# Setup complete project template
+uv run cs-new-project
+
+# Generate complete KiCad project  
+uv run python circuit-synth/main.py
+
+# Result: ESP32-C6 dev board with:
+# - USB-C with CC resistors
+# - 5V→3.3V power regulation  
+# - Programming interface
+# - Status LED control</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="component-intelligence" class="section">
+            <div class="container">
+                <h2>🔍 Component Intelligence & AI Integration</h2>
+                <p class="section-subtitle">Tightly integrated with Claude Code for natural language circuit design and component search</p>
+                
+                <div class="ai-integration-grid">
+                    <div class="ai-feature">
+                        <h3>Natural Component Search via Claude Code</h3>
+                        <div class="code-example">
+                            <div class="example-query">
+                                <span class="user">👤</span> "find a stm32 mcu that has 3 spi's and is available on jlcpcb"
+                            </div>
+                            <div class="example-response">
+                                <span class="bot">🤖</span> <strong>Claude Code</strong> searches and finds:<br>
+                                <strong>STM32G431CBT6</strong> - Found matching component<br>
+                                📊 Stock: 83,737 units | Price: $2.50@100pcs | LCSC: C529092<br>
+                                ✅ 3 SPIs: SPI1, SPI2, SPI3<br>
+                                📦 LQFP-48 package | 128KB Flash, 32KB RAM
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-feature">
+                        <h3>Claude Code Integration</h3>
+                        <p>Circuit-synth is purpose-built for <strong>Claude Code</strong> - Anthropic's AI coding assistant. Get production-ready circuits from natural language:</p>
+                        <div class="code-example">
+                            <div class="example-query">
+                                <span class="user">👤</span> "Design an ESP32 IoT sensor with LoRaWAN and solar charging"
+                            </div>
+                            <div class="example-response">
+                                <span class="bot">🤖</span> <strong>Claude Code</strong> automatically:<br>
+                                ✅ Searches JLCPCB for available components<br>
+                                ✅ Generates hierarchical Python circuits<br>
+                                ✅ Creates complete KiCad project files<br>
+                                ✅ Validates design with simulation
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="kicad-plugin-section">
+                    <h3>KiCad Plugin - Direct Claude Code Access</h3>
+                    <div class="plugin-content">
+                        <div class="plugin-description">
+                            <p>Our KiCad plugin creatively repurposes the BOM generation system to create a direct line to Claude Code. What KiCad designed for parts lists, we use for AI-powered circuit analysis. It's unconventional and a bit clunky, but people seem to find it interesting!</p>
+                            <ul class="plugin-features">
+                                <li>💬 <strong>Ask About Circuits:</strong> "How can I improve this power supply?" or "What's wrong with this amplifier?"</li>
+                                <li>🤖 <strong>Claude Code Bridge:</strong> Uses KiCad's BOM script system as a backdoor to Claude Code</li>
+                                <li>⚡ <strong>Schematic Context:</strong> Claude Code sees your complete circuit for intelligent analysis</li>
+                                <li>🔧 <strong>Design Suggestions:</strong> Get optimization tips, component alternatives, and troubleshooting help</li>
+                            </ul>
+                            <p class="plugin-note"><em>A quirky backdoor using KiCad's BOM system for AI circuit analysis - not elegant, but it works! <strong>Thank you BlackCoffee!!</strong> Your <a href="https://forum.kicad.info/t/schematics-bom-tools-usefulness-as-cli/46619" target="_blank">forum insights</a> helped inspire this approach.</em></p>
+                        </div>
+                        <div class="plugin-image">
+                            <img src="kicad_plugin_sch.png" alt="KiCad Plugin in Action" class="kicad-screenshot">
+                            <p class="image-caption">KiCad plugin providing direct Claude Code access for circuit analysis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="community" class="section">
+            <div class="container">
+                <h2>Join the Community</h2>
+                <p class="section-subtitle">Connect with engineers building the future of circuit design automation</p>
+                <div class="community-grid">
+                    <div class="community-item">
+                        <h3>📦 GitHub Repository</h3>
+                        <p>Source code, issues, and contributions</p>
+                        <a href="https://github.com/circuit-synth/circuit-synth" class="btn btn-secondary">View Repository</a>
+                    </div>
+                    <div class="community-item">
+                        <h3>📚 Documentation</h3>
+                        <p>Complete guides and API reference</p>
+                        <a href="https://circuit-synth.readthedocs.io" class="btn btn-secondary">Read Docs</a>
+                    </div>
+                    <div class="community-item">
+                        <h3>💬 Discussions</h3>
+                        <p>Community support and feature requests</p>
+                        <a href="https://github.com/circuit-synth/circuit-synth/discussions" class="btn btn-secondary">Join Discussion</a>
+                    </div>
+                    <div class="community-item">
+                        <h3>🐛 Issues</h3>
+                        <p>Bug reports and feature tracking</p>
+                        <a href="https://github.com/circuit-synth/circuit-synth/issues" class="btn btn-secondary">Report Issues</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Project</h4>
+                    <ul>
+                        <li><a href="https://github.com/circuit-synth/circuit-synth">GitHub Repository</a></li>
+                        <li><a href="https://github.com/circuit-synth/circuit-synth/blob/main/LICENSE">MIT License</a></li>
+                        <li><a href="https://github.com/circuit-synth/circuit-synth/releases">Releases</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="https://circuit-synth.readthedocs.io">Full Documentation</a></li>
+                        <li><a href="https://circuit-synth.readthedocs.io/en/latest/quickstart.html">Getting Started</a></li>
+                        <li><a href="https://circuit-synth.readthedocs.io/en/latest/api.html">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://github.com/circuit-synth/circuit-synth/discussions">Discussions</a></li>
+                        <li><a href="https://github.com/circuit-synth/circuit-synth/issues">Issues</a></li>
+                        <li><a href="https://github.com/circuit-synth/circuit-synth/blob/main/CONTRIBUTING.md">Contributing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Tools</h4>
+                    <ul>
+                        <li><a href="https://www.kicad.org/">KiCad</a></li>
+                        <li><a href="https://github.com/astral-sh/uv">uv Package Manager</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Circuit Synth. Open source project under MIT License.</p>
+                <p>Empowering engineers to design circuits with Python.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

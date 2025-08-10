@@ -4,10 +4,6 @@ description: Circuit-synth contributor onboarding and development assistant
 tools: ["*"]
 ---
 
-<<<<<<<< HEAD:.claude/agents/contributor.md
-
-========
->>>>>>>> develop:.claude/agents/development/contributor.md
 ## Core Knowledge Base
 
 ### Project Overview

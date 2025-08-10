@@ -307,7 +307,13 @@ def check_documentation_quality(file_path):
 
 #### Website Content Review (circuit-synth.com)
 
-**CRITICAL: Review circuit-synth.com for accuracy after any significant changes:**
+**CRITICAL: Review website/* directory and circuit-synth.com for accuracy after any significant changes:**
+
+**Website Files to Validate:**
+- **website/index.html** - Main landing page content accuracy
+- **website/style.css** - Styling and responsive design
+- **website/deploy-website.sh** - Deployment script functionality
+- **website/DEPLOYMENT.md** - Deployment documentation
 
 **Current Website Content Areas to Validate:**
 - **Features Section** - Ensure listed capabilities match current implementation
@@ -316,8 +322,10 @@ def check_documentation_quality(file_path):
   - KiCad project generation
   - Automatic error checking
   - Design history tracking
-  - Manufacturing integration
+  - Manufacturing integration (JLCPCB, DigiKey)
   - SPICE simulation support
+  - Memory bank system for design tracking
+  - AI agent workflows
 
 - **Installation Instructions** - Verify commands and steps are current
   - `uv` package manager usage
@@ -325,24 +333,30 @@ def check_documentation_quality(file_path):
   - `uv add circuit-synth`
   - `uv run cs-new-project`
   - `uv run python circuit-synth/main.py`
+  - Claude Code integration setup
+  - Agent registration commands
 
 - **Code Examples** - Ensure syntax and patterns are up-to-date
   - `@circuit` decorator usage
   - Component creation patterns
   - Net connection syntax
   - Import statements and module structure
+  - AI agent usage examples
 
 - **Technical Requirements** - Validate dependencies and compatibility
-  - Python version requirements
-  - KiCad version compatibility
+  - Python version requirements (>=3.12)
+  - KiCad version compatibility (6/7/8)
   - Claude Code AI integration status
   - System requirements
+  - Manufacturing API requirements
 
 - **Command Reference** - Check if new commands or workflows need documentation
   - CLI commands and flags
-  - Development workflows
-  - Testing procedures
+  - Development workflows (`/dev-review-branch`, `/dev-review-repo`)
+  - Testing procedures (`./tools/testing/run_full_regression_tests.py`)
   - Build processes
+  - AI agent commands
+  - Memory bank commands
 
 **Website Update Triggers:**
 - New features added or removed
@@ -350,8 +364,11 @@ def check_documentation_quality(file_path):
 - Command syntax modifications
 - API changes affecting user code
 - Workflow improvements
-- Integration updates (KiCad, Claude, etc.)
+- Integration updates (KiCad, Claude, JLCPCB, DigiKey, etc.)
 - Version compatibility changes
+- New AI agents or capabilities
+- Memory bank system changes
+- Manufacturing integration updates
 
 **Key documentation review questions:**
 - Does this change introduce new user-facing features? → Update @README.md features section
@@ -640,6 +657,29 @@ mypy src/ --ignore-missing-imports
 # Documentation validation
 sphinx-build -b html docs/ docs/_build/html
 markdown-link-check README.md
+
+# Website validation
+if [ -d "website" ]; then
+    echo "📱 Validating website content..."
+    # Check website deployment script
+    if [ -f "website/deploy-website.sh" ]; then
+        bash -n website/deploy-website.sh || echo "⚠️ Website deployment script syntax error"
+    fi
+    # Validate HTML structure
+    if [ -f "website/index.html" ]; then
+        grep -q "circuit-synth" website/index.html || echo "⚠️ Missing circuit-synth branding in website"
+        # Check for current version references
+        current_version=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+        if ! grep -q "$current_version" website/index.html; then
+            echo "⚠️ Website may need version update to $current_version"
+        fi
+    fi
+    # Check for broken internal links
+    find website/ -name "*.html" -exec grep -l "href=" {} \; | while read file; do
+        echo "Checking links in $file"
+        grep 'href="[^h]' "$file" || true
+    done
+fi
 ```
 
 ### 6. Performance and Resource Analysis
