@@ -229,7 +229,7 @@ repo-review/
 ├── 14-testing-coverage-analysis.md          # Test quality and coverage
 ├── 15-documentation-analysis.md             # Documentation accuracy and quality
 ├── 16-dependency-analysis.md                # Package health and updates
-├── 18-website-validation-analysis.md        # circuit-synth.com accuracy
+├── 18-website-validation-analysis.md        # circuit-synth.com and website/ directory accuracy
 ├── 19-undocumented-features-analysis.md     # Features in code but not documented
 ├── 20-test-plan-analysis.md                 # Test plan generation capabilities
 ├── 21-recommendations-roadmap.md            # Prioritized action items
@@ -400,6 +400,110 @@ python -m cProfile -o repo-review/findings/profile.stats example_project/circuit
 echo "=== Documentation Validation ==="
 sphinx-build -b html docs/ docs/_build/html 2>/dev/null || echo "Sphinx documentation build failed or not configured"
 markdown-link-check README.md Contributors.md 2>/dev/null || echo "Markdown link check failed or tool not installed"
+
+# Phase 11.5: Website Validation
+echo "=== Website Validation ==="
+if [ -d "website" ]; then
+    echo "📱 Found website directory - validating content..."
+    
+    # Check website structure
+    required_files=("index.html" "style.css" "deploy-website.sh")
+    for file in "${required_files[@]}"; do
+        if [ -f "website/$file" ]; then
+            echo "✅ website/$file exists"
+        else
+            echo "❌ Missing website/$file"
+        fi
+    done
+    
+    # Validate HTML content
+    if [ -f "website/index.html" ]; then
+        # Check for current version references
+        current_version=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/' || echo "unknown")
+        echo "Current version: $current_version"
+        
+        # Check website content accuracy
+        html_content=$(cat website/index.html)
+        
+        # Check for branding consistency
+        if echo "$html_content" | grep -q "circuit-synth"; then
+            echo "✅ Circuit-synth branding found"
+        else
+            echo "⚠️ Missing circuit-synth branding in website"
+        fi
+        
+        # Check for key features mentioned
+        features=("Python" "KiCad" "AI" "manufacturing" "SPICE")
+        for feature in "${features[@]}"; do
+            if echo "$html_content" | grep -qi "$feature"; then
+                echo "✅ Feature '$feature' mentioned in website"
+            else
+                echo "⚠️ Feature '$feature' not found in website content"
+            fi
+        done
+        
+        # Check installation instructions
+        if echo "$html_content" | grep -q "uv add circuit-synth"; then
+            echo "✅ Installation instructions include uv"
+        else
+            echo "⚠️ Website may need updated installation instructions"
+        fi
+        
+        # Check for Claude Code integration mention
+        if echo "$html_content" | grep -qi "claude"; then
+            echo "✅ Claude Code integration mentioned"
+        else
+            echo "⚠️ Claude Code integration not prominently featured"
+        fi
+    fi
+    
+    # Validate deployment script
+    if [ -f "website/deploy-website.sh" ]; then
+        echo "🚀 Checking deployment script..."
+        if bash -n website/deploy-website.sh; then
+            echo "✅ Deployment script syntax OK"
+        else
+            echo "❌ Deployment script has syntax errors"
+        fi
+        
+        # Check if deployment docs exist
+        if [ -f "website/DEPLOYMENT.md" ]; then
+            echo "✅ Deployment documentation exists"
+        else
+            echo "⚠️ Missing website/DEPLOYMENT.md"
+        fi
+    fi
+    
+    # Check CSS for responsive design
+    if [ -f "website/style.css" ]; then
+        css_content=$(cat website/style.css)
+        if echo "$css_content" | grep -q "@media"; then
+            echo "✅ CSS includes responsive design rules"
+        else
+            echo "⚠️ CSS may lack responsive design"
+        fi
+    fi
+    
+    # Check for asset files
+    asset_types=("*.png" "*.jpg" "*.svg" "*.ico")
+    assets_found=0
+    for pattern in "${asset_types[@]}"; do
+        if find website/ -name "$pattern" -type f | head -1 | grep -q .; then
+            assets_found=$((assets_found + 1))
+            echo "✅ Found assets matching $pattern"
+        fi
+    done
+    
+    if [ $assets_found -gt 0 ]; then
+        echo "✅ Website includes visual assets"
+    else
+        echo "⚠️ No visual assets found in website/"
+    fi
+    
+else
+    echo "❌ Website directory not found - website content not validated"
+    echo "💡 Consider adding website/ directory for circuit-synth.com deployment"
+fi
 
 # Check for broken example references after cleanup
 echo "=== Documentation Alignment Check ==="
