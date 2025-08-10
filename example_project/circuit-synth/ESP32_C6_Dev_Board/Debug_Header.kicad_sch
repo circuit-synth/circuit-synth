@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid 5e6acdcd-e7bd-43a4-a31b-d20ad431aa7b)
+	(uuid c7765b7f-ba04-4923-8846-c5edab475946)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_02x03_Odd_Even"
@@ -276,7 +276,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid c06fea09-485d-42d5-906a-5d9ba6306189)
+		(uuid 7b157a06-ac13-4f51-a0ed-fafb8bd77732)
 		(property "Reference" "J2"
 			(at 58.42 40.72 0)
 			(effects
@@ -297,7 +297,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/afffd9ea-a1e6-4cab-b055-c1424f39d114/d57f5ef7-3e22-4f45-b654-dc9ae7fac918/393f3271-e53b-415e-9224-b8feb38e9ea9"
+				(path "/780efb89-b962-41c0-857c-68acee7b4a97/7fc44096-df0f-45dd-93b8-bd48f37bcb2f/0b8db7bc-a8db-472a-8b95-43f32e502987"
 					(reference "J2")
 					(unit 1)
 				)
@@ -316,7 +316,7 @@
 			)
 			(justify right)
 		)
-		(uuid 274e6619-b720-4642-9c40-b4eb1cf47bdb)
+		(uuid b2069c8b-c3b7-4e03-bbd9-7be577b19ed6)
 	)
 	(hierarchical_label
 		"DEBUG_TX"
@@ -330,7 +330,7 @@
 			)
 			(justify right)
 		)
-		(uuid 93a3bba6-5a09-4ca8-ba1a-8db888c87c50)
+		(uuid 3f238ca6-c541-4dbe-8456-89d44f98f86a)
 	)
 	(hierarchical_label
 		"DEBUG_RX"
@@ -344,7 +344,7 @@
 			)
 			(justify right)
 		)
-		(uuid 279e26d0-c8ee-4d46-b8fb-5d3a1c476573)
+		(uuid 8fdf46cc-8a1f-4e23-be4c-a999fa4aee0b)
 	)
 	(hierarchical_label
 		"VCC_3V3"
@@ -358,7 +358,7 @@
 			)
 			(justify left)
 		)
-		(uuid ba4652f3-8edd-457b-aee3-8942b49084a4)
+		(uuid 50486e47-7403-4351-9633-50119d0a9091)
 	)
 	(hierarchical_label
 		"GND"
@@ -372,7 +372,7 @@
 			)
 			(justify left)
 		)
-		(uuid 2a7f853c-37f5-477b-8cbd-8580c2794983)
+		(uuid 87394fff-de03-4854-88d0-d8e0cdccc733)
 	)
 	(hierarchical_label
 		"DEBUG_IO0"
@@ -386,7 +386,7 @@
 			)
 			(justify left)
 		)
-		(uuid 869b8428-ce6b-4aad-8aa7-474a0f803706)
+		(uuid 06dda9d3-7fc7-4fd8-be7e-42518f4469d9)
 	)
 	(sheet_instances
 		(path "/"

@@ -101,6 +101,7 @@ from .collision_manager import SHEET_MARGIN
 # Import existing dependencies
 from ...core.circuit import Circuit
 from .integrated_reference_manager import IntegratedReferenceManager
+
 # from .kicad_formatter import format_kicad_schematic  # Removed - using integrated formatter
 from .shape_drawer import arc_s_expr, circle_s_expr, polyline_s_expr, rectangle_s_expr
 
