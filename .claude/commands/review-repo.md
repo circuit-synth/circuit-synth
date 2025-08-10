@@ -18,6 +18,10 @@
 - `--generate-fixes=false` - Generate automated fix suggestions (default: false)
 - `--website-check=true` - Validate circuit-synth.com content accuracy (default: true)
 - `--feature-discovery=true` - Auto-discover features from codebase (default: true)
+- `--test-memory-bank=true` - Test memory-bank system for PCB design tracking (default: true)
+- `--test-plans=true` - Test circuit test plan generation features (default: true)
+- `--doc-accuracy=true` - Validate documentation accuracy against code (default: true)
+- `--find-undocumented=true` - Flag features in code but not in documentation (default: true)
 - `--depth=standard` - Analysis depth: `quick`, `standard`, `deep` (default: standard)
 
 ## What This Does
@@ -31,6 +35,8 @@ The command first performs automatic feature discovery to ensure nothing is miss
 4. **Tool Discovery** - Finds all CLI tools and development utilities
 5. **Integration Discovery** - Identifies external integrations (KiCad, JLCPCB, DigiKey, etc.)
 6. **Documentation Survey** - Maps all documentation and examples
+7. **Undocumented Feature Detection** - Identifies features in code but missing from documentation
+8. **Documentation Accuracy Validation** - Verifies documentation matches actual code behavior
 
 ### Phase 2: Comprehensive Analysis
 Based on discovered features, performs targeted analysis:
@@ -91,10 +97,16 @@ Based on discovered features, performs targeted analysis:
   - circuit-debugger (PCB troubleshooting)
   - contributor (development assistance)
 - **Agent Infrastructure**
-  - Memory bank system
-  - Knowledge management
+  - Memory bank system (progress tracking, decisions, patterns, issues, knowledge)
+  - Knowledge management and context preservation
   - Agent registration (MCP)
   - Prompt engineering
+- **Memory Bank System**
+  - PCB design change tracking
+  - Technical decision recording
+  - Pattern and solution storage
+  - Issue tracking with workarounds
+  - Cross-session knowledge preservation
 
 ### 5. Quality Assurance Systems
 - **FMEA (Failure Mode and Effects Analysis)**
@@ -112,6 +124,11 @@ Based on discovered features, performs targeted analysis:
   - Import verification
   - Runtime execution testing
   - Circuit structure validation
+- **Test Plan Generation**
+  - Automated circuit test plan creation
+  - Validation strategy development
+  - Test case generation for circuits
+  - Quality assurance test frameworks
 - **Debugging System**
   - Symptom analysis
   - Pattern recognition
@@ -216,15 +233,22 @@ repo-review/
 ├── 14-testing-coverage-analysis.md          # Test quality and coverage
 ├── 15-documentation-analysis.md             # Documentation accuracy and quality
 ├── 16-dependency-analysis.md                # Package health and updates
+├── 17-memory-bank-analysis.md               # Memory bank system functionality
 ├── 18-website-validation-analysis.md        # circuit-synth.com accuracy
-├── 19-recommendations-roadmap.md            # Prioritized action items
+├── 19-undocumented-features-analysis.md     # Features in code but not documented
+├── 20-test-plan-analysis.md                 # Test plan generation capabilities
+├── 21-recommendations-roadmap.md            # Prioritized action items
 └── findings/                                 # Raw data, logs, and detailed reports
     ├── discovered-features.json             # Auto-discovered feature list
     ├── agent-test-results/                  # Agent functionality tests
     ├── example-test-results/                # Example circuit tests
     ├── security-scan-results/               # Security scan outputs
     ├── performance-profiles/                # Performance profiling data
-    └── coverage-reports/                    # Test coverage reports
+    ├── coverage-reports/                    # Test coverage reports
+    ├── memory-bank-test-results/            # Memory bank system tests
+    ├── test-plan-analysis/                  # Test plan generation results
+    ├── undocumented-features/               # Features found but not documented
+    └── doc-accuracy-checks/                 # Documentation vs code validation
 ```
 
 ## Implementation Details
@@ -241,6 +265,9 @@ def discover_features():
         'examples': scan_examples('examples'),
         'integrations': detect_integrations(),
         'recent_features': analyze_recent_commits(100),
+        'memory_bank': scan_memory_bank('memory-bank/'),
+        'undocumented_features': find_undocumented_features(),
+        'doc_accuracy': validate_documentation_accuracy(),
     }
     return features
 ```
@@ -257,6 +284,31 @@ def test_agent_functionality(agent_name):
         'knowledge_test': check_agent_knowledge(agent_name),
     }
     return tests
+
+def test_memory_bank_system():
+    """Test memory bank functionality for PCB design tracking"""
+    tests = {
+        'structure_test': verify_memory_bank_structure(),
+        'read_write_test': test_memory_bank_operations(),
+        'context_preservation': test_cross_session_memory(),
+        'decision_tracking': test_technical_decision_storage(),
+    }
+    return tests
+
+def find_undocumented_features():
+    """Find features implemented in code but missing from documentation"""
+    code_features = extract_features_from_code()
+    doc_features = extract_features_from_docs()
+    undocumented = set(code_features) - set(doc_features)
+    return list(undocumented)
+
+def validate_documentation_accuracy():
+    """Verify documentation matches actual code behavior"""
+    mismatches = []
+    for doc_example in find_code_examples_in_docs():
+        if not validate_example_against_code(doc_example):
+            mismatches.append(doc_example)
+    return mismatches
 ```
 
 ### Comprehensive Analysis Execution
@@ -330,6 +382,43 @@ echo "=== Testing Quality Assurance Systems ==="
 uv run python -m circuit_synth.quality_assurance.fmea_cli --help
 uv run python -m circuit_synth.debugging.debug_cli --help
 
+# Phase 6.1: Test Memory Bank System
+echo "=== Testing Memory Bank System ==="
+if [ -d "memory-bank" ]; then
+    echo "Memory bank directory exists"
+    ls -la memory-bank/
+    # Test memory bank operations
+    uv run python -c "
+    import os
+    from pathlib import Path
+    
+    # Test memory bank structure
+    expected_dirs = ['progress', 'decisions', 'patterns', 'issues', 'knowledge']
+    memory_bank = Path('memory-bank')
+    
+    if memory_bank.exists():
+        for dir_name in expected_dirs:
+            dir_path = memory_bank / dir_name
+            print(f'{dir_name}: {"OK" if dir_path.exists() else "MISSING"}')
+    else:
+        print('Memory bank directory not found')
+    "
+else
+    echo "Memory bank directory not found"
+fi
+
+# Phase 6.2: Test Test Plan Features
+echo "=== Testing Test Plan Generation ==="
+# Look for test plan related modules
+find src/ -name "*test*plan*" -o -name "*plan*test*" 2>/dev/null | head -10 || echo "No test plan modules found"
+# Check for test-plan-creator agent
+if [ -f ".claude/agents/test-plan-creator.md" ]; then
+    echo "test-plan-creator agent found"
+    grep -A 5 -B 5 "test.plan" .claude/agents/test-plan-creator.md || echo "Agent content check"
+else
+    echo "test-plan-creator agent not found"
+fi
+
 for module in */; do
 done
 cd ..
@@ -351,8 +440,8 @@ python -m cProfile -o repo-review/findings/profile.stats example_project/circuit
 
 # Phase 11: Documentation Validation  
 echo "=== Documentation Validation ==="
-sphinx-build -b html docs/ docs/_build/html
-markdown-link-check README.md Contributors.md
+sphinx-build -b html docs/ docs/_build/html 2>/dev/null || echo "Sphinx documentation build failed or not configured"
+markdown-link-check README.md Contributors.md 2>/dev/null || echo "Markdown link check failed or tool not installed"
 
 # Check for broken example references after cleanup
 echo "=== Documentation Alignment Check ==="
@@ -361,6 +450,100 @@ find . -name "*.md" -o -name "*.rst" | xargs grep -l "example_kicad_project.py" 
   echo "Checking: $file"
   grep -n "example_kicad_project.py" "$file"
 done
+
+# Phase 11.1: Find Undocumented Features
+echo "=== Finding Undocumented Features ==="
+uv run python -c "
+import os
+import re
+from pathlib import Path
+
+# Scan Python files for classes and functions
+code_features = set()
+for py_file in Path('src/circuit_synth').rglob('*.py'):
+    try:
+        content = py_file.read_text()
+        # Find class definitions
+        classes = re.findall(r'^class\s+([A-Za-z][A-Za-z0-9_]*)', content, re.MULTILINE)
+        # Find function definitions
+        functions = re.findall(r'^def\s+([A-Za-z][A-Za-z0-9_]*)', content, re.MULTILINE)
+        code_features.update(classes)
+        code_features.update(functions)
+    except:
+        pass
+
+# Scan documentation for mentioned features
+doc_features = set()
+doc_files = []
+doc_files.extend(Path('.').glob('*.md'))
+if Path('docs').exists():
+    doc_files.extend(Path('docs').rglob('*.md'))
+    doc_files.extend(Path('docs').rglob('*.rst'))
+if Path('.claude').exists():
+    doc_files.extend(Path('.claude').rglob('*.md'))
+
+for doc_file in doc_files:
+    try:
+        content = doc_file.read_text().lower()
+        # Extract potential feature names from documentation
+        words = re.findall(r'[a-z][a-z0-9_]+', content)
+        doc_features.update(words)
+    except:
+        pass
+
+# Find features in code but not documented (case-insensitive)
+code_lower = {f.lower() for f in code_features}
+doc_lower = {f.lower() for f in doc_features}
+undocumented = [f for f in code_features if f.lower() not in doc_lower and len(f) > 3]
+
+print(f'Total code features found: {len(code_features)}')
+print(f'Potentially undocumented features: {len(undocumented)}')
+if undocumented[:10]:  # Show first 10
+    print('Sample undocumented features:', undocumented[:10])
+" > repo-review/findings/undocumented-features/feature-analysis.txt
+
+# Phase 11.2: Documentation Accuracy Check
+echo "=== Documentation Accuracy Validation ==="
+uv run python -c "
+import re
+from pathlib import Path
+
+# Find code examples in documentation
+code_examples = []
+doc_files = []
+doc_files.extend(Path('.').glob('*.md'))
+if Path('docs').exists():
+    doc_files.extend(Path('docs').rglob('*.md'))
+
+for doc_file in doc_files:
+    try:
+        content = doc_file.read_text()
+        # Find Python code blocks
+        python_blocks = re.findall(r'\`\`\`python\n(.+?)\`\`\`', content, re.DOTALL)
+        for block in python_blocks:
+            code_examples.append({
+                'file': str(doc_file),
+                'code': block.strip()
+            })
+    except:
+        pass
+
+print(f'Found {len(code_examples)} Python code examples in documentation')
+
+# Try to validate some examples
+valid_examples = 0
+for example in code_examples[:5]:  # Check first 5
+    try:
+        # Basic syntax check
+        compile(example['code'], '<string>', 'exec')
+        valid_examples += 1
+    except SyntaxError:
+        print(f'Syntax error in {example[\"file\"]}')
+    except:
+        pass
+
+print(f'Syntactically valid examples: {valid_examples}/{min(5, len(code_examples))}')
+" > repo-review/findings/doc-accuracy-checks/syntax-validation.txt
 
 # Phase 12: Dependency Analysis
 echo "=== Dependency Analysis ==="
@@ -402,6 +585,15 @@ pip-audit --format json > repo-review/findings/pip-audit.json
 
 ## Features Not Yet Tested
 [Features without corresponding tests]
+
+## Memory Bank System Status
+[Status of memory bank directories and functionality]
+
+## Test Plan Generation Features
+[Test plan creation capabilities and agents]
+
+## Documentation Accuracy Issues
+[Examples and descriptions that don't match current code]
 ```
 
 ### Agent System Analysis Report
@@ -428,8 +620,19 @@ Total agents discovered: X
 - MCP registration: [OK/Issues]
 - Knowledge management: [OK/Issues]
 
+## Memory Bank System Analysis
+- Directory structure: [OK/Missing directories]
+- Content preservation: [OK/Issues]
+- Cross-session memory: [OK/Issues]
+- Design decision tracking: [OK/Issues]
+
+## Test Plan Generation Analysis
+- test-plan-creator agent: [OK/Missing/Broken]
+- Test framework integration: [OK/Issues]
+- Automated test generation: [OK/Issues]
+
 ## Recommendations
-[Specific fixes for non-functional agents]
+[Specific fixes for non-functional agents and systems]
 ```
 
 ## Advanced Features
@@ -448,6 +651,34 @@ When `--test-agents=true`:
 - Tests agent prompts and capabilities
 - Validates agent knowledge base
 - Checks MCP registration
+
+### Memory Bank Testing
+When `--test-memory-bank=true`:
+- Verifies memory-bank directory structure
+- Tests read/write operations for design tracking
+- Validates cross-session knowledge preservation
+- Checks technical decision recording functionality
+
+### Test Plan Feature Testing
+When `--test-plans=true`:
+- Identifies test plan generation modules
+- Tests test-plan-creator agent functionality
+- Validates circuit test case generation
+- Checks quality assurance framework integration
+
+### Undocumented Feature Discovery
+When `--find-undocumented=true`:
+- Scans codebase for classes, functions, and modules
+- Compares against all documentation sources
+- Identifies features missing from docs
+- Flags potential documentation gaps
+
+### Documentation Accuracy Validation
+When `--doc-accuracy=true`:
+- Extracts code examples from documentation
+- Validates syntax and imports against current codebase
+- Checks API examples for accuracy
+- Identifies outdated documentation sections
 
 - Checks compilation status
 - Tests Python bindings
@@ -479,6 +710,12 @@ When `--test-agents=true`:
 
 # Documentation and website validation
 /dev-review-repo --focus=docs --website-check=true
+
+# Memory bank and test plan focused review
+/dev-review-repo --test-memory-bank=true --test-plans=true
+
+# Find undocumented features and validate documentation
+/dev-review-repo --find-undocumented=true --doc-accuracy=true
 
 ```
 
