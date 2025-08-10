@@ -122,6 +122,56 @@ uv run python -c "from circuit_synth import Circuit, Component, Net; print('✅ 
 
 echo -e "${GREEN}✅ Core functionality tests passed${NC}"
 
+# Copy .claude directory to package templates (Option A implementation)
+echo -e "\n${YELLOW}📋 Copying .claude directory to package templates...${NC}"
+CLAUDE_SOURCE=".claude"
+CLAUDE_TARGET="src/circuit_synth/data/templates/example_project/.claude"
+
+if [ -d "$CLAUDE_SOURCE" ]; then
+    echo -e "${BLUE}🔄 Copying production agents and commands to package...${NC}"
+    
+    # Remove existing template .claude directory
+    rm -rf "$CLAUDE_TARGET"
+    
+    # Create target directory structure
+    mkdir -p "$CLAUDE_TARGET/agents" "$CLAUDE_TARGET/commands"
+    
+    # Copy production agents (exclude dev/ subdirectory)
+    find "$CLAUDE_SOURCE/agents" -name "*.md" -not -path "*/dev/*" -exec cp {} "$CLAUDE_TARGET/agents/" \;
+    
+    # Organize agents into subdirectories in target
+    mkdir -p "$CLAUDE_TARGET/agents/circuit-design" "$CLAUDE_TARGET/agents/manufacturing" "$CLAUDE_TARGET/agents/orchestration" "$CLAUDE_TARGET/agents/microcontrollers"
+    
+    # Move agents to proper subdirectories in target
+    [ -f "$CLAUDE_TARGET/agents/circuit-architect.md" ] && mv "$CLAUDE_TARGET/agents/circuit-architect.md" "$CLAUDE_TARGET/agents/circuit-design/"
+    [ -f "$CLAUDE_TARGET/agents/component-symbol-validator.md" ] && mv "$CLAUDE_TARGET/agents/component-symbol-validator.md" "$CLAUDE_TARGET/agents/circuit-design/"
+    [ -f "$CLAUDE_TARGET/agents/circuit-design-guide.md" ] && mv "$CLAUDE_TARGET/agents/circuit-design-guide.md" "$CLAUDE_TARGET/agents/circuit-design/"
+    [ -f "$CLAUDE_TARGET/agents/circuit-validation-agent.md" ] && mv "$CLAUDE_TARGET/agents/circuit-validation-agent.md" "$CLAUDE_TARGET/agents/circuit-design/"
+    [ -f "$CLAUDE_TARGET/agents/circuit-syntax-fixer.md" ] && mv "$CLAUDE_TARGET/agents/circuit-syntax-fixer.md" "$CLAUDE_TARGET/agents/circuit-design/"
+    [ -f "$CLAUDE_TARGET/agents/simulation-expert.md" ] && mv "$CLAUDE_TARGET/agents/simulation-expert.md" "$CLAUDE_TARGET/agents/circuit-design/"
+    [ -f "$CLAUDE_TARGET/agents/test-plan-creator.md" ] && mv "$CLAUDE_TARGET/agents/test-plan-creator.md" "$CLAUDE_TARGET/agents/circuit-design/"
+    
+    [ -f "$CLAUDE_TARGET/agents/jlc-parts-finder.md" ] && mv "$CLAUDE_TARGET/agents/jlc-parts-finder.md" "$CLAUDE_TARGET/agents/manufacturing/"
+    [ -f "$CLAUDE_TARGET/agents/component-guru.md" ] && mv "$CLAUDE_TARGET/agents/component-guru.md" "$CLAUDE_TARGET/agents/manufacturing/"
+    [ -f "$CLAUDE_TARGET/agents/dfm-agent.md" ] && mv "$CLAUDE_TARGET/agents/dfm-agent.md" "$CLAUDE_TARGET/agents/manufacturing/"
+    
+    [ -f "$CLAUDE_TARGET/agents/circuit-project-creator.md" ] && mv "$CLAUDE_TARGET/agents/circuit-project-creator.md" "$CLAUDE_TARGET/agents/orchestration/"
+    
+    [ -f "$CLAUDE_TARGET/agents/stm32-mcu-finder.md" ] && mv "$CLAUDE_TARGET/agents/stm32-mcu-finder.md" "$CLAUDE_TARGET/agents/microcontrollers/"
+    
+    # Copy production commands (exclude dev/ subdirectory) 
+    cp -r "$CLAUDE_SOURCE/commands/circuit-design" "$CLAUDE_TARGET/commands/" 2>/dev/null || true
+    cp -r "$CLAUDE_SOURCE/commands/manufacturing" "$CLAUDE_TARGET/commands/" 2>/dev/null || true  
+    cp -r "$CLAUDE_SOURCE/commands/setup" "$CLAUDE_TARGET/commands/" 2>/dev/null || true
+    
+    # Copy any remaining project config files
+    [ -f "$CLAUDE_SOURCE/mcp_settings.json" ] && cp "$CLAUDE_SOURCE/mcp_settings.json" "$CLAUDE_TARGET/"
+    
+    echo -e "${GREEN}✅ Production .claude directory copied to package templates${NC}"
+else
+    echo -e "${YELLOW}⚠️  .claude directory not found, skipping template update${NC}"
+fi
+
 # Update Version
 echo -e "\n${YELLOW}📝 Updating version to ${VERSION}...${NC}"
 
