@@ -11,7 +11,7 @@ REPO_DIR="/root/circuit-synth"
 WEBSITE_DIR="/var/www/html"
 BACKUP_DIR="/var/backups/circuit-synth-website"
 LOG_FILE="/var/log/circuit-synth-deploy.log"
-WEBSITE_BRANCH="website"
+WEBSITE_BRANCH="main"
 MAX_BACKUPS=10
 
 # Colors for output

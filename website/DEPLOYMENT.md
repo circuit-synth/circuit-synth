@@ -1,11 +1,11 @@
 # Circuit-Synth Website Deployment Guide
 
-This document provides comprehensive instructions for deploying the Circuit-Synth website from the repository's `website` branch to a production server.
+This document provides comprehensive instructions for deploying the Circuit-Synth website from the repository's `main` branch to a production server.
 
 ## 📋 Overview
 
 The deployment system consists of:
-- **Website Branch**: Contains the production website files (`index.html`, `style.css`, etc.)
+- **Main Branch**: Contains the production website files in the `website/` directory (`index.html`, `style.css`, etc.)
 - **Deployment Script**: Automated deployment with error handling and logging
 - **Management Script**: Easy-to-use commands for deployment operations
 - **Backup System**: Automatic backups before each deployment
@@ -16,7 +16,7 @@ The deployment system consists of:
 - Server with nginx installed and configured
 - Git repository cloned to `/root/circuit-synth/`
 - Root access to the server
-- Website branch checked out
+- Main branch checked out
 
 ### One-Command Deployment
 ```bash
@@ -81,7 +81,7 @@ The deployment script follows this process:
    - Maintain last 10 backups automatically
 
 3. **Repository Update**
-   - Switch to `website` branch
+   - Switch to `main` branch
    - Stash any local changes
    - Pull latest changes from origin
 
@@ -108,7 +108,7 @@ The deployment script follows this process:
 - **Logs**: `/var/log/circuit-synth-deploy.log`
 - **Backups**: `/var/backups/circuit-synth-website/`
 
-### Repository Files (website branch)
+### Repository Files (main branch)
 - **Main Page**: `website/index.html`
 - **Styles**: `website/style.css`
 - **Deployment Script**: `website/deploy-website.sh`
@@ -147,8 +147,8 @@ git status
 
 # Reset if needed
 git stash
-git checkout website
-git pull origin website
+git checkout main
+git pull origin main
 ```
 
 **3. Nginx Issues**
