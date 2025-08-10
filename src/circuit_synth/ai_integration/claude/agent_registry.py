@@ -71,7 +71,7 @@ class CircuitSubAgent:
             "description": self.description,
             "tools": self.allowed_tools,
         }
-        
+
         # Add model if specified
         if self.model:
             frontmatter["model"] = self.model
@@ -170,6 +170,7 @@ Use your architectural expertise to coordinate complex designs and delegate spec
 Focus on manufacturing optimization, supply chain management, and broad component expertise beyond JLCPCB-specific searches.""",
         allowed_tools=["WebSearch", "WebFetch", "Read", "Write", "Edit", "Task"],
         expertise_area="Component Sourcing & Manufacturing Optimization",
+        model="haiku",
     )
 
     # SPICE Simulation Expert
@@ -225,6 +226,7 @@ Your simulation approach:
 Always provide practical, working circuit-synth code with simulation examples that users can immediately run and validate.""",
         allowed_tools=["*"],
         expertise_area="SPICE Simulation & Circuit Validation",
+        model="haiku",
     )
 
     # Test Plan Creation Expert
@@ -273,6 +275,7 @@ Your approach:
 Always prioritize safety, include troubleshooting guidance, and optimize for practical execution in real-world environments.""",
         allowed_tools=["*"],
         expertise_area="Test Plan Creation & Circuit Validation",
+        model="haiku",
     )
 
     return agents
@@ -283,6 +286,9 @@ def register_circuit_agents():
 
     # Import agents to trigger registration
     try:
+        from .agents import circuit_project_creator  # Master orchestrator agent
+        from .agents import circuit_syntax_fixer  # New syntax fixer agent
+        from .agents import circuit_validation_agent  # New validation agent
         from .agents import contributor_agent  # This triggers @register_agent decorator
         from .agents import test_plan_agent  # Now available!
 
@@ -307,12 +313,17 @@ def register_circuit_agents():
             agent_instance = agent_class()
 
             # Convert modern agent to legacy format for compatibility
-            # Organize contributor agent in development category
-            organized_name = (
-                f"development/{agent_name}"
-                if agent_name == "contributor"
-                else agent_name
-            )
+            # Organize agents into appropriate categories
+            if agent_name == "contributor":
+                organized_name = f"development/{agent_name}"
+            elif agent_name == "circuit-validation-agent":
+                organized_name = f"circuit-design/{agent_name}"
+            elif agent_name == "circuit-syntax-fixer":
+                organized_name = f"circuit-design/{agent_name}"
+            elif agent_name == "circuit-project-creator":
+                organized_name = f"orchestration/{agent_name}"
+            else:
+                organized_name = agent_name
             modern_agents[organized_name] = CircuitSubAgent(
                 name=agent_name,
                 description=getattr(
