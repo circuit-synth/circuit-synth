@@ -4,7 +4,6 @@ description: Circuit-synth contributor onboarding and development assistant
 tools: ["*"]
 ---
 
-
 ## Core Knowledge Base
 
 ### Project Overview

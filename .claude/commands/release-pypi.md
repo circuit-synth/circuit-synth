@@ -23,6 +23,7 @@ This command handles the complete release process:
 - **Check for uncommitted changes** - Ensure clean working directory
 - **Sync with remote** - Fetch latest changes from origin
 - **Verify main branch is up-to-date** - Ensure main is current with develop
+- **Website validation** - Check website content accuracy and deployment readiness
 
 
 ### 3. Version Management
@@ -154,6 +155,64 @@ uv run python -c "from circuit_synth import Circuit, Component, Net; print('✅ 
 kicad-cli version >/dev/null 2>&1 || {
     echo "⚠️  KiCad not found - integration tests skipped"
 }
+
+# Website validation (CRITICAL for PyPI release)
+echo "🌐 Validating website content before release..."
+if [ -d "website" ]; then
+    echo "📱 Checking website directory..."
+    
+    # Check if website content includes new version
+    if [ -f "website/index.html" ]; then
+        html_content=$(cat website/index.html)
+        
+        # Check for circuit-synth branding
+        if ! echo "$html_content" | grep -q "circuit-synth"; then
+            echo "❌ Website missing circuit-synth branding"
+            exit 1
+        fi
+        
+        # Check for key features
+        required_features=("Python" "KiCad" "AI")
+        for feature in "${required_features[@]}"; do
+            if ! echo "$html_content" | grep -qi "$feature"; then
+                echo "❌ Website missing '$feature' in content"
+                exit 1
+            fi
+        done
+        
+        # Check installation instructions
+        if ! echo "$html_content" | grep -q "uv add circuit-synth"; then
+            echo "⚠️  Website may need installation instruction updates"
+        fi
+        
+        echo "✅ Website content validation passed"
+    else
+        echo "❌ Missing website/index.html"
+        exit 1
+    fi
+    
+    # Check deployment script
+    if [ -f "website/deploy-website.sh" ]; then
+        if ! bash -n website/deploy-website.sh; then
+            echo "❌ Website deployment script has syntax errors"
+            exit 1
+        fi
+        echo "✅ Website deployment script OK"
+    else
+        echo "⚠️  Missing website deployment script"
+    fi
+    
+    # Check deployment documentation
+    if [ -f "website/DEPLOYMENT.md" ]; then
+        echo "✅ Website deployment documentation exists"
+    else
+        echo "⚠️  Consider adding website/DEPLOYMENT.md"
+    fi
+    
+else
+    echo "⚠️  No website directory found - website won't be updated"
+    echo "💡 Consider adding website/ directory for circuit-synth.com"
+fi
 ```
 
 ```bash
@@ -586,6 +645,30 @@ python -c "import circuit_synth; print(f'✅ Installed version: {circuit_synth._
 deactivate
 cd - >/dev/null
 rm -rf "$temp_dir"
+
+# Deploy website after successful PyPI release
+echo "🌐 Deploying website after successful release..."
+if [ -f "website/deploy-website.sh" ]; then
+    echo "🚀 Running website deployment..."
+    cd website
+    if bash deploy-website.sh; then
+        echo "✅ Website deployed successfully"
+    else
+        echo "⚠️  Website deployment failed - manual intervention may be needed"
+        echo "💡 Check website/deploy-website.sh and website/DEPLOYMENT.md"
+    fi
+    cd - >/dev/null
+else
+    echo "⚠️  No website deployment script found"
+    echo "💡 Consider adding website/deploy-website.sh for automated deployment"
+fi
+
+# Final verification
+echo "📊 Release Summary:"
+echo "   📦 PyPI: https://pypi.org/project/circuit-synth/$version/"
+echo "   🏷️  Git Tag: v$version"
+echo "   🌐 Website: circuit-synth.com (if deployment succeeded)"
+echo "   📋 GitHub: https://github.com/circuit-synth/circuit-synth/releases/tag/v$version"
 ```
 
 ## Example Usage
@@ -683,6 +766,7 @@ The release includes:
 - **GitHub release** with auto-generated release notes
 - **PyPI package** published and available for installation
 - **Main branch** updated with latest changes from develop
+- **Website deployment** to circuit-synth.com (if website/ directory exists)
 
 ## Rollback
 
