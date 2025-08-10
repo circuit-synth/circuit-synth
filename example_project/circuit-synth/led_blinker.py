@@ -7,7 +7,7 @@ Simple LED indicator with proper current limiting resistor
 from circuit_synth import *
 
 @circuit(name="LED_Blinker")  
-def led_blinker(vcc_3v3, gnd, led_control):
+def led_blinker(led_control, gnd):
     """LED with current limiting resistor"""
     
     # LED and resistor
@@ -17,7 +17,7 @@ def led_blinker(vcc_3v3, gnd, led_control):
                         footprint="Resistor_SMD:R_0805_2012Metric")
     
     # Connections  
-    resistor[1] += vcc_3v3
-    resistor[2] += led["A"]  # Anode
-    led["K"] += led_control  # Cathode (controlled by MCU)
+    resistor[1] += led_control  # MCU drives the LED through resistor
+    resistor[2] += led["A"]     # Anode
+    led["K"] += gnd             # Cathode to ground
 

@@ -463,7 +463,7 @@ class APISynchronizer:
         """Add lib_symbols definitions to the S-expression data."""
         from sexpdata import Symbol
 
-        from circuit_synth.kicad.sch_gen.symbol_cache import SymbolCache
+        from circuit_synth.kicad.core.symbol_cache import SymbolLibraryCache
 
         # Find or create lib_symbols block
         lib_symbols_block = None
@@ -496,7 +496,7 @@ class APISynchronizer:
                 lib_ids.add(comp.lib_id)
 
         # Add symbol definitions
-        symbol_cache = SymbolCache()
+        symbol_cache = SymbolLibraryCache()
         for lib_id in sorted(lib_ids):
             try:
                 symbol_data = symbol_cache.get_symbol(lib_id)

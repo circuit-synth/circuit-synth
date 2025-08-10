@@ -42,7 +42,7 @@ Available log levels:
 uv run cs-new-project
 
 # This generates a complete ESP32-C6 development board
-cd circuit-synth && uv run python main.py
+cd circuit-synth && uv run python example_project/circuit-synth/main.py
 ```
 
 ## Example: Power Supply Circuit
@@ -212,7 +212,7 @@ cs-new-project              # Complete project setup with ESP32-C6 example
 
 ### Circuit Generation
 ```bash
-cd circuit-synth && uv run python main.py    # Generate KiCad files from Python code
+cd circuit-synth && uv run python example_project/circuit-synth/main.py    # Generate KiCad files from Python code
 ```
 
 ### Claude Code Slash Commands
@@ -348,19 +348,18 @@ jlc-fast benchmark
 
 ```
 my_circuit_project/
-├── circuit-synth/
-│   ├── main.py              # ESP32-C6 dev board (hierarchical)
-│   ├── power_supply.py      # 5V→3.3V regulation
-│   ├── usb.py               # USB-C with CC resistors
-│   ├── esp32c6.py           # ESP32-C6 microcontroller
-│   ├── debug_header.py      # Programming interface
-│   ├── led_blinker.py       # Status LED control
-│   └── ESP32_C6_Dev_Board.json  # Generated netlist
-├── ESP32_C6_Dev_Board/      # Generated KiCad files
-│   ├── ESP32_C6_Dev_Board.kicad_pro
-│   ├── ESP32_C6_Dev_Board.kicad_sch
-│   ├── ESP32_C6_Dev_Board.kicad_pcb
-│   └── ESP32_C6_Dev_Board.net
+├── example_project/
+│   ├── circuit-synth/
+│   │   ├── main.py              # ESP32-C6 dev board (hierarchical)
+│   │   ├── power_supply.py      # 5V→3.3V regulation
+│   │   ├── usb.py               # USB-C with CC resistors
+│   │   ├── esp32c6.py           # ESP32-C6 microcontroller
+│   │   └── led_blinker.py       # Status LED control
+│   └── ESP32_C6_Dev_Board/      # Generated KiCad files
+│       ├── ESP32_C6_Dev_Board.kicad_pro
+│       ├── ESP32_C6_Dev_Board.kicad_sch
+│       ├── ESP32_C6_Dev_Board.kicad_pcb
+│       └── ESP32_C6_Dev_Board.net
 ├── README.md                # Project guide
 ├── CLAUDE.md                # AI assistant instructions
 └── pyproject.toml           # Project dependencies
@@ -371,7 +370,7 @@ my_circuit_project/
 
 | Traditional EE Workflow | With Circuit-Synth |
 |-------------------------|-------------------|
-| Manual component placement | `python main.py` → Complete project |
+| Manual component placement | `python example_project/circuit-synth/main.py` → Complete project |
 | Hunt through symbol libraries | Verified components with JLCPCB & DigiKey availability |
 | Visual net verification | Explicit Python connections |
 | GUI-based editing | Version-controlled Python files |
@@ -583,7 +582,7 @@ circuit-synth/
 │   ├── component_info/          # Component databases
 │   ├── manufacturing/           # JLCPCB, DigiKey, etc.
 │   └── simulation/              # SPICE integration
-├── examples/                    # Usage examples
+├── example_project/             # Complete usage example
 ├── tests/                       # Test suites
 └── scripts/                     # Build and development scripts
 ```

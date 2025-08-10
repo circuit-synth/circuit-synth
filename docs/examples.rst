@@ -8,7 +8,7 @@ Simple LED Circuit
 
 A basic LED circuit with current limiting resistor:
 
-.. literalinclude:: ../examples/example_kicad_project.py
+.. literalinclude:: ../example_project/circuit-synth/main.py
    :language: python
    :lines: 1-50
    :caption: Basic LED circuit setup
@@ -18,7 +18,7 @@ Complex ESP32 Project
 
 The main example demonstrates a complex ESP32-based project with multiple subcircuits:
 
-.. literalinclude:: ../examples/example_kicad_project.py
+.. literalinclude:: ../example_project/circuit-synth/main.py
    :language: python
    :lines: 270-320
    :caption: ESP32 main circuit
@@ -36,9 +36,9 @@ Power Supply Circuit
 
 A 3.3V linear regulator circuit:
 
-.. literalinclude:: ../examples/example_kicad_project.py
+.. literalinclude:: ../example_project/circuit-synth/power_supply.py
    :language: python
-   :lines: 53-82
+   :lines: 1-30
    :caption: Linear regulator circuit
 
 USB Interface
@@ -46,20 +46,20 @@ USB Interface
 
 USB-C connector with ESD protection:
 
-.. literalinclude:: ../examples/example_kicad_project.py
+.. literalinclude:: ../example_project/circuit-synth/usb.py
    :language: python
-   :lines: 108-165
+   :lines: 1-40
    :caption: USB-C interface with protection
 
-IMU Circuit
------------
+ESP32 Microcontroller
+---------------------
 
-SPI-connected IMU with power filtering:
+ESP32-C6 microcontroller with decoupling:
 
-.. literalinclude:: ../examples/example_kicad_project.py
+.. literalinclude:: ../example_project/circuit-synth/esp32c6.py
    :language: python
-   :lines: 166-198
-   :caption: IMU circuit with SPI interface
+   :lines: 1-40
+   :caption: ESP32 microcontroller circuit
 
 Running the Examples
 --------------------
@@ -72,25 +72,18 @@ To run the complete example:
    cd circuit-synth
    
    # Run the example
-   python examples/example_kicad_project.py
+   python example_project/circuit-synth/main.py
    
-   # Specify placement algorithm (optional)
-   python examples/example_kicad_project.py connection_aware
+   # Generate complete KiCad project
+   python example_project/circuit-synth/main.py
 
 This will generate:
 
-* ``circuit_synth_example_kicad_project.json`` - Circuit data
-* ``circuit_synth_example_kicad_project.net`` - KiCad netlist
-* ``kicad_output/`` directory with complete KiCad project files
-
-Placement Algorithms
---------------------
-
-The example supports different placement algorithms:
-
-* ``sequential`` - Simple sequential placement
-* ``connection_aware`` - Connection-based optimization (default)
-* ``llm`` - AI-powered intelligent placement
+* ``ESP32_C6_Dev_Board.json`` - Circuit netlist data
+* ``ESP32_C6_Dev_Board/`` directory with complete KiCad project files
+  * ``.kicad_pro`` - KiCad project file
+  * ``.kicad_sch`` - Schematic file
+  * ``.kicad_pcb`` - PCB layout file
 
 Advanced Features
 -----------------
