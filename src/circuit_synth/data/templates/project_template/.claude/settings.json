@@ -1,0 +1,97 @@
+{
+  "description": "Circuit-Synth Library Development Environment",
+  "version": "2.0.0",
+  
+  "env": {
+    "PYTHONPATH": "${PYTHONPATH}:./src",
+    "CIRCUIT_SYNTH_DEV": "1"
+  },
+  
+  "hooks": {
+    "PostToolUse": [
+      {
+        "description": "Format and lint Python files after editing",
+        "matcher": "Edit|Write|MultiEdit.*\\.py$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE_PATH=$(echo '$CLAUDE_TOOL_INPUT' | jq -r '.file_path // .edits[0].file_path // empty'); if [[ \"$FILE_PATH\" == *.py ]]; then echo '<¨ Formatting...'; black \"$FILE_PATH\" 2>/dev/null; isort \"$FILE_PATH\" 2>/dev/null; echo '= Linting...'; flake8 \"$FILE_PATH\" --max-line-length=100 2>/dev/null || echo '  Linting issues found'; fi"
+          }
+        ]
+      },
+      {
+        "description": "Run tests for modified test files",
+        "matcher": "Edit|Write.*test.*\\.py$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE_PATH=$(echo '$CLAUDE_TOOL_INPUT' | jq -r '.file_path // empty'); if [[ \"$FILE_PATH\" =~ test.*\\.py$ ]]; then echo '>ê Running tests...'; uv run pytest \"$FILE_PATH\" -v --tb=short || echo 'L Tests failed'; fi"
+          }
+        ]
+      },
+      {
+        "description": "Type check Python files",
+        "matcher": "Edit|Write.*\\.py$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE_PATH=$(echo '$CLAUDE_TOOL_INPUT' | jq -r '.file_path // empty'); if [[ \"$FILE_PATH\" == *.py ]] && [[ ! \"$FILE_PATH\" =~ test ]]; then mypy \"$FILE_PATH\" 2>/dev/null || echo '  Type issues detected'; fi"
+          }
+        ]
+      },
+      {
+        "description": "Format Rust files",
+        "matcher": "Edit|Write.*\\.rs$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE_PATH=$(echo '$CLAUDE_TOOL_INPUT' | jq -r '.file_path // empty'); if [[ \"$FILE_PATH\" == *.rs ]]; then rustfmt \"$FILE_PATH\" 2>/dev/null; fi"
+          }
+        ]
+      },
+      {
+        "description": "Check for TODO items after changes",
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE_PATH=$(echo '$CLAUDE_TOOL_INPUT' | jq -r '.file_path // empty'); if grep -q 'TODO\\|FIXME\\|XXX' \"$FILE_PATH\" 2>/dev/null; then echo '=Ý TODOs found in file:'; grep -n 'TODO\\|FIXME\\|XXX' \"$FILE_PATH\"; fi"
+          }
+        ]
+      }
+    ],
+    
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '=€ Circuit-Synth Development Environment'; echo '=Ú Remember: Planning ’ Tests ’ Implementation ’ Review'; if [[ -d '.claude/agents' ]]; then echo '> Development agents available:'; ls .claude/agents/*.md 2>/dev/null | xargs -I {} basename {} .md | sed 's/^/   - /'; fi; echo '¡ Quality checks enabled: formatting, linting, testing'"
+          }
+        ]
+      }
+    ],
+    
+    "PreCommit": [
+      {
+        "description": "Run quality checks before committing",
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '= Running pre-commit checks...'; black src/ tests/ --check 2>/dev/null || echo '  Formatting needed'; flake8 src/ tests/ 2>/dev/null || echo '  Linting issues'; uv run pytest tests/unit/ --tb=short -q || echo 'L Tests failing'"
+          }
+        ]
+      }
+    ]
+  },
+  
+  "qualityGates": {
+    "minTestCoverage": 80,
+    "maxCyclomaticComplexity": 10,
+    "maxFunctionLength": 30,
+    "requireTypeHints": true,
+    "requireDocstrings": true
+  }
+}
