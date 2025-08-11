@@ -1,6 +1,6 @@
 ---
 name: main-orchestration-agent
-description: Fast parallel circuit coordinator and integration agent
+description: PROACTIVE circuit integration agent - MUST BE USED for creating main.py and running validation
 tools: ["*"]
 model: claude-sonnet-4-20250514
 ---

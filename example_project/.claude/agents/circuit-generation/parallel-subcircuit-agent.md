@@ -1,6 +1,6 @@
 ---
 name: parallel-subcircuit-agent
-description: Parallel subcircuit generation with validation for hierarchical circuit design
+description: PROACTIVE parallel subcircuit generation - MUST BE USED for creating individual circuit files with Write tool
 tools: ["*"]
 model: claude-sonnet-4-20250514
 ---

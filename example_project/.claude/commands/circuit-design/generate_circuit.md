@@ -198,27 +198,27 @@ Based on clarified/inferred requirements, break down into functional blocks:
 **ONLY AFTER collecting user requirements, launch agents based on their specific circuit:**
 
 ```python
-# Launch agents based on the ACTUAL user requirements gathered above
-# Customize each agent prompt based on user's specific needs
+# FORCE Claude to use the parallel-subcircuit-agent by explicit Task calls
+# Use the PROACTIVE parallel subcircuit generation agents
 
-Task(subagent_type="parallel-subcircuit-agent", description="Power circuit", 
-     prompt=f"SAVE FILE power_management.py: Create power management circuit for {power_requirements_from_user} using {preferred_supplier} components. MUST use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/power_management.py with complete circuit-synth code including @circuit decorator and function definition.")
+Task(subagent_type="parallel-subcircuit-agent", description="MUST CREATE power_management.py file", 
+     prompt=f"You MUST use the Write tool to create power_management.py. SAVE FILE power_management.py: Create power management circuit for {power_requirements_from_user} using {preferred_supplier} components. Use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/power_management.py with complete circuit-synth code including @circuit decorator and function definition. DO NOT just provide text - USE THE WRITE TOOL.")
 
-Task(subagent_type="parallel-subcircuit-agent", description="Main controller",
-     prompt=f"SAVE FILE esp32_controller.py: Create ESP32 controller circuit for {controller_requirements_from_user} with {required_peripherals} using {preferred_supplier} components. MUST use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/esp32_controller.py with complete circuit-synth code.")
+Task(subagent_type="parallel-subcircuit-agent", description="MUST CREATE esp32_controller.py file",
+     prompt=f"You MUST use the Write tool to create esp32_controller.py. SAVE FILE esp32_controller.py: Create ESP32 controller circuit for {controller_requirements_from_user} with {required_peripherals} using {preferred_supplier} components. Use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/esp32_controller.py with complete circuit-synth code. DO NOT just provide text - USE THE WRITE TOOL.")
      
-Task(subagent_type="parallel-subcircuit-agent", description="Motor control", 
-     prompt=f"SAVE FILE motor_control.py: Create motor control circuit for {motor_requirements_from_user} using {preferred_supplier} components. MUST use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/motor_control.py with complete circuit-synth code.")
+Task(subagent_type="parallel-subcircuit-agent", description="MUST CREATE motor_control.py file", 
+     prompt=f"You MUST use the Write tool to create motor_control.py. SAVE FILE motor_control.py: Create motor control circuit for {motor_requirements_from_user} using {preferred_supplier} components. Use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/motor_control.py with complete circuit-synth code. DO NOT just provide text - USE THE WRITE TOOL.")
 
-Task(subagent_type="parallel-subcircuit-agent", description="Audio/LED system", 
-     prompt=f"SAVE FILE audio_led.py: Create audio and LED circuit for {audio_led_requirements_from_user} using {preferred_supplier} components. MUST use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/audio_led.py with complete circuit-synth code.")
+Task(subagent_type="parallel-subcircuit-agent", description="MUST CREATE audio_led.py file", 
+     prompt=f"You MUST use the Write tool to create audio_led.py. SAVE FILE audio_led.py: Create audio and LED circuit for {audio_led_requirements_from_user} using {preferred_supplier} components. Use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/audio_led.py with complete circuit-synth code. DO NOT just provide text - USE THE WRITE TOOL.")
      
-Task(subagent_type="parallel-subcircuit-agent", description="USB interface",
-     prompt=f"SAVE FILE usb_interface.py: Create USB interface circuit for {usb_requirements_from_user} using {preferred_supplier} components. MUST use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/usb_interface.py with complete circuit-synth code.")
+Task(subagent_type="parallel-subcircuit-agent", description="MUST CREATE usb_interface.py file",
+     prompt=f"You MUST use the Write tool to create usb_interface.py. SAVE FILE usb_interface.py: Create USB interface circuit for {usb_requirements_from_user} using {preferred_supplier} components. Use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/usb_interface.py with complete circuit-synth code. DO NOT just provide text - USE THE WRITE TOOL.")
 
 # Integration agent creates main.py AFTER subcircuit files exist
-Task(subagent_type="main-orchestration-agent", description="Integration and validation", 
-     prompt=f"CREATE main.py integration file that imports: power_management.py, esp32_controller.py, motor_control.py, audio_led.py, usb_interface.py. Then RUN the main.py file to verify KiCad generation works. Report success or failure. Circuit description: {circuit_description}")
+Task(subagent_type="main-orchestration-agent", description="MUST CREATE main.py and validate", 
+     prompt=f"You MUST use the Write tool to create main.py. First check if these files exist: power_management.py, esp32_controller.py, motor_control.py, audio_led.py, usb_interface.py. If they don't exist, report FAILURE. If they exist, create main.py integration file that imports all 5 files. Then run 'uv run python main.py' to verify KiCad generation works. Report success or failure. Circuit description: {circuit_description}")
 ```
 
 **CRITICAL INSTRUCTIONS FOR ALL AGENTS:**
