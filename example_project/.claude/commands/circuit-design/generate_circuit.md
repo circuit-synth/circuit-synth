@@ -1,6 +1,6 @@
 ---
 description: Generate complete validated circuit project (interactive by default)
-model: claude-3-5-sonnet-20241022
+model: claude-sonnet-4-20250514
 ---
 
 # Unified Circuit Generation Pipeline
@@ -193,32 +193,32 @@ Based on clarified/inferred requirements, break down into functional blocks:
 - Debug: `SWD_CLK/DIO`, `nRST`, `BOOT0`
 - Status: `LED_POWER`, `LED_STATUS`, `LED_ERROR`
 
-### Step 3: Direct Parallel Generation (Launch Immediately)
+### Step 3: Launch Parallel Generation Based on User Requirements
 
-**NOW: Launch all subcircuit agents in parallel based on the planned architecture:**
+**ONLY AFTER collecting user requirements, launch agents based on their specific circuit:**
 
 ```python
-# Launch ALL agents simultaneously for maximum speed using Haiku
-# All circuit generation uses fast Haiku, only planning uses Sonnet 4
+# Launch agents based on the ACTUAL user requirements gathered above
+# Customize each agent prompt based on user's specific needs
 
-Task(subagent_type="parallel-subcircuit-agent", description="Power management", 
-     prompt="GENERATE AND SAVE power_management.py file using Write tool: USB-C input → 3.3V regulation circuit with AMS1117-3.3. Include decoupling capacitors and ESD protection. Use JLCPCB components. Output power on VCC_3V3 net. MUST use Write tool to save file.")
+Task(subagent_type="parallel-subcircuit-agent", description="Power circuit", 
+     prompt=f"Generate power_management.py: {power_requirements_from_user} with {preferred_supplier} components. Use Write tool to save file.")
 
-Task(subagent_type="parallel-subcircuit-agent", description="MCU core",
-     prompt="GENERATE AND SAVE mcu_core.py file using Write tool: STM32 microcontroller with SPI/USB peripherals. Include crystal oscillator, decoupling caps, SWD interface. Connect to shared power/communication nets. Use JLCPCB available STM32. MUST use Write tool to save file.")
+Task(subagent_type="parallel-subcircuit-agent", description="Main controller",
+     prompt=f"Generate main_controller.py: {controller_requirements_from_user} with {required_peripherals}. Use {preferred_supplier} components. Use Write tool to save file.")
      
-Task(subagent_type="parallel-subcircuit-agent", description="IMU sensor", 
-     prompt="GENERATE AND SAVE imu_sensor.py file using Write tool: IMU sensor (accelerometer+gyro+magnetometer) with SPI interface for hand tracking. Include proper decoupling and filtering. Connect to SPI nets. Use JLCPCB IMU component. MUST use Write tool to save file.")
+Task(subagent_type="parallel-subcircuit-agent", description="Sensor/peripheral", 
+     prompt=f"Generate sensor_interface.py: {sensor_requirements_from_user} with {interface_type}. Use {preferred_supplier} components. Use Write tool to save file.")
 
-Task(subagent_type="parallel-subcircuit-agent", description="USB interface",
-     prompt="GENERATE AND SAVE usb_interface.py file using Write tool: USB-C connector with ESD protection, data lines USB_DP/USB_DM, VBUS power input. Include ferrite beads and protection diodes. JLCPCB connector. MUST use Write tool to save file.")
+Task(subagent_type="parallel-subcircuit-agent", description="Communication", 
+     prompt=f"Generate communication.py: {communication_requirements_from_user} with {connector_type}. Use {preferred_supplier} components. Use Write tool to save file.")
      
-Task(subagent_type="parallel-subcircuit-agent", description="Debug header",
-     prompt="GENERATE AND SAVE debug_interface.py file using Write tool: SWD programming header (4-pin: VCC, GND, SWDCLK, SWDIO). Include pull-up resistors. Standard 2.54mm header footprint. MUST use Write tool to save file.")
+Task(subagent_type="parallel-subcircuit-agent", description="Debug/programming",
+     prompt=f"Generate debug_interface.py: {debug_requirements_from_user} programming interface. Use Write tool to save file.")
 
-# Integration agent creates main.py (also using fast Haiku)
+# Integration agent creates main.py
 Task(subagent_type="main-orchestration-agent", description="Integration", 
-     prompt="GENERATE AND SAVE main.py integration file using Write tool: Import all generated subcircuits and connect via shared nets. Test circuit compilation and generate KiCad output. MUST use Write tool to save main.py file.")
+     prompt=f"Generate main.py integration file for {circuit_description} based on user requirements: {user_requirements_summary}. Import all subcircuits and generate KiCad output. Use Write tool to save file.")
 ```
 
 **CRITICAL INSTRUCTIONS FOR ALL AGENTS:**
