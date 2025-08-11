@@ -193,37 +193,39 @@ Based on clarified/inferred requirements, break down into functional blocks:
 - Debug: `SWD_CLK/DIO`, `nRST`, `BOOT0`
 - Status: `LED_POWER`, `LED_STATUS`, `LED_ERROR`
 
-### Step 3: Main Orchestration Agent (Sonnet 4)
+### Step 3: Direct Parallel Generation (Launch Immediately)
 
-**FIRST: Deploy the main orchestration agent to coordinate the entire workflow:**
-
-```python
-# Use Sonnet 4 for the orchestration agent (best reasoning for coordination)
-Task(subagent_type="main-orchestration-agent", description="Circuit orchestration", 
-     prompt="You are the master orchestrator. Based on the clarified requirements:
-     1. Create detailed specifications for each subcircuit 
-     2. Define all shared nets and interfaces precisely
-     3. Launch parallel circuit-generation-agent tasks for each subcircuit
-     4. Coordinate the parallel workflow to ensure proper integration
-     5. Generate the main.py integration file that ties everything together
-     Use Sonnet 4 reasoning to ensure perfect coordination between all agents.")
-```
-
-### Step 4: The Orchestration Agent Will Then Launch Parallel Subcircuit Generation
-
-**The main-orchestration-agent will coordinate these parallel tasks:**
+**NOW: Launch all subcircuit agents in parallel based on the planned architecture:**
 
 ```python
-# These will be launched BY the orchestration agent, not by this planning agent
-# Power management subcircuit (using faster Haiku for code generation)
-# MCU core subcircuit (using faster Haiku for code generation)  
-# Sensor interface subcircuit (using faster Haiku for code generation)
-# USB interface subcircuit (using faster Haiku for code generation)
-# Integration and validation (orchestration agent handles this)
+# Launch ALL agents simultaneously for maximum speed
+# Use Haiku for fast code generation, parallel execution
+
+Task(subagent_type="parallel-subcircuit-agent", description="Power management", 
+     prompt="Generate power_management.py: USB-C input → 3.3V regulation circuit with AMS1117-3.3 or similar. Include decoupling capacitors and ESD protection. Use JLCPCB components. Output power on VCC_3V3 net.")
+
+Task(subagent_type="parallel-subcircuit-agent", description="MCU core",
+     prompt="Generate mcu_core.py: STM32 microcontroller with {required_peripherals} (SPI, USB, etc). Include crystal oscillator, decoupling caps, SWD interface. Connect to shared power/communication nets. Use JLCPCB available STM32.")
+     
+Task(subagent_type="parallel-subcircuit-agent", description="Sensor interfaces", 
+     prompt="Generate sensor_interface.py: {sensor_type} with {interface_type} interface. Include proper decoupling and filtering. Connect to shared SPI/I2C nets. Use JLCPCB components.")
+
+Task(subagent_type="parallel-subcircuit-agent", description="USB interface",
+     prompt="Generate usb_interface.py: USB-C connector with ESD protection, data lines USB_DP/USB_DM, VBUS power input. Include ferrite beads and protection diodes. JLCPCB connector.")
+     
+Task(subagent_type="parallel-subcircuit-agent", description="Debug header",
+     prompt="Generate debug_interface.py: SWD programming header (4-pin: VCC, GND, SWDCLK, SWDIO). Include pull-up resistors. Standard 2.54mm header footprint.")
+
+# Integration agent runs in parallel to create main.py
+Task(subagent_type="main-orchestration-agent", description="Integration", 
+     prompt="Create main.py integration file that imports all generated subcircuits and connects them via shared nets. Test circuit compilation and generate KiCad output.")
 ```
 
-**CRITICAL INSTRUCTION FOR ORCHESTRATION AGENT:**
-You must coordinate the entire workflow. Launch parallel subcircuit agents, ensure they create actual files using the Write tool, validate all files, and generate the final integrated circuit with KiCad output.
+**CRITICAL INSTRUCTIONS FOR ALL AGENTS:**
+- **Use Write tool** to save all .py files immediately
+- **Verify JLCPCB availability** for all components before using
+- **Follow shared net naming** exactly as specified above
+- **Generate working code** that compiles with `uv run python filename.py`
 
 **COMPONENT SOURCING FALLBACK LOGIC:**
 1. **Primary**: Use the supplier preference specified by user (JLCPCB or DigiKey)
