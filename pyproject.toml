@@ -98,6 +98,7 @@ cs-new-project = "circuit_synth.tools.project_management.new_project:main"
 cs-init-pcb = "circuit_synth.tools.project_management.init_pcb:main"
 cs-init-existing-project = "circuit_synth.tools.project_management.init_existing_project:main"
 cs-setup-kicad-plugins = "circuit_synth.tools.development.setup_kicad_plugins:main"
+cs-generate-fast = "circuit_synth.tools.ai_generation.fast_generate:main"
 
 # Memory-Bank System
 cs-memory-bank-init = "circuit_synth.ai_integration.memory_bank.cli:init_cli"
