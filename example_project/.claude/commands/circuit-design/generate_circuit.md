@@ -198,27 +198,27 @@ Based on clarified/inferred requirements, break down into functional blocks:
 **NOW: Launch all subcircuit agents in parallel based on the planned architecture:**
 
 ```python
-# Launch ALL agents simultaneously for maximum speed
-# Use Haiku for fast code generation, parallel execution
+# Launch ALL agents simultaneously for maximum speed using Haiku
+# All circuit generation uses fast Haiku, only planning uses Sonnet 4
 
 Task(subagent_type="parallel-subcircuit-agent", description="Power management", 
-     prompt="Generate power_management.py: USB-C input → 3.3V regulation circuit with AMS1117-3.3 or similar. Include decoupling capacitors and ESD protection. Use JLCPCB components. Output power on VCC_3V3 net.")
+     prompt="GENERATE AND SAVE power_management.py file using Write tool: USB-C input → 3.3V regulation circuit with AMS1117-3.3. Include decoupling capacitors and ESD protection. Use JLCPCB components. Output power on VCC_3V3 net. MUST use Write tool to save file.")
 
 Task(subagent_type="parallel-subcircuit-agent", description="MCU core",
-     prompt="Generate mcu_core.py: STM32 microcontroller with {required_peripherals} (SPI, USB, etc). Include crystal oscillator, decoupling caps, SWD interface. Connect to shared power/communication nets. Use JLCPCB available STM32.")
+     prompt="GENERATE AND SAVE mcu_core.py file using Write tool: STM32 microcontroller with SPI/USB peripherals. Include crystal oscillator, decoupling caps, SWD interface. Connect to shared power/communication nets. Use JLCPCB available STM32. MUST use Write tool to save file.")
      
-Task(subagent_type="parallel-subcircuit-agent", description="Sensor interfaces", 
-     prompt="Generate sensor_interface.py: {sensor_type} with {interface_type} interface. Include proper decoupling and filtering. Connect to shared SPI/I2C nets. Use JLCPCB components.")
+Task(subagent_type="parallel-subcircuit-agent", description="IMU sensor", 
+     prompt="GENERATE AND SAVE imu_sensor.py file using Write tool: IMU sensor (accelerometer+gyro+magnetometer) with SPI interface for hand tracking. Include proper decoupling and filtering. Connect to SPI nets. Use JLCPCB IMU component. MUST use Write tool to save file.")
 
 Task(subagent_type="parallel-subcircuit-agent", description="USB interface",
-     prompt="Generate usb_interface.py: USB-C connector with ESD protection, data lines USB_DP/USB_DM, VBUS power input. Include ferrite beads and protection diodes. JLCPCB connector.")
+     prompt="GENERATE AND SAVE usb_interface.py file using Write tool: USB-C connector with ESD protection, data lines USB_DP/USB_DM, VBUS power input. Include ferrite beads and protection diodes. JLCPCB connector. MUST use Write tool to save file.")
      
 Task(subagent_type="parallel-subcircuit-agent", description="Debug header",
-     prompt="Generate debug_interface.py: SWD programming header (4-pin: VCC, GND, SWDCLK, SWDIO). Include pull-up resistors. Standard 2.54mm header footprint.")
+     prompt="GENERATE AND SAVE debug_interface.py file using Write tool: SWD programming header (4-pin: VCC, GND, SWDCLK, SWDIO). Include pull-up resistors. Standard 2.54mm header footprint. MUST use Write tool to save file.")
 
-# Integration agent runs in parallel to create main.py
+# Integration agent creates main.py (also using fast Haiku)
 Task(subagent_type="main-orchestration-agent", description="Integration", 
-     prompt="Create main.py integration file that imports all generated subcircuits and connects them via shared nets. Test circuit compilation and generate KiCad output.")
+     prompt="GENERATE AND SAVE main.py integration file using Write tool: Import all generated subcircuits and connect via shared nets. Test circuit compilation and generate KiCad output. MUST use Write tool to save main.py file.")
 ```
 
 **CRITICAL INSTRUCTIONS FOR ALL AGENTS:**
