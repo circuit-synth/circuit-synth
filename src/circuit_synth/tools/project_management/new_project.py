@@ -349,373 +349,70 @@ def check_kicad_installation() -> Dict[str, Any]:
         return {"kicad_installed": False, "error": str(e)}
 
 
-def create_example_circuits(project_path: Path) -> None:
-    """Create example circuit files in circuit-synth directory"""
-    circuit_synth_dir = project_path / "circuit-synth"
-    circuit_synth_dir.mkdir(exist_ok=True)
+def copy_example_project_template(project_path: Path) -> bool:
+    """Copy the entire example_project template to the target project directory
 
-    # USB-C implementation with protection
-    usb_circuit = '''#!/usr/bin/env python3
-"""
-USB-C Circuit - Professional USB-C implementation with ESD protection
-Includes CC resistors, ESD protection, and shield grounding
-"""
-
-from circuit_synth import *
-
-@circuit(name="USB_Port")
-def usb_port(vbus_out, gnd, usb_dp, usb_dm):
-    """USB-C port with CC resistors, ESD protection, and proper grounding"""
-    
-    # USB-C connector
-    usb_conn = Component(
-        symbol="Connector:USB_C_Receptacle_USB2.0_16P",
-        ref="J",
-        footprint="Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal"
-    )
-    
-    # CC pull-down resistors (5.1k for UFP device)
-    cc1_resistor = Component(symbol="Device:R", ref="R", value="5.1k",
-                            footprint="Resistor_SMD:R_0603_1608Metric")
-    cc2_resistor = Component(symbol="Device:R", ref="R", value="5.1k", 
-                            footprint="Resistor_SMD:R_0603_1608Metric")
-    
-    
-    # ESD protection diodes for data lines
-    esd_dp = Component(symbol="Diode:ESD5Zxx", ref="D",
-                      footprint="Diode_SMD:D_SOD-523")
-    esd_dm = Component(symbol="Diode:ESD5Zxx", ref="D",
-                      footprint="Diode_SMD:D_SOD-523")
-    
-    # USB decoupling capacitor
-    cap_usb = Component(symbol="Device:C", ref="C", value="10uF",
-                       footprint="Capacitor_SMD:C_0805_2012Metric")
-    
-    # USB-C connections
-    usb_conn["VBUS"] += vbus_out
-    usb_conn["GND"] += gnd
-    usb_conn["SHIELD"] += gnd  # Ground the shield
-    usb_conn["D+"] += usb_dp
-    usb_conn["D-"] += usb_dm
-    
-    # CC resistors to ground
-    usb_conn["CC1"] += cc1_resistor[1]
-    cc1_resistor[2] += gnd
-    usb_conn["CC2"] += cc2_resistor[1] 
-    cc2_resistor[2] += gnd
-    
-    # ESD protection (connector side)
-    esd_dp[1] += usb_dp
-    esd_dp[2] += gnd
-    esd_dm[1] += usb_dm
-    esd_dm[2] += gnd
-    
-    # USB decoupling capacitor connections
-    cap_usb[1] += vbus_out
-    cap_usb[2] += gnd
-
-'''
-
-    # Power supply circuit
-    power_supply_circuit = '''#!/usr/bin/env python3
-"""
-Power Supply Circuit - 5V to 3.3V regulation
-Clean power regulation from USB-C VBUS to regulated 3.3V
-"""
-
-from circuit_synth import *
-
-@circuit(name="Power_Supply")
-def power_supply(vbus_in, vcc_3v3_out, gnd):
-    """5V to 3.3V power regulation subcircuit"""
-    
-    # 3.3V regulator
-    regulator = Component(
-        symbol="Regulator_Linear:AMS1117-3.3", 
-        ref="U",
-        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
-    )
-    
-    # Input/output capacitors
-    cap_in = Component(symbol="Device:C", ref="C", value="10uF", 
-                      footprint="Capacitor_SMD:C_0805_2012Metric")
-    cap_out = Component(symbol="Device:C", ref="C", value="22uF",
-                       footprint="Capacitor_SMD:C_0805_2012Metric")
-    
-    # Connections
-    regulator["VI"] += vbus_in   # Input pin for AMS1117
-    regulator["VO"] += vcc_3v3_out  # Output pin for AMS1117
-    regulator["GND"] += gnd
-    cap_in[1] += vbus_in
-    cap_in[2] += gnd
-    cap_out[1] += vcc_3v3_out
-    cap_out[2] += gnd
-
-'''
-
-    # Debug header circuit
-    debug_header_circuit = '''#!/usr/bin/env python3
-"""
-Debug Header Circuit - Programming and debugging interface
-Standard ESP32 debug header with UART, reset, and boot control
-"""
-
-from circuit_synth import *
-
-@circuit(name="Debug_Header")
-def debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0):
-    """Debug header for programming and debugging"""
-    
-    # 2x3 debug header
-    debug_header = Component(
-        symbol="Connector_Generic:Conn_02x03_Odd_Even",
-        ref="J",
-        footprint="Connector_IDC:IDC-Header_2x03_P2.54mm_Vertical"
-    )
-    
-    # Header connections (standard ESP32 debug layout)
-    debug_header[1] += debug_en   # EN/RST
-    debug_header[2] += vcc_3v3    # 3.3V
-    debug_header[3] += debug_tx   # TX
-    debug_header[4] += gnd        # GND
-    debug_header[5] += debug_rx   # RX  
-    debug_header[6] += debug_io0  # IO0/BOOT
-
-'''
-
-    # LED blinker circuit
-    led_blinker_circuit = '''#!/usr/bin/env python3
-"""
-LED Blinker Circuit - Status LED with current limiting
-Simple LED indicator with proper current limiting resistor
-"""
-
-from circuit_synth import *
-
-@circuit(name="LED_Blinker")  
-def led_blinker(vcc_3v3, gnd, led_control):
-    """LED with current limiting resistor"""
-    
-    # LED and resistor
-    led = Component(symbol="Device:LED", ref="D", 
-                   footprint="LED_SMD:LED_0805_2012Metric")
-    resistor = Component(symbol="Device:R", ref="R", value="330",
-                        footprint="Resistor_SMD:R_0805_2012Metric")
-    
-    # Connections  
-    resistor[1] += vcc_3v3
-    resistor[2] += led["A"]  # Anode
-    led["K"] += led_control  # Cathode (controlled by MCU)
-
-'''
-
-    # ESP32-C6 circuit (includes debug and LED as subcircuits)
-    esp32c6_circuit = '''#!/usr/bin/env python3
-"""
-ESP32-C6 Circuit
-Professional ESP32-C6 microcontroller with USB signal integrity and support circuitry
-"""
-
-from circuit_synth import *
-from debug_header import debug_header
-from led_blinker import led_blinker
-
-@circuit(name="ESP32_C6_MCU")
-def esp32c6(vcc_3v3, gnd, usb_dp, usb_dm):
+    Returns:
+        bool: True if template was successfully copied, False otherwise
     """
-    ESP32-C6 microcontroller subcircuit with decoupling and connections
-    
-    Args:
-        vcc_3v3: 3.3V power supply net
-        gnd: Ground net
-        usb_dp: USB Data+ net
-        usb_dm: USB Data- net
-    """
-    
-    # ESP32-C6 MCU
-    esp32_c6 = Component(
-        symbol="RF_Module:ESP32-C6-MINI-1",
-        ref="U", 
-        footprint="RF_Module:ESP32-C6-MINI-1"
-    )
 
-    # ESP32-C6 decoupling capacitor
-    cap_esp = Component(
-        symbol="Device:C", 
-        ref="C", 
-        value="100nF",
-        footprint="Capacitor_SMD:C_0603_1608Metric"
-    )
+    # Find the project template in the package data directory
+    circuit_synth_dir = Path(
+        __file__
+    ).parent.parent.parent  # Get to circuit_synth directory
+    template_dir = circuit_synth_dir / "data" / "templates" / "project_template"
 
-    # USB D+/D- inline resistors (22R for signal integrity)
-    usb_dp_resistor = Component(symbol="Device:R", ref="R", value="22",
-                               footprint="Resistor_SMD:R_0603_1608Metric")
-    usb_dm_resistor = Component(symbol="Device:R", ref="R", value="22",
-                               footprint="Resistor_SMD:R_0603_1608Metric")
+    # Fallback: check for example_project in repo root (for development)
+    if not template_dir.exists():
+        circuit_synth_root = Path(__file__).parent.parent.parent.parent
+        fallback_template = circuit_synth_root / "example_project"
+        if fallback_template.exists():
+            template_dir = fallback_template
 
-    # Internal USB data nets (after ESD, before MCU)
-    usb_dp_mcu = Net('USB_DP_MCU')
-    usb_dm_mcu = Net('USB_DM_MCU')
-
-    # Debug signals
-    debug_tx = Net('DEBUG_TX')
-    debug_rx = Net('DEBUG_RX')
-    debug_en = Net('DEBUG_EN')
-    debug_io0 = Net('DEBUG_IO0')
-    
-    # LED control
-    led_control = Net('LED_CONTROL')
-    
-    # Power connections
-    esp32_c6["3V3"] += vcc_3v3
-    esp32_c6["GND"] += gnd
-    
-    # USB D+/D- inline resistors (ESD protected signal -> 22R -> MCU)
-    usb_dp_resistor[1] += usb_dp
-    usb_dp_resistor[2] += usb_dp_mcu
-    usb_dm_resistor[1] += usb_dm
-    usb_dm_resistor[2] += usb_dm_mcu
-    
-    # USB connections to MCU
-    esp32_c6["IO18"] += usb_dp_mcu  # USB D+
-    esp32_c6["IO19"] += usb_dm_mcu  # USB D-
-    
-    # Debug connections
-    esp32_c6["EN"] += debug_en    # Reset/Enable
-    esp32_c6["TXD0"] += debug_tx  # UART TX
-    esp32_c6["RXD0"] += debug_rx  # UART RX
-    esp32_c6["IO0"] += debug_io0  # Boot mode control
-    
-    # LED control GPIO
-    esp32_c6["IO8"] += led_control  # GPIO for LED control
-    
-
-    cap_esp[1] += vcc_3v3
-    cap_esp[2] += gnd
-
-
-    debug_header_circuit = debug_header(vcc_3v3, gnd, debug_tx, debug_rx, debug_en, debug_io0)
-    led_blinker_circuit = led_blinker(vcc_3v3, gnd, led_control)
-
-
-'''
-
-    # Main circuit example
-    main_circuit = '''#!/usr/bin/env python3
-"""
-Main Circuit - ESP32-C6 Development Board
-Professional hierarchical circuit design with modular subcircuits
-
-This is the main entry point that orchestrates all subcircuits:
-- USB-C power input with proper CC resistors and protection
-- 5V to 3.3V power regulation  
-- ESP32-C6 microcontroller with USB and debug interfaces
-- Status LED with current limiting
-- Debug header for programming and development
-"""
-
-from circuit_synth import *
-
-# Import all circuits
-from usb import usb_port
-from power_supply import power_supply
-from esp32c6 import esp32c6
-
-@circuit(name="ESP32_C6_Dev_Board_Main")
-def main_circuit():
-    """Main hierarchical circuit - ESP32-C6 development board"""
-    
-    # Create shared nets between subcircuits (ONLY nets - no components here)
-    vbus = Net('VBUS')
-    vcc_3v3 = Net('VCC_3V3')
-    gnd = Net('GND')
-    usb_dp = Net('USB_DP')
-    usb_dm = Net('USB_DM')
-
-    
-    # Create all circuits with shared nets
-    usb_port_circuit = usb_port(vbus, gnd, usb_dp, usb_dm)
-    power_supply_circuit = power_supply(vbus, vcc_3v3, gnd)
-    esp32_circuit = esp32c6(vcc_3v3, gnd, usb_dp, usb_dm)
-
-
-if __name__ == "__main__":
-    print("🚀 Starting ESP32-C6 development board generation...")
-    
-    # Generate the complete hierarchical circuit
-    print("📋 Creating circuit...")
-    circuit = main_circuit()
-    
-    # Generate KiCad netlist (required for ratsnest display)
-    print("🔌 Generating KiCad netlist...")
-    circuit.generate_kicad_netlist("ESP32_C6_Dev_Board.net")
-    
-    # Generate JSON netlist (for debugging and analysis)
-    print("📄 Generating JSON netlist...")
-    circuit.generate_json_netlist("ESP32_C6_Dev_Board.json")
-    
-    # Create KiCad project with hierarchical sheets
-    print("🏗️  Generating KiCad project...")
-    circuit.generate_kicad_project(
-        project_name="ESP32_C6_Dev_Board",
-        placement_algorithm="hierarchical",
-        generate_pcb=True
-    )
-    
-    print("")
-    print("✅ ESP32-C6 Development Board project generated!")
-    print("📁 Check the ESP32_C6_Dev_Board/ directory for KiCad files")
-    print("")
-    print("🏗️ Generated circuits:")
-    print("   • USB-C port with CC resistors and ESD protection")
-    print("   • 5V to 3.3V power regulation")
-    print("   • ESP32-C6 microcontroller with support circuits")
-    print("   • Debug header for programming")  
-    print("   • Status LED with current limiting")
-    print("")
-    print("📋 Generated files:")
-    print("   • ESP32_C6_Dev_Board.kicad_pro - KiCad project file")
-    print("   • ESP32_C6_Dev_Board.kicad_sch - Hierarchical schematic")
-    print("   • ESP32_C6_Dev_Board.kicad_pcb - PCB layout")
-    print("   • ESP32_C6_Dev_Board.net - Netlist (enables ratsnest)")
-    print("   • ESP32_C6_Dev_Board.json - JSON netlist (for analysis)")
-    print("")
-    print("🎯 Ready for professional PCB manufacturing!")
-    print("💡 Open ESP32_C6_Dev_Board.kicad_pcb in KiCad to see the ratsnest!")
-'''
-
-    # Write all circuit files
-    with open(circuit_synth_dir / "main.py", "w") as f:
-        f.write(main_circuit)
-
-    with open(circuit_synth_dir / "usb.py", "w") as f:
-        f.write(usb_circuit)
-
-    with open(circuit_synth_dir / "power_supply.py", "w") as f:
-        f.write(power_supply_circuit)
-
-    with open(circuit_synth_dir / "debug_header.py", "w") as f:
-        f.write(debug_header_circuit)
-
-    with open(circuit_synth_dir / "led_blinker.py", "w") as f:
-        f.write(led_blinker_circuit)
-
-    with open(circuit_synth_dir / "esp32c6.py", "w") as f:
-        f.write(esp32c6_circuit)
+    if not template_dir.exists():
+        console.print(
+            f"⚠️  Project template not found at {template_dir}", style="yellow"
+        )
+        console.print("🔄 Falling back to basic project creation", style="yellow")
+        return False
 
     console.print(
-        f"✅ Created hierarchical circuit examples in {circuit_synth_dir}/",
-        style="green",
+        f"📋 Copying complete project template from {template_dir}", style="blue"
     )
-    console.print("   • main.py - Main ESP32-C6 development board", style="cyan")
-    console.print("   • usb.py - USB-C with CC resistors", style="cyan")
-    console.print("   • power_supply.py - 5V to 3.3V regulation", style="cyan")
-    console.print("   • debug_header.py - Programming interface", style="cyan")
-    console.print("   • led_blinker.py - Status LED", style="cyan")
-    console.print("   • esp32c6.py - ESP32-C6 microcontroller", style="cyan")
-    console.print(
-        "   🎯 All files are used by main.py - clean working example!", style="green"
-    )
+
+    try:
+        # Copy all files and directories from template to project_path
+        for item in template_dir.iterdir():
+            if item.is_file():
+                # Copy individual files
+                dest_file = project_path / item.name
+                shutil.copy2(item, dest_file)
+                console.print(f"   ✅ Copied {item.name}", style="green")
+            elif item.is_dir():
+                # Copy entire directories
+                dest_dir = project_path / item.name
+                if dest_dir.exists():
+                    shutil.rmtree(dest_dir)
+                shutil.copytree(item, dest_dir)
+                console.print(f"   ✅ Copied {item.name}/ directory", style="green")
+
+        console.print("✅ Complete project template copied successfully", style="green")
+        console.print(
+            "   🎯 Ready-to-use ESP32-C6 development board example included!",
+            style="cyan",
+        )
+        console.print(
+            "   🤖 Claude Code agents and commands included from template!",
+            style="cyan",
+        )
+        return True
+
+    except Exception as e:
+        console.print(f"⚠️  Could not copy project template: {e}", style="yellow")
+        console.print(
+            "🔄 Project setup will continue without template files", style="yellow"
+        )
+        return False
 
 
 def create_project_readme(
@@ -1162,24 +859,24 @@ def main(skip_kicad_check: bool, minimal: bool, developer: bool, no_memory_bank:
     else:
         console.print("⏭️  Skipped KiCad check", style="yellow")
 
-    # Step 2: Setup complete Claude Code integration
-    if developer:
-        console.print(
-            "\n🤖 Setting up Claude Code integration (developer mode)...",
-            style="yellow",
-        )
-    else:
-        console.print("\n🤖 Setting up Claude Code integration...", style="yellow")
-    try:
-        copy_complete_claude_setup(project_path, developer_mode=developer)
+    # Step 2: Copy complete project template (includes .claude directory)
+    console.print("\n📝 Copying project template...", style="yellow")
+    template_copied = copy_example_project_template(project_path)
+
+    # Fallback: If template copy failed, setup Claude integration separately
+    if not template_copied:
         if developer:
             console.print(
-                "✅ Developer Claude setup copied successfully", style="green"
+                "\n🤖 Setting up Claude Code integration (developer mode)...",
+                style="yellow",
             )
         else:
+            console.print("\n🤖 Setting up Claude Code integration...", style="yellow")
+        try:
+            copy_complete_claude_setup(project_path, developer_mode=developer)
             console.print("✅ Claude setup copied successfully", style="green")
-    except Exception as e:
-        console.print(f"⚠️  Could not copy Claude setup: {e}", style="yellow")
+        except Exception as e:
+            console.print(f"⚠️  Could not copy Claude setup: {e}", style="yellow")
 
     # KiCad plugins setup removed - use 'uv run cs-setup-kicad-plugins' if needed
     if not skip_kicad_check and kicad_info.get("kicad_installed", False):
@@ -1192,12 +889,7 @@ def main(skip_kicad_check: bool, minimal: bool, developer: bool, no_memory_bank:
     # Step 3: Skip library preferences (no user prompt needed)
     additional_libraries = []
 
-    # Step 4: Create example circuits
-    if not minimal:
-        console.print("\n📝 Creating example circuits...", style="yellow")
-        create_example_circuits(project_path)
-    else:
-        console.print("⏭️  Skipped example circuits (minimal mode)", style="yellow")
+    # Skip duplicate template step - already done in Step 2
 
     # Step 5: Initialize Memory-Bank System
     if not no_memory_bank:
@@ -1230,18 +922,24 @@ def main(skip_kicad_check: bool, minimal: bool, developer: bool, no_memory_bank:
     else:
         console.print("⏭️  Skipped memory-bank system initialization", style="yellow")
 
-    # Step 6: Create project documentation
-    console.print("\n📚 Creating project documentation...", style="yellow")
-    create_project_readme(project_path, project_name, additional_libraries)
-
-    # Create memory-bank enhanced CLAUDE.md (or basic one if no memory-bank)
-    if not no_memory_bank:
-        # The memory-bank init_memory_bank function already creates CLAUDE.md with memory-bank docs
+    # Step 6: Documentation already included in template
+    if template_copied:
+        console.print("\n📚 Project documentation included in template", style="green")
+        console.print("   ✅ README.md with comprehensive usage guide", style="cyan")
         console.print(
-            "✅ Memory-bank enhanced CLAUDE.md already created", style="green"
+            "   ✅ CLAUDE.md with circuit-synth specific guidance", style="cyan"
         )
     else:
-        create_claude_md(project_path)
+        console.print("\n📚 Creating project documentation...", style="yellow")
+        create_project_readme(project_path, project_name, additional_libraries)
+        # Create memory-bank enhanced CLAUDE.md (or basic one if no memory-bank)
+        if not no_memory_bank:
+            # The memory-bank init_memory_bank function already creates CLAUDE.md with memory-bank docs
+            console.print(
+                "✅ Memory-bank enhanced CLAUDE.md already created", style="green"
+            )
+        else:
+            create_claude_md(project_path)
 
     # Success message
     console.print(

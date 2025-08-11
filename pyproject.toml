@@ -136,7 +136,12 @@ circuit_synth = [
     "data/templates/example_project/circuit-synth/*",
     "data/templates/example_project/.claude/*",
     "data/templates/example_project/.claude/agents/*/*",
-    "data/templates/example_project/.claude/commands/*/*"
+    "data/templates/example_project/.claude/commands/*/*",
+    "data/templates/project_template/*",
+    "data/templates/project_template/circuit-synth/*",
+    "data/templates/project_template/.claude/*",
+    "data/templates/project_template/.claude/agents/*/*",
+    "data/templates/project_template/.claude/commands/*/*"
 ]
 
 # Include all Python module files
@@ -198,6 +203,7 @@ members = [
     "test_8_agents/test_project",
     "test_install",
     "test-project",
+    "test_project_creation",
 ]
 
 [dependency-groups]

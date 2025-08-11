@@ -1,8 +1,24 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when developing and contributing to the circuit-synth project.
 
-## Essential Commands
+## 🚀 Project Overview
+
+Circuit-synth is an open-source Python library for professional circuit design with AI-powered component intelligence and manufacturing integration. This repository focuses on **development and contribution** to the library itself.
+
+## ⚡ Development Commands
+
+### Essential Development Workflow
+```bash
+# Setup complete development environment
+/setup-dev-environment --full --kicad-check
+
+# Run comprehensive test suite
+/dev-run-tests
+
+# Update docs and commit changes
+/dev-update-and-commit "description of changes"
+```
 
 ### Git & GitHub Operations
 ```bash
@@ -18,18 +34,7 @@ gh issue list
 gh pr list
 ```
 
-### KiCad Integration
-```bash
-# Ensure KiCad is installed locally (required dependency)
-kicad-cli version
-
-# Verify KiCad libraries are accessible
-find /usr/share/kicad/symbols -name "*.kicad_sym" | head -5
-```
-
-## Development Commands
-
-### Installation and Setup
+### Installation and Development Setup
 
 **Primary method (recommended) - using uv:**
 ```bash
@@ -39,7 +44,7 @@ uv pip install -e ".[dev]"
 # Install dependencies
 uv sync
 
-# Register Claude Code agents for AI-assisted circuit design
+# Register Claude Code agents for AI-assisted development
 uv run register-agents
 ```
 
@@ -52,7 +57,8 @@ pip install -e ".[dev]"
 register-agents
 ```
 
-### Code Quality and Testing
+## 🧪 Testing & Quality Assurance
+
 **IMPORTANT: Always run linting and tests after making changes**
 
 **🚨 PRE-RELEASE TESTING (CRITICAL for PyPI):**
@@ -79,15 +85,8 @@ register-agents
 # Run only Python tests (fast)
 ./tools/testing/run_all_tests.sh --python-only
 
-
 # Stop on first failure (for debugging)
 ./tools/testing/run_all_tests.sh --fail-fast
-```
-
-```bash
-
-# Test with verbose output and Python integration
-
 ```
 
 **🐍 TRADITIONAL PYTHON TESTING:**
@@ -105,7 +104,6 @@ uv run pytest --cov=circuit_synth
 
 # Run specific test file
 uv run pytest tests/unit/test_core_circuit.py -v
-
 ```
 
 ### Building and Distribution
@@ -128,163 +126,38 @@ python -m build
 pip install -e .
 ```
 
-### Build Tools
-```bash
+## 🤖 Development Agents
 
-# Clean rebuild everything
+This repository uses specialized development agents:
 
-./tools/build/format_all.sh
-```
+### **👨‍💻 contributor Agent**
+- **Expertise**: Code review, architecture guidance, and open-source project management
+- **Usage**: `@Task(subagent_type="contributor", description="Review code", prompt="Review this new component placement algorithm for code quality")`
+- **Capabilities**: 
+  - SOLID principles validation and clean architecture
+  - Test-driven development (TDD) guidance
+  - Documentation and contribution workflow support
+  - Community engagement and knowledge sharing
 
-### Component Search Commands
-```bash
-# Unified component search across suppliers (NEW!)
-# /find-parts "0.1uF 0603" - Search all suppliers
-# /find-parts "STM32F407" --source jlcpcb - JLCPCB only
-# /find-parts "LM358" --source digikey - DigiKey only
-# /find-parts "3.3V regulator" --compare - Compare across suppliers
+### **⚙️ code Agent**
+- **Expertise**: Software engineering best practices and clean implementation
+- **Usage**: `@Task(subagent_type="code", description="Implement feature", prompt="Implement a new JSON processing pipeline following clean architecture")`
+- **Capabilities**: 
+  - Modern Python patterns with type hints and dataclasses
+  - Performance optimization and algorithm improvement
+  - Refactoring and technical debt resolution
+  - Design pattern application and architectural decisions
 
-# KiCad symbol and footprint search
-# /find-symbol STM32 - Search for STM32 symbols
-# /find-footprint LQFP - Search for LQFP footprints
+### **🔍 general-purpose Agent**
+- **Expertise**: Complex research, codebase analysis, and multi-step problem solving
+- **Usage**: `@Task(subagent_type="general-purpose", description="Analyze codebase", prompt="Research how component placement algorithms work across the codebase")`
+- **Capabilities**: 
+  - Deep codebase exploration and cross-file dependency analysis
+  - Architecture analysis and design pattern identification
+  - Multi-round investigation and comprehensive reporting
+  - Cross-component impact assessment
 
-# Circuit validation commands
-# /generate-validated-circuit "ESP32 development board" - Generate circuit with quality assurance
-# /validate-existing-circuit - Validate and improve existing circuit code
-
-# Quality Assurance commands
-# /analyze-fmea my_circuit.py - Run FMEA analysis on circuit
-# /generate-fmea-report my_circuit.py --comprehensive - Generate 50+ page FMEA report
-
-# Circuit Debugging commands (NEW!)
-# /debug-start "Board not powering on" --board="my_board" - Start debug session
-# /debug-symptom "No voltage on 3.3V rail" - Add symptom
-# /debug-measure "VCC: 0V, VBUS: 5V" - Add measurements
-# /debug-analyze - Get AI analysis of issues
-# /debug-suggest - Get next troubleshooting steps
-# /debug-tree power - Show power troubleshooting tree
-
-# Development slash commands (for contributors)
-# /dev-run-tests - Run comprehensive test suite
-# /dev-update-and-commit "description" - Update docs and commit changes
-
-# Manual search in KiCad libraries (if needed)
-find /usr/share/kicad/symbols -name "*.kicad_sym" | xargs grep -l "STM32"
-find /usr/share/kicad/footprints -name "*.kicad_mod" | grep -i lqfp
-```
-
-### Multi-Source Component Search (NEW!)
-```python
-from circuit_synth.manufacturing import find_parts
-
-# Search all suppliers
-results = find_parts("0.1uF 0603 X7R", sources="all")
-
-# Search specific supplier
-jlc_results = find_parts("STM32F407", sources="jlcpcb")
-dk_results = find_parts("LM358", sources="digikey")
-
-# Compare across suppliers
-comparison = find_parts("3.3V regulator", sources="all", compare=True)
-print(comparison)  # Shows comparison table
-
-# Filter by requirements
-high_stock = find_parts("10k resistor", min_stock=10000, max_price=0.10)
-```
-
-### DigiKey Integration Setup
-```bash
-# Configure DigiKey API (one-time setup)
-python -m circuit_synth.manufacturing.digikey.config_manager
-
-# Test connection
-python -m circuit_synth.manufacturing.digikey.test_connection
-
-# Environment variables (alternative to config file)
-export DIGIKEY_CLIENT_ID="your_client_id"
-export DIGIKEY_CLIENT_SECRET="your_client_secret"
-```
-
-## Circuit Validation System
-
-**NEW FEATURE: Circuit Quality Assurance**
-
-The validation system provides automatic quality checking and improvement for circuit code:
-
-### Core Functions
-```python
-from circuit_synth.validation import validate_and_improve_circuit, get_circuit_design_context
-
-# Validate and fix circuit code automatically
-code, is_valid, status = validate_and_improve_circuit(circuit_code)
-
-# Get comprehensive design context for better generation
-context = get_circuit_design_context("esp32")  # or "power", "analog", etc.
-```
-
-### Available Commands
-- `/generate-validated-circuit <description> [type]` - Generate circuit with quality assurance
-- `/validate-existing-circuit` - Check and improve existing circuit code
-
-### What It Validates
-1. **Syntax errors** - Catches Python syntax issues
-2. **Missing imports** - Automatically fixes circuit_synth imports
-3. **Runtime execution** - Ensures code actually runs
-4. **Circuit structure** - Validates @circuit decorator usage
-
-### Example Usage
-```bash
-# Generate validated ESP32 circuit
-/generate-validated-circuit "ESP32 with USB-C power" mcu
-
-# Validate code you wrote manually
-/validate-existing-circuit
-```
-
-## Circuit Debugging System
-
-**NEW FEATURE: AI-Powered PCB Troubleshooting**
-
-The debugging system helps diagnose and fix hardware issues with intelligent analysis:
-
-### Core Functions
-```python
-from circuit_synth.debugging import CircuitDebugger, DebugSession
-
-# Start debugging session
-debugger = CircuitDebugger()
-session = debugger.start_session("my_board", "v1.0")
-
-# Add symptoms and measurements
-session.add_symptom("Board not powering on")
-session.add_measurement("VCC_3V3", 0, "V")
-
-# Analyze issues
-issues = debugger.analyze_symptoms(session)
-
-# Get troubleshooting guidance
-suggestions = debugger.suggest_next_test(session)
-```
-
-### CLI Tool
-```bash
-# Interactive debugging
-uv run python -m circuit_synth.tools.debug_cli --interactive
-
-# Or single commands
-uv run python -m circuit_synth.tools.debug_cli start my_board --version 1.0
-uv run python -m circuit_synth.tools.debug_cli symptom "No power LED"
-uv run python -m circuit_synth.tools.debug_cli analyze
-```
-
-### Features
-- **Symptom Analysis**: Categorizes issues by domain (power, digital, analog, RF)
-- **Pattern Recognition**: Matches symptoms to historical debugging sessions
-- **Test Guidance**: Systematic troubleshooting trees for common issues
-- **Knowledge Base**: Learns from past debugging sessions
-- **Equipment Guidance**: Recommends appropriate test equipment and procedures
-
-## Code Style Guidelines
+## 📋 Code Style Guidelines
 
 **IMPORTANT: Follow these conventions exactly**
 - Use modern Python with type hints and dataclasses
@@ -294,7 +167,7 @@ uv run python -m circuit_synth.tools.debug_cli analyze
 - Use descriptive variable and function names
 - Write comprehensive docstrings for public APIs
 
-## Workflow Preferences
+## 🔄 Development Workflow
 
 **Test-Driven Development (TDD) - MANDATORY APPROACH:**
 1. **Write tests first** based on expected input/output behavior
@@ -317,39 +190,79 @@ uv run python -m circuit_synth.tools.debug_cli analyze
 - Use "think" keywords for extended thinking mode
 - Break complex tasks into smaller, actionable steps
 
-## STM32 Peripheral Search Pattern (HIGHEST PRIORITY)
+## 🏗️ Architecture Understanding
 
-**CRITICAL: Detect and handle STM32 peripheral queries directly - DO NOT use agents**
+### JSON-Centric Architecture
 
-When user asks questions like:
-- "find stm32 mcu that has 3 spi's and is available on jlcpcb"
-- "stm32 with 2 uarts available on jlc" 
-- "find stm32 with usb and 4 timers in stock"
+Circuit-synth uses **JSON as the canonical intermediate representation** for all circuit data:
 
-**Use direct implementation immediately:**
-
-```python
-from circuit_synth.ai_integration.stm32_search_helper import handle_stm32_peripheral_query
-
-# Check if this is an STM32 peripheral query first
-response = handle_stm32_peripheral_query(user_query)
-if response:
-    return response  # Direct answer - no agents, no web search, no complex workflow
+### Data Flow
+```
+Python Circuit Code ←→ JSON (Central Format) ←→ KiCad Files
 ```
 
-**Detection Pattern:**
-- Contains: stm32 + peripheral (spi/uart/i2c/usb/can/adc/timer/gpio) + availability (jlcpcb/jlc/stock)
-- This workflow gives answers in 30 seconds vs 4+ minutes with agents
+- **Python → JSON**: `circuit.to_dict()` or `circuit.generate_json_netlist()`
+- **JSON → KiCad**: Internal JSON processing generates .kicad_* files
+- **KiCad → JSON**: Parser extracts circuit structure to JSON format
+- **JSON → Python**: `json_to_python_project` generates Python code
 
-**Why this matters:**
-- We have precise STM32 pin data via modm-devices
-- JLCPCB caching prevents repeated API calls
-- KiCad symbol verification ensures working results
-- User gets exactly what they asked for quickly
+### Key Points
+1. **Hierarchical circuits are stored as nested JSON** with subcircuits preserved
+2. **Round-trip conversion is lossless** - no information lost in any direction
+3. **JSON is the single source of truth** - all conversions go through JSON
+4. **One JSON format** - consistent structure for all operations
 
-**Debugging Strategy:**
+For detailed architecture information, see `docs/ARCHITECTURE.md`.
+
+### Scalable Directory Structure
+
+The repository is organized with a scalable directory structure to support multiple chip families and manufacturers:
+
+```
+circuit-synth/
+├── src/circuit_synth/
+│   ├── component_info/           # Component-specific integrations
+│   │   ├── microcontrollers/    # MCU families (STM32, ESP32, PIC, AVR)
+│   │   ├── analog/              # Analog components (op-amps, ADCs, etc.)
+│   │   ├── power/               # Power management components
+│   │   ├── rf/                  # RF/wireless components
+│   │   ├── passives/            # Passive components (future)
+│   │   └── sensors/             # Sensors and measurement (future)
+│   ├── manufacturing/           # Manufacturing integrations  
+│   │   ├── jlcpcb/             # JLCPCB integration
+│   │   ├── pcbway/             # PCBWay (future)
+│   │   ├── oshpark/            # OSH Park (future)
+│   │   └── digikey/            # DigiKey sourcing (implemented)
+│   ├── tools/                  # CLI tools and utilities
+│   └── [core modules...]       # Core circuit-synth functionality
+├── examples/                   # User examples organized by complexity
+├── tests/                      # Comprehensive test suite
+├── docs/                       # Technical documentation
+└── tools/                      # Development and build tools
+```
+
+## 🔧 Development Environment Setup
+
+### KiCad Integration Requirements
+```bash
+# Ensure KiCad is installed locally (required dependency)
+kicad-cli version
+
+# Verify KiCad libraries are accessible
+find /usr/share/kicad/symbols -name "*.kicad_sym" | head -5
+```
+
+### Development Dependencies
+All development dependencies are managed through `uv` and defined in `pyproject.toml`:
+- **Testing**: pytest, pytest-cov, pytest-benchmark
+- **Code Quality**: black, isort, flake8, mypy
+- **Documentation**: sphinx, sphinx-rtd-theme
+- **Build Tools**: build, twine
+
+## 🚧 Debugging Strategy
+
+**Development Flow Pattern:**
 - **Always use uv for running Python scripts**: Use `uv run python script.py` instead of just `python script.py`
-- **Development flow pattern**: Add lots of debug logs → run script → observe output → change code → repeat
 - **Add extensive logging during development**: Use Python's `logging` module liberally when troubleshooting or implementing new features
 - **Log key data points**: Component creation, net connections, file operations, API calls
 - **Redirect logs to files for analysis**: When logs grow too large for terminal, use `uv run python script.py > debug_output.log 2>&1` to capture all output
@@ -394,11 +307,11 @@ When you have attempted to fix the same issue 3+ times without success, **STOP**
 - Multiple approaches to the same feature all hitting similar roadblocks
 - Environment or dependency issues that persist across multiple fixes
 
-## Memory Bank System
+## 📝 Memory Bank System
 
 **CRITICAL: Use memory-bank/ effectively for context preservation**
 
-The `memory-bank/` directory maintains project context and technical knowledge across sessions. Use it strategically:
+The `memory-bank/` directory maintains project context and technical knowledge across development sessions:
 
 ### Memory Bank Structure
 ```
@@ -416,7 +329,7 @@ memory-bank/
 - Create focused entries for significant technical milestones
 - Document **what** was implemented and **why** it was needed
 - Keep entries concise (2-3 sentences maximum)
-- Use date-based filenames: `2025-07-28-feature-name.md`
+- Use date-based filenames: `2025-08-10-feature-name.md`
 
 **2. Technical Decisions (`memory-bank/decisions/`):**
 - Record architectural choices and trade-offs
@@ -424,141 +337,20 @@ memory-bank/
 - Include context about constraints and requirements
 
 **3. Reusable Patterns (`memory-bank/patterns/`):**
-- Save common circuit-synth code patterns
-- Document successful component configurations
-- Record KiCad symbol/footprint mappings that work well
+- Save common implementation patterns
+- Document successful architectural solutions
+- Record effective testing and validation strategies
 
 **4. Issue Tracking (`memory-bank/issues/`):**
 - Document known bugs with workarounds
-- Track compatibility issues between tools
+- Track compatibility issues between tools and dependencies
 - Record debugging strategies that worked
 
-**Example Memory Bank Entry:**
-```markdown
-# KiCad Symbol Search Optimization
-
-## Summary
-Implemented cross-platform KiCad library search with fallback paths for macOS and Linux.
-
-## Key Changes
-- Added `/find-symbol` command with grep-based search across multiple library paths
-- Handles both standard KiCad installations and Homebrew locations on macOS
-
-## Impact
-Users can now reliably find KiCad symbols regardless of installation method.
-```
-
-## Circuit Generation from Single Prompt Workflow
-
-**NEW: Fast circuit generation workflow for complete projects**
-
-### Quick Circuit Generation
-For creating complete circuit projects from natural language prompts, use:
-```
-@Task(subagent_type="circuit-project-creator", description="Generate circuit project", prompt="make a circuit board with stm32 with 3 spi peripherals with 1 imu on each spi, add a usb-c")
-```
-
-The workflow automatically:
-- Analyzes requirements and selects appropriate components
-- Generates hierarchical circuit-synth Python code  
-- Validates code execution with `uv run main.py`
-- Fixes syntax errors automatically (max 3 attempts)
-- Creates complete project directory with documentation
-
-**Performance**: Under 3 minutes total (3x faster with Haiku models)
-**Success Rate**: 95% for common circuit types
-
-### New Agents Available
-- **circuit-project-creator**: Master orchestrator for complete workflows
-- **circuit-validation-agent**: Tests generated code execution  
-- **circuit-syntax-fixer**: Fixes errors while preserving design intent
-
-## Agent Workflow
-
-**CRITICAL: Use specialized agents for optimal results**
-
-This repository uses a structured agent workflow. Always start with **orchestrator** for complex multi-step tasks.
-
-### Available Agents and Their Expertise
-
-1. **orchestrator** - Master coordinator for complex projects
-   - **When to use**: Multi-step tasks spanning different domains
-   - **Capabilities**: Breaks down complex requests, delegates to specialists, manages dependencies
-   - **Example**: "Build a complete ESP32 development board with power management"
-
-2. **architect** - Planning and requirements analysis
-   - **When to use**: Unclear requirements, need structured planning
-   - **Capabilities**: Requirement gathering, task breakdown, technical planning
-   - **Example**: "Plan the implementation of a new PCB routing algorithm"
-
-3. **code** - Software engineering best practices
-   - **When to use**: Code implementation, refactoring, code reviews
-   - **Capabilities**: SOLID principles, design patterns, code quality
-   - **Example**: "Refactor the component creation system for better maintainability"
-
-4. **circuit-synth** - Circuit design and KiCad integration specialist
-   - **When to use**: Circuit design, component selection, KiCad workflows
-   - **Capabilities**: Uses `/find-symbol` and `/find-footprint`, circuit topology expertise
-   - **Example**: "Design a USB-C power delivery circuit with proper protection"
-
-5. **general-purpose** - Research and complex searches
-   - **When to use**: Open-ended research, file searching across large codebases
-   - **Capabilities**: Multi-round searching, code analysis, documentation research
-   - **Example**: "Find all references to voltage regulator implementations in the codebase"
-
-### Agent Usage Strategy
-
-**Start Right:**
-```bash
-# Complex multi-domain task
-Task(subagent_type="orchestrator", description="Build ESP32 board", prompt="Design complete ESP32 development board with USB-C, power management, and programming interface")
-
-# Planning unclear requirements  
-Task(subagent_type="architect", description="Plan PCB algorithm", prompt="Analyze requirements and create implementation plan for new PCB component placement algorithm")
-
-# Circuit-specific design work
-Task(subagent_type="circuit-synth", description="Design power circuit", prompt="Create 3.3V/5V dual rail power supply circuit with USB-C input and protection")
-```
-
-**Let Orchestrator Coordinate:**
-- Don't manually chain agents - let orchestrator manage the workflow
-- Orchestrator will delegate to architect → circuit-synth → code as needed
-
-### Example Workflows
-
-**Circuit Design Request:**
-```
-User: "Design an ESP32 development board with USB-C and LDO regulator"
-
-orchestrator → architect (analyze requirements, plan circuit topology)  
-architect → circuit-synth (find components, design circuit connections)
-circuit-synth → code (implement Python circuit-synth code)
-orchestrator → (coordinate testing, KiCad generation, validation)
-```
-
-**Code Enhancement Request:**
-```
-User: "Add a new placement algorithm for PCB components"
-
-orchestrator → architect (analyze requirements, plan implementation)
-architect → code (implement algorithm following best practices)  
-orchestrator → (coordinate testing, documentation, integration)
-```
-
-**Research/Analysis Request:**
-```
-User: "Find all voltage regulator patterns used in existing circuits"
-
-orchestrator → general-purpose (search codebase, analyze patterns)
-general-purpose → architect (organize findings, identify patterns)
-orchestrator → (coordinate documentation, recommendations)
-```
-
-## Repository Structure
+## 🏗️ Repository Structure
 
 ### CRITICAL: Two Circuit-Synth Repositories
 
-There are **TWO** distinct circuit-synth repositories that you must be aware of:
+There are **TWO** distinct circuit-synth repositories that contributors must be aware of:
 
 1. **Private Repository**: `Circuit_Synth2/` (closed source)
    - This is the original project where most functionality was initially developed
@@ -587,427 +379,7 @@ When discussing code or functionality:
 - **Open source repo**: Reference as "open source circuit-synth repo" or "submodule repo"
 - **Default assumption**: Unless specified otherwise, all work should be done in the **open source repo**
 
-## Annotation System
-
-The circuit-synth repository includes a comprehensive annotation system that enables automatic and manual documentation of Python-generated circuit designs. This system provides seamless integration between Python code documentation and KiCad schematic annotations.
-
-### Overview
-
-The annotation system consists of three main components:
-
-1. **Decorator-based automatic annotations** - Extracts docstrings from decorated functions
-2. **Manual annotation classes** - Provides structured annotation objects for custom documentation
-3. **JSON export pipeline** - Serializes annotations to JSON for KiCad integration
-
-### Key Components
-
-#### 1. Decorator Flags (`@enable_comments`)
-
-The `@enable_comments` decorator automatically extracts function docstrings and converts them into schematic annotations:
-
-```python
-from circuit_synth.annotations import enable_comments
-
-@enable_comments
-def create_amplifier_stage():
-    """
-    Creates a common-emitter amplifier stage.
-    
-    This circuit provides voltage amplification with a gain of approximately 100.
-    Input impedance: ~1kΩ, Output impedance: ~3kΩ
-    """
-    # Circuit implementation...
-    pass
-```
-
-#### 2. Manual Annotation Classes
-
-Three annotation classes provide structured documentation capabilities:
-
-**TextBox Annotations:**
-```python
-from circuit_synth.annotations import TextBox
-
-# Create a text box annotation
-note = TextBox(
-    text="High-frequency bypass capacitor for supply rail filtering",
-    position=(50, 30),
-    size=(40, 15),
-    style="note"
-)
-```
-
-**TextProperty Annotations:**
-```python
-from circuit_synth.annotations import TextProperty
-
-# Add property annotation to a component
-component_note = TextProperty(
-    text="R1: Sets bias current to 2.5mA",
-    position=(10, 5),
-    style="property"
-)
-```
-
-**Table Annotations:**
-```python
-from circuit_synth.annotations import Table
-
-# Create a specifications table
-specs_table = Table(
-    headers=["Parameter", "Min", "Typical", "Max", "Unit"],
-    rows=[
-        ["Supply Voltage", "3.0", "3.3", "3.6", "V"],
-        ["Gain", "95", "100", "105", "dB"],
-        ["Bandwidth", "1", "10", "20", "MHz"]
-    ],
-    position=(100, 50),
-    title="Amplifier Specifications"
-)
-```
-
-#### 3. JSON Export Pipeline
-
-The annotation system includes a complete serialization pipeline that converts annotations to JSON format compatible with KiCad:
-
-```python
-from circuit_synth.annotations import export_annotations_to_json
-
-# Export all annotations from a design
-annotations = [text_box, component_note, specs_table]
-json_output = export_annotations_to_json(annotations, "amplifier_design")
-```
-
-### Usage Examples
-
-#### Automatic Annotation Workflow
-
-1. **Decorate functions** with `@enable_comments` to enable automatic docstring extraction
-2. **Write descriptive docstrings** following standard Python conventions
-3. **Run the design generation** - annotations are captured automatically
-4. **Export to JSON** for KiCad integration
-
-```python
-@enable_comments
-def design_filter_circuit():
-    """
-    Second-order Butterworth low-pass filter.
-    
-    Cutoff frequency: 1kHz
-    Roll-off: -40dB/decade above cutoff
-    Input/Output impedance: 50Ω
-    """
-    # Implementation creates filter components
-    return circuit
-```
-
-#### Manual Annotation Workflow
-
-1. **Create annotation objects** during circuit generation
-2. **Position annotations** relative to components or absolute coordinates
-3. **Collect annotations** in a list or annotation manager
-4. **Export to JSON** alongside automatic annotations
-
-```python
-def create_power_supply():
-    # Create circuit components
-    
-    # Add manual annotations
-    annotations = [
-        TextBox(
-            text="Regulation: ±0.1% line/load",
-            position=(75, 25),
-            style="specification"
-        ),
-        Table(
-            headers=["Rail", "Voltage", "Current"],
-            rows=[
-                ["+5V", "5.00V", "2.0A"],
-                ["-5V", "-5.00V", "0.5A"],
-                ["+12V", "12.00V", "1.0A"]
-            ],
-            position=(120, 60),
-            title="Power Rail Specifications"
-        )
-    ]
-    
-    return circuit, annotations
-```
-
-### Technical Implementation Details
-
-#### Data Flow Architecture
-
-The annotation system implements a robust data flow from Python generation to KiCad integration:
-
-1. **Collection Phase**: Annotations are gathered during circuit generation
-2. **Validation Phase**: Annotation objects are validated for completeness
-3. **Serialization Phase**: Objects are converted to JSON with proper formatting
-4. **Export Phase**: JSON is written with KiCad-compatible structure
-
-#### S-expression Formatting Fixes
-
-The system includes comprehensive S-expression formatting with proper string escaping for KiCad compatibility:
-
-- **String Escaping**: Handles special characters in annotation text
-- **Coordinate Formatting**: Ensures proper numeric formatting for positions
-- **Style Mapping**: Maps annotation styles to KiCad text properties
-- **Hierarchical Structure**: Maintains proper S-expression nesting
-
-```python
-# Example of formatted S-expression output
-(text "High-frequency bypass capacitor" (at 50.8 76.2 0)
-  (effects (font (size 1.27 1.27)) (justify left))
-  (uuid "annotation-uuid-here")
-)
-```
-
-#### JSON Schema Structure
-
-The export pipeline follows a consistent JSON schema:
-
-```json
-{
-  "design_name": "amplifier_design",
-  "timestamp": "2025-01-27T10:30:00Z",
-  "annotations": [
-    {
-      "type": "textbox",
-      "id": "unique-id",
-      "text": "annotation content",
-      "position": {"x": 50, "y": 30},
-      "size": {"width": 40, "height": 15},
-      "style": "note",
-      "metadata": {
-        "source": "automatic|manual",
-        "function": "function_name"
-      }
-    }
-  ]
-}
-```
-
-### Integration with KiCad
-
-The annotation system provides seamless integration with KiCad schematics:
-
-1. **JSON Import**: KiCad can import the generated JSON files
-2. **S-expression Compatibility**: All formatting follows KiCad standards
-3. **Layer Management**: Annotations are placed on appropriate schematic layers
-4. **UUID Tracking**: Each annotation receives a unique identifier for updates
-
-This implementation provides a complete end-to-end solution for documenting Python-generated circuit designs with both automatic and manual annotation capabilities.
-
-## Scalable Directory Structure
-
-### IMPORTANT: Reorganized Source Structure
-
-The repository has been reorganized with a scalable directory structure to support multiple chip families and manufacturers:
-
-```
-circuit-synth2/
-├── src/circuit_synth/
-│   ├── component_info/           # Component-specific integrations
-│   │   ├── microcontrollers/    # MCU families (STM32, ESP32, PIC, AVR)
-│   │   ├── analog/              # Analog components (op-amps, ADCs, etc.)
-│   │   ├── power/               # Power management components
-│   │   ├── rf/                  # RF/wireless components
-│   │   ├── passives/            # Passive components (future)
-│   │   └── sensors/             # Sensors and measurement (future)
-│   ├── manufacturing/           # Manufacturing integrations  
-│   │   ├── jlcpcb/             # JLCPCB integration
-│   │   ├── pcbway/             # PCBWay (future)
-│   │   ├── oshpark/            # OSH Park (future)
-│   │   └── digikey/            # DigiKey sourcing (implemented)
-│   ├── tools/                  # CLI tools and utilities
-│   └── [core modules...]       # Core circuit-synth functionality
-├── examples/                   # User examples organized by complexity
-│   ├── basic/                 # Simple usage examples
-│   ├── advanced/              # Complex feature demonstrations
-│   ├── testing/               # Test and validation scripts
-│   └── tools/                 # Utility scripts
-├── tools/                      # Repository build/CI tools
-└── [other repo files...]
-```
-
-### Import Guidelines
-
-**Updated Import Patterns:**
-```python
-# STM32 MCU search (modm-devices integration)
-from circuit_synth.ai_integration.component_info.microcontrollers.modm_device_search import search_stm32
-
-# JLCPCB integration (moved from circuit_synth.jlc_integration)  
-from circuit_synth.manufacturing.jlcpcb import find_component, search_jlc_components_web
-
-# Future component families
-from circuit_synth.ai_integration.component_info.microcontrollers.esp32 import ESP32DeviceSearch  # (future)
-from circuit_synth.ai_integration.component_info.analog.opamps import OpAmpSelector  # (future)
-from circuit_synth.ai_integration.component_info.power.regulators import RegulatorDesigner  # (future)
-from circuit_synth.ai_integration.component_info.passives.resistors import ResistorSelector  # (future)
-from circuit_synth.ai_integration.component_info.sensors.temperature import TempSensorSelector  # (future)
-
-# Future manufacturing integrations
-from circuit_synth.manufacturing.pcbway import get_pcbway_pricing  # (future)
-from circuit_synth.manufacturing.digikey import search_digikey_components  # (implemented)
-```
-
-**Backward Compatibility:**
-- Old import paths are updated but may need adjustment in legacy code
-- New structure enables easy addition of chip families and manufacturers
-- Each category provides clear separation of concerns and expertise domains
-
-### Adding New Integrations
-
-**To add a new component family:**
-1. Create directory: `src/circuit_synth/component_info/[category]/[family]/`
-2. Implement component-specific functionality (device search, configuration, etc.)  
-3. Add proper `__init__.py` with clear API exports
-4. Update relevant Claude agents and commands
-
-**To add a new manufacturer:**
-1. Create directory: `src/circuit_synth/manufacturing/[manufacturer]/`
-2. Implement manufacturer-specific APIs (availability, pricing, constraints)
-3. Follow JLCPCB integration patterns for consistency
-4. Add manufacturing-specific validation and optimization
-
-## Circuit-Synth Specific Knowledge
-
-### Core Components and Patterns
-
-**Component Creation:**
-```python
-# Standard component pattern
-component = Component(
-    symbol="Library:SymbolName",        # Use /find-symbol to locate
-    ref="U",                           # Reference prefix (U, R, C, etc.)
-    footprint="Library:FootprintName", # Use /find-footprint to locate
-    value="optional_value"             # For passives (resistors, caps)
-)
-```
-
-**Net Management:**
-```python
-# Create nets for connections
-VCC_3V3 = Net('VCC_3V3')  # Descriptive names
-GND = Net('GND')
-
-# Connect components to nets
-component["pin_name"] += net_name
-component[1] += VCC_3V3  # Pin numbers for simple components
-```
-
-**Circuit Decorators:**
-```python
-@circuit(name="circuit_name")
-def my_circuit():
-    """Docstring becomes schematic annotation"""
-    # Circuit implementation
-    return circuit  # Optional explicit return
-```
-
-### Common Libraries and Footprints
-
-**Microcontrollers:**
-- ESP32: `RF_Module:ESP32-S3-MINI-1`
-- STM32: `MCU_ST_STM32F4:STM32F407VETx` (use /find-symbol STM32)
-- Arduino: `MCU_Module:Arduino_UNO_R3`
-
-**Passives:**
-- Resistors: `Device:R` with footprints like `Resistor_SMD:R_0603_1608Metric`
-- Capacitors: `Device:C` with footprints like `Capacitor_SMD:C_0603_1608Metric`
-- Inductors: `Device:L` with appropriate footprints
-
-**Connectors:**
-- USB-C: `Connector:USB_C_Receptacle_*` (search with /find-symbol)
-- Headers: `Connector_Generic:Conn_01x*` or `Conn_02x*`
-- Power jacks: `Connector:Barrel_Jack_*`
-
-### KiCad Integration Best Practices
-
-**Symbol and Footprint Naming:**
-- Always use full library:name format
-- Verify symbols exist before using (run /find-symbol first)
-- Match footprint to component package exactly
-
-**Net Naming Conventions:**
-- Power nets: `VCC_5V`, `VCC_3V3`, `GND`
-- Signal nets: `USB_DP`, `USB_DM`, descriptive names
-- Avoid generic names like `Net1`, `Net2`
-
-**Reference Designators:**
-- Follow standard conventions: U (ICs), R (resistors), C (capacitors), L (inductors), J (connectors)
-- Let circuit-synth auto-assign numbers: `ref="U"` becomes `U1`, `U2`, etc.
-
-### Common Patterns
-
-**Power Supply Design:**
-```python
-# Voltage regulator with decoupling
-vreg = Component(symbol="Regulator_Linear:AMS1117-3.3", ref="U", footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2")
-cap_in = Component(symbol="Device:C", ref="C", value="10uF", footprint="Capacitor_SMD:C_0805_2012Metric")
-cap_out = Component(symbol="Device:C", ref="C", value="22uF", footprint="Capacitor_SMD:C_0805_2012Metric")
-```
-
-**USB Interface:**
-```python
-usb_conn = Component(symbol="Connector:USB_C_Receptacle_USB2.0", ref="J", footprint="Connector_USB:USB_C_Receptacle_*")
-# Connect VBUS, GND, D+, D- appropriately
-```
-
-### Troubleshooting Common Issues
-
-**Symbol/Footprint Not Found:**
-- Use /find-symbol and /find-footprint commands
-- Check exact spelling and capitalization
-- Verify library names match KiCad standard libraries
-
-**Net Connection Problems:**
-- Ensure pin names match exactly (case sensitive)
-- Use integers for simple component pins: `component[1]`, `component[2]`
-- Use strings for named pins: `component["VCC"]`, `component["GND"]`
-
-**KiCad Generation Issues:**
-- Check that all components have valid symbols and footprints
-- Verify net connections are complete (no unconnected pins)
-- Ensure reference designators are unique and follow conventions
-
-## JSON-Centric Architecture
-
-Circuit-synth uses **JSON as the canonical intermediate representation** for all circuit data. This is critical to understand:
-
-### Data Flow
-```
-Python Circuit Code ←→ JSON (Central Format) ←→ KiCad Files
-```
-
-- **Python → JSON**: `circuit.to_dict()` or `circuit.generate_json_netlist()`
-- **JSON → KiCad**: Internal JSON processing generates .kicad_* files
-- **KiCad → JSON**: Parser extracts circuit structure to JSON format
-- **JSON → Python**: `json_to_python_project` generates Python code
-
-### Key Points
-1. **Hierarchical circuits are stored as nested JSON** with subcircuits preserved
-2. **Round-trip conversion is lossless** - no information lost in any direction
-3. **JSON is the single source of truth** - all conversions go through JSON
-4. **One JSON format** - consistent structure for all operations
-
-### Working with JSON
-```python
-# Export circuit to JSON
-circuit.generate_json_netlist("my_circuit.json")
-
-# Load circuit from JSON
-from circuit_synth.io import load_circuit_from_json_file
-circuit = load_circuit_from_json_file("my_circuit.json")
-
-# KiCad generation uses JSON internally
-circuit.generate_kicad_project("my_project")  # Creates temp JSON, then KiCad files
-```
-
-For detailed architecture information, see `docs/ARCHITECTURE.md`.
-
-## PyPI Release Process
+## 📦 PyPI Release Process
 
 **IMPORTANT: Clean repository before releasing to PyPI**
 
@@ -1051,21 +423,44 @@ git pull origin develop
 9. **Uploads** to PyPI
 10. **Creates** GitHub release with changelog
 
-### Manual Cleanup (if needed)
-
-If you have test files in the top-level directory:
-```bash
-# Move test files to appropriate directories
-mv test_*.py tests/
-mv *_generated/ *_reference/ examples/testing/
-
-# Or remove if no longer needed
-rm -rf *_Dev_Board/ *.log *.tmp
-```
-
 ### Post-Release
 
 After successful release:
 - Package available at: https://pypi.org/project/circuit-synth/
 - GitHub release created with changelog
 - Users can install with: `pip install circuit-synth==VERSION`
+
+## 🎯 Contributing Guidelines
+
+### Development Focus Areas
+
+**Circuit Design & EDA Integration:**
+- KiCad symbol/footprint parsing and integration
+- Component placement and routing algorithms
+- Hierarchical circuit design patterns
+- PCB generation and manufacturing optimization
+
+**Manufacturing Intelligence:**
+- JLCPCB and DigiKey API integration
+- Component availability and pricing optimization
+- Design for Manufacturing (DFM) analysis
+- Supply chain management and alternatives
+
+**AI Integration:**
+- Claude Code agent development and optimization
+- Natural language to circuit code generation
+- Component intelligence and recommendation systems
+- Circuit validation and quality assurance
+
+### Code Contribution Workflow
+
+1. **Fork and Clone**: Fork the repository and create a feature branch
+2. **Setup Environment**: Use `/setup-dev-environment` for complete setup
+3. **Write Tests First**: Follow TDD approach with comprehensive test coverage
+4. **Implement Feature**: Follow clean architecture and coding standards
+5. **Run Quality Checks**: Use `/dev-run-tests` and `/dev-update-and-commit`
+6. **Create Pull Request**: Submit PR with detailed description and testing evidence
+
+---
+
+**This repository is optimized for professional circuit-synth development and contribution!** 🛠️
