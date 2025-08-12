@@ -10,7 +10,7 @@ import shutil
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from circuit_synth.kicad.atomic_operations import remove_component_from_schematic
+from circuit_synth.kicad.atomic_operations_exact import remove_component_from_schematic_exact
 
 def main():
     print("Manual Test 4: Remove Resistor")
@@ -40,8 +40,8 @@ def main():
     print(f"📊 Initial R2: {'R2' in initial_content}")
     
     # Remove R1
-    print("\n🗑️  Removing R1 using atomic operations...")
-    success = remove_component_from_schematic(target_path, "R1")
+    print("\n🗑️  Removing R1 using exact atomic operations...")
+    success = remove_component_from_schematic_exact(target_path, "R1")
     
     print(f"🔍 Remove R1 result: {success}")
     

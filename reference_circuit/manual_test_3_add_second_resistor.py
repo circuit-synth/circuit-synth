@@ -10,7 +10,7 @@ import shutil
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from circuit_synth.kicad.atomic_operations import add_component_to_schematic
+from circuit_synth.kicad.atomic_operations_exact import add_component_to_schematic_exact
 
 def main():
     print("Manual Test 3: Add Second Resistor")
@@ -38,8 +38,8 @@ def main():
     print(f"📊 Initial symbols: {initial_content.count('(symbol')}")
     
     # Add second resistor
-    print("\n⚡ Adding R2 using atomic operations...")
-    success = add_component_to_schematic(
+    print("\n⚡ Adding R2 using exact atomic operations...")
+    success = add_component_to_schematic_exact(
         target_path,
         lib_id="Device:R",
         reference="R2", 
