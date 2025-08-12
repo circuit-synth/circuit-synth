@@ -2,10 +2,16 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid e25fce06-c650-4ad6-a92f-2cad9d1ac61e)
+	(uuid e4fdffb4-eea4-41a9-9862-5bc8ec2a7931)
 	(paper "A4")
 	(lib_symbols
 	)
 	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts
+		no
 	)
 )

@@ -1,8 +1,8 @@
 (kicad_sch
 	(version 20250114)
-	(generator "circuit_synth")
+	(generator "eeschema")
 	(generator_version "9.0")
-	(uuid 3b00c319-470a-4e85-847f-5cfe3c5f3f10)
+	(uuid "74e372da-cc39-487f-983b-58f37bb773ba")
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
@@ -139,9 +139,9 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "a51ea61d-d79e-48a9-b814-a84f30e335d1")
+		(uuid "bd34465d-8519-4f5c-bb55-7bbe68901235")
 		(property "Reference" "R1"
-			(at 124.46000000000001 67.31 0)
+			(at 124.46 67.3099 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -150,7 +150,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 124.46000000000001 69.85 0)
+			(at 124.46 69.8499 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -186,14 +186,14 @@
 			)
 		)
 		(pin "2"
-			(uuid "463d0c7b-e6eb-42bb-9631-8003b75fec72")
+			(uuid "79399b6d-3e01-46d7-9233-d96e4e1112c8")
 		)
 		(pin "1"
-			(uuid "f6035965-4a4a-4355-9126-6679b00850d0")
+			(uuid "e1ff919f-acc2-40fe-9fb5-39af1255cb5d")
 		)
 		(instances
 			(project ""
-				(path "/3b00c319-470a-4e85-847f-5cfe3c5f3f10"
+				(path "/74e372da-cc39-487f-983b-58f37bb773ba"
 					(reference "R1")
 					(unit 1)
 				)
@@ -205,7 +205,5 @@
 			(page "1")
 		)
 	)
-	(embedded_fonts
-		no
-	)
+	(embedded_fonts no)
 )

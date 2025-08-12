@@ -1,9 +1,9 @@
 (export (version "E")
     (design
       (source "manual_atomic.kicad_sch")
-      (date "2025-08-12T12:01:04-0700")
+      (date "2025-08-12T13:00:05-0700")
       (tool "Circuit-Synth Exporter v0.1.0")
-      (sheet (number "1") (name "root") (tstamps "/206ff679-43c4-43e0-b79b-cbe30e690db7/")
+      (sheet (number "1") (name "root") (tstamps "/a1d842bd-55ea-4622-803d-efe32e4c94c2/")
       (title_block
         (title )
         (company )
