@@ -99,6 +99,7 @@ if __name__ == "__main__":
 
 - **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files
 - **Hierarchical Design**: Modular subcircuits like software modules  
+- **Atomic KiCad Operations**: Add/remove individual components from existing schematics with rollback safety
 - **Component Intelligence**: JLCPCB & DigiKey integration, symbol/footprint verification
 - **Fast JLCPCB Search**: Direct search with 80% speed improvement, 90% less tokens
 - **AI Integration**: Claude Code agents for automated design assistance
@@ -255,6 +256,56 @@ When working with Claude Code, these agents provide domain expertise:
 - **stm32-mcu-finder**: STM32 peripheral search and selection
 - **test-plan-creator**: Automated test plan generation
 - **fmea-analyzer**: Reliability analysis and failure prediction
+
+## ⚡ Atomic KiCad Operations
+
+Circuit-synth provides atomic operations for surgical modifications to existing KiCad schematics, enabling incremental updates without regenerating entire projects:
+
+### Production API
+
+```python
+from circuit_synth.kicad.atomic_integration import AtomicKiCadIntegration, migrate_circuit_to_atomic
+
+# Initialize atomic integration for a KiCad project
+atomic = AtomicKiCadIntegration("/path/to/project")
+
+# Add components using atomic operations
+atomic.add_component_atomic("main", {
+    'symbol': 'Device:R',
+    'ref': 'R1',
+    'value': '10k',
+    'footprint': 'Resistor_SMD:R_0603_1608Metric',
+    'position': (100, 80)
+})
+
+# Remove components
+atomic.remove_component_atomic("main", "R1")
+
+# Fix hierarchical main schematics with sheet references
+subcircuits = [
+    {"name": "USB_Port", "filename": "USB_Port.kicad_sch", "position": (35, 35), "size": (43, 25)},
+    {"name": "Power_Supply", "filename": "Power_Supply.kicad_sch", "position": (95, 35), "size": (44, 20)}
+]
+atomic.fix_hierarchical_main_schematic(subcircuits)
+
+# Migrate JSON netlist to KiCad using atomic operations
+migrate_circuit_to_atomic("circuit.json", "output_project/")
+```
+
+### Key Benefits
+
+- **True Atomic Operations**: Add/remove individual components with rollback safety
+- **Hierarchical Sheet Management**: Fixes blank main schematics automatically
+- **Production Integration**: Seamless integration with existing circuit-synth pipeline  
+- **S-Expression Safety**: Proper parsing with backup/restore on failure
+- **JSON Pipeline Integration**: Full compatibility with circuit-synth JSON format
+
+### Use Cases
+
+- **Incremental Updates**: Add components to existing designs without full regeneration
+- **Debug and Fix**: Resolve blank schematic issues (like ESP32-C6 project)
+- **External Integration**: Third-party tools can manipulate circuit-synth schematics
+- **Advanced Workflows**: Power users building custom automation
 
 ## FMEA and Quality Assurance
 

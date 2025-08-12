@@ -6,9 +6,9 @@ import pytest
 import tempfile
 from pathlib import Path
 
-from circuit_synth.kicad.atomic_operations import (
-    add_component_to_schematic,
-    remove_component_from_schematic
+from circuit_synth.kicad.atomic_operations_exact import (
+    add_component_to_schematic_exact as add_component_to_schematic,
+    remove_component_from_schematic_exact as remove_component_from_schematic
 )
 
 

@@ -14,9 +14,9 @@ import os
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from circuit_synth import *
-from circuit_synth.kicad.atomic_operations import (
-    add_component_to_schematic,
-    remove_component_from_schematic
+from circuit_synth.kicad.atomic_operations_exact import (
+    add_component_to_schematic_exact as add_component_to_schematic,
+    remove_component_from_schematic_exact as remove_component_from_schematic
 )
 
 # Set up detailed logging

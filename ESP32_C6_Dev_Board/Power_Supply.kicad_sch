@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid 6466f4f1-6849-40f0-b694-89bf5ca0a091)
+	(uuid ff6fddb0-4055-41bb-8564-7af042a28379)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:C"
@@ -294,7 +294,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 5a8296a4-5f69-46e5-a365-b186522c492e)
+		(uuid 2274fd21-5701-4f95-8361-8b68339e295e)
 		(property "Reference" "U1"
 			(at 45.72 53.42 0)
 			(effects
@@ -315,7 +315,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/755f5d52-edaa-4622-92f3-8fb46042924c/4aa584ce-0dca-4e2b-a805-92b01cd22170"
+				(path "/76fb79a7-e9b4-4610-846e-e55f5e0218ac/fb188cb2-f869-4f3b-bcdd-8eeacb38a105"
 					(reference "U1")
 					(unit 1)
 				)
@@ -331,7 +331,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid d1388caa-157c-4b2f-b3dc-098ee2a7894d)
+		(uuid 1ea8c67f-8bff-403c-bc18-25a94af14fc3)
 		(property "Reference" "C2"
 			(at 71.12 53.42 0)
 			(effects
@@ -361,7 +361,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/755f5d52-edaa-4622-92f3-8fb46042924c/4aa584ce-0dca-4e2b-a805-92b01cd22170"
+				(path "/76fb79a7-e9b4-4610-846e-e55f5e0218ac/fb188cb2-f869-4f3b-bcdd-8eeacb38a105"
 					(reference "C2")
 					(unit 1)
 				)
@@ -377,7 +377,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid abe755f1-d073-4791-8a49-5403d99d640d)
+		(uuid 44476c1e-50fc-48bd-9a0b-23f6f60acb43)
 		(property "Reference" "C3"
 			(at 91.44 53.42 0)
 			(effects
@@ -407,7 +407,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/755f5d52-edaa-4622-92f3-8fb46042924c/4aa584ce-0dca-4e2b-a805-92b01cd22170"
+				(path "/76fb79a7-e9b4-4610-846e-e55f5e0218ac/fb188cb2-f869-4f3b-bcdd-8eeacb38a105"
 					(reference "C3")
 					(unit 1)
 				)
@@ -423,7 +423,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid d355aa69-67d2-46fb-af04-787d3b6d0712)
+		(uuid 3517faa6-ad10-410b-acf8-b86bc95082d8)
 		(property "Reference" "C4"
 			(at 111.76 53.42 0)
 			(effects
@@ -453,7 +453,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/755f5d52-edaa-4622-92f3-8fb46042924c/4aa584ce-0dca-4e2b-a805-92b01cd22170"
+				(path "/76fb79a7-e9b4-4610-846e-e55f5e0218ac/fb188cb2-f869-4f3b-bcdd-8eeacb38a105"
 					(reference "C4")
 					(unit 1)
 				)
@@ -472,7 +472,7 @@
 			)
 			(justify right)
 		)
-		(uuid 44fa1ddc-27b2-46ad-84e3-587378b3d1ff)
+		(uuid 1cb4a90a-09b6-45f0-9b4e-df3c0268c22f)
 	)
 	(hierarchical_label
 		"VBUS"
@@ -486,7 +486,7 @@
 			)
 			(justify right)
 		)
-		(uuid f85e3e58-da5a-4654-afec-1ba8f6a24624)
+		(uuid 24d1f471-7098-4d68-9de1-47381f0a4018)
 	)
 	(hierarchical_label
 		"VBUS"
@@ -500,7 +500,7 @@
 			)
 			(justify left)
 		)
-		(uuid 1b9e49cc-b208-4e8f-aae2-cafcdf230b21)
+		(uuid 706e581b-36f7-4e7d-a1ec-e1e9665af798)
 	)
 	(hierarchical_label
 		"GND"
@@ -514,7 +514,7 @@
 			)
 			(justify right)
 		)
-		(uuid 438f6fbe-ac24-49ae-89ba-b9e0a5e2cfea)
+		(uuid b767fe3a-68ed-4a73-a2ce-ae6df25f6e8f)
 	)
 	(hierarchical_label
 		"GND"
@@ -528,7 +528,7 @@
 			)
 			(justify right)
 		)
-		(uuid 83561fca-f9c3-4ee7-86a1-ac3b4bdf7616)
+		(uuid b1de94a7-b3d1-4d9f-af04-067a15171d5e)
 	)
 	(hierarchical_label
 		"GND"
@@ -542,7 +542,7 @@
 			)
 			(justify right)
 		)
-		(uuid 465807c5-07ab-4240-a917-c8f0f4e9f2af)
+		(uuid ef29d1c1-47b2-426a-9147-ca62a6135a8d)
 	)
 	(hierarchical_label
 		"GND"
@@ -556,7 +556,7 @@
 			)
 			(justify right)
 		)
-		(uuid ef59c39f-185d-4563-b024-008f54e8589e)
+		(uuid 2b4ad7eb-726b-45fb-8cec-f6d6f135698a)
 	)
 	(hierarchical_label
 		"VCC_3V3"
@@ -570,7 +570,7 @@
 			)
 			(justify left)
 		)
-		(uuid 6ac90aae-c284-4fe6-b1ce-8f7902a61094)
+		(uuid 39c34e8c-bcaf-4b4a-bb61-2dfddc6ff3e8)
 	)
 	(hierarchical_label
 		"VCC_3V3"
@@ -584,7 +584,7 @@
 			)
 			(justify left)
 		)
-		(uuid ef23fdbf-dca2-4a25-9df1-e4514a833750)
+		(uuid aecc5b2a-f10a-40df-a6bd-3a2402c20ca7)
 	)
 	(hierarchical_label
 		"VCC_3V3"
@@ -598,7 +598,7 @@
 			)
 			(justify left)
 		)
-		(uuid d97684af-cff9-4f58-9c89-71d8cdff3fcf)
+		(uuid a90c0034-8d53-4eaa-bbe5-55867298e89c)
 	)
 	(sheet_instances
 		(path "/"

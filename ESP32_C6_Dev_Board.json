@@ -1,7 +1,7 @@
 {
   "name": "ESP32_C6_Dev_Board_Main",
   "description": "Main hierarchical circuit - ESP32-C6 development board",
-  "tstamps": "/esp32_c6_dev_board_main-124099760475456/",
+  "tstamps": "/esp32_c6_dev_board_main-131082965584592/",
   "source_file": "ESP32_C6_Dev_Board_Main.kicad_sch",
   "components": {},
   "nets": {},
@@ -9,7 +9,7 @@
     {
       "name": "USB_Port",
       "description": "USB-C port with CC resistors, ESD protection, and proper grounding",
-      "tstamps": "/usb_port-124099760476080/",
+      "tstamps": "/usb_port-131082965585168/",
       "source_file": "USB_Port.kicad_sch",
       "components": {
         "J1": {
@@ -677,14 +677,14 @@
           "border_color": "black",
           "justify": "center center",
           "rotation": 0,
-          "uuid": "b1150dcf-3f1b-4524-b5a0-af5a25386495"
+          "uuid": "61b71537-6248-4208-b71f-2abc7139235e"
         }
       ]
     },
     {
       "name": "Power_Supply",
       "description": "5V to 3.3V power regulation subcircuit",
-      "tstamps": "/power_supply-124099768171216/",
+      "tstamps": "/power_supply-131082976133488/",
       "source_file": "Power_Supply.kicad_sch",
       "components": {
         "U1": {
@@ -990,14 +990,14 @@
           "border_color": "black",
           "justify": "center center",
           "rotation": 0,
-          "uuid": "af32ec6b-a493-43dd-8432-7b06ba0426d6"
+          "uuid": "4231be84-e1b2-44ef-b7c5-6062ea78e998"
         }
       ]
     },
     {
       "name": "ESP32_C6_MCU",
       "description": "\n    ESP32-C6 microcontroller subcircuit with decoupling and connections\n    \n    Args:\n        vcc_3v3: 3.3V power supply net\n        gnd: Ground net\n        usb_dp: USB Data+ net\n        usb_dm: USB Data- net\n    ",
-      "tstamps": "/esp32_c6_mcu-124099718821696/",
+      "tstamps": "/esp32_c6_mcu-131082933524080/",
       "source_file": "ESP32_C6_MCU.kicad_sch",
       "components": {
         "U2": {
@@ -2239,7 +2239,7 @@
         {
           "name": "LED_Blinker",
           "description": "LED with current limiting resistor",
-          "tstamps": "/led_blinker-124099685171520/",
+          "tstamps": "/led_blinker-131082932075168/",
           "source_file": "LED_Blinker.kicad_sch",
           "components": {
             "D3": {
@@ -2403,7 +2403,7 @@
               "border_color": "black",
               "justify": "center center",
               "rotation": 0,
-              "uuid": "c01f23e5-aede-450f-968f-fce292ce6fca"
+              "uuid": "ef511f91-0261-454e-99d1-6079a5f3d77c"
             }
           ]
         }
@@ -2437,7 +2437,7 @@
           "border_color": "black",
           "justify": "center center",
           "rotation": 0,
-          "uuid": "875473d4-49de-49ba-895d-731dbada3012"
+          "uuid": "3d0ba1d0-d3fe-4aa7-83a0-2fd967dbc425"
         }
       ]
     }
@@ -2471,7 +2471,7 @@
       "border_color": "black",
       "justify": "center center",
       "rotation": 0,
-      "uuid": "4d63261a-71f3-433b-adca-05cb922c5945"
+      "uuid": "fb566b29-be94-4ab5-a5d1-779a82e81940"
     }
   ]
 }
