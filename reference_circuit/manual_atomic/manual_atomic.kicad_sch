@@ -139,7 +139,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "69ef094c-658c-46ed-ad08-3c78a8f7249c")
+		(uuid "8bb764b3-f91f-47f0-a340-8702ee9db56a")
 		(property "Reference" "R1"
 			(at 124.46000000000001 67.3099 0)
 			(effects
@@ -186,14 +186,14 @@
 			)
 		)
 		(pin "2"
-			(uuid "0c9ac50a-43ec-4ad0-a7ce-179c0cb76e58")
+			(uuid "40981c21-4f03-4beb-b2c6-a2b8f3a26d61")
 		)
 		(pin "1"
-			(uuid "23d59fcb-4096-494d-b8e0-c830c92ebe7f")
+			(uuid "d9e49216-e67f-40c6-bad2-4c93dc1b9144")
 		)
 		(instances
 			(project ""
-				(path "/00000000-0000-0000-0000-000000000000"
+				(path "/c607e5f1-42e2-4249-b659-6d0555bce224"
 					(reference "R1")
 					(unit 1)
 				)
