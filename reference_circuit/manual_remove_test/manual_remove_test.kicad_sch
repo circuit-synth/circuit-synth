@@ -2,79 +2,132 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid a7a9cfb1-7aba-408e-9eeb-c11e93e08ec9)
+	(uuid db66d28a-a23c-4144-877e-f204c9d93c8b)
 	(paper "A4")
 	(lib_symbols
-	)
-
-	(symbol
-		(lib_id "Device:R")
-		(at 121.92 68.58 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "fba4981f-e111-4b5c-9656-3458ce047b0a")
-		(property "Reference" "R1"
-			(at 124.46000000000001 67.31 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "10k"
-			(at 124.46000000000001 69.85 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 120.142 68.58 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
+		(symbol "Device:R"
+			(pin_numbers
 				(hide yes)
 			)
-		)
-		(property "Datasheet" "~"
-			(at 121.92 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
+			(pin_names
+				(offset 0)
 			)
-		)
-		(property "Description" "Resistor"
-			(at 121.92 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "badb805c-3008-44bd-bcc3-0c9af923120d")
-		)
-		(pin "1"
-			(uuid "d449bc74-207c-4960-b413-d6779390e67f")
-		)
-		(instances
-			(project ""
-				(path "/a7a9cfb1-7aba-408e-9eeb-c11e93e08ec9"
-					(reference "R1")
-					(unit 1)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "R"
+				(at 2.032 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
 				)
 			)
+			(property "Value" "R"
+				(at 0 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at -1.778 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Resistor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "R res resistor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "R_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
 		)
 	)
 	(symbol
@@ -86,7 +139,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "1d9c9ed8-0f91-49ff-9388-49598babab35")
+		(uuid "b90167c3-4d10-4684-bdde-2dac8f065d46")
 		(property "Reference" "R2"
 			(at 139.7 67.31 0)
 			(effects
@@ -133,14 +186,14 @@
 			)
 		)
 		(pin "2"
-			(uuid "d1d29def-f7c5-42ad-a2be-f13b8d78db4f")
+			(uuid "1a8d8509-d1a7-4269-a052-cd952b3d182f")
 		)
 		(pin "1"
-			(uuid "c625659b-38ac-4f3a-8168-b4820525f8bf")
+			(uuid "c39caf2f-0f39-4f78-9eba-ee0338a12ffe")
 		)
 		(instances
 			(project ""
-				(path "/a7a9cfb1-7aba-408e-9eeb-c11e93e08ec9"
+				(path "/db66d28a-a23c-4144-877e-f204c9d93c8b"
 					(reference "R2")
 					(unit 1)
 				)
