@@ -58,7 +58,7 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "manual_blank.kicad_prl",
+    "filename": "blank_schematic.kicad_prl",
     "version": 5
   },
   "net_inspector_panel": {

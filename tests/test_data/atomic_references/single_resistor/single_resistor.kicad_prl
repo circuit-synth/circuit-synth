@@ -58,7 +58,7 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "manual_atomic.kicad_prl",
+    "filename": "single_resistor.kicad_prl",
     "version": 5
   },
   "net_inspector_panel": {

@@ -2,7 +2,12 @@
   "board": {
     "3dviewports": [],
     "design_settings": {
-      "defaults": {}
+      "defaults": {},
+      "diff_pair_dimensions": [],
+      "drc_exclusions": [],
+      "rules": {},
+      "track_widths": [],
+      "via_dimensions": []
     },
     "ipc2581": {
       "dist": "",
@@ -244,7 +249,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "manual_atomic.kicad_pro",
+    "filename": "single_resistor.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -375,14 +380,14 @@
       "intersheets_ref_show": false,
       "intersheets_ref_suffix": "",
       "junction_size_choice": 3,
-      "label_size_ratio": 0.25,
+      "label_size_ratio": 0.375,
       "operating_point_overlay_i_precision": 3,
       "operating_point_overlay_i_range": "~A",
       "operating_point_overlay_v_precision": 3,
       "operating_point_overlay_v_range": "~V",
       "overbar_offset_ratio": 1.23,
-      "pin_symbol_size": 0.0,
-      "text_offset_ratio": 0.08
+      "pin_symbol_size": 25.0,
+      "text_offset_ratio": 0.15
     },
     "legacy_lib_dir": "",
     "legacy_lib_list": [],
@@ -390,19 +395,9 @@
       "version": 1
     },
     "net_format_name": "",
-    "ngspice": {
-      "fix_include_paths": true,
-      "fix_passive_vals": false,
-      "meta": {
-        "version": 0
-      },
-      "model_mode": 0,
-      "workbook_filename": ""
-    },
     "page_layout_descr_file": "",
     "plot_directory": "",
     "space_save_all_events": true,
-    "spice_adjust_passive_values": false,
     "spice_current_sheet_as_root": false,
     "spice_external_command": "spice \"%I\"",
     "spice_model_current_sheet_as_root": true,
@@ -414,8 +409,8 @@
   },
   "sheets": [
     [
-      "3b00c319-470a-4e85-847f-5cfe3c5f3f10",
-      ""
+      "276f8821-4c7d-4bd9-a39c-2b6212c3a3a2",
+      "Root"
     ]
   ],
   "text_variables": {}

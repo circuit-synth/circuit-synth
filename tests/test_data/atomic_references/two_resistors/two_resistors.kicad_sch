@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "eeschema")
 	(generator_version "9.0")
-	(uuid "c607e5f1-42e2-4249-b659-6d0555bce224")
+	(uuid "0e79bda9-beda-4798-b37e-f051596b1108")
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
@@ -132,16 +132,16 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 121.92 68.58 0)
+		(at 121.92 67.31 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "5a8c2387-7f50-44f6-8664-d343a5707350")
+		(uuid "6ef7fa07-37eb-4b5b-a2bf-c95d2c5e30f6")
 		(property "Reference" "R1"
-			(at 124.46000000000001 67.3099 0)
+			(at 124.46 66.0399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -150,7 +150,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 124.46000000000001 69.8599 0)
+			(at 124.46 68.5799 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -159,7 +159,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 120.142 68.58 90)
+			(at 120.142 67.31 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -168,7 +168,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 121.92 68.58 0)
+			(at 121.92 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -177,7 +177,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 121.92 68.58 0)
+			(at 121.92 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -185,15 +185,15 @@
 				(hide yes)
 			)
 		)
-		(pin "2"
-			(uuid "9732dff3-7152-4d78-bc86-bfb07a84bb5f")
-		)
 		(pin "1"
-			(uuid "dcba2aa8-eccb-4896-a7ad-24a8bbbecf03")
+			(uuid "84091103-e517-4d41-b41f-edca21fa911a")
+		)
+		(pin "2"
+			(uuid "a64d6697-a640-4841-bb19-d9a384ed03c5")
 		)
 		(instances
 			(project ""
-				(path "/c607e5f1-42e2-4249-b659-6d0555bce224"
+				(path "/0e79bda9-beda-4798-b37e-f051596b1108"
 					(reference "R1")
 					(unit 1)
 				)
@@ -209,7 +209,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "3fb67429-a322-42fe-8dcd-507c7a350254")
+		(uuid "b12e3a58-2c57-477b-8c3f-e6c8d9b54b55")
 		(property "Reference" "R2"
 			(at 139.7 67.3099 0)
 			(effects
@@ -219,8 +219,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "22k"
-			(at 139.7 69.8599 0)
+		(property "Value" "10k"
+			(at 139.7 69.8499 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -255,15 +255,15 @@
 				(hide yes)
 			)
 		)
-		(pin "2"
-			(uuid "60b88588-6686-416c-9bf4-128f00190439")
-		)
 		(pin "1"
-			(uuid "8241dbdc-f679-4360-858e-a0d832042010")
+			(uuid "ad72e17e-336e-45a5-b0fe-bf8e4fe22dc2")
+		)
+		(pin "2"
+			(uuid "7abe14b8-f5b0-485c-9baf-978cc0f75f05")
 		)
 		(instances
-			(project ""
-				(path "/c607e5f1-42e2-4249-b659-6d0555bce224"
+			(project "two_resistors"
+				(path "/0e79bda9-beda-4798-b37e-f051596b1108"
 					(reference "R2")
 					(unit 1)
 				)
