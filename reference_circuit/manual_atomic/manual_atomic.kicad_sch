@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid db66d28a-a23c-4144-877e-f204c9d93c8b)
+	(uuid 3b00c319-470a-4e85-847f-5cfe3c5f3f10)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
@@ -139,99 +139,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 31ba54cb-f508-4275-a9c0-3d32700f82c7)
-		(property "Reference" "R1"
-			(at 121.92 63.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "10k"
-			(at 121.92 73.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 121.92 78.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project
-				(path "/"
-					(reference "R1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 121.92 68.58 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid fba4981f-e111-4b5c-9656-3458ce047b0a)
-		(property "Reference" "R1"
-			(at 121.92 63.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "10k"
-			(at 121.92 73.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 121.92 78.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(instances
-			(project
-				(path "/"
-					(reference "R1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 121.92 68.58 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "487df08e-0bc2-42d6-bcca-5a44b9e18c81")
+		(uuid "a51ea61d-d79e-48a9-b814-a84f30e335d1")
 		(property "Reference" "R1"
 			(at 124.46000000000001 67.31 0)
 			(effects
@@ -278,14 +186,14 @@
 			)
 		)
 		(pin "2"
-			(uuid "92892ab7-b4d9-4ebe-8360-39a18479398d")
+			(uuid "463d0c7b-e6eb-42bb-9631-8003b75fec72")
 		)
 		(pin "1"
-			(uuid "4bdf0dd7-86f6-4296-9673-f57a177fc379")
+			(uuid "f6035965-4a4a-4355-9126-6679b00850d0")
 		)
 		(instances
 			(project ""
-				(path "/db66d28a-a23c-4144-877e-f204c9d93c8b"
+				(path "/3b00c319-470a-4e85-847f-5cfe3c5f3f10"
 					(reference "R1")
 					(unit 1)
 				)
@@ -293,5 +201,11 @@
 		)
 	)
 	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts
+		no
 	)
 )
