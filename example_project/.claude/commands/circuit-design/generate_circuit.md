@@ -198,32 +198,50 @@ Based on clarified/inferred requirements, break down into functional blocks:
 **ONLY AFTER collecting user requirements, launch agents based on their specific circuit:**
 
 ```python
-# FORCE Claude to use the parallel-subcircuit-agent by explicit Task calls
-# Use the PROACTIVE parallel subcircuit generation agents
+# NEW ARCHITECTURE: Main orchestrator collects code from subagents and creates all files
+# Launch the main orchestration agent to coordinate the entire workflow
 
-Task(subagent_type="parallel-subcircuit-agent", description="MUST CREATE power_management.py file", 
-     prompt=f"You MUST use the Write tool to create power_management.py. SAVE FILE power_management.py: Create power management circuit for {power_requirements_from_user} using {preferred_supplier} components. Use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/power_management.py with complete circuit-synth code including @circuit decorator and function definition. DO NOT just provide text - USE THE WRITE TOOL.")
+Task(subagent_type="main-orchestration-agent", description="Generate complete hierarchical circuit project", 
+     prompt=f"""Generate complete circuit project using NEW ARCHITECTURE:
 
-Task(subagent_type="parallel-subcircuit-agent", description="MUST CREATE esp32_controller.py file",
-     prompt=f"You MUST use the Write tool to create esp32_controller.py. SAVE FILE esp32_controller.py: Create ESP32 controller circuit for {controller_requirements_from_user} with {required_peripherals} using {preferred_supplier} components. Use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/esp32_controller.py with complete circuit-synth code. DO NOT just provide text - USE THE WRITE TOOL.")
-     
-Task(subagent_type="parallel-subcircuit-agent", description="MUST CREATE motor_control.py file", 
-     prompt=f"You MUST use the Write tool to create motor_control.py. SAVE FILE motor_control.py: Create motor control circuit for {motor_requirements_from_user} using {preferred_supplier} components. Use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/motor_control.py with complete circuit-synth code. DO NOT just provide text - USE THE WRITE TOOL.")
+Circuit Requirements: {circuit_description}
+Power Requirements: {power_requirements_from_user}
+Controller Requirements: {controller_requirements_from_user} 
+Motor Requirements: {motor_requirements_from_user}
+Audio/LED Requirements: {audio_led_requirements_from_user}
+USB Requirements: {usb_requirements_from_user}
+Preferred Supplier: {preferred_supplier}
 
-Task(subagent_type="parallel-subcircuit-agent", description="MUST CREATE audio_led.py file", 
-     prompt=f"You MUST use the Write tool to create audio_led.py. SAVE FILE audio_led.py: Create audio and LED circuit for {audio_led_requirements_from_user} using {preferred_supplier} components. Use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/audio_led.py with complete circuit-synth code. DO NOT just provide text - USE THE WRITE TOOL.")
-     
-Task(subagent_type="parallel-subcircuit-agent", description="MUST CREATE usb_interface.py file",
-     prompt=f"You MUST use the Write tool to create usb_interface.py. SAVE FILE usb_interface.py: Create USB interface circuit for {usb_requirements_from_user} using {preferred_supplier} components. Use Write tool to save /Users/shanemattner/Desktop/circuit-synth3/example_project/usb_interface.py with complete circuit-synth code. DO NOT just provide text - USE THE WRITE TOOL.")
+Follow the NEW ARCHITECTURE workflow:
 
-# Integration agent creates main.py AFTER subcircuit files exist
-Task(subagent_type="main-orchestration-agent", description="MUST CREATE main.py and validate", 
-     prompt=f"You MUST use the Write tool to create main.py. First check if these files exist: power_management.py, esp32_controller.py, motor_control.py, audio_led.py, usb_interface.py. If they don't exist, report FAILURE. If they exist, create main.py integration file that imports all 5 files. Then run 'uv run python main.py' to verify KiCad generation works. Report success or failure. Circuit description: {circuit_description}")
+1. Launch parallel subcircuit agents to generate Python CODE (not files):
+   - Request power management Python code
+   - Request controller circuit Python code  
+   - Request motor control Python code
+   - Request audio/LED circuit Python code
+   - Request USB interface Python code
+
+2. Collect all returned Python code from agents
+
+3. Use Write tool to create ALL project files:
+   - Create power_management.py with collected code
+   - Create esp32_controller.py with collected code
+   - Create motor_control.py with collected code
+   - Create audio_led.py with collected code
+   - Create usb_interface.py with collected code
+   - Create main.py integration file
+
+4. Test complete project with: uv run python main.py
+
+5. Report success/failure and generated KiCad files
+
+CRITICAL: Subagents return code, YOU create files. This fixes the file generation bottleneck.""")
 ```
 
-**CRITICAL INSTRUCTIONS FOR ALL AGENTS:**
-- **Use Write tool** to save all .py files immediately
-- **Verify JLCPCB availability** for all components before using
+**CRITICAL INSTRUCTIONS FOR NEW ARCHITECTURE:**
+- **Subagents**: Return Python code as text, DO NOT use Write tool
+- **Main orchestrator**: Use Write tool to create all files from collected code  
+- **All agents**: Verify JLCPCB availability for all components before using
 - **Follow shared net naming** exactly as specified above
 - **Generate working code** that compiles with `uv run python filename.py`
 
