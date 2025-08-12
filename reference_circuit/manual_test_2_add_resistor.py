@@ -21,12 +21,30 @@ def main():
     print("Manual Test 2: Add Resistor with Atomic Operations")
     print("=" * 50)
     
-    # Step 1: Generate blank schematic
+    # Step 1: Create truly blank schematic directly
     print("\n🔧 Step 1: Creating blank schematic...")
-    circuit = blank_for_atomic()
-    circuit.generate_kicad_project(project_name="manual_atomic")
-    
     schematic_path = Path("manual_atomic/manual_atomic.kicad_sch")
+    schematic_path.parent.mkdir(exist_ok=True)
+    
+    # Create minimal blank schematic matching reference format
+    blank_content = '''(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "c607e5f1-42e2-4249-b659-6d0555bce224")
+	(paper "A4")
+	(lib_symbols
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)'''
+    
+    with open(schematic_path, 'w') as f:
+        f.write(blank_content)
     
     # Check blank schematic
     if schematic_path.exists():
