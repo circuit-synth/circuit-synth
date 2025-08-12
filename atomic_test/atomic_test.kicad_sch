@@ -1,0 +1,75 @@
+(kicad_sch
+	(version 20250114)
+	(generator circuit_synth)
+	(generator_version 9.0)
+	(uuid b1c3f8d6-10b7-4b82-9599-7a18e69f94f8)
+	(paper A4)
+	(lib_symbols)
+	(symbol
+		(lib_id Device:R)
+		(at
+			121.92
+			88.58
+			0
+		)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid 748f738c-5c9f-4888-ab89-5124a3e1651e)
+		(property
+			Reference
+			R2
+			(at
+				121.92
+				83.58
+				0
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			Value
+			22k
+			(at
+				121.92
+				93.58
+				0
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property
+			Footprint
+			Resistor_SMD:R_0603_1608Metric
+			(at
+				121.92
+				88.58
+				0
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+	)
+	(sheet_instances
+		(path
+			/
+			(page 1)
+		)
+	)
+	(embedded_fonts no)
+)
