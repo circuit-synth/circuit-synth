@@ -34,7 +34,15 @@ class ConnectionAnalyzer:
         logger.debug(f"Analyzing connections for circuit: {circuit.name}")
 
         # Build connection graph from circuit nets
-        for net_name, net in circuit.nets.items():
+        # Handle blank circuits where nets might be empty or converted to list
+        nets = circuit.nets
+        if isinstance(nets, list):
+            # If nets got converted to a list (shouldn't happen but defensive)
+            nets = {}
+        elif nets is None:
+            nets = {}
+            
+        for net_name, net in nets.items():
             connected_components = []
 
             # Find all components connected to this net
