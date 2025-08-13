@@ -44,7 +44,7 @@ If GitHub MCP is NOT available, immediately ask the user:
 2. Use `CLAUDE.md` for development commands
 
 **Key Commands:**
-- `./tools/testing/run_full_regression_tests.py` - Run comprehensive tests
+- `./tools/testing/run_full_regression_tests.py` - Run all tests
 - `/find-symbol STM32` - Search KiCad symbols  
 - `/jlc-search ESP32` - Find JLCPCB components
 

@@ -17,6 +17,7 @@
 This command handles the complete release process:
 
 ### 1. Pre-Release Validation
+- **🚨 CRITICAL: Sync project template** - Run `./tools/packaging/sync_example_to_template.sh` to ensure PyPI package includes latest agents
 - **Test core functionality** - Run main examples
 - **Check branch status** - Ensure we're on develop/main
 - **Validate version format** - Semantic versioning check
