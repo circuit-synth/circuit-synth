@@ -122,6 +122,49 @@ def create_claude_directory_from_templates(
         # Also register agents to update with any newer agent definitions
         register_circuit_agents()
 
+        # Install intelligent circuit-synth hooks
+        from circuit_synth.ai_integration.claude.hooks import create_claude_settings
+
+        # Create intelligent hooks settings
+        intelligent_hooks = create_claude_settings()
+
+        # Merge with existing settings if they exist
+        settings_file = dest_claude_dir / "settings.json"
+        if settings_file.exists():
+            import json
+
+            try:
+                with open(settings_file, "r") as f:
+                    existing_settings = json.load(f)
+
+                # Merge hooks intelligently
+                if "hooks" not in existing_settings:
+                    existing_settings["hooks"] = {}
+
+                # Add intelligent hooks, but preserve any PostToolUse hooks from template
+                for hook_type, hooks in intelligent_hooks["hooks"].items():
+                    if (
+                        hook_type == "PostToolUse"
+                        and hook_type in existing_settings["hooks"]
+                    ):
+                        # Merge PostToolUse hooks instead of replacing
+                        existing_settings["hooks"][hook_type].extend(hooks)
+                    else:
+                        # For SessionStart and other hooks, use the intelligent ones
+                        existing_settings["hooks"][hook_type] = hooks
+
+                # Write merged settings
+                with open(settings_file, "w") as f:
+                    json.dump(existing_settings, f, indent=2)
+
+                console.print(
+                    "✅ Installed intelligent circuit-synth hooks", style="green"
+                )
+            except Exception as e:
+                console.print(
+                    f"⚠️  Could not merge intelligent hooks: {e}", style="yellow"
+                )
+
         # Remove mcp_settings.json as it's not needed for user projects
         mcp_settings_file = dest_claude_dir / "mcp_settings.json"
         if mcp_settings_file.exists():
@@ -231,6 +274,49 @@ def copy_complete_claude_setup(
             console.print("✅ Keeping all developer tools and agents", style="green")
 
         console.print("✅ Copied all agents and commands", style="green")
+
+        # Install intelligent circuit-synth hooks
+        from circuit_synth.ai_integration.claude.hooks import create_claude_settings
+
+        # Create intelligent hooks settings
+        intelligent_hooks = create_claude_settings()
+
+        # Merge with existing settings if they exist
+        settings_file = dest_claude_dir / "settings.json"
+        if settings_file.exists():
+            import json
+
+            try:
+                with open(settings_file, "r") as f:
+                    existing_settings = json.load(f)
+
+                # Merge hooks intelligently
+                if "hooks" not in existing_settings:
+                    existing_settings["hooks"] = {}
+
+                # Add intelligent hooks, but preserve any PostToolUse hooks from template
+                for hook_type, hooks in intelligent_hooks["hooks"].items():
+                    if (
+                        hook_type == "PostToolUse"
+                        and hook_type in existing_settings["hooks"]
+                    ):
+                        # Merge PostToolUse hooks instead of replacing
+                        existing_settings["hooks"][hook_type].extend(hooks)
+                    else:
+                        # For SessionStart and other hooks, use the intelligent ones
+                        existing_settings["hooks"][hook_type] = hooks
+
+                # Write merged settings
+                with open(settings_file, "w") as f:
+                    json.dump(existing_settings, f, indent=2)
+
+                console.print(
+                    "✅ Installed intelligent circuit-synth hooks", style="green"
+                )
+            except Exception as e:
+                console.print(
+                    f"⚠️  Could not merge intelligent hooks: {e}", style="yellow"
+                )
 
         # Count what was copied (now includes subdirectories)
         agents_count = len(list((dest_claude_dir / "agents").rglob("*.md")))
