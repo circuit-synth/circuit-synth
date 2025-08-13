@@ -1,50 +1,68 @@
-# Script Reference Guide
+# Development Tools Reference Guide
 
-This document lists all scripts in the `scripts/` directory and their purposes.
+⚠️ **DEPRECATED**: Scripts have moved to the `tools/` directory for better organization.
 
-## 🧪 **Testing Scripts**
+## 🏗️ **New Organization Structure**
 
-### Automated Testing
+All development tools are now organized in the `tools/` directory:
 
-## 🔧 **Build & Setup Scripts**
-
-
-### Code Formatting
-- **`scripts/setup_formatting.sh`** - Sets up pre-commit hooks for automatic formatting
-
-## 🛠️ **Maintenance & Utilities**
-
-- **`scripts/clear_all_caches.sh`** - Clears all circuit-synth caches for fresh testing
+```
+tools/
+├── testing/           # Test automation
+│   ├── run_full_regression_tests.py
+│   ├── run_regression_tests.py
+│   └── test_release.py
+├── build/             # Build and formatting
+│   ├── format_all.sh
+│   └── setup_formatting.sh
+├── release/           # Release automation
+│   └── release_to_pypi.sh
+├── maintenance/       # Utilities
+│   └── clear_all_caches.sh
+└── analysis/          # Code analysis
+    ├── dead-code-analysis.py
+    └── dead-code-analysis.sh
+```
 
 ## 📖 **Quick Reference Commands**
 
 ```bash
-# Most commonly used scripts:
-./scripts/run_all_tests.sh                    # Run comprehensive tests
-./scripts/format_all.sh                      # Format all code
-./scripts/clear_all_caches.sh                # Clear caches
+# Most commonly used tools:
+./tools/testing/run_full_regression_tests.py  # Comprehensive pre-release tests
+./tools/build/format_all.sh                   # Format all code
+./tools/maintenance/clear_all_caches.sh       # Clear caches
+./tools/release/release_to_pypi.sh             # Release to PyPI
 ```
 
-## 🔍 **Finding Scripts**
-
-All scripts are now located in the `scripts/` directory. Use these commands to explore:
+## 🔍 **Finding Tools**
 
 ```bash
-# List all scripts
-ls scripts/
+# List all tools by category
+ls tools/*/
 
-# Find specific script
+# Find specific tool
+find tools/ -name "*regression*"
 
-# Search script content  
-grep -r "function_name" scripts/
+# Search tool content  
+grep -r "function_name" tools/
 ```
+
+## 🔄 **Migration from scripts/**
+
+The old `scripts/` directory contains symbolic links for backward compatibility but will be removed in a future release.
+
+**Updated paths:**
+- `./scripts/run_all_tests.sh` → `./tools/testing/run_full_regression_tests.py`
+- `./scripts/clear_all_caches.sh` → `./tools/maintenance/clear_all_caches.sh`
+- `./scripts/format_all.sh` → `./tools/build/format_all.sh`
+- `./scripts/release_to_pypi.sh` → `./tools/release/release_to_pypi.sh`
 
 ## 📚 **Related Documentation**
 
-- **Main docs**: `docs/AUTOMATED_TESTING.md` - Comprehensive testing guide
-- **Contributing**: `CONTRIBUTING.md` - Development guidelines
+- **Testing**: `docs/TESTING.md` - Comprehensive testing guide
+- **Contributing**: `docs/CONTRIBUTING.md` - Development guidelines  
 - **Claude instructions**: `CLAUDE.md` - Claude Code guidance
 
 ---
 
-**💡 Tip**: Bookmark this file! All your utility scripts are now organized in `scripts/` with this reference guide.
+**💡 Tip**: Use the organized `tools/` structure for clearer development workflows!

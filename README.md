@@ -462,8 +462,8 @@ For 6x performance improvement:
 ## Testing
 
 ```bash
-# Run all tests
-./scripts/run_all_tests.sh
+# Run comprehensive tests
+./tools/testing/run_full_regression_tests.py
 
 # Python tests only
 uv run pytest --cov=circuit_synth
@@ -635,7 +635,7 @@ circuit-synth/
 │   └── simulation/              # SPICE integration
 ├── example_project/             # Complete usage example
 ├── tests/                       # Test suites
-└── scripts/                     # Build and development scripts
+└── tools/                       # Development and build tools (organized by category)
 ```
 
 ## 🤝 Contributing
