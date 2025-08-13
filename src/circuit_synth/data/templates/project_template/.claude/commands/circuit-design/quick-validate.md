@@ -105,4 +105,4 @@ else:
 - **Connectors**: `Connector:USB_B_Micro`
 - **Crystals**: `Device:Crystal`
 
-This command helps you quickly verify all components in your design before generating circuit-synth code, preventing the frustrating pin name errors shown in your logs!
+This command helps you quickly verify all components in your design before generating circuit-synth code, preventing pin name errors!

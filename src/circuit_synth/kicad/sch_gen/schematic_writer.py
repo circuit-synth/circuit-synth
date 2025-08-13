@@ -105,7 +105,6 @@ from .integrated_reference_manager import IntegratedReferenceManager
 from .shape_drawer import arc_s_expr, circle_s_expr, polyline_s_expr, rectangle_s_expr
 
 # Python-only implementation
-_RUST_COMPONENT_ACCELERATION = False
 
 from sexpdata import Symbol
 
@@ -711,7 +710,7 @@ class SchematicWriter:
                 self.placement_engine.arrange_components(
                     components_needing_placement,
                     arrangement="force_directed",
-                    use_rust_acceleration=False,  # Python implementation
+                    # Python implementation
                 )
             else:
                 # For few components, use grid placement

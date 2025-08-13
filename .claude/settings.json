@@ -41,16 +41,6 @@
         ]
       },
       {
-        "description": "Format Rust files",
-        "matcher": "Edit|Write.*\\.rs$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "FILE_PATH=$(echo '$CLAUDE_TOOL_INPUT' | jq -r '.file_path // empty'); if [[ \"$FILE_PATH\" == *.rs ]]; then rustfmt \"$FILE_PATH\" 2>/dev/null; fi"
-          }
-        ]
-      },
-      {
         "description": "Check for TODO items after changes",
         "matcher": "Edit|Write",
         "hooks": [
