@@ -69,6 +69,8 @@ except ImportError:
         return decorator
 
 
+from sexpdata import Symbol
+
 # Use optimized symbol cache from core.component for better performance,
 # but keep Python fallback for graphics data
 from circuit_synth.core.component import SymbolLibCache
@@ -106,7 +108,6 @@ from .shape_drawer import arc_s_expr, circle_s_expr, polyline_s_expr, rectangle_
 
 # Python-only implementation
 
-from sexpdata import Symbol
 
 
 # Python implementation for generate_component_sexp

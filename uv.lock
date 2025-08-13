@@ -289,7 +289,7 @@ wheels = [
 
 [[package]]
 name = "circuit-synth"
-version = "0.8.27"
+version = "0.8.28"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
