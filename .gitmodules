@@ -25,3 +25,6 @@
 [submodule "submodules/atopile"]
 	path = submodules/atopile
 	url = https://github.com/atopile/atopile
+[submodule "submodules/kicad-skip"]
+	path = submodules/kicad-skip
+	url = https://github.com/psychogenic/kicad-skip.git
