@@ -1,0 +1,17 @@
+{
+  "description": "Circuit-Synth Project Environment",
+  "version": "2.0.0",
+  "model": "claude-sonnet-4-20250514[1m]",
+  
+  "env": {
+    "CIRCUIT_SYNTH_PROJECT": "1"
+  },
+  
+  "qualityGates": {
+    "minTestCoverage": 80,
+    "maxCyclomaticComplexity": 10,
+    "maxFunctionLength": 30,
+    "requireTypeHints": true,
+    "requireDocstrings": true
+  }
+}

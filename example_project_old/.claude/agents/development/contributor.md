@@ -39,11 +39,7 @@ Always guide contributors to read these key documents (in order of importance):
 
 **Testing Infrastructure:**
 ```bash
-<<<<<<< HEAD
 ./tools/testing/run_full_regression_tests.py           # Complete test suite
-=======
-./tools/testing/run_full_regression_tests.py  # Complete test suite
->>>>>>> origin/main
 ```
 
 **Special Tools Available:**

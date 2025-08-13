@@ -197,7 +197,6 @@ env = [
 
 [tool.uv.workspace]
 members = [
-    "example_project",
     "test_uv",
     "cs_test",
     "test_agent_setup/fresh_agent_test",
