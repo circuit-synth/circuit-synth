@@ -1,1 +1,0 @@
-../tools/build/setup_formatting.sh

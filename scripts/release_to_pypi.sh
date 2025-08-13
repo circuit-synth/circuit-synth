@@ -1,1 +1,0 @@
-../tools/release/release_to_pypi.sh

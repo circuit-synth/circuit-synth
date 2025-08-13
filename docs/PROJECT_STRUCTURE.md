@@ -16,7 +16,7 @@ circuit-synth/
 ├── examples/                   # Usage examples and demos
 ├── docs/                       # Documentation and guides
 ├── tools/                      # Development and CI tools
-├── scripts/                    # Backward compatibility symlinks (deprecated)
+# (scripts/ directory removed - now consolidated in tools/)
 ├── docker/                     # Container definitions
 ├── submodules/                 # Git submodules (external projects)
 ├── memory-bank/                # Project knowledge and decisions
@@ -49,9 +49,9 @@ circuit-synth/
   - `ci-setup/` - Continuous integration setup scripts
   - Future: `development/`, `deployment/`, etc.
 
-- **`scripts/`** - Deprecated (symbolic links for backward compatibility)
-  - All functionality moved to organized `tools/` directory
-  - Will be removed in future release
+- ~~**`scripts/`**~~ - **REMOVED** (consolidated into organized `tools/` directory)
+  - All functionality now in appropriate `tools/` subdirectories
+  - Migration completed successfully
 
 ### Testing & Examples
 - **`tests/`** - Comprehensive test suite

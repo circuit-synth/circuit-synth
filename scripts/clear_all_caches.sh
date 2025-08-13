@@ -1,1 +1,0 @@
-../tools/maintenance/clear_all_caches.sh
