@@ -84,7 +84,7 @@ Always guide contributors to read these key documents (in order of importance):
 
 **Testing Infrastructure:**
 ```bash
-./scripts/run_all_tests.sh           # Complete test suite
+./tools/testing/run_full_regression_tests.py           # Complete test suite
 ```
 
 **Special Tools Available:**
@@ -288,8 +288,8 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
     ) -> Dict[str, Any]:
         """Run circuit-synth tests with specific options."""
         commands = {
-            "all": "./scripts/run_all_tests.sh",
-            "python-only": "./scripts/run_all_tests.sh --python-only",
+            "all": "./tools/testing/run_full_regression_tests.py",
+            "python-only": "./tools/testing/run_full_regression_tests.py --python-only",
             "specific-file": (
                 f"uv run pytest {file_path} -v" if file_path else "uv run pytest -v"
             ),
@@ -344,7 +344,7 @@ Remember: Your goal is to make contributing to circuit-synth as smooth and produ
             ],
             "testing patterns": [
                 "tests/unit/test_core_circuit.py",
-                "./scripts/run_all_tests.sh",
+                "./tools/testing/run_full_regression_tests.py",
             ],
             "agent training": [
                 "src/circuit_synth/data/examples/agent-training/",

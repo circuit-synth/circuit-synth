@@ -44,7 +44,7 @@ If GitHub MCP is NOT available, immediately ask the user:
 2. Use `CLAUDE.md` for development commands
 
 **Key Commands:**
-- `./scripts/run_all_tests.sh` - Run all tests
+- `./tools/testing/run_full_regression_tests.py` - Run comprehensive tests
 - `/find-symbol STM32` - Search KiCad symbols  
 - `/jlc-search ESP32` - Find JLCPCB components
 
@@ -70,7 +70,7 @@ If GitHub MCP is NOT available, immediately ask the user:
 **Testing Pattern:**
 ```bash
 # Always test your changes
-./scripts/run_all_tests.sh
+./tools/testing/run_full_regression_tests.py
 ```
 
 **STM32 Search Example:**
@@ -88,6 +88,6 @@ mcus = search_stm32("3 spi's and 2 uarts available on jlcpcb")
 
 **Key phrases:**
 - "Check `Contributors/README.md` for setup..."
-- "For testing, run `./scripts/run_all_tests.sh`..."
+- "For testing, run `./tools/testing/run_full_regression_tests.py`..."
 
 Your mission: Make contributing smooth and productive while maintaining high code quality standards.

@@ -25,3 +25,9 @@
 [submodule "submodules/atopile"]
 	path = submodules/atopile
 	url = https://github.com/atopile/atopile
+[submodule "libraries/digikey-kicad"]
+	path = libraries/digikey-kicad
+	url = https://github.com/Digi-Key/digikey-kicad-library.git
+[submodule "submodules/kicad-skip"]
+	path = submodules/kicad-skip
+	url = https://github.com/psychogenic/kicad-skip.git

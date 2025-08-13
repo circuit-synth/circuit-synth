@@ -54,17 +54,17 @@ pip install -e ".[dev]"
 
 **🚀 AUTOMATED TESTING (Recommended):**
 ```bash
-./scripts/run_all_tests.sh
+./tools/testing/run_full_regression_tests.py
 
 # Run with verbose output for debugging
-./scripts/run_all_tests.sh --verbose
+./tools/testing/run_full_regression_tests.py --verbose
 
 # Run only Python tests (fast)
-./scripts/run_all_tests.sh --python-only
+./tools/testing/run_full_regression_tests.py --python-only
 
 
 # Stop on first failure (for debugging)
-./scripts/run_all_tests.sh --fail-fast
+./tools/testing/run_full_regression_tests.py --fail-fast
 ```
 
 ```bash

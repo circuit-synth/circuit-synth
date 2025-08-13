@@ -320,7 +320,7 @@ def guide_regression_testing():
     print("\n📋 STEP 1: CLEAR ALL CACHES (CRITICAL)")
     print("Before testing, you MUST clear all caches to ensure clean testing:")
     print()
-    print("   ./scripts/clear_all_caches.sh")
+    print("   ./tools/maintenance/clear_all_caches.sh")
     print("   # OR manually:")
     print("   rm -rf ~/.cache/circuit_synth/")
     print("   rm -rf ~/.circuit-synth/")
@@ -446,7 +446,7 @@ def guide_regression_testing():
         print("\n⏭️  Summary skipped")
     
     print(f"\n📚 Complete test documentation: docs/MANUAL_REGRESSION_TESTS.md")
-    print("🔄 Re-run this analysis anytime with: python scripts/dead-code-analysis.py")
+    print("🔄 Re-run this analysis anytime with: python tools/analysis/dead-code-analysis.py")
 
 
 def main():
