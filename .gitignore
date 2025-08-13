@@ -169,3 +169,5 @@ test_output/
 .pypirc
 memory-bank/
 .circuit_synth/
+.circuit-synth/
+libraries/digikey-kicad-converted/
