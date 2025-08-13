@@ -30,7 +30,7 @@ def setup_digikey_api(api_key: str, client_id: str):
 
     config = LibrarySourceConfig()
     config.update_api_credentials(
-        LibrarySource.DIGIKEY, api_key=api_key, client_id=client_id, enabled=True
+        LibrarySource.DIGIKEY_API, api_key=api_key, client_id=client_id, enabled=True
     )
 
     click.echo(f"✅ DigiKey API configured successfully")

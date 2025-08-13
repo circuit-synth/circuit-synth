@@ -117,7 +117,7 @@ class LibrarySourceConfig:
         if source == LibrarySource.SNAPEDA:
             return source_data.get("enabled", False)  # Can use free tier
 
-        if source == LibrarySource.DIGIKEY:
+        if source == LibrarySource.DIGIKEY_API:
             return (
                 source_data.get("enabled", False)
                 and source_data.get("api_key")
@@ -150,7 +150,7 @@ class LibrarySourceConfig:
         # Check current status
         local_ok = self.is_source_configured(LibrarySource.LOCAL_KICAD)
         snapeda_ok = self.is_source_configured(LibrarySource.SNAPEDA)
-        digikey_ok = self.is_source_configured(LibrarySource.DIGIKEY)
+        digikey_ok = self.is_source_configured(LibrarySource.DIGIKEY_API)
 
         instructions.append("## Current Status")
         instructions.append(
