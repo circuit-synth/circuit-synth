@@ -1,0 +1,231 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "circuit_synth"
+version = "0.8.25"
+description = "Pythonic circuit design for production-ready KiCad projects"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [
+    {name = "Circuit Synth Contributors", email = "contact@circuitsynth.com"},
+]
+keywords = ["circuit", "design", "kicad", "electronics", "pcb", "schematic"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    # Core dependencies
+    "numpy>=1.20.0",
+    "scipy>=1.7.0",
+    "matplotlib>=3.3.0",
+    "networkx>=2.6.0",
+    "pydantic>=2.0.0",
+    "PyYAML>=5.4.0",
+    "click>=8.0.0",
+    "rich>=10.0.0",
+    "loguru>=0.5.0",
+    "psutil>=5.9.0",
+    # Cache and performance dependencies
+    "cachetools>=5.3.0",
+    # Additional data processing
+    "sexpdata>=0.0.3",
+    # Async support
+    "aiohttp>=3.9.0",
+    "aiofiles>=23.2.0",
+    # Web scraping for JLC integration
+    "requests>=2.28.0",
+    "beautifulsoup4>=4.11.0",
+    "lxml>=6.0.0",
+    "pyspice>=1.5",
+    "twine>=6.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=3.0.0",
+    "pytest-mock>=3.14.0",
+    "pytest-env>=1.1.0",
+    "black>=22.0.0",
+    "isort>=5.10.0",
+    "flake8>=4.0.0",
+    "mypy>=0.950",
+    "types-PyYAML>=6.0.0",
+    "pre-commit>=2.17.0",
+]
+claude = [
+    # Claude Code SDK integration for AI-powered circuit design
+    "claude-code-sdk>=0.0.17",
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-mock>=3.14.0", 
+    "pytest-asyncio>=0.24.0",  # Async test support
+    "memory-profiler>=0.60.0",
+    "hypothesis>=6.0.0",  # Property-based testing
+]
+
+[project.scripts]
+# Sync scripts
+kicad-to-python = "circuit_synth.tools.kicad_integration.kicad_to_python_sync:main"
+python-to-kicad = "circuit_synth.tools.kicad_integration.python_to_kicad_sync:main"
+
+# Symbol management scripts  
+preload-symbols = "circuit_synth.tools.kicad_integration.preload_symbols:main"
+preparse-symbols = "circuit_synth.tools.kicad_integration.preparse_kicad_symbols:main"
+
+# Import/Export tools
+netlist-import = "circuit_synth.kicad.netlist_importer:main"
+json-to-python = "circuit_synth.codegen.json_to_python_project:main"
+
+# KiCad Integration
+validate-kicad = "circuit_synth.core.kicad_validator:main"
+
+# Claude Code Integration
+setup-claude-integration = "circuit_synth.tools.development.setup_claude:main"
+register-agents = "circuit_synth.ai_integration.claude.agent_registry:main"
+validate-circuit = "circuit_synth.ai_integration.validation.real_time_check:main"
+cs-new-project = "circuit_synth.tools.project_management.new_project:main"
+cs-init-pcb = "circuit_synth.tools.project_management.init_pcb:main"
+cs-init-existing-project = "circuit_synth.tools.project_management.init_existing_project:main"
+cs-setup-kicad-plugins = "circuit_synth.tools.development.setup_kicad_plugins:main"
+
+# Memory-Bank System
+cs-memory-bank-init = "circuit_synth.ai_integration.memory_bank.cli:init_cli"
+cs-memory-bank-remove = "circuit_synth.ai_integration.memory_bank.cli:remove_cli"
+
+# Quality Assurance Tools
+cs-fmea = "circuit_synth.tools.quality_assurance.fmea_cli:main"
+
+# Library API Setup Tools
+cs-setup-snapeda-api = "circuit_synth.tools.setup.library_api_setup:setup_snapeda_api"
+cs-setup-digikey-api = "circuit_synth.tools.setup.library_api_setup:setup_digikey_api"
+cs-library-setup = "circuit_synth.tools.setup.library_api_setup:show_library_setup"
+
+# Test Plan Generation - DISABLED: Files don't exist yet
+# create-test-plan = "circuit_synth.tools.test_plan_commands:create_test_plan"
+# generate-manufacturing-tests = "circuit_synth.tools.test_plan_commands:generate_manufacturing_tests"
+
+# Plugin Management
+install-kicad-plugins = "install_kicad_plugins:main"
+
+[project.urls]
+Homepage = "https://github.com/circuit-synth/circuit-synth"
+Documentation = "https://circuit-synth.readthedocs.io"
+Repository = "https://github.com/circuit-synth/circuit-synth"
+Issues = "https://github.com/circuit-synth/circuit-synth/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+# Include all packages from src
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+circuit_synth = [
+    "py.typed",
+    "data/templates/project/*",
+    "data/templates/claude/*", 
+    "data/templates/memory_bank/*",
+    "data/templates/example_project/*",
+    "data/templates/example_project/circuit-synth/*",
+    "data/templates/example_project/.claude/*",
+    "data/templates/example_project/.claude/agents/*/*",
+    "data/templates/example_project/.claude/commands/*/*",
+    "data/templates/project_template/*",
+    "data/templates/project_template/circuit-synth/*",
+    "data/templates/project_template/.claude/*",
+    "data/templates/project_template/.claude/agents/*/*",
+    "data/templates/project_template/.claude/commands/*/*"
+]
+
+# Include all Python module files
+"*" = [
+    "__init__.py", "*.py",  # Python files
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+exclude = [
+    "^.venv/",
+    "^venv/",
+    "build/",
+    "dist/"
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow running tests",
+    "asyncio: marks tests as async/await tests",
+    "integration: marks tests as integration tests",
+    "functional: marks tests as functional tests",
+    "cache: marks tests as cache-related tests",
+    "asyncio: marks tests as async tests",
+]
+env = [
+    "KICAD_SYMBOL_DIR=tests/test_data/kicad_symbols",
+]
+
+[tool.uv.workspace]
+members = [
+    "example_project",
+    "test_uv",
+    "cs_test",
+    "test_agent_setup/fresh_agent_test",
+    "test_agent_setup/validation_test",
+    "test_agent_setup/final_test",
+    "agent_validation_test/agent_test",
+    "test_generation/format_test",
+    "test_8_agents/test_project",
+    "test_install",
+    "test-project",
+    "test_project_creation",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "build>=1.2.2.post1",
+    "flake8>=7.3.0",
+    "isort>=6.0.1",
+    "linkify-it-py>=2.0.3",
+    "myst-parser>=3.0.1",
+    "pytest-env>=1.1.5",
+    "sphinx>=7.4.7",
+    "sphinx-autodoc-typehints>=2.3.0",
+    "sphinx-rtd-theme>=3.0.2",
+    "twine>=6.1.0",
+]
+test = [
+    "pytest-asyncio>=1.1.0",
+]
+

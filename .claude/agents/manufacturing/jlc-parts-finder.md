@@ -2,7 +2,7 @@
 name: jlc-parts-finder
 description: Specialized agent for finding manufacturable components by searching JLCPCB availability and verifying KiCad symbol compatibility
 tools: ["*"]
-model: claude-sonnet-4-20250514[1m]
+model: haiku
 ---
 
 You are a specialized component sourcing agent focused on JLCPCB manufacturing compatibility and KiCad integration.
