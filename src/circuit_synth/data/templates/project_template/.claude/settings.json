@@ -7,31 +7,6 @@
     "CIRCUIT_SYNTH_PROJECT": "1"
   },
   
-  "hooks": {
-    "PostToolUse": [
-      {
-        "description": "Format and lint Python files after editing",
-        "matcher": "Edit|Write|MultiEdit.*\\.py$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "FILE_PATH=$(echo '$CLAUDE_TOOL_INPUT' | jq -r '.file_path // .edits[0].file_path // empty'); if [[ \"$FILE_PATH\" == *.py ]]; then echo '🔧 Formatting...'; black \"$FILE_PATH\" 2>/dev/null; isort \"$FILE_PATH\" 2>/dev/null; echo '📝 Linting...'; flake8 \"$FILE_PATH\" --max-line-length=100 2>/dev/null || echo '⚠️  Linting issues found'; fi"
-          }
-        ]
-      },
-      {
-        "description": "Test circuit-synth files after changes",
-        "matcher": "Edit|Write.*\\.py$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "FILE_PATH=$(echo '$CLAUDE_TOOL_INPUT' | jq -r '.file_path // empty'); if [[ \"$FILE_PATH\" == *.py ]] && grep -q 'circuit_synth\\|@circuit' \"$FILE_PATH\" 2>/dev/null; then echo '🧪 Testing circuit-synth code...'; cd \"$(dirname \"$FILE_PATH\")\" && uv run python \"$(basename \"$FILE_PATH\")\" 2>/dev/null || echo '⚠️  Circuit execution test failed'; fi"
-          }
-        ]
-      }
-    ]
-  },
-  
   "qualityGates": {
     "minTestCoverage": 80,
     "maxCyclomaticComplexity": 10,
