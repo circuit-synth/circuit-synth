@@ -48,12 +48,14 @@ TESTING_TEMPLATE = """# Testing Results
 *This file tracks test results, measurements, and performance validation*
 
 ## Template Test
-**Test Name**: Brief description of test performed  
 **Date**: YYYY-MM-DD  
-**Setup**: Test equipment and conditions  
-**Results**: Measured values and outcomes  
-**Specification**: Expected values and pass/fail status  
-**Notes**: Additional observations and analysis  
+**Test Type**: Power consumption, functional, stress, etc.  
+**Commit**: Git commit hash of version tested  
+**Setup**: Test equipment and configuration  
+**Expected**: Predicted results  
+**Actual**: Measured results  
+**Status**: Pass/Fail/Marginal  
+**Notes**: Observations and follow-up actions  
 
 ---
 
@@ -63,29 +65,30 @@ TIMELINE_TEMPLATE = """# Project Timeline
 
 *This file tracks project milestones, key events, and deadlines*
 
-## Template Milestone
+## Template Event
 **Date**: YYYY-MM-DD  
-**Milestone**: Brief description of milestone or event  
-**Status**: Completed, In Progress, Planned  
-**Details**: Additional context and notes  
-**Next Steps**: What needs to happen next  
+**Event**: Milestone or significant event  
+**Commit**: Related git commit hash  
+**Impact**: Effects on project timeline or scope  
+**Next Actions**: Required follow-up tasks  
 
 ---
 
 """
 
-ISSUES_TEMPLATE = """# Issues & Solutions
+ISSUES_TEMPLATE = """# Known Issues
 
 *This file tracks problems encountered, root causes, and solutions*
 
 ## Template Issue
 **Date**: YYYY-MM-DD  
 **Issue**: Brief description of the problem  
-**Severity**: Low, Medium, High, Critical  
-**Root Cause**: Technical analysis of what caused the issue  
-**Solution**: How the problem was resolved  
-**Prevention**: Steps to avoid similar issues in future  
-**Status**: Open, In Progress, Resolved  
+**Commit**: Git commit hash where issue was introduced/discovered  
+**Symptoms**: How the issue manifests  
+**Root Cause**: Technical reason for the issue  
+**Workaround**: Temporary solution if available  
+**Status**: Open/In Progress/Resolved  
+**Resolution**: Final solution and verification  
 
 ---
 
@@ -93,139 +96,142 @@ ISSUES_TEMPLATE = """# Issues & Solutions
 
 
 def generate_claude_md(project_name: str, boards: list = None, **kwargs) -> str:
-    """Generate project-specific CLAUDE.md with memory-bank documentation."""
+    """Generate project-specific CLAUDE.md with direct circuit generation workflow."""
 
-    boards = boards or ["board-v1", "board-v2"]
     timestamp = datetime.now().isoformat()
 
-    # Extract optional parameters
-    project_specific_instructions = kwargs.get(
-        "project_specific_instructions", "Add any project-specific instructions here."
+    template = f"""# CLAUDE.md - Circuit-Synth Direct Generation
+
+**Generate working circuits directly using commands - NO AGENTS**
+
+## 🔥 Circuit Design Workflow
+
+When user requests circuit design, follow this EXACT workflow:
+
+### STEP 1: Quick Requirements (5 seconds)
+Ask 1-2 focused questions:
+- Circuit type (power supply, MCU board, analog, etc.)
+- Key specifications (voltage, current, frequency, etc.)
+- Main component requirements (STM32 with USB, 3.3V regulator, etc.)
+
+### STEP 2: Find Suitable Components (15 seconds)
+
+#### For STM32 Circuits:
+```bash
+# Find STM32 with specific peripherals
+/find_stm32 "STM32 with USB and 3 SPIs available on JLCPCB"
+```
+
+#### For Other Components:
+```bash
+# Check JLCPCB availability
+/find-parts --source jlcpcb AMS1117-3.3
+
+# Check DigiKey for alternatives
+/find-parts --source digikey "3.3V linear regulator SOT-223"
+```
+
+### STEP 3: Get KiCad Integration Data (15 seconds)
+```bash
+# Find exact KiCad symbol
+/find-symbol STM32F411CEU
+
+# Find matching footprint
+/find-footprint LQFP-48
+
+# Get exact pin names (CRITICAL)
+/find-pins MCU_ST_STM32F4:STM32F411CEUx
+```
+
+### STEP 4: Generate Circuit-Synth Code (15 seconds)
+Write Python file using EXACT data from commands:
+```python
+from circuit_synth import Component, Net, circuit
+
+@circuit(name="MyCircuit")
+def my_circuit():
+    # Use EXACT symbol and footprint from commands
+    mcu = Component(
+        symbol="MCU_ST_STM32F4:STM32F411CEUx",  # From /find-symbol
+        ref="U",
+        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"  # From /find-footprint
     )
-
-    template = f"""# CLAUDE.md - {project_name}
-
-This file provides guidance to Claude Code when working on the {project_name} project.
-
-## Memory-Bank System
-
-This project uses the Circuit Memory-Bank System for automatic engineering documentation and project knowledge preservation.
-
-### Overview
-The memory-bank system automatically tracks:
-- **Design Decisions**: Component choices and rationale
-- **Fabrication History**: PCB orders, delivery, and assembly
-- **Testing Results**: Performance data and issue resolution
-- **Timeline Events**: Project milestones and key dates
-- **Cross-Board Insights**: Knowledge shared between PCB variants
-
-### Multi-Level Agent System
-
-This project uses a nested agent structure:
-
+    
+    # Use EXACT pin names from /find-pins
+    vcc = Net('VCC_3V3')
+    gnd = Net('GND')
+    
+    mcu["VDD"] += vcc      # Exact pin name from /find-pins
+    mcu["VSS"] += gnd      # Exact pin name from /find-pins
+    
+    # Continue circuit design...
+    
+    if __name__ == "__main__":
+        circuit_obj = my_circuit()
+        circuit_obj.generate_kicad_project(
+            project_name="MyProject",
+            placement_algorithm="hierarchical",
+            generate_pcb=True
+        )
+        print("✅ KiCad project generated!")
+        
+# ALWAYS include main execution block
 ```
-{project_name}/
-├── .claude/                    # Project-level agent
-├── pcbs/
-"""
 
-    # Add board structure dynamically
-    for i, board in enumerate(boards):
-        template += f"""│   ├── {board}/
-│   │   ├── .claude/           # PCB-level agent
-│   │   └── memory-bank/       # PCB-specific documentation
-"""
-
-    template += f"""```
-
-### Context Switching
-
-Use the `cs-switch-board` command to work on specific PCBs:
-
+### STEP 5: Test and Generate KiCad (10 seconds)
 ```bash
-# Switch to specific board context
-cs-switch-board {boards[0] if boards else 'board-name'}
+# MANDATORY: Test the code
+uv run python circuit_file.py
 
-# List available boards
-cs-switch-board --list
-
-# Check current context
-cs-switch-board --status
+# If successful: Open KiCad project
+open MyProject.kicad_pro
 ```
 
-**Important**: `cs-switch-board` will compress Claude's memory and reload the appropriate .claude configuration. This ensures you're working with the right context and memory-bank scope.
+## ⚡ Available Commands
 
-### Memory-Bank Files
+### Component Sourcing:
+- `/find-parts --source jlcpcb <component>` - Search JLCPCB
+- `/find-parts --source digikey <component>` - Search DigiKey  
+- `/find_stm32 "<requirements>"` - STM32 peripheral search
 
-Each PCB maintains standard memory-bank files:
+### KiCad Integration:
+- `/find-symbol <component_name>` - Find KiCad symbols
+- `/find-footprint <package_type>` - Find KiCad footprints
+- `/find-pins <symbol_name>` - Get exact pin names
 
-- **decisions.md**: Component choices, design rationale, alternatives considered
-- **fabrication.md**: PCB orders, delivery tracking, assembly notes
-- **testing.md**: Test results, measurements, performance validation
-- **timeline.md**: Project milestones, key events, deadlines
-- **issues.md**: Problems encountered, root causes, solutions
+## 🚨 Critical Rules
 
-### Automatic Documentation
+1. **ALWAYS use commands** - don't guess component specs
+2. **VALIDATE before generating** - use /find-pins for exact pin names
+3. **TEST the code** - uv run python before claiming success
+4. **Use uv run python** - not python3 or python
+5. **Include KiCad generation** - in the if __name__ == "__main__" block
+6. **60-second time limit** - work fast and direct
 
-The system automatically updates memory-bank files when you:
-- Make git commits (primary trigger)
-- Run circuit-synth commands
-- Ask questions about the design
-- Perform tests or measurements
+## 📦 Working Component Library
 
-**Best Practices for Commits**:
-- Use descriptive commit messages explaining **why** changes were made
-- Commit frequently to capture incremental design decisions
-- Include context about alternatives considered
-- Mention any testing or validation performed
+### STM32 Microcontrollers:
+- **STM32F4**: `MCU_ST_STM32F4:STM32F411CEUx` / LQFP-48
+- **STM32G4**: `MCU_ST_STM32G4:STM32G431CBTx` / LQFP-48
 
-Examples:
-```bash
-# Good commit messages for memory-bank
-git commit -m "Switch to buck converter for better efficiency - tested 90% vs 60% with linear reg"
-git commit -m "Add external crystal for USB stability - internal RC caused enumeration failures"
-git commit -m "Increase decoupling cap to 22uF - scope showed 3.3V rail noise during WiFi tx"
-```
+### Power Components:
+- **Linear Reg**: `Regulator_Linear:AMS1117-3.3` / SOT-223
 
-### Memory-Bank Commands
+### Basic Components:
+- **Resistor**: `Device:R` / R_0603_1608Metric
+- **Capacitor**: `Device:C` / C_0603_1608Metric  
+- **LED**: `Device:LED` / LED_0603_1608Metric
 
-```bash
-# Initialize memory-bank in existing project
-cs-memory-bank-init
-
-# Remove memory-bank system
-cs-memory-bank-remove
-
-# Check memory-bank status
-cs-memory-bank-status
-
-# Search memory-bank content
-cs-memory-bank-search "voltage regulator"
-```
-
-### Troubleshooting
-
-**Context Issues**:
-- If Claude seems confused about which board you're working on, use `cs-switch-board --status`
-- Use `cs-switch-board {{board_name}}` to explicitly set context
-
-**Memory-Bank Updates Not Working**:
-- Ensure you're committing through git (primary trigger for updates)
-- Check that memory-bank files exist in current board directory
-- Verify .claude configuration includes memory-bank instructions
-
-**File Corruption**:
-- All memory-bank files are in git - use `git checkout` to recover
-- Use `cs-memory-bank-init` to recreate missing template files
-
-## Project-Specific Instructions
-
-{project_specific_instructions}
+### Connectors:
+- **USB Micro**: `Connector:USB_B_Micro`
+- **Headers**: `Connector_Generic:Conn_01x10`
 
 ---
 
 *This CLAUDE.md was generated automatically by circuit-synth memory-bank system*  
 *Last updated: {timestamp}*
+
+**WORK DIRECTLY. USE COMMANDS. GENERATE WORKING CIRCUITS FAST.**
 """
 
     return template
