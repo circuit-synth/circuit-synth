@@ -70,6 +70,7 @@ claude = [
 test = [
     "pytest>=7.0.0",
     "pytest-mock>=3.14.0", 
+    "pytest-asyncio>=0.24.0",  # Async test support
     "memory-profiler>=0.60.0",
     "hypothesis>=6.0.0",  # Property-based testing
 ]
@@ -105,6 +106,11 @@ cs-memory-bank-remove = "circuit_synth.ai_integration.memory_bank.cli:remove_cli
 
 # Quality Assurance Tools
 cs-fmea = "circuit_synth.tools.quality_assurance.fmea_cli:main"
+
+# Library API Setup Tools
+cs-setup-snapeda-api = "circuit_synth.tools.setup.library_api_setup:setup_snapeda_api"
+cs-setup-digikey-api = "circuit_synth.tools.setup.library_api_setup:setup_digikey_api"
+cs-library-setup = "circuit_synth.tools.setup.library_api_setup:show_library_setup"
 
 # Test Plan Generation - DISABLED: Files don't exist yet
 # create-test-plan = "circuit_synth.tools.test_plan_commands:create_test_plan"
@@ -218,5 +224,8 @@ dev = [
     "sphinx-autodoc-typehints>=2.3.0",
     "sphinx-rtd-theme>=3.0.2",
     "twine>=6.1.0",
+]
+test = [
+    "pytest-asyncio>=1.1.0",
 ]
 
