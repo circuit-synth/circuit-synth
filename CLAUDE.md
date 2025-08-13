@@ -92,6 +92,19 @@ cs-memory-bank-status
 cs-memory-bank-search "voltage regulator"
 ```
 
+### Library Sourcing Commands
+
+```bash
+# Setup library API credentials
+cs-library-setup                     # Show setup instructions
+cs-setup-snapeda-api YOUR_API_KEY    # Configure SnapEDA API
+cs-setup-digikey-api API_KEY CLIENT_ID  # Configure DigiKey API
+
+# Enhanced symbol/footprint search with fallback
+/find-symbol STM32                   # Local → DigiKey GitHub → APIs
+/find-footprint LQFP                 # Multi-source component search
+```
+
 ### Troubleshooting
 
 **Context Issues**:

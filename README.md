@@ -201,6 +201,7 @@ Circuit-synth includes specialized AI agents for different aspects of circuit de
 - **Circuit Design**: analyze-design, find-footprint, find-symbol, validate-existing-circuit
 - **Development**: dev-run-tests, dev-update-and-commit, dev-review-branch
 - **Manufacturing**: find-parts, find-mcu, find_stm32
+- **Library Setup**: cs-library-setup, cs-setup-snapeda-api, cs-setup-digikey-api
 - **Test Planning**: create-test-plan, generate-manufacturing-tests
 - **Setup**: setup-kicad-plugins, setup_circuit_synth
 
@@ -220,9 +221,9 @@ cd circuit-synth && uv run python example_project/circuit-synth/main.py    # Gen
 Available when working with Claude Code in a circuit-synth project:
 
 ```bash
-# Component Search
-/find-symbol STM32              # Search KiCad symbol libraries
-/find-footprint LQFP64          # Find footprint libraries
+# Component Search (with API fallback)
+/find-symbol STM32              # Local → DigiKey GitHub → SnapEDA/DigiKey APIs
+/find-footprint LQFP64          # Multi-source component search
 /find-stm32 "3 SPIs, USB"       # STM32 with specific peripherals
 
 # Circuit generation
@@ -355,6 +356,26 @@ uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py --
 ```
 
 See [FMEA Guide](docs/FMEA_GUIDE.md) for detailed documentation.
+
+## Library Sourcing System
+
+Hybrid component discovery across multiple sources with automatic fallback:
+
+### Setup
+```bash
+cs-library-setup                    # Show configuration status
+cs-setup-snapeda-api YOUR_KEY       # Optional: SnapEDA API access  
+cs-setup-digikey-api KEY CLIENT_ID  # Optional: DigiKey API access
+```
+
+### Usage
+Enhanced `/find-symbol` and `/find-footprint` commands automatically search:
+1. **Local KiCad** (user installation)
+2. **DigiKey GitHub** (150 curated libraries, auto-converted)
+3. **SnapEDA API** (millions of components)
+4. **DigiKey API** (supplier validation)
+
+Results show source tags: `[Local]`, `[DigiKey GitHub]`, `[SnapEDA]`, `[DigiKey API]`
 
 ## Fast JLCPCB Component Search
 
