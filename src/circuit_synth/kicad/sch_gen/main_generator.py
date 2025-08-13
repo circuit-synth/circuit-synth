@@ -1088,6 +1088,13 @@ class SchematicGenerator:
                 f"Processing circuit: '{c_name}' with {len(circ.components)} components, {len(circ.child_instances)} child instances"
             )
 
+            # Special case: Skip collision placement for blank circuits (no components)
+            if len(circ.components) == 0 and len(circ.child_instances) == 0:
+                logger.info(
+                    f"Skipping collision placement for blank circuit '{c_name}'"
+                )
+                continue
+
             # Log component details
             logger.debug("Components in circuit:")
             for comp in circ.components:

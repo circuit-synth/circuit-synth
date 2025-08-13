@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "circuit_synth"
-version = "0.8.20"
+version = "0.8.22"
 description = "Pythonic circuit design for production-ready KiCad projects"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -192,7 +192,6 @@ env = [
 [tool.uv.workspace]
 members = [
     "example_project",
-    "test_project",
     "test_uv",
     "cs_test",
     "test_agent_setup/fresh_agent_test",
