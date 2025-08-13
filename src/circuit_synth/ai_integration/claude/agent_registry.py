@@ -519,7 +519,7 @@ After generating any circuit-synth Python file, you MUST:
    - All component/net connections validated
    - Ready for KiCad project generation (if requested)
 
-**NO EXCEPTIONS**: Circuit generation is only complete when the code executes successfully. This prevents the frustrating debug cycles shown in user logs.""",
+**NO EXCEPTIONS**: Circuit generation is only complete when the code executes successfully. This prevents debug cycles.""",
         allowed_tools=["*"],
         expertise_area="Interactive Circuit Design Partnership",
         model="haiku",

@@ -720,18 +720,13 @@ class PlacementEngine:
         self,
         components: List[SchematicSymbol],
         arrangement: str = "grid",
-        use_rust_acceleration: bool = True,
     ) -> None:
         """
         Arrange multiple components in a pattern with dynamic spacing.
 
-        PERFORMANCE OPTIMIZATION: Uses Rust force-directed placement when available
-        for 40-60% performance improvement on large circuits.
-
         Args:
             components: Components to arrange
             arrangement: "grid", "vertical", "horizontal", "circular" or "force_directed"
-            use_rust_acceleration: Whether to use Rust acceleration for force-directed placement
         """
         if not components:
             return
