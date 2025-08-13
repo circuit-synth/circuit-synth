@@ -41,7 +41,7 @@ class ConnectionAnalyzer:
             nets = {}
         elif nets is None:
             nets = {}
-            
+
         for net_name, net in nets.items():
             connected_components = []
 
