@@ -2,6 +2,21 @@
 
 This file provides guidance to Claude Code when working on the circuit-synth project.
 
+## 🎛️ CIRCUIT DESIGN AGENT (PRIMARY INTERFACE)
+
+**🚨 FOR ALL CIRCUIT-RELATED TASKS: Use the interactive-circuit-designer agent**
+
+```python
+@Task(subagent_type="interactive-circuit-designer", description="Circuit design", prompt="Any circuit design, analysis, optimization, or troubleshooting request")
+```
+
+This agent provides professional engineering partnership throughout the complete design lifecycle with:
+- Expert consultation and probing questions for optimal design decisions
+- Comprehensive project memory and design decision tracking  
+- Component intelligence with real-time sourcing integration
+- Professional documentation generation and test procedures
+- Seamless support from concept through manufacturing and testing
+
 ## Memory-Bank System
 
 This project uses the Circuit Memory-Bank System for automatic engineering documentation and project knowledge preservation.
