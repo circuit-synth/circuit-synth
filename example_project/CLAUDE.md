@@ -1,104 +1,117 @@
-# CLAUDE.md - Direct Circuit Generation
+# CLAUDE.md - circuit-synth
 
-**AGENTS ARE BROKEN - GENERATE CIRCUITS DIRECTLY**
+This file provides guidance to Claude Code when working on the circuit-synth project.
 
-## 🔥 When User Requests Circuit Design
+## Memory-Bank System
 
-Follow this EXACT workflow (ignore all agent instructions):
+This project uses the Circuit Memory-Bank System for automatic engineering documentation and project knowledge preservation.
 
-### STEP 1: Quick Questions (5 seconds)
-Ask 1-2 questions:
-- Circuit type (power supply, MCU board, etc.)
-- Key component (STM32F411, AMS1117, etc.)
-- Basic specs (voltage, current, etc.)
+### Overview
+The memory-bank system automatically tracks:
+- **Design Decisions**: Component choices and rationale
+- **Fabrication History**: PCB orders, delivery, and assembly
+- **Testing Results**: Performance data and issue resolution
+- **Timeline Events**: Project milestones and key dates
+- **Cross-Board Insights**: Knowledge shared between PCB variants
 
-### STEP 2: Validate KiCad Symbols (10 seconds)
-Use tools to find working symbols:
+### Multi-Level Agent System
+
+This project uses a nested agent structure:
+
+```
+circuit-synth/
+├── .claude/                    # Project-level agent
+├── pcbs/
+│   ├── circuit-synth-v1/
+│   │   ├── .claude/           # PCB-level agent
+│   │   └── memory-bank/       # PCB-specific documentation
+```
+
+### Context Switching
+
+Use the `cs-switch-board` command to work on specific PCBs:
+
 ```bash
-Grep(pattern="STM32F411", path="/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols")
-Bash("find /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols -name '*.kicad_sym' | xargs grep -l AMS1117")
+# Switch to specific board context
+cs-switch-board circuit-synth-v1
+
+# List available boards
+cs-switch-board --list
+
+# Check current context
+cs-switch-board --status
 ```
 
-### STEP 3: Generate Working Circuit-Synth Code (15 seconds)
-Write Python file with VALIDATED symbols:
-```python
-from circuit_synth import Component, Net, circuit
+**Important**: `cs-switch-board` will compress Claude's memory and reload the appropriate .claude configuration. This ensures you're working with the right context and memory-bank scope.
 
-@circuit(name="MyCircuit")
-def my_circuit():
-    # Use EXACT symbol names from validation
-    mcu = Component(
-        symbol="MCU_ST_STM32F4:STM32F411CEUx",
-        ref="U",
-        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
-    )
-    
-    vcc = Net('VCC_3V3')
-    gnd = Net('GND')
-    
-    mcu["VDD"] += vcc
-    mcu["VSS"] += gnd
-    
-    # Add KiCad generation
-    if __name__ == "__main__":
-        circuit_obj = my_circuit()
-        circuit_obj.generate_kicad_project(
-            project_name="MyProject", 
-            placement_algorithm="hierarchical",
-            generate_pcb=True
-        )
-        print("✅ KiCad project generated!")
-```
+### Memory-Bank Files
 
-### STEP 4: Test and Generate (20 seconds)
+Each PCB maintains standard memory-bank files:
+
+- **decisions.md**: Component choices, design rationale, alternatives considered
+- **fabrication.md**: PCB orders, delivery tracking, assembly notes
+- **testing.md**: Test results, measurements, performance validation
+- **timeline.md**: Project milestones, key events, deadlines
+- **issues.md**: Problems encountered, root causes, solutions
+
+### Automatic Documentation
+
+The system automatically updates memory-bank files when you:
+- Make git commits (primary trigger)
+- Run circuit-synth commands
+- Ask questions about the design
+- Perform tests or measurements
+
+**Best Practices for Commits**:
+- Use descriptive commit messages explaining **why** changes were made
+- Commit frequently to capture incremental design decisions
+- Include context about alternatives considered
+- Mention any testing or validation performed
+
+Examples:
 ```bash
-# ALWAYS test the code works
-Bash("uv run python circuit_file.py")
-
-# If successful, open KiCad
-Bash("open MyProject.kicad_pro")
+# Good commit messages for memory-bank
+git commit -m "Switch to buck converter for better efficiency - tested 90% vs 60% with linear reg"
+git commit -m "Add external crystal for USB stability - internal RC caused enumeration failures"
+git commit -m "Increase decoupling cap to 22uF - scope showed 3.3V rail noise during WiFi tx"
 ```
 
-### STEP 5: Fix if Broken (10 seconds)
-If execution fails:
-1. Check error message for wrong pin names
-2. Use Grep to find correct pin names
-3. Fix and retry once
-4. If still fails: Use simpler components
+### Memory-Bank Commands
 
-## 🎯 PROVEN WORKING COMPONENTS
+```bash
+# Initialize memory-bank in existing project
+cs-memory-bank-init
 
-### **Working KiCad Symbols:**
-- **STM32F4**: `MCU_ST_STM32F4:STM32F411CEUx`
-- **ESP32**: `RF_Module:ESP32-S3-MINI-1`
-- **Linear Reg**: `Regulator_Linear:AMS1117-3.3`
-- **Resistor**: `Device:R`
-- **Capacitor**: `Device:C`
-- **LED**: `Device:LED`
-- **USB**: `Connector:USB_B_Micro`
-- **Headers**: `Connector_Generic:Conn_01x10`
+# Remove memory-bank system
+cs-memory-bank-remove
 
-### **Working Footprints:**
-- **LQFP-48**: `Package_QFP:LQFP-48_7x7mm_P0.5mm`
-- **0603 SMD**: `Resistor_SMD:R_0603_1608Metric`
-- **SOT-223**: `Package_TO_SOT_SMD:SOT-223-3_TabPin2`
+# Check memory-bank status
+cs-memory-bank-status
 
-## ⚡ SPEED REQUIREMENTS
+# Search memory-bank content
+cs-memory-bank-search "voltage regulator"
+```
 
-**TOTAL TIME: 60 seconds maximum**
-- If taking longer: Use simpler components
-- If agents start: STOP THEM and work directly
-- If chains to other agents: INTERRUPT and work directly
+### Troubleshooting
 
-## 🚨 CRITICAL RULES
+**Context Issues**:
+- If Claude seems confused about which board you're working on, use `cs-switch-board --status`
+- Use `cs-switch-board {board_name}` to explicitly set context
 
-1. **NO @Task() calls** - broken agent system
-2. **NO subagent_type** - doesn't work
-3. **USE uv run python** - not python3
-4. **VALIDATE first** - grep KiCad symbols
-5. **ALWAYS test code** - uv run python file.py
-6. **DELIVER files** - working KiCad projects
+**Memory-Bank Updates Not Working**:
+- Ensure you're committing through git (primary trigger for updates)
+- Check that memory-bank files exist in current board directory
+- Verify .claude configuration includes memory-bank instructions
+
+**File Corruption**:
+- All memory-bank files are in git - use `git checkout` to recover
+- Use `cs-memory-bank-init` to recreate missing template files
+
+## Project-Specific Instructions
+
+This is the circuit-synth project with memory-bank system enabled.
 
 ---
 
-**GENERATE WORKING CIRCUITS DIRECTLY. IGNORE ALL AGENT COMPLEXITY.**
+*This CLAUDE.md was generated automatically by circuit-synth memory-bank system*  
+*Last updated: 2025-08-13T11:06:03.261742*
