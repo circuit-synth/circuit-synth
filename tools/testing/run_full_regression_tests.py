@@ -747,6 +747,87 @@ print(f'✅ Symbol library works: Resistor has {len(symbol.pins)} pins')
         self.results.extend(tests)
         return all(t.passed for t in tests if t.severity == "CRITICAL")
 
+    def test_cs_new_project_end_to_end(self):
+        """
+        Test complete cs-new-project workflow including execution.
+        THIS TEST WOULD HAVE CAUGHT THE 0.8.22 WORKSPACE BUG!
+        """
+        self.log("\n" + "=" * 60, "HEADER")
+        self.log("TESTING CS-NEW-PROJECT END-TO-END WORKFLOW", "HEADER")
+        self.log("=" * 60, "HEADER")
+        
+        import tempfile
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            test_project_dir = Path(temp_dir) / "test_cs_project"
+            
+            # Step 1: Initialize project
+            self.log("Creating test project...", "INFO")
+            success, stdout, stderr = self.run_command([
+                "uv", "init", "test_cs_project"
+            ], "Initialize project", cwd=temp_dir, timeout=60)
+            
+            if not success:
+                self.log(f"❌ Project initialization failed: {stderr}", "ERROR")
+                return False
+                
+            # Step 2: Add circuit-synth dependency  
+            self.log("Adding circuit-synth dependency...", "INFO")
+            success, stdout, stderr = self.run_command([
+                "uv", "add", "circuit-synth"
+            ], "Add dependency", cwd=test_project_dir, timeout=120)
+            
+            if not success:
+                self.log(f"❌ Failed to add circuit-synth: {stderr}", "ERROR")
+                return False
+                
+            # Step 3: Run cs-new-project
+            self.log("Running cs-new-project...", "INFO")
+            success, stdout, stderr = self.run_command([
+                "uv", "run", "cs-new-project"
+            ], "cs-new-project", cwd=test_project_dir, timeout=120)
+            
+            if not success:
+                self.log(f"❌ cs-new-project failed: {stderr}", "ERROR")
+                return False
+                
+            # Step 4: CRITICAL TEST - Try to run the generated circuit
+            self.log("Testing circuit execution (CRITICAL)...", "INFO")
+            circuit_main = test_project_dir / "circuit-synth" / "main.py"
+            
+            if not circuit_main.exists():
+                self.log("❌ Circuit main.py not generated", "ERROR")
+                return False
+                
+            success, stdout, stderr = self.run_command([
+                "uv", "run", "python", "circuit-synth/main.py"
+            ], "Execute circuit", cwd=test_project_dir, timeout=180)
+            
+            if not success:
+                self.log(f"❌ CRITICAL: Circuit execution failed!", "ERROR")
+                self.log(f"   Error: {stderr}", "ERROR")
+                self.log(f"   This indicates template configuration issues", "ERROR")
+                return False
+                
+            self.log("✅ Circuit execution successful", "SUCCESS")
+            
+            # Step 5: Verify KiCad files generated
+            kicad_dir = test_project_dir / "ESP32_C6_Dev_Board"
+            if not kicad_dir.exists():
+                self.log("❌ KiCad project not generated", "ERROR")
+                return False
+                
+            required_files = ["ESP32_C6_Dev_Board.kicad_pro", "ESP32_C6_Dev_Board.kicad_sch"]
+            for filename in required_files:
+                file_path = kicad_dir / filename
+                if not file_path.exists() or file_path.stat().st_size < 100:
+                    self.log(f"❌ KiCad file missing or empty: {filename}", "ERROR")
+                    return False
+                    
+            self.log("✅ All KiCad files generated successfully", "SUCCESS")
+            
+        return True
+
     def test_example_project(self):
         """Test the complete example project"""
         self.log("\n" + "=" * 60, "HEADER")
@@ -866,6 +947,9 @@ print(f'✅ Symbol library works: Resistor has {len(symbol.pins)} pins')
 
         # Step 7: Test CLI entry points (CRITICAL - this was missing!)
         cli_passed = self.test_cli_entry_points()
+        
+        # Step 7.5: Test cs-new-project end-to-end workflow (CRITICAL NEW TEST)
+        project_creation_passed = self.test_cs_new_project_end_to_end()
 
         # Step 8: Run example project test
         example_passed = self.test_example_project()

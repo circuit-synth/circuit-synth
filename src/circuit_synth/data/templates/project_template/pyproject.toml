@@ -7,5 +7,3 @@ dependencies = [
     "circuit-synth",
 ]
 
-[tool.uv.sources]
-circuit-synth = { workspace = true }

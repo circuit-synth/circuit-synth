@@ -26,17 +26,17 @@ This document describes the comprehensive testing infrastructure for the circuit
 ### Run All Tests (Recommended)
 ```bash
 # Run comprehensive test suite
-./scripts/run_all_tests.sh
+./tools/testing/run_full_regression_tests.py
 
 # Run with verbose output
-./scripts/run_all_tests.sh --verbose
+./tools/testing/run_full_regression_tests.py --verbose
 
 # Run only Python tests
-./scripts/run_all_tests.sh --python-only
+./tools/testing/run_full_regression_tests.py --python-only
 
 
 # Stop on first failure
-./scripts/run_all_tests.sh --fail-fast
+./tools/testing/run_full_regression_tests.py --fail-fast
 ```
 
 ```bash
@@ -124,7 +124,7 @@ Optional pre-commit hooks prevent issues before commit:
 
 ```bash
 # Install pre-commit hooks
-./scripts/setup_formatting.sh
+./tools/build/setup_formatting.sh
 
 # Run manually
 pre-commit run --all-files
@@ -195,15 +195,15 @@ python --version
 # Test specific module
 
 # Clear caches and test fresh
-./scripts/clear_all_caches.sh
-./scripts/run_all_tests.sh
+./tools/maintenance/clear_all_caches.sh
+./tools/testing/run_full_regression_tests.py
 ```
 
 ## Recommended Development Workflow
 
 2. **🧪 Run tests locally**:
    ```bash
-   ./scripts/run_all_tests.sh
+   ./tools/testing/run_full_regression_tests.py
    ```
 3. **📝 Commit changes** (pre-commit hooks run automatically)
 4. **🚀 Create PR** (GitHub Actions run automatically)
@@ -215,7 +215,7 @@ The automated testing is integrated with CLAUDE.md workflows:
 
 - **Core circuit test**: `uv run python examples/example_kicad_project.py`
 - **Unit tests**: `uv run pytest tests/unit/test_core_circuit.py -v`
-- **Comprehensive**: `./scripts/run_all_tests.sh`
+- **Comprehensive**: `./tools/testing/run_full_regression_tests.py`
 
 This ensures both manual and automated testing follow the same validation patterns.
 

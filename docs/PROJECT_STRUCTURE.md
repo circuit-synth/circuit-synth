@@ -16,7 +16,7 @@ circuit-synth/
 ├── examples/                   # Usage examples and demos
 ├── docs/                       # Documentation and guides
 ├── tools/                      # Development and CI tools
-├── scripts/                    # Runtime utility scripts
+├── scripts/                    # Backward compatibility symlinks (deprecated)
 ├── docker/                     # Container definitions
 ├── submodules/                 # Git submodules (external projects)
 ├── memory-bank/                # Project knowledge and decisions
@@ -49,10 +49,9 @@ circuit-synth/
   - `ci-setup/` - Continuous integration setup scripts
   - Future: `development/`, `deployment/`, etc.
 
-- **`scripts/`** - Runtime scripts (part of installed package)
-  - Docker integration scripts
-  - Production deployment tools
-  - KiCad environment setup
+- **`scripts/`** - Deprecated (symbolic links for backward compatibility)
+  - All functionality moved to organized `tools/` directory
+  - Will be removed in future release
 
 ### Testing & Examples
 - **`tests/`** - Comprehensive test suite

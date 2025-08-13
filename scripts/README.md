@@ -16,7 +16,7 @@ Scripts have been reorganized into the `/tools/` directory for better organizati
 
 | Old Path | New Path |
 |----------|----------|
-| `./scripts/run_all_tests.sh` | `./tools/testing/run_all_tests.sh` |
+| `./scripts/run_regression_tests.py` | `./tools/testing/run_regression_tests.py` |
 | `./scripts/release_to_pypi.sh` | `./tools/release/release_to_pypi.sh` |
 | `./scripts/dead-code-analysis.py` | `./tools/analysis/dead-code-analysis.py` |
 | `./scripts/clear_all_caches.sh` | `./tools/maintenance/clear_all_caches.sh` |

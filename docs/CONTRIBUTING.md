@@ -17,7 +17,7 @@ uv sync
 
 3. Run tests:
 ```bash
-./scripts/run_all_tests.sh
+./tools/testing/run_full_regression_tests.py
 ```
 
 4. (Optional) Register Claude Code agents:
@@ -29,7 +29,7 @@ uv run register-agents
 
 1. Create a feature branch from `develop`
 2. Make your changes with tests
-3. Run the test suite: `./scripts/run_all_tests.sh`
+3. Run the test suite: `./tools/testing/run_full_regression_tests.py`
 4. Submit a pull request to `develop`
 
 ## Code Style
@@ -90,7 +90,7 @@ uv run pytest
 1. Fork and clone the repository
 2. Create a feature branch: `git checkout -b feature/your-feature`
 3. Make changes following existing patterns
-4. Test: `./scripts/run_all_tests.sh`
+4. Test: `./tools/testing/run_full_regression_tests.py`
 5. Format: `black src/ && isort src/`
 6. Push and create a pull request
 
@@ -98,7 +98,7 @@ uv run pytest
 
 ```bash
 # Run all tests
-./scripts/run_all_tests.sh
+./tools/testing/run_full_regression_tests.py
 
 # Python tests only
 uv run pytest --cov=circuit_synth
