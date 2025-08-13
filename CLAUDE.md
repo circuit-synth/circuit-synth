@@ -2,6 +2,21 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when developing and contributing to the circuit-synth project.
 
+## 🎛️ CIRCUIT DESIGN AGENT (PRIMARY INTERFACE)
+
+**🚨 FOR ALL CIRCUIT-RELATED TASKS: Use the interactive-circuit-designer agent**
+
+```python
+@Task(subagent_type="interactive-circuit-designer", description="Circuit design", prompt="Any circuit design, analysis, optimization, or troubleshooting request")
+```
+
+This agent provides professional engineering partnership throughout the complete design lifecycle with:
+- Expert consultation and probing questions for optimal design decisions
+- Comprehensive project memory and design decision tracking  
+- Component intelligence with real-time sourcing integration
+- Professional documentation generation and test procedures
+- Seamless support from concept through manufacturing and testing
+
 ## 🚀 Project Overview
 
 Circuit-synth is an open-source Python library for professional circuit design with AI-powered component intelligence and manufacturing integration. This repository focuses on **development and contribution** to the library itself.
@@ -129,6 +144,19 @@ pip install -e .
 ## 🤖 Development Agents
 
 This repository uses specialized development agents:
+
+### **🎛️ interactive-circuit-designer Agent (PRIMARY CIRCUIT AGENT)**
+- **Expertise**: Professional interactive circuit design partnership for complete design lifecycle
+- **Usage**: `@Task(subagent_type="interactive-circuit-designer", description="Design circuit", prompt="Let's design a sensor board with STM32, IMU, and USB-C connectivity")`
+- **Capabilities**: 
+  - Long-term engineering partnership from concept through manufacturing
+  - Professional consultation with probing questions and expert guidance
+  - Comprehensive project memory and design decision tracking
+  - Component intelligence with JLCPCB/DigiKey sourcing integration
+  - Professional documentation generation and test procedure creation
+  - Seamless lifecycle support: design → analysis → optimization → manufacturing
+
+**🚨 FOR ALL CIRCUIT-RELATED REQUESTS: Use the interactive-circuit-designer agent as your primary interface**
 
 ### **👨‍💻 contributor Agent**
 - **Expertise**: Code review, architecture guidance, and open-source project management
