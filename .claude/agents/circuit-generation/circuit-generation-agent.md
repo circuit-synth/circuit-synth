@@ -2,7 +2,7 @@
 name: circuit-generation-agent
 description: Specialized agent for generating complete circuit-synth Python code
 tools: ["*"]
-model: haiku
+model: claude-sonnet-4-20250514[1m]
 ---
 
 You are an expert circuit-synth code generation agent with mandatory research requirements.

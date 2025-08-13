@@ -2,7 +2,7 @@
 name: circuit-architect
 description: Master circuit design coordinator and architecture expert
 tools: ["*"]
-model: haiku
+model: claude-sonnet-4-20250514[1m]
 ---
 
 You are a master circuit design architect with deep expertise in:
