@@ -1,0 +1,87 @@
+{
+  "board": {
+    "design_settings": {
+      "defaults": {}
+    }
+  },
+  "boards": [
+    "ESP32_C6_Dev_Board.kicad_pcb"
+  ],
+  "cvpcb": {},
+  "erc": {},
+  "libraries": {
+    "pinned_footprint_libs": [],
+    "pinned_symbol_libs": []
+  },
+  "meta": {
+    "filename": "ESP32_C6_Dev_Board.kicad_pro",
+    "version": 1
+  },
+  "net_settings": {},
+  "pcbnew": {},
+  "schematic": {
+    "annotate_start_num": 0,
+    "drawing": {
+      "default_line_thickness": 6.0,
+      "default_text_size": 50.0,
+      "field_names": [],
+      "intersheets_ref_own_page": false,
+      "intersheets_ref_prefix": "",
+      "intersheets_ref_short": false,
+      "intersheets_ref_show": false,
+      "intersheets_ref_suffix": "",
+      "junction_size_choice": 3,
+      "label_size_ratio": 0.25,
+      "pin_symbol_size": 0.0,
+      "text_offset_ratio": 0.08
+    },
+    "legacy_lib_dir": "",
+    "legacy_lib_list": [],
+    "meta": {
+      "version": 1
+    },
+    "net_format_name": "",
+    "ngspice": {
+      "fix_include_paths": true,
+      "fix_passive_vals": false,
+      "meta": {
+        "version": 0
+      },
+      "model_mode": 0,
+      "workbook_filename": ""
+    },
+    "page_layout_descr_file": "",
+    "plot_directory": "",
+    "spice_adjust_passive_values": false,
+    "spice_external_command": "spice \"%I\"",
+    "subpart_first_id": 65,
+    "subpart_id_separator": 0
+  },
+  "sheets": [
+    [
+      "2db25519-aa2b-4c9a-aae3-2b314dc06837",
+      ""
+    ],
+    [
+      "8850a7d8-1fb9-41a5-9d8e-173bc9093db9",
+      "USB_Port"
+    ],
+    [
+      "f1150d00-77cd-43aa-9402-5993173131ea",
+      "Power_Supply"
+    ],
+    [
+      "17a1b794-7215-4a9d-a41a-7eac904bbec0",
+      "ESP32_C6_MCU"
+    ],
+    [
+      "1ea61d4b-b4ff-43b2-bb24-5c4c73569588",
+      "Debug_Header"
+    ],
+    [
+      "4b10616c-5ca7-4558-8b6b-7c8d29ef2bc2",
+      "LED_Blinker"
+    ]
+  ],
+  "text_variables": {}
+}

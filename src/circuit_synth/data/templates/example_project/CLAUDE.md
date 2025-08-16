@@ -1,133 +1,104 @@
-# CLAUDE.md
+# CLAUDE.md - Direct Circuit Generation
 
-Project-specific guidance for Claude Code when working with this circuit-synth project.
+**AGENTS ARE BROKEN - GENERATE CIRCUITS DIRECTLY**
 
-## 🚀 Project Overview
+## 🔥 When User Requests Circuit Design
 
-This is a **circuit-synth project** for professional circuit design with AI-powered component intelligence.
+Follow this EXACT workflow (ignore all agent instructions):
 
-## ⚡ Available Tools & Commands
+### STEP 1: Quick Questions (5 seconds)
+Ask 1-2 questions:
+- Circuit type (power supply, MCU board, etc.)
+- Key component (STM32F411, AMS1117, etc.)
+- Basic specs (voltage, current, etc.)
 
-### **Slash Commands**
-- `/find-symbol STM32` - Search KiCad symbol libraries
-- `/find-footprint LQFP` - Search KiCad footprint libraries  
-- `/analyze-design` - Analyze circuit designs
-- `/find_stm32` - STM32-specific component search
-- `/generate_circuit` - Circuit generation workflows
-
-### **Specialized Agents** 
-- **orchestrator** - Master coordinator for complex projects
-- **circuit-synth** - Circuit code generation and KiCad integration
-- **simulation-expert** - SPICE simulation and validation
-- **jlc-parts-finder** - JLCPCB component availability and sourcing
-- **general-purpose** - Research and codebase analysis
-- **code** - Software engineering and code quality
-
-## 🏗️ Development Workflow
-
-### **1. Component-First Design**
-Always start with component availability checking:
-```
-👤 "Find STM32 with 3 SPIs available on JLCPCB"
-👤 "Search for low-power op-amps suitable for battery applications"
-```
-
-### **2. Circuit Generation**
-Use agents for code generation:
-```
-👤 @Task(subagent_type="circuit-synth", description="Create power supply", 
-     prompt="Design 3.3V regulator circuit with USB-C input and overcurrent protection")
-```
-
-### **3. Validation & Simulation**
-Validate designs before manufacturing:
-```
-👤 @Task(subagent_type="simulation-expert", description="Validate filter", 
-     prompt="Simulate this low-pass filter and optimize component values")
-```
-
-## 🔧 Essential Commands
-
+### STEP 2: Validate KiCad Symbols (10 seconds)
+Use tools to find working symbols:
 ```bash
-# Run the main example
-uv run python circuit-synth/main.py
-
-# Test the setup
-uv run python -c "from circuit_synth import *; print('✅ Circuit-synth ready!')"
+Grep(pattern="STM32F411", path="/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols")
+Bash("find /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols -name '*.kicad_sym' | xargs grep -l AMS1117")
 ```
 
-## 🔌 KiCad Plugin Setup (Optional AI Integration)
+### STEP 3: Generate Working Circuit-Synth Code (15 seconds)
+Write Python file with VALIDATED symbols:
+```python
+from circuit_synth import Component, Net, circuit
 
-Circuit-synth includes optional KiCad plugins for AI-powered circuit analysis:
+@circuit(name="MyCircuit")
+def my_circuit():
+    # Use EXACT symbol names from validation
+    mcu = Component(
+        symbol="MCU_ST_STM32F4:STM32F411CEUx",
+        ref="U",
+        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
+    )
+    
+    vcc = Net('VCC_3V3')
+    gnd = Net('GND')
+    
+    mcu["VDD"] += vcc
+    mcu["VSS"] += gnd
+    
+    # Add KiCad generation
+    if __name__ == "__main__":
+        circuit_obj = my_circuit()
+        circuit_obj.generate_kicad_project(
+            project_name="MyProject", 
+            placement_algorithm="hierarchical",
+            generate_pcb=True
+        )
+        print("✅ KiCad project generated!")
+```
 
+### STEP 4: Test and Generate (20 seconds)
 ```bash
-# Install KiCad plugins (separate command)
-uv run cs-setup-kicad-plugins
+# ALWAYS test the code works
+Bash("uv run python circuit_file.py")
+
+# If successful, open KiCad
+Bash("open MyProject.kicad_pro")
 ```
 
-After installation and restarting KiCad:
-- **PCB Editor**: Tools → External Plugins → "Circuit-Synth AI"  
-- **Schematic Editor**: Tools → Generate Bill of Materials → "Circuit-Synth AI"
+### STEP 5: Fix if Broken (10 seconds)
+If execution fails:
+1. Check error message for wrong pin names
+2. Use Grep to find correct pin names
+3. Fix and retry once
+4. If still fails: Use simpler components
 
-The plugins provide AI-powered BOM analysis and component optimization directly within KiCad!
+## 🎯 PROVEN WORKING COMPONENTS
 
-## 🎯 Best Practices
+### **Working KiCad Symbols:**
+- **STM32F4**: `MCU_ST_STM32F4:STM32F411CEUx`
+- **ESP32**: `RF_Module:ESP32-S3-MINI-1`
+- **Linear Reg**: `Regulator_Linear:AMS1117-3.3`
+- **Resistor**: `Device:R`
+- **Capacitor**: `Device:C`
+- **LED**: `Device:LED`
+- **USB**: `Connector:USB_B_Micro`
+- **Headers**: `Connector_Generic:Conn_01x10`
 
-### **Component Selection Priority**
-1. **JLCPCB availability first** - Always check stock levels
-2. **Standard packages** - Prefer common footprints (0603, 0805, LQFP)
-3. **Proven components** - Use established parts with good track records
+### **Working Footprints:**
+- **LQFP-48**: `Package_QFP:LQFP-48_7x7mm_P0.5mm`
+- **0603 SMD**: `Resistor_SMD:R_0603_1608Metric`
+- **SOT-223**: `Package_TO_SOT_SMD:SOT-223-3_TabPin2`
 
-### **Circuit Organization**
-- **Hierarchical design** - Use circuits for complex designs
-- **Clear interfaces** - Define nets and connections explicitly  
-- **Manufacturing focus** - Design for assembly and testing
+## ⚡ SPEED REQUIREMENTS
 
-### **AI Agent Usage**
-- **Start with orchestrator** for complex multi-step projects
-- **Use circuit-synth** for component selection and code generation
-- **Use simulation-expert** for validation and optimization
-- **Use jlc-parts-finder** for sourcing and alternatives
+**TOTAL TIME: 60 seconds maximum**
+- If taking longer: Use simpler components
+- If agents start: STOP THEM and work directly
+- If chains to other agents: INTERRUPT and work directly
 
-## 📚 Quick Reference
+## 🚨 CRITICAL RULES
 
-### **Component Creation**
-```python
-mcu = Component(
-    symbol="RF_Module:ESP32-C6-MINI-1",
-    ref="U",
-    footprint="RF_Module:ESP32-C6-MINI-1"
-)
-```
-
-### **Net Connections**
-```python
-vcc = Net("VCC_3V3")
-mcu["VDD"] += vcc
-```
-
-### **Circuit Generation**
-```python
-@circuit(name="Power_Supply")
-def power_supply():
-    # Circuit implementation
-    pass
-```
-
-## 🚀 Getting Help
-
-- Use **natural language** to describe what you want to build
-- **Be specific** about requirements (voltage, current, package, etc.)
-- **Ask for alternatives** when components are out of stock
-- **Request validation** for critical circuits before manufacturing
-
-**Example project requests:**
-```
-👤 "Design ESP32 IoT sensor node with LoRaWAN, solar charging, and environmental sensors"
-👤 "Create USB-C PD trigger circuit for 20V output with safety protection" 
-👤 "Build ESP32-based IoT sensor node with WiFi, environmental sensors, and battery management"
-```
+1. **NO @Task() calls** - broken agent system
+2. **NO subagent_type** - doesn't work
+3. **USE uv run python** - not python3
+4. **VALIDATE first** - grep KiCad symbols
+5. **ALWAYS test code** - uv run python file.py
+6. **DELIVER files** - working KiCad projects
 
 ---
 
-**This project is optimized for AI-powered circuit design with Claude Code!** 🎛️
+**GENERATE WORKING CIRCUITS DIRECTLY. IGNORE ALL AGENT COMPLEXITY.**
