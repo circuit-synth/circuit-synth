@@ -122,6 +122,9 @@ def create_claude_directory_from_templates(
         # Also register agents to update with any newer agent definitions
         register_circuit_agents()
 
+        # Hooks removed - they caused more problems than they solved
+        console.print("✅ Clean environment setup (no hooks)", style="green")
+
         # Remove mcp_settings.json as it's not needed for user projects
         mcp_settings_file = dest_claude_dir / "mcp_settings.json"
         if mcp_settings_file.exists():
@@ -231,6 +234,9 @@ def copy_complete_claude_setup(
             console.print("✅ Keeping all developer tools and agents", style="green")
 
         console.print("✅ Copied all agents and commands", style="green")
+
+        # Hooks removed - they caused more problems than they solved
+        console.print("✅ Clean environment setup (no hooks)", style="green")
 
         # Count what was copied (now includes subdirectories)
         agents_count = len(list((dest_claude_dir / "agents").rglob("*.md")))
