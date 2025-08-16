@@ -48,6 +48,9 @@ dependencies = [
     "lxml>=6.0.0",
     "pyspice>=1.5",
     "twine>=6.1.0",
+    # Fast generation dependencies
+    "openai>=1.0.0",
+    "python-dotenv>=1.0.0",
 ]
 
 [project.optional-dependencies]
@@ -66,6 +69,12 @@ dev = [
 claude = [
     # Claude Code SDK integration for AI-powered circuit design
     "claude-code-sdk>=0.0.17",
+]
+fast_generation = [
+    # Fast generation with Google ADK (optional)
+    "google-adk>=0.1.0",
+    # Additional async dependencies
+    "asyncio-mqtt>=0.16.0",
 ]
 test = [
     "pytest>=7.0.0",
@@ -111,6 +120,10 @@ cs-fmea = "circuit_synth.tools.quality_assurance.fmea_cli:main"
 cs-setup-snapeda-api = "circuit_synth.tools.setup.library_api_setup:setup_snapeda_api"
 cs-setup-digikey-api = "circuit_synth.tools.setup.library_api_setup:setup_digikey_api"
 cs-library-setup = "circuit_synth.tools.setup.library_api_setup:show_library_setup"
+
+# Fast Generation Tools
+cs-fast-gen-demo = "circuit_synth.fast_generation.demo:main_cli"
+cs-fast-gen-setup = "fast_generation_setup:main"
 
 # Test Plan Generation - DISABLED: Files don't exist yet
 # create-test-plan = "circuit_synth.tools.test_plan_commands:create_test_plan"
