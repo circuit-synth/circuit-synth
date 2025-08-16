@@ -1,121 +1,81 @@
 #!/usr/bin/env python3
 """
-ESP32-C6 Development Board - Circuit-Synth Example
-===================================================
+Main Circuit - ESP32-C6 Development Board
+Professional hierarchical circuit design with modular subcircuits
 
-This is a complete, production-ready ESP32-C6 development board design
-demonstrating hierarchical circuit architecture with circuit-synth.
-
-Features:
-- ESP32-C6-MINI-1 module (WiFi 6, Bluetooth 5, Thread, Zigbee)
-- USB-C power and programming interface  
-- 3.3V power regulation with proper decoupling
+This is the main entry point that orchestrates all subcircuits:
+- USB-C power input with proper CC resistors and protection
+- 5V to 3.3V power regulation  
+- ESP32-C6 microcontroller with USB and debug interfaces
 - Status LED with current limiting
-- Reset button and boot mode selection
-- Debug interface for professional development
-
-Run this file to generate the complete KiCad project!
+- Debug header for programming and development
 """
 
-from circuit_synth import Component, Net, circuit
+from circuit_synth import *
 
-# Import hierarchical subcircuits
-from usb import usb_subcircuit
-from power_supply import power_supply_subcircuit  
-from led_blinker import led_blinker_subcircuit
-from esp32c6 import esp32c6_subcircuit
+# Import all circuits
+from usb import usb_port
+from power_supply import power_supply
+from esp32c6 import esp32c6
 
+@circuit(name="ESP32_C6_Dev_Board_Main")
+def main_circuit():
+    """Main hierarchical circuit - ESP32-C6 development board"""
+    
+    # Create shared nets between subcircuits (ONLY nets - no components here)
+    vbus = Net('VBUS')
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    usb_dp = Net('USB_DP')
+    usb_dm = Net('USB_DM')
 
-@circuit(name="ESP32_C6_Development_Board")
-def esp32_c6_dev_board():
-    """
-    Main ESP32-C6 development board circuit
     
-    This is the top-level circuit that defines the shared nets
-    and connects all the hierarchical subcircuits together.
-    """
-    
-    # Define shared power and ground nets
-    vcc_5v = Net('VCC_5V')      # USB 5V power
-    vcc_3v3 = Net('VCC_3V3')    # Regulated 3.3V power  
-    gnd = Net('GND')            # System ground
-    
-    # USB data and control nets
-    usb_dp = Net('USB_DP')      # USB D+ data line
-    usb_dm = Net('USB_DM')      # USB D- data line
-    usb_vbus = Net('USB_VBUS')  # USB bus voltage detection
-    
-    # ESP32-C6 programming and debug nets
-    esp32_tx = Net('ESP32_TX')   # UART transmit for programming
-    esp32_rx = Net('ESP32_RX')   # UART receive for programming  
-    esp32_en = Net('ESP32_EN')   # ESP32 enable/reset control
-    esp32_io0 = Net('ESP32_IO0') # Boot mode control (GPIO0)
-    
-    # Status LED control
-    led_control = Net('LED_CTRL') # GPIO pin controlling status LED
-    
-    # Create hierarchical subcircuits
-    # Each subcircuit handles a specific functional area
-    
-    # USB-C connector with ESD protection and CC resistors
-    usb_circuit = usb_subcircuit(
-        vbus_net=usb_vbus,
-        vcc_5v_net=vcc_5v, 
-        gnd_net=gnd,
-        usb_dp_net=usb_dp,
-        usb_dm_net=usb_dm
-    )
-    
-    # 5V to 3.3V power regulation with proper decoupling
-    power_circuit = power_supply_subcircuit(
-        vin_net=vcc_5v,
-        vout_net=vcc_3v3,
-        gnd_net=gnd
-    )
-    
-    # ESP32-C6 microcontroller with crystal and decoupling
-    esp32_circuit = esp32c6_subcircuit(
-        vcc_3v3_net=vcc_3v3,
-        gnd_net=gnd,
-        usb_dp_net=usb_dp,
-        usb_dm_net=usb_dm,
-        uart_tx_net=esp32_tx,
-        uart_rx_net=esp32_rx, 
-        enable_net=esp32_en,
-        gpio0_net=esp32_io0,
-        led_control_net=led_control
-    )
-    
-    # Status LED with current limiting resistor
-    led_circuit = led_blinker_subcircuit(
-        vcc_3v3_net=vcc_3v3,
-        gnd_net=gnd,
-        control_net=led_control
-    )
-    
-    return {
-        'usb_circuit': usb_circuit,
-        'power_circuit': power_circuit,
-        'esp32_circuit': esp32_circuit, 
-        'led_circuit': led_circuit
-    }
+    # Create all circuits with shared nets
+    usb_port_circuit = usb_port(vbus, gnd, usb_dp, usb_dm)
+    power_supply_circuit = power_supply(vbus, vcc_3v3, gnd)
+    esp32_circuit = esp32c6(vcc_3v3, gnd, usb_dp, usb_dm)
 
 
 if __name__ == "__main__":
-    print("🚀 Generating ESP32-C6 Development Board...")
-    print("📋 Features: WiFi 6, Bluetooth 5, USB-C, 3.3V regulation")
+    print("🚀 Starting ESP32-C6 development board generation...")
     
-    # Generate the circuit
-    circuit_obj = esp32_c6_dev_board()
+    # Generate the complete hierarchical circuit
+    print("📋 Creating circuit...")
+    circuit = main_circuit()
     
-    # Export to KiCad project
-    print("📦 Generating KiCad project files...")
-    circuit_obj.generate_kicad_project(
+    # Generate KiCad netlist (required for ratsnest display)
+    print("🔌 Generating KiCad netlist...")
+    circuit.generate_kicad_netlist("ESP32_C6_Dev_Board.net")
+    
+    # Generate JSON netlist (for debugging and analysis)
+    print("📄 Generating JSON netlist...")
+    circuit.generate_json_netlist("ESP32_C6_Dev_Board.json")
+    
+    # Create KiCad project with hierarchical sheets
+    print("🏗️  Generating KiCad project...")
+    circuit.generate_kicad_project(
         project_name="ESP32_C6_Dev_Board",
         placement_algorithm="hierarchical",
         generate_pcb=True
     )
     
-    print("✅ ESP32-C6 Development Board generated successfully!")
-    print("📁 Check the 'kicad-project/' directory for KiCad files")
-    print("🎯 Ready for PCB layout and manufacturing!")
+    print("")
+    print("✅ ESP32-C6 Development Board project generated!")
+    print("📁 Check the ESP32_C6_Dev_Board/ directory for KiCad files")
+    print("")
+    print("🏗️ Generated circuits:")
+    print("   • USB-C port with CC resistors and ESD protection")
+    print("   • 5V to 3.3V power regulation")
+    print("   • ESP32-C6 microcontroller with support circuits")
+    print("   • Debug header for programming")  
+    print("   • Status LED with current limiting")
+    print("")
+    print("📋 Generated files:")
+    print("   • ESP32_C6_Dev_Board.kicad_pro - KiCad project file")
+    print("   • ESP32_C6_Dev_Board.kicad_sch - Hierarchical schematic")
+    print("   • ESP32_C6_Dev_Board.kicad_pcb - PCB layout")
+    print("   • ESP32_C6_Dev_Board.net - Netlist (enables ratsnest)")
+    print("   • ESP32_C6_Dev_Board.json - JSON netlist (for analysis)")
+    print("")
+    print("🎯 Ready for professional PCB manufacturing!")
+    print("💡 Open ESP32_C6_Dev_Board.kicad_pcb in KiCad to see the ratsnest!")
