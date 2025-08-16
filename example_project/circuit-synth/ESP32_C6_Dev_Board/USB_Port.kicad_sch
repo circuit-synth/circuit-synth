@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid e847ea38-2877-4714-a5f0-9cae2a0ec7d6)
+	(uuid 29bc3ce0-b645-4b2c-b872-04bdad1fb826)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Connector:USB_C_Receptacle_USB2.0_16P"
@@ -1113,7 +1113,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 26705d32-ed18-4fc9-be47-bc9ca12fd9d6)
+		(uuid 1a7beab0-2ac2-4de4-80f0-d3a08aaf13b5)
 		(property "Reference" "J1"
 			(at 45.72 61.04 0)
 			(effects
@@ -1134,7 +1134,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/aff7aaf2-a09a-4e91-940a-c5b9c61e3b32/9de1799b-93bb-466c-ae2b-81d76e711e71"
+				(path "/becaca26-6b2a-434b-88eb-5fe3c2de06d7/07bede42-a3a1-4dc0-a8bf-48384edbbaa2"
 					(reference "J1")
 					(unit 1)
 				)
@@ -1150,7 +1150,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 44cf5c30-415b-4b71-b022-b1386486d328)
+		(uuid 904b6e64-85cd-4c03-8f95-84c2fa9596f8)
 		(property "Reference" "R1"
 			(at 76.2 61.04 0)
 			(effects
@@ -1180,7 +1180,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/aff7aaf2-a09a-4e91-940a-c5b9c61e3b32/9de1799b-93bb-466c-ae2b-81d76e711e71"
+				(path "/becaca26-6b2a-434b-88eb-5fe3c2de06d7/07bede42-a3a1-4dc0-a8bf-48384edbbaa2"
 					(reference "R1")
 					(unit 1)
 				)
@@ -1196,7 +1196,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 68594ac5-46c1-43bf-9181-c0b44e92cf79)
+		(uuid 3280a5a5-c50d-44c5-adb4-86c90a77e736)
 		(property "Reference" "R2"
 			(at 96.52 61.04 0)
 			(effects
@@ -1226,7 +1226,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/aff7aaf2-a09a-4e91-940a-c5b9c61e3b32/9de1799b-93bb-466c-ae2b-81d76e711e71"
+				(path "/becaca26-6b2a-434b-88eb-5fe3c2de06d7/07bede42-a3a1-4dc0-a8bf-48384edbbaa2"
 					(reference "R2")
 					(unit 1)
 				)
@@ -1242,7 +1242,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 3970b4c7-5af6-44a2-a300-71301ea32688)
+		(uuid 8dad7fd2-1022-4d8c-ac93-882ab7188e94)
 		(property "Reference" "D1"
 			(at 116.84 61.04 0)
 			(effects
@@ -1263,7 +1263,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/aff7aaf2-a09a-4e91-940a-c5b9c61e3b32/9de1799b-93bb-466c-ae2b-81d76e711e71"
+				(path "/becaca26-6b2a-434b-88eb-5fe3c2de06d7/07bede42-a3a1-4dc0-a8bf-48384edbbaa2"
 					(reference "D1")
 					(unit 1)
 				)
@@ -1279,7 +1279,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 7daa4711-e089-4edc-9e26-65caacf99679)
+		(uuid 80540518-fe04-4f73-8a50-edc8d38e4f86)
 		(property "Reference" "D2"
 			(at 142.24 61.04 0)
 			(effects
@@ -1300,7 +1300,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/aff7aaf2-a09a-4e91-940a-c5b9c61e3b32/9de1799b-93bb-466c-ae2b-81d76e711e71"
+				(path "/becaca26-6b2a-434b-88eb-5fe3c2de06d7/07bede42-a3a1-4dc0-a8bf-48384edbbaa2"
 					(reference "D2")
 					(unit 1)
 				)
@@ -1316,7 +1316,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 9b93b6b3-f07d-48ec-8233-db794cd3e17e)
+		(uuid 3f1ce26d-bee3-45c9-81cb-caec4b7cb275)
 		(property "Reference" "C1"
 			(at 162.56 61.04 0)
 			(effects
@@ -1346,7 +1346,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/aff7aaf2-a09a-4e91-940a-c5b9c61e3b32/9de1799b-93bb-466c-ae2b-81d76e711e71"
+				(path "/becaca26-6b2a-434b-88eb-5fe3c2de06d7/07bede42-a3a1-4dc0-a8bf-48384edbbaa2"
 					(reference "C1")
 					(unit 1)
 				)
@@ -1365,7 +1365,7 @@
 			)
 			(justify right)
 		)
-		(uuid ab822318-c2e6-4a79-a6aa-8dd4ff267448)
+		(uuid 1e870b40-6780-4904-b8e7-5370081b0d9d)
 	)
 	(hierarchical_label
 		"GND"
@@ -1379,7 +1379,7 @@
 			)
 			(justify right)
 		)
-		(uuid 395b8ec3-a6de-4722-803c-95cb5590e8e2)
+		(uuid 7ea34184-797f-4aab-83f1-83fa8b75dd75)
 	)
 	(hierarchical_label
 		"GND"
@@ -1393,7 +1393,7 @@
 			)
 			(justify right)
 		)
-		(uuid 7c3bb051-668f-4c9f-8ee8-1cd131677156)
+		(uuid a70f74f4-7833-4617-9b47-c0a6c5396f04)
 	)
 	(hierarchical_label
 		"GND"
@@ -1407,7 +1407,7 @@
 			)
 			(justify right)
 		)
-		(uuid 0d01afaa-403f-4ea9-bb0d-cb16fe4c2179)
+		(uuid ac62200b-3654-47e4-bcf3-0bf6c755f22f)
 	)
 	(hierarchical_label
 		"GND"
@@ -1421,7 +1421,7 @@
 			)
 			(justify right)
 		)
-		(uuid b7e663c8-9c0b-4d63-9266-9a47c98ea9e7)
+		(uuid c7f7a25a-4183-45c8-ba31-fef6cdc84d87)
 	)
 	(hierarchical_label
 		"GND"
@@ -1435,7 +1435,7 @@
 			)
 			(justify right)
 		)
-		(uuid cd3c4649-ad62-46d7-ae3a-ecc8d1ecd575)
+		(uuid cecfe962-744c-4839-9784-1627a80e19ab)
 	)
 	(hierarchical_label
 		"GND"
@@ -1449,7 +1449,7 @@
 			)
 			(justify right)
 		)
-		(uuid 40f12817-11db-4678-8e85-0fc98612760b)
+		(uuid 3dcdaf6c-2459-45e2-878f-f772518c4b95)
 	)
 	(hierarchical_label
 		"GND"
@@ -1463,7 +1463,7 @@
 			)
 			(justify right)
 		)
-		(uuid 380c40d8-49dd-4c8b-ab22-836ec6a53e60)
+		(uuid d275f268-633d-4851-a011-75388f83f692)
 	)
 	(hierarchical_label
 		"GND"
@@ -1477,7 +1477,7 @@
 			)
 			(justify left)
 		)
-		(uuid d75a9aad-464c-4483-8885-d261546fb582)
+		(uuid 17d59d8b-d12f-47e6-9650-5bbb0dcb8be2)
 	)
 	(hierarchical_label
 		"GND"
@@ -1491,7 +1491,7 @@
 			)
 			(justify left)
 		)
-		(uuid 441628d0-eb16-4cc1-b440-212006725ffd)
+		(uuid 64532d96-015a-4d7d-aab0-a0e64fb31829)
 	)
 	(hierarchical_label
 		"GND"
@@ -1505,7 +1505,7 @@
 			)
 			(justify right)
 		)
-		(uuid d9c6159e-a6f7-4c40-a84a-c81d3d714477)
+		(uuid 66b4ec72-04ec-41ff-8bdd-b68ec0a2dee2)
 	)
 	(hierarchical_label
 		"VBUS"
@@ -1519,7 +1519,7 @@
 			)
 			(justify left)
 		)
-		(uuid c2adb0da-533c-4a52-87ff-c6e1886e77ec)
+		(uuid 921f3b40-5867-451d-b66d-cbea69d2f409)
 	)
 	(hierarchical_label
 		"VBUS"
@@ -1533,7 +1533,7 @@
 			)
 			(justify left)
 		)
-		(uuid a3a315d9-5473-468a-b3b5-566b70ad6d3c)
+		(uuid 3c84980c-42ab-410b-82f7-94352cfa3587)
 	)
 	(hierarchical_label
 		"VBUS"
@@ -1547,7 +1547,7 @@
 			)
 			(justify left)
 		)
-		(uuid d2c0e326-bbcd-4a98-b022-3ca341fc047b)
+		(uuid b99e0147-5d8d-4dc3-9232-058653949cce)
 	)
 	(hierarchical_label
 		"VBUS"
@@ -1561,7 +1561,7 @@
 			)
 			(justify left)
 		)
-		(uuid 22f0861b-9500-4e99-a646-5b149ffdaf87)
+		(uuid 3f138c14-5111-4cc4-94cd-b268c3a79ea7)
 	)
 	(hierarchical_label
 		"VBUS"
@@ -1575,7 +1575,7 @@
 			)
 			(justify left)
 		)
-		(uuid d5a21190-b971-4761-bb4e-71daa2ba6ae6)
+		(uuid f5637007-10ee-4bc5-a6eb-c285412362b8)
 	)
 	(hierarchical_label
 		"N$1"
@@ -1589,7 +1589,7 @@
 			)
 			(justify left)
 		)
-		(uuid 06165203-79e6-4fda-9d66-b9ba96af1a47)
+		(uuid d78968ae-6628-42c4-8e7b-104062d3814b)
 	)
 	(hierarchical_label
 		"N$1"
@@ -1603,7 +1603,7 @@
 			)
 			(justify left)
 		)
-		(uuid 3f9d9d0b-e356-459b-b5b8-98e8870cb89f)
+		(uuid 2e565123-c97c-44d6-b372-0712218edbc9)
 	)
 	(hierarchical_label
 		"N$1"
@@ -1617,7 +1617,7 @@
 			)
 			(justify left)
 		)
-		(uuid fadbfb33-2213-4422-be4c-fb90e47eac1a)
+		(uuid 8dd64ad3-657d-44ff-83eb-d1b866409d83)
 	)
 	(hierarchical_label
 		"N$2"
@@ -1631,7 +1631,7 @@
 			)
 			(justify left)
 		)
-		(uuid 39505212-fd65-463e-8e72-3d0a9357b7ab)
+		(uuid d6021ec2-7d3f-4491-8fdb-708ccb601b78)
 	)
 	(hierarchical_label
 		"N$2"
@@ -1645,7 +1645,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9d644892-e17d-4961-86a6-bc3a64cf6744)
+		(uuid 22f6fdb8-8658-42fa-8445-32e9000419be)
 	)
 	(hierarchical_label
 		"N$2"
@@ -1659,7 +1659,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9f608610-815f-4e91-ada3-07814eaa349d)
+		(uuid 59735e6c-15fc-43d1-bf0d-689ffe9f7918)
 	)
 	(hierarchical_label
 		"USB_DM"
@@ -1673,7 +1673,7 @@
 			)
 			(justify left)
 		)
-		(uuid 6bd53983-afd1-4b27-910c-0510da40a36e)
+		(uuid 2f4bcee4-374f-47e7-9188-a8b652038f62)
 	)
 	(hierarchical_label
 		"USB_DM"
@@ -1687,7 +1687,7 @@
 			)
 			(justify left)
 		)
-		(uuid ac7443a2-47ec-47c0-a0b4-ba8224e4dc38)
+		(uuid 81ca1d6e-e2a7-415f-9ddc-8360a20f71b7)
 	)
 	(hierarchical_label
 		"USB_DM"
@@ -1701,7 +1701,7 @@
 			)
 			(justify right)
 		)
-		(uuid 34ccb6e9-cdf0-42fa-a5db-62e54764781c)
+		(uuid 41ae19ed-aa6d-42bd-911f-a4830d9db9c7)
 	)
 	(hierarchical_label
 		"USB_DP"
@@ -1715,7 +1715,7 @@
 			)
 			(justify left)
 		)
-		(uuid 9a860051-5a0b-46d1-ae0c-0936fe7da752)
+		(uuid 1b0076e7-2032-4713-acf4-aab41596892a)
 	)
 	(hierarchical_label
 		"USB_DP"
@@ -1729,7 +1729,7 @@
 			)
 			(justify left)
 		)
-		(uuid 96ae23d6-d740-4405-a241-a8ae2672063a)
+		(uuid 0a638405-5eb1-4c6e-9cd0-0d044029a3db)
 	)
 	(hierarchical_label
 		"USB_DP"
@@ -1743,7 +1743,7 @@
 			)
 			(justify right)
 		)
-		(uuid 8da5270e-fe51-4f8e-9550-43d55aa782d9)
+		(uuid 697c0353-5ba3-4908-90a8-5fc2ea3ee933)
 	)
 	(sheet_instances
 		(path "/"
