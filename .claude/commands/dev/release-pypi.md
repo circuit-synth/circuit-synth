@@ -55,14 +55,23 @@ This command handles the complete release process:
 
 ## Implementation
 
-**🔧 ENHANCED: Now includes .claude directory synchronization**
+**🔧 ENHANCED: Now includes template synchronization and validation**
 
 The command runs the complete release script at `./tools/release/release_to_pypi.sh` which includes:
+- **CRITICAL**: Sync working `example_project/` to PyPI templates before build
+- Validate template integrity to prevent broken cs-new-project 
 - Copy production agents/commands from `.claude/` to package templates 
 - Exclude development agents/commands (dev/ subdirectories)
-- Ensure users get latest circuit design workflow improvements
+- Ensure users get latest working circuit examples and commands
 
-The command runs these steps automatically:
+## Execution
+
+```bash
+# Execute the complete release pipeline
+./tools/release/release_to_pypi.sh "$1"
+```
+
+This script runs these steps automatically:
 
 ### Pre-Release Checks and Branch Management
 ```bash

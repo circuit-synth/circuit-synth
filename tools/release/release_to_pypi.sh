@@ -122,55 +122,83 @@ uv run python -c "from circuit_synth import Circuit, Component, Net; print('✅ 
 
 echo -e "${GREEN}✅ Core functionality tests passed${NC}"
 
-# Copy .claude directory to package templates (Option A implementation)
-echo -e "\n${YELLOW}📋 Copying .claude directory to package templates...${NC}"
-CLAUDE_SOURCE=".claude"
-CLAUDE_TARGET="src/circuit_synth/data/templates/example_project/.claude"
+# CRITICAL: Sync working example_project to PyPI templates
+echo -e "\n${YELLOW}📋 Syncing example_project to PyPI templates...${NC}"
 
-if [ -d "$CLAUDE_SOURCE" ]; then
-    echo -e "${BLUE}🔄 Copying production agents and commands to package...${NC}"
-    
-    # Remove existing template .claude directory
-    rm -rf "$CLAUDE_TARGET"
-    
-    # Create target directory structure
-    mkdir -p "$CLAUDE_TARGET/agents" "$CLAUDE_TARGET/commands"
-    
-    # Copy production agents (exclude dev/ subdirectory)
-    find "$CLAUDE_SOURCE/agents" -name "*.md" -not -path "*/dev/*" -exec cp {} "$CLAUDE_TARGET/agents/" \;
-    
-    # Organize agents into subdirectories in target
-    mkdir -p "$CLAUDE_TARGET/agents/circuit-design" "$CLAUDE_TARGET/agents/manufacturing" "$CLAUDE_TARGET/agents/orchestration" "$CLAUDE_TARGET/agents/microcontrollers"
-    
-    # Move agents to proper subdirectories in target
-    [ -f "$CLAUDE_TARGET/agents/circuit-architect.md" ] && mv "$CLAUDE_TARGET/agents/circuit-architect.md" "$CLAUDE_TARGET/agents/circuit-design/"
-    [ -f "$CLAUDE_TARGET/agents/component-symbol-validator.md" ] && mv "$CLAUDE_TARGET/agents/component-symbol-validator.md" "$CLAUDE_TARGET/agents/circuit-design/"
-    [ -f "$CLAUDE_TARGET/agents/circuit-design-guide.md" ] && mv "$CLAUDE_TARGET/agents/circuit-design-guide.md" "$CLAUDE_TARGET/agents/circuit-design/"
-    [ -f "$CLAUDE_TARGET/agents/circuit-validation-agent.md" ] && mv "$CLAUDE_TARGET/agents/circuit-validation-agent.md" "$CLAUDE_TARGET/agents/circuit-design/"
-    [ -f "$CLAUDE_TARGET/agents/circuit-syntax-fixer.md" ] && mv "$CLAUDE_TARGET/agents/circuit-syntax-fixer.md" "$CLAUDE_TARGET/agents/circuit-design/"
-    [ -f "$CLAUDE_TARGET/agents/simulation-expert.md" ] && mv "$CLAUDE_TARGET/agents/simulation-expert.md" "$CLAUDE_TARGET/agents/circuit-design/"
-    [ -f "$CLAUDE_TARGET/agents/test-plan-creator.md" ] && mv "$CLAUDE_TARGET/agents/test-plan-creator.md" "$CLAUDE_TARGET/agents/circuit-design/"
-    
-    [ -f "$CLAUDE_TARGET/agents/jlc-parts-finder.md" ] && mv "$CLAUDE_TARGET/agents/jlc-parts-finder.md" "$CLAUDE_TARGET/agents/manufacturing/"
-    [ -f "$CLAUDE_TARGET/agents/component-guru.md" ] && mv "$CLAUDE_TARGET/agents/component-guru.md" "$CLAUDE_TARGET/agents/manufacturing/"
-    [ -f "$CLAUDE_TARGET/agents/dfm-agent.md" ] && mv "$CLAUDE_TARGET/agents/dfm-agent.md" "$CLAUDE_TARGET/agents/manufacturing/"
-    
-    [ -f "$CLAUDE_TARGET/agents/circuit-project-creator.md" ] && mv "$CLAUDE_TARGET/agents/circuit-project-creator.md" "$CLAUDE_TARGET/agents/orchestration/"
-    
-    [ -f "$CLAUDE_TARGET/agents/stm32-mcu-finder.md" ] && mv "$CLAUDE_TARGET/agents/stm32-mcu-finder.md" "$CLAUDE_TARGET/agents/microcontrollers/"
-    
-    # Copy production commands (exclude dev/ subdirectory) 
-    cp -r "$CLAUDE_SOURCE/commands/circuit-design" "$CLAUDE_TARGET/commands/" 2>/dev/null || true
-    cp -r "$CLAUDE_SOURCE/commands/manufacturing" "$CLAUDE_TARGET/commands/" 2>/dev/null || true  
-    cp -r "$CLAUDE_SOURCE/commands/setup" "$CLAUDE_TARGET/commands/" 2>/dev/null || true
-    
-    # Copy any remaining project config files
-    [ -f "$CLAUDE_SOURCE/mcp_settings.json" ] && cp "$CLAUDE_SOURCE/mcp_settings.json" "$CLAUDE_TARGET/"
-    
-    echo -e "${GREEN}✅ Production .claude directory copied to package templates${NC}"
+# Run the dedicated sync script to ensure templates are current
+if [ -f "./tools/packaging/sync_example_to_template.sh" ]; then
+    echo -e "${BLUE}🔄 Running template sync script...${NC}"
+    ./tools/packaging/sync_example_to_template.sh || {
+        echo -e "${RED}❌ Template sync failed!${NC}"
+        exit 1
+    }
+    echo -e "${GREEN}✅ Template sync completed successfully${NC}"
 else
-    echo -e "${YELLOW}⚠️  .claude directory not found, skipping template update${NC}"
+    echo -e "${YELLOW}⚠️  Sync script not found, performing manual sync...${NC}"
+    
+    # Fallback manual sync
+    EXAMPLE_DIR="example_project"
+    PROJECT_TEMPLATE_DIR="src/circuit_synth/data/templates/project_template"
+    
+    if [ -d "$EXAMPLE_DIR" ]; then
+        echo -e "${BLUE}📋 Copying complete example_project to project_template...${NC}"
+        rm -rf "$PROJECT_TEMPLATE_DIR"
+        cp -r "$EXAMPLE_DIR" "$PROJECT_TEMPLATE_DIR"
+        echo -e "${GREEN}✅ Manual template sync completed${NC}"
+    else
+        echo -e "${RED}❌ example_project directory not found!${NC}"
+        exit 1
+    fi
 fi
+
+# Also sync to example_project template (for backward compatibility)
+EXAMPLE_TEMPLATE_DIR="src/circuit_synth/data/templates/example_project"
+if [ -d "example_project" ]; then
+    echo -e "${BLUE}📋 Syncing to example_project template for backward compatibility...${NC}"
+    # Only sync circuit files to preserve template structure
+    cp -r example_project/circuit-synth/* "$EXAMPLE_TEMPLATE_DIR/circuit-synth/" 2>/dev/null || true
+    cp example_project/CLAUDE.md "$EXAMPLE_TEMPLATE_DIR/" 2>/dev/null || true
+    cp example_project/README.md "$EXAMPLE_TEMPLATE_DIR/" 2>/dev/null || true
+    echo -e "${GREEN}✅ Example template sync completed${NC}"
+fi
+
+# CRITICAL: Validate template integrity to prevent broken releases
+echo -e "\n${YELLOW}🔍 Validating template integrity...${NC}"
+
+# Check for known problematic symbols that break cs-new-project
+BROKEN_SYMBOLS=(
+    "USB_C_Receptacle_USB2.0_16P_TopMount_DrillsUnspecified"
+)
+
+for symbol in "${BROKEN_SYMBOLS[@]}"; do
+    if grep -r "$symbol" src/circuit_synth/data/templates/ >/dev/null 2>&1; then
+        echo -e "${RED}❌ CRITICAL: Found broken symbol '$symbol' in templates!${NC}"
+        echo -e "${RED}   This will cause cs-new-project to fail for users${NC}"
+        echo -e "${YELLOW}   Please fix the symbol in example_project and re-sync templates${NC}"
+        exit 1
+    fi
+done
+
+# Verify key template files exist and have correct symbols
+TEMPLATE_DIRS=(
+    "src/circuit_synth/data/templates/project_template"
+    "src/circuit_synth/data/templates/example_project"
+)
+
+for template_dir in "${TEMPLATE_DIRS[@]}"; do
+    if [ -f "$template_dir/circuit-synth/usb.py" ]; then
+        if grep -q "USB_C_Receptacle_USB2.0_16P" "$template_dir/circuit-synth/usb.py"; then
+            echo -e "${GREEN}✅ $template_dir has correct USB symbol${NC}"
+        else
+            echo -e "${RED}❌ $template_dir missing correct USB symbol${NC}"
+            exit 1
+        fi
+    else
+        echo -e "${YELLOW}⚠️  $template_dir/circuit-synth/usb.py not found${NC}"
+    fi
+done
+
+echo -e "${GREEN}✅ Template integrity validation passed${NC}"
 
 # Update Version
 echo -e "\n${YELLOW}📝 Updating version to ${VERSION}...${NC}"

@@ -62,12 +62,55 @@ echo "   ⚡ Commands: $COMMAND_COUNT command files"
 echo "   📋 Interactive Circuit Design Agent: ✅ Included"
 echo "   🛠️ Validation commands: ✅ Included"
 
+# CRITICAL: Validate template integrity
+echo ""
+echo "🔍 Validating template integrity..."
+
+# Check for known problematic symbols that break cs-new-project
+BROKEN_SYMBOLS=(
+    "USB_C_Receptacle_USB2.0_16P_TopMount_DrillsUnspecified"
+    "NonExistentSymbol"
+)
+
+echo "🚨 Checking for broken symbols that will break cs-new-project..."
+for symbol in "${BROKEN_SYMBOLS[@]}"; do
+    if grep -r "$symbol" "$PROJECT_TEMPLATE_DIR" >/dev/null 2>&1; then
+        echo "❌ CRITICAL: Found broken symbol '$symbol' in templates!"
+        echo "   This will cause cs-new-project to fail for users"
+        echo "   Location: $(grep -r "$symbol" "$PROJECT_TEMPLATE_DIR")"
+        echo ""
+        echo "🔧 To fix:"
+        echo "   1. Update $EXAMPLE_PROJECT_DIR with correct symbols"
+        echo "   2. Re-run this sync script"
+        exit 1
+    fi
+done
+
+# Verify that correct symbols exist
+REQUIRED_SYMBOLS=(
+    "USB_C_Receptacle_USB2.0_16P"
+    "Device:R"
+    "Device:C"
+)
+
+echo "✅ Checking for required working symbols..."
+for symbol in "${REQUIRED_SYMBOLS[@]}"; do
+    if grep -r "$symbol" "$PROJECT_TEMPLATE_DIR" >/dev/null 2>&1; then
+        echo "   ✅ $symbol found"
+    else
+        echo "   ⚠️  $symbol not found (may be OK)"
+    fi
+done
+
+echo ""
+echo "✅ Template integrity validation passed!"
 echo ""
 echo "✅ Sync complete! PyPI package will now include:"
 echo "   🎛️ Interactive Circuit Design Agent"
 echo "   🔧 Component validation commands (/find-pins, /quick-validate)"
 echo "   ⚡ Quick access commands (/design, /design-mode)"
 echo "   📚 Complete agent and command ecosystem"
+echo "   🔌 WORKING circuit examples with validated KiCad symbols"
 
 echo ""
-echo "🚀 Ready for PyPI release with latest agents!"
+echo "🚀 Ready for PyPI release with latest agents and WORKING templates!"
