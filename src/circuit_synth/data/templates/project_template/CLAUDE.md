@@ -1,106 +1,4 @@
-"""
-Memory-Bank File Templates
-
-Standard templates for memory-bank markdown files with consistent formatting.
-"""
-
-from datetime import datetime
-from typing import Any, Dict
-
-DECISIONS_TEMPLATE = """# Design Decisions
-
-*This file automatically tracks design decisions and component choices*
-
-## Template Entry
-**Date**: YYYY-MM-DD  
-**Change**: Brief description of what changed  
-**Commit**: Git commit hash  
-**Rationale**: Why this change was made  
-**Alternatives Considered**: Other options evaluated  
-**Impact**: Effects on design, cost, performance  
-**Testing**: Any validation performed  
-
----
-
-"""
-
-FABRICATION_TEMPLATE = """# Fabrication History
-
-*This file tracks PCB orders, delivery, and assembly notes*
-
-## Template Order
-**Order ID**: Vendor order number  
-**Date**: YYYY-MM-DD  
-**Specs**: Board specifications (size, layers, finish, etc.)  
-**Quantity**: Number of boards ordered  
-**Cost**: Total cost including shipping  
-**Expected Delivery**: Estimated delivery date  
-**Status**: Order status and tracking information  
-**Received**: Actual delivery date and quality notes  
-**Assembly Notes**: Assembly process and any issues  
-
----
-
-"""
-
-TESTING_TEMPLATE = """# Testing Results
-
-*This file tracks test results, measurements, and performance validation*
-
-## Template Test
-**Date**: YYYY-MM-DD  
-**Test Type**: Power consumption, functional, stress, etc.  
-**Commit**: Git commit hash of version tested  
-**Setup**: Test equipment and configuration  
-**Expected**: Predicted results  
-**Actual**: Measured results  
-**Status**: Pass/Fail/Marginal  
-**Notes**: Observations and follow-up actions  
-
----
-
-"""
-
-TIMELINE_TEMPLATE = """# Project Timeline
-
-*This file tracks project milestones, key events, and deadlines*
-
-## Template Event
-**Date**: YYYY-MM-DD  
-**Event**: Milestone or significant event  
-**Commit**: Related git commit hash  
-**Impact**: Effects on project timeline or scope  
-**Next Actions**: Required follow-up tasks  
-
----
-
-"""
-
-ISSUES_TEMPLATE = """# Known Issues
-
-*This file tracks problems encountered, root causes, and solutions*
-
-## Template Issue
-**Date**: YYYY-MM-DD  
-**Issue**: Brief description of the problem  
-**Commit**: Git commit hash where issue was introduced/discovered  
-**Symptoms**: How the issue manifests  
-**Root Cause**: Technical reason for the issue  
-**Workaround**: Temporary solution if available  
-**Status**: Open/In Progress/Resolved  
-**Resolution**: Final solution and verification  
-
----
-
-"""
-
-
-def generate_claude_md(project_name: str, boards: list = None, **kwargs) -> str:
-    """Generate project-specific CLAUDE.md with direct circuit generation workflow."""
-
-    timestamp = datetime.now().isoformat()
-
-    template = f"""# CLAUDE.md - Circuit-Synth Direct Generation
+# CLAUDE.md - Circuit-Synth Direct Generation
 
 **Generate working circuits directly using commands - NO AGENTS**
 
@@ -199,6 +97,40 @@ open MyProject.kicad_pro
 - `/find-footprint <package_type>` - Find KiCad footprints
 - `/find-pins <symbol_name>` - Get exact pin names
 
+## 🎯 Example Workflows
+
+### STM32 Development Board:
+```
+User: "STM32 development board with USB"
+1. /find_stm32 "STM32 with USB available on JLCPCB"
+2. /find-symbol STM32F411CEU
+3. /find-footprint LQFP-48
+4. /find-pins MCU_ST_STM32F4:STM32F411CEUx
+5. Generate circuit with exact pin names
+6. uv run python stm32_board.py
+```
+
+### Power Supply Circuit:
+```
+User: "3.3V power supply from USB"
+1. /find-parts --source jlcpcb AMS1117-3.3
+2. /find-symbol AMS1117-3.3
+3. /find-footprint SOT-223
+4. /find-pins Regulator_Linear:AMS1117-3.3
+5. Generate power circuit
+6. uv run python power_supply.py
+```
+
+### LED Circuit:
+```
+User: "LED blinker circuit"
+1. /find-parts --source jlcpcb "LED 0603"
+2. /find-symbol LED
+3. /find-footprint 0603
+4. Generate simple LED circuit (Device:LED, Device:R)
+5. uv run python led_blinker.py
+```
+
 ## 🚨 Critical Rules
 
 1. **ALWAYS use commands** - don't guess component specs
@@ -208,6 +140,21 @@ open MyProject.kicad_pro
 5. **Include KiCad generation** - in the if __name__ == "__main__" block
 6. **60-second time limit** - work fast and direct
 
+## 🔧 Error Handling
+
+### Component Not Found:
+- Try /find-parts with different search terms
+- Use basic Device: components as fallback
+
+### Pin Name Errors:
+- Use /find-pins to get exact pin names
+- Don't guess pin names - always validate
+
+### Execution Failures:
+- Check error message for specific issues
+- Fix pin names or component symbols
+- Retry once maximum
+
 ## 📦 Working Component Library
 
 ### STM32 Microcontrollers:
@@ -216,6 +163,7 @@ open MyProject.kicad_pro
 
 ### Power Components:
 - **Linear Reg**: `Regulator_Linear:AMS1117-3.3` / SOT-223
+- **Buck IC**: `Regulator_Switching:LM2596S-3.3` / TO-263
 
 ### Basic Components:
 - **Resistor**: `Device:R` / R_0603_1608Metric
@@ -228,30 +176,4 @@ open MyProject.kicad_pro
 
 ---
 
-*This CLAUDE.md was generated automatically by circuit-synth memory-bank system*  
-*Last updated: {timestamp}*
-
 **WORK DIRECTLY. USE COMMANDS. GENERATE WORKING CIRCUITS FAST.**
-"""
-
-    return template
-
-
-# Template file mapping for easy access
-TEMPLATE_FILES = {
-    "decisions.md": DECISIONS_TEMPLATE,
-    "fabrication.md": FABRICATION_TEMPLATE,
-    "testing.md": TESTING_TEMPLATE,
-    "timeline.md": TIMELINE_TEMPLATE,
-    "issues.md": ISSUES_TEMPLATE,
-}
-
-
-def get_template(filename: str) -> str:
-    """Get template content for a specific memory-bank file."""
-    return TEMPLATE_FILES.get(filename, "")
-
-
-def get_all_templates() -> Dict[str, str]:
-    """Get all template files as a dictionary."""
-    return TEMPLATE_FILES.copy()

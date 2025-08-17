@@ -1,117 +1,179 @@
-# CLAUDE.md - circuit-synth
+# CLAUDE.md - Circuit-Synth Direct Generation
 
-This file provides guidance to Claude Code when working on the circuit-synth project.
+**Generate working circuits directly using commands - NO AGENTS**
 
-## Memory-Bank System
+## 🔥 Circuit Design Workflow
 
-This project uses the Circuit Memory-Bank System for automatic engineering documentation and project knowledge preservation.
+When user requests circuit design, follow this EXACT workflow:
 
-### Overview
-The memory-bank system automatically tracks:
-- **Design Decisions**: Component choices and rationale
-- **Fabrication History**: PCB orders, delivery, and assembly
-- **Testing Results**: Performance data and issue resolution
-- **Timeline Events**: Project milestones and key dates
-- **Cross-Board Insights**: Knowledge shared between PCB variants
+### STEP 1: Quick Requirements (5 seconds)
+Ask 1-2 focused questions:
+- Circuit type (power supply, MCU board, analog, etc.)
+- Key specifications (voltage, current, frequency, etc.)
+- Main component requirements (STM32 with USB, 3.3V regulator, etc.)
 
-### Multi-Level Agent System
+### STEP 2: Find Suitable Components (15 seconds)
 
-This project uses a nested agent structure:
-
-```
-circuit-synth/
-├── .claude/                    # Project-level agent
-├── pcbs/
-│   ├── circuit-synth-v1/
-│   │   ├── .claude/           # PCB-level agent
-│   │   └── memory-bank/       # PCB-specific documentation
-```
-
-### Context Switching
-
-Use the `cs-switch-board` command to work on specific PCBs:
-
+#### For STM32 Circuits:
 ```bash
-# Switch to specific board context
-cs-switch-board circuit-synth-v1
-
-# List available boards
-cs-switch-board --list
-
-# Check current context
-cs-switch-board --status
+# Find STM32 with specific peripherals
+/find_stm32 "STM32 with USB and 3 SPIs available on JLCPCB"
 ```
 
-**Important**: `cs-switch-board` will compress Claude's memory and reload the appropriate .claude configuration. This ensures you're working with the right context and memory-bank scope.
-
-### Memory-Bank Files
-
-Each PCB maintains standard memory-bank files:
-
-- **decisions.md**: Component choices, design rationale, alternatives considered
-- **fabrication.md**: PCB orders, delivery tracking, assembly notes
-- **testing.md**: Test results, measurements, performance validation
-- **timeline.md**: Project milestones, key events, deadlines
-- **issues.md**: Problems encountered, root causes, solutions
-
-### Automatic Documentation
-
-The system automatically updates memory-bank files when you:
-- Make git commits (primary trigger)
-- Run circuit-synth commands
-- Ask questions about the design
-- Perform tests or measurements
-
-**Best Practices for Commits**:
-- Use descriptive commit messages explaining **why** changes were made
-- Commit frequently to capture incremental design decisions
-- Include context about alternatives considered
-- Mention any testing or validation performed
-
-Examples:
+#### For Other Components:
 ```bash
-# Good commit messages for memory-bank
-git commit -m "Switch to buck converter for better efficiency - tested 90% vs 60% with linear reg"
-git commit -m "Add external crystal for USB stability - internal RC caused enumeration failures"
-git commit -m "Increase decoupling cap to 22uF - scope showed 3.3V rail noise during WiFi tx"
+# Check JLCPCB availability
+/find-parts --source jlcpcb AMS1117-3.3
+
+# Check DigiKey for alternatives
+/find-parts --source digikey "3.3V linear regulator SOT-223"
 ```
 
-### Memory-Bank Commands
-
+### STEP 3: Get KiCad Integration Data (15 seconds)
 ```bash
-# Initialize memory-bank in existing project
-cs-memory-bank-init
+# Find exact KiCad symbol
+/find-symbol STM32F411CEU
 
-# Remove memory-bank system
-cs-memory-bank-remove
+# Find matching footprint
+/find-footprint LQFP-48
 
-# Check memory-bank status
-cs-memory-bank-status
-
-# Search memory-bank content
-cs-memory-bank-search "voltage regulator"
+# Get exact pin names (CRITICAL)
+/find-pins MCU_ST_STM32F4:STM32F411CEUx
 ```
 
-### Troubleshooting
+### STEP 4: Generate Circuit-Synth Code (15 seconds)
+Write Python file using EXACT data from commands:
+```python
+from circuit_synth import Component, Net, circuit
 
-**Context Issues**:
-- If Claude seems confused about which board you're working on, use `cs-switch-board --status`
-- Use `cs-switch-board {board_name}` to explicitly set context
+@circuit(name="MyCircuit")
+def my_circuit():
+    # Use EXACT symbol and footprint from commands
+    mcu = Component(
+        symbol="MCU_ST_STM32F4:STM32F411CEUx",  # From /find-symbol
+        ref="U",
+        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"  # From /find-footprint
+    )
+    
+    # Use EXACT pin names from /find-pins
+    vcc = Net('VCC_3V3')
+    gnd = Net('GND')
+    
+    mcu["VDD"] += vcc      # Exact pin name from /find-pins
+    mcu["VSS"] += gnd      # Exact pin name from /find-pins
+    
+    # Continue circuit design...
+    
+    if __name__ == "__main__":
+        circuit_obj = my_circuit()
+        circuit_obj.generate_kicad_project(
+            project_name="MyProject",
+            placement_algorithm="hierarchical",
+            generate_pcb=True
+        )
+        print("✅ KiCad project generated!")
+        
+# ALWAYS include main execution block
+```
 
-**Memory-Bank Updates Not Working**:
-- Ensure you're committing through git (primary trigger for updates)
-- Check that memory-bank files exist in current board directory
-- Verify .claude configuration includes memory-bank instructions
+### STEP 5: Test and Generate KiCad (10 seconds)
+```bash
+# MANDATORY: Test the code
+uv run python circuit_file.py
 
-**File Corruption**:
-- All memory-bank files are in git - use `git checkout` to recover
-- Use `cs-memory-bank-init` to recreate missing template files
+# If successful: Open KiCad project
+open MyProject.kicad_pro
+```
 
-## Project-Specific Instructions
+## ⚡ Available Commands
 
-This is the circuit-synth project with memory-bank system enabled.
+### Component Sourcing:
+- `/find-parts --source jlcpcb <component>` - Search JLCPCB
+- `/find-parts --source digikey <component>` - Search DigiKey  
+- `/find_stm32 "<requirements>"` - STM32 peripheral search
+
+### KiCad Integration:
+- `/find-symbol <component_name>` - Find KiCad symbols
+- `/find-footprint <package_type>` - Find KiCad footprints
+- `/find-pins <symbol_name>` - Get exact pin names
+
+## 🎯 Example Workflows
+
+### STM32 Development Board:
+```
+User: "STM32 development board with USB"
+1. /find_stm32 "STM32 with USB available on JLCPCB"
+2. /find-symbol STM32F411CEU
+3. /find-footprint LQFP-48
+4. /find-pins MCU_ST_STM32F4:STM32F411CEUx
+5. Generate circuit with exact pin names
+6. uv run python stm32_board.py
+```
+
+### Power Supply Circuit:
+```
+User: "3.3V power supply from USB"
+1. /find-parts --source jlcpcb AMS1117-3.3
+2. /find-symbol AMS1117-3.3
+3. /find-footprint SOT-223
+4. /find-pins Regulator_Linear:AMS1117-3.3
+5. Generate power circuit
+6. uv run python power_supply.py
+```
+
+### LED Circuit:
+```
+User: "LED blinker circuit"
+1. /find-parts --source jlcpcb "LED 0603"
+2. /find-symbol LED
+3. /find-footprint 0603
+4. Generate simple LED circuit (Device:LED, Device:R)
+5. uv run python led_blinker.py
+```
+
+## 🚨 Critical Rules
+
+1. **ALWAYS use commands** - don't guess component specs
+2. **VALIDATE before generating** - use /find-pins for exact pin names
+3. **TEST the code** - uv run python before claiming success
+4. **Use uv run python** - not python3 or python
+5. **Include KiCad generation** - in the if __name__ == "__main__" block
+6. **60-second time limit** - work fast and direct
+
+## 🔧 Error Handling
+
+### Component Not Found:
+- Try /find-parts with different search terms
+- Use basic Device: components as fallback
+
+### Pin Name Errors:
+- Use /find-pins to get exact pin names
+- Don't guess pin names - always validate
+
+### Execution Failures:
+- Check error message for specific issues
+- Fix pin names or component symbols
+- Retry once maximum
+
+## 📦 Working Component Library
+
+### STM32 Microcontrollers:
+- **STM32F4**: `MCU_ST_STM32F4:STM32F411CEUx` / LQFP-48
+- **STM32G4**: `MCU_ST_STM32G4:STM32G431CBTx` / LQFP-48
+
+### Power Components:
+- **Linear Reg**: `Regulator_Linear:AMS1117-3.3` / SOT-223
+- **Buck IC**: `Regulator_Switching:LM2596S-3.3` / TO-263
+
+### Basic Components:
+- **Resistor**: `Device:R` / R_0603_1608Metric
+- **Capacitor**: `Device:C` / C_0603_1608Metric  
+- **LED**: `Device:LED` / LED_0603_1608Metric
+
+### Connectors:
+- **USB Micro**: `Connector:USB_B_Micro`
+- **Headers**: `Connector_Generic:Conn_01x10`
 
 ---
 
-*This CLAUDE.md was generated automatically by circuit-synth memory-bank system*  
-*Last updated: 2025-08-13T11:06:03.261742*
+**WORK DIRECTLY. USE COMMANDS. GENERATE WORKING CIRCUITS FAST.**
