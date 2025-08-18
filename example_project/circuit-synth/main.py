@@ -56,7 +56,8 @@ if __name__ == "__main__":
     circuit.generate_kicad_project(
         project_name="ESP32_C6_Dev_Board",
         placement_algorithm="hierarchical",
-        generate_pcb=True
+        generate_pcb=True,
+        force_regenerate=True
     )
     
     print("")
