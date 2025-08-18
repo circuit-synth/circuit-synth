@@ -2,7 +2,7 @@
 
 ## Overview
 
-Circuit-synth is built around a **JSON-centric architecture** where JSON serves as the canonical intermediate representation for all circuit data. This design enables seamless interoperability between Python circuit definitions and KiCad projects while maintaining full round-trip fidelity.
+Circuit-synth is built around a **JSON-centric architecture** with modern **kicad-sch-api integration** where JSON serves as the canonical intermediate representation for all circuit data. This design enables seamless interoperability between Python circuit definitions and KiCad projects while maintaining full round-trip fidelity.
 
 ## Core Data Flow
 
@@ -18,7 +18,10 @@ Circuit-synth is built around a **JSON-centric architecture** where JSON serves 
 
 1. **Python Circuit Definition**: Engineers write circuit designs using Python classes (`Circuit`, `Component`, `Net`)
 2. **JSON Serialization**: The `Circuit.to_dict()` method converts the circuit hierarchy to JSON
-3. **KiCad Generation**: JSON is processed to generate KiCad schematic and PCB files
+3. **KiCad Generation**: JSON is processed with hybrid architecture:
+   - **Legacy positioning system**: Handles component placement and hierarchical structure
+   - **Modern kicad-sch-api**: Professional schematic file generation via PyPI package (v0.1.1+)
+   - **Intelligent selection**: Automatically chooses optimal approach per schematic type
 
 ### KiCad → JSON → Python
 

@@ -102,6 +102,15 @@ circuit.generate_kicad_project("voltage_regulator")</code></pre>
                 <div class="advanced-features-grid">
                     <div class="advanced-feature">
                         <div class="feature-icon">🏗️</div>
+                        <h3>Modern KiCad Integration</h3>
+                        <p>Built on modern <strong>kicad-sch-api</strong> (PyPI) - a valuable standalone tool extracted from circuit-synth. Hybrid architecture combines legacy positioning with professional schematic generation. Generate industry-standard KiCad files with proper formatting, symbol library integration, and modern compatibility.</p>
+                        <div class="feature-example">
+                            <code>Python + kicad-sch-api = Professional KiCad Files</code>
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-feature">
+                        <div class="feature-icon">🔄</div>
                         <h3>Professional Workflow</h3>
                         <p>Work in traditional KiCad or Python - your choice. Make changes in either environment, then sync when ready. One-to-one mapping: every Python component and connection becomes exactly one KiCad component and connection. You control when updates happen, KiCad remains the source of truth, and nothing is hidden or altered unexpectedly.</p>
                         <div class="feature-example">
@@ -285,6 +294,31 @@ uv run python circuit-synth/main.py
             </div>
         </section>
 
+        <section id="suite-tools" class="section">
+            <div class="container">
+                <h2>🛠️ Circuit-Synth Suite</h2>
+                <p class="section-subtitle">A growing collection of professional tools for modern circuit design</p>
+                <div class="suite-grid">
+                    <div class="suite-item">
+                        <h3>🏗️ circuit-synth</h3>
+                        <p>The main framework for Python-based circuit design with KiCad integration. Hierarchical design, AI integration, and professional workflows.</p>
+                        <a href="https://github.com/circuit-synth/circuit-synth" class="btn btn-secondary">Main Project</a>
+                    </div>
+                    <div class="suite-item">
+                        <h3>📐 kicad-sch-api</h3>
+                        <p><strong>Standalone PyPI package</strong> extracted from circuit-synth for broader community use. Professional KiCad schematic generation from Python - valuable for any KiCad automation project.</p>
+                        <div class="code-snippet">
+                            <code>pip install kicad-sch-api</code>
+                        </div>
+                        <a href="https://github.com/circuit-synth/kicad-sch-api" class="btn btn-secondary">Standalone Tool</a>
+                    </div>
+                </div>
+                <div class="suite-note">
+                    <p><em>We extract valuable components as standalone tools when they benefit the broader engineering community. kicad-sch-api is the first of many planned standalone packages.</em></p>
+                </div>
+            </div>
+        </section>
+
         <section id="community" class="section">
             <div class="container">
                 <h2>Join the Community</h2>
@@ -346,6 +380,7 @@ uv run python circuit-synth/main.py
                     <h4>Tools</h4>
                     <ul>
                         <li><a href="https://www.kicad.org/">KiCad</a></li>
+                        <li><a href="https://github.com/circuit-synth/kicad-sch-api">kicad-sch-api</a></li>
                         <li><a href="https://github.com/astral-sh/uv">uv Package Manager</a></li>
                     </ul>
                 </div>
