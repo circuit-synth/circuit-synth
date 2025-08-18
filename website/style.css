@@ -664,6 +664,60 @@ header {
     margin-top: auto;
 }
 
+/* Suite Grid */
+.suite-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.suite-item {
+    background: var(--bg-color);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.suite-item h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.suite-item p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.suite-item .code-snippet {
+    background: var(--code-bg);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    margin: 1rem 0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.suite-item .btn {
+    margin-top: auto;
+}
+
+.suite-note {
+    text-align: center;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--bg-light);
+    border-radius: 0.5rem;
+    border-left: 4px solid var(--primary-color);
+}
+
+.suite-note em {
+    color: var(--text-light);
+    font-style: italic;
+}
+
 /* Footer */
 footer {
     background: var(--text-color);
@@ -754,6 +808,10 @@ footer {
     }
     
     .community-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .suite-grid {
         grid-template-columns: 1fr;
     }
     

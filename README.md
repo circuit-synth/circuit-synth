@@ -97,9 +97,10 @@ if __name__ == "__main__":
 
 ## Core Features
 
-- **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files
+- **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files with modern kicad-sch-api integration
 - **Hierarchical Design**: Modular subcircuits like software modules  
 - **Atomic KiCad Operations**: Add/remove individual components from existing schematics with rollback safety
+- **Modern KiCad Integration**: Uses PyPI kicad-sch-api (v0.1.1+) for professional schematic generation
 - **Component Intelligence**: JLCPCB & DigiKey integration, symbol/footprint verification
 - **Fast JLCPCB Search**: Direct search with 80% speed improvement, 90% less tokens
 - **AI Integration**: Claude Code agents for automated design assistance
@@ -107,6 +108,41 @@ if __name__ == "__main__":
 - **FMEA Analysis**: Comprehensive reliability analysis with physics-based failure models
 - **Test Generation**: Automated test plans for validation
 - **Version Control**: Git-friendly text-based circuit definitions
+
+## KiCad-sch-api Integration
+
+Circuit-synth integrates with the modern **kicad-sch-api** PyPI package - a valuable standalone tool that was extracted from circuit-synth for broader community use.
+
+### Benefits of kicad-sch-api
+- **Professional KiCad Files**: Generates industry-standard .kicad_sch files with proper formatting
+- **Symbol Library Integration**: Full access to KiCad's extensive symbol libraries  
+- **Hierarchical Support**: Clean handling of complex multi-sheet designs
+- **Version Compatibility**: Works with modern KiCad versions (v7.0+)
+
+### Hybrid Architecture
+Circuit-synth uses a hybrid approach combining the best of both worlds:
+- **Legacy System**: Handles component positioning and hierarchical structure
+- **Modern API**: Professional schematic file writing via kicad-sch-api
+- **Intelligent Selection**: Automatically chooses the right approach per schematic type
+
+```python
+# The modern API integration is automatic - just use circuit-synth as normal!
+@circuit(name="MyCircuit")
+def my_design():
+    # Your circuit design here
+    pass
+
+# Behind the scenes: circuit-synth + kicad-sch-api = professional results
+```
+
+### Standalone kicad-sch-api Usage
+The kicad-sch-api package is also valuable as a standalone tool for Python KiCad integration:
+
+```bash
+pip install kicad-sch-api
+```
+
+Visit the [kicad-sch-api repository](https://github.com/circuit-synth/kicad-sch-api) for standalone usage examples.
 
 ## AI-Powered Design
 

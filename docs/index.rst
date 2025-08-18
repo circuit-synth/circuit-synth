@@ -30,6 +30,7 @@ Circuit-Synth is an open-source Python library that fits seamlessly into normal 
    :caption: Architecture & Design:
 
    ARCHITECTURE
+   KICAD_SCH_API_INTEGRATION
    JSON_SCHEMA
    PROJECT_STRUCTURE
 
@@ -114,7 +115,7 @@ Current Capabilities
 
 **Circuit-synth is ready for professional use with:**
 
-* **Full KiCad Integration**: Generate complete KiCad projects with schematics and PCB layouts
+* **Full KiCad Integration**: Generate complete KiCad projects with modern kicad-sch-api integration
 * **Schematic Annotations**: Automatic docstring extraction and manual text annotations with tables
 * **Netlist Generation**: Export industry-standard KiCad netlist files (.net) for seamless PCB workflow
 * **Hierarchical Design Support**: Multi-sheet projects with proper organization and connectivity

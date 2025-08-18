@@ -1593,10 +1593,261 @@ class SchematicWriter:
 def write_schematic_file(schematic_expr: list, out_path: str):
     """
     Helper to serialize the final S-expression to a .kicad_sch file.
-
-    PERFORMANCE OPTIMIZATION: Uses optimized S-expression formatting.
-    This is the final step where the S-expression formatter is applied.
+    
+    HYBRID APPROACH: Uses modern kicad-sch-api if available, otherwise falls back to legacy.
+    The legacy system handles positioning and hierarchy, modern API handles file writing.
     """
+    # Try to use modern API for file writing if available
+    try:
+        from ..config import KiCadConfig, is_kicad_sch_api_available
+        
+        if is_kicad_sch_api_available():
+            # Check if this contains hierarchical sheets - if so, use legacy for now
+            import sexpdata
+            from pathlib import Path
+            has_sheets = _contains_sheet_symbols(schematic_expr)
+            
+            # For now, only use modern API for component-level schematics
+            # Main hierarchical schematics need legacy writer for proper sheet symbol support
+            filename = Path(out_path).name
+            is_main_schematic = not ('/' in filename or filename.count('.') > 1)
+            
+            if has_sheets or is_main_schematic:
+                logger.info(f"Using legacy writer for hierarchical schematic: {out_path}")
+            else:
+                logger.info(f"Using modern kicad-sch-api for component schematic: {out_path}")
+                return _write_with_modern_api(schematic_expr, out_path)
+        else:
+            logger.info(f"Modern API not available, using legacy writer: {out_path}")
+            
+    except Exception as e:
+        logger.warning(f"Modern API check failed, using legacy: {e}")
+    
+    # Fallback to legacy S-expression writing
+    return _write_with_legacy_sexpr(schematic_expr, out_path)
+
+
+def _write_with_modern_api(schematic_expr: list, out_path: str) -> None:
+    """Write schematic using modern kicad-sch-api."""
+    try:
+        import kicad_sch_api as ksa
+        import sexpdata
+        from pathlib import Path
+        
+        # Create new schematic
+        project_name = Path(out_path).stem
+        schematic = ksa.create_schematic(project_name)
+        
+        # Check if this S-expression contains sheet symbols or individual components
+        has_sheets = _contains_sheet_symbols(schematic_expr)
+        has_components = _contains_component_symbols(schematic_expr)
+        
+        if has_components:
+            # Extract components and their positions from S-expression
+            components_data = _extract_components_from_sexpr(schematic_expr)
+            logger.info(f"Modern API: Adding {len(components_data)} positioned components")
+            
+            # Add components with their calculated positions
+            for comp_data in components_data:
+                try:
+                    kicad_component = schematic.components.add(
+                        lib_id=comp_data['lib_id'],
+                        reference=comp_data['reference'],
+                        value=comp_data.get('value', ''),
+                        position=comp_data['position'],
+                        footprint=comp_data.get('footprint', None)
+                    )
+                    logger.debug(f"Added component {comp_data['reference']} at {comp_data['position']}")
+                except Exception as e:
+                    logger.error(f"Failed to add component {comp_data.get('reference')}: {e}")
+        
+        # Save using modern API
+        schematic.save(str(out_path), preserve_format=True)
+        
+        logger.info(f"Modern API: Successfully wrote {out_path}")
+        
+    except Exception as e:
+        logger.error(f"Modern API: Failed to write schematic: {e}")
+        raise
+
+
+def _extract_components_from_sexpr(schematic_expr: list) -> List[Dict]:
+    """Extract component data with positions from legacy S-expression."""
+    components = []
+    import sexpdata
+    
+    def extract_component_data(expr, path=""):
+        if isinstance(expr, list) and len(expr) > 0:
+            if isinstance(expr[0], sexpdata.Symbol) and str(expr[0]) == 'symbol':
+                # Found a component symbol
+                comp_data = {
+                    'lib_id': None,
+                    'reference': 'U',
+                    'value': '',
+                    'position': (100.0, 100.0),
+                    'footprint': None
+                }
+                
+                # Extract component properties
+                for item in expr[1:]:
+                    if isinstance(item, list) and len(item) > 1:
+                        if isinstance(item[0], sexpdata.Symbol):
+                            key = str(item[0])
+                            if key == 'lib_id' and len(item) > 1:
+                                comp_data['lib_id'] = str(item[1]).strip('"')
+                            elif key == 'at' and len(item) >= 3:
+                                try:
+                                    comp_data['position'] = (float(item[1]), float(item[2]))
+                                except (ValueError, IndexError):
+                                    pass
+                            elif key == 'property' and len(item) >= 3:
+                                prop_name = str(item[1]).strip('"')
+                                prop_value = str(item[2]).strip('"')
+                                if prop_name == 'Reference':
+                                    comp_data['reference'] = prop_value
+                                elif prop_name == 'Value':
+                                    comp_data['value'] = prop_value
+                                elif prop_name == 'Footprint':
+                                    comp_data['footprint'] = prop_value
+                
+                if comp_data['lib_id']:  # Only add if we found a valid lib_id
+                    components.append(comp_data)
+                    
+            # Recursively search nested lists
+            for item in expr:
+                if isinstance(item, list):
+                    extract_component_data(item, path)
+    
+    extract_component_data(schematic_expr)
+    return components
+
+
+def _contains_sheet_symbols(schematic_expr: list) -> bool:
+    """Check if S-expression contains sheet symbols (hierarchical design)."""
+    import sexpdata
+    
+    def find_sheets(expr):
+        if isinstance(expr, list) and len(expr) > 0:
+            if isinstance(expr[0], sexpdata.Symbol) and str(expr[0]) == 'sheet':
+                return True
+            for item in expr:
+                if isinstance(item, list) and find_sheets(item):
+                    return True
+        return False
+    
+    return find_sheets(schematic_expr)
+
+
+def _contains_component_symbols(schematic_expr: list) -> bool:
+    """Check if S-expression contains component symbols."""
+    import sexpdata
+    
+    def find_components(expr):
+        if isinstance(expr, list) and len(expr) > 0:
+            if isinstance(expr[0], sexpdata.Symbol) and str(expr[0]) == 'symbol':
+                return True
+            for item in expr:
+                if isinstance(item, list) and find_components(item):
+                    return True
+        return False
+    
+    return find_components(schematic_expr)
+
+
+def _extract_sheets_from_sexpr(schematic_expr: list) -> List[Dict]:
+    """Extract sheet symbols from legacy S-expression."""
+    sheets = []
+    import sexpdata
+    
+    def extract_sheet_data(expr):
+        if isinstance(expr, list) and len(expr) > 0:
+            if isinstance(expr[0], sexpdata.Symbol) and str(expr[0]) == 'sheet':
+                # Found a sheet symbol
+                sheet_data = {
+                    'name': 'Unknown',
+                    'file': 'unknown.kicad_sch',
+                    'position': (100.0, 100.0),
+                    'size': (50.0, 30.0),
+                    'uuid': None,
+                    'pins': []
+                }
+                
+                # Extract sheet properties
+                for item in expr[1:]:
+                    if isinstance(item, list) and len(item) > 1:
+                        if isinstance(item[0], sexpdata.Symbol):
+                            key = str(item[0])
+                            if key == 'at' and len(item) >= 3:
+                                try:
+                                    sheet_data['position'] = (float(item[1]), float(item[2]))
+                                except (ValueError, IndexError):
+                                    pass
+                            elif key == 'size' and len(item) >= 3:
+                                try:
+                                    sheet_data['size'] = (float(item[1]), float(item[2]))
+                                except (ValueError, IndexError):
+                                    pass
+                            elif key == 'property' and len(item) >= 3:
+                                prop_name = str(item[1]).strip('"')
+                                prop_value = str(item[2]).strip('"')
+                                if prop_name == 'Sheet name':
+                                    sheet_data['name'] = prop_value
+                                elif prop_name == 'Sheet file':
+                                    sheet_data['file'] = prop_value
+                            elif key == 'uuid' and len(item) > 1:
+                                sheet_data['uuid'] = str(item[1]).strip('"')
+                            elif key == 'pin' and len(item) > 1:
+                                # Extract sheet pin information
+                                pin_info = {'name': str(item[1]).strip('"'), 'type': 'input', 'position': (0, 0)}
+                                for pin_item in item[2:]:
+                                    if isinstance(pin_item, list) and len(pin_item) > 1:
+                                        if isinstance(pin_item[0], sexpdata.Symbol):
+                                            pin_key = str(pin_item[0])
+                                            if pin_key == 'at' and len(pin_item) >= 3:
+                                                pin_info['position'] = (float(pin_item[1]), float(pin_item[2]))
+                                            elif pin_key == 'type' and len(pin_item) > 1:
+                                                pin_info['type'] = str(pin_item[1])
+                                sheet_data['pins'].append(pin_info)
+                
+                sheets.append(sheet_data)
+                    
+            # Recursively search nested lists
+            for item in expr:
+                if isinstance(item, list):
+                    extract_sheet_data(item)
+    
+    extract_sheet_data(schematic_expr)
+    return sheets
+
+
+def _write_with_legacy_sexpr(schematic_expr: list, out_path: str) -> None:
+    """Legacy S-expression writing method."""
+    start_time = time.perf_counter()
+    expr_size = len(str(schematic_expr)) if schematic_expr else 0
+
+    logger.info(f"📜 LEGACY WRITER: Starting file write to {out_path}")
+    logger.info(f"📊 LEGACY WRITER: Input S-expression size: {expr_size:,} characters")
+
+    # Use the original legacy S-expression parser
+    try:
+        from circuit_synth.kicad.core.s_expression import SExpressionParser
+        parser = SExpressionParser()
+        parser.write_file(schematic_expr, out_path)
+        
+        # Analyze the output file
+        with open(out_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        total_time = time.perf_counter() - start_time
+        throughput = len(content) / (total_time * 1000) if total_time > 0 else 0
+
+        logger.info(f"📜 LEGACY WRITER: File written successfully in {total_time*1000:.2f}ms")
+        logger.info(f"📊 LEGACY WRITER: Output size: {len(content):,} characters")
+        logger.info(f"⚡ LEGACY WRITER: Throughput: {throughput:.1f} chars/ms")
+        
+    except Exception as e:
+        logger.error(f"📜 LEGACY WRITER: Failed to write schematic: {e}")
+        raise
     start_time = time.perf_counter()
     expr_size = len(str(schematic_expr)) if schematic_expr else 0
 
