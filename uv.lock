@@ -289,7 +289,7 @@ wheels = [
 
 [[package]]
 name = "circuit-synth"
-version = "0.8.29"
+version = "0.8.31"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
@@ -297,11 +297,13 @@ dependencies = [
     { name = "beautifulsoup4" },
     { name = "cachetools" },
     { name = "click" },
+    { name = "kicad-sch-api" },
     { name = "loguru" },
     { name = "lxml" },
     { name = "matplotlib" },
     { name = "networkx" },
     { name = "numpy" },
+    { name = "packaging" },
     { name = "psutil" },
     { name = "pydantic" },
     { name = "pyspice" },
@@ -367,6 +369,7 @@ requires-dist = [
     { name = "flake8", marker = "extra == 'dev'", specifier = ">=4.0.0" },
     { name = "hypothesis", marker = "extra == 'test'", specifier = ">=6.0.0" },
     { name = "isort", marker = "extra == 'dev'", specifier = ">=5.10.0" },
+    { name = "kicad-sch-api", specifier = ">=0.1.1" },
     { name = "loguru", specifier = ">=0.5.0" },
     { name = "lxml", specifier = ">=6.0.0" },
     { name = "matplotlib", specifier = ">=3.3.0" },
@@ -374,6 +377,7 @@ requires-dist = [
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=0.950" },
     { name = "networkx", specifier = ">=2.6.0" },
     { name = "numpy", specifier = ">=1.20.0" },
+    { name = "packaging", specifier = ">=21.0" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=2.17.0" },
     { name = "psutil", specifier = ">=5.9.0" },
     { name = "pydantic", specifier = ">=2.0.0" },
@@ -877,6 +881,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/70/09/d904a6e96f76ff214be59e7aa6ef7190008f52a0ab6689760a98de0bf37d/keyring-25.6.0.tar.gz", hash = "sha256:0b39998aa941431eb3d9b0d4b2460bc773b9df6fed7621c2dfb291a7e0187a66", size = 62750, upload-time = "2024-12-25T15:26:45.782Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d3/32/da7f44bcb1105d3e88a0b74ebdca50c59121d2ddf71c9e34ba47df7f3a56/keyring-25.6.0-py3-none-any.whl", hash = "sha256:552a3f7af126ece7ed5c89753650eec89c7eaae8617d0aa4d9ad2b75111266bd", size = 39085, upload-time = "2024-12-25T15:26:44.377Z" },
+]
+
+[[package]]
+name = "kicad-sch-api"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "sexpdata" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/eb/4e/c2fd364b42dc666dcdfa987c44d828ccd8af97987b75059ffe8735f4a80b/kicad_sch_api-0.1.1.tar.gz", hash = "sha256:23e8c2d65165ad35d83cbb45d25d7e43d5ed4c4d6d954a078a9f404b836f890d", size = 92854, upload-time = "2025-08-18T01:50:37.333Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/97/e1/9510ee875dce43a0ae465551cb0f00b51506365b4b8a1e5116fa0f6e29ae/kicad_sch_api-0.1.1-py3-none-any.whl", hash = "sha256:3e78d9506679a4a4ab1c10e3352f93495bcd515a7b5f31f9e7732f20280fdca9", size = 57211, upload-time = "2025-08-18T01:50:35.879Z" },
 ]
 
 [[package]]

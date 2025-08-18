@@ -28,20 +28,22 @@ logger = logging.getLogger(__name__)
 
 class ModernKiCadGenerator:
     """
-    Modern KiCad schematic generator using kicad-sch-api.
+    Modern KiCad schematic file writer using kicad-sch-api.
     
-    This generator provides enhanced functionality compared to the legacy
-    implementation, including:
-    - Exact format preservation
-    - Professional validation
+    This generator focuses ONLY on schematic file writing with exact format
+    preservation. Component placement, hierarchy, and layout are handled
+    by the legacy system and passed in as positioned data.
+    
+    Features:
+    - Exact KiCad format preservation
+    - Professional validation  
     - Symbol library caching
-    - Bulk operations
-    - Performance optimization
+    - Accepts pre-positioned components from legacy placement system
     """
     
     def __init__(self, output_dir: str = ".", project_name: str = "circuit"):
         """
-        Initialize modern generator.
+        Initialize modern schematic file writer.
         
         Args:
             output_dir: Directory for output files
@@ -64,6 +66,50 @@ class ModernKiCadGenerator:
         self._component_map = {}  # circuit_synth ref -> kicad-sch-api component
         
         logger.info(f"Initialized modern KiCad generator for {project_name}")
+    
+    def write_positioned_schematic(self, positioned_components: List[Dict], nets: List[Dict], title_info: Dict = None) -> str:
+        """
+        Write schematic file using pre-positioned components from legacy placement system.
+        
+        Args:
+            positioned_components: List of components with positions calculated by legacy system
+            nets: List of nets/connections from legacy system  
+            title_info: Title block information
+            
+        Returns:
+            str: Path to generated .kicad_sch file
+        """
+        logger.info(f"Writing positioned schematic with {len(positioned_components)} components")
+        
+        # Add positioned components
+        for comp_data in positioned_components:
+            self._add_positioned_component(comp_data)
+        
+        # Add nets (legacy system handles wire generation)
+        for net_data in nets:
+            self._add_net_data(net_data)
+        
+        # Set title block
+        if title_info:
+            self._set_title_block_from_data(title_info)
+        
+        # Save schematic
+        output_path = self.output_dir / f"{self.project_name}.kicad_sch"
+        self.schematic.save(str(output_path), preserve_format=True)
+        
+        # Create KiCad project file
+        project_file_path = self.output_dir / f"{self.project_name}.kicad_pro"
+        self._create_project_file(project_file_path)
+        
+        # Validate output
+        issues = self.schematic.validate()
+        if issues:
+            logger.warning(f"Generated schematic has {len(issues)} validation issues")
+            for issue in issues[:3]:
+                logger.warning(f"Validation: {issue}")
+        
+        logger.info(f"Generated positioned schematic: {output_path}")
+        return str(output_path)
     
     def generate_schematic(self, circuit: Circuit) -> str:
         """
@@ -378,6 +424,74 @@ class ModernKiCadGenerator:
         
         with open(project_path, 'w') as f:
             f.write(project_content)
+    
+    def _add_positioned_component(self, comp_data: Dict) -> None:
+        """Add a component with pre-calculated position from legacy system."""
+        try:
+            # Extract component information
+            lib_id = comp_data.get('symbol', comp_data.get('lib_id', 'Device:U'))
+            reference = comp_data.get('ref', comp_data.get('reference', 'U'))
+            value = comp_data.get('value', '')
+            position = comp_data.get('position', (100.0, 100.0))
+            footprint = comp_data.get('footprint', None)
+            
+            # Ensure position is a tuple of floats
+            if isinstance(position, dict):
+                pos = (float(position.get('x', 100)), float(position.get('y', 100)))
+            elif isinstance(position, (list, tuple)) and len(position) >= 2:
+                pos = (float(position[0]), float(position[1]))
+            else:
+                pos = (100.0, 100.0)
+            
+            # Add component with kicad-sch-api
+            kicad_component = self.schematic.components.add(
+                lib_id=lib_id,
+                reference=reference,
+                value=value,
+                position=pos,
+                footprint=footprint
+            )
+            
+            # Set additional properties
+            if 'properties' in comp_data:
+                for key, val in comp_data['properties'].items():
+                    kicad_component.set_property(key, str(val))
+            
+            # Track mapping
+            self._component_map[reference] = kicad_component
+            
+            logger.debug(f"Added positioned component {reference} at {pos}")
+            
+        except Exception as e:
+            logger.error(f"Failed to add positioned component {comp_data.get('ref', 'unknown')}: {e}")
+            raise
+    
+    def _add_net_data(self, net_data: Dict) -> None:
+        """Add net data from legacy system (labels only, no wires)."""
+        try:
+            # Legacy system handles hierarchical labels, not wires
+            # This is a placeholder for future net data integration
+            net_name = net_data.get('name', 'unknown')
+            logger.debug(f"Processing net data for {net_name}")
+            
+        except Exception as e:
+            logger.error(f"Failed to process net data: {e}")
+    
+    def _set_title_block_from_data(self, title_info: Dict) -> None:
+        """Set title block from legacy system data."""
+        title_block = self.schematic.title_block
+        
+        if 'title' in title_info:
+            title_block['title'] = title_info['title']
+        if 'description' in title_info:
+            title_block['comment1'] = title_info['description']
+        if 'date' in title_info:
+            title_block['date'] = title_info['date']
+        else:
+            import datetime
+            title_block['date'] = datetime.datetime.now().strftime("%Y-%m-%d")
+            
+        title_block['comment4'] = "Generated by circuit-synth with kicad-sch-api"
 
 
 def generate_kicad_schematic_modern(
