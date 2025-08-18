@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "9.0")
-	(uuid 668d320a-01a3-4223-a472-b2cbf5c93e59)
+	(uuid 59043214-6e5a-4231-a717-983fc39ff606)
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:C"
@@ -294,7 +294,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 19f4661b-1a2e-4a6d-acbe-9833a501cdec)
+		(uuid 81a3c560-645c-46a7-8755-3f1776786da0)
 		(property "Reference" "U1"
 			(at 45.72 53.42 0)
 			(effects
@@ -315,7 +315,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/becaca26-6b2a-434b-88eb-5fe3c2de06d7/e2e42613-40c1-43c1-a431-a07183353508"
+				(path "/2a0654fa-1045-468f-b8a3-fd7db58e59f5/b90961aa-833c-47d1-bf82-56f133ccd49f"
 					(reference "U1")
 					(unit 1)
 				)
@@ -331,7 +331,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid 7f3d6a48-a0ee-4ebd-945b-44114e0d8ad8)
+		(uuid cfdbf1bf-dd72-432a-b3b7-414c2d364834)
 		(property "Reference" "C2"
 			(at 71.12 53.42 0)
 			(effects
@@ -361,7 +361,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/becaca26-6b2a-434b-88eb-5fe3c2de06d7/e2e42613-40c1-43c1-a431-a07183353508"
+				(path "/2a0654fa-1045-468f-b8a3-fd7db58e59f5/b90961aa-833c-47d1-bf82-56f133ccd49f"
 					(reference "C2")
 					(unit 1)
 				)
@@ -377,7 +377,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid b82c089a-2f10-4f20-acb8-5f348f3a86f2)
+		(uuid c0e5cbc3-234a-48eb-a9c2-545af4c2ba69)
 		(property "Reference" "C3"
 			(at 91.44 53.42 0)
 			(effects
@@ -407,7 +407,7 @@
 		)
 		(instances
 			(project "ESP32_C6_Dev_Board"
-				(path "/becaca26-6b2a-434b-88eb-5fe3c2de06d7/e2e42613-40c1-43c1-a431-a07183353508"
+				(path "/2a0654fa-1045-468f-b8a3-fd7db58e59f5/b90961aa-833c-47d1-bf82-56f133ccd49f"
 					(reference "C3")
 					(unit 1)
 				)
@@ -426,7 +426,7 @@
 			)
 			(justify right)
 		)
-		(uuid 809e8669-d873-4450-9e02-060ce13fb0e6)
+		(uuid 0d3fe2be-02aa-49b2-9eea-533a9fa62d0d)
 	)
 	(hierarchical_label
 		"VBUS"
@@ -440,7 +440,7 @@
 			)
 			(justify right)
 		)
-		(uuid 455d2689-5ce6-4a9d-b0eb-26af380143da)
+		(uuid 175cd4b2-c410-4ac1-9acb-d7e2f092b4bc)
 	)
 	(hierarchical_label
 		"VBUS"
@@ -454,7 +454,7 @@
 			)
 			(justify left)
 		)
-		(uuid 0d6822f4-d873-4fb9-a067-777cf973c46a)
+		(uuid 018791cc-831b-4826-a2a1-3fd9aec19d2a)
 	)
 	(hierarchical_label
 		"GND"
@@ -468,7 +468,7 @@
 			)
 			(justify right)
 		)
-		(uuid e85e1760-cf9f-46ee-bc82-b0cad3df2f6e)
+		(uuid d4a0577c-747a-49bd-a451-2f2f5129e4f9)
 	)
 	(hierarchical_label
 		"GND"
@@ -482,7 +482,7 @@
 			)
 			(justify right)
 		)
-		(uuid 13b74f64-6a5a-42a2-99dd-ca8271cc9752)
+		(uuid 1242c811-c9fd-46f3-809b-dc98c21b2032)
 	)
 	(hierarchical_label
 		"GND"
@@ -496,7 +496,7 @@
 			)
 			(justify right)
 		)
-		(uuid 4c4bdd76-ab9a-4f71-beb8-79a1c6b44bf5)
+		(uuid fe0a0056-6d56-42ae-95cc-40835344942c)
 	)
 	(hierarchical_label
 		"GND"
@@ -510,7 +510,7 @@
 			)
 			(justify right)
 		)
-		(uuid 517f03b4-429f-4f52-a8b8-a3d146d26fa8)
+		(uuid fd6e352e-bed5-4657-b42b-9ddbe3350136)
 	)
 	(hierarchical_label
 		"VCC_3V3"
@@ -524,7 +524,7 @@
 			)
 			(justify left)
 		)
-		(uuid 0c3ad333-a75b-4fbe-a7a8-81c72870d35b)
+		(uuid 02081578-5b9f-4c2c-a1f1-a684ca1f37df)
 	)
 	(hierarchical_label
 		"VCC_3V3"
@@ -538,7 +538,7 @@
 			)
 			(justify left)
 		)
-		(uuid 91be75a4-9377-48e6-a9af-e91782a58074)
+		(uuid c56639ad-79ee-4b3d-b839-411c555598a9)
 	)
 	(hierarchical_label
 		"VCC_3V3"
@@ -552,7 +552,7 @@
 			)
 			(justify left)
 		)
-		(uuid 3b7fde58-4592-4fd8-80aa-109b9d88851e)
+		(uuid fb069b0c-c516-4455-8774-2ae5be933d73)
 	)
 	(sheet_instances
 		(path "/"

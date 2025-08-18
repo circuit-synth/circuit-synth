@@ -176,7 +176,7 @@ class FormatterTestHarness:
 
         # Format using current formatter
         parser = SExpressionParser()
-        return parser._format_sexp(schematic_sexp)
+        return parser.dumps(schematic_sexp)
 
     def _build_component_sexp(self, component: Dict) -> List:
         """Build component S-expression structure.
