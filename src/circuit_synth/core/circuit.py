@@ -476,9 +476,8 @@ class Circuit:
             >>> circuit.generate_kicad_project("esp32s3_simple")
         """
         try:
-            from ..kicad.sch_gen.main_generator import SchematicGenerator
-
-            # Python backend is used for hierarchical circuits
+            from ..kicad.config import KiCadConfig, get_recommended_generator
+            
             # Finalize references before generation
             self.finalize_references()
 
@@ -493,38 +492,53 @@ class Circuit:
                 output_dir=str(output_path),
                 generate_pcb=generate_pcb,
                 placement_algorithm=placement_algorithm,
+                generator_type=get_recommended_generator(),
             )
 
-            # Create a temporary JSON file for the circuit (will be cleaned up)
-            import tempfile
-
-            with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".json", delete=False
-            ) as temp_file:
-                temp_json_path = temp_file.name
-                self.generate_json_netlist(temp_json_path)
-
+            # Use modern kicad-sch-api for schematic generation
             try:
-                # Create schematic generator that outputs directly to the project directory
-                generator = SchematicGenerator(str(output_path.parent), project_name)
-
-                # Generate the complete project using the temporary JSON file
-                result = generator.generate_project(
-                    json_file=temp_json_path,
-                    schematic_placement=placement_algorithm,
-                    generate_pcb=generate_pcb,
-                    force_regenerate=force_regenerate,
-                    draw_bounding_boxes=draw_bounding_boxes,
-                    generate_ratsnest=generate_ratsnest,
+                from ..kicad.sch_gen.modern_generator import generate_kicad_schematic
+                
+                context_logger.info("Using modern kicad-sch-api for schematic generation", component="CIRCUIT")
+                
+                # Generate schematic using modern API
+                schematic_path = generate_kicad_schematic(
+                    circuit=self,
+                    output_dir=str(output_path),
+                    project_name=project_name
                 )
-            finally:
-                # Clean up the temporary JSON file
-                import os
-
-                try:
-                    os.unlink(temp_json_path)
-                except OSError:
-                    pass
+                
+                context_logger.info(f"Modern schematic generated: {schematic_path}", component="CIRCUIT")
+                
+                # For PCB generation, use legacy system (as specified in PRD)
+                if generate_pcb:
+                    from ..kicad.sch_gen.main_generator import SchematicGenerator
+                    
+                    # Create a temporary JSON file for PCB generation
+                    import tempfile
+                    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as temp_file:
+                        temp_json_path = temp_file.name
+                        self.generate_json_netlist(temp_json_path)
+                    
+                    try:
+                        generator = SchematicGenerator(str(output_path.parent), project_name)
+                        pcb_result = generator.generate_pcb_from_schematics(
+                            placement_algorithm=placement_algorithm,
+                        )
+                        context_logger.info("PCB generation completed using legacy system", component="CIRCUIT")
+                    finally:
+                        import os
+                        try:
+                            os.unlink(temp_json_path)
+                        except OSError:
+                            pass
+                
+                # Create successful result
+                result = {"success": True, "schematic_path": schematic_path}
+                
+            except Exception as e:
+                context_logger.error(f"Modern API failed: {e}", component="CIRCUIT")
+                raise CircuitSynthError(f"KiCad schematic generation failed: {e}")
 
             if result.get("success", True):  # Default to success if not specified
                 context_logger.info(
