@@ -43,6 +43,12 @@ class SExpressionParser:
 
     def __init__(self):
         """Initialize the parser."""
+        import os
+        
+        # Check environment variables for formatter options
+        self.use_clean_formatter = os.environ.get("CIRCUIT_SYNTH_USE_CLEAN_FORMATTER", "").lower() in ("1", "true", "yes")
+        self.shadow_mode = os.environ.get("CIRCUIT_SYNTH_SHADOW_MODE", "").lower() in ("1", "true", "yes")
+        
         self._clean_formatter = CleanSExprFormatter()
         logger.info("S-expression parser initialized with clean formatter")
 

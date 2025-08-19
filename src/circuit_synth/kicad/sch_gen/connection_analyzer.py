@@ -119,20 +119,31 @@ class ConnectionAnalyzer:
 
         return connections
     
-    def get_placement_order(self, components: List[str]) -> List[str]:
+    def get_placement_order(self, components) -> List[str]:
         """
         Get optimal placement order for components based on connections.
         
         Args:
-            components: List of component references to order
+            components: List of component references to order (can be strings or SchematicSymbol objects)
             
         Returns:
             List of component references in optimal placement order
         """
+        # Handle both string component refs and SchematicSymbol objects
+        def get_component_ref(comp):
+            if isinstance(comp, str):
+                return comp
+            else:
+                # Assume it's a SchematicSymbol with a ref attribute
+                return getattr(comp, 'ref', str(comp))
+        
+        # Extract component references
+        comp_refs = [get_component_ref(comp) for comp in components]
+        
         # Simple implementation: sort by number of connections (most connected first)
         def connection_count(comp_ref):
             return len(self.get_connections(comp_ref))
         
-        ordered = sorted(components, key=connection_count, reverse=True)
+        ordered = sorted(comp_refs, key=connection_count, reverse=True)
         logger.debug(f"Placement order: {ordered}")
         return ordered
