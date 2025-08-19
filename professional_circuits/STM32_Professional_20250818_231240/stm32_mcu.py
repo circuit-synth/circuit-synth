@@ -1,0 +1,1 @@
+# STM32 MCU template (abbreviated for space)
