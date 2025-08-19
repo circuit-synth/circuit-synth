@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-Circuit Design Chat Interface
+NEW Circuit Design Chat Interface
 
-Natural conversation interface for circuit design with ESP32/STM32 expertise.
-No pre-made patterns - just smart circuit generation through conversation.
+Professional hierarchical circuit generation with proper components:
+- Always generates hierarchical projects (like example_project/circuit-synth/)
+- Includes proper passives (decoupling caps, pull-ups, regulators)
+- Asks clarifying questions when needed
+- Adds ESD protection and CC resistors for USB circuits
 """
 
 import asyncio
@@ -12,421 +15,331 @@ import sys
 import readline
 from datetime import datetime
 from pathlib import Path
-from typing import List
+from typing import List, Dict, Any
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
+from circuit_synth.fast_generation.core import FastCircuitGenerator
 from circuit_synth.fast_generation.models import OpenRouterModel
-from circuit_synth.fast_generation.pin_finder import pin_finder
 
 
-class CircuitChat:
-    """Conversational circuit design assistant"""
+class ProfessionalCircuitChat:
+    """Professional circuit design chat with hierarchical generation"""
     
     def __init__(self):
-        self.model = None
+        self.fast_generator = FastCircuitGenerator()
         self.conversation_history = []
         self.session_start = datetime.now()
+        self.pending_generation = None  # Track if we're waiting for answers to questions
         
-    def log_exchange(self, user_msg: str, assistant_msg: str, metadata: dict = None):
-        """Log a complete conversation exchange"""
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        self.conversation_history.append({
-            "timestamp": timestamp,
-            "user": user_msg,
-            "assistant": assistant_msg,
-            "metadata": metadata or {}
-        })
-    
-    def build_context(self) -> str:
-        """Build comprehensive context for circuit design"""
-        context = """You are a professional circuit design engineer specializing in ESP32 and STM32 circuits using circuit-synth.
-
-## CIRCUIT-SYNTH SYNTAX (CRITICAL):
-```python
-from circuit_synth import *
-
-@circuit(name="CircuitName")
-def my_circuit():
-    # Create nets first
-    vcc_3v3 = Net('VCC_3V3')  
-    gnd = Net('GND')
-    
-    # Create components with EXACT verified symbols
-    mcu = Component(
-        symbol="RF_Module:ESP32-C6-MINI-1",
-        ref="U",
-        footprint="RF_Module:ESP32-C6-MINI-1"
-    )
-    
-    # Connect pins - NO .pin() method!
-    mcu["3V3"] += vcc_3v3
-    mcu["GND"] += gnd
-    
-if __name__ == "__main__":
-    circuit = my_circuit()
-    circuit.generate_kicad_project(
-        project_name="MyProject",
-        placement_algorithm="hierarchical",
-        generate_pcb=True
-    )
-    print("✅ KiCad project generated!")
-```
-
-## VERIFIED WORKING COMPONENTS:
-
-### ESP32 Family:
-- **ESP32-C6**: symbol="RF_Module:ESP32-C6-MINI-1", footprint="RF_Module:ESP32-C6-MINI-1"
-  - Pins: "3V3", "GND", "IO0"-"IO23", "TXD0", "RXD0", "EN", "IO18"(USB_D+), "IO19"(USB_D-)
-  - Features: WiFi 6, Bluetooth 5, Thread/Zigbee, USB support
-- **ESP32-S3**: symbol="MCU_Espressif:ESP32-S3", footprint="Package_DFN_QFN:QFN-56-1EP_7x7mm_P0.4mm_EP5.6x5.6mm"
-  - Pins: "VDD", "VSS", "EN", "IO0"-"IO48", "USB_DM", "USB_DP", "XTAL_P", "XTAL_N"
-  - Features: Dual-core, AI acceleration, camera support
-
-### STM32 Family:
-- **STM32F411**: symbol="MCU_ST_STM32F4:STM32F411CEUx", footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
-  - Pins: "VDD", "VSS", "PA0"-"PA15", "PB0"-"PB15", "PC13"-"PC15", "NRST", "BOOT0"
-  - Features: 100MHz ARM Cortex-M4, USB OTG, low power
-- **STM32F407**: symbol="MCU_ST_STM32F4:STM32F407VETx", footprint="Package_QFP:LQFP-100_14x14mm_P0.5mm"
-  - Pins: "VDD", "VDDA", "VSS", "VSSA", "PA0"-"PA15", "PB0"-"PB15", etc.
-  - Features: 168MHz, FPU, Ethernet, CAN
-
-### Common Components:
-- **Resistor**: symbol="Device:R", footprint="Resistor_SMD:R_0603_1608Metric"
-- **Capacitor**: symbol="Device:C", footprint="Capacitor_SMD:C_0603_1608Metric"
-- **LED**: symbol="Device:LED", footprint="LED_SMD:LED_0603_1608Metric"
-- **Crystal**: symbol="Device:Crystal", footprint="Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm"
-- **USB-C**: symbol="Connector:USB_C_Receptacle_USB2.0_16P", footprint="Connector_USB:USB_C_Receptacle_GCT_USB4085"
-- **Header**: symbol="Connector_Generic:Conn_01x10", footprint="Connector_PinHeader_2.54mm:PinHeader_1x10_P2.54mm_Vertical"
-
-## DESIGN PATTERNS:
-
-### ESP32 Development Board:
-- USB-C connector with CC resistors (5.1k to GND)
-- 3.3V LDO regulator (AMS1117-3.3 or similar)  
-- Crystal oscillator (40MHz for ESP32-S3, internal for ESP32-C6)
-- Reset button, boot button
-- Status LED on GPIO pin
-- Debug header (UART, power, EN, GPIO0)
-- Decoupling capacitors (100nF, 10uF)
-
-### STM32 Development Board:
-- External crystal (8MHz HSE)
-- SWD debug connector (SWDIO, SWCLK, VCC, GND, NRST)
-- Reset button with 10k pullup
-- BOOT0 jumper/button
-- 3.3V regulation from USB or external
-- Decoupling on all VDD pins
-- User LED and button
-
-### Power Supply Design:
-- USB input protection (fuse, ESD)
-- 5V to 3.3V regulation (linear or switching)
-- Power indicator LED
-- Bulk and decoupling capacitors
-- Enable/shutdown control
-
-## CONVERSATION STYLE:
-- Ask clarifying questions about requirements
-- Suggest appropriate components based on needs
-- Generate complete working circuit-synth code
-- Explain design decisions
-- Provide practical engineering advice
-- Generate files that actually work when run
-
-## CRITICAL RULES:
-1. NEVER use markdown code fences - output raw Python only
-2. Use EXACT symbol names from verified list above
-3. Use component["pin"] += net syntax (NOT .pin())
-4. Always include @circuit decorator and __main__ section
-5. Test knowledge - if unsure about pins, say so
-6. Focus on practical, manufacturable designs
-"""
-        return context
-    
-    async def initialize_model(self):
-        """Initialize the OpenRouter model"""
-        print("🔧 Initializing Circuit Design AI...")
+    async def initialize(self):
+        """Initialize the chat system"""
+        print("🔧 Initializing Professional Circuit Design AI...")
         
-        api_key = os.getenv("OPENROUTER_API_KEY") 
+        # Check API key
+        api_key = os.getenv("OPENROUTER_API_KEY")
         if not api_key:
-            print("❌ OPENROUTER_API_KEY not set!")
-            print("   Set it with: export OPENROUTER_API_KEY=your_key_here")
+            print("❌ OpenRouter API key not found!")
+            print("   Set: export OPENROUTER_API_KEY=your_key_here")
             return False
         
         print(f"✅ API Key found: {api_key[:10]}...")
-        
-        try:
-            self.model = OpenRouterModel(
-                api_key=api_key,
-                model="google/gemini-2.5-flash"
-            )
-            print("✅ Circuit design AI ready")
-            return True
-        except Exception as e:
-            print(f"❌ Failed to initialize AI: {e}")
-            return False
+        print("✅ Professional circuit design AI ready")
+        return True
     
-    def _extract_components_from_message(self, message: str) -> List[str]:
-        """Extract likely component symbols from user message"""
-        components = []
+    def analyze_request(self, message: str) -> Dict[str, Any]:
+        """Analyze user request to determine circuit requirements"""
+        message_lower = message.lower()
         
-        # Common component mappings
-        component_map = {
-            # ESP32 variants
-            "esp32-s3": "MCU_Espressif:ESP32-S3",
-            "esp32-c6": "RF_Module:ESP32-C6-MINI-1",
-            "esp32": "RF_Module:ESP32-C6-MINI-1",  # Default to C6
-            
-            # STM32 variants  
-            "stm32f411": "MCU_ST_STM32F4:STM32F411CEUx",
-            "stm32f407": "MCU_ST_STM32F4:STM32F407VETx",
-            "stm32": "MCU_ST_STM32F4:STM32F411CEUx",  # Default to F411
-            
-            # Common components
-            "resistor": "Device:R",
-            "capacitor": "Device:C", 
-            "led": "Device:LED",
-            "crystal": "Device:Crystal",
-            "usb-c": "Connector:USB_C_Receptacle_USB2.0_16P",
-            "usb_c": "Connector:USB_C_Receptacle_USB2.0_16P",
-            "imu": "Sensor_Motion:MPU-6050",
-            "temperature": "Sensor_Temperature:DS18B20",
-            "temp": "Sensor_Temperature:DS18B20"
+        analysis = {
+            "mcu_type": None,
+            "needs_usb": False,
+            "needs_power_reg": False,
+            "peripherals": [],
+            "questions": []
         }
         
-        message_lower = message.lower()
-        for keyword, symbol in component_map.items():
+        # Detect MCU
+        if "esp32" in message_lower:
+            if "s3" in message_lower:
+                analysis["mcu_type"] = "ESP32-S3"
+            elif "c6" in message_lower:
+                analysis["mcu_type"] = "ESP32-C6"
+            else:
+                analysis["mcu_type"] = "ESP32"
+                analysis["questions"].append("Which ESP32? (S3 recommended for USB, C6 for WiFi 6)")
+                
+        elif "stm32" in message_lower:
+            if "f411" in message_lower:
+                analysis["mcu_type"] = "STM32F411"
+            else:
+                analysis["mcu_type"] = "STM32"
+                analysis["questions"].append("Which STM32? (F411 recommended for general use)")
+        
+        # Detect USB requirement  
+        if any(term in message_lower for term in ["usb", "usb-c", "programming"]):
+            analysis["needs_usb"] = True
+            analysis["needs_power_reg"] = True
+        
+        # Detect peripherals
+        peripherals = {
+            "imu": "MPU-6050 IMU sensor",
+            "mpu": "MPU-6050 IMU sensor", 
+            "neopixel": "WS2812B NeoPixel LEDs",
+            "led": "Status LEDs",
+            "motor": "Motor control",
+            "stepper": "Stepper motor",
+            "temperature": "Temperature sensor",
+            "display": "Display interface"
+        }
+        
+        for keyword, description in peripherals.items():
             if keyword in message_lower:
-                components.append(symbol)
+                analysis["peripherals"].append(description)
         
-        return list(set(components))  # Remove duplicates
-
-    async def chat(self, user_message: str) -> str:
-        """Have a conversation about circuit design"""
-        if not self.model:
-            return "❌ AI not initialized"
+        return analysis
+    
+    def ask_questions(self, analysis: Dict[str, Any]) -> str:
+        """Generate clarifying questions"""
+        questions = analysis["questions"].copy()
         
-        # Extract likely components from user message
-        components = self._extract_components_from_message(user_message)
+        # Add specific questions based on peripherals
+        if "Motor control" in analysis["peripherals"] or "Stepper motor" in analysis["peripherals"]:
+            questions.append("Motor voltage? (12V typical for steppers)")
+            
+        if "WS2812B NeoPixel LEDs" in analysis["peripherals"]:
+            questions.append("How many NeoPixels? (affects power requirements)")
         
-        # Build conversation history for context
-        conversation_context = ""
-        for exchange in self.conversation_history[-5:]:  # Last 5 exchanges
-            conversation_context += f"User: {exchange['user']}\nAssistant: {exchange['assistant']}\n\n"
+        if not questions:
+            return None
+            
+        question_text = "🤔 I need a few details to create the best design:\n\n"
+        for i, q in enumerate(questions, 1):
+            question_text += f"  {i}. {q}\n"
+        question_text += "\n💡 Or say 'use defaults' and I'll make good engineering choices!"
         
-        # Build full prompt with pin finding instruction
-        full_prompt = f"""Previous conversation:
-{conversation_context}
-
-Current user message: {user_message}
-
-INSTRUCTIONS: You are a professional circuit design engineer. 
-
-If the user is asking for a complete circuit design:
-1. FIRST identify the components needed
-2. Get exact pin information for each component (this is critical!)
-3. Generate working circuit-synth Python code with correct pin names
-4. Use the @circuit decorator and proper syntax
-
-If they're asking questions or need clarification, provide helpful guidance about ESP32/STM32 circuit design.
-
-CRITICAL: Never guess pin names - use exact pin names from component datasheets."""
-
+        return question_text
+    
+    async def generate_professional_project(self, user_message: str, analysis: Dict[str, Any]) -> str:
+        """Generate a professional hierarchical project"""
         try:
-            # Get pin information for detected components
-            pin_info = ""
-            if components:
-                print(f"🔍 Found components: {', '.join(components)}")
-                print("📍 Getting pin information...")
-                
-                pin_parts = []
-                for symbol in components:
-                    try:
-                        pin_data = pin_finder.get_pin_info_for_ai(symbol)
-                        pin_parts.append(pin_data)
-                    except Exception as e:
-                        pin_parts.append(f"❌ Could not get pins for {symbol}: {e}")
-                
-                pin_info = "\n\n".join(pin_parts)
+            # Determine project type
+            if analysis["mcu_type"] and "ESP32" in analysis["mcu_type"]:
+                project_type = "esp32_complete_board"
+                mcu_name = analysis["mcu_type"]
+            elif analysis["mcu_type"] and "STM32" in analysis["mcu_type"]:
+                project_type = "stm32_complete_board" 
+                mcu_name = analysis["mcu_type"]
+            else:
+                return "❌ Please specify ESP32 or STM32 for circuit generation"
             
-            # Get AI response with pin information
-            context = {
-                "conversation_context": conversation_context,
-                "components": components,
-                "pin_information": pin_info
-            }
+            # Create project
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            project_name = f"{mcu_name}_Professional_{timestamp}"
+            output_dir = Path("professional_circuits")
             
-            response = await self.model.generate_circuit(
-                full_prompt, 
-                context,
-                max_tokens=4000
+            print(f"🏗️  Generating professional {project_type}...")
+            
+            result = self.fast_generator.generate_hierarchical_project(
+                project_type=project_type,
+                output_dir=output_dir,
+                project_name=project_name
             )
             
-            if response.success:
-                # Clean up response (remove markdown if present)
-                content = response.content.strip()
+            if not result["success"]:
+                return f"❌ Generation failed: {result.get('error')}"
+            
+            project_path = Path(result["project_path"])
+            
+            # Success response
+            response = f"✅ **Professional {mcu_name} Circuit Generated!**\n\n"
+            response += f"📁 **Project:** {project_path}\n\n"
+            
+            # Show hierarchical structure
+            if project_path.exists():
+                py_files = sorted(project_path.glob("*.py"))
+                response += f"🏗️  **Hierarchical Architecture** ({len(py_files)} subcircuits):\n"
                 
-                # Remove code fences more thoroughly
-                lines = content.split('\n')
-                clean_lines = []
-                
-                for line in lines:
-                    line_clean = line.strip()
-                    # Skip markdown fence lines
-                    if line_clean in ['```python', '```', '```py']:
-                        continue
-                    clean_lines.append(line)
-                
-                content = '\n'.join(clean_lines).strip()
-                
-                # Log the exchange
-                metadata = {
-                    "tokens": response.tokens_used,
-                    "latency_ms": response.latency_ms,
-                    "model": response.model
-                }
-                self.log_exchange(user_message, content, metadata)
-                
-                return content
-            else:
-                error_msg = f"❌ AI Error: {response.error}"
-                self.log_exchange(user_message, error_msg)
-                return error_msg
-                
+                for file_path in py_files:
+                    if file_path.name == "main.py":
+                        response += f"   📋 {file_path.name} - Project orchestrator\n"
+                    elif "usb" in file_path.name:
+                        response += f"   🔌 {file_path.name} - USB-C + CC resistors + ESD protection\n"
+                    elif "power" in file_path.name:
+                        response += f"   ⚡ {file_path.name} - 5V→3.3V regulation + filtering\n"
+                    elif "mcu" in file_path.name:
+                        response += f"   🧠 {file_path.name} - {mcu_name} + decoupling + support\n"
+                    elif "debug" in file_path.name:
+                        response += f"   🔧 {file_path.name} - Debug/programming interface\n"
+                    elif "led" in file_path.name:
+                        response += f"   💡 {file_path.name} - Status LEDs + current limiting\n"
+                    else:
+                        response += f"   📄 {file_path.name}\n"
+            
+            # Professional features
+            response += f"\n🎯 **Professional Features:**\n"
+            if analysis["needs_usb"]:
+                response += f"   ✅ USB-C with CC1/CC2 pull-down resistors (5.1kΩ)\n"
+                response += f"   ✅ ESD protection (USBLC6-2P6) on data lines\n"
+            if analysis["needs_power_reg"]:
+                response += f"   ✅ Clean 5V→3.3V regulation (AMS1117-3.3)\n"
+                response += f"   ✅ Input/output filtering capacitors\n"
+            response += f"   ✅ Decoupling capacitors on all power rails\n"
+            response += f"   ✅ Pull-up resistors where needed (EN, I2C)\n"
+            response += f"   ✅ Debug interface for development\n"
+            response += f"   ✅ Modular design like example_project/circuit-synth/\n"
+            
+            # Usage instructions
+            response += f"\n🚀 **To Use This Project:**\n"
+            response += f"```bash\n"
+            response += f"cd {project_path}\n"
+            response += f"python3 main.py  # Generate complete KiCad project\n"
+            response += f"```\n\n"
+            response += f"🔍 **Each subcircuit can be tested individually!**"
+            
+            # Log successful generation
+            self.conversation_history.append({
+                "timestamp": datetime.now().strftime("%H:%M:%S"),
+                "user": user_message,
+                "assistant": response,
+                "metadata": {"project_path": str(project_path), "success": True}
+            })
+            
+            return response
+            
         except Exception as e:
-            error_msg = f"❌ Chat error: {e}"
-            self.log_exchange(user_message, error_msg)
+            error_msg = f"❌ Generation error: {e}"
+            self.conversation_history.append({
+                "timestamp": datetime.now().strftime("%H:%M:%S"),
+                "user": user_message, 
+                "assistant": error_msg,
+                "metadata": {"success": False, "error": str(e)}
+            })
             return error_msg
     
-    def show_history(self):
+    async def chat(self, user_message: str) -> str:
+        """Main chat interface"""
+        
+        # Handle commands
+        if user_message.lower() in ['history', 'h']:
+            return self.show_history()
+        elif user_message.lower() in ['quit', 'exit', 'q']:
+            return "👋 Thanks for using Professional Circuit Chat!"
+        
+        # Analyze the user's request
+        analysis = self.analyze_request(user_message)
+        
+        # Check if this is a follow-up to questions
+        if self.pending_generation and not user_message.lower().startswith(('make', 'create', 'design', 'build')):
+            # This is a follow-up response, use the pending analysis and generate
+            original_analysis = self.pending_generation
+            self.pending_generation = None  # Clear pending state
+            return await self.generate_professional_project(f"ESP32-S3 with {', '.join(original_analysis['peripherals'])}", original_analysis)
+        
+        # Ask questions if needed (unless they want defaults)
+        if "default" not in user_message.lower():
+            questions = self.ask_questions(analysis)
+            if questions:
+                # Store the analysis for when they answer
+                self.pending_generation = analysis
+                self.conversation_history.append({
+                    "timestamp": datetime.now().strftime("%H:%M:%S"),
+                    "user": user_message,
+                    "assistant": questions,
+                    "metadata": {"type": "questions"}
+                })
+                return questions
+        
+        # Generate professional project if they want a circuit
+        if analysis["mcu_type"]:
+            return await self.generate_professional_project(user_message, analysis)
+        
+        # For general questions, provide helpful guidance
+        response = "💡 I specialize in generating **professional hierarchical circuit projects**.\n\n"
+        response += "🎯 **I can create:**\n"
+        response += "   • ESP32 development boards (with S3/C6 variants)\n"
+        response += "   • STM32 development boards (F411 recommended)\n" 
+        response += "   • Complete projects with USB-C, power regulation, ESD protection\n"
+        response += "   • Hierarchical designs like example_project/circuit-synth/\n\n"
+        response += "💬 **Try saying:**\n"
+        response += "   • 'Make an ESP32-S3 board with IMU and NeoPixels'\n"
+        response += "   • 'Create STM32F411 development board'\n"
+        response += "   • 'ESP32 with USB-C and temperature sensor'\n"
+        
+        return response
+    
+    def show_history(self) -> str:
         """Show conversation history"""
-        print("\n" + "=" * 80)
-        print("📜 CONVERSATION HISTORY")
-        print("=" * 80)
+        if not self.conversation_history:
+            return "📝 No conversation history yet."
         
-        for i, exchange in enumerate(self.conversation_history, 1):
-            print(f"\n[{exchange['timestamp']}] Exchange #{i}")
-            print("-" * 40)
-            print(f"👤 YOU: {exchange['user']}")
-            print()
-            print(f"🤖 ASSISTANT:")
+        history = "📝 **Conversation History:**\n\n"
+        for i, exchange in enumerate(self.conversation_history[-5:], 1):
+            history += f"**{i}. {exchange['timestamp']}**\n"
+            history += f"👤 User: {exchange['user'][:100]}{'...' if len(exchange['user']) > 100 else ''}\n"
             
-            # Format assistant response nicely
-            assistant_msg = exchange['assistant']
-            if len(assistant_msg) > 500:
-                lines = assistant_msg.split('\n')
-                if len(lines) > 20:
-                    # Show first 10 and last 5 lines for code
-                    for line in lines[:10]:
-                        print(f"   {line}")
-                    print("   ... (truncated) ...")
-                    for line in lines[-5:]:
-                        print(f"   {line}")
-                else:
-                    for line in lines:
-                        print(f"   {line}")
-            else:
-                for line in assistant_msg.split('\n'):
-                    print(f"   {line}")
+            assistant_msg = exchange['assistant'][:200]
+            history += f"🤖 Assistant: {assistant_msg}{'...' if len(exchange['assistant']) > 200 else ''}\n"
             
-            # Show metadata
-            if 'metadata' in exchange and exchange['metadata']:
-                meta = exchange['metadata']
-                if 'tokens' in meta:
-                    print(f"\n   📊 {meta['tokens']} tokens, {meta.get('latency_ms', 0):.0f}ms")
-            print()
-    
-    def save_code_if_present(self, response: str) -> bool:
-        """Save code to file if the response contains circuit code"""
-        if "from circuit_synth import" in response and "@circuit" in response:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"circuit_{timestamp}.py"
+            if exchange.get('metadata', {}).get('project_path'):
+                history += f"   📁 Generated: {exchange['metadata']['project_path']}\n"
             
-            with open(filename, 'w') as f:
-                f.write(response)
-            
-            print(f"\n💾 Circuit code saved to: {filename}")
-            print("   Run with: python " + filename)
-            return True
-        return False
-    
-    async def run(self):
-        """Main chat loop"""
-        print("=" * 80)
-        print("🎛️  CIRCUIT DESIGN CHAT")
-        print("=" * 80)
-        print("💬 Natural conversation interface for ESP32/STM32 circuit design")
-        print("🎯 Just describe what you want to build!")
-        print()
-        print("Examples:")
-        print("  'I need an ESP32 board with USB-C and a temperature sensor'")
-        print("  'Design an STM32F411 development board with SWD debug'")
-        print("  'How do I add a crystal oscillator to my ESP32?'")
-        print("  'Show me a simple LED blinker circuit'")
-        print()
-        print("Commands: 'history' (show chat), 'quit' (exit)")
-        print("=" * 80)
+            history += "\n"
         
-        # Initialize
-        if not await self.initialize_model():
-            return
-        
-        print("\n💬 Ready! What circuit do you want to design?")
-        
-        while True:
-            try:
-                # Get user input  
-                user_input = input("\n🎛️  > ").strip()
-                
-                if not user_input:
-                    continue
-                
-                # Handle special commands
-                if user_input.lower() in ['quit', 'exit', 'bye']:
-                    print("\n👋 Happy circuit designing!")
-                    break
-                
-                elif user_input.lower() == 'history':
-                    self.show_history()
-                    continue
-                
-                elif user_input.lower() == 'help':
-                    print("\n🎯 Just describe your circuit needs naturally!")
-                    print("Examples:")
-                    print("  - 'ESP32 board with WiFi and temperature sensor'")
-                    print("  - 'STM32 motor controller with encoder feedback'")
-                    print("  - 'USB-C power supply for 3.3V circuits'")
-                    print("  - 'How do I connect an IMU to ESP32?'")
-                    continue
-                
-                # Get AI response
-                print("\n🤖 Thinking...")
-                response = await self.chat(user_input)
-                
-                # Show response
-                print("\n" + "=" * 80)
-                print(response)
-                print("=" * 80)
-                
-                # Save code if generated
-                self.save_code_if_present(response)
-                
-            except KeyboardInterrupt:
-                print("\n\n👋 Goodbye!")
-                break
-            except EOFError:
-                print("\n\n👋 Goodbye!")
-                break
-            except Exception as e:
-                print(f"\n❌ Error: {e}")
+        return history
 
 
 async def main():
-    """Main entry point"""
-    chat = CircuitChat()
-    await chat.run()
+    """Main chat loop"""
+    chat = ProfessionalCircuitChat()
+    
+    # Initialize
+    if not await chat.initialize():
+        return
+    
+    # Show welcome
+    print()
+    print("=" * 80)
+    print("🎛️  PROFESSIONAL CIRCUIT DESIGN CHAT")
+    print("=" * 80)
+    print("🏗️  Generates hierarchical projects like example_project/circuit-synth/")
+    print("⚡ Includes proper passives, regulators, and ESD protection")
+    print("🤔 Asks questions to ensure optimal design")
+    print()
+    print("💬 Examples:")
+    print("   'Make an ESP32-S3 board with IMU and USB-C'")
+    print("   'Create STM32F411 development board'")
+    print("   'ESP32 with NeoPixels and temperature sensor'")
+    print()
+    print("Commands: 'history' (show chat), 'quit' (exit)")
+    print("=" * 80)
+    print("💬 Ready! What professional circuit do you want to design?")
+    print()
+    
+    # Chat loop
+    try:
+        while True:
+            user_input = input("🎛️  > ").strip()
+            
+            if not user_input:
+                continue
+                
+            if user_input.lower() in ['quit', 'exit', 'q']:
+                print("\\n👋 Thanks for using Professional Circuit Chat!")
+                break
+            
+            print("\\n🤖 Thinking...")
+            response = await chat.chat(user_input)
+            
+            print()
+            print(response)
+            print()
+            
+    except KeyboardInterrupt:
+        print("\\n\\n👋 Chat interrupted by user")
+    except Exception as e:
+        print(f"\\n❌ Chat error: {e}")
 
 
 if __name__ == "__main__":

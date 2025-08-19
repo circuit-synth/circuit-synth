@@ -40,6 +40,27 @@ def esp32_basic(VCC_3V3, VCC_5V, GND, USB_DP, USB_DM):
         footprint="Capacitor_SMD:C_0805_2012Metric"
     )
     
+    cap_bypass1 = Component(
+        symbol="Device:C",
+        ref="C",
+        value="100nF", 
+        footprint="Capacitor_SMD:C_0603_1608Metric"
+    )
+    
+    cap_bypass2 = Component(
+        symbol="Device:C",
+        ref="C",
+        value="100nF", 
+        footprint="Capacitor_SMD:C_0603_1608Metric"
+    )
+    
+    # EN pull-up resistor
+    en_pullup = Component(
+        symbol="Device:R",
+        ref="R",
+        value="10k",
+        footprint="Resistor_SMD:R_0603_1608Metric"
+    )
     
     # Debug header for programming
     debug_header = Component(
@@ -67,7 +88,14 @@ def esp32_basic(VCC_3V3, VCC_5V, GND, USB_DP, USB_DM):
     # Power supply decoupling
     cap_bulk["1"] += VCC_3V3
     cap_bulk["2"] += GND
-
+    cap_bypass1["1"] += VCC_3V3
+    cap_bypass1["2"] += GND
+    cap_bypass2["1"] += VCC_3V3
+    cap_bypass2["2"] += GND
+    
+    # EN pull-up
+    en_pullup["1"] += VCC_3V3
+    en_pullup["2"] += esp32["EN"]
 
     # Debug header connections
     debug_header["1"] += VCC_3V3  # Power

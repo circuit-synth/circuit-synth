@@ -13,6 +13,7 @@ from datetime import datetime
 
 from .models import OpenRouterModel, GoogleADKModel, ModelResponse
 from .patterns import CircuitPatterns, PatternType, PatternTemplate
+from .project_templates import ProjectTemplateGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,9 @@ class FastCircuitGenerator:
         
         # Load patterns
         self.patterns = CircuitPatterns()
+        
+        # Project template generator
+        self.project_generator = ProjectTemplateGenerator()
         
         # Performance tracking
         self.generation_stats = {
@@ -379,3 +383,63 @@ IMPORTANT: Only use the exact KiCad symbols and footprints specified above.
                 results[pattern.value] = {"success": False, "error": str(e)}
         
         return results
+    
+    def generate_hierarchical_project(
+        self,
+        project_type: str,
+        output_dir: Path,
+        project_name: str = None
+    ) -> Dict[str, Any]:
+        """
+        Generate complete hierarchical project with separate subcircuit files
+        
+        Args:
+            project_type: Type of project ("esp32_complete_board", "stm32_complete_board")
+            output_dir: Directory to create project in
+            project_name: Name for the project directory (defaults to project_type)
+            
+        Returns:
+            Dict with success status and project information
+        """
+        try:
+            if project_name is None:
+                project_name = project_type
+            
+            project_path = output_dir / project_name
+            success = self.project_generator.generate_project(project_type, output_dir, project_name)
+            
+            if success:
+                return {
+                    "success": True,
+                    "project_path": str(project_path),
+                    "project_type": project_type,
+                    "files_created": self._count_project_files(project_path),
+                    "message": f"✅ Hierarchical project '{project_name}' created successfully"
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": f"Failed to generate project type: {project_type}",
+                    "message": f"❌ Project generation failed"
+                }
+                
+        except Exception as e:
+            logger.error(f"❌ Hierarchical project generation failed: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "message": f"❌ Exception during project generation: {e}"
+            }
+    
+    def _count_project_files(self, project_path: Path) -> int:
+        """Count files created in the project"""
+        try:
+            if project_path.exists():
+                return len([f for f in project_path.iterdir() if f.is_file()])
+            return 0
+        except Exception:
+            return 0
+    
+    def list_available_project_types(self) -> List[str]:
+        """List available hierarchical project types"""
+        return list(self.project_generator.templates.keys())
