@@ -118,3 +118,21 @@ class ConnectionAnalyzer:
                 connections.append((connected_ref, weight))
 
         return connections
+    
+    def get_placement_order(self, components: List[str]) -> List[str]:
+        """
+        Get optimal placement order for components based on connections.
+        
+        Args:
+            components: List of component references to order
+            
+        Returns:
+            List of component references in optimal placement order
+        """
+        # Simple implementation: sort by number of connections (most connected first)
+        def connection_count(comp_ref):
+            return len(self.get_connections(comp_ref))
+        
+        ordered = sorted(components, key=connection_count, reverse=True)
+        logger.debug(f"Placement order: {ordered}")
+        return ordered

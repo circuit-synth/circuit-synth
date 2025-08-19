@@ -476,9 +476,8 @@ class Circuit:
             >>> circuit.generate_kicad_project("esp32s3_simple")
         """
         try:
-            from ..kicad.sch_gen.main_generator import SchematicGenerator
-
-            # Python backend is used for hierarchical circuits
+            from ..kicad.config import KiCadConfig, get_recommended_generator
+            
             # Finalize references before generation
             self.finalize_references()
 
@@ -493,7 +492,13 @@ class Circuit:
                 output_dir=str(output_path),
                 generate_pcb=generate_pcb,
                 placement_algorithm=placement_algorithm,
+                generator_type=get_recommended_generator(),
             )
+
+            # Use legacy system for positioning/hierarchy, modern API for file writing
+            from ..kicad.sch_gen.main_generator import SchematicGenerator
+
+            context_logger.info("Using hybrid approach: legacy positioning + modern kicad-sch-api file writing", component="CIRCUIT")
 
             # Create a temporary JSON file for the circuit (will be cleaned up)
             import tempfile
@@ -509,6 +514,7 @@ class Circuit:
                 generator = SchematicGenerator(str(output_path.parent), project_name)
 
                 # Generate the complete project using the temporary JSON file
+                # Legacy system handles placement, modern API handles file writing via write_schematic_file
                 result = generator.generate_project(
                     json_file=temp_json_path,
                     schematic_placement=placement_algorithm,
