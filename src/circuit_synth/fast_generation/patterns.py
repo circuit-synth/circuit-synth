@@ -41,7 +41,7 @@ class PatternTemplate:
     name: str
     description: str
     components: List[ComponentSpec]
-    connections: List[Dict[str, str]]  # Connection specifications
+    connections: List[str]             # Circuit-synth connection code
     power_rails: List[str]             # Required power rails
     design_notes: List[str]            # Design considerations
     estimated_complexity: int         # 1-5 complexity rating
@@ -134,11 +134,11 @@ class CircuitPatterns:
                 )
             ],
             connections=[
-                {"from": "U1.VDD", "to": "3V3_RAIL"},
-                {"from": "U1.VSS", "to": "GND"},
-                {"from": "J1.VBUS", "to": "5V_RAIL"},
-                {"from": "Y1.1", "to": "U1.GPIO0"}, 
-                {"from": "Y1.2", "to": "U1.GPIO1"}
+                'esp32["3V3"] += vcc_3v3',
+                'esp32["GND"] += gnd', 
+                'usb_connector["VBUS"] += vbus',
+                'crystal[1] += esp32["GPIO0"]',
+                'crystal[2] += esp32["GPIO1"]'
             ],
             power_rails=["3V3", "GND", "5V"],
             design_notes=[
@@ -180,10 +180,12 @@ class CircuitPatterns:
                 )
             ],
             connections=[
-                {"from": "U2.VDD", "to": "3V3_RAIL"},
-                {"from": "U2.GND", "to": "GND"},
-                {"from": "U2.SCL", "to": "U1.GPIO22"},
-                {"from": "U2.SDA", "to": "U1.GPIO21"}
+                'esp32["3V3"] += vcc_3v3',
+                'esp32["GND"] += gnd',
+                'mpu6050["VDD"] += vcc_3v3',
+                'mpu6050["GND"] += gnd',
+                'mpu6050["SCL"] += esp32["GPIO22"]',
+                'mpu6050["SDA"] += esp32["GPIO21"]'
             ],
             power_rails=["3V3", "GND"],
             design_notes=[
@@ -225,10 +227,10 @@ class CircuitPatterns:
                 )
             ],
             connections=[
-                {"from": "U1.VDD", "to": "3V3_RAIL"},
-                {"from": "U1.VSS", "to": "GND"},
-                {"from": "J1.SWDIO", "to": "U1.PA13"},
-                {"from": "J1.SWCLK", "to": "U1.PA14"}
+                'stm32["VDD"] += vcc_3v3',
+                'stm32["VSS"] += gnd',
+                'debug_header["SWDIO"] += stm32["PA13"]',
+                'debug_header["SWCLK"] += stm32["PA14"]'
             ],
             power_rails=["3V3", "GND"],
             design_notes=[
@@ -270,10 +272,10 @@ class CircuitPatterns:
                 )
             ],
             connections=[
-                {"from": "A1.VMOT", "to": "12V_RAIL"},
-                {"from": "A1.GND", "to": "GND"},  
-                {"from": "A1.1A", "to": "J1.1"},
-                {"from": "A1.1B", "to": "J1.2"}
+                'drv8825["VMOT"] += power_12v',
+                'drv8825["GND"] += gnd',
+                'drv8825["1A"] += motor["A1"]',
+                'drv8825["1B"] += motor["A2"]'
             ],
             power_rails=["12V", "5V", "GND"],
             design_notes=[
@@ -315,10 +317,10 @@ class CircuitPatterns:
                 )
             ],
             connections=[
-                {"from": "U1.VDD", "to": "J1.1"},
-                {"from": "U1.GND", "to": "J1.2"},
-                {"from": "U1.SCL", "to": "J1.3"}, 
-                {"from": "U1.SDA", "to": "J1.4"}
+                'mpu6050["VDD"] += vcc_3v3',
+                'mpu6050["GND"] += gnd',
+                'mpu6050["SCL"] += scl_net',
+                'mpu6050["SDA"] += sda_net'
             ],
             power_rails=["3V3", "GND"],
             design_notes=[
@@ -353,9 +355,9 @@ class CircuitPatterns:
                 )
             ],
             connections=[
-                {"from": "U1.VDD", "to": "3V3_RAIL"},
-                {"from": "U1.GND", "to": "GND"},
-                {"from": "U1.DQ", "to": "DATA_LINE"}
+                'ds18b20["VDD"] += vcc_3v3',
+                'ds18b20["GND"] += gnd',
+                'ds18b20["DQ"] += data_line'
             ],
             power_rails=["3V3", "GND"],
             design_notes=[
@@ -397,11 +399,11 @@ class CircuitPatterns:
                 )
             ],
             connections=[
-                {"from": "U1.VCC", "to": "5V_RAIL"},
-                {"from": "U1.GND", "to": "GND"},
-                {"from": "U1.1Y", "to": "J1.2"},  # Data out
-                {"from": "J1.1", "to": "5V_RAIL"},  # LED power
-                {"from": "J1.3", "to": "GND"}       # LED ground
+                'level_shifter["VCC"] += vcc_5v',
+                'level_shifter["GND"] += gnd',
+                'level_shifter["1Y"] += neopixel_connector["DATA"]',
+                'neopixel_connector["VCC"] += vcc_5v',
+                'neopixel_connector["GND"] += gnd'
             ],
             power_rails=["5V", "3V3", "GND"],
             design_notes=[
@@ -443,10 +445,12 @@ class CircuitPatterns:
                 )
             ],
             connections=[
-                {"from": "J1.VBUS", "to": "5V_RAIL"},
-                {"from": "J1.GND", "to": "GND"},
-                {"from": "J1.CC1", "to": "R1.1"},
-                {"from": "J1.CC2", "to": "R2.1"}
+                'usb_c["VBUS"] += vbus',
+                'usb_c["GND"] += gnd',
+                'usb_c["CC1"] += cc1_resistor[1]',
+                'usb_c["CC2"] += cc2_resistor[1]',
+                'cc1_resistor[2] += gnd',
+                'cc2_resistor[2] += gnd'
             ],
             power_rails=["5V", "GND"],
             design_notes=[
@@ -488,11 +492,12 @@ class CircuitPatterns:
                 )
             ],
             connections=[
-                {"from": "U1.VDD", "to": "3V3_RAIL"},
-                {"from": "A1.STEP", "to": "U1.PA8"},
-                {"from": "A1.DIR", "to": "U1.PA9"},
-                {"from": "J1.1", "to": "U1.PA0"},  # Encoder A
-                {"from": "J1.2", "to": "U1.PA1"}   # Encoder B
+                'stm32["VDD"] += vcc_3v3',
+                'stm32["VSS"] += gnd',
+                'drv8825["STEP"] += stm32["PA8"]',
+                'drv8825["DIR"] += stm32["PA9"]',
+                'encoder["A"] += stm32["PA0"]',
+                'encoder["B"] += stm32["PA1"]'
             ],
             power_rails=["3V3", "12V", "GND"],
             design_notes=[
@@ -534,11 +539,14 @@ class CircuitPatterns:
                 )
             ],
             connections=[
-                {"from": "J1.4", "to": "5V_RAIL"},  # Encoder VCC
-                {"from": "J1.5", "to": "GND"},      # Encoder GND  
-                {"from": "J1.1", "to": "R1.2"},    # A channel
-                {"from": "J1.2", "to": "R2.2"},    # B channel
-                {"from": "J1.3", "to": "R3.2"}     # Z index
+                'encoder["VCC"] += vcc_5v',
+                'encoder["GND"] += gnd',
+                'encoder["A"] += pullup_a[2]',
+                'encoder["B"] += pullup_b[2]',
+                'encoder["Z"] += pullup_z[2]',
+                'pullup_a[1] += vcc_3v3',
+                'pullup_b[1] += vcc_3v3',
+                'pullup_z[1] += vcc_3v3'
             ],
             power_rails=["5V", "GND"],
             design_notes=[

@@ -21,6 +21,7 @@ except ImportError:
     google_search = None
 
 from .pin_finder import pin_finder, get_ai_pin_context, adk_pin_finder_tool
+from .adk_tools import create_adk_tools
 
 logger = logging.getLogger(__name__)
 
@@ -138,11 +139,19 @@ CRITICAL REQUIREMENTS:
 1. Generate ONLY Python code using circuit-synth syntax - NO markdown fences
 2. Use EXACT working KiCad symbols and footprints from verified list
 3. Use ONLY the EXACT pin names provided in the PIN INFORMATION section below
-4. Follow the EXACT syntax patterns from examples
+4. Follow the EXACT syntax patterns from reference circuits
 5. Include proper @circuit decorator and function structure
 6. Use correct pin connection syntax: component["pin_name"] += net
 
 ⚠️  NEVER GUESS PIN NAMES - Use only pins listed in PIN INFORMATION section below!
+
+📚 REFERENCE CIRCUITS: Study these working examples for proper syntax:
+- ESP32 Basic: /src/circuit_synth/fast_generation/reference_circuits/esp32_basic.py
+- ESP32 Sensor: /src/circuit_synth/fast_generation/reference_circuits/esp32_sensor.py  
+- STM32 Basic: /src/circuit_synth/fast_generation/reference_circuits/stm32_basic.py
+- Motor Driver: /src/circuit_synth/fast_generation/reference_circuits/motor_stepper.py
+- LED Driver: /src/circuit_synth/fast_generation/reference_circuits/led_neopixel.py
+- USB Power: /src/circuit_synth/fast_generation/reference_circuits/usb_power.py
 
 CORRECT CIRCUIT-SYNTH SYNTAX:
 ```python
@@ -234,13 +243,9 @@ class GoogleADKModel:
     def _setup_agents(self):
         """Setup specialized circuit generation agents"""
         
-        # Available tools including pin finder
-        tools = []
-        if adk_pin_finder_tool:
-            try:
-                tools.append(adk_pin_finder_tool.to_adk_tool())
-            except:
-                pass  # ADK tool conversion not available
+        # Create all available ADK tools
+        tools = create_adk_tools()
+        logger.info(f"Created {len(tools)} ADK tools for circuit design")
         
         # Main circuit generator agent
         self.agents["generator"] = Agent(
@@ -249,8 +254,12 @@ class GoogleADKModel:
             instruction="""You are a circuit design specialist. Generate production-ready 
             KiCad circuit-synth code following electrical engineering best practices.
             
-            CRITICAL: Always use the find_pins tool for every component before generating connections.
-            This ensures you use the exact pin names from KiCad symbols.""",
+            CRITICAL: Always use these tools before generating circuits:
+            1. find_symbol_tool_function() - Find correct KiCad symbols
+            2. find_footprint_tool_function() - Find matching footprints  
+            3. find_pins_tool_function() - Get exact pin names
+            
+            This ensures you use verified components with correct pin names.""",
             description="Primary circuit code generation",
             tools=tools
         )
@@ -260,7 +269,7 @@ class GoogleADKModel:
             name="component_validator", 
             model="gemini-2.5-flash",
             instruction="""Validate that all components exist in KiCad libraries and 
-            verify electrical connections are correct. Use find_pins to verify pin names.""",
+            verify electrical connections are correct. Use find_pins_tool_function to verify pin names.""",
             description="Component and connection validation",
             tools=tools
         )
