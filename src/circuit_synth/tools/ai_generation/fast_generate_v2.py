@@ -47,6 +47,9 @@ def integrate_with_claude_agents(description: str, chat_mode: bool = False, mult
         r"(?i).*\s+(\d+)\s+(imu|sensor|motor|led).*on\s+(spi|i2c)",
         r"(?i).*(power\s+supply|regulator).*and.*(usb|connector)",
         r"(?i)complete\s+(circuit|system|board)",
+        r"(?i).*(controller|control).*",  # Added to catch "BB-8 droid controller"
+        r"(?i).*(robot|droid|motor|pwm|sound|led).*",  # Robot-related keywords
+        r"(?i)(bb.?8|bb8|robot|droid).*",  # Specific robot project triggers
     ]
     
     is_hands_off = any(re.search(pattern, description) for pattern in hands_off_triggers)
@@ -122,19 +125,40 @@ def analyze_circuit_architecture(description: str) -> dict:
         "hierarchical_structure": []
     }
     
+    # Detect robot/droid projects and add all typical components
+    is_robot_project = any(word in description.lower() for word in ["robot", "droid", "bb-8", "bb8", "controller"])
+    
     # Detect components mentioned
-    if any(word in description.lower() for word in ["stm32", "microcontroller", "mcu"]):
+    if any(word in description.lower() for word in ["stm32", "microcontroller", "mcu", "esp32", "controller", "control"]):
         architecture["components"].append({
             "type": "mcu",
             "family": "stm32" if "stm32" in description.lower() else "esp32",
             "requirements": extract_mcu_requirements(description)
         })
     
-    if any(word in description.lower() for word in ["imu", "sensor", "accelerometer"]):
+    if any(word in description.lower() for word in ["imu", "sensor", "accelerometer"]) or is_robot_project:
         architecture["components"].append({
             "type": "imu",
             "count": extract_sensor_count(description),
             "interface": "spi" if "spi" in description.lower() else "i2c"
+        })
+    
+    if any(word in description.lower() for word in ["motor", "pwm", "drive"]) or is_robot_project:
+        architecture["components"].append({
+            "type": "motor_driver", 
+            "count": extract_motor_count(description)
+        })
+    
+    if any(word in description.lower() for word in ["led", "light"]) or is_robot_project:
+        architecture["components"].append({
+            "type": "led",
+            "count": extract_led_count(description)
+        })
+    
+    if any(word in description.lower() for word in ["sound", "beep", "buzzer", "speaker"]) or is_robot_project:
+        architecture["components"].append({
+            "type": "audio",
+            "type_detail": "buzzer"
         })
     
     if any(word in description.lower() for word in ["usb", "connector"]):
@@ -150,9 +174,15 @@ def analyze_circuit_architecture(description: str) -> dict:
         for comp in architecture["components"]:
             if comp["type"] == "mcu":
                 architecture["hierarchical_structure"].append("mcu.py")
-            if comp["type"] == "imu":
+            elif comp["type"] == "imu":
                 for i in range(comp.get("count", 1)):
                     architecture["hierarchical_structure"].append(f"imu_{i+1}.py")
+            elif comp["type"] == "motor_driver":
+                architecture["hierarchical_structure"].append("motor_driver.py")
+            elif comp["type"] == "led":
+                architecture["hierarchical_structure"].append("leds.py")
+            elif comp["type"] == "audio":
+                architecture["hierarchical_structure"].append("audio.py")
     
     return architecture
 
@@ -193,6 +223,32 @@ def extract_sensor_count(description: str) -> int:
     return 1
 
 
+def extract_motor_count(description: str) -> int:
+    """Extract motor count from description."""
+    count_matches = re.findall(r'(\d+)\s+(?:motor|motors)', description.lower())
+    if count_matches:
+        return int(count_matches[0])
+    
+    # Default to 2 motors for robots/droids
+    if any(word in description.lower() for word in ["robot", "droid", "bb-8", "bb8"]):
+        return 2
+    
+    return 1
+
+
+def extract_led_count(description: str) -> int:
+    """Extract LED count from description."""
+    count_matches = re.findall(r'(\d+)\s+(?:led|leds)', description.lower())
+    if count_matches:
+        return int(count_matches[0])
+    
+    # Default to multiple LEDs for robots
+    if any(word in description.lower() for word in ["robot", "droid", "bb-8", "bb8"]):
+        return 3
+    
+    return 1
+
+
 def select_and_validate_components(architecture: dict) -> dict:
     """Select and validate components with proper circuit-synth patterns."""
     
@@ -226,6 +282,31 @@ def select_and_validate_components(architecture: dict) -> dict:
                 "footprint": "Sensor_Motion:InvenSense_QFN-24_4x4mm_P0.5mm",
                 "count": component["count"],
                 "interface": component["interface"]
+            }
+        
+        elif component["type"] == "motor_driver":
+            # Motor driver for robot control
+            validated_components["motor_driver"] = {
+                "part_number": "DRV8833",
+                "symbol": "Driver_Motor:DRV8833",
+                "footprint": "Package_SON:WSON-16-1EP_3x3mm_P0.5mm_EP1.6x1.6mm",
+                "count": component["count"]
+            }
+        
+        elif component["type"] == "led":
+            validated_components["leds"] = {
+                "part_number": "Standard_LED",
+                "symbol": "Device:LED",
+                "footprint": "LED_SMD:LED_0603_1608Metric", 
+                "count": component["count"]
+            }
+        
+        elif component["type"] == "audio":
+            validated_components["buzzer"] = {
+                "part_number": "Buzzer",
+                "symbol": "Device:Buzzer",
+                "footprint": "Buzzer_Beeper:Buzzer_12x9.5RM7.6",
+                "type_detail": component.get("type_detail", "buzzer")
             }
     
     # Add basic power components
@@ -302,6 +383,12 @@ def generate_circuit_file_content(filename: str, description: str, architecture:
     elif filename.startswith("imu_"):
         imu_num = filename.split("_")[1].split(".")[0]
         return generate_imu_content(components, imu_num)
+    elif filename == "motor_driver.py":
+        return generate_motor_driver_content(components)
+    elif filename == "leds.py":
+        return generate_led_content(components)
+    elif filename == "audio.py":
+        return generate_audio_content(components)
     else:
         return f"# {filename} - Circuit implementation\nfrom circuit_synth import *\n"
 
@@ -321,13 +408,34 @@ def generate_main_circuit_content(description: str, architecture: dict, componen
         for filename in architecture["hierarchical_structure"]:
             if filename != "main.py":
                 module_name = filename.replace(".py", "")
-                imports.append(f"from {module_name} import {module_name}")
-                if module_name == "power_supply":
-                    subcircuit_calls.append(f"    {module_name}(vcc_5v, vcc_3v3, gnd)")
-                elif module_name == "mcu":
-                    subcircuit_calls.append(f"    {module_name}(vcc_3v3, gnd)")
+                function_name = module_name  # Default to same name
+                
+                # Map module names to their actual function names
+                if module_name == "mcu":
+                    function_name = "mcu_circuit"
                 elif module_name.startswith("imu_"):
-                    subcircuit_calls.append(f"    {module_name}(vcc_3v3, gnd)")
+                    function_name = module_name  # imu_1, imu_2, etc. match their function names
+                elif module_name == "motor_driver":
+                    function_name = "motor_driver_circuit"
+                elif module_name == "leds":
+                    function_name = "led_circuit"
+                elif module_name == "audio":
+                    function_name = "audio_circuit"
+                
+                imports.append(f"from {module_name} import {function_name}")
+                
+                if module_name == "power_supply":
+                    subcircuit_calls.append(f"    {function_name}(vcc_5v, vcc_3v3, gnd)")
+                elif module_name == "mcu":
+                    subcircuit_calls.append(f"    {function_name}(vcc_3v3, gnd)")
+                elif module_name.startswith("imu_"):
+                    subcircuit_calls.append(f"    {function_name}(vcc_3v3, gnd)")
+                elif module_name == "motor_driver":
+                    subcircuit_calls.append(f"    {function_name}(vcc_3v3, gnd)")
+                elif module_name == "leds":
+                    subcircuit_calls.append(f"    {function_name}(vcc_3v3, gnd)")
+                elif module_name == "audio":
+                    subcircuit_calls.append(f"    {function_name}(vcc_3v3, gnd)")
         
         imports_str = "\n".join(imports)
         subcircuits_str = "\n".join(subcircuit_calls)
@@ -614,6 +722,171 @@ def imu_{imu_num}(vcc_3v3, gnd):
     r_sda[2] += sda
     r_scl[1] += vcc_3v3
     r_scl[2] += scl
+'''
+
+
+def generate_motor_driver_content(components: dict) -> str:
+    """Generate motor driver circuit content."""
+    return '''from circuit_synth import *
+
+@circuit(name="motor_driver_circuit")
+def motor_driver_circuit(vcc_3v3, gnd):
+    """Motor driver circuit for robot control"""
+    
+    # Motor driver IC
+    driver = Component(
+        symbol="Driver_Motor:DRV8833",
+        ref="U3",
+        footprint="Package_SON:WSON-16-1EP_3x3mm_P0.5mm_EP1.6x1.6mm"
+    )
+    
+    # Decoupling capacitor
+    cap = Component(
+        symbol="Device:C",
+        ref="C10",
+        footprint="Capacitor_SMD:C_0603_1608Metric"
+    )
+    
+    # Motor nets
+    motor1_a = Net('MOTOR1_A')
+    motor1_b = Net('MOTOR1_B') 
+    motor2_a = Net('MOTOR2_A')
+    motor2_b = Net('MOTOR2_B')
+    
+    # Control signals from MCU
+    ain1 = Net('AIN1')
+    ain2 = Net('AIN2')
+    bin1 = Net('BIN1')
+    bin2 = Net('BIN2')
+    
+    # Power connections
+    driver[1] += vcc_3v3   # VCC
+    driver[2] += gnd       # GND
+    
+    # Control inputs
+    driver[5] += ain1      # AIN1
+    driver[6] += ain2      # AIN2
+    driver[9] += bin1      # BIN1
+    driver[10] += bin2     # BIN2
+    
+    # Motor outputs
+    driver[3] += motor1_a  # AOUT1
+    driver[4] += motor1_b  # AOUT2
+    driver[7] += motor2_a  # BOUT1
+    driver[8] += motor2_b  # BOUT2
+    
+    # Decoupling
+    cap[1] += vcc_3v3
+    cap[2] += gnd
+'''
+
+
+def generate_led_content(components: dict) -> str:
+    """Generate LED circuit content."""
+    return '''from circuit_synth import *
+
+@circuit(name="led_circuit")
+def led_circuit(vcc_3v3, gnd):
+    """LED indicator circuits"""
+    
+    # Status LEDs
+    led1 = Component(
+        symbol="Device:LED",
+        ref="D2",
+        footprint="LED_SMD:LED_0603_1608Metric"
+    )
+    
+    led2 = Component(
+        symbol="Device:LED", 
+        ref="D3",
+        footprint="LED_SMD:LED_0603_1608Metric"
+    )
+    
+    led3 = Component(
+        symbol="Device:LED",
+        ref="D4",
+        footprint="LED_SMD:LED_0603_1608Metric"
+    )
+    
+    # Current limiting resistors
+    r1 = Component(
+        symbol="Device:R",
+        ref="R10",
+        footprint="Resistor_SMD:R_0603_1608Metric"
+    )
+    
+    r2 = Component(
+        symbol="Device:R",
+        ref="R11", 
+        footprint="Resistor_SMD:R_0603_1608Metric"
+    )
+    
+    r3 = Component(
+        symbol="Device:R",
+        ref="R12",
+        footprint="Resistor_SMD:R_0603_1608Metric"
+    )
+    
+    # Control signals from MCU
+    led1_ctrl = Net('LED1_CTRL')
+    led2_ctrl = Net('LED2_CTRL')
+    led3_ctrl = Net('LED3_CTRL')
+    
+    # LED 1 connections
+    r1[1] += led1_ctrl
+    r1[2] += led1[1]  # Anode
+    led1[2] += gnd    # Cathode
+    
+    # LED 2 connections
+    r2[1] += led2_ctrl
+    r2[2] += led2[1]  # Anode
+    led2[2] += gnd    # Cathode
+    
+    # LED 3 connections
+    r3[1] += led3_ctrl
+    r3[2] += led3[1]  # Anode
+    led3[2] += gnd    # Cathode
+'''
+
+
+def generate_audio_content(components: dict) -> str:
+    """Generate audio/buzzer circuit content."""
+    return '''from circuit_synth import *
+
+@circuit(name="audio_circuit")
+def audio_circuit(vcc_3v3, gnd):
+    """Audio/buzzer circuit for sound generation"""
+    
+    # Buzzer component
+    buzzer = Component(
+        symbol="Device:Buzzer",
+        ref="BZ1",
+        footprint="Buzzer_Beeper:Buzzer_12x9.5RM7.6"
+    )
+    
+    # Transistor for amplification
+    transistor = Component(
+        symbol="Device:Q_NPN_BCE",
+        ref="Q1",
+        footprint="Package_TO_SOT_SMD:SOT-23"
+    )
+    
+    # Base resistor
+    r_base = Component(
+        symbol="Device:R",
+        ref="R20",
+        footprint="Resistor_SMD:R_0603_1608Metric"
+    )
+    
+    # Control signal from MCU
+    buzzer_ctrl = Net('BUZZER_CTRL')
+    
+    # Connections
+    r_base[1] += buzzer_ctrl      # MCU control signal
+    r_base[2] += transistor[1]    # Base
+    transistor[2] += gnd          # Emitter
+    transistor[3] += buzzer[2]    # Collector to buzzer negative
+    buzzer[1] += vcc_3v3         # Buzzer positive to VCC
 '''
 
 
