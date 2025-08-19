@@ -125,6 +125,16 @@ class ProjectTemplateGenerator:
                         nets_out=[],
                         components=["SWD connector"],
                         code_template=self._get_swd_debug_template()
+                    ),
+                    SubcircuitSpec(
+                        name="Status LED",
+                        filename="led_status.py",
+                        function_name="led_status",
+                        description="Status LED with current limiting",
+                        nets_in=["VCC_3V3", "GND", "LED_CONTROL"],
+                        nets_out=[],
+                        components=["LED", "Current limiting resistor"],
+                        code_template=self._get_led_status_template()
                     )
                 ],
                 "main_template": self._get_stm32_main_template()
@@ -487,20 +497,250 @@ if __name__ == "__main__":
 '''
 
     def _get_stm32_power_template(self) -> str:
-        # Similar template for STM32 power supply
-        return "# STM32 power template (abbreviated for space)"
+        return '''#!/usr/bin/env python3
+"""
+STM32 Power Supply Circuit
+3.3V power input with filtering and protection
+"""
+
+from circuit_synth import *
+
+@circuit(name="STM32_Power_Supply")
+def power_supply(vcc_3v3_out, gnd):
+    """STM32 power supply subcircuit with filtering"""
+    
+    # Power input connector (assuming external 3.3V supply)
+    power_input = Component(
+        symbol="Connector_Generic:Conn_01x02",
+        ref="J",
+        footprint="Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
+    )
+    
+    # Power filtering capacitors
+    cap_bulk = Component(
+        symbol="Device:C",
+        ref="C",
+        value="10uF",
+        footprint="Capacitor_SMD:C_0805_2012Metric"
+    )
+    
+    cap_bypass = Component(
+        symbol="Device:C",
+        ref="C",
+        value="100nF",
+        footprint="Capacitor_SMD:C_0603_1608Metric"
+    )
+    
+    # Power connections
+    power_input[1] += vcc_3v3_out  # 3.3V input
+    power_input[2] += gnd          # Ground
+    
+    # Power filtering
+    cap_bulk[1] += vcc_3v3_out
+    cap_bulk[2] += gnd
+    cap_bypass[1] += vcc_3v3_out
+    cap_bypass[2] += gnd
+'''
     
     def _get_stm32_mcu_template(self) -> str:
-        # Similar template for STM32 MCU
-        return "# STM32 MCU template (abbreviated for space)"
+        return '''#!/usr/bin/env python3
+"""
+STM32 MCU Circuit
+STM32F411 microcontroller with crystal and support circuits
+"""
+
+from circuit_synth import *
+
+@circuit(name="STM32_MCU")
+def stm32_mcu(vcc_3v3, gnd, swdio, swclk, led_control):
+    """STM32F411 microcontroller subcircuit"""
+    
+    # STM32F411 microcontroller
+    stm32 = Component(
+        symbol="MCU_ST_STM32F4:STM32F411CEUx",
+        ref="U",
+        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
+    )
+    
+    # 8MHz HSE crystal
+    crystal = Component(
+        symbol="Device:Crystal",
+        ref="Y",
+        value="8MHz",
+        footprint="Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm"
+    )
+    
+    # Crystal load capacitors
+    cap_c1 = Component(
+        symbol="Device:C",
+        ref="C",
+        value="18pF",
+        footprint="Capacitor_SMD:C_0603_1608Metric"
+    )
+    
+    cap_c2 = Component(
+        symbol="Device:C",
+        ref="C",
+        value="18pF",
+        footprint="Capacitor_SMD:C_0603_1608Metric"
+    )
+    
+    # Power decoupling
+    cap_bulk = Component(
+        symbol="Device:C",
+        ref="C",
+        value="10uF",
+        footprint="Capacitor_SMD:C_0805_2012Metric"
+    )
+    
+    cap_bypass = Component(
+        symbol="Device:C",
+        ref="C",
+        value="100nF",
+        footprint="Capacitor_SMD:C_0603_1608Metric"
+    )
+    
+    # Reset components
+    reset_button = Component(
+        symbol="Switch:SW_Push",
+        ref="SW",
+        footprint="Button_Switch_SMD:SW_SPST_CK_RS282G05A3"
+    )
+    
+    reset_pullup = Component(
+        symbol="Device:R",
+        ref="R",
+        value="10k",
+        footprint="Resistor_SMD:R_0603_1608Metric"
+    )
+    
+    # Internal reset net
+    reset = Net('nRESET')
+    
+    # STM32 power connections
+    stm32["VDD"] += vcc_3v3
+    stm32["VSS"] += gnd
+    stm32["VDDA"] += vcc_3v3
+    stm32["VSSA"] += gnd
+    
+    # HSE crystal connections
+    crystal[1] += stm32["PH0"]  # HSE_IN
+    crystal[2] += stm32["PH1"]  # HSE_OUT
+    
+    # Crystal load capacitors
+    cap_c1[1] += stm32["PH0"]
+    cap_c1[2] += gnd
+    cap_c2[1] += stm32["PH1"]
+    cap_c2[2] += gnd
+    
+    # SWD debug connections
+    stm32["PA13"] += swdio
+    stm32["PA14"] += swclk
+    
+    # LED control
+    stm32["PA5"] += led_control  # GPIO for LED
+    
+    # Reset circuit
+    reset_pullup[1] += vcc_3v3
+    reset_pullup[2] += reset
+    reset_button[1] += reset
+    reset_button[2] += gnd
+    stm32["NRST"] += reset
+    
+    # Power decoupling
+    cap_bulk[1] += vcc_3v3
+    cap_bulk[2] += gnd
+    cap_bypass[1] += vcc_3v3
+    cap_bypass[2] += gnd
+'''
     
     def _get_swd_debug_template(self) -> str:
-        # Similar template for SWD debug
-        return "# SWD debug template (abbreviated for space)"
+        return '''#!/usr/bin/env python3
+"""
+SWD Debug Header Circuit
+SWD debug and programming interface for STM32
+"""
+
+from circuit_synth import *
+
+@circuit(name="SWD_Debug_Header")
+def debug_header(vcc_3v3, gnd, swdio, swclk):
+    """SWD debug header subcircuit"""
+    
+    # SWD debug connector (4-pin: VCC, GND, SWDIO, SWCLK)
+    swd_conn = Component(
+        symbol="Connector_Generic:Conn_01x04",
+        ref="J",
+        footprint="Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+    )
+    
+    # Connections
+    swd_conn[1] += vcc_3v3  # Power
+    swd_conn[2] += gnd      # Ground
+    swd_conn[3] += swdio    # SWDIO
+    swd_conn[4] += swclk    # SWCLK
+'''
     
     def _get_stm32_main_template(self) -> str:
-        # Similar template for STM32 main
-        return "# STM32 main template (abbreviated for space)"
+        return '''#!/usr/bin/env python3
+"""
+Main Circuit - STM32 Complete Development Board
+Professional hierarchical circuit design with modular subcircuits
+
+This is the main entry point that orchestrates all subcircuits:
+- 3.3V power input with filtering
+- STM32F411 microcontroller with crystal and support circuits
+- SWD debug header for programming
+- Status LED with current limiting
+"""
+
+from circuit_synth import *
+
+# Import all subcircuits
+from power_supply import power_supply
+from stm32_mcu import stm32_mcu
+from debug_header import debug_header
+from led_status import led_status
+
+@circuit(name="STM32_Complete_Board")
+def main_circuit():
+    """Main hierarchical circuit - STM32 complete development board"""
+    
+    # Create shared nets between subcircuits (ONLY nets - no components here)
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    swdio = Net('SWDIO')
+    swclk = Net('SWCLK')
+    led_control = Net('LED_CONTROL')
+    
+    # Create all circuits with shared nets
+    power_supply_circuit = power_supply(vcc_3v3, gnd)
+    stm32_circuit = stm32_mcu(vcc_3v3, gnd, swdio, swclk, led_control)
+    debug_header_circuit = debug_header(vcc_3v3, gnd, swdio, swclk)
+    led_status_circuit = led_status(vcc_3v3, gnd, led_control)
+
+
+if __name__ == "__main__":
+    print("🚀 Starting STM32 Complete Board generation...")
+    
+    circuit = main_circuit()
+    
+    print("🔌 Generating KiCad netlist...")
+    circuit.generate_kicad_netlist("STM32_Complete_Board.net")
+    
+    print("📄 Generating JSON netlist...")
+    circuit.generate_json_netlist("STM32_Complete_Board.json")
+    
+    print("🏗️  Generating KiCad project...")
+    circuit.generate_kicad_project(
+        project_name="STM32_Complete_Board",
+        placement_algorithm="hierarchical",
+        generate_pcb=True
+    )
+    
+    print("✅ STM32 Complete Board project generated!")
+    print("📁 Check the STM32_Complete_Board/ directory for KiCad files")
+'''
 
 
 # For testing
