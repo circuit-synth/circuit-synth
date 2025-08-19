@@ -231,11 +231,16 @@ class ProfessionalCircuitChat:
         analysis = self.analyze_request(user_message)
         
         # Check if this is a follow-up to questions
-        if self.pending_generation and not user_message.lower().startswith(('make', 'create', 'design', 'build')):
-            # This is a follow-up response, use the pending analysis and generate
+        if self.pending_generation:
+            # This is a follow-up response - generate the circuit with their previous request
             original_analysis = self.pending_generation
             self.pending_generation = None  # Clear pending state
-            return await self.generate_professional_project(f"ESP32-S3 with {', '.join(original_analysis['peripherals'])}", original_analysis)
+            
+            # Add their answer to the peripherals context
+            original_analysis["user_answers"] = user_message
+            
+            print(f"🏗️  Got your requirements! Generating {original_analysis['mcu_type']} project...")
+            return await self.generate_professional_project(user_message, original_analysis)
         
         # Ask questions if needed (unless they want defaults)
         if "default" not in user_message.lower():

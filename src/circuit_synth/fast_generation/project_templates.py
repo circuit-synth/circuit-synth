@@ -164,14 +164,8 @@ USB-C connector with CC resistors for power negotiation
 from circuit_synth import *
 
 @circuit(name="USB_Power_Input")
-def usb_power():
+def usb_power(vbus_out, gnd, usb_dp, usb_dm):
     """USB-C power input subcircuit"""
-    
-    # Create output nets
-    vbus = Net('VBUS')
-    gnd = Net('GND')
-    usb_dp = Net('USB_DP')
-    usb_dm = Net('USB_DM')
     
     # USB-C connector
     usb_c = Component(
@@ -211,25 +205,31 @@ def usb_power():
     )
     
     # USB-C power connections
-    usb_c["VBUS"] += vbus_fuse["1"]
-    vbus_fuse["2"] += vbus
-    usb_c["GND"] += gnd
+    usb_c["A4"] += vbus_fuse[1]  # VBUS (A-side)
+    usb_c["A9"] += vbus_fuse[1]  # VBUS (A-side)
+    usb_c["B4"] += vbus_fuse[1]  # VBUS (B-side)  
+    usb_c["B9"] += vbus_fuse[1]  # VBUS (B-side)
+    vbus_fuse[2] += vbus_out
+    usb_c["A1"] += gnd   # GND (A-side)
+    usb_c["A12"] += gnd  # GND (A-side)
+    usb_c["B1"] += gnd   # GND (B-side)
+    usb_c["B12"] += gnd  # GND (B-side)
     
     # USB-C data connections through ESD protection
-    usb_c["D+"] += esd_protection["I/O1"]
-    usb_c["D-"] += esd_protection["I/O2"] 
-    esd_protection["I/O1"] += usb_dp  # Protected data lines to output
-    esd_protection["I/O2"] += usb_dm
-    esd_protection["VBUS"] += vbus    # ESD protection power
-    esd_protection["GND"] += gnd      # ESD protection ground
+    usb_c["A6"] += esd_protection[1]  # D+ (A-side) to ESD pin 1
+    usb_c["A7"] += esd_protection[3]  # D- (A-side) to ESD pin 3
+    usb_c["B6"] += esd_protection[1]  # D+ (B-side) to ESD pin 1  
+    usb_c["B7"] += esd_protection[3]  # D- (B-side) to ESD pin 3
+    esd_protection[6] += usb_dp  # Protected D+ output (pin 6)
+    esd_protection[4] += usb_dm  # Protected D- output (pin 4)
+    esd_protection[5] += vbus_out    # ESD protection power (pin 5 = VBUS)
+    esd_protection[2] += gnd         # ESD protection ground (pin 2 = GND)
     
     # CC pull-down resistors for power negotiation
-    usb_c["CC1"] += cc1_resistor["1"]
-    cc1_resistor["2"] += gnd
-    usb_c["CC2"] += cc2_resistor["1"] 
-    cc2_resistor["2"] += gnd
-    
-    return vbus, gnd, usb_dp, usb_dm
+    usb_c["A5"] += cc1_resistor[1]  # CC1
+    cc1_resistor[2] += gnd
+    usb_c["B5"] += cc2_resistor[1]  # CC2
+    cc2_resistor[2] += gnd
 '''
 
     def _get_power_supply_template(self) -> str:
@@ -242,12 +242,8 @@ Clean power regulation from USB-C VBUS to regulated 3.3V
 from circuit_synth import *
 
 @circuit(name="Power_Supply")
-def power_supply(vbus_in, gnd_in):
+def power_supply(vbus_in, vcc_3v3_out, gnd):
     """5V to 3.3V power regulation subcircuit"""
-    
-    # Create output nets
-    vcc_3v3 = Net('VCC_3V3')
-    gnd = gnd_in  # Use input ground
     
     # 3.3V regulator
     regulator = Component(
@@ -273,15 +269,13 @@ def power_supply(vbus_in, gnd_in):
     
     # Connections
     regulator["VI"] += vbus_in
-    regulator["VO"] += vcc_3v3 
+    regulator["VO"] += vcc_3v3_out 
     regulator["GND"] += gnd
     
-    cap_in["1"] += vbus_in
-    cap_in["2"] += gnd
-    cap_out["1"] += vcc_3v3
-    cap_out["2"] += gnd
-    
-    return vcc_3v3, gnd
+    cap_in[1] += vbus_in
+    cap_in[2] += gnd
+    cap_out[1] += vcc_3v3_out
+    cap_out[2] += gnd
 '''
 
     def _get_esp32_mcu_template(self) -> str:
@@ -294,19 +288,8 @@ ESP32-S3 microcontroller with support circuitry
 from circuit_synth import *
 
 @circuit(name="ESP32_MCU")
-def esp32_mcu(vcc_3v3_in, gnd_in, usb_dp_in, usb_dm_in):
+def esp32_mcu(vcc_3v3, gnd, usb_dp, usb_dm, debug_tx, debug_rx, led_control):
     """ESP32-S3 microcontroller subcircuit"""
-    
-    # Use input nets
-    vcc_3v3 = vcc_3v3_in
-    gnd = gnd_in
-    usb_dp = usb_dp_in
-    usb_dm = usb_dm_in
-    
-    # Create output nets for other subcircuits
-    debug_tx = Net('DEBUG_TX')
-    debug_rx = Net('DEBUG_RX') 
-    led_control = Net('LED_CONTROL')
     
     # ESP32-S3 microcontroller
     esp32 = Component(
@@ -354,16 +337,14 @@ def esp32_mcu(vcc_3v3_in, gnd_in, usb_dp_in, usb_dm_in):
     esp32["IO8"] += led_control
     
     # Power supply decoupling
-    cap_bulk["1"] += vcc_3v3
-    cap_bulk["2"] += gnd
-    cap_bypass1["1"] += vcc_3v3
-    cap_bypass1["2"] += gnd
+    cap_bulk[1] += vcc_3v3
+    cap_bulk[2] += gnd
+    cap_bypass1[1] += vcc_3v3
+    cap_bypass1[2] += gnd
     
     # EN pull-up
-    en_pullup["1"] += vcc_3v3
-    en_pullup["2"] += esp32["EN"]
-    
-    return vcc_3v3, gnd, debug_tx, debug_rx, led_control
+    en_pullup[1] += vcc_3v3
+    en_pullup[2] += esp32["EN"]
 '''
 
     def _get_debug_header_template(self) -> str:
@@ -393,10 +374,10 @@ def debug_header(vcc_3v3_in, gnd_in, debug_tx_in, debug_rx_in):
     )
     
     # Connections
-    debug_conn["1"] += vcc_3v3  # Power
-    debug_conn["2"] += gnd      # Ground
-    debug_conn["3"] += debug_tx # UART TX
-    debug_conn["4"] += debug_rx # UART RX
+    debug_conn[1] += vcc_3v3  # Power
+    debug_conn[2] += gnd      # Ground
+    debug_conn[3] += debug_tx # UART TX
+    debug_conn[4] += debug_rx # UART RX
 '''
 
     def _get_led_status_template(self) -> str:
@@ -433,8 +414,8 @@ def led_status(vcc_3v3_in, gnd_in, led_control_in):
     )
     
     # Connections
-    led_control += led_resistor["1"]
-    led_resistor["2"] += led["A"]
+    led_control += led_resistor[1]
+    led_resistor[2] += led["A"]
     led["K"] += gnd
 '''
 
@@ -465,20 +446,22 @@ from led_status import led_status
 def main_circuit():
     """Main hierarchical circuit - ESP32-S3 complete development board"""
     
-    # Create USB power input
-    vbus, gnd, usb_dp, usb_dm = usb_power()
+    # Create shared nets between subcircuits (ONLY nets - no components here)
+    vbus = Net('VBUS')
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    usb_dp = Net('USB_DP')
+    usb_dm = Net('USB_DM')
+    debug_tx = Net('DEBUG_TX')
+    debug_rx = Net('DEBUG_RX')
+    led_control = Net('LED_CONTROL')
     
-    # Create power supply (5V to 3.3V)
-    vcc_3v3, gnd = power_supply(vbus, gnd)
-    
-    # Create ESP32 MCU with support circuits
-    vcc_3v3, gnd, debug_tx, debug_rx, led_control = esp32_mcu(vcc_3v3, gnd, usb_dp, usb_dm)
-    
-    # Create debug interface
-    debug_header(vcc_3v3, gnd, debug_tx, debug_rx)
-    
-    # Create status LED
-    led_status(vcc_3v3, gnd, led_control)
+    # Create all circuits with shared nets
+    usb_power_circuit = usb_power(vbus, gnd, usb_dp, usb_dm)
+    power_supply_circuit = power_supply(vbus, vcc_3v3, gnd)
+    esp32_circuit = esp32_mcu(vcc_3v3, gnd, usb_dp, usb_dm, debug_tx, debug_rx, led_control)
+    debug_header_circuit = debug_header(vcc_3v3, gnd, debug_tx, debug_rx)
+    led_status_circuit = led_status(vcc_3v3, gnd, led_control)
 
 
 if __name__ == "__main__":
