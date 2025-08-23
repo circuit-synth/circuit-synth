@@ -1865,25 +1865,34 @@ class PCBBoard:
 
         elif algorithm == "external":
             # External placement: all components at origin (0,0) with cutout rectangle
-            logger.debug(f"Starting external placement with {len(self.footprints)} components")
+            logger.error(f"🔥🔥🔥 EXTERNAL PLACEMENT ALGORITHM STARTED 🔥🔥🔥")
+            logger.error(f"🔥 Starting external placement with {len(self.footprints)} components")
+            logger.error(f"🔥 Available footprints: {list(self.footprints.keys())}")
             
             # Place all components at origin (0,0)
             updated_count = 0
             for footprint in self.footprints.values():
                 old_pos = footprint.position
+                logger.error(f"🔥 BEFORE: {footprint.reference} at ({old_pos.x}, {old_pos.y})")
                 footprint.position = Point(0.0, 0.0)
                 footprint.rotation = 0.0  # Reset rotation to 0
-                logger.debug(f"Moved {footprint.reference}: ({old_pos.x}, {old_pos.y}) -> (0.0, 0.0)")
+                logger.error(f"🔥 AFTER: {footprint.reference} at ({footprint.position.x}, {footprint.position.y})")
                 updated_count += 1
             
+            logger.error(f"🔥 All components positioned at origin: {updated_count} components updated")
+            
             # Clear existing Edge.Cuts and add only our cutout rectangle
+            logger.error(f"🔥 Clearing existing edge cuts...")
             self.clear_edge_cuts()
+            logger.error(f"🔥 Edge cuts cleared")
             
             # Add cutout rectangle on Edge.Cuts layer from (100,100) to (200,200)
             cutout_start_x = kwargs.get("cutout_start_x", 100.0)
             cutout_start_y = kwargs.get("cutout_start_y", 100.0) 
             cutout_end_x = kwargs.get("cutout_end_x", 200.0)
             cutout_end_y = kwargs.get("cutout_end_y", 200.0)
+            
+            logger.error(f"🔥 Creating cutout rectangle: ({cutout_start_x}, {cutout_start_y}) to ({cutout_end_x}, {cutout_end_y})")
             
             # Create cutout rectangle on Edge.Cuts layer
             cutout_rect = Rectangle(
@@ -1895,7 +1904,14 @@ class PCBBoard:
                 uuid=str(uuid_module.uuid4()),
             )
             
+            logger.error(f"🔥 Adding cutout rectangle to board...")
             self._add_graphic_item(cutout_rect)
+            logger.error(f"🔥 Cutout rectangle added")
+            
+            logger.error(f"🔥🔥🔥 EXTERNAL PLACEMENT COMPLETED SUCCESSFULLY 🔥🔥🔥")
+            logger.error(f"🔥 Final component positions after external placement:")
+            for footprint in self.footprints.values():
+                logger.error(f"🔥   {footprint.reference}: ({footprint.position.x}, {footprint.position.y})")
             
             logger.info(f"External placement completed: {updated_count} components at origin")
             logger.info(f"Added cutout rectangle: ({cutout_start_x}, {cutout_start_y}) to ({cutout_end_x}, {cutout_end_y})")
