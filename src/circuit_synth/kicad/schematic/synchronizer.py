@@ -499,15 +499,12 @@ class APISynchronizer:
         symbol_cache = SymbolLibraryCache()
         for lib_id in sorted(lib_ids):
             try:
-                symbol_data = symbol_cache.get_symbol(lib_id)
-                if symbol_data:
-                    # Build symbol definition from JSON data
-                    symbol_def = symbol_cache._build_symbol_definition(
-                        lib_id, symbol_data
-                    )
-                    if symbol_def:
-                        lib_symbols_block.append(symbol_def)
-                        logger.debug(f"Added symbol definition for {lib_id}")
+                symbol_def = symbol_cache.get_symbol(lib_id)
+                if symbol_def:
+                    # Convert SymbolDefinition to S-expression format
+                    symbol_sexp = self.parser._symbol_definition_to_sexp(symbol_def)
+                    lib_symbols_block.append(symbol_sexp)
+                    logger.debug(f"Added symbol definition for {lib_id}")
             except Exception as e:
                 logger.warning(f"Failed to add symbol definition for {lib_id}: {e}")
 

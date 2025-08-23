@@ -1015,9 +1015,11 @@ class PCBParser:
             sexpdata.Symbol(pad.shape),
         ]
 
-        # Add position
-        if pad.position.x != 0 or pad.position.y != 0:
-            sexp.append([sexpdata.Symbol("at"), pad.position.x, pad.position.y])
+        # Add position with rotation
+        at_expr = [sexpdata.Symbol("at"), pad.position.x, pad.position.y]
+        if hasattr(pad, 'rotation') and pad.rotation != 0:
+            at_expr.append(pad.rotation)
+        sexp.append(at_expr)
 
         # Add size
         sexp.append([sexpdata.Symbol("size")] + list(pad.size))

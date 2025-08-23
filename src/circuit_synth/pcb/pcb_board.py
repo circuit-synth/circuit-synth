@@ -2520,6 +2520,7 @@ class PCBBoard:
                 shape=pad_shape_enum,
                 position=Point(x, y),
                 size=(width, height),
+                rotation=rotation,  # Add the parsed rotation
                 layers=layers,
                 uuid=str(uuid_module.uuid4()),
             )
