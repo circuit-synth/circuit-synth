@@ -52,6 +52,7 @@ class Pad:
     shape: str  # "circle", "rect", "roundrect", etc.
     position: Point  # Relative to footprint origin
     size: Tuple[float, float]  # (width, height)
+    rotation: float = 0.0  # Rotation in degrees
     layers: List[str] = field(default_factory=list)
     drill: Optional[Union[float, Dict[str, float]]] = (
         None  # float for circular, dict for oval
