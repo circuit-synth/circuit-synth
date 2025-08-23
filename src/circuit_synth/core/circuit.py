@@ -452,7 +452,7 @@ class Circuit:
         project_name: str,
         generate_pcb: bool = True,
         force_regenerate: bool = False,
-        placement_algorithm: str = "connection_aware",
+        placement_algorithm: str = "connection_centric",
         draw_bounding_boxes: bool = False,
         generate_ratsnest: bool = True,
     ) -> None:
@@ -467,7 +467,7 @@ class Circuit:
             project_name: Name of the KiCad project and directory to create
             generate_pcb: Whether to generate PCB in addition to schematic (default: True)
             force_regenerate: Force regeneration of existing files, losing manual edits (default: False)
-            placement_algorithm: Component placement algorithm to use (default: "connection_aware")
+            placement_algorithm: Component placement algorithm to use (default: "connection_centric")
             draw_bounding_boxes: Whether to draw visual bounding boxes around components (default: False)
             generate_ratsnest: Whether to generate ratsnest connections in PCB (default: True)
 
