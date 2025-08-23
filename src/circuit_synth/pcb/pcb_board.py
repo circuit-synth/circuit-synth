@@ -1876,6 +1876,9 @@ class PCBBoard:
                 logger.debug(f"Moved {footprint.reference}: ({old_pos.x}, {old_pos.y}) -> (0.0, 0.0)")
                 updated_count += 1
             
+            # Clear existing Edge.Cuts and add only our cutout rectangle
+            self.clear_edge_cuts()
+            
             # Add cutout rectangle on Edge.Cuts layer from (100,100) to (200,200)
             cutout_start_x = kwargs.get("cutout_start_x", 100.0)
             cutout_start_y = kwargs.get("cutout_start_y", 100.0) 
