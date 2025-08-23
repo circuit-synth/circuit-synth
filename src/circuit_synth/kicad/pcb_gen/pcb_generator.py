@@ -315,7 +315,7 @@ class PCBGenerator:
                             connections=(
                                 connections
                                 if placement_algorithm
-                                in ["spiral", "force_directed", "connection_centric"]
+                                in ["spiral", "force_directed", "connection_centric", "external"]
                                 else None
                             ),
                         )
@@ -347,11 +347,14 @@ class PCBGenerator:
                     actual_width = ((max_x - min_x + 4) // 5) * 5
                     actual_height = ((max_y - min_y + 4) // 5) * 5
 
-                    # Update board outline to actual size needed
-                    pcb.set_board_outline_rect(0, 0, actual_width, actual_height)
-                    logger.debug(
-                        f"✓ Adjusted board size to actual needs: {actual_width}x{actual_height}mm"
-                    )
+                    # Update board outline to actual size needed (skip for external placement)
+                    if placement_algorithm != "external":
+                        pcb.set_board_outline_rect(0, 0, actual_width, actual_height)
+                        logger.debug(
+                            f"✓ Adjusted board size to actual needs: {actual_width}x{actual_height}mm"
+                        )
+                    else:
+                        logger.debug("Skipping board outline recalculation for external placement to preserve cutout")
 
                     # Debug: Check result and list components after placement
                     logger.debug(f"Placement result: {result}")

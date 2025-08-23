@@ -1393,7 +1393,7 @@ class PCBBoard:
         Automatically place components using specified algorithm.
 
         Args:
-            algorithm: Placement algorithm to use ("hierarchical", "force_directed", "spiral", "advanced", etc.)
+            algorithm: Placement algorithm to use ("hierarchical", "force_directed", "spiral", "advanced", "external", etc.)
             **kwargs: Algorithm-specific parameters
                 For hierarchical placement:
                 - component_spacing: Spacing between components in mm (default: 0.5)
@@ -1422,6 +1422,11 @@ class PCBBoard:
                 - enable_global_optimization: Enable global optimization phase (default: True)
                 - enable_decoupling_optimization: Enable special decoupling cap placement (default: True)
                 - enable_passive_grouping: Enable passive component grouping (default: True)
+                For external placement:
+                - cutout_start_x: X coordinate of cutout start (default: 100.0)
+                - cutout_start_y: Y coordinate of cutout start (default: 100.0)
+                - cutout_end_x: X coordinate of cutout end (default: 200.0)
+                - cutout_end_y: Y coordinate of cutout end (default: 200.0)
 
         Raises:
             ValueError: If unknown algorithm is specified
@@ -1858,6 +1863,43 @@ class PCBBoard:
                 f"Completed {algorithm} placement with {len(connections)} connections"
             )
 
+        elif algorithm == "external":
+            # External placement: all components at origin (0,0) with cutout rectangle
+            logger.debug(f"Starting external placement with {len(self.footprints)} components")
+            
+            # Place all components at origin (0,0)
+            updated_count = 0
+            for footprint in self.footprints.values():
+                old_pos = footprint.position
+                footprint.position = Point(0.0, 0.0)
+                footprint.rotation = 0.0  # Reset rotation to 0
+                logger.debug(f"Moved {footprint.reference}: ({old_pos.x}, {old_pos.y}) -> (0.0, 0.0)")
+                updated_count += 1
+            
+            # Clear existing Edge.Cuts and add only our cutout rectangle
+            self.clear_edge_cuts()
+            
+            # Add cutout rectangle on Edge.Cuts layer from (100,100) to (200,200)
+            cutout_start_x = kwargs.get("cutout_start_x", 100.0)
+            cutout_start_y = kwargs.get("cutout_start_y", 100.0) 
+            cutout_end_x = kwargs.get("cutout_end_x", 200.0)
+            cutout_end_y = kwargs.get("cutout_end_y", 200.0)
+            
+            # Create cutout rectangle on Edge.Cuts layer
+            cutout_rect = Rectangle(
+                start=Point(cutout_start_x, cutout_start_y),
+                end=Point(cutout_end_x, cutout_end_y),
+                layer="Edge.Cuts",
+                width=0.05,  # Standard width for edge cuts
+                fill=False,
+                uuid=str(uuid_module.uuid4()),
+            )
+            
+            self._add_graphic_item(cutout_rect)
+            
+            logger.info(f"External placement completed: {updated_count} components at origin")
+            logger.info(f"Added cutout rectangle: ({cutout_start_x}, {cutout_start_y}) to ({cutout_end_x}, {cutout_end_y})")
+            
         else:
             raise ValueError(f"Unknown placement algorithm: {algorithm}")
 

@@ -517,7 +517,8 @@ class Circuit:
                 # Legacy system handles placement, modern API handles file writing via write_schematic_file
                 result = generator.generate_project(
                     json_file=temp_json_path,
-                    schematic_placement=placement_algorithm,
+                    placement_algorithm=placement_algorithm,  # PCB placement algorithm  
+                    schematic_placement="sequential",  # Use simple sequential for schematic
                     generate_pcb=generate_pcb,
                     force_regenerate=force_regenerate,
                     draw_bounding_boxes=draw_bounding_boxes,
