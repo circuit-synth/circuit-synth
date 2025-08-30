@@ -33,10 +33,24 @@ from .simulator import CircuitSimulator, SimulationResult
 from .testbench import TestBenchGenerator, generate_testbench_for_circuit
 from .visualization import SimulationVisualizer, enhance_simulation_result
 
+# New plugin-based simulation interface
+from .simulation_interface import (
+    simulate,
+    simulate_dc,
+    simulate_ac, 
+    simulate_transient,
+    simulate_all,
+    list_available_analyses,
+    list_available_formats,
+    get_plugin_info
+)
+from .plugin_manager import get_plugin_registry, get_configuration_manager
+
 # Enhance SimulationResult with export capabilities
 SimulationResult = enhance_simulation_result(SimulationResult)
 
 __all__ = [
+    # Traditional simulation interface
     "CircuitSimulator",
     "SimulationResult",
     "SpiceConverter",
@@ -51,4 +65,16 @@ __all__ = [
     "TestBenchGenerator",
     "generate_testbench_for_circuit",
     "SimulationVisualizer",
+    
+    # New plugin-based simulation interface
+    "simulate",
+    "simulate_dc",
+    "simulate_ac",
+    "simulate_transient", 
+    "simulate_all",
+    "list_available_analyses",
+    "list_available_formats",
+    "get_plugin_info",
+    "get_plugin_registry",
+    "get_configuration_manager",
 ]

@@ -1,0 +1,40 @@
+{
+  "format": "circuit-synth-simulation-report",
+  "version": "1.0",
+  "analysis_results": {
+    "dc": {
+      "error": "Circuit-simulation integration not found at: ../../../src/circuit_sim/circuit_synth_integration.py",
+      "status": "failed"
+    }
+  },
+  "metadata": {
+    "generated_by": "circuit-synth",
+    "plugin_name": "json",
+    "plugin_version": "1.0.0",
+    "generator": "JSONFormatPlugin",
+    "generated_at": "2025-08-30T09:08:10.671800"
+  },
+  "circuit": {
+    "name": "simple_divider",
+    "description": "Simple resistor divider with voltage source.",
+    "components": [],
+    "nets": [],
+    "error": "Failed to export circuit data: Could not write JSON netlist to /var/folders/rm/26jsncrd4xl3z78w3jdxplrw0000gn/T/tmpx2t29cnb.json: Object of type Net is not JSON serializable"
+  },
+  "summary": {
+    "circuit_name": "simple_divider",
+    "analysis_types": [
+      "dc"
+    ],
+    "num_analysis_types": 1,
+    "dc_summary": {
+      "analysis_type": "dc",
+      "status": "completed",
+      "operating_point": true,
+      "data_size": {
+        "bytes": 131,
+        "characters": 131
+      }
+    }
+  }
+}

@@ -601,6 +601,61 @@ class Circuit:
         )
         return CircuitSimulator(self)
 
+    def simulate_with_plugins(self, 
+                             analysis=None, 
+                             config=None, 
+                             format="default"):
+        """
+        Run simulation using the new extensible plugin system.
+        
+        This method uses the plugin-based simulation system to run analysis and generate reports.
+        It provides a more streamlined interface compared to the traditional simulate() method.
+        
+        Args:
+            analysis: Analysis type(s) to run. Can be:
+                - None: Run default analysis types from config
+                - str: Single analysis type (e.g., "dc", "ac", "transient") 
+                - List[str]: Multiple analysis types (e.g., ["dc", "ac"])
+            config: Optional configuration override dict
+            format: Output format ("html", "json", or "default")
+        
+        Returns:
+            str: Path to generated report file
+            
+        Examples:
+            >>> circuit = my_circuit_function()
+            >>> report_path = circuit.simulate_with_plugins()  # All analyses, HTML report
+            
+            >>> report_path = circuit.simulate_with_plugins(analysis="ac")  # AC only
+            
+            >>> report_path = circuit.simulate_with_plugins(
+            ...     analysis=["dc", "transient"], 
+            ...     format="json"
+            ... )
+        """
+        try:
+            from ..simulation.simulation_interface import simulate
+        except ImportError as e:
+            context_logger.error(
+                "Plugin simulation system not available", 
+                component="CIRCUIT", 
+                error=str(e)
+            )
+            raise ImportError(
+                "Plugin simulation system requires dependencies. "
+                "Check circuit-synth installation."
+            ) from e
+        
+        context_logger.info(
+            "Running plugin-based simulation",
+            component="CIRCUIT",
+            circuit_name=self.name,
+            analysis=analysis,
+            format=format
+        )
+        
+        return simulate(self, analysis=analysis, config=config, format=format)
+
     def simulator(self):
         """
         Alias for simulate() method for backward compatibility.

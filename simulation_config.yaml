@@ -1,0 +1,49 @@
+# Circuit-Synth Plugin-Based Simulation Configuration
+
+analysis:
+  default_types: ['dc', 'ac', 'transient']
+  
+  dc:
+    enabled: true
+    include_operating_point: true
+    calculate_small_signal: false
+  
+  ac:
+    enabled: true
+    start_frequency: '1Hz'
+    stop_frequency: '1MHz'
+    points_per_decade: 10
+    variation: 'dec'
+    include_phase: true
+    include_magnitude: true
+  
+  transient:
+    enabled: true
+    duration: '10ms'
+    timestep: '1us'
+    start_time: '0s'
+    max_timestep: null
+    include_initial_conditions: true
+
+output:
+  default_format: 'html'
+  output_directory: 'simulation_reports'
+  
+  html:
+    include_interactive_plots: true
+    include_summary: true
+    include_raw_data: false
+    theme: 'professional'
+    plot_width: 800
+    plot_height: 600
+  
+  json:
+    pretty_print: true
+    indent: 2
+    include_metadata: true
+    include_circuit_data: true
+    include_timestamps: true
+
+circuit_simulation:
+  backend_path: '../../../'  # Path to circuit-simulation library
+  timeout: 30  # seconds for analysis

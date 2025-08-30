@@ -81,6 +81,13 @@ def setup_claude_integration():
 # KiCad API imports
 from .kicad.core.types import Junction, Label, Schematic, SchematicSymbol, Wire
 
+# Simulation imports (optional - requires dependencies)
+try:
+    from .simulation import simulate, simulate_dc, simulate_ac, simulate_transient
+    _SIMULATION_AVAILABLE = True
+except ImportError:
+    _SIMULATION_AVAILABLE = False
+
 __all__ = [
     # Core
     "Circuit",
@@ -123,3 +130,12 @@ __all__ = [
     # Claude Code integration
     "setup_claude_integration",
 ]
+
+# Add simulation functions to __all__ if available
+if _SIMULATION_AVAILABLE:
+    __all__.extend([
+        "simulate",
+        "simulate_dc", 
+        "simulate_ac",
+        "simulate_transient",
+    ])
