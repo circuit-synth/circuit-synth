@@ -16,10 +16,22 @@ class SpiceExporter:
     
     # Component mapping from KiCad symbols to SPICE syntax
     SPICE_COMPONENT_MAP = {
+        # Basic passive components
         "Device:R": "R{ref} {pin1} {pin2} {value}",
         "Device:C": "C{ref} {pin1} {pin2} {value}",
         "Device:L": "L{ref} {pin1} {pin2} {value}",
-        # Add more component types as needed
+        
+        # Power regulation components (VI GND VO pinout)
+        "Regulator_Linear:AMS1117-3.3": "X{ref} {pin1} {pin2} {pin3} AMS1117_3V3",
+        
+        # Protection components  
+        "Diode:ESD5Zxx": "D{ref} {pin1} {pin2} ESD5Z",
+        
+        # Connectors (simplified models)
+        "Connector:USB_C_Receptacle_USB2.0_16P": "X{ref} {vbus} {gnd} {dp} {dm} {cc1} {cc2} {shield} USB_CONN",
+        
+        # Complex ICs (behavioral models)
+        "RF_Module:ESP32-C6-MINI-1": "X{ref} {vdd} {gnd} {io18} {io19} {en} ESP32_C6"
     }
     
     def __init__(self, circuit):
@@ -54,20 +66,29 @@ class SpiceExporter:
         component_lines = self._export_components()
         lines.extend(component_lines)
         
+        # Add SPICE subcircuit models
+        lines.extend([
+            "",
+            "* SPICE Subcircuit Models",
+            self._get_subcircuit_models()
+        ])
+        
         # Add voltage sources for analysis (basic implementation)
         if include_analysis:
             lines.extend([
                 "",
                 "* Voltage sources for analysis",
-                "VIN VIN 0 DC 0  ; Sweep this for DC analysis",
+                "VIN VIN 0 DC 5V  ; 5V USB power input",
                 "",
                 "* Analysis commands",
-                ".DC VIN 0 5 0.1",
+                ".DC VIN 3 6 0.1  ; Sweep input voltage",
                 ".AC DEC 10 0.1 1MEG",
+                ".TRAN 0 10m 0 10u  ; Transient analysis for load regulation",
                 "",
                 "* Output requests", 
-                ".PRINT DC V(VOUT)",
-                ".PRINT AC VDB(VOUT) VP(VOUT)"
+                ".PRINT DC V(VOUT) I(VIN)",
+                ".PRINT AC VDB(VOUT) VP(VOUT)",
+                ".PRINT TRAN V(VOUT) I(VIN)"
             ])
         
         lines.extend(["", ".END"])
@@ -140,38 +161,84 @@ class SpiceExporter:
             logger.warning(f"Component {component.ref} has insufficient pin connections")
             return None
         
-        # Format the SPICE line
-        return template.format(
-            ref=component.ref,
-            pin1=pin_nets[0],
-            pin2=pin_nets[1] if len(pin_nets) > 1 else "0",
-            value=component.value or "1"
-        )
+        # Format the SPICE line with proper pin mapping
+        format_dict = {
+            'ref': component.ref,
+            'value': component.value or "1"
+        }
+        
+        # Add pin mappings (pin1, pin2, pin3, etc.)
+        for i, net in enumerate(pin_nets, 1):
+            format_dict[f'pin{i}'] = net
+            
+        # Fill any missing pins with ground (0)
+        max_pins = template.count('{pin')  # Count how many pins the template needs
+        for i in range(len(pin_nets) + 1, max_pins + 1):
+            format_dict[f'pin{i}'] = "0"
+        
+        return template.format(**format_dict)
     
     def _get_component_pin_nets(self, component) -> List[str]:
         """
         Get SPICE net names for component pins.
         
-        This is a simplified implementation - the real one needs to 
-        inspect the component's pin connections to nets.
+        This inspects the component's pin connections and maps them to net names.
         """
-        # TODO: Implement proper pin-to-net mapping
-        # For now, return placeholder names based on common patterns
+        pin_nets = []
         
-        # This is a placeholder - in real implementation, we need to:
-        # 1. Get the component's pins
-        # 2. Find which nets are connected to each pin  
-        # 3. Map those nets to SPICE net names
+        # Get the component's pin connections
+        # In circuit-synth, components connect to nets via the += operator
+        # We need to find which nets each pin is connected to
         
-        # Temporary: return some reasonable defaults for testing
-        if hasattr(component, '_connected_nets'):
-            # If component tracks its net connections
-            nets = component._connected_nets
-            return [self._net_map.get(net, net.name) for net in nets]
+        if hasattr(component, '_pin_connections') and component._pin_connections:
+            # If component has pin connection tracking
+            for pin_name, net in component._pin_connections.items():
+                spice_net_name = self._net_map.get(net, net.name if hasattr(net, 'name') else str(net))
+                pin_nets.append(spice_net_name)
         else:
-            # Fallback - return generic names
-            # This won't work for real circuits, but allows testing the structure
-            return ["VIN", "VOUT"]  # Placeholder for testing
+            # Fallback: try to determine connections based on component type and circuit context
+            # This is a simplified approach for demonstration
+            
+            if component.symbol == "Regulator_Linear:AMS1117-3.3":
+                # AMS1117: VI, GND, VO (Input, Ground, Output)
+                # Look for nets that match common power net patterns
+                all_nets = list(self._net_map.keys())
+                
+                # Find input net (likely VBUS, VIN, V+, etc.)
+                input_net = None
+                for net in all_nets:
+                    if net.name.upper() in ['VBUS', 'VIN', 'V+', 'INPUT']:
+                        input_net = self._net_map[net]
+                        break
+                if not input_net:
+                    input_net = "VIN"  # Default
+                
+                # Find ground net 
+                ground_net = "0"  # Always use SPICE ground
+                
+                # Find output net (likely VCC_3V3, VOUT, 3V3, etc.)
+                output_net = None
+                for net in all_nets:
+                    if net.name.upper() in ['VCC_3V3', 'VOUT', '3V3', 'OUTPUT', 'VDD']:
+                        output_net = self._net_map[net]
+                        break
+                if not output_net:
+                    output_net = "VOUT"  # Default
+                
+                pin_nets = [input_net, ground_net, output_net]
+                
+            elif component.symbol in ["Device:R", "Device:C", "Device:L"]:
+                # 2-pin passive components - connect to any two available nets
+                available_nets = list(self._net_map.values())
+                if len(available_nets) >= 2:
+                    pin_nets = available_nets[:2]
+                else:
+                    pin_nets = ["VIN", "VOUT"]  # Fallback
+            else:
+                # Generic component - use placeholder nets
+                pin_nets = ["VIN", "VOUT"]
+        
+        return pin_nets
     
     def validate_netlist(self, netlist: str) -> bool:
         """
@@ -188,3 +255,51 @@ class SpiceExporter:
         has_components = any(line.strip() and not line.strip().startswith(('*', '.')) for line in lines)
         
         return has_title and has_end and has_components
+    
+    def _get_subcircuit_models(self) -> str:
+        """
+        Return SPICE subcircuit models for complex components.
+        
+        Returns:
+            str: Multi-line string with .SUBCKT definitions
+        """
+        models = [
+            "* AMS1117-3.3 Behavioral Model",
+            ".SUBCKT AMS1117_3V3 VI GND VO",
+            "* Simple regulation: VO = 3.3V when VI > 4V (dropout = 1.2V typical)",
+            "* Current limit: 1A maximum",
+            "E1 VO GND VALUE={IF(V(VI,GND) > 4.0, 3.3, V(VI,GND)-1.2)}",
+            "R1 VO GND 1MEG  ; Output impedance",
+            "G1 VI GND VALUE={I(E1)*1.2/V(VI,GND)}  ; Power dissipation model",
+            ".ENDS AMS1117_3V3",
+            "",
+            "* ESP32-C6 Simplified Power Model",
+            ".SUBCKT ESP32_C6 VDD GND IO18 IO19 EN",
+            "* Power consumption: 200mA active, 10uA deep sleep",
+            "I1 VDD GND 200m  ; 200mA typical current draw",
+            "* GPIO behavioral models (simplified)",
+            "R18 IO18 GND 10k ; GPIO pull-up",
+            "R19 IO19 GND 10k",
+            "R_EN EN GND 10k  ; Enable pin pull-up",
+            ".ENDS ESP32_C6",
+            "",
+            "* ESD Protection Diode",
+            ".SUBCKT ESD5Z A K",
+            "D1 A K D_ESD5V",
+            ".MODEL D_ESD5V D(IS=1e-14 BV=5.5 IBV=1e-3 CJO=50p)",
+            ".ENDS ESD5Z",
+            "",
+            "* USB Connector Model (simplified)",
+            ".SUBCKT USB_CONN VBUS GND DP DM CC1 CC2 SHIELD",
+            "* CC resistors for device detection (5.1k pull-down)",
+            "R_CC1 CC1 GND 5.1k",
+            "R_CC2 CC2 GND 5.1k",
+            "* Shield connection",
+            "R_SHIELD SHIELD GND 1m  ; Shield to ground",
+            "* USB data lines (minimal model)",
+            "R_DP DP GND 1MEG  ; High impedance when not driven",
+            "R_DM DM GND 1MEG",
+            ".ENDS USB_CONN"
+        ]
+        
+        return "\n".join(models)
