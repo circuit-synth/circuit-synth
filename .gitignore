@@ -9,7 +9,6 @@ test_outputs/
 *.kicad_sch-bak
 
 # Submodules in development
-submodules/circuit-intelligence/
 
 # C extensions
 *.so
