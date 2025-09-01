@@ -1,9 +1,9 @@
 (export (version "E")
     (design
       (source "test_schematic.kicad_sch")
-      (date "2025-08-10T07:10:44-0700")
+      (date "2025-08-17T21:49:28-0700")
       (tool "Circuit-Synth Exporter v0.1.0")
-      (sheet (number "1") (name "root") (tstamps "/851bb7b0-e643-4c80-9af4-18877fc4e256/")
+      (sheet (number "1") (name "root") (tstamps "/2b6caabd-c263-4ddf-86b3-3745ce0b0228/")
       (title_block
         (title)
         (company)
@@ -34,7 +34,7 @@
       (property (name "ki_keywords") (value "cap capacitor"))
       (property (name "ki_fp_filters") (value "C_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "eac2a710-9448-46d3-8e80-83b377dcd584"))
+      (tstamps "dd368131-4200-412f-a18a-b595678aa47e"))
     (comp (ref "R1")
       (value "10k")
       (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -49,7 +49,7 @@
       (property (name "ki_keywords") (value "R res resistor"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "6ce14978-6870-4a5b-95eb-16976e737402"))
+      (tstamps "173e3693-09af-47af-a30c-b3ce14540ea9"))
     (comp (ref "R2")
       (value "1k")
       (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -64,7 +64,7 @@
       (property (name "ki_keywords") (value "R res resistor"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "0129c3b1-3720-4e78-a80e-cc6f80dce3b0")))
+      (tstamps "a0736e19-8713-40df-baf4-d8d0e232ed72")))
     (libparts
     (libpart (lib "Device") (part "C")
       (description "Unpolarized capacitor")
