@@ -51,6 +51,16 @@ if __name__ == "__main__":
     print("📄 Generating JSON netlist...")
     circuit.generate_json_netlist("ESP32_C6_Dev_Board.json")
     
+    # Generate SPICE netlist for circuit simulation
+    print("⚡ Generating SPICE netlist for simulation...")
+    try:
+        spice_netlist = circuit.to_spice(include_analysis=True)
+        with open("ESP32_C6_Dev_Board.cir", "w") as f:
+            f.write(spice_netlist)
+        print("✅ SPICE netlist saved as ESP32_C6_Dev_Board.cir")
+    except Exception as e:
+        print(f"⚠️  SPICE export not available: {e}")
+    
     # Create KiCad project with hierarchical sheets
     print("🏗️  Generating KiCad project...")
     circuit.generate_kicad_project(
@@ -77,6 +87,8 @@ if __name__ == "__main__":
     print("   • ESP32_C6_Dev_Board.kicad_pcb - PCB layout")
     print("   • ESP32_C6_Dev_Board.net - Netlist (enables ratsnest)")
     print("   • ESP32_C6_Dev_Board.json - JSON netlist (for analysis)")
+    print("   • ESP32_C6_Dev_Board.cir - SPICE netlist (for simulation)")
     print("")
-    print("🎯 Ready for professional PCB manufacturing!")
+    print("🎯 Ready for professional PCB manufacturing and simulation!")
     print("💡 Open ESP32_C6_Dev_Board.kicad_pcb in KiCad to see the ratsnest!")
+    print("⚡ Use ESP32_C6_Dev_Board.cir with SPICE simulators for circuit analysis!")
