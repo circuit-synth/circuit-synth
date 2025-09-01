@@ -37,3 +37,6 @@
 [submodule "submodules/kicad-sch-api"]
 	path = submodules/kicad-sch-api
 	url = git@github.com:circuit-synth/kicad-sch-api.git
+[submodule "submodules/circuit-intelligence"]
+	path = submodules/circuit-intelligence
+	url = https://github.com/circuit-synth/circuit-intelligence
