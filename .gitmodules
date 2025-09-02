@@ -40,3 +40,6 @@
 [submodule "submodules/circuit-intelligence"]
 	path = submodules/circuit-intelligence
 	url = https://github.com/circuit-synth/circuit-intelligence
+[submodule "submodules/circuit-simulation-upstream"]
+	path = submodules/circuit-simulation-upstream
+	url = https://github.com/circuit-synth/circuit-simulation
