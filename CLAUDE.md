@@ -1,151 +1,112 @@
-# CLAUDE.md - circuit-synth
+# CLAUDE.md — PRD + Logging Cooperative Workflow (Slim)
 
-This file provides guidance to Claude Code when working on the circuit-synth project.
-
-## 🎛️ CIRCUIT DESIGN AGENT (PRIMARY INTERFACE)
-
-**🚨 FOR ALL CIRCUIT-RELATED TASKS: Use the interactive-circuit-designer agent**
-
-```python
-@Task(subagent_type="interactive-circuit-designer", description="Circuit design", prompt="Any circuit design, analysis, optimization, or troubleshooting request")
-```
-
-This agent provides professional engineering partnership throughout the complete design lifecycle with:
-- Expert consultation and probing questions for optimal design decisions
-- Comprehensive project memory and design decision tracking  
-- Component intelligence with real-time sourcing integration
-- Professional documentation generation and test procedures
-- Seamless support from concept through manufacturing and testing
-
-## Memory-Bank System
-
-This project uses the Circuit Memory-Bank System for automatic engineering documentation and project knowledge preservation.
-
-### Overview
-The memory-bank system automatically tracks:
-- **Design Decisions**: Component choices and rationale
-- **Fabrication History**: PCB orders, delivery, and assembly
-- **Testing Results**: Performance data and issue resolution
-- **Timeline Events**: Project milestones and key dates
-- **Cross-Board Insights**: Knowledge shared between PCB variants
-
-### Multi-Level Agent System
-
-This project uses a nested agent structure:
-
-```
-circuit-synth/
-├── .claude/                    # Project-level agent
-├── pcbs/
-│   ├── circuit-synth-v1/
-│   │   ├── .claude/           # PCB-level agent
-│   │   └── memory-bank/       # PCB-specific documentation
-```
-
-### Context Switching
-
-Use the `cs-switch-board` command to work on specific PCBs:
-
-```bash
-# Switch to specific board context
-cs-switch-board circuit-synth-v1
-
-# List available boards
-cs-switch-board --list
-
-# Check current context
-cs-switch-board --status
-```
-
-**Important**: `cs-switch-board` will compress Claude's memory and reload the appropriate .claude configuration. This ensures you're working with the right context and memory-bank scope.
-
-### Memory-Bank Files
-
-Each PCB maintains standard memory-bank files:
-
-- **decisions.md**: Component choices, design rationale, alternatives considered
-- **fabrication.md**: PCB orders, delivery tracking, assembly notes
-- **testing.md**: Test results, measurements, performance validation
-- **timeline.md**: Project milestones, key events, deadlines
-- **issues.md**: Problems encountered, root causes, solutions
-
-### Automatic Documentation
-
-The system automatically updates memory-bank files when you:
-- Make git commits (primary trigger)
-- Run circuit-synth commands
-- Ask questions about the design
-- Perform tests or measurements
-
-**Best Practices for Commits**:
-- Use descriptive commit messages explaining **why** changes were made
-- Commit frequently to capture incremental design decisions
-- Include context about alternatives considered
-- Mention any testing or validation performed
-
-Examples:
-```bash
-# Good commit messages for memory-bank
-git commit -m "Switch to buck converter for better efficiency - tested 90% vs 60% with linear reg"
-git commit -m "Add external crystal for USB stability - internal RC caused enumeration failures"
-git commit -m "Increase decoupling cap to 22uF - scope showed 3.3V rail noise during WiFi tx"
-```
-
-### Memory-Bank Commands
-
-```bash
-# Initialize memory-bank in existing project
-cs-memory-bank-init
-
-# Remove memory-bank system
-cs-memory-bank-remove
-
-# Check memory-bank status
-cs-memory-bank-status
-
-# Search memory-bank content
-cs-memory-bank-search "voltage regulator"
-```
-
-### Library Sourcing Commands
-
-```bash
-# Setup library API credentials
-cs-library-setup                     # Show setup instructions
-cs-setup-snapeda-api YOUR_API_KEY    # Configure SnapEDA API
-cs-setup-digikey-api API_KEY CLIENT_ID  # Configure DigiKey API
-
-# Enhanced symbol/footprint search with fallback
-/find-symbol STM32                   # Local → DigiKey GitHub → APIs
-/find-footprint LQFP                 # Multi-source component search
-```
-
-### Troubleshooting
-
-**Environment Issues - Package Conflicts**:
-- **Problem**: Components placed incorrectly due to old pip-installed circuit-synth
-- **Solution**: Run `./scripts/ensure-clean-environment.sh` to remove conflicting packages
-- **Prevention**: Always use the cleanup script before starting work
-- **Symptoms**: Layout doesn't match expected placement, import errors, outdated behavior
-
-**Context Issues**:
-- If Claude seems confused about which board you're working on, use `cs-switch-board --status`
-- Use `cs-switch-board {board_name}` to explicitly set context
-
-**Memory-Bank Updates Not Working**:
-- Ensure you're committing through git (primary trigger for updates)
-- Check that memory-bank files exist in current board directory
-- Verify .claude configuration includes memory-bank instructions
-
-**File Corruption**:
-- All memory-bank files are in git - use `git checkout` to recover
-- Use `cs-memory-bank-init` to recreate missing template files
-
-## Project-Specific Instructions
-
-This is the circuit-synth project with memory-bank system enabled.
+> **Premise:** Keep it simple. We collaborate through a **thorough but crisp PRD**, build in **small chunks** with **TDD or probes**, and use **extensive logging breadcrumbs** so it’s obvious where logic runs, what decisions were made, and how to troubleshoot.
 
 ---
 
-*This CLAUDE.md was generated automatically by circuit-synth memory-bank system*  
-*Last updated: 2025-08-12T18:22:53.791299*
+## Repo & Naming
+
+* **PRDs:** `.claude/PRD/PRD-YYYYMMDD-<slug>.md`  (Status: Draft → Implementable → Shipped)
+* **Bugs:** `./claude/bug_fixes/BUG-YYYYMMDD-<slug>.md`
+
+```bash
+mkdir -p .claude/PRD ./claude/bug_fixes
+```
+
+---
+
+## Core Loop
+
+1. **Ask lots of questions** (be inquisitive; mark blocking vs. non‑blocking).
+2. **Draft/Update PRD** (it’s the source of truth).
+3. **Break into small chunks** (each proves one behavior).
+4. **TDD or probe‑first** (write a test or a precise probe before code).
+5. **Log breadcrumbs extensively** (see below).
+6. **Iterate**: code → run → read logs/tests → adjust → repeat until acceptance passes.
+
+---
+
+## Default Response (keep answers short)
+
+* **Summary & Success Criteria**
+* **Questions** (grouped; defaults offered; blocking tagged)
+* **Plan** (3–5 bullets)
+* **Chunks + Acceptance** (Given–When–Then)
+* **Test/Probe Next** (what we’ll add now)
+* **Next Action** (one concrete step)
+
+---
+
+## PRD — Thorough but Crisp (features)
+
+**Header:** `PRD-YYYYMMDD-<slug>` | Owner | Status | Version | Last updated
+
+**1. Executive Summary** — who/what/why now.
+**2. Goals / Non‑Goals** — scope boundaries.
+**3. Acceptance Criteria (Given–When–Then)** — clear, verifiable.
+**4. Requirements** — functional + key non‑functional.
+**5. Interfaces & Data Contracts** — inputs/outputs; link ERD only if data‑heavy.
+**6. Risks & Open Questions** — with how we’ll answer them.
+**7. Test Strategy** — what proves it works.
+**8. Logging Notes** — what breadcrumbs we expect to see when it runs.
+**Change Log** — date/version/summary.
+
+---
+
+## Unified Bug Fix Doc (single file)
+
+**Header:** `BUG-YYYYMMDD-<slug>` | Owner | Status | Version | Last updated
+**1. Summary & Impact**
+**2. Environment & Repro**
+**3. Expected vs. Actual**
+**4. Hypotheses → Experiments** (tests/probes)
+**5. Change Plan** (smallest safe)
+**6. Embedded Logging Plan** (breadcrumbs for the fix)
+**7. Acceptance (Given–When–Then)**
+**8. Rollback/Mitigations**
+**9. Evidence (key logs/traces)**
+**Change Log**
+
+---
+
+## Chunk Template (tiny)
+
+```
+Chunk: <name>
+Acceptance: <Given–When–Then>
+Test/Probe: <first proof>
+Next Step: <one action>
+```
+
+---
+
+## TDD / Probe‑First (tiny)
+
+1. Add a failing test **or** a precise probe.
+2. Make it pass with the **smallest** change.
+3. Refactor; keep green.
+4. Read logs; tighten probe if needed.
+
+---
+
+## Logging Breadcrumbs (directive)
+
+Use **extensive, moderate‑frequency breadcrumbs** to make execution paths obvious:
+
+* Log **entry/exit** of key functions/steps.
+* Log **decisions** (conditions, chosen branches, key parameters).
+* Log **inputs/outputs** at boundaries.
+* Include a **run/session id** when helpful.
+  Keep messages short, consistent, and easy to scan. Demote/trim once acceptance passes, but leave enough to troubleshoot later.
+
+---
+
+## Ready‑to‑Use Prompts
+
+**PRD Builder** — "Draft a crisp PRD using the template with Given–When–Then acceptance and brief logging notes."
+
+**Bug Doc Builder** — "Create the unified bug document (report + fix plan + logging) with repro, hypotheses→experiments, acceptance, and rollback."
+
+**Intake & Plan** — "Summarize goals, ask grouped questions, outline a short plan, list chunks with acceptance, specify the first test/probe, and give one next action."
+
+**Question Bank (auto‑ask)** — "List questions across goals/users, constraints, interfaces/data, environment, acceptance, risks, rollout; mark blocking vs. non‑blocking and suggest defaults."
