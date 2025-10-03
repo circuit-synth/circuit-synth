@@ -408,6 +408,12 @@ class SExpressionParser:
             if sexp and len(sexp) > 1:
                 result.append(sexp)
 
+        # Add rectangles (graphical bounding boxes) - only if they have content
+        for rectangle in schematic.rectangles:
+            sexp = self._rectangle_to_sexp(rectangle)
+            if sexp and len(sexp) > 1:
+                result.append(sexp)
+
         # Add sheet_instances placeholder (will be populated later)
         result.append([sexpdata.Symbol("sheet_instances")])
 
