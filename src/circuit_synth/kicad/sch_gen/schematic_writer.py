@@ -1010,10 +1010,10 @@ class SchematicWriter:
     def _add_component_bounding_boxes(self):
         """Add bounding box rectangles using KiCad API."""
         logger.debug(
-            f"Adding bounding boxes for {len(self.schematic.components)} components"
+            f"Adding bounding boxes for {len(self.circuit.components)} components"
         )
 
-        for comp in self.schematic.components:
+        for comp in self.circuit.components:
             # Get precise bounding box from existing calculator
             lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
             if not lib_data:
@@ -1593,27 +1593,32 @@ class SchematicWriter:
 def write_schematic_file(schematic_expr: list, out_path: str):
     """
     Helper to serialize the final S-expression to a .kicad_sch file.
-    
+
     HYBRID APPROACH: Uses modern kicad-sch-api if available, otherwise falls back to legacy.
     The legacy system handles positioning and hierarchy, modern API handles file writing.
     """
     # Try to use modern API for file writing if available
     try:
         from ..config import KiCadConfig, is_kicad_sch_api_available
-        
+
         if is_kicad_sch_api_available():
-            # Check if this contains hierarchical sheets - if so, use legacy for now
+            # Check if this contains hierarchical sheets or rectangles - if so, use legacy
             import sexpdata
             from pathlib import Path
             has_sheets = _contains_sheet_symbols(schematic_expr)
-            
-            # For now, only use modern API for component-level schematics
+            has_rectangles = _contains_rectangles(schematic_expr)
+
+            # For now, only use modern API for component-level schematics without rectangles
             # Main hierarchical schematics need legacy writer for proper sheet symbol support
+            # Schematics with rectangles need legacy writer since kicad-sch-api doesn't support graphics
             filename = Path(out_path).name
             is_main_schematic = not ('/' in filename or filename.count('.') > 1)
-            
-            if has_sheets or is_main_schematic:
-                logger.info(f"Using legacy writer for hierarchical schematic: {out_path}")
+
+            if has_sheets or is_main_schematic or has_rectangles:
+                if has_rectangles:
+                    logger.info(f"Using legacy writer for schematic with rectangles: {out_path}")
+                elif has_sheets or is_main_schematic:
+                    logger.info(f"Using legacy writer for hierarchical schematic: {out_path}")
             else:
                 logger.info(f"Using modern kicad-sch-api for component schematic: {out_path}")
                 return _write_with_modern_api(schematic_expr, out_path)
@@ -1646,7 +1651,7 @@ def _write_with_modern_api(schematic_expr: list, out_path: str) -> None:
             # Extract components and their positions from S-expression
             components_data = _extract_components_from_sexpr(schematic_expr)
             logger.info(f"Modern API: Adding {len(components_data)} positioned components")
-            
+
             # Add components with their calculated positions
             for comp_data in components_data:
                 try:
@@ -1660,7 +1665,7 @@ def _write_with_modern_api(schematic_expr: list, out_path: str) -> None:
                     logger.debug(f"Added component {comp_data['reference']} at {comp_data['position']}")
                 except Exception as e:
                     logger.error(f"Failed to add component {comp_data.get('reference')}: {e}")
-        
+
         # Save using modern API
         schematic.save(str(out_path), preserve_format=True)
         
@@ -1736,6 +1741,74 @@ def _contains_sheet_symbols(schematic_expr: list) -> bool:
         return False
     
     return find_sheets(schematic_expr)
+
+
+def _contains_rectangles(schematic_expr: list) -> bool:
+    """Check if S-expression contains rectangle graphics."""
+    import sexpdata
+
+    def find_rectangles(expr):
+        if isinstance(expr, list) and len(expr) > 0:
+            if isinstance(expr[0], sexpdata.Symbol) and str(expr[0]) == 'rectangle':
+                return True
+            for item in expr:
+                if isinstance(item, list) and find_rectangles(item):
+                    return True
+        return False
+
+    return find_rectangles(schematic_expr)
+
+
+def _extract_rectangles_from_sexpr(schematic_expr: list) -> List[Dict]:
+    """Extract rectangle data from S-expression."""
+    rectangles = []
+    import sexpdata
+
+    def extract_rect_data(expr):
+        if isinstance(expr, list) and len(expr) > 0:
+            if isinstance(expr[0], sexpdata.Symbol) and str(expr[0]) == 'rectangle':
+                # Found a rectangle
+                rect_data = {
+                    'start': (0.0, 0.0),
+                    'end': (0.0, 0.0),
+                    'stroke_width': 0.127,
+                    'stroke_type': 'solid',
+                    'fill_type': 'none'
+                }
+
+                # Parse rectangle attributes
+                for item in expr[1:]:
+                    if isinstance(item, list) and len(item) > 0:
+                        tag = str(item[0]) if isinstance(item[0], sexpdata.Symbol) else ''
+
+                        if tag == 'start':
+                            rect_data['start'] = (float(item[1]), float(item[2]))
+                        elif tag == 'end':
+                            rect_data['end'] = (float(item[1]), float(item[2]))
+                        elif tag == 'stroke':
+                            for stroke_item in item[1:]:
+                                if isinstance(stroke_item, list) and len(stroke_item) >= 2:
+                                    stroke_tag = str(stroke_item[0]) if isinstance(stroke_item[0], sexpdata.Symbol) else ''
+                                    if stroke_tag == 'width':
+                                        rect_data['stroke_width'] = float(stroke_item[1])
+                                    elif stroke_tag == 'type':
+                                        rect_data['stroke_type'] = str(stroke_item[1])
+                        elif tag == 'fill':
+                            for fill_item in item[1:]:
+                                if isinstance(fill_item, list) and len(fill_item) >= 2:
+                                    fill_tag = str(fill_item[0]) if isinstance(fill_item[0], sexpdata.Symbol) else ''
+                                    if fill_tag == 'type':
+                                        rect_data['fill_type'] = str(fill_item[1])
+
+                rectangles.append(rect_data)
+            else:
+                # Recursively search
+                for item in expr:
+                    if isinstance(item, list):
+                        extract_rect_data(item)
+
+    extract_rect_data(schematic_expr)
+    return rectangles
 
 
 def _contains_component_symbols(schematic_expr: list) -> bool:
