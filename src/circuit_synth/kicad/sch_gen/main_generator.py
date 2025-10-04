@@ -463,89 +463,13 @@ class SchematicGenerator:
         else:
             sync_report = synchronizer.sync_with_circuit(top_circuit)
 
-        # Add bounding boxes if requested
-        if draw_bounding_boxes:
-            logger.debug("Adding bounding boxes to synchronized schematic...")
-            self._add_bounding_boxes_to_existing_project(synchronizer, top_circuit)
+        # Note: Bounding boxes are added during initial generation in schematic_writer.py
+        # after component placement. No need to add them again during sync.
 
         # Log results
         self._log_sync_results(sync_report)
 
         return sync_report
-
-    def _add_bounding_boxes_to_existing_project(self, synchronizer, circuit):
-        """Add bounding boxes to an existing synchronized project."""
-        try:
-            # Import necessary classes
-            # Use optimized symbol cache from core.component for better performance
-            from circuit_synth.core.component import SymbolLibCache
-
-            from ...kicad.core.types import Point, Rectangle
-            from ..kicad_symbol_cache import SymbolLibCache
-            from .symbol_geometry import SymbolBoundingBoxCalculator
-
-            # Get the synchronized schematic
-            schematic = synchronizer.api_sync.schematic
-
-            logger.debug(
-                f"Adding bounding boxes for {len(schematic.components)} components"
-            )
-
-            # Track added rectangles for logging
-            added_count = 0
-
-            for comp in schematic.components:
-                # Get precise bounding box from existing calculator
-                lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
-                if not lib_data:
-                    logger.warning(
-                        f"No symbol data found for {comp.lib_id}, skipping bounding box"
-                    )
-                    continue
-
-                try:
-                    min_x, min_y, max_x, max_y = (
-                        SymbolBoundingBoxCalculator.calculate_bounding_box(lib_data)
-                    )
-
-                    # Create Rectangle using API types
-                    bbox_rect = Rectangle(
-                        start=Point(comp.position.x + min_x, comp.position.y + min_y),
-                        end=Point(comp.position.x + max_x, comp.position.y + max_y),
-                        stroke_width=0.127,  # Thin stroke (5 mils)
-                        stroke_type="solid",
-                        fill_type="none",
-                        # No stroke_color - KiCad uses default color
-                    )
-
-                    # Add to schematic using API method
-                    schematic.add_rectangle(bbox_rect)
-                    added_count += 1
-                    logger.debug(
-                        f"Added bounding box for {comp.reference} at ({comp.position.x + min_x:.2f}, {comp.position.y + min_y:.2f}) to ({comp.position.x + max_x:.2f}, {comp.position.y + max_y:.2f})"
-                    )
-
-                except Exception as e:
-                    logger.error(
-                        f"Failed to add bounding box for {comp.reference} ({comp.lib_id}): {e}"
-                    )
-                    continue
-
-            # Save and log results
-            if added_count > 0:
-                logger.info(
-                    f"Added {added_count} bounding boxes to synchronized schematic"
-                )
-                # Save the updated schematic using the synchronizer's save method
-                synchronizer.api_sync._save_schematic()
-                logger.debug(f"Updated schematic saved with bounding boxes")
-            else:
-                logger.warning("No bounding boxes were added")
-
-        except Exception as e:
-            logger.error(f"Failed to add bounding boxes to existing project: {e}")
-            # Don't fail the entire update process for bounding box issues
-            pass
 
     def _log_sync_results(self, sync_report):
         """Display synchronization results to user"""
