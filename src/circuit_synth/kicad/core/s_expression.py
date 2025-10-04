@@ -743,11 +743,11 @@ class SExpressionParser:
         sexp = [sexpdata.Symbol("symbol"), symbol_def.lib_id]
 
         # Add basic properties
-        # For KiCad compatibility, pin_numbers uses special format: (pin_numbers (hide yes))
+        # For KiCad compatibility, pin_numbers uses format: (pin_numbers hide)
         sexp.append(
             [
                 sexpdata.Symbol("pin_numbers"),
-                [sexpdata.Symbol("hide"), sexpdata.Symbol("yes")],
+                sexpdata.Symbol("hide"),
             ]
         )
         sexp.append([sexpdata.Symbol("pin_names"), [sexpdata.Symbol("offset"), 0]])

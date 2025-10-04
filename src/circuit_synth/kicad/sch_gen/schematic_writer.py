@@ -664,63 +664,70 @@ class SchematicWriter:
 
     def _place_components(self):
         """
-        Use the PlacementEngine to arrange components.
+        Use text-flow placement algorithm for component arrangement.
 
-        PERFORMANCE OPTIMIZATION: Uses force-directed placement algorithms.
+        Places components left-to-right, wrapping to new rows when needed.
+        Automatically selects appropriate sheet size (A4 or A3).
         """
+        print("=" * 80)
+        print("🔤 TEXT-FLOW PLACEMENT _place_components() called!")
+        print("=" * 80)
+
         if not self.schematic.components:
             logger.debug("No components to place")
+            print("⚠️  No components to place!")
             return
 
         start_time = time.perf_counter()
+        print(f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components")
+        print(f"🔤 PLACE_COMPONENTS: Using text-flow placement algorithm")
         logger.info(
             f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components"
         )
-        logger.info(f"🐍 PLACE_COMPONENTS: Using Python placement engine")
+        logger.info(f"🔤 PLACE_COMPONENTS: Using text-flow placement algorithm")
 
-        # Check if components need repositioning (have default positions)
-        components_needing_placement = []
+        # Print current positions
+        print("\n🔍 Component positions before placement:")
         for comp in self.schematic.components:
-            # If component is at origin or has no meaningful position, it needs placement
-            if (
-                comp.position.x <= 25.4 and comp.position.y <= 25.4
-            ):  # Within 1 inch of origin
-                components_needing_placement.append(comp)
+            print(f"  {comp.reference}: ({comp.position.x:.1f}, {comp.position.y:.1f})")
 
-        if not components_needing_placement:
-            logger.info(
-                "⏭️  PLACE_COMPONENTS: All components already have valid positions, skipping placement"
-            )
-            return
+        # Use text-flow placement for ALL components (ignore existing positions)
+        components_needing_placement = list(self.schematic.components)
+
+        print(f"\n📊 Components to place with text-flow: {len(components_needing_placement)}")
 
         logger.info(
             f"🔧 PLACE_COMPONENTS: {len(components_needing_placement)} components need placement"
         )
 
-        # Use the PlacementEngine
+        # Use text-flow placement
         try:
+            from ..schematic.text_flow_placement import place_with_text_flow
+            from ..schematic.layout_intermediate import LayoutIntermediate
+
             placement_start = time.perf_counter()
 
-            # Try force-directed placement for optimal results
-            if (
-                len(components_needing_placement) >= 3
-            ):  # Force-directed works best with multiple components
-                logger.info(
-                    "🦀 PLACE_COMPONENTS: Using force-directed placement for optimal component arrangement"
-                )
-                self.placement_engine.arrange_components(
-                    components_needing_placement,
-                    arrangement="force_directed",
-                    # Python implementation
-                )
-            else:
-                # For few components, use grid placement
-                logger.info(
-                    "🔧 PLACE_COMPONENTS: Using grid placement for few components"
-                )
-                self.placement_engine.arrange_components(
-                    components_needing_placement, arrangement="grid"
-                )
+            # Estimate bounding boxes for all components
+            layout_gen = LayoutIntermediate(self.schematic)
+            component_bboxes = []
+
+            for comp in components_needing_placement:
+                width, height = layout_gen._estimate_component_bbox(comp)
+                component_bboxes.append((comp.reference, width, height))
+                logger.debug(f"  {comp.reference}: bbox {width:.1f}x{height:.1f}mm")
+
+            # Run text-flow placement algorithm
+            placements, selected_sheet = place_with_text_flow(component_bboxes, spacing=2.54)
+
+            logger.info(f"📄 PLACE_COMPONENTS: Selected sheet size: {selected_sheet}")
+
+            # Apply placements to components
+            placement_map = {ref: (x, y) for ref, x, y in placements}
+            for comp in components_needing_placement:
+                if comp.reference in placement_map:
+                    x, y = placement_map[comp.reference]
+                    comp.position.x = x
+                    comp.position.y = y
 
             placement_time = time.perf_counter() - placement_start
             logger.info(
@@ -737,7 +744,7 @@ class SchematicWriter:
         except Exception as e:
             placement_error_time = time.perf_counter() - start_time
             logger.error(
-                f"❌ PLACE_COMPONENTS: PLACEMENT FAILED after {placement_error_time*1000:.2f}ms: {e}"
+                f"❌ PLACE_COMPONENTS: TEXT-FLOW PLACEMENT FAILED after {placement_error_time*1000:.2f}ms: {e}"
             )
             logger.warning("🔄 PLACE_COMPONENTS: Using fallback grid placement")
 

@@ -132,6 +132,26 @@ class ComponentManager:
         # Update component position
         component.position = Point(position[0], position[1])
 
+        # Track placement in JSON for visualization
+        try:
+            from .placement_tracker import PlacementTracker
+            from .layout_intermediate import LayoutIntermediate
+
+            # Use the same bbox estimation as the intermediate format generator
+            # This includes text labels and pin names, not just the symbol body
+            layout_gen = LayoutIntermediate(self.schematic)
+            width, height = layout_gen._estimate_component_bbox(component)
+
+            PlacementTracker.update_component_position(
+                reference,
+                position,
+                width,
+                height
+            )
+        except Exception as e:
+            # Don't fail if tracking doesn't work
+            logger.debug(f"Placement tracking failed: {e}")
+
         # Add instance using centralized utility with proper hierarchy
         from .instance_utils import add_symbol_instance, get_project_hierarchy_path
 
