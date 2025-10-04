@@ -52,6 +52,10 @@ class SymbolBoundingBoxCalculator:
         if not symbol_data:
             raise ValueError("Symbol data is None or empty")
 
+        import sys
+        print(f"\n=== CALCULATING BOUNDING BOX ===", file=sys.stderr, flush=True)
+        print(f"include_properties={include_properties}", file=sys.stderr, flush=True)
+
         min_x = float("inf")
         min_y = float("inf")
         max_x = float("-inf")
@@ -59,6 +63,7 @@ class SymbolBoundingBoxCalculator:
 
         # Process main symbol shapes (handle both 'shapes' and 'graphics' keys)
         shapes = symbol_data.get("shapes", []) or symbol_data.get("graphics", [])
+        print(f"Processing {len(shapes)} main shapes", file=sys.stderr, flush=True)
         for shape in shapes:
             shape_bounds = cls._get_shape_bounds(shape)
             if shape_bounds:
@@ -70,6 +75,7 @@ class SymbolBoundingBoxCalculator:
 
         # Process pins (including their labels)
         pins = symbol_data.get("pins", [])
+        print(f"Processing {len(pins)} main pins", file=sys.stderr, flush=True)
         for pin in pins:
             pin_bounds = cls._get_pin_bounds(pin)
             if pin_bounds:
@@ -107,6 +113,9 @@ class SymbolBoundingBoxCalculator:
         if min_x == float("inf") or max_x == float("-inf"):
             raise ValueError(f"No valid geometry found in symbol data")
 
+        print(f"After geometry processing: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})", file=sys.stderr, flush=True)
+        print(f"  Width: {max_x - min_x:.2f}, Height: {max_y - min_y:.2f}", file=sys.stderr, flush=True)
+
         # Add small margin for text that might extend beyond shapes
         margin = 0.254  # 10 mils
         min_x -= margin
@@ -137,6 +146,121 @@ class SymbolBoundingBoxCalculator:
         logger.debug(
             f"Calculated bounding box: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})"
         )
+
+        print(f"FINAL BBOX: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})", file=sys.stderr, flush=True)
+        print(f"  Width: {max_x - min_x:.2f}, Height: {max_y - min_y:.2f}", file=sys.stderr, flush=True)
+        print("=" * 50 + "\n", file=sys.stderr, flush=True)
+
+        return (min_x, min_y, max_x, max_y)
+
+    @classmethod
+    def calculate_placement_bounding_box(
+        cls,
+        symbol_data: Dict[str, Any],
+    ) -> Tuple[float, float, float, float]:
+        """
+        Calculate bounding box for PLACEMENT purposes - excludes pin labels.
+
+        This method calculates a tighter bounding box that only includes:
+        - Component body (shapes/graphics)
+        - Pin endpoints (without label text)
+        - Small margin for component properties
+
+        Pin label text is excluded because it extends arbitrarily far based on
+        text length and would cause incorrect spacing in text-flow placement.
+
+        Args:
+            symbol_data: Dictionary containing symbol definition from KiCad library
+
+        Returns:
+            Tuple of (min_x, min_y, max_x, max_y) in mm
+
+        Raises:
+            ValueError: If symbol data is invalid or bounding box cannot be calculated
+        """
+        if not symbol_data:
+            raise ValueError("Symbol data is None or empty")
+
+        import sys
+        print(f"\n=== CALCULATING PLACEMENT BOUNDING BOX (NO PIN LABELS) ===", file=sys.stderr, flush=True)
+
+        min_x = float("inf")
+        min_y = float("inf")
+        max_x = float("-inf")
+        max_y = float("-inf")
+
+        # Process main symbol shapes (handle both 'shapes' and 'graphics' keys)
+        shapes = symbol_data.get("shapes", []) or symbol_data.get("graphics", [])
+        print(f"Processing {len(shapes)} main shapes", file=sys.stderr, flush=True)
+        for shape in shapes:
+            shape_bounds = cls._get_shape_bounds(shape)
+            if shape_bounds:
+                s_min_x, s_min_y, s_max_x, s_max_y = shape_bounds
+                min_x = min(min_x, s_min_x)
+                min_y = min(min_y, s_min_y)
+                max_x = max(max_x, s_max_x)
+                max_y = max(max_y, s_max_y)
+
+        # Process pins WITHOUT labels (just pin endpoints)
+        pins = symbol_data.get("pins", [])
+        print(f"Processing {len(pins)} main pins (NO LABELS)", file=sys.stderr, flush=True)
+        for pin in pins:
+            pin_bounds = cls._get_pin_bounds_no_labels(pin)
+            if pin_bounds:
+                p_min_x, p_min_y, p_max_x, p_max_y = pin_bounds
+                min_x = min(min_x, p_min_x)
+                min_y = min(min_y, p_min_y)
+                max_x = max(max_x, p_max_x)
+                max_y = max(max_y, p_max_y)
+
+        # Process sub-symbols
+        sub_symbols = symbol_data.get("sub_symbols", [])
+        for sub in sub_symbols:
+            # Sub-symbols can have their own shapes and pins
+            sub_shapes = sub.get("shapes", []) or sub.get("graphics", [])
+            for shape in sub_shapes:
+                shape_bounds = cls._get_shape_bounds(shape)
+                if shape_bounds:
+                    s_min_x, s_min_y, s_max_x, s_max_y = shape_bounds
+                    min_x = min(min_x, s_min_x)
+                    min_y = min(min_y, s_min_y)
+                    max_x = max(max_x, s_max_x)
+                    max_y = max(max_y, s_max_y)
+
+            sub_pins = sub.get("pins", [])
+            for pin in sub_pins:
+                pin_bounds = cls._get_pin_bounds_no_labels(pin)
+                if pin_bounds:
+                    p_min_x, p_min_y, p_max_x, p_max_y = pin_bounds
+                    min_x = min(min_x, p_min_x)
+                    min_y = min(min_y, p_min_y)
+                    max_x = max(max_x, p_max_x)
+                    max_y = max(max_y, p_max_y)
+
+        # Check if we found any geometry
+        if min_x == float("inf") or max_x == float("-inf"):
+            raise ValueError(f"No valid geometry found in symbol data")
+
+        print(f"After geometry processing: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})", file=sys.stderr, flush=True)
+        print(f"  Width: {max_x - min_x:.2f}, Height: {max_y - min_y:.2f}", file=sys.stderr, flush=True)
+
+        # Add small margin
+        margin = 1.27  # 50mil margin
+        min_x -= margin
+        min_y -= margin
+        max_x += margin
+        max_y += margin
+
+        # Add space for component properties (Reference, Value) - minimal
+        # Reference is placed 5mm above center
+        # Value is placed 5mm below center
+        property_height = 2.54  # Standard text height
+        min_y -= 5.0 + property_height  # Reference above
+        max_y += 5.0 + property_height  # Value below
+
+        print(f"FINAL PLACEMENT BBOX: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})", file=sys.stderr, flush=True)
+        print(f"  Width: {max_x - min_x:.2f}, Height: {max_y - min_y:.2f}", file=sys.stderr, flush=True)
+        print("=" * 50 + "\n", file=sys.stderr, flush=True)
 
         return (min_x, min_y, max_x, max_y)
 
@@ -237,6 +361,8 @@ class SymbolBoundingBoxCalculator:
         cls, pin: Dict[str, Any]
     ) -> Optional[Tuple[float, float, float, float]]:
         """Get bounding box for a pin including its labels."""
+        import sys
+
         # Handle both formats: 'at' array or separate x/y/orientation
         if "at" in pin:
             at = pin.get("at", [0, 0])
@@ -265,6 +391,8 @@ class SymbolBoundingBoxCalculator:
         pin_name = pin.get("name", "")
         pin_number = pin.get("number", "")
 
+        print(f"  PIN {pin_number}: name='{pin_name}', at=({x:.2f}, {y:.2f}), angle={angle}, length={length:.2f}", file=sys.stderr, flush=True)
+
         if pin_name and pin_name != "~":  # ~ means no name
             # Pin labels are placed directly on the pin and extend outward
             # The text extends based on its length and height
@@ -274,15 +402,21 @@ class SymbolBoundingBoxCalculator:
                 * cls.DEFAULT_PIN_TEXT_WIDTH_RATIO
             )
 
+            print(f"    name_width={name_width:.2f} (len={len(pin_name)}, text_height={cls.DEFAULT_TEXT_HEIGHT}, ratio={cls.DEFAULT_PIN_TEXT_WIDTH_RATIO})", file=sys.stderr, flush=True)
+
             # Adjust bounds based on pin orientation
             # The label starts at the pin end and extends outward
             if angle == 0:  # Right - label extends to the right
+                print(f"    Angle 0 (Right): max_x {max_x:.2f} -> {end_x + name_width:.2f}", file=sys.stderr, flush=True)
                 max_x = end_x + name_width
             elif angle == 180:  # Left - label extends to the left
+                print(f"    Angle 180 (Left): min_x {min_x:.2f} -> {end_x - name_width:.2f}", file=sys.stderr, flush=True)
                 min_x = end_x - name_width
             elif angle == 90:  # Up - label extends upward
+                print(f"    Angle 90 (Up): max_y {max_y:.2f} -> {end_y + name_width:.2f}", file=sys.stderr, flush=True)
                 max_y = end_y + name_width  # Use name_width for vertical text too
             elif angle == 270:  # Down - label extends downward
+                print(f"    Angle 270 (Down): min_y {min_y:.2f} -> {end_y - name_width:.2f}", file=sys.stderr, flush=True)
                 min_y = end_y - name_width  # Use name_width for vertical text too
 
         # Pin numbers are typically placed near the component body
@@ -300,5 +434,46 @@ class SymbolBoundingBoxCalculator:
             min_y -= margin
             max_x += margin
             max_y += margin
+
+        print(f"    Pin bounds: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})", file=sys.stderr, flush=True)
+        return (min_x, min_y, max_x, max_y)
+
+    @classmethod
+    def _get_pin_bounds_no_labels(
+        cls, pin: Dict[str, Any]
+    ) -> Optional[Tuple[float, float, float, float]]:
+        """Get bounding box for a pin WITHOUT labels - for placement calculations only."""
+        import sys
+
+        # Handle both formats: 'at' array or separate x/y/orientation
+        if "at" in pin:
+            at = pin.get("at", [0, 0])
+            x, y = at[0], at[1]
+            angle = at[2] if len(at) > 2 else 0
+        else:
+            # Handle the format from symbol cache
+            x = pin.get("x", 0)
+            y = pin.get("y", 0)
+            angle = pin.get("orientation", 0)
+
+        length = pin.get("length", cls.DEFAULT_PIN_LENGTH)
+
+        # Calculate pin endpoint based on angle
+        angle_rad = math.radians(angle)
+        end_x = x + length * math.cos(angle_rad)
+        end_y = y + length * math.sin(angle_rad)
+
+        # Only include the pin line itself - NO labels
+        min_x = min(x, end_x)
+        min_y = min(y, end_y)
+        max_x = max(x, end_x)
+        max_y = max(y, end_y)
+
+        # Add small margin for pin graphics (circles, etc)
+        margin = 0.5  # Small margin for pin endpoint graphics
+        min_x -= margin
+        min_y -= margin
+        max_x += margin
+        max_y += margin
 
         return (min_x, min_y, max_x, max_y)

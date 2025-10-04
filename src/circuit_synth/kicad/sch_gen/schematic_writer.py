@@ -669,18 +669,19 @@ class SchematicWriter:
         Places components left-to-right, wrapping to new rows when needed.
         Automatically selects appropriate sheet size (A4 or A3).
         """
-        print("=" * 80)
-        print("🔤 TEXT-FLOW PLACEMENT _place_components() called!")
-        print("=" * 80)
+        import sys
+        print("=" * 80, file=sys.stderr, flush=True)
+        print("🔤 TEXT-FLOW PLACEMENT _place_components() called!", file=sys.stderr, flush=True)
+        print("=" * 80, file=sys.stderr, flush=True)
 
         if not self.schematic.components:
             logger.debug("No components to place")
-            print("⚠️  No components to place!")
+            print("⚠️  No components to place!", file=sys.stderr, flush=True)
             return
 
         start_time = time.perf_counter()
-        print(f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components")
-        print(f"🔤 PLACE_COMPONENTS: Using text-flow placement algorithm")
+        print(f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components", file=sys.stderr, flush=True)
+        print(f"🔤 PLACE_COMPONENTS: Using text-flow placement algorithm", file=sys.stderr, flush=True)
         logger.info(
             f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components"
         )
@@ -722,12 +723,15 @@ class SchematicWriter:
                     # Fallback to reasonable defaults
                     width, height = 10.0, 10.0
                 else:
-                    # Calculate bounding box from symbol body (same as drawn rectangles)
+                    # Calculate bounding box for PLACEMENT (excludes pin labels)
+                    import sys
+                    print(f"\n🔍 PLACEMENT: About to calculate bbox for {comp.reference} ({comp.lib_id})", file=sys.stderr, flush=True)
                     min_x, min_y, max_x, max_y = (
-                        SymbolBoundingBoxCalculator.calculate_bounding_box(lib_data)
+                        SymbolBoundingBoxCalculator.calculate_placement_bounding_box(lib_data)
                     )
                     width = max_x - min_x
                     height = max_y - min_y
+                    print(f"🔍 PLACEMENT: Calculated bbox for {comp.reference}: {width:.2f} x {height:.2f} mm", file=sys.stderr, flush=True)
 
                 component_bboxes.append((comp.reference, width, height))
                 logger.debug(f"  {comp.reference}: bbox {width:.1f}x{height:.1f}mm")
@@ -1049,8 +1053,9 @@ class SchematicWriter:
             try:
                 from .symbol_geometry import SymbolBoundingBoxCalculator
 
+                # Use placement bbox (without pin labels) so drawn boxes match placement
                 min_x, min_y, max_x, max_y = (
-                    SymbolBoundingBoxCalculator.calculate_bounding_box(lib_data)
+                    SymbolBoundingBoxCalculator.calculate_placement_bounding_box(lib_data)
                 )
 
                 # Create Rectangle using API types
