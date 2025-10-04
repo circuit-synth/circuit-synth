@@ -1017,10 +1017,11 @@ class SchematicWriter:
     def _add_component_bounding_boxes(self):
         """Add bounding box rectangles using KiCad API."""
         logger.debug(
-            f"Adding bounding boxes for {len(self.circuit.components)} components"
+            f"Adding bounding boxes for {len(self.schematic.components)} components"
         )
 
-        for comp in self.circuit.components:
+        # Use schematic components (with updated positions) instead of circuit components
+        for comp in self.schematic.components:
             # Get precise bounding box from existing calculator
             lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
             if not lib_data:
