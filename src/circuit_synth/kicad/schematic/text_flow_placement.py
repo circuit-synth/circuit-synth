@@ -110,12 +110,27 @@ class TextFlowPlacer:
         """
         placements = []
 
+        # Sort components by area (largest first), then by width
+        # This ensures better space utilization
+        sorted_bboxes = sorted(
+            component_bboxes,
+            key=lambda x: (x[1] * x[2], x[1]),  # (area, width)
+            reverse=True
+        )
+
+        print(f"  Sorted components (largest first):")
+        for i, (ref, width, height) in enumerate(sorted_bboxes[:5]):
+            print(f"    [{i+1}] {ref}: {width:.1f}×{height:.1f}mm (area={width*height:.1f}mm²)")
+        if len(sorted_bboxes) > 5:
+            print(f"    ... and {len(sorted_bboxes)-5} more")
+        print()
+
         # Initialize bounding box position (top-left corner)
         bbox_x = sheet.min_x
         bbox_y = sheet.min_y
         current_row_height = 0.0
 
-        for i, (ref, width, height) in enumerate(component_bboxes):
+        for i, (ref, width, height) in enumerate(sorted_bboxes):
             # Check if component fits in current row
             if bbox_x + width > sheet.max_x:
                 # Wrap to next row

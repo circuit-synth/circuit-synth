@@ -703,21 +703,37 @@ class SchematicWriter:
         # Use text-flow placement
         try:
             from ..schematic.text_flow_placement import place_with_text_flow
-            from ..schematic.layout_intermediate import LayoutIntermediate
+            from .symbol_geometry import SymbolBoundingBoxCalculator
+            from ..kicad_symbol_cache import SymbolLibCache
 
             placement_start = time.perf_counter()
 
-            # Estimate bounding boxes for all components
-            layout_gen = LayoutIntermediate(self.schematic)
+            # Get accurate bounding boxes using SymbolBoundingBoxCalculator
+            # (same method used to draw the bbox rectangles)
             component_bboxes = []
 
             for comp in components_needing_placement:
-                width, height = layout_gen._estimate_component_bbox(comp)
+                # Get symbol library data
+                lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
+                if not lib_data:
+                    logger.warning(
+                        f"No symbol data found for {comp.lib_id}, using fallback size"
+                    )
+                    # Fallback to reasonable defaults
+                    width, height = 10.0, 10.0
+                else:
+                    # Calculate bounding box from symbol body (same as drawn rectangles)
+                    min_x, min_y, max_x, max_y = (
+                        SymbolBoundingBoxCalculator.calculate_bounding_box(lib_data)
+                    )
+                    width = max_x - min_x
+                    height = max_y - min_y
+
                 component_bboxes.append((comp.reference, width, height))
                 logger.debug(f"  {comp.reference}: bbox {width:.1f}x{height:.1f}mm")
 
-            # Run text-flow placement algorithm
-            placements, selected_sheet = place_with_text_flow(component_bboxes, spacing=2.54)
+            # Run text-flow placement algorithm with 50mil (1.27mm) spacing
+            placements, selected_sheet = place_with_text_flow(component_bboxes, spacing=1.27)
 
             logger.info(f"📄 PLACE_COMPONENTS: Selected sheet size: {selected_sheet}")
 
