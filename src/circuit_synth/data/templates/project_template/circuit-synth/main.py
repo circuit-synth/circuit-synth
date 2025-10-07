@@ -57,7 +57,8 @@ if __name__ == "__main__":
         project_name="ESP32_C6_Dev_Board",
         placement_algorithm="external",
         generate_pcb=True,
-        force_regenerate=True
+        force_regenerate=True,
+        draw_bounding_boxes=True  # Enable ComponentUnit bounding boxes for debugging
     )
     
     print("")
