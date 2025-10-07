@@ -90,6 +90,7 @@ from circuit_synth.kicad.core.types import (
     Text,
     Wire,
 )
+from circuit_synth.kicad.schematic.component_unit import ComponentUnit
 
 # Import Python symbol cache specifically for graphics data
 from circuit_synth.kicad.kicad_symbol_cache import (
@@ -374,9 +375,10 @@ class SchematicWriter:
         logger.info(
             f"⚡ STEP 3/8: Adding pin-level net labels for {len(self.circuit.nets)} nets..."
         )
-        self._add_pin_level_net_labels()
+        component_labels = self._add_pin_level_net_labels()
         labels_time = time.perf_counter() - labels_start
         logger.info(f"✅ STEP 3/8: Net labels added in {labels_time*1000:.2f}ms")
+        logger.debug(f"  Label tracking: {len(component_labels)} components with labels")
 
         # Add subcircuit sheets if needed
         sheets_start = time.perf_counter()
@@ -388,17 +390,24 @@ class SchematicWriter:
         sheets_time = time.perf_counter() - sheets_start
         logger.info(f"✅ STEP 4/8: Subcircuit sheets added in {sheets_time*1000:.2f}ms")
 
-        # Add bounding boxes if enabled
+        # Create ComponentUnits (bundles component + labels + bbox)
+        units_start = time.perf_counter()
+        logger.info(f"⚡ STEP 5/8: Creating ComponentUnits for {len(self.circuit.components)} components...")
+        component_units = self._create_component_units(component_labels)
+        units_time = time.perf_counter() - units_start
+        logger.info(f"✅ STEP 5/8: ComponentUnits created in {units_time*1000:.2f}ms")
+
+        # Draw bounding boxes if enabled
         bbox_start = time.perf_counter()
         if self.draw_bounding_boxes:
             logger.info(
-                f"⚡ STEP 5/8: Adding bounding boxes for {len(self.circuit.components)} components..."
+                f"⚡ STEP 6/8: Drawing bounding boxes for {len(component_units)} ComponentUnits..."
             )
-            self._add_component_bounding_boxes()
+            self._draw_component_unit_bboxes(component_units)
             bbox_time = time.perf_counter() - bbox_start
-            logger.info(f"✅ STEP 5/8: Bounding boxes added in {bbox_time*1000:.2f}ms")
+            logger.info(f"✅ STEP 6/8: Bounding boxes drawn in {bbox_time*1000:.2f}ms")
         else:
-            logger.info("⏭️  STEP 5/8: Bounding boxes disabled, skipping")
+            logger.info("⏭️  STEP 6/8: Bounding boxes disabled, skipping")
             bbox_time = 0
 
         # Add text annotations (TextBox, TextProperty, etc.)
@@ -406,17 +415,17 @@ class SchematicWriter:
 
         # Convert to S-expression format using the parser
         sexpr_start = time.perf_counter()
-        logger.info("⚡ STEP 6/8: Converting to S-expression format...")
+        logger.info("⚡ STEP 7/9: Converting to S-expression format...")
         schematic_sexpr = self.parser.from_schematic(self.schematic)
         sexpr_time = time.perf_counter() - sexpr_start
         logger.info(
-            f"✅ STEP 6/8: S-expression conversion completed in {sexpr_time*1000:.2f}ms"
+            f"✅ STEP 7/9: S-expression conversion completed in {sexpr_time*1000:.2f}ms"
         )
 
         # Add additional sections
         sections_start = time.perf_counter()
         logger.info(
-            "⚡ STEP 7/8: Adding additional sections (paper, lib_symbols, sheet_instances)..."
+            "⚡ STEP 8/9: Adding additional sections (paper, lib_symbols, sheet_instances)..."
         )
 
         # Paper size is now added by the parser, so we don't need to add it again
@@ -439,7 +448,7 @@ class SchematicWriter:
 
         sections_time = time.perf_counter() - sections_start
         logger.info(
-            f"✅ STEP 7/8: Additional sections added in {sections_time*1000:.2f}ms"
+            f"✅ STEP 8/9: Additional sections added in {sections_time*1000:.2f}ms"
         )
         logger.debug(f"  📄 Paper size: {paper_time*1000:.3f}ms")
         logger.debug(f"  📚 Lib symbols: {libsym_time*1000:.2f}ms")
@@ -452,7 +461,7 @@ class SchematicWriter:
         total_time = time.perf_counter() - start_time
         expr_size = len(str(schematic_sexpr)) if schematic_sexpr else 0
 
-        logger.info("🏁 STEP 8/8: Schematic generation complete!")
+        logger.info("🏁 STEP 9/9: Schematic generation complete!")
         logger.info(f"✅ GENERATE_S_EXPR: ✅ TOTAL TIME: {total_time*1000:.2f}ms")
         logger.info(
             f"📊 GENERATE_S_EXPR: Generated S-expression: {expr_size:,} characters"
@@ -664,63 +673,165 @@ class SchematicWriter:
 
     def _place_components(self):
         """
-        Use the PlacementEngine to arrange components.
+        Use text-flow placement algorithm for component arrangement.
 
-        PERFORMANCE OPTIMIZATION: Uses force-directed placement algorithms.
+        Places components left-to-right, wrapping to new rows when needed.
+        Automatically selects appropriate sheet size (A4 or A3).
         """
+        import sys
+        print("=" * 80, file=sys.stderr, flush=True)
+        print("🔤 TEXT-FLOW PLACEMENT _place_components() called!", file=sys.stderr, flush=True)
+        print("=" * 80, file=sys.stderr, flush=True)
+
         if not self.schematic.components:
             logger.debug("No components to place")
+            print("⚠️  No components to place!", file=sys.stderr, flush=True)
             return
 
         start_time = time.perf_counter()
+        print(f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components", file=sys.stderr, flush=True)
+        print(f"🔤 PLACE_COMPONENTS: Using text-flow placement algorithm", file=sys.stderr, flush=True)
         logger.info(
             f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components"
         )
-        logger.info(f"🐍 PLACE_COMPONENTS: Using Python placement engine")
+        logger.info(f"🔤 PLACE_COMPONENTS: Using text-flow placement algorithm")
 
-        # Check if components need repositioning (have default positions)
-        components_needing_placement = []
+        # Print current positions
+        print("\n🔍 Component positions before placement:")
         for comp in self.schematic.components:
-            # If component is at origin or has no meaningful position, it needs placement
-            if (
-                comp.position.x <= 25.4 and comp.position.y <= 25.4
-            ):  # Within 1 inch of origin
-                components_needing_placement.append(comp)
+            print(f"  {comp.reference}: ({comp.position.x:.1f}, {comp.position.y:.1f})")
 
-        if not components_needing_placement:
-            logger.info(
-                "⏭️  PLACE_COMPONENTS: All components already have valid positions, skipping placement"
-            )
-            return
+        # Use text-flow placement for ALL components (ignore existing positions)
+        components_needing_placement = list(self.schematic.components)
+
+        print(f"\n📊 Components to place with text-flow: {len(components_needing_placement)}")
 
         logger.info(
             f"🔧 PLACE_COMPONENTS: {len(components_needing_placement)} components need placement"
         )
 
-        # Use the PlacementEngine
+        # Use text-flow placement
         try:
+            from ..schematic.text_flow_placement import place_with_text_flow
+            from .symbol_geometry import SymbolBoundingBoxCalculator
+            from ..kicad_symbol_cache import SymbolLibCache
+
             placement_start = time.perf_counter()
 
-            # Try force-directed placement for optimal results
-            if (
-                len(components_needing_placement) >= 3
-            ):  # Force-directed works best with multiple components
-                logger.info(
-                    "🦀 PLACE_COMPONENTS: Using force-directed placement for optimal component arrangement"
-                )
-                self.placement_engine.arrange_components(
-                    components_needing_placement,
-                    arrangement="force_directed",
-                    # Python implementation
-                )
-            else:
-                # For few components, use grid placement
-                logger.info(
-                    "🔧 PLACE_COMPONENTS: Using grid placement for few components"
-                )
-                self.placement_engine.arrange_components(
-                    components_needing_placement, arrangement="grid"
-                )
+            # Get accurate bounding boxes using SymbolBoundingBoxCalculator
+            # (same method used to draw the bbox rectangles)
+            component_bboxes = []
+
+            # Add components
+            for comp in components_needing_placement:
+                # Get symbol library data
+                lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
+                if not lib_data:
+                    logger.warning(
+                        f"No symbol data found for {comp.lib_id}, using fallback size"
+                    )
+                    # Fallback to reasonable defaults
+                    width, height = 10.0, 10.0
+                else:
+                    # Calculate bounding box for PLACEMENT only (excludes pin labels and hierarchical labels)
+                    # This is just for spacing - visual bboxes are drawn separately based on actual labels
+                    import sys
+                    print(f"\n🔍 PLACEMENT: About to calculate bbox for {comp.reference} ({comp.lib_id})", file=sys.stderr, flush=True)
+                    min_x, min_y, max_x, max_y = (
+                        SymbolBoundingBoxCalculator.calculate_placement_bounding_box(lib_data)
+                    )
+                    width = max_x - min_x
+                    height = max_y - min_y
+                    print(f"🔍 PLACEMENT: Calculated bbox for {comp.reference}: {width:.2f} x {height:.2f} mm", file=sys.stderr, flush=True)
+
+                component_bboxes.append((comp.reference, width, height))
+                logger.debug(f"  {comp.reference}: bbox {width:.1f}x{height:.1f}mm")
+
+            # Add sheets (if any)
+            if hasattr(self.circuit, 'child_instances') and self.circuit.child_instances:
+                print(f"\n📄 Found {len(self.circuit.child_instances)} sheets to place")
+                logger.debug(f"Found {len(self.circuit.child_instances)} sheets to place")
+
+                for child in self.circuit.child_instances:
+                    sub_name = child["sub_name"]
+
+                    # Calculate sheet dimensions (same logic as main_generator.py)
+                    sub_circ = self.all_subcircuits.get(sub_name)
+                    if sub_circ:
+                        pin_count = len(sub_circ.nets)
+
+                        # Calculate height based on pin count
+                        pin_spacing = 2.54
+                        min_height = 20.32
+                        padding = 5.08
+                        calculated_height = (pin_count * pin_spacing) + (2 * padding)
+                        sheet_height = max(min_height, calculated_height)
+
+                        # Calculate width based on name and labels
+                        min_width = 25.4
+                        char_width = 1.5
+                        name_width = len(sub_name) * char_width + 10
+
+                        # Find longest net name
+                        max_label_length = max((len(net.name) for net in sub_circ.nets), default=0)
+
+                        # Calculate bbox including labels that extend beyond sheet
+                        label_char_width = 1.27
+                        label_width = max_label_length * label_char_width + 10
+
+                        # Bbox width = sheet width + label extension
+                        sheet_width = max(min_width, name_width)
+                        bbox_width = sheet_width + label_width
+
+                        print(f"🔍 PLACEMENT: Sheet {sub_name}: sheet={sheet_width:.1f}mm, labels={label_width:.1f}mm, bbox={bbox_width:.1f}x{sheet_height:.1f}mm")
+                        logger.debug(f"  Sheet {sub_name}: bbox {bbox_width:.1f}x{sheet_height:.1f}mm")
+
+                        # Store dimensions for later use
+                        child["sheet_width"] = sheet_width
+                        child["sheet_height"] = sheet_height
+                        child["bbox_width"] = bbox_width
+                        child["bbox_height"] = sheet_height
+                    else:
+                        # Use defaults
+                        sheet_width = 50.8
+                        sheet_height = 25.4
+                        bbox_width = sheet_width + 20  # Add some space for labels
+                        child["sheet_width"] = sheet_width
+                        child["sheet_height"] = sheet_height
+                        child["bbox_width"] = bbox_width
+                        child["bbox_height"] = sheet_height
+
+                    # Add to placement list using a sheet identifier
+                    sheet_ref = f"SHEET_{sub_name}"
+                    component_bboxes.append((sheet_ref, bbox_width, sheet_height))
+                    child["placement_ref"] = sheet_ref
+
+            # Run text-flow placement algorithm
+            # Use larger spacing to account for hierarchical labels (not included in placement bbox)
+            placements, selected_sheet = place_with_text_flow(component_bboxes, spacing=15.0)
+
+            logger.info(f"📄 PLACE_COMPONENTS: Selected sheet size: {selected_sheet}")
+
+            # Apply placements to components and sheets
+            placement_map = {ref: (x, y) for ref, x, y in placements}
+
+            # Apply to components
+            for comp in components_needing_placement:
+                if comp.reference in placement_map:
+                    x, y = placement_map[comp.reference]
+                    comp.position.x = x
+                    comp.position.y = y
+
+            # Apply to sheets
+            if hasattr(self.circuit, 'child_instances') and self.circuit.child_instances:
+                for child in self.circuit.child_instances:
+                    sheet_ref = child.get("placement_ref")
+                    if sheet_ref and sheet_ref in placement_map:
+                        x, y = placement_map[sheet_ref]
+                        child["x"] = x
+                        child["y"] = y
+                        print(f"📄 Placed sheet {child['sub_name']} at ({x:.1f}, {y:.1f})")
+                        logger.debug(f"Placed sheet {child['sub_name']} at ({x:.1f}, {y:.1f})")
 
             placement_time = time.perf_counter() - placement_start
             logger.info(
@@ -737,7 +848,7 @@ class SchematicWriter:
         except Exception as e:
             placement_error_time = time.perf_counter() - start_time
             logger.error(
-                f"❌ PLACE_COMPONENTS: PLACEMENT FAILED after {placement_error_time*1000:.2f}ms: {e}"
+                f"❌ PLACE_COMPONENTS: TEXT-FLOW PLACEMENT FAILED after {placement_error_time*1000:.2f}ms: {e}"
             )
             logger.warning("🔄 PLACE_COMPONENTS: Using fallback grid placement")
 
@@ -759,8 +870,15 @@ class SchematicWriter:
     def _add_pin_level_net_labels(self):
         """
         Add local net labels at component pins for all nets.
+
+        Returns:
+            Dict[str, List[Label]]: Mapping of component reference to list of labels created for it.
+                                   Example: {"U1": [Label("RUN"), Label("USB_DP"), ...], "C1": [...]}
         """
         logger.debug(f"Adding pin-level net labels for circuit '{self.circuit.name}'.")
+
+        # Track which labels belong to which component
+        component_labels = {}  # Dict[str, List[Label]]
 
         # Get component lookup from the API
         for net in self.circuit.nets:
@@ -840,6 +958,12 @@ class SchematicWriter:
                 )
 
                 self.schematic.add_label(label)
+
+                # Track that this label belongs to this component
+                if actual_ref not in component_labels:
+                    component_labels[actual_ref] = []
+                component_labels[actual_ref].append(label)
+
                 label_time = (time.perf_counter() - label_start) * 1000
                 if PERF_DEBUG and label_time > 5:
                     log_net_label_creation(
@@ -848,6 +972,8 @@ class SchematicWriter:
                 logger.debug(
                     f"Added hierarchical label for net {net_name} at component {actual_ref}.{pin_identifier}"
                 )
+
+        return component_labels
 
     def _add_subcircuit_sheets(self):
         """
@@ -935,11 +1061,12 @@ class SchematicWriter:
                 pin_list = sorted(pin_list)
                 logger.info(f"Inferred hierarchical pins for '{sub_name}': {pin_list}")
 
-            # Use pre-calculated position and size
+            # Use pre-calculated position and size from placement
+            # These were set by _place_components() text-flow algorithm
             cx = child_info.get("x", 50.0)
             cy = child_info.get("y", 50.0)
-            width = child_info.get("width", 30.0)
-            height = child_info.get("height", 30.0)
+            width = child_info.get("sheet_width", child_info.get("width", 30.0))
+            height = child_info.get("sheet_height", child_info.get("height", 30.0))
 
             # Calculate sheet position (upper-left corner) and snap to grid
             # KiCad uses 50mil (1.27mm) grid
@@ -994,6 +1121,35 @@ class SchematicWriter:
             # Add sheet to schematic
             self.schematic.sheets.append(sheet)
 
+            # Draw bounding box around sheet if requested
+            if self.draw_bounding_boxes:
+                # Get bbox dimensions (includes label extensions)
+                bbox_width = child_info.get("bbox_width", width + 20)
+                bbox_height = child_info.get("bbox_height", height)
+
+                # Calculate bbox corners from center position
+                bbox_min_x = cx - (bbox_width / 2)
+                bbox_min_y = cy - (bbox_height / 2)
+                bbox_max_x = cx + (bbox_width / 2)
+                bbox_max_y = cy + (bbox_height / 2)
+
+                # Create Rectangle graphic for sheet bbox
+                bbox_rect = Rectangle(
+                    start=Point(bbox_min_x, bbox_min_y),
+                    end=Point(bbox_max_x, bbox_max_y),
+                    stroke_width=0.127,
+                    stroke_type="solid",
+                    fill_type="none",
+                )
+
+                # Add to schematic
+                self.schematic.add_rectangle(bbox_rect)
+
+                logger.debug(
+                    f"  Drew sheet bbox: ({bbox_min_x:.1f}, {bbox_min_y:.1f}) to "
+                    f"({bbox_max_x:.1f}, {bbox_max_y:.1f})"
+                )
+
             # Track sheet symbol UUID for hierarchical references
             self.sheet_symbol_map[sub_name] = sheet.uuid
 
@@ -1007,12 +1163,168 @@ class SchematicWriter:
             logger.debug(f"  Stored mapping: {sub_name} -> {sheet.uuid}")
             logger.debug(f"  Added sheet '{usage_label}' with {len(pin_list)} pins")
 
+    def _create_component_units(
+        self, component_labels: Dict[str, List[Label]]
+    ) -> List[ComponentUnit]:
+        """
+        Create ComponentUnit objects for all components.
+
+        Each ComponentUnit bundles a component with its labels and bounding box.
+        The bbox is calculated once based on the component's connected labels,
+        then the unit can be moved as a whole without recalculating dimensions.
+
+        Args:
+            component_labels: Mapping of component reference to its labels
+
+        Returns:
+            List of ComponentUnit objects
+        """
+        from .symbol_geometry import SymbolBoundingBoxCalculator
+
+        units = []
+        logger.debug(f"Creating ComponentUnits for {len(self.schematic.components)} components")
+
+        for comp in self.schematic.components:
+            comp_ref = comp.reference
+            labels = component_labels.get(comp_ref, [])
+
+            logger.debug(
+                f"  Creating ComponentUnit for {comp_ref} with {len(labels)} labels"
+            )
+
+            # 1. Get base bbox (component body + pins) in local coordinates
+            lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
+            if not lib_data:
+                logger.warning(f"No symbol data for {comp_ref} ({comp.lib_id}), skipping")
+                continue
+
+            base_bbox = SymbolBoundingBoxCalculator.calculate_placement_bounding_box(
+                lib_data
+            )
+
+            # 2. Convert base bbox to global coordinates
+            local_min_x, local_min_y, local_max_x, local_max_y = base_bbox
+            global_min_x = comp.position.x + local_min_x
+            global_min_y = comp.position.y + local_min_y
+            global_max_x = comp.position.x + local_max_x
+            global_max_y = comp.position.y + local_max_y
+
+            # 3. Extend bbox to include this component's labels
+            LABEL_CHAR_WIDTH = 1.27  # mm per character
+            LABEL_PADDING = 2.54  # vertical padding around label
+
+            logger.debug(f"  Base bbox (global): min=({global_min_x:.1f}, {global_min_y:.1f}), max=({global_max_x:.1f}, {global_max_y:.1f})")
+
+            for label in labels:
+                label_length = len(label.text) * LABEL_CHAR_WIDTH
+                logger.debug(f"    Label '{label.text}' at ({label.position.x:.1f}, {label.position.y:.1f}), orientation={label.orientation}°, length={label_length:.1f}mm")
+
+                # Extend bbox based on label orientation
+                # Labels extend IN THE DIRECTION the pin points (not opposite)
+                if label.orientation == 0:  # Right pin → label extends RIGHT
+                    old_max_x = global_max_x
+                    global_max_x = max(global_max_x, label.position.x + label_length)
+                    global_min_y = min(global_min_y, label.position.y - LABEL_PADDING)
+                    global_max_y = max(global_max_y, label.position.y + LABEL_PADDING)
+                    logger.debug(f"      0° (right pin): extended max_x from {old_max_x:.1f} to {global_max_x:.1f}")
+
+                elif label.orientation == 90:  # Up pin → label extends UP
+                    old_min_y = global_min_y
+                    global_min_y = min(global_min_y, label.position.y - label_length)
+                    global_min_x = min(global_min_x, label.position.x - LABEL_PADDING)
+                    global_max_x = max(global_max_x, label.position.x + LABEL_PADDING)
+                    logger.debug(f"      90° (up pin): extended min_y from {old_min_y:.1f} to {global_min_y:.1f}")
+
+                elif label.orientation == 180:  # Left pin → label extends LEFT
+                    old_min_x = global_min_x
+                    global_min_x = min(global_min_x, label.position.x - label_length)
+                    global_min_y = min(global_min_y, label.position.y - LABEL_PADDING)
+                    global_max_y = max(global_max_y, label.position.y + LABEL_PADDING)
+                    logger.debug(f"      180° (left pin): extended min_x from {old_min_x:.1f} to {global_min_x:.1f}")
+
+                elif label.orientation == 270:  # Down pin → label extends DOWN
+                    old_max_y = global_max_y
+                    global_max_y = max(global_max_y, label.position.y + label_length)
+                    global_min_x = min(global_min_x, label.position.x - LABEL_PADDING)
+                    global_max_x = max(global_max_x, label.position.x + LABEL_PADDING)
+                    logger.debug(f"      270° (down pin): extended max_y from {old_max_y:.1f} to {global_max_y:.1f}")
+
+            # 4. Create ComponentUnit
+            unit = ComponentUnit(
+                component=comp,
+                labels=labels,
+                bbox_min_x=global_min_x,
+                bbox_min_y=global_min_y,
+                bbox_max_x=global_max_x,
+                bbox_max_y=global_max_y,
+                bbox_graphic=None,  # Will be created later if draw_bounding_boxes=True
+            )
+
+            units.append(unit)
+            logger.debug(
+                f"  Final bbox (global): min=({global_min_x:.1f}, {global_min_y:.1f}), max=({global_max_x:.1f}, {global_max_y:.1f})"
+            )
+            logger.debug(
+                f"  Created ComponentUnit: {comp_ref} bbox={unit.width:.1f}×{unit.height:.1f}mm"
+            )
+
+        logger.info(f"Created {len(units)} ComponentUnits")
+        return units
+
+    def _draw_component_unit_bboxes(self, units: List[ComponentUnit]) -> None:
+        """
+        Draw bounding box rectangles for ComponentUnits.
+
+        Creates a Rectangle graphic for each unit's bbox and adds it to the schematic.
+        Much simpler than the old proximity-based approach - we already know the exact bbox!
+
+        Args:
+            units: List of ComponentUnit objects with calculated bboxes
+        """
+        logger.debug(f"Drawing bounding boxes for {len(units)} ComponentUnits")
+
+        for unit in units:
+            # Create Rectangle graphic from bbox coordinates
+            bbox_rect = Rectangle(
+                start=Point(unit.bbox_min_x, unit.bbox_min_y),
+                end=Point(unit.bbox_max_x, unit.bbox_max_y),
+                stroke_width=0.127,
+                stroke_type="solid",
+                fill_type="none",
+                # No stroke_color - KiCad uses default color
+            )
+
+            # Add to schematic
+            self.schematic.add_rectangle(bbox_rect)
+
+            # Also store reference in the unit (optional, for debugging)
+            unit.bbox_graphic = bbox_rect
+
+            logger.debug(
+                f"  Drew bbox for {unit.reference}: "
+                f"({unit.bbox_min_x:.1f}, {unit.bbox_min_y:.1f}) to "
+                f"({unit.bbox_max_x:.1f}, {unit.bbox_max_y:.1f})"
+            )
+
+        logger.info(f"Drew {len(units)} bounding box rectangles")
+
     def _add_component_bounding_boxes(self):
         """Add bounding box rectangles using KiCad API."""
         logger.debug(
             f"Adding bounding boxes for {len(self.schematic.components)} components"
         )
 
+        # Check if labels are available
+        import sys
+        print(f"\n🔍 BBOX: Checking for labels in schematic", file=sys.stderr, flush=True)
+        if hasattr(self.schematic, 'labels'):
+            print(f"🔍 BBOX: ✅ Has labels, count: {len(self.schematic.labels)}", file=sys.stderr, flush=True)
+            for i, label in enumerate(self.schematic.labels[:10]):
+                print(f"🔍 BBOX:   Label[{i}]: {label}", file=sys.stderr, flush=True)
+        else:
+            print(f"🔍 BBOX: ❌ No labels attribute", file=sys.stderr, flush=True)
+
+        # Use schematic components (with updated positions) instead of circuit components
         for comp in self.schematic.components:
             # Get precise bounding box from existing calculator
             lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
@@ -1025,9 +1337,58 @@ class SchematicWriter:
             try:
                 from .symbol_geometry import SymbolBoundingBoxCalculator
 
+                # Calculate base component bbox (without labels)
+                print(f"\n🔍 BBOX: Calculating bbox for {comp.reference} at ({comp.position.x:.3f}, {comp.position.y:.3f})", file=sys.stderr, flush=True)
+
                 min_x, min_y, max_x, max_y = (
-                    SymbolBoundingBoxCalculator.calculate_bounding_box(lib_data)
+                    SymbolBoundingBoxCalculator.calculate_placement_bounding_box(lib_data)
                 )
+
+                print(f"🔍 BBOX: Base component bbox: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})", file=sys.stderr, flush=True)
+
+                # Extend bbox to include all nearby hierarchical labels
+                LABEL_CHAR_WIDTH = 1.27  # mm per character (matches KiCad default font size)
+                LABEL_PROXIMITY = 30.0  # Fixed proximity radius for detecting nearby labels
+
+                for label in self.schematic.labels:
+                    if label.label_type.value != 'hierarchical_label':
+                        continue
+
+                    # Calculate distance to component
+                    dx = abs(label.position.x - comp.position.x)
+                    dy = abs(label.position.y - comp.position.y)
+                    dist = (dx**2 + dy**2)**0.5
+
+                    if dist < LABEL_PROXIMITY:
+                        # Calculate label dimensions
+                        label_length = len(label.text) * LABEL_CHAR_WIDTH
+
+                        # Extend bbox based on label orientation
+                        label_rel_x = label.position.x - comp.position.x
+                        label_rel_y = label.position.y - comp.position.y
+
+                        # Horizontal label (0° or 180°)
+                        if label.orientation in [0, 180]:
+                            if label.orientation == 180:  # Label extends to the left
+                                min_x = min(min_x, label_rel_x - label_length)
+                            else:  # Label extends to the right
+                                max_x = max(max_x, label_rel_x + label_length)
+                            # Add small vertical padding
+                            min_y = min(min_y, label_rel_y - 2.54)
+                            max_y = max(max_y, label_rel_y + 2.54)
+                        # Vertical label (90° or 270°)
+                        else:
+                            if label.orientation == 270:  # Label extends down (positive Y)
+                                max_y = max(max_y, label_rel_y + label_length)
+                            else:  # Label extends up (90°, negative Y)
+                                min_y = min(min_y, label_rel_y - label_length)
+                            # Add small horizontal padding
+                            min_x = min(min_x, label_rel_x - 2.54)
+                            max_x = max(max_x, label_rel_x + 2.54)
+
+                        print(f"🔍 BBOX:   Label '{label.text}' ({len(label.text)} chars, {label.orientation}°) at rel ({label_rel_x:.2f}, {label_rel_y:.2f})", file=sys.stderr, flush=True)
+
+                print(f"🔍 BBOX: Final bbox with labels: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})", file=sys.stderr, flush=True)
 
                 # Create Rectangle using API types
                 bbox_rect = Rectangle(
@@ -1593,27 +1954,32 @@ class SchematicWriter:
 def write_schematic_file(schematic_expr: list, out_path: str):
     """
     Helper to serialize the final S-expression to a .kicad_sch file.
-    
+
     HYBRID APPROACH: Uses modern kicad-sch-api if available, otherwise falls back to legacy.
     The legacy system handles positioning and hierarchy, modern API handles file writing.
     """
     # Try to use modern API for file writing if available
     try:
         from ..config import KiCadConfig, is_kicad_sch_api_available
-        
+
         if is_kicad_sch_api_available():
-            # Check if this contains hierarchical sheets - if so, use legacy for now
+            # Check if this contains hierarchical sheets or rectangles - if so, use legacy
             import sexpdata
             from pathlib import Path
             has_sheets = _contains_sheet_symbols(schematic_expr)
-            
-            # For now, only use modern API for component-level schematics
+            has_rectangles = _contains_rectangles(schematic_expr)
+
+            # For now, only use modern API for component-level schematics without rectangles
             # Main hierarchical schematics need legacy writer for proper sheet symbol support
+            # Schematics with rectangles need legacy writer since kicad-sch-api doesn't support graphics
             filename = Path(out_path).name
             is_main_schematic = not ('/' in filename or filename.count('.') > 1)
-            
-            if has_sheets or is_main_schematic:
-                logger.info(f"Using legacy writer for hierarchical schematic: {out_path}")
+
+            if has_sheets or is_main_schematic or has_rectangles:
+                if has_rectangles:
+                    logger.info(f"Using legacy writer for schematic with rectangles: {out_path}")
+                elif has_sheets or is_main_schematic:
+                    logger.info(f"Using legacy writer for hierarchical schematic: {out_path}")
             else:
                 logger.info(f"Using modern kicad-sch-api for component schematic: {out_path}")
                 return _write_with_modern_api(schematic_expr, out_path)
@@ -1646,7 +2012,7 @@ def _write_with_modern_api(schematic_expr: list, out_path: str) -> None:
             # Extract components and their positions from S-expression
             components_data = _extract_components_from_sexpr(schematic_expr)
             logger.info(f"Modern API: Adding {len(components_data)} positioned components")
-            
+
             # Add components with their calculated positions
             for comp_data in components_data:
                 try:
@@ -1660,7 +2026,7 @@ def _write_with_modern_api(schematic_expr: list, out_path: str) -> None:
                     logger.debug(f"Added component {comp_data['reference']} at {comp_data['position']}")
                 except Exception as e:
                     logger.error(f"Failed to add component {comp_data.get('reference')}: {e}")
-        
+
         # Save using modern API
         schematic.save(str(out_path), preserve_format=True)
         
@@ -1736,6 +2102,74 @@ def _contains_sheet_symbols(schematic_expr: list) -> bool:
         return False
     
     return find_sheets(schematic_expr)
+
+
+def _contains_rectangles(schematic_expr: list) -> bool:
+    """Check if S-expression contains rectangle graphics."""
+    import sexpdata
+
+    def find_rectangles(expr):
+        if isinstance(expr, list) and len(expr) > 0:
+            if isinstance(expr[0], sexpdata.Symbol) and str(expr[0]) == 'rectangle':
+                return True
+            for item in expr:
+                if isinstance(item, list) and find_rectangles(item):
+                    return True
+        return False
+
+    return find_rectangles(schematic_expr)
+
+
+def _extract_rectangles_from_sexpr(schematic_expr: list) -> List[Dict]:
+    """Extract rectangle data from S-expression."""
+    rectangles = []
+    import sexpdata
+
+    def extract_rect_data(expr):
+        if isinstance(expr, list) and len(expr) > 0:
+            if isinstance(expr[0], sexpdata.Symbol) and str(expr[0]) == 'rectangle':
+                # Found a rectangle
+                rect_data = {
+                    'start': (0.0, 0.0),
+                    'end': (0.0, 0.0),
+                    'stroke_width': 0.127,
+                    'stroke_type': 'solid',
+                    'fill_type': 'none'
+                }
+
+                # Parse rectangle attributes
+                for item in expr[1:]:
+                    if isinstance(item, list) and len(item) > 0:
+                        tag = str(item[0]) if isinstance(item[0], sexpdata.Symbol) else ''
+
+                        if tag == 'start':
+                            rect_data['start'] = (float(item[1]), float(item[2]))
+                        elif tag == 'end':
+                            rect_data['end'] = (float(item[1]), float(item[2]))
+                        elif tag == 'stroke':
+                            for stroke_item in item[1:]:
+                                if isinstance(stroke_item, list) and len(stroke_item) >= 2:
+                                    stroke_tag = str(stroke_item[0]) if isinstance(stroke_item[0], sexpdata.Symbol) else ''
+                                    if stroke_tag == 'width':
+                                        rect_data['stroke_width'] = float(stroke_item[1])
+                                    elif stroke_tag == 'type':
+                                        rect_data['stroke_type'] = str(stroke_item[1])
+                        elif tag == 'fill':
+                            for fill_item in item[1:]:
+                                if isinstance(fill_item, list) and len(fill_item) >= 2:
+                                    fill_tag = str(fill_item[0]) if isinstance(fill_item[0], sexpdata.Symbol) else ''
+                                    if fill_tag == 'type':
+                                        rect_data['fill_type'] = str(fill_item[1])
+
+                rectangles.append(rect_data)
+            else:
+                # Recursively search
+                for item in expr:
+                    if isinstance(item, list):
+                        extract_rect_data(item)
+
+    extract_rect_data(schematic_expr)
+    return rectangles
 
 
 def _contains_component_symbols(schematic_expr: list) -> bool:

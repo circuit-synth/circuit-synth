@@ -408,6 +408,12 @@ class SExpressionParser:
             if sexp and len(sexp) > 1:
                 result.append(sexp)
 
+        # Add rectangles (graphical bounding boxes) - only if they have content
+        for rectangle in schematic.rectangles:
+            sexp = self._rectangle_to_sexp(rectangle)
+            if sexp and len(sexp) > 1:
+                result.append(sexp)
+
         # Add sheet_instances placeholder (will be populated later)
         result.append([sexpdata.Symbol("sheet_instances")])
 
@@ -737,11 +743,11 @@ class SExpressionParser:
         sexp = [sexpdata.Symbol("symbol"), symbol_def.lib_id]
 
         # Add basic properties
-        # For KiCad compatibility, pin_numbers uses special format: (pin_numbers (hide yes))
+        # For KiCad compatibility, pin_numbers uses format: (pin_numbers hide)
         sexp.append(
             [
                 sexpdata.Symbol("pin_numbers"),
-                [sexpdata.Symbol("hide"), sexpdata.Symbol("yes")],
+                sexpdata.Symbol("hide"),
             ]
         )
         sexp.append([sexpdata.Symbol("pin_names"), [sexpdata.Symbol("offset"), 0]])
