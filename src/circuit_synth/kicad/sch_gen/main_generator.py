@@ -465,87 +465,16 @@ class SchematicGenerator:
 
         # Add bounding boxes if requested
         if draw_bounding_boxes:
-            logger.debug("Adding bounding boxes to synchronized schematic...")
-            self._add_bounding_boxes_to_existing_project(synchronizer, top_circuit)
+            logger.info("📦 Adding bounding boxes to visualize component placement...")
+            self._add_bounding_boxes_to_schematic(top_circuit)
+
+        # FIX: Post-process all schematic files to fix missing project names
+        self._fix_all_schematic_project_names()
 
         # Log results
         self._log_sync_results(sync_report)
 
         return sync_report
-
-    def _add_bounding_boxes_to_existing_project(self, synchronizer, circuit):
-        """Add bounding boxes to an existing synchronized project."""
-        try:
-            # Import necessary classes
-            # Use optimized symbol cache from core.component for better performance
-            from circuit_synth.core.component import SymbolLibCache
-
-            from ...kicad.core.types import Point, Rectangle
-            from ..kicad_symbol_cache import SymbolLibCache
-            from .symbol_geometry import SymbolBoundingBoxCalculator
-
-            # Get the synchronized schematic
-            schematic = synchronizer.api_sync.schematic
-
-            logger.debug(
-                f"Adding bounding boxes for {len(schematic.components)} components"
-            )
-
-            # Track added rectangles for logging
-            added_count = 0
-
-            for comp in schematic.components:
-                # Get precise bounding box from existing calculator
-                lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
-                if not lib_data:
-                    logger.warning(
-                        f"No symbol data found for {comp.lib_id}, skipping bounding box"
-                    )
-                    continue
-
-                try:
-                    min_x, min_y, max_x, max_y = (
-                        SymbolBoundingBoxCalculator.calculate_bounding_box(lib_data)
-                    )
-
-                    # Create Rectangle using API types
-                    bbox_rect = Rectangle(
-                        start=Point(comp.position.x + min_x, comp.position.y + min_y),
-                        end=Point(comp.position.x + max_x, comp.position.y + max_y),
-                        stroke_width=0.127,  # Thin stroke (5 mils)
-                        stroke_type="solid",
-                        fill_type="none",
-                        # No stroke_color - KiCad uses default color
-                    )
-
-                    # Add to schematic using API method
-                    schematic.add_rectangle(bbox_rect)
-                    added_count += 1
-                    logger.debug(
-                        f"Added bounding box for {comp.reference} at ({comp.position.x + min_x:.2f}, {comp.position.y + min_y:.2f}) to ({comp.position.x + max_x:.2f}, {comp.position.y + max_y:.2f})"
-                    )
-
-                except Exception as e:
-                    logger.error(
-                        f"Failed to add bounding box for {comp.reference} ({comp.lib_id}): {e}"
-                    )
-                    continue
-
-            # Save and log results
-            if added_count > 0:
-                logger.info(
-                    f"Added {added_count} bounding boxes to synchronized schematic"
-                )
-                # Save the updated schematic using the synchronizer's save method
-                synchronizer.api_sync._save_schematic()
-                logger.debug(f"Updated schematic saved with bounding boxes")
-            else:
-                logger.warning("No bounding boxes were added")
-
-        except Exception as e:
-            logger.error(f"Failed to add bounding boxes to existing project: {e}")
-            # Don't fail the entire update process for bounding box issues
-            pass
 
     def _log_sync_results(self, sync_report):
         """Display synchronization results to user"""
@@ -594,6 +523,82 @@ class SchematicGenerator:
 
         logger.info("✓ All manual work preserved!")
         logger.info(f"\nProject updated successfully at: {self.project_dir}")
+
+    def _fix_all_schematic_project_names(self):
+        """
+        Fix missing project names in all schematic files in the project directory.
+
+        The kicad-sch-api auto-generates instance blocks but leaves project names empty.
+        This method post-processes all .kicad_sch files to add the project name.
+        """
+        import re
+        from pathlib import Path
+
+        logger.info("🔧 Fixing missing project names in schematic files...")
+
+        # Find all .kicad_sch files in the project directory
+        schematic_files = list(Path(self.project_dir).glob("*.kicad_sch"))
+
+        total_fixes = 0
+        for sch_file in schematic_files:
+            # Get project name from file name
+            project_name = sch_file.stem
+
+            # Read the schematic file
+            content = sch_file.read_text(encoding='utf-8')
+
+            # Fix empty (project blocks by adding the project name
+            # Pattern: (project\n\t\t\t(path -> (project "ProjectName"\n\t\t\t(path
+            pattern = r'(\(project)\n(\s+)\(path'
+            replacement = rf'\1 "{project_name}"\n\2(path'
+
+            fixed_content = re.sub(pattern, replacement, content)
+
+            # Count how many fixes were made in this file
+            fixes = content.count('(project\n')
+
+            if fixes > 0:
+                logger.info(f"  Fixed {fixes} empty project names in {sch_file.name}")
+                # Write the fixed content back
+                sch_file.write_text(fixed_content, encoding='utf-8')
+                total_fixes += fixes
+
+        if total_fixes > 0:
+            logger.info(f"✅ Fixed {total_fixes} total empty project names across {len(schematic_files)} files")
+        else:
+            logger.debug("No empty project names found")
+
+    def _add_bounding_boxes_to_schematic(self, circuit):
+        """
+        Add bounding boxes to existing schematic using kicad-sch-api.
+
+        This is used in update mode to visualize component placement areas.
+        """
+        try:
+            import kicad_sch_api as ksa
+
+            # Load the main schematic
+            sch_path = self.project_dir / f"{self.project_name}.kicad_sch"
+
+            if not sch_path.exists():
+                logger.warning(f"Schematic not found: {sch_path}")
+                return
+
+            logger.info(f"Loading schematic: {sch_path}")
+            schematic = ksa.load_schematic(str(sch_path))
+
+            logger.info(f"Adding bounding boxes for {len(schematic.components)} components")
+
+            # Use kicad-sch-api's built-in method to draw all component bounding boxes
+            schematic.draw_component_bounding_boxes()
+
+            # Save the updated schematic
+            schematic.save(str(sch_path), preserve_format=True)
+            logger.info(f"✅ Bounding boxes added and saved to {sch_path.name}")
+
+        except Exception as e:
+            logger.error(f"Failed to add bounding boxes: {e}")
+            logger.warning("Continuing without bounding boxes...")
 
     def generate_project(
         self,
@@ -722,6 +727,7 @@ class SchematicGenerator:
         logger.info(f"  Main circuit name: {top_name}")
         logger.info(f"  Hierarchical path: {hierarchical_path}")
 
+        print(f"🚨 MAIN_GEN DEBUG: About to create SchematicWriter with draw_bounding_boxes={draw_bounding_boxes}")
         main_writer = SchematicWriter(
             sub_dict[top_name],
             sub_dict,
@@ -733,7 +739,9 @@ class SchematicGenerator:
             draw_bounding_boxes=draw_bounding_boxes,  # Pass bounding box flag
             uuid=root_uuid,  # Pass the root UUID to ensure consistency
         )
+        print(f"🚨 MAIN_GEN DEBUG: SchematicWriter created, calling generate_s_expr()")
         main_sch_expr = main_writer.generate_s_expr()
+        print(f"🚨 MAIN_GEN DEBUG: generate_s_expr() returned")
         sheet_uuids[top_name] = main_writer.uuid_top
         sheet_writers[top_name] = main_writer  # Store main writer for reference
 
@@ -1279,9 +1287,38 @@ class SchematicGenerator:
                         if not symbol_data:
                             raise ValueError(f"No symbol data found for {comp.lib_id}")
 
+                        # Build pin-to-net mapping for accurate bounding box calculation
+                        logger.debug(f"🔍 Building pin_net_map for {comp.reference}")
+                        logger.debug(f"🔍 Component type: {type(comp)}")
+                        logger.debug(f"🔍 Has _pins: {hasattr(comp, '_pins')}")
+                        logger.debug(f"🔍 Has pins: {hasattr(comp, 'pins')}")
+
+                        pin_net_map = {}
+                        # Handle both Component (has _pins) and SchematicSymbol (has pins list)
+                        if hasattr(comp, '_pins'):
+                            logger.debug(f"🔍 Using _pins dict, count: {len(comp._pins)}")
+                            for pin_num, pin in comp._pins.items():
+                                logger.debug(f"🔍   Pin {pin_num}: number={pin.number}, net={pin.net}, net.name={pin.net.name if pin.net else 'None'}")
+                                if pin.net:
+                                    pin_net_map[pin.number] = pin.net.name
+                                    logger.debug(f"🔍     ✅ Mapped {pin.number} -> {pin.net.name}")
+                        elif hasattr(comp, 'pins'):
+                            logger.debug(f"🔍 Using pins list, count: {len(comp.pins)}")
+                            for pin in comp.pins:
+                                logger.debug(f"🔍   Pin: {pin}, has net: {hasattr(pin, 'net')}, has net_name: {hasattr(pin, 'net_name')}")
+                                if hasattr(pin, 'net') and pin.net:
+                                    pin_net_map[pin.number] = pin.net
+                                    logger.debug(f"🔍     ✅ Mapped via net: {pin.number} -> {pin.net}")
+                                elif hasattr(pin, 'net_name') and pin.net_name:
+                                    pin_net_map[pin.number] = pin.net_name
+                                    logger.debug(f"🔍     ✅ Mapped via net_name: {pin.number} -> {pin.net_name}")
+
+                        logger.debug(f"🔍 FINAL pin_net_map for {comp.reference}: {pin_net_map}")
+                        logger.debug(f"🔍 Calling get_symbol_dimensions with pin_net_map")
+
                         comp_width, comp_height = (
                             SymbolBoundingBoxCalculator.get_symbol_dimensions(
-                                symbol_data
+                                symbol_data, pin_net_map=pin_net_map
                             )
                         )
                         logger.debug(
