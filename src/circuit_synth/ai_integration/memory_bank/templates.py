@@ -96,142 +96,335 @@ ISSUES_TEMPLATE = """# Known Issues
 
 
 def generate_claude_md(project_name: str, boards: list = None, **kwargs) -> str:
-    """Generate project-specific CLAUDE.md with direct circuit generation workflow."""
+    """Generate project-specific CLAUDE.md with comprehensive circuit-synth usage guidance."""
 
     timestamp = datetime.now().isoformat()
 
-    template = f"""# CLAUDE.md - Circuit-Synth Direct Generation
+    template = f"""# CLAUDE.md - {project_name}
 
-**Generate working circuits directly using commands - NO AGENTS**
+Circuit-synth project guidance for Claude Code AI assistant.
 
-## 🔥 Circuit Design Workflow
+## 🎯 Project Structure
 
-When user requests circuit design, follow this EXACT workflow:
+This is a **circuit-synth project** - Python code that generates professional KiCad PCB designs.
 
-### STEP 1: Quick Requirements (5 seconds)
-Ask 1-2 focused questions:
-- Circuit type (power supply, MCU board, analog, etc.)
-- Key specifications (voltage, current, frequency, etc.)
-- Main component requirements (STM32 with USB, 3.3V regulator, etc.)
+### Recommended File Organization
 
-### STEP 2: Find Suitable Components (15 seconds)
-
-#### For STM32 Circuits:
-```bash
-# Find STM32 with specific peripherals
-/find_stm32 "STM32 with USB and 3 SPIs available on JLCPCB"
+```
+{project_name}/
+├── main.py                    # Main circuit (nets only, coordinates subcircuits)
+├── power_supply.py           # Power regulation subcircuit
+├── mcu_subcircuit.py         # Microcontroller subcircuit
+├── usb_interface.py          # USB connectivity subcircuit
+├── led_indicators.py         # Status LEDs subcircuit
+└── kicad-project/            # Generated KiCad files (auto-created)
+    ├── {project_name}.kicad_pro
+    ├── {project_name}.kicad_sch
+    └── *.kicad_sch           # Hierarchical sheets
 ```
 
-#### For Other Components:
-```bash
-# Check JLCPCB availability
-/find-parts --source jlcpcb AMS1117-3.3
+**Key Principle**: **One circuit per file** - keep circuits small and modular, just like you would functions.
 
-# Check DigiKey for alternatives
-/find-parts --source digikey "3.3V linear regulator SOT-223"
-```
+## 🔧 Circuit-Synth Basics
 
-### STEP 3: Get KiCad Integration Data (15 seconds)
-```bash
-# Find exact KiCad symbol
-/find-symbol STM32F411CEU
+### 1. Creating Components
 
-# Find matching footprint
-/find-footprint LQFP-48
-
-# Get exact pin names (CRITICAL)
-/find-pins MCU_ST_STM32F4:STM32F411CEUx
-```
-
-### STEP 4: Generate Circuit-Synth Code (15 seconds)
-Write Python file using EXACT data from commands:
 ```python
 from circuit_synth import Component, Net, circuit
 
-@circuit(name="MyCircuit")
-def my_circuit():
-    # Use EXACT symbol and footprint from commands
-    mcu = Component(
-        symbol="MCU_ST_STM32F4:STM32F411CEUx",  # From /find-symbol
+# Basic component with symbol, reference, and footprint
+mcu = Component(
+    symbol="MCU_ST_STM32F4:STM32F411CEUx",      # KiCad symbol
+    ref="U",                                     # Reference prefix (U1, U2, etc.)
+    footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm" # KiCad footprint
+)
+
+# Passive components include value
+resistor = Component(
+    symbol="Device:R",
+    ref="R",
+    value="10k",
+    footprint="Resistor_SMD:R_0603_1608Metric"
+)
+
+capacitor = Component(
+    symbol="Device:C",
+    ref="C",
+    value="100nF",
+    footprint="Capacitor_SMD:C_0603_1608Metric"
+)
+```
+
+### 2. Connecting Components with Nets
+
+```python
+# Create nets for electrical connections
+vcc_3v3 = Net('VCC_3V3')
+gnd = Net('GND')
+usb_dp = Net('USB_DP')
+usb_dm = Net('USB_DM')
+
+# Connect components to nets using pin names
+mcu["VDD"] += vcc_3v3       # Named pins (for complex ICs)
+mcu["VSS"] += gnd
+mcu["PA11"] += usb_dp
+mcu["PA12"] += usb_dm
+
+# Or use pin numbers (for simple components)
+resistor[1] += vcc_3v3      # Pin 1 to VCC
+resistor[2] += gnd          # Pin 2 to GND
+```
+
+### 3. Circuit Decorator Pattern
+
+```python
+@circuit(name="PowerSupply")
+def power_supply_circuit():
+    \"\"\"3.3V voltage regulator with decoupling capacitors\"\"\"
+
+    # Create components
+    vreg = Component(
+        symbol="Regulator_Linear:AMS1117-3.3",
         ref="U",
-        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"  # From /find-footprint
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
     )
-    
-    # Use EXACT pin names from /find-pins
-    vcc = Net('VCC_3V3')
+
+    cap_in = Component(
+        symbol="Device:C",
+        ref="C",
+        value="10uF",
+        footprint="Capacitor_SMD:C_0805_2012Metric"
+    )
+
+    cap_out = Component(
+        symbol="Device:C",
+        ref="C",
+        value="22uF",
+        footprint="Capacitor_SMD:C_0805_2012Metric"
+    )
+
+    # Create nets
+    vin = Net('VIN_5V')
+    vout = Net('VCC_3V3')
     gnd = Net('GND')
-    
-    mcu["VDD"] += vcc      # Exact pin name from /find-pins
-    mcu["VSS"] += gnd      # Exact pin name from /find-pins
-    
-    # Continue circuit design...
-    
-    if __name__ == "__main__":
-        circuit_obj = my_circuit()
-        circuit_obj.generate_kicad_project(
-            project_name="MyProject",
-            placement_algorithm="hierarchical",
-            generate_pcb=True
-        )
-        print("✅ KiCad project generated!")
-        
-# ALWAYS include main execution block
+
+    # Connect components
+    vreg["VIN"] += vin
+    vreg["VOUT"] += vout
+    vreg["GND"] += gnd
+
+    cap_in[1] += vin
+    cap_in[2] += gnd
+
+    cap_out[1] += vout
+    cap_out[2] += gnd
+
+    # Circuit decorator automatically returns the circuit object
 ```
 
-### STEP 5: Test and Generate KiCad (10 seconds)
+### 4. Hierarchical Main Circuit
+
+**IMPORTANT**: The main circuit should **only define nets and call subcircuits** - no components!
+
+```python
+from power_supply import power_supply_circuit
+from mcu_subcircuit import mcu_subcircuit
+from usb_interface import usb_interface_circuit
+
+@circuit(name="{project_name}_Main")
+def main_circuit():
+    \"\"\"Main circuit - coordinates subcircuits with shared nets\"\"\"
+
+    # Define shared nets (NO COMPONENTS HERE!)
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    usb_dp = Net('USB_DP')
+    usb_dm = Net('USB_DM')
+
+    # Instantiate subcircuits and pass nets
+    power = power_supply_circuit()
+    mcu = mcu_subcircuit(vcc_3v3, gnd, usb_dp, usb_dm)
+    usb = usb_interface_circuit(usb_dp, usb_dm, gnd)
+
+    # That's it! No components in main circuit.
+
+if __name__ == "__main__":
+    circuit = main_circuit()
+    circuit.generate_kicad_project(
+        project_name="{project_name}",
+        placement_algorithm="hierarchical",
+        generate_pcb=True
+    )
+    print("✅ KiCad project generated successfully!")
+```
+
+## 🔍 Finding KiCad Components
+
+### Search for Symbols
+
 ```bash
-# MANDATORY: Test the code
-uv run python circuit_file.py
-
-# If successful: Open KiCad project
-open MyProject.kicad_pro
+# Use slash commands to find KiCad symbols
+/find-symbol STM32F411
+/find-symbol AMS1117
+/find-symbol USB_C
 ```
 
-## ⚡ Available Commands
+### Search for Footprints
 
-### Component Sourcing:
-- `/find-parts --source jlcpcb <component>` - Search JLCPCB
-- `/find-parts --source digikey <component>` - Search DigiKey  
-- `/find_stm32 "<requirements>"` - STM32 peripheral search
+```bash
+# Find footprints by package type
+/find-footprint LQFP-48
+/find-footprint SOT-223
+/find-footprint 0603
+```
 
-### KiCad Integration:
-- `/find-symbol <component_name>` - Find KiCad symbols
-- `/find-footprint <package_type>` - Find KiCad footprints
-- `/find-pins <symbol_name>` - Get exact pin names
+### Get Exact Pin Names
 
-## 🚨 Critical Rules
+```bash
+# CRITICAL: Get exact pin names before connecting components
+/find-pins MCU_ST_STM32F4:STM32F411CEUx
+```
 
-1. **ALWAYS use commands** - don't guess component specs
-2. **VALIDATE before generating** - use /find-pins for exact pin names
-3. **TEST the code** - uv run python before claiming success
-4. **Use uv run python** - not python3 or python
-5. **Include KiCad generation** - in the if __name__ == "__main__" block
-6. **60-second time limit** - work fast and direct
+**Why this matters**: Pin names must match exactly (case-sensitive) or connections will fail.
 
-## 📦 Working Component Library
+## 🏭 Component Sourcing
 
-### STM32 Microcontrollers:
-- **STM32F4**: `MCU_ST_STM32F4:STM32F411CEUx` / LQFP-48
-- **STM32G4**: `MCU_ST_STM32G4:STM32G431CBTx` / LQFP-48
+### Check JLCPCB Availability
 
-### Power Components:
-- **Linear Reg**: `Regulator_Linear:AMS1117-3.3` / SOT-223
+```bash
+# Search for components available on JLCPCB
+/find-parts --source jlcpcb AMS1117-3.3
+/find-parts --source jlcpcb "STM32F411"
+```
 
-### Basic Components:
-- **Resistor**: `Device:R` / R_0603_1608Metric
-- **Capacitor**: `Device:C` / C_0603_1608Metric  
-- **LED**: `Device:LED` / LED_0603_1608Metric
+### STM32 Peripheral Search
 
-### Connectors:
-- **USB Micro**: `Connector:USB_B_Micro`
-- **Headers**: `Connector_Generic:Conn_01x10`
+```bash
+# Find STM32 with specific peripherals
+/find_stm32 "STM32 with USB and 3 SPIs available on JLCPCB"
+/find_stm32 "STM32G4 with CAN and 2 UARTs in stock"
+```
+
+## ⚡ Running Your Circuit
+
+```bash
+# Execute the main circuit file
+uv run python main.py
+
+# Generated files appear in kicad-project/
+# Open with: open kicad-project/{project_name}.kicad_pro
+```
+
+## 🎨 Best Practices
+
+### Circuit Organization
+1. **One circuit per file** - like functions, keep them focused and modular
+2. **Main circuit coordinates** - only nets and subcircuit calls, no components
+3. **Descriptive net names** - `VCC_3V3`, `USB_DP`, not `Net1`, `Net2`
+4. **Standard reference prefixes** - U (ICs), R (resistors), C (capacitors), L (inductors), J (connectors)
+
+### Component Selection
+1. **Verify symbols exist** - use `/find-symbol` before creating components
+2. **Check JLCPCB stock** - use `/find-parts` to ensure manufacturability
+3. **Standard packages** - prefer common footprints (0603, 0805, LQFP, QFN)
+4. **Get exact pins** - use `/find-pins` to get correct pin names
+
+### Development Workflow
+1. **Search for components** - verify symbols/footprints exist
+2. **Write circuit code** - one subcircuit at a time
+3. **Test generation** - run `uv run python main.py` frequently
+4. **Open in KiCad** - verify layout and connections
+5. **Iterate** - refine placement and routing
+
+## 🚨 Common Issues
+
+### "Symbol not found"
+- Use `/find-symbol` to find exact symbol name
+- Check spelling and library prefix (e.g., `Device:R` not just `R`)
+
+### "Pin not found" or "Invalid pin name"
+- Use `/find-pins` to get exact pin names (case-sensitive!)
+- Named pins: `component["VDD"]` for ICs
+- Numbered pins: `component[1]` for simple components
+
+### Components overlap in KiCad
+- Use `placement_algorithm="hierarchical"` for better automatic layout
+- Adjust positions manually in KiCad after generation
+
+### Import errors
+- Always use `uv run python` (not `python` or `python3`)
+- Ensure circuit-synth is installed: `uv add circuit-synth`
+
+## 📚 Example Patterns
+
+### Voltage Regulator Circuit
+```python
+@circuit(name="VoltageRegulator")
+def voltage_regulator(vin_net, vout_net, gnd_net):
+    vreg = Component(symbol="Regulator_Linear:AMS1117-3.3", ref="U",
+                    footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2")
+    cap_in = Component(symbol="Device:C", ref="C", value="10uF",
+                      footprint="Capacitor_SMD:C_0805_2012Metric")
+    cap_out = Component(symbol="Device:C", ref="C", value="22uF",
+                       footprint="Capacitor_SMD:C_0805_2012Metric")
+
+    vreg["VIN"] += vin_net
+    vreg["VOUT"] += vout_net
+    vreg["GND"] += gnd_net
+    cap_in[1] += vin_net
+    cap_in[2] += gnd_net
+    cap_out[1] += vout_net
+    cap_out[2] += gnd_net
+```
+
+### LED with Current Limiting Resistor
+```python
+@circuit(name="StatusLED")
+def status_led(vcc_net, gnd_net):
+    led = Component(symbol="Device:LED", ref="D",
+                   footprint="LED_SMD:LED_0603_1608Metric")
+    resistor = Component(symbol="Device:R", ref="R", value="330",
+                        footprint="Resistor_SMD:R_0603_1608Metric")
+
+    resistor[1] += vcc_net
+    resistor[2] += led[1]  # LED anode
+    led[2] += gnd_net      # LED cathode
+```
+
+### USB Connector
+```python
+@circuit(name="USB_Interface")
+def usb_interface(dp_net, dm_net, gnd_net):
+    usb = Component(symbol="Connector:USB_C_Receptacle_USB2.0", ref="J",
+                   footprint="Connector_USB:USB_C_Receptacle_GCT_USB4085")
+
+    usb["DP"] += dp_net
+    usb["DM"] += dm_net
+    usb["GND"] += gnd_net
+    usb["VBUS"] += Net('VBUS_5V')
+```
+
+## 🤖 Getting Help from Claude
+
+When asking for circuit design help:
+
+1. **Be specific about requirements**:
+   - "Design a 3.3V regulator with USB-C input"
+   - "Create ESP32 board with WiFi and battery charging"
+
+2. **Mention constraints**:
+   - "Use components available on JLCPCB"
+   - "Prefer 0603 passives"
+   - "STM32 with at least 2 UARTs and SPI"
+
+3. **Request verification**:
+   - "Check if these symbols exist in KiCad"
+   - "Verify JLCPCB stock for these components"
 
 ---
 
-*This CLAUDE.md was generated automatically by circuit-synth memory-bank system*  
-*Last updated: {timestamp}*
-
-**WORK DIRECTLY. USE COMMANDS. GENERATE WORKING CIRCUITS FAST.**
+*Generated: {timestamp}*
+*Circuit-synth: Professional PCB design with Python*
 """
 
     return template
