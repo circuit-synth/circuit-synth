@@ -11,8 +11,8 @@ from typing import Optional
 
 import sexpdata
 
-from ..core.s_expression import SExpressionParser
-from ..core.types import Label, LabelType, Point, Schematic, SchematicSymbol, Sheet
+from kicad_sch_api.core.parser import SExpressionParser
+from kicad_sch_api.core.types import Label, LabelType, Point, Schematic, SchematicSymbol, Sheet
 from .component_manager import ComponentManager
 from .connection_updater import ConnectionUpdater
 from .geometry_utils import GeometryUtils

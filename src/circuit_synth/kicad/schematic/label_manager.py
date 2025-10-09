@@ -8,7 +8,7 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
-from ..core.types import Label, LabelType, Point, Schematic, Wire
+from kicad_sch_api.core.types import Label, LabelType, Point, Schematic, Wire
 from .connection_utils import points_equal, snap_to_grid
 
 logger = logging.getLogger(__name__)

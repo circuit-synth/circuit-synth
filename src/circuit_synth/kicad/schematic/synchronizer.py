@@ -10,8 +10,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from ..core.s_expression import SExpressionParser
-from ..core.types import Schematic, SchematicSymbol
+from kicad_sch_api.core.parser import SExpressionParser
+from kicad_sch_api.core.types import Schematic, SchematicSymbol
 from .component_manager import ComponentManager
 from .connection_tracer import ConnectionTracer
 from .net_matcher import NetMatcher

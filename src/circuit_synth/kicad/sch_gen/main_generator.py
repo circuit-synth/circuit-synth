@@ -55,7 +55,8 @@ class LLMPlacementManager:
 # Use optimized symbol cache from core.component for better performance
 from circuit_synth.core.component import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
-from circuit_synth.kicad.core.s_expression import SExpressionParser
+from kicad_sch_api.core.parser import SExpressionParser
+from kicad_sch_api.core.types import Point
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
 from .symbol_geometry import SymbolBoundingBoxCalculator
@@ -1274,8 +1275,7 @@ class SchematicGenerator:
                 if comp.reference in existing_positions:
                     # Use existing position
                     x, y = existing_positions[comp.reference]
-                    comp.position.x = x
-                    comp.position.y = y
+                    comp.position = Point(x, y)
                     logger.debug(
                         f"Using preserved position for {comp.reference}: ({x}, {y})"
                     )
@@ -1342,8 +1342,7 @@ class SchematicGenerator:
                     else:
                         x, y = cm.place_symbol(comp_width, comp_height)
 
-                    comp.position.x = x
-                    comp.position.y = y
+                    comp.position = Point(x, y)
                     logger.debug(
                         f"Placed new component {comp.reference} at: ({x}, {y})"
                     )

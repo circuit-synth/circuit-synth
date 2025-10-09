@@ -10,8 +10,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
-from ..core.s_expression import SExpressionParser
-from ..core.types import Schematic, Sheet, SheetPin
+from kicad_sch_api.core.parser import SExpressionParser
+from kicad_sch_api.core.types import Schematic, Sheet, SheetPin
 from .sheet_manager import SheetManager
 
 logger = logging.getLogger(__name__)

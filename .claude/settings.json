@@ -1,13 +1,13 @@
 {
   "description": "Circuit-Synth Library Development Environment",
   "version": "2.0.0",
-  "model": "claude-sonnet-4-20250514[1m]",
-  
+  "model": "claude-sonnet-4-5",
+
   "env": {
     "PYTHONPATH": "${PYTHONPATH}:./src",
     "CIRCUIT_SYNTH_DEV": "1"
   },
-  
+
   "qualityGates": {
     "minTestCoverage": 80,
     "maxCyclomaticComplexity": 10,

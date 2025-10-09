@@ -1,41 +1,48 @@
 """
 Core module for KiCad API.
 
-This module contains fundamental components:
-- Data types and structures
-- S-expression parser
-- Symbol library cache
+This module re-exports core types from kicad-sch-api and adds circuit-synth
+specific extensions for backward compatibility.
 """
 
-from .s_expression import SExpressionParser
-from .symbol_cache import SymbolDefinition, SymbolLibraryCache, get_symbol_cache
-from .types import (
-    BoundingBox,  # Enums; Core data structures; Search types; Connection types
-)
-from .types import (
-    ConnectionEdge,
-    ConnectionNode,
-    ElementType,
+# Import core types from kicad-sch-api (the authoritative source)
+# Use parser directly
+from kicad_sch_api.core.parser import SExpressionParser
+
+# Import all types from kicad-sch-api types module
+from kicad_sch_api.core.types import (
     Junction,
     Label,
     LabelType,
     Net,
-    NetTrace,
-    PlacementStrategy,
     Point,
+    Rectangle,
     Schematic,
     SchematicPin,
     SchematicSymbol,
-    SearchCriteria,
-    SearchResult,
     Sheet,
     SheetPin,
     SymbolInstance,
     Text,
     Wire,
+)
+
+# Import circuit-synth specific extensions
+from .types_extensions import (
+    BoundingBox,
+    ConnectionEdge,
+    ConnectionNode,
+    ElementType,
+    NetTrace,
+    PlacementStrategy,
+    SearchCriteria,
+    SearchResult,
     WireRoutingStyle,
     WireStyle,
 )
+
+# Import symbol cache (circuit-synth specific)
+from .symbol_cache import SymbolDefinition, SymbolLibraryCache, get_symbol_cache
 
 __all__ = [
     # Enums
@@ -44,9 +51,8 @@ __all__ = [
     "WireStyle",
     "LabelType",
     "PlacementStrategy",
-    # Core data structures
+    # Core data structures from kicad-sch-api
     "Point",
-    "BoundingBox",
     "SchematicPin",
     "SymbolInstance",
     "SchematicSymbol",
@@ -58,16 +64,17 @@ __all__ = [
     "SheetPin",
     "Net",
     "Schematic",
-    # Search types
+    "Rectangle",
+    # Circuit-synth extensions
+    "BoundingBox",
     "SearchCriteria",
     "SearchResult",
-    # Connection types
     "ConnectionNode",
     "ConnectionEdge",
     "NetTrace",
-    # Parser
+    # Parser from kicad-sch-api
     "SExpressionParser",
-    # Symbol cache
+    # Symbol cache (circuit-synth specific)
     "SymbolLibraryCache",
     "SymbolDefinition",
     "get_symbol_cache",

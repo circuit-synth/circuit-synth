@@ -10,7 +10,7 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from ..core.s_expression import SExpressionParser
+from kicad_sch_api.core.parser import SExpressionParser
 from .synchronizer import APISynchronizer
 
 logger = logging.getLogger(__name__)

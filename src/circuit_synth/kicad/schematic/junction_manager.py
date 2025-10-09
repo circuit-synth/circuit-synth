@@ -7,7 +7,7 @@ import logging
 from collections import defaultdict
 from typing import Dict, List, Set, Tuple
 
-from ..core.types import Junction, Point, Schematic, Wire
+from kicad_sch_api.core.types import Junction, Point, Schematic, Wire
 from .connection_utils import get_wire_segments, points_equal, segment_intersection
 
 logger = logging.getLogger(__name__)

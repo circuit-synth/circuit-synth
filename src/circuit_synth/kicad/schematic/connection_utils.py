@@ -7,7 +7,7 @@ import math
 from typing import Any, Dict, List, Optional, Tuple
 
 from ..core.symbol_cache import get_symbol_cache
-from ..core.types import Point, SchematicPin, SchematicSymbol
+from kicad_sch_api.core.types import Point, SchematicPin, SchematicSymbol
 
 
 def snap_to_grid(

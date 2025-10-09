@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from circuit_synth.core.circuit import Circuit
-from circuit_synth.kicad.core.s_expression import SExpressionParser
+from kicad_sch_api.core.parser import SExpressionParser
 from circuit_synth.pcb import PCBBoard
 
 # Removed duplicate PCB API imports - using single implementation
@@ -275,8 +275,7 @@ class PCBGenerator:
                     # Reset component positions before retry
                     if retry_count > 0:
                         for fp in pcb.footprints.values():
-                            fp.position.x = 50
-                            fp.position.y = 50
+                            fp.position = Point(50, 50)
 
                     # Debug: List components before placement
                     if retry_count == 0:

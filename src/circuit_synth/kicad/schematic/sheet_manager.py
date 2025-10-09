@@ -11,8 +11,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
-from ..core.s_expression import SExpressionParser
-from ..core.types import BoundingBox, Point, Schematic, SchematicSymbol, Sheet, SheetPin
+from kicad_sch_api.core.parser import SExpressionParser
+from kicad_sch_api.core.types import Point, Schematic, SchematicSymbol, Sheet, SheetPin
+from ..core import BoundingBox
 
 logger = logging.getLogger(__name__)
 

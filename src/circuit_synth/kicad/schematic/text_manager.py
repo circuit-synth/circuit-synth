@@ -8,7 +8,7 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
-from ..core.types import Point, Schematic, Text
+from kicad_sch_api.core.types import Point, Schematic, Text
 from .connection_utils import points_equal, snap_to_grid
 
 logger = logging.getLogger(__name__)
@@ -244,43 +244,43 @@ class TextManager:
             # Align to leftmost text
             min_x = min(t.position.x for t in texts)
             for text in texts:
-                text.position.x = min_x
+                text.position = Point(min_x, text.position.y)
 
         elif alignment == "right":
             # Align to rightmost text
             max_x = max(t.position.x for t in texts)
             for text in texts:
-                text.position.x = max_x
+                text.position = Point(max_x, text.position.y)
 
         elif alignment == "top":
             # Align to topmost text
             min_y = min(t.position.y for t in texts)
             for text in texts:
-                text.position.y = min_y
+                text.position = Point(text.position.x, min_y)
 
         elif alignment == "bottom":
             # Align to bottommost text
             max_y = max(t.position.y for t in texts)
             for text in texts:
-                text.position.y = max_y
+                text.position = Point(text.position.x, max_y)
 
         elif alignment == "center":
             # Center horizontally
             avg_x = sum(t.position.x for t in texts) / len(texts)
             for text in texts:
-                text.position.x = avg_x
+                text.position = Point(avg_x, text.position.y)
 
         elif alignment == "distribute_horizontal":
             # Distribute horizontally with equal spacing
             min_x = min(t.position.x for t in texts)
             for i, text in enumerate(texts):
-                text.position.x = min_x + (i * spacing)
+                text.position = Point(min_x + (i * spacing), text.position.y)
 
         elif alignment == "distribute_vertical":
             # Distribute vertically with equal spacing
             min_y = min(t.position.y for t in texts)
             for i, text in enumerate(texts):
-                text.position.y = min_y + (i * spacing)
+                text.position = Point(text.position.x, min_y + (i * spacing))
 
         else:
             logger.error(f"Unknown alignment type: {alignment}")

@@ -79,7 +79,7 @@ def setup_claude_integration():
 
 
 # KiCad API imports
-from .kicad.core.types import Junction, Label, Schematic, SchematicSymbol, Wire
+from .kicad.core import Junction, Label, Schematic, SchematicSymbol, Wire
 
 __all__ = [
     # Core
