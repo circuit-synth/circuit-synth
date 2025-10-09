@@ -901,13 +901,29 @@ class SchematicWriter:
 
                 # Create hierarchical label using the API
                 label = Label(
-                    text=net_name,
+                    uuid=str(uuid_module.uuid4()),
                     position=Point(global_x, global_y),
+                    text=net_name,
                     label_type=LabelType.HIERARCHICAL,
-                    orientation=int(global_angle),
+                    rotation=float(global_angle),
                 )
 
-                self.schematic.add_label(label)
+                # Add to schematic _data directly to bypass kicad-sch-api methods
+                if not hasattr(self.schematic, '_data'):
+                    self.schematic.labels.append(label)
+                else:
+                    if "labels" not in self.schematic._data:
+                        self.schematic._data["labels"] = []
+                    label_dict = {
+                        "uuid": label.uuid,
+                        "position": {"x": label.position.x, "y": label.position.y},
+                        "text": label.text,
+                        "label_type": label.label_type.value if hasattr(label.label_type, 'value') else label.label_type,
+                        "rotation": label.rotation,
+                        "size": label.size,
+                        "shape": label.shape,
+                    }
+                    self.schematic._data["labels"].append(label_dict)
 
                 # Track that this label belongs to this component
                 if actual_ref not in component_labels:
@@ -1026,10 +1042,11 @@ class SchematicWriter:
 
             # Create sheet using the API
             sheet = Sheet(
+                uuid=str(uuid_module.uuid4()),
+                position=Point(sheet_x, sheet_y),
+                size=Point(width, height),  # size is a Point, not a tuple
                 name=usage_label,
                 filename=f"{sub_name}.kicad_sch",
-                position=Point(sheet_x, sheet_y),
-                size=(width, height),
             )
 
             # Add project name to sheet for instances generation
@@ -1048,28 +1065,69 @@ class SchematicWriter:
 
                 # Create sheet pin
                 sheet_pin = SheetPin(
+                    uuid=str(uuid_module.uuid4()),
                     name=net_name,
                     position=Point(pin_x - 1.27, pin_y),
-                    orientation=0,  # on right side of the sheet
-                    shape="passive",
+                    # pin_type defaults to BIDIRECTIONAL
+                    # size defaults to 1.27
                 )
 
                 sheet.pins.append(sheet_pin)
                 logger.debug(
-                    f"Created sheet pin '{net_name}' with orientation {sheet_pin.orientation}"
+                    f"Created sheet pin '{net_name}' at position ({pin_x}, {pin_y})"
                 )
 
                 label_x = pin_x
                 label = Label(
-                    text=net_name,
+                    uuid=str(uuid_module.uuid4()),
                     position=Point(label_x, pin_y),
+                    text=net_name,
                     label_type=LabelType.HIERARCHICAL,
-                    orientation=0,
+                    rotation=0.0,
                 )
-                self.schematic.add_label(label)
 
-            # Add sheet to schematic
-            self.schematic.sheets.append(sheet)
+                # Add to schematic _data directly to bypass kicad-sch-api methods
+                if not hasattr(self.schematic, '_data'):
+                    self.schematic.labels.append(label)
+                else:
+                    if "labels" not in self.schematic._data:
+                        self.schematic._data["labels"] = []
+                    label_dict = {
+                        "uuid": label.uuid,
+                        "position": {"x": label.position.x, "y": label.position.y},
+                        "text": label.text,
+                        "label_type": label.label_type.value if hasattr(label.label_type, 'value') else label.label_type,
+                        "rotation": label.rotation,
+                        "size": label.size,
+                        "shape": label.shape,
+                    }
+                    self.schematic._data["labels"].append(label_dict)
+
+            # Add sheet to schematic _data directly to bypass kicad-sch-api methods
+            if not hasattr(self.schematic, '_data'):
+                self.schematic.sheets.append(sheet)
+            else:
+                if "sheets" not in self.schematic._data:
+                    self.schematic._data["sheets"] = []
+                # Convert Sheet to dict for storage
+                sheet_dict = {
+                    "uuid": sheet.uuid,
+                    "position": {"x": sheet.position.x, "y": sheet.position.y},
+                    "size": {"width": sheet.size.x, "height": sheet.size.y},  # Parser expects width/height
+                    "name": sheet.name,
+                    "filename": sheet.filename,
+                    "pins": [
+                        {
+                            "uuid": pin.uuid,
+                            "name": pin.name,
+                            "position": {"x": pin.position.x, "y": pin.position.y},
+                            "pin_type": pin.pin_type.value if hasattr(pin.pin_type, 'value') else pin.pin_type,
+                            "size": pin.size,
+                        }
+                        for pin in sheet.pins
+                    ],
+                }
+                self.schematic._data["sheets"].append(sheet_dict)
 
             # Draw bounding box around sheet if requested
             if self.draw_bounding_boxes:
