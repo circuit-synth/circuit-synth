@@ -342,6 +342,14 @@ class SchematicWriter:
         logger.debug(f"  - Self UUID (uuid_top): {self.uuid_top}")
         logger.debug(f"  - Project name: {self.project_name}")
 
+        # CRITICAL DEBUG: Log hierarchical path for UUID fix verification
+        import sys
+        print(f"\n🔍 WRITER_INIT: Circuit='{circuit.name}'", file=sys.stderr, flush=True)
+        print(f"🔍 WRITER_INIT:   Hierarchical path={self.hierarchical_path}", file=sys.stderr, flush=True)
+        print(f"🔍 WRITER_INIT:   Self UUID={self.uuid_top}", file=sys.stderr, flush=True)
+        if self.hierarchical_path and len(self.hierarchical_path) > 0:
+            print(f"🔍 WRITER_INIT:   Root UUID (path[0])={self.hierarchical_path[0]}", file=sys.stderr, flush=True)
+
     @quick_time("Generate S-Expression")
     def generate_s_expr(self) -> list:
         """
@@ -541,6 +549,13 @@ class SchematicWriter:
                 # Store project name for the instances section in new KiCad format
                 api_component.properties["project_name"] = self.project_name
 
+                # CRITICAL: Store root UUID for instances path generation
+                # The parser needs this to create correct instance paths
+                if self.hierarchical_path and len(self.hierarchical_path) > 0:
+                    root_uuid = self.hierarchical_path[0]
+                    api_component.properties["root_uuid"] = root_uuid
+                    logger.debug(f"  Storing root_uuid property: {root_uuid}")
+
                 # Create instances for the new KiCad format (20250114+)
                 # The path should contain only sheet UUIDs, not component UUID
                 logger.debug(f"=== CREATING INSTANCE FOR COMPONENT {new_ref} ===")
@@ -558,12 +573,21 @@ class SchematicWriter:
                     for i, uuid in enumerate(self.hierarchical_path):
                         logger.debug(f"    [{i}]: {uuid}")
 
+                # CRITICAL FIX FOR KICAD ANNOTATION:
+                # Component instances MUST use the FULL hierarchical path
+                # This includes the root UUID + all sheet symbol UUIDs in the path
+                # For KiCad to properly annotate references (avoid "?" display)
                 if self.hierarchical_path and len(self.hierarchical_path) > 0:
-                    # For sub-sheets, use only the sheet hierarchy path
+                    # Use the FULL hierarchical path (root + all sheet symbols)
+                    # The hierarchical_path contains [root_uuid, sheet_symbol_uuid, sub_sheet_symbol_uuid, ...]
+                    # For USB_Port: [root_uuid, usb_port_sheet_symbol_uuid]
+                    # For nested sheets like LED_Blinker: [root_uuid, esp32_mcu_sheet_symbol_uuid, led_blinker_sheet_symbol_uuid]
                     instance_path = "/" + "/".join(self.hierarchical_path)
                     logger.debug(
-                        f"  Creating SUB-SHEET instance with path: {instance_path}"
+                        f"  Creating SUB-SHEET component instance with FULL hierarchical path: {instance_path}"
                     )
+                    logger.debug(f"    Full hierarchical path: {self.hierarchical_path}")
+                    logger.debug(f"    Number of levels: {len(self.hierarchical_path)}")
                 else:
                     # Root sheet - use schematic UUID in path
                     instance_path = f"/{self.schematic.uuid}"
@@ -912,18 +936,47 @@ class SchematicWriter:
                 if not hasattr(self.schematic, '_data'):
                     self.schematic.labels.append(label)
                 else:
-                    if "labels" not in self.schematic._data:
-                        self.schematic._data["labels"] = []
-                    label_dict = {
-                        "uuid": label.uuid,
-                        "position": {"x": label.position.x, "y": label.position.y},
-                        "text": label.text,
-                        "label_type": label.label_type.value if hasattr(label.label_type, 'value') else label.label_type,
-                        "rotation": label.rotation,
-                        "size": label.size,
-                        "shape": label.shape,
-                    }
-                    self.schematic._data["labels"].append(label_dict)
+                    # Hierarchical labels go in separate list
+                    if label.label_type == LabelType.HIERARCHICAL:
+                        if "hierarchical_labels" not in self.schematic._data:
+                            self.schematic._data["hierarchical_labels"] = []
+
+                        # Determine justification based on rotation for proper text alignment
+                        # Matches KiCad's hierarchical label behavior
+                        rotation_normalized = label.rotation % 360
+                        if rotation_normalized == 0:
+                            justify = "left"
+                        elif rotation_normalized == 90:
+                            justify = "left"
+                        elif rotation_normalized == 180:
+                            justify = "right"
+                        elif rotation_normalized == 270:
+                            justify = "right"
+                        else:
+                            justify = "left"  # Default fallback
+
+                        label_dict = {
+                            "uuid": label.uuid,
+                            "position": {"x": label.position.x, "y": label.position.y},
+                            "text": label.text,
+                            "rotation": label.rotation,
+                            "size": label.size,
+                            "shape": label.shape if label.shape else "input",  # Default to "input" if None
+                            "justify": justify,
+                        }
+                        self.schematic._data["hierarchical_labels"].append(label_dict)
+                    else:
+                        if "labels" not in self.schematic._data:
+                            self.schematic._data["labels"] = []
+                        label_dict = {
+                            "uuid": label.uuid,
+                            "position": {"x": label.position.x, "y": label.position.y},
+                            "text": label.text,
+                            "label_type": label.label_type.value if hasattr(label.label_type, 'value') else label.label_type,
+                            "rotation": label.rotation,
+                            "size": label.size,
+                        }
+                        self.schematic._data["labels"].append(label_dict)
 
                 # Track that this label belongs to this component
                 if actual_ref not in component_labels:
@@ -1090,18 +1143,47 @@ class SchematicWriter:
                 if not hasattr(self.schematic, '_data'):
                     self.schematic.labels.append(label)
                 else:
-                    if "labels" not in self.schematic._data:
-                        self.schematic._data["labels"] = []
-                    label_dict = {
-                        "uuid": label.uuid,
-                        "position": {"x": label.position.x, "y": label.position.y},
-                        "text": label.text,
-                        "label_type": label.label_type.value if hasattr(label.label_type, 'value') else label.label_type,
-                        "rotation": label.rotation,
-                        "size": label.size,
-                        "shape": label.shape,
-                    }
-                    self.schematic._data["labels"].append(label_dict)
+                    # Hierarchical labels go in separate list
+                    if label.label_type == LabelType.HIERARCHICAL:
+                        if "hierarchical_labels" not in self.schematic._data:
+                            self.schematic._data["hierarchical_labels"] = []
+
+                        # Determine justification based on rotation for proper text alignment
+                        # Matches KiCad's hierarchical label behavior
+                        rotation_normalized = label.rotation % 360
+                        if rotation_normalized == 0:
+                            justify = "left"
+                        elif rotation_normalized == 90:
+                            justify = "left"
+                        elif rotation_normalized == 180:
+                            justify = "right"
+                        elif rotation_normalized == 270:
+                            justify = "right"
+                        else:
+                            justify = "left"  # Default fallback
+
+                        label_dict = {
+                            "uuid": label.uuid,
+                            "position": {"x": label.position.x, "y": label.position.y},
+                            "text": label.text,
+                            "rotation": label.rotation,
+                            "size": label.size,
+                            "shape": label.shape if label.shape else "input",  # Default to "input" if None
+                            "justify": justify,
+                        }
+                        self.schematic._data["hierarchical_labels"].append(label_dict)
+                    else:
+                        if "labels" not in self.schematic._data:
+                            self.schematic._data["labels"] = []
+                        label_dict = {
+                            "uuid": label.uuid,
+                            "position": {"x": label.position.x, "y": label.position.y},
+                            "text": label.text,
+                            "label_type": label.label_type.value if hasattr(label.label_type, 'value') else label.label_type,
+                            "rotation": label.rotation,
+                            "size": label.size,
+                        }
+                        self.schematic._data["labels"].append(label_dict)
 
             # Add sheet to schematic _data directly to bypass kicad-sch-api methods
             if not hasattr(self.schematic, '_data'):
@@ -1126,6 +1208,8 @@ class SchematicWriter:
                         }
                         for pin in sheet.pins
                     ],
+                    "project_name": self.project_name or "",  # Add project name for instances
+                    "page_number": "2",  # Default page number for sub-sheets
                 }
                 self.schematic._data["sheets"].append(sheet_dict)
 
@@ -1141,17 +1225,12 @@ class SchematicWriter:
                 bbox_max_x = cx + (bbox_width / 2)
                 bbox_max_y = cy + (bbox_height / 2)
 
-                # Create Rectangle graphic for sheet bbox
-                bbox_rect = Rectangle(
-                    start=Point(bbox_min_x, bbox_min_y),
-                    end=Point(bbox_max_x, bbox_max_y),
-                    stroke_width=0.127,
-                    stroke_type="solid",
-                    fill_type="none",
-                )
-
-                # Add to schematic
-                self.schematic.add_rectangle(bbox_rect)
+                # TODO: Add Rectangle graphic for sheet bbox
+                # Rectangle drawing not yet supported in kicad-sch-api
+                # bbox_rect = Rectangle(
+                #     top_left=Point(bbox_min_x, bbox_max_y),
+                #     bottom_right=Point(bbox_max_x, bbox_min_y),
+                # )
 
                 logger.debug(
                     f"  Drew sheet bbox: ({bbox_min_x:.1f}, {bbox_min_y:.1f}) to "
@@ -1225,32 +1304,32 @@ class SchematicWriter:
 
             for label in labels:
                 label_length = len(label.text) * LABEL_CHAR_WIDTH
-                logger.debug(f"    Label '{label.text}' at ({label.position.x:.1f}, {label.position.y:.1f}), orientation={label.orientation}°, length={label_length:.1f}mm")
+                logger.debug(f"    Label '{label.text}' at ({label.position.x:.1f}, {label.position.y:.1f}), rotation={label.rotation}°, length={label_length:.1f}mm")
 
-                # Extend bbox based on label orientation
+                # Extend bbox based on label rotation
                 # Labels extend IN THE DIRECTION the pin points (not opposite)
-                if label.orientation == 0:  # Right pin → label extends RIGHT
+                if label.rotation == 0:  # Right pin → label extends RIGHT
                     old_max_x = global_max_x
                     global_max_x = max(global_max_x, label.position.x + label_length)
                     global_min_y = min(global_min_y, label.position.y - LABEL_PADDING)
                     global_max_y = max(global_max_y, label.position.y + LABEL_PADDING)
                     logger.debug(f"      0° (right pin): extended max_x from {old_max_x:.1f} to {global_max_x:.1f}")
 
-                elif label.orientation == 90:  # Up pin → label extends UP
+                elif label.rotation == 90:  # Up pin → label extends UP
                     old_min_y = global_min_y
                     global_min_y = min(global_min_y, label.position.y - label_length)
                     global_min_x = min(global_min_x, label.position.x - LABEL_PADDING)
                     global_max_x = max(global_max_x, label.position.x + LABEL_PADDING)
                     logger.debug(f"      90° (up pin): extended min_y from {old_min_y:.1f} to {global_min_y:.1f}")
 
-                elif label.orientation == 180:  # Left pin → label extends LEFT
+                elif label.rotation == 180:  # Left pin → label extends LEFT
                     old_min_x = global_min_x
                     global_min_x = min(global_min_x, label.position.x - label_length)
                     global_min_y = min(global_min_y, label.position.y - LABEL_PADDING)
                     global_max_y = max(global_max_y, label.position.y + LABEL_PADDING)
                     logger.debug(f"      180° (left pin): extended min_x from {old_min_x:.1f} to {global_min_x:.1f}")
 
-                elif label.orientation == 270:  # Down pin → label extends DOWN
+                elif label.rotation == 270:  # Down pin → label extends DOWN
                     old_max_y = global_max_y
                     global_max_y = max(global_max_y, label.position.y + label_length)
                     global_min_x = min(global_min_x, label.position.x - LABEL_PADDING)
@@ -1292,21 +1371,14 @@ class SchematicWriter:
         logger.debug(f"Drawing bounding boxes for {len(units)} ComponentUnits")
 
         for unit in units:
-            # Create Rectangle graphic from bbox coordinates
-            bbox_rect = Rectangle(
-                start=Point(unit.bbox_min_x, unit.bbox_min_y),
-                end=Point(unit.bbox_max_x, unit.bbox_max_y),
-                stroke_width=0.127,
-                stroke_type="solid",
-                fill_type="none",
-                # No stroke_color - KiCad uses default color
-            )
-
-            # Add to schematic
-            self.schematic.add_rectangle(bbox_rect)
-
-            # Also store reference in the unit (optional, for debugging)
-            unit.bbox_graphic = bbox_rect
+            # TODO: Create Rectangle graphic from bbox coordinates
+            # Rectangle drawing not yet supported in kicad-sch-api
+            # bbox_rect = Rectangle(
+            #     top_left=Point(unit.bbox_min_x, unit.bbox_max_y),
+            #     bottom_right=Point(unit.bbox_max_x, unit.bbox_min_y),
+            # )
+            # unit.bbox_graphic = bbox_rect
+            pass
 
             logger.debug(
                 f"  Drew bbox for {unit.reference}: "
@@ -1371,13 +1443,13 @@ class SchematicWriter:
                         # Calculate label dimensions
                         label_length = len(label.text) * LABEL_CHAR_WIDTH
 
-                        # Extend bbox based on label orientation
+                        # Extend bbox based on label rotation
                         label_rel_x = label.position.x - comp.position.x
                         label_rel_y = label.position.y - comp.position.y
 
                         # Horizontal label (0° or 180°)
-                        if label.orientation in [0, 180]:
-                            if label.orientation == 180:  # Label extends to the left
+                        if label.rotation in [0, 180]:
+                            if label.rotation == 180:  # Label extends to the left
                                 min_x = min(min_x, label_rel_x - label_length)
                             else:  # Label extends to the right
                                 max_x = max(max_x, label_rel_x + label_length)
@@ -1386,7 +1458,7 @@ class SchematicWriter:
                             max_y = max(max_y, label_rel_y + 2.54)
                         # Vertical label (90° or 270°)
                         else:
-                            if label.orientation == 270:  # Label extends down (positive Y)
+                            if label.rotation == 270:  # Label extends down (positive Y)
                                 max_y = max(max_y, label_rel_y + label_length)
                             else:  # Label extends up (90°, negative Y)
                                 min_y = min(min_y, label_rel_y - label_length)
@@ -1394,22 +1466,16 @@ class SchematicWriter:
                             min_x = min(min_x, label_rel_x - 2.54)
                             max_x = max(max_x, label_rel_x + 2.54)
 
-                        print(f"🔍 BBOX:   Label '{label.text}' ({len(label.text)} chars, {label.orientation}°) at rel ({label_rel_x:.2f}, {label_rel_y:.2f})", file=sys.stderr, flush=True)
+                        print(f"🔍 BBOX:   Label '{label.text}' ({len(label.text)} chars, {label.rotation}°) at rel ({label_rel_x:.2f}, {label_rel_y:.2f})", file=sys.stderr, flush=True)
 
                 print(f"🔍 BBOX: Final bbox with labels: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})", file=sys.stderr, flush=True)
 
-                # Create Rectangle using API types
-                bbox_rect = Rectangle(
-                    start=Point(comp.position.x + min_x, comp.position.y + min_y),
-                    end=Point(comp.position.x + max_x, comp.position.y + max_y),
-                    stroke_width=0.127,  # Thin stroke (5 mils)
-                    stroke_type="solid",
-                    fill_type="none",
-                    # No stroke_color - KiCad uses default color
-                )
-
-                # Add to schematic using API method
-                self.schematic.add_rectangle(bbox_rect)
+                # TODO: Create Rectangle using API types
+                # Rectangle drawing not yet supported in kicad-sch-api
+                # bbox_rect = Rectangle(
+                #     top_left=Point(comp.position.x + min_x, comp.position.y + max_y),
+                #     bottom_right=Point(comp.position.x + max_x, comp.position.y + min_y),
+                # )
                 logger.debug(
                     f"Added bounding box for {comp.reference} at ({comp.position.x + min_x:.2f}, {comp.position.y + min_y:.2f}) to ({comp.position.x + max_x:.2f}, {comp.position.y + max_y:.2f})"
                 )
@@ -1981,8 +2047,11 @@ def write_schematic_file(schematic, out_path: str):
     logger.info(f"Writing schematic to {out_path}")
 
     try:
-        # Use kicad-sch-api's formatter without the sync calls
-        # since we populated _data directly to bypass ComponentCollection
+        # Sync ComponentCollection to _data before writing
+        if hasattr(schematic, '_sync_components_to_data'):
+            logger.debug(f"Syncing {len(schematic._components)} components to _data before writing")
+            schematic._sync_components_to_data()
+
         file_path = Path(out_path)
 
         # Convert data to S-expression using kicad-sch-api's parser
