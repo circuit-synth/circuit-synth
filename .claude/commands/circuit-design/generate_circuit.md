@@ -1,3 +1,8 @@
+---
+name: generate_circuit
+description: Generate Circuit
+---
+
 # Generate Circuit
 
 **Command**: `/generate_circuit <description>`

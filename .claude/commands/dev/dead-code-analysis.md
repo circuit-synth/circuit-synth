@@ -1,3 +1,8 @@
+---
+name: dead-code-analysis
+description: Dead Code Analysis
+---
+
 # Dead Code Analysis Command
 
 ## Usage

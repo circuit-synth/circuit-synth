@@ -1,3 +1,8 @@
+---
+name: generate-validated-circuit
+description: Generate Validated Circuit
+---
+
 # Generate Validated Circuit
 
 Generate circuit code with automatic validation and quality assurance.

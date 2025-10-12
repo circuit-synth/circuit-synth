@@ -1,3 +1,8 @@
+---
+name: dev-review-repo
+description: Dev Review Repo
+---
+
 # Repository Review Command
 
 **Purpose:** Complete repository analysis to identify what's working, what's broken, and what needs attention.

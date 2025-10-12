@@ -1,4 +1,5 @@
 ---
+name: find-footprint
 allowed-tools: Bash(find*), Bash(grep*), Bash(ls*), Grep, Glob
 description: Search KiCad footprint libraries for component footprints
 argument-hint: [search term]

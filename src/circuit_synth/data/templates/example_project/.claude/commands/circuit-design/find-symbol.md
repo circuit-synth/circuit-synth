@@ -1,4 +1,5 @@
 ---
+name: find-symbol
 allowed-tools: Bash(find*), Bash(grep*), Bash(ls*), Bash(xargs*), Grep, Glob
 description: Search KiCad symbol libraries for component symbols
 argument-hint: [search term]
