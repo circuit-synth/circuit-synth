@@ -166,14 +166,48 @@ class PCBParser:
             pcb_data: PCB data dictionary
             filepath: Path to write to
         """
+        logger.error(f"🔥🔥🔥 PCB_PARSER.write_file: STARTING 🔥🔥🔥")
+        logger.error(f"🔥 PCB_PARSER.write_file: Input filepath: {filepath}")
+        logger.error(f"🔥 PCB_PARSER.write_file: Input filepath type: {type(filepath)}")
+
         filepath = Path(filepath)
-        content = self.dumps(pcb_data)
+        logger.error(f"🔥 PCB_PARSER.write_file: Converted to Path: {filepath}")
+        logger.error(f"🔥 PCB_PARSER.write_file: Absolute path: {filepath.absolute()}")
+        logger.error(f"🔥 PCB_PARSER.write_file: PCB data type: {type(pcb_data)}")
+        logger.error(f"🔥 PCB_PARSER.write_file: PCB data keys: {list(pcb_data.keys()) if isinstance(pcb_data, dict) else 'not a dict'}")
+
+        logger.error(f"🔥 PCB_PARSER.write_file: Calling dumps() to convert to string...")
+        try:
+            content = self.dumps(pcb_data)
+            logger.error(f"🔥 PCB_PARSER.write_file: dumps() returned successfully")
+            logger.error(f"🔥 PCB_PARSER.write_file: Content length: {len(content)} characters")
+            logger.error(f"🔥 PCB_PARSER.write_file: Content preview (first 200 chars): {content[:200]}")
+        except Exception as e:
+            logger.error(f"❌ PCB_PARSER.write_file: EXCEPTION in dumps(): {e}", exc_info=True)
+            raise
 
         # Ensure directory exists
+        logger.error(f"🔥 PCB_PARSER.write_file: Creating parent directory: {filepath.parent}")
+        logger.error(f"🔥 PCB_PARSER.write_file: Parent dir exists before mkdir: {filepath.parent.exists()}")
         filepath.parent.mkdir(parents=True, exist_ok=True)
+        logger.error(f"🔥 PCB_PARSER.write_file: Parent dir exists after mkdir: {filepath.parent.exists()}")
 
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write(content)
+        logger.error(f"🔥 PCB_PARSER.write_file: Opening file for writing: {filepath}")
+        try:
+            with open(filepath, "w", encoding="utf-8") as f:
+                logger.error(f"🔥 PCB_PARSER.write_file: File opened successfully, writing content...")
+                f.write(content)
+                logger.error(f"🔥 PCB_PARSER.write_file: Content written to file")
+            logger.error(f"🔥🔥🔥 PCB_PARSER.write_file: FILE CLOSED, CHECKING... 🔥🔥🔥")
+            logger.error(f"🔥 PCB_PARSER.write_file: File exists after write: {filepath.exists()}")
+            if filepath.exists():
+                file_size = filepath.stat().st_size
+                logger.error(f"🔥 PCB_PARSER.write_file: File size: {file_size} bytes")
+            else:
+                logger.error(f"❌ PCB_PARSER.write_file: FILE DOES NOT EXIST AFTER WRITE!")
+        except Exception as e:
+            logger.error(f"❌ PCB_PARSER.write_file: EXCEPTION during file write: {e}", exc_info=True)
+            raise
 
     def dumps(self, pcb_data: Dict[str, Any]) -> str:
         """

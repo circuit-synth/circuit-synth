@@ -439,7 +439,29 @@ class PCBGenerator:
                     logger.warning("⚠ Auto-routing failed, saving unrouted PCB")
 
             # Save PCB file
-            pcb.save(self.pcb_path)
+            logger.error(f"🔥🔥🔥 PCB GENERATOR: ATTEMPTING TO SAVE PCB FILE 🔥🔥🔥")
+            logger.error(f"🔥 PCB GENERATOR: Target path: {self.pcb_path}")
+            logger.error(f"🔥 PCB GENERATOR: Path exists: {self.pcb_path.exists()}")
+            logger.error(f"🔥 PCB GENERATOR: Parent dir exists: {self.pcb_path.parent.exists()}")
+            logger.error(f"🔥 PCB GENERATOR: PCB object type: {type(pcb)}")
+            logger.error(f"🔥 PCB GENERATOR: PCB has save method: {hasattr(pcb, 'save')}")
+
+            try:
+                pcb.save(self.pcb_path)
+                logger.error(f"🔥🔥🔥 PCB GENERATOR: SAVE METHOD RETURNED SUCCESSFULLY 🔥🔥🔥")
+                logger.error(f"🔥 PCB GENERATOR: Checking if file was created...")
+                logger.error(f"🔥 PCB GENERATOR: File exists: {self.pcb_path.exists()}")
+                if self.pcb_path.exists():
+                    file_size = self.pcb_path.stat().st_size
+                    logger.error(f"🔥 PCB GENERATOR: File size: {file_size} bytes")
+                    logger.info(f"✅ PCB file saved successfully to: {self.pcb_path} ({file_size} bytes)")
+                else:
+                    logger.error(f"❌ PCB GENERATOR: SAVE METHOD COMPLETED BUT FILE DOES NOT EXIST!")
+                    logger.error(f"❌ PCB GENERATOR: This is the silent failure issue!")
+            except Exception as e:
+                logger.error(f"❌ PCB GENERATOR: EXCEPTION DURING SAVE: {e}", exc_info=True)
+                raise
+
             logger.debug(f"PCB file saved to: {self.pcb_path}")
 
             # Generate ratsnest connections if requested (AFTER PCB save)

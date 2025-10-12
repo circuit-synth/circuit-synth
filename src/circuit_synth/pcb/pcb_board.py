@@ -3,6 +3,7 @@ Main PCB board class providing a simple API for PCB manipulation.
 """
 
 import logging
+import os
 import uuid as uuid_module
 from collections import defaultdict
 from pathlib import Path
@@ -239,8 +240,35 @@ class PCBBoard:
             filepath: Path to save the .kicad_pcb file
         """
         save_path = Path(filepath)
+        logger.error(f"🔥🔥🔥 PCB_BOARD.SAVE: STARTING SAVE OPERATION 🔥🔥🔥")
+        logger.error(f"🔥 PCB_BOARD.SAVE: Target path: {save_path}")
+        logger.error(f"🔥 PCB_BOARD.SAVE: Target path type: {type(save_path)}")
+        logger.error(f"🔥 PCB_BOARD.SAVE: Target path absolute: {save_path.absolute()}")
+        logger.error(f"🔥 PCB_BOARD.SAVE: Parent dir: {save_path.parent}")
+        logger.error(f"🔥 PCB_BOARD.SAVE: Parent dir exists: {save_path.parent.exists()}")
+        logger.error(f"🔥 PCB_BOARD.SAVE: Parent dir writable: {save_path.parent.exists() and os.access(save_path.parent, os.W_OK)}")
+        logger.error(f"🔥 PCB_BOARD.SAVE: Parser type: {type(self.parser)}")
+        logger.error(f"🔥 PCB_BOARD.SAVE: Parser has write_file: {hasattr(self.parser, 'write_file')}")
+        logger.error(f"🔥 PCB_BOARD.SAVE: PCB data type: {type(self.pcb_data)}")
+        logger.error(f"🔥 PCB_BOARD.SAVE: PCB data keys: {list(self.pcb_data.keys()) if isinstance(self.pcb_data, dict) else 'not a dict'}")
+
         logger.info(f"Saving PCB to {save_path}")
-        self.parser.write_file(self.pcb_data, save_path)
+
+        logger.error(f"🔥🔥🔥 PCB_BOARD.SAVE: CALLING parser.write_file() 🔥🔥🔥")
+        try:
+            self.parser.write_file(self.pcb_data, save_path)
+            logger.error(f"🔥🔥🔥 PCB_BOARD.SAVE: parser.write_file() RETURNED SUCCESSFULLY 🔥🔥🔥")
+        except Exception as e:
+            logger.error(f"❌ PCB_BOARD.SAVE: EXCEPTION IN write_file(): {e}", exc_info=True)
+            raise
+
+        logger.error(f"🔥 PCB_BOARD.SAVE: Checking if file was created...")
+        logger.error(f"🔥 PCB_BOARD.SAVE: File exists after write: {save_path.exists()}")
+        if save_path.exists():
+            file_size = save_path.stat().st_size
+            logger.error(f"🔥 PCB_BOARD.SAVE: File size: {file_size} bytes")
+        else:
+            logger.error(f"❌ PCB_BOARD.SAVE: FILE DOES NOT EXIST AFTER write_file() CALL!")
 
         # Update stored filepath
         self._filepath = save_path
