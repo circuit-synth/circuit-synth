@@ -458,62 +458,9 @@ class APISynchronizer:
         else:
             return "Device:R"  # Default
 
-    def _add_lib_symbols_to_sexp(self, sexp_data: list):
-        """Add lib_symbols definitions to the S-expression data."""
-        from sexpdata import Symbol
-
-        from circuit_synth.kicad.core.symbol_cache import SymbolLibraryCache
-
-        # Find or create lib_symbols block
-        lib_symbols_block = None
-        for item in sexp_data:
-            if (
-                isinstance(item, list)
-                and item
-                and isinstance(item[0], Symbol)
-                and item[0].value() == "lib_symbols"
-            ):
-                lib_symbols_block = item
-                break
-
-        if not lib_symbols_block:
-            # Create new lib_symbols block
-            lib_symbols_block = [Symbol("lib_symbols")]
-            # Insert after paper
-            for i, item in enumerate(sexp_data):
-                if isinstance(item, list) and item and item[0] == Symbol("paper"):
-                    sexp_data.insert(i + 1, lib_symbols_block)
-                    break
-
-        # Clear existing content (keep only the header)
-        lib_symbols_block[:] = [lib_symbols_block[0]]
-
-        # Get unique lib_ids from all components
-        lib_ids = set()
-        for comp in self.schematic.components:
-            if hasattr(comp, "lib_id") and comp.lib_id:
-                lib_ids.add(comp.lib_id)
-
-        # Add symbol definitions
-        symbol_cache = SymbolLibraryCache()
-        for lib_id in sorted(lib_ids):
-            try:
-                symbol_def = symbol_cache.get_symbol(lib_id)
-                if symbol_def:
-                    # Convert SymbolDefinition to S-expression format
-                    symbol_sexp = self.parser._symbol_definition_to_sexp(symbol_def)
-                    lib_symbols_block.append(symbol_sexp)
-                    logger.debug(f"Added symbol definition for {lib_id}")
-            except Exception as e:
-                logger.warning(f"Failed to add symbol definition for {lib_id}: {e}")
-
     def _save_schematic(self):
-        """Save the modified schematic."""
-        # Convert schematic to S-expression
-        sexp_data = self.parser.from_schematic(self.schematic)
-
-        # Add lib_symbols definitions for all components
-        self._add_lib_symbols_to_sexp(sexp_data)
-
-        # Write to file
-        self.parser.write_file(sexp_data, str(self.schematic_path))
+        """Save the modified schematic using kicad-sch-api's native save."""
+        # Use kicad-sch-api's built-in save method which handles all S-expression formatting
+        # and lib_symbols automatically. This preserves format and includes wires/labels.
+        self.schematic.save(str(self.schematic_path), preserve_format=True)
+        logger.info(f"Saved schematic to {self.schematic_path}")
