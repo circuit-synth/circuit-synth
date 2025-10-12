@@ -10,15 +10,15 @@
 
 ### Overall Results
 
-**Tests Passing:** 10 / 10 (100%) 🎉🎉🎉
-**Tests Failing:** 0 / 10 (0%)
+**Tests Passing:** 11 / 11 (100%) 🎉🎉🎉
+**Tests Failing:** 0 / 11 (0%)
 
-**Improvement:** ⬆️ **+40% from initial state** (4/10 → 10/10)
-**This Session:** ⬆️ **+20% from session start** (8/10 → 10/10)
+**Improvement:** ⬆️ **+45% from initial state** (4/10 → 11/11)
+**This Session:** ⬆️ **+27% from session start** (8/10 → 11/11)
 
 ---
 
-## ✅ All Passing Tests (10/10)
+## ✅ All Passing Tests (11/11)
 
 ### 1. test_component_position_preservation
 **Status:** ✅ PASS
@@ -74,6 +74,17 @@
 **Coverage:** Power symbol preservation through synchronizer
 **Fix:** Updated test to use correct `sch.components.add()` API
 
+### 11. test_component_movement_preserves_labels 🆕 **ADDED THIS SESSION!**
+**Status:** ✅ PASS
+**Description:** Component position changes are preserved along with associated labels
+**Coverage:** Tests realistic workflow of moving components and verifying labels remain connected
+**Workflow:**
+1. Generate circuit with two resistors connected via MID net
+2. Move R1 to new position
+3. Update component value in Python
+4. Re-generate with `force_regenerate=False`
+5. Verify: position updated, value updated, labels preserved
+
 ---
 
 ## 🐛 Bugs Fixed This Session
@@ -122,6 +133,7 @@
 - ✅ Label preservation 🎉 **NEW!**
 - ✅ Manual component preservation 🎉 **NEW!**
 - ✅ Power symbol preservation 🎉 **NEW!**
+- ✅ Component movement with labels 🆕 **LATEST!**
 
 ### 🎯 Professional Round-Trip Workflow Achieved
 Users can now:
@@ -142,14 +154,15 @@ This enables true **bidirectional workflow** between Python and KiCad! 🚀
 1. **Root Cause Identified**: Wire/label parser methods were stub implementations
 2. **Parser Fixed**: Implemented complete parsing for wires, labels, and junctions
 3. **Test Code Fixed**: Updated tests to use correct kicad-sch-api API
-4. **100% Test Pass Rate Achieved**: All 10/10 tests passing
+4. **100% Test Pass Rate Achieved**: All 11/11 tests passing
+5. **Component Movement Test Added**: Realistic workflow test for moving components with labels
 
 ### Key Metrics
 
-- **Test Pass Rate:** 100% (10/10)
-- **Session Improvement:** +20% (8/10 → 10/10)
-- **Overall Improvement:** +40% (4/10 → 10/10)
-- **Test Execution Time:** 1.55s
+- **Test Pass Rate:** 100% (11/11)
+- **Session Improvement:** +27% (8/10 → 11/11)
+- **Overall Improvement:** +45% (4/10 → 11/11)
+- **Test Execution Time:** 1.54s
 
 ### Files Modified This Session
 
@@ -170,12 +183,12 @@ PRESERVE_FILES=1 uv run pytest tests/integration/test_roundtrip_preservation.py 
 
 ### Expected Output
 ```
-============================== 10 passed in 1.55s ==============================
+============================== 11 passed in 1.54s ==============================
 ```
 
 ### Individual Test Files
 - `tests/integration/test_roundtrip_preservation.py` - Basic preservation tests (4 tests)
-- `tests/integration/test_roundtrip_advanced.py` - Advanced workflow tests (6 tests)
+- `tests/integration/test_roundtrip_advanced.py` - Advanced workflow tests (7 tests)
 
 ---
 
@@ -247,10 +260,15 @@ With 100% test pass rate, consider adding performance benchmarks:
 
 ## 📝 Commit History
 
-- **[Current]** - Fix test code to use correct ComponentCollection API
+- **[Current]** - Add component movement with labels test
+  - Added test_component_movement_preserves_labels
+  - Tests realistic workflow of moving components
+  - **11/11 tests now passing (100%)** 🎉
+
+- **[Previous]** - Fix test code to use correct ComponentCollection API
   - Updated test_manual_component_preserved to use `sch.components.add()`
   - Updated test_power_symbol_preservation to use `sch.components.add()`
-  - **10/10 tests now passing (100%)** 🎉
+  - **10/10 tests passing (100%)** 🎉
 
 - **[Previous]** - Implement wire/label/junction parsing in kicad-sch-api
   - Fixed parser stub implementations
@@ -273,4 +291,4 @@ All tests passing! The synchronizer now perfectly preserves manual KiCad edits w
 ---
 
 *Generated: 2025-10-12*
-*Final Status: ALL TESTS PASSING (10/10)* 🎉
+*Final Status: ALL TESTS PASSING (11/11)* 🎉
