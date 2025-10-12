@@ -386,9 +386,18 @@ class SchematicGenerator:
         # Check for hierarchical projects: also look for root.kicad_sch
         root_sch_file = self.project_dir / "root.kicad_sch"
 
+        # Debug logging
+        logger.debug(f"🔍 _check_existing_project:")
+        logger.debug(f"   project_dir: {self.project_dir}")
+        logger.debug(f"   project_name: {self.project_name}")
+        logger.debug(f"   Checking .kicad_pro: {kicad_pro_file} -> exists={kicad_pro_file.exists()}")
+        logger.debug(f"   Checking .kicad_sch: {kicad_sch_file} -> exists={kicad_sch_file.exists()}")
+
         # Both files must exist for a valid project
         project_exists = kicad_pro_file.exists()
         schematic_exists = kicad_sch_file.exists() or root_sch_file.exists()
+
+        logger.debug(f"   Result: project_exists={project_exists}, schematic_exists={schematic_exists}")
 
         if project_exists and schematic_exists:
             return True
@@ -434,7 +443,8 @@ class SchematicGenerator:
         project_path = self.project_dir / f"{self.project_name}.kicad_pro"
 
         # Check if this is a hierarchical project
-        has_subcircuits = bool(sub_dict)
+        # Note: sub_dict always includes the main circuit, so check if there's more than one
+        has_subcircuits = len(sub_dict) > 1
 
         if has_subcircuits:
             # Use hierarchical synchronizer for projects with subcircuits
@@ -622,6 +632,8 @@ class SchematicGenerator:
             schematic_placement: Schematic placement algorithm - "sequential" or "connection_aware" (default: "sequential")
             **pcb_kwargs: Additional keyword arguments passed to PCB generation
         """
+        logger.debug(f"🚀 generate_project() called: force_regenerate={force_regenerate}")
+
         # Check if project already exists
         project_exists = self._check_existing_project()
 
