@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "circuit_synth"
-version = "0.8.37"
+dynamic = ["version"]
 description = "Pythonic circuit design for production-ready KiCad projects"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -143,6 +143,9 @@ Issues = "https://github.com/circuit-synth/circuit-synth/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+
+[tool.setuptools.dynamic]
+version = {attr = "circuit_synth.__version__"}
 
 # Include all packages from src
 [tool.setuptools.packages.find]
