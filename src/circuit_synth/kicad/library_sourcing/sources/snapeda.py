@@ -2,6 +2,8 @@
 SnapEDA API source implementation
 """
 
+import asyncio
+import logging
 import time
 from typing import List, Optional
 from urllib.parse import quote
@@ -10,6 +12,8 @@ import aiohttp
 
 from ..models import ComponentSearchResult, LibrarySource, SearchQuery
 from .base import BaseLibrarySource
+
+logger = logging.getLogger(__name__)
 
 
 class SnapEDASource(BaseLibrarySource):
@@ -29,7 +33,9 @@ class SnapEDASource(BaseLibrarySource):
         results = []
 
         try:
-            async with aiohttp.ClientSession() as session:
+            # Set timeout to 10 seconds for API requests
+            timeout = aiohttp.ClientTimeout(total=10)
+            async with aiohttp.ClientSession(timeout=timeout) as session:
                 # Search parts endpoint
                 search_url = f"{self.base_url}/parts/search"
                 params = {
@@ -60,6 +66,9 @@ class SnapEDASource(BaseLibrarySource):
                     else:
                         logger.warning(f"SnapEDA search failed: {response.status}")
 
+        except asyncio.TimeoutError:
+            error_msg = "SnapEDA API timeout after 10 seconds - check your internet connection and API credentials"
+            logger.error(error_msg)
         except Exception as e:
             logger.error(f"SnapEDA search error: {e}")
 
@@ -108,21 +117,24 @@ class SnapEDASource(BaseLibrarySource):
         """Check SnapEDA API connectivity"""
 
         try:
-            async with aiohttp.ClientSession() as session:
+            # Set timeout to 5 seconds for health check
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with aiohttp.ClientSession(timeout=timeout) as session:
                 # Test API connectivity
                 test_url = f"{self.base_url}/health"
                 headers = {}
                 if self.api_key:
                     headers["Authorization"] = f"Bearer {self.api_key}"
 
-                async with session.get(
-                    test_url, headers=headers, timeout=5
-                ) as response:
+                async with session.get(test_url, headers=headers) as response:
                     return response.status in [
                         200,
                         404,
                     ]  # 404 acceptable if no health endpoint
 
+        except asyncio.TimeoutError:
+            logger.debug("SnapEDA health check timeout after 5 seconds")
+            return False
         except Exception as e:
             logger.debug(f"SnapEDA health check failed: {e}")
             return False

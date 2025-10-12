@@ -1,4 +1,5 @@
 ---
+name: find-digikey-parts
 allowed-tools: Bash, Read, Write
 description: Search DigiKey for components using existing circuit-synth integration
 argument-hint: [component specification]

@@ -1,3 +1,8 @@
+---
+name: dev-release-pypi
+description: Dev Release Pypi
+---
+
 # PyPI Release Command
 
 **Purpose:** Complete PyPI release pipeline - from testing to tagging to publishing.

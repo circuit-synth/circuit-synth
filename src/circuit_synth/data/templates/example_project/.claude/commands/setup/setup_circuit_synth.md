@@ -1,3 +1,8 @@
+---
+name: setup_circuit_synth
+description: Setup Circuit Synth
+---
+
 # Setup Circuit-Synth Environment
 
 **Command**: `/setup_circuit_synth`

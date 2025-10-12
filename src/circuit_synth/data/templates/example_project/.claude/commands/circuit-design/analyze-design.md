@@ -1,4 +1,5 @@
 ---
+name: analyze-design
 allowed-tools: ['*']
 description: Comprehensive circuit analysis - power, routing, and optimization suggestions
 argument-hint: [analysis type: power/routing/optimize/all]

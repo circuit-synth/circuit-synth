@@ -4,6 +4,39 @@
 
 Generate professional KiCad projects from Python code with hierarchical design, version control, and automated documentation.
 
+## 🚀 First Time User? Start Here!
+
+**Complete working example in 3 minutes:**
+
+```bash
+# 1. Install circuit-synth
+pip install circuit-synth
+
+# 2. Create a new project with working example
+uv run cs-new-project my_first_board
+
+# 3. Generate KiCad files from the example
+cd my_first_board/circuit-synth
+uv run python example_project/circuit-synth/main.py
+
+# 4. Open in KiCad (generated in ESP32_C6_Dev_Board/)
+open ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.kicad_pro
+```
+
+**That's it!** You now have a complete ESP32-C6 development board schematic and PCB.
+
+**What you just created:**
+- ✅ ESP32-C6 microcontroller with proper power connections
+- ✅ USB-C connector with CC resistors
+- ✅ 3.3V voltage regulator
+- ✅ LED with current-limiting resistor
+- ✅ Complete KiCad project ready to edit/manufacture
+
+**Next steps:**
+- Modify `example_project/circuit-synth/main.py` to customize your circuit
+- Re-run `uv run python example_project/circuit-synth/main.py` to regenerate KiCad files
+- Open KiCad to view/edit your schematic and PCB layout
+
 ## Installation
 
 ```bash

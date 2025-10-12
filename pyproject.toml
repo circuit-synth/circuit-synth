@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "circuit_synth"
-version = "0.8.37"
+dynamic = ["version"]
 description = "Pythonic circuit design for production-ready KiCad projects"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -126,14 +126,17 @@ cs-library-setup = "circuit_synth.tools.setup.library_api_setup:show_library_set
 
 # Fast Generation Tools
 cs-fast-gen-demo = "circuit_synth.fast_generation.demo:main_cli"
-cs-fast-gen-setup = "fast_generation_setup:main"
+
+# Fast JLCPCB Search CLI
+jlc-fast = "circuit_synth.tools.jlc_fast_search_cli:cli"
 
 # Test Plan Generation - DISABLED: Files don't exist yet
 # create-test-plan = "circuit_synth.tools.test_plan_commands:create_test_plan"
 # generate-manufacturing-tests = "circuit_synth.tools.test_plan_commands:generate_manufacturing_tests"
 
-# Plugin Management
-install-kicad-plugins = "install_kicad_plugins:main"
+# Plugin Management - REMOVED: Modules don't exist
+# install-kicad-plugins = "install_kicad_plugins:main"  # BROKEN
+# cs-fast-gen-setup = "fast_generation_setup:main"  # BROKEN
 
 [project.urls]
 Homepage = "https://github.com/circuit-synth/circuit-synth"
@@ -143,6 +146,9 @@ Issues = "https://github.com/circuit-synth/circuit-synth/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+
+[tool.setuptools.dynamic]
+version = {attr = "circuit_synth.__version__"}
 
 # Include all packages from src
 [tool.setuptools.packages.find]

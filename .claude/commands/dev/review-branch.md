@@ -1,3 +1,8 @@
+---
+name: review-branch
+description: Review Branch
+---
+
 # Development Branch Review Command
 
 **Purpose:** Comprehensive branch analysis for code quality, security, performance, and risk assessment before merging to main. Specialized for circuit-synth development workflows.

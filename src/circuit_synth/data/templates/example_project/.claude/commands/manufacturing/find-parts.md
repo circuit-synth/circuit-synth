@@ -1,4 +1,5 @@
 ---
+name: find-parts
 allowed-tools: Task, WebSearch, Read, Write, Bash, Grep
 description: Search for components across multiple suppliers (JLCPCB, DigiKey) with KiCad integration
 argument-hint: [component specification]
