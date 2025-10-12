@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from ..core.symbol_cache import get_symbol_cache
 from kicad_sch_api.core.types import Point, Schematic, SchematicSymbol
+from kicad_sch_api.core.components import Component
 from .instance_utils import add_symbol_instance
 from .placement import PlacementEngine, PlacementStrategy
 
@@ -144,32 +145,12 @@ class ComponentManager:
         add_symbol_instance(component, project_name, hierarchical_path)
 
         # Add to schematic - need to handle both old and new (kicad-sch-api) schematic types
-        if hasattr(self.schematic, '_data'):
-            # kicad-sch-api Schematic - add to internal _data["components"] list
-            # This bypasses ComponentCollection but works with save()
-            if "components" not in self.schematic._data:
-                self.schematic._data["components"] = []
-            # Components in _data need to be dicts for the parser to convert to S-expressions
-            # but some fields like position need to be Point objects
-            component_dict = {
-                "uuid": component.uuid,
-                "lib_id": component.lib_id,
-                "position": component.position,  # Keep as Point object
-                "reference": component.reference,
-                "value": component.value,
-                "rotation": component.rotation,
-                "in_bom": getattr(component, 'in_bom', True),
-                "on_board": getattr(component, 'on_board', True),
-                "footprint": component.footprint or "",
-                "properties": component.properties or {},
-                "pins": component.pins or [],
-                "unit": component.unit,
-                "instances": [
-                    {"path": inst.path, "reference": inst.reference, "unit": inst.unit}
-                    for inst in (component.instances or [])
-                ],
-            }
-            self.schematic._data["components"].append(component_dict)
+        if hasattr(self.schematic, '_components'):
+            # kicad-sch-api Schematic - add to ComponentCollection properly
+            # Create Component wrapper and add to collection
+            comp_wrapper = Component(component, self.schematic._components)
+            self.schematic._components._add_to_indexes(comp_wrapper)
+            logger.debug(f"Added component to ComponentCollection: {reference}")
         else:
             # Fallback for older schematic types
             self.schematic.components.append(component)
