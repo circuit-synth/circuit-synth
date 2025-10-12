@@ -76,8 +76,8 @@ class APISynchronizer:
         # Load schematic
         self.schematic = self._load_schematic()
 
-        # Store the file path in the schematic for instance hierarchy detection
-        self.schematic.file_path = str(self.schematic_path)
+        # NOTE: file_path is already set when the schematic is loaded from file
+        # The Schematic object's file_path property is read-only, so we can't set it
 
         # Initialize API components
         self.component_manager = ComponentManager(self.schematic)
@@ -114,7 +114,23 @@ class APISynchronizer:
         self, schematic: Schematic, base_path: Path, loaded_files: set
     ):
         """Recursively load components from all hierarchical sheets."""
-        for sheet in schematic.sheets:
+        # Check if the schematic has sheets attribute and if it's iterable
+        if not hasattr(schematic, 'sheets') or schematic.sheets is None:
+            logger.debug(f"Schematic has no sheets attribute or it's None - skipping hierarchical loading")
+            return
+
+        # Check if sheets is empty
+        try:
+            sheets_list = list(schematic.sheets) if schematic.sheets else []
+        except (TypeError, AttributeError):
+            logger.debug(f"Schematic.sheets is not iterable - skipping hierarchical loading")
+            return
+
+        if not sheets_list:
+            logger.debug(f"Schematic has no sheets - skipping hierarchical loading")
+            return
+
+        for sheet in sheets_list:
             # Construct the full path to the sheet file
             sheet_path = base_path / sheet.filename
 
@@ -132,19 +148,28 @@ class APISynchronizer:
                 sheet_schematic = ksa.Schematic.load(str(sheet_path))
 
                 # Add all components from the sheet to the main schematic
-                for comp in sheet_schematic.components:
-                    schematic.add_component(comp)
+                if hasattr(sheet_schematic, 'components') and sheet_schematic.components:
+                    for comp in sheet_schematic.components:
+                        schematic.add_component(comp)
 
-                # Add all wires from the sheet
-                for wire in sheet_schematic.wires:
-                    schematic.add_wire(wire)
+                # Add all wires from the sheet (if they exist)
+                if hasattr(sheet_schematic, 'wires') and sheet_schematic.wires:
+                    try:
+                        for wire in sheet_schematic.wires:
+                            schematic.add_wire(wire)
+                    except (TypeError, AttributeError) as e:
+                        logger.debug(f"Could not add wires from sheet: {e}")
 
-                # Add all labels from the sheet
-                for label in sheet_schematic.labels:
-                    schematic.add_label(label)
+                # Add all labels from the sheet (if they exist)
+                if hasattr(sheet_schematic, 'labels') and sheet_schematic.labels:
+                    try:
+                        for label in sheet_schematic.labels:
+                            schematic.add_label(label)
+                    except (TypeError, AttributeError) as e:
+                        logger.debug(f"Could not add labels from sheet: {e}")
 
-                # Recursively load any sub-sheets
-                if sheet_schematic.sheets:
+                # Recursively load any sub-sheets (if they exist)
+                if hasattr(sheet_schematic, 'sheets') and sheet_schematic.sheets:
                     self._load_sheets_recursively(schematic, base_path, loaded_files)
             else:
                 logger.warning(f"Sheet file not found: {sheet_path}")
