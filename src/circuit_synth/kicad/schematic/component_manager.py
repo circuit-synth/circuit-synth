@@ -233,7 +233,7 @@ class ComponentManager:
         component.on_board = True
 
         # Ensure component has proper instance information for reference display
-        if not component.instances or len(component.instances) == 0:
+        if not hasattr(component, 'instances') or not component.instances or len(component.instances) == 0:
             from .instance_utils import add_symbol_instance, get_project_hierarchy_path
 
             schematic_path = getattr(self.schematic, "file_path", "")

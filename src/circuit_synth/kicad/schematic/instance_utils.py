@@ -25,10 +25,14 @@ def add_symbol_instance(
         hierarchical_path: Hierarchical path in the schematic (default: "/" for root)
     """
     # Create the instance
+    unit_value = 1
+    if hasattr(symbol, 'unit') and symbol.unit:
+        unit_value = symbol.unit
+
     instance = SymbolInstance(
         path=hierarchical_path,
         reference=symbol.reference,
-        unit=symbol.unit if symbol.unit else 1,
+        unit=unit_value,
     )
 
     # Set the instances list (replacing any existing)

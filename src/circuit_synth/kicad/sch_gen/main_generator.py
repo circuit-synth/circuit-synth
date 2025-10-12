@@ -386,9 +386,18 @@ class SchematicGenerator:
         # Check for hierarchical projects: also look for root.kicad_sch
         root_sch_file = self.project_dir / "root.kicad_sch"
 
+        # Debug logging
+        logger.debug(f"🔍 _check_existing_project:")
+        logger.debug(f"   project_dir: {self.project_dir}")
+        logger.debug(f"   project_name: {self.project_name}")
+        logger.debug(f"   Checking .kicad_pro: {kicad_pro_file} -> exists={kicad_pro_file.exists()}")
+        logger.debug(f"   Checking .kicad_sch: {kicad_sch_file} -> exists={kicad_sch_file.exists()}")
+
         # Both files must exist for a valid project
         project_exists = kicad_pro_file.exists()
         schematic_exists = kicad_sch_file.exists() or root_sch_file.exists()
+
+        logger.debug(f"   Result: project_exists={project_exists}, schematic_exists={schematic_exists}")
 
         if project_exists and schematic_exists:
             return True
@@ -413,19 +422,34 @@ class SchematicGenerator:
         self, json_file: str, draw_bounding_boxes: bool = False
     ):
         """Update existing project using synchronizer to preserve manual work"""
+        print("\n" + "="*80)
+        print("🔧 DEBUG: _update_existing_project() CALLED")
+        print("="*80)
         logger.info("🔄 Updating existing project while preserving your work...")
+        logger.info(f"   json_file: {json_file}")
+        logger.info(f"   project_dir: {self.project_dir}")
+        print(f"📁 json_file: {json_file}")
+        print(f"📁 project_dir: {self.project_dir}")
 
         # Import here to avoid circular dependencies
-        from circuit_synth.kicad.schematic.hierarchical_synchronizer import (
-            HierarchicalSynchronizer,
-        )
-        from circuit_synth.kicad.schematic.sync_adapter import SyncAdapter
+        logger.debug("Importing synchronizers...")
+        try:
+            from circuit_synth.kicad.schematic.hierarchical_synchronizer import (
+                HierarchicalSynchronizer,
+            )
+            from circuit_synth.kicad.schematic.sync_adapter import SyncAdapter
+            logger.debug("   Synchronizers imported successfully")
+        except Exception as e:
+            logger.error(f"   Failed to import synchronizers: {e}")
+            raise
 
         # Load circuit from JSON using the same loader as generate
         logger.debug(f"Loading circuit from {json_file}")
         from .circuit_loader import load_circuit_hierarchy
 
+        logger.debug("Calling load_circuit_hierarchy...")
         top_circuit, sub_dict = load_circuit_hierarchy(json_file)
+        logger.info(f"   Loaded {len(sub_dict)} circuits from JSON")
 
         # For now, we'll use the top circuit for synchronization
         # In the future, this could be extended to handle hierarchical circuits
@@ -434,10 +458,27 @@ class SchematicGenerator:
         project_path = self.project_dir / f"{self.project_name}.kicad_pro"
 
         # Check if this is a hierarchical project
-        has_subcircuits = bool(sub_dict)
+        # Note: sub_dict always includes the main circuit, so check if there's more than one
+        print("\n" + "="*80)
+        print("🔍 DEBUG: Determining project type")
+        print("="*80)
+        print(f"📊 sub_dict keys: {list(sub_dict.keys())}")
+        print(f"📊 sub_dict length: {len(sub_dict)}")
+        has_subcircuits = len(sub_dict) > 1
+        print(f"📊 has_subcircuits = len(sub_dict) > 1 = {len(sub_dict)} > 1 = {has_subcircuits}")
+        print(f"📊 Project type: {'HIERARCHICAL' if has_subcircuits else 'FLAT'}")
+        print("="*80 + "\n")
+        logger.info(f"🔍 Project detection: sub_dict has {len(sub_dict)} circuits")
+        logger.info(f"   Circuit names: {list(sub_dict.keys())}")
+        logger.info(f"   has_subcircuits={has_subcircuits} (flat={not has_subcircuits})")
 
         if has_subcircuits:
             # Use hierarchical synchronizer for projects with subcircuits
+            print("\n" + "="*80)
+            print("🏗️ DEBUG: Creating HIERARCHICAL synchronizer")
+            print("="*80)
+            print(f"📍 project_path: {project_path}")
+            print(f"📍 Number of subcircuits: {len(sub_dict)}")
             logger.debug(
                 f"Creating hierarchical synchronizer for project: {project_path}"
             )
@@ -447,22 +488,40 @@ class SchematicGenerator:
             synchronizer = HierarchicalSynchronizer(
                 project_path=str(project_path), preserve_user_components=True
             )
+            print(f"✅ HierarchicalSynchronizer created: {type(synchronizer)}")
+            print("="*80 + "\n")
             # Show hierarchy info
             logger.info(synchronizer.get_hierarchy_info())
         else:
             # Use regular synchronizer for flat projects
+            print("\n" + "="*80)
+            print("🏗️ DEBUG: Creating FLAT (SyncAdapter) synchronizer")
+            print("="*80)
+            print(f"📍 project_path: {project_path}")
             logger.debug(f"Creating synchronizer for flat project: {project_path}")
             synchronizer = SyncAdapter(
                 project_path=str(project_path), preserve_user_components=True
             )
+            print(f"✅ SyncAdapter created: {type(synchronizer)}")
+            print("="*80 + "\n")
 
         # Perform synchronization
+        print("\n" + "="*80)
+        print("🔄 DEBUG: Starting synchronization")
+        print("="*80)
+        print(f"📊 Synchronizer type: {type(synchronizer).__name__}")
+        print(f"📊 has_subcircuits: {has_subcircuits}")
         logger.debug("Starting synchronization...")
         if has_subcircuits:
             # Pass subcircuit dictionary for hierarchical sync
+            print("📞 Calling synchronizer.sync_with_circuit(top_circuit, sub_dict)")
             sync_report = synchronizer.sync_with_circuit(top_circuit, sub_dict)
         else:
+            print("📞 Calling synchronizer.sync_with_circuit(top_circuit)")
             sync_report = synchronizer.sync_with_circuit(top_circuit)
+        print(f"✅ Synchronization completed!")
+        print(f"📊 Sync report keys: {list(sync_report.keys()) if isinstance(sync_report, dict) else 'N/A'}")
+        print("="*80 + "\n")
 
         # Add bounding boxes if requested
         if draw_bounding_boxes:
@@ -622,11 +681,18 @@ class SchematicGenerator:
             schematic_placement: Schematic placement algorithm - "sequential" or "connection_aware" (default: "sequential")
             **pcb_kwargs: Additional keyword arguments passed to PCB generation
         """
+        logger.debug(f"🚀 generate_project() called: force_regenerate={force_regenerate}")
+
         # Check if project already exists
         project_exists = self._check_existing_project()
 
         if project_exists and not force_regenerate:
             # Auto-switch to update mode
+            print("\n" + "="*80)
+            print("🔄 DEBUG: generate_project() switching to UPDATE MODE")
+            print("="*80)
+            print(f"📁 Project exists: {project_exists}")
+            print(f"🚫 force_regenerate: {force_regenerate}")
             logger.info(f"Existing KiCad project detected at: {self.project_dir}")
             logger.info(
                 "🔄 Automatically switching to update mode to preserve your work"
@@ -636,8 +702,20 @@ class SchematicGenerator:
             )
 
             try:
-                return self._update_existing_project(json_file, draw_bounding_boxes)
+                print("📞 Calling _update_existing_project()...")
+                result = self._update_existing_project(json_file, draw_bounding_boxes)
+                print(f"✅ _update_existing_project() returned successfully!")
+                return result
             except Exception as e:
+                print("\n" + "="*80)
+                print("❌ DEBUG: EXCEPTION CAUGHT in generate_project()")
+                print("="*80)
+                print(f"🔥 Exception type: {type(e).__name__}")
+                print(f"🔥 Exception message: {e}")
+                import traceback
+                print(f"🔥 Traceback:")
+                traceback.print_exc()
+                print("="*80 + "\n")
                 logger.error(f"❌ Update failed: {e}")
                 logger.error("   Falling back to regeneration...")
                 # Fall through to regeneration

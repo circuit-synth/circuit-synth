@@ -2,8 +2,8 @@
 	(version 20250114)
 	(generator "eeschema")
 	(generator_version "9.0")
-	(uuid "a31519b5-f6f3-4552-b4db-6ce849cc39e7")
-	(paper A4)
+	(uuid "6d070985-38c8-4ff4-b9ce-2b69acec99bd")
+	(paper "A4")
 	(title_block
 		(title "subcircuit1")
 	)
