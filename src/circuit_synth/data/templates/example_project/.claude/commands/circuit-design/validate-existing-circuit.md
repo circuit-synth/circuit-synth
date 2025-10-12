@@ -1,3 +1,8 @@
+---
+name: validate-existing-circuit
+description: Validate Existing Circuit
+---
+
 # Validate Existing Circuit
 
 Validate and improve existing circuit code.

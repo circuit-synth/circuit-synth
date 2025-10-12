@@ -1,4 +1,5 @@
 ---
+name: dev-update-and-commit
 allowed-tools: Bash(git*), Bash(uv*), Bash(black*), Bash(isort*), Edit, Read, Write, Task, Grep, Glob
 description: Comprehensive workflow for documenting progress and committing changes
 argument-hint: [description of changes]

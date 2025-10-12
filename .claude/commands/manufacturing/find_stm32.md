@@ -1,3 +1,8 @@
+---
+name: find_stm32
+description: Find Stm32
+---
+
 # Find STM32 Microcontroller
 
 **Command**: `/find_stm32 <requirements>`

@@ -1,4 +1,5 @@
 ---
+name: dev-run-tests
 allowed-tools: Bash(uv*), Bash(pytest*), Bash(open*)
 description: Run test suite with optional formatting (dev dependencies required)
 ---

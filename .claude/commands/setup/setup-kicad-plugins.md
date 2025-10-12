@@ -1,3 +1,8 @@
+---
+name: setup-kicad-plugins
+description: Setup Kicad Plugins
+---
+
 # Setup KiCad Plugins
 
 You are tasked with helping the user set up KiCad plugins for circuit-synth AI integration.

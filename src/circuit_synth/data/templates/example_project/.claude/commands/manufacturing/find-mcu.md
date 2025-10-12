@@ -1,4 +1,5 @@
 ---
+name: find-mcu
 allowed-tools: ['*']
 description: "Find microcontrollers with specifications and JLCPCB availability"
 argument-hint: [requirements: family, peripherals, specifications]

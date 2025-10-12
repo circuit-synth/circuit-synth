@@ -1,4 +1,5 @@
 ---
+name: run-tests
 description: Orchestrates existing test tools for comprehensive testing
 ---
 
