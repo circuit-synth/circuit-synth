@@ -12,6 +12,22 @@ from dataclasses import dataclass
 logger = logging.getLogger(__name__)
 
 
+def snap_to_grid(value: float, grid_size: float = 2.54) -> float:
+    """
+    Snap a coordinate value to the nearest grid point.
+
+    KiCad uses a 2.54mm (100mil) grid by default for professional schematics.
+
+    Args:
+        value: Coordinate value in mm
+        grid_size: Grid size in mm (default: 2.54mm = 100mil)
+
+    Returns:
+        Value snapped to nearest grid point
+    """
+    return round(value / grid_size) * grid_size
+
+
 @dataclass
 class SheetDef:
     """Sheet size definition."""
@@ -148,9 +164,13 @@ class TextFlowPlacer:
                 print(f"  ⚠️  Component {ref} overflows at y={bbox_y:.1f}mm (max={sheet.max_y:.1f}mm)")
                 return placements, False
 
-            # Calculate component center position
-            center_x = bbox_x + width / 2
-            center_y = bbox_y + height / 2
+            # Calculate component center position and snap to grid
+            center_x_raw = bbox_x + width / 2
+            center_y_raw = bbox_y + height / 2
+
+            # Snap to 2.54mm (100mil) grid for professional KiCad appearance
+            center_x = snap_to_grid(center_x_raw, 2.54)
+            center_y = snap_to_grid(center_y_raw, 2.54)
 
             placements.append((ref, center_x, center_y))
 
