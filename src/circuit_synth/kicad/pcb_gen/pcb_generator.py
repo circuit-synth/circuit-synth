@@ -303,11 +303,6 @@ class PCBGenerator:
                             iterations_per_level=150,  # More iterations
                         )
                     else:
-                        logger.error(f"🔥🔥🔥 PCB GENERATOR: About to call auto_place_components 🔥🔥🔥")
-                        logger.error(f"🔥 PCB GENERATOR: placement_algorithm = '{placement_algorithm}'")
-                        logger.error(f"🔥 PCB GENERATOR: board size = {current_width}x{current_height}")
-                        logger.error(f"🔥 PCB GENERATOR: component count = {len(pcb.footprints)}")
-                        
                         result = pcb.auto_place_components(
                             algorithm=placement_algorithm,
                             component_spacing=component_spacing,
@@ -323,12 +318,6 @@ class PCBGenerator:
                                 else None
                             ),
                         )
-                        
-                        logger.error(f"🔥🔥🔥 PCB GENERATOR: auto_place_components RETURNED 🔥🔥🔥")
-                        logger.error(f"🔥 PCB GENERATOR: result = {result}")
-                        logger.error(f"🔥 PCB GENERATOR: Component positions after auto_place_components:")
-                        for ref, footprint in pcb.footprints.items():
-                            logger.error(f"🔥   {ref}: ({footprint.position.x}, {footprint.position.y})")
 
                     # If we get here, placement was successful
                     placement_successful = True
@@ -337,23 +326,13 @@ class PCBGenerator:
                     )
 
                     # Calculate actual board size needed based on placement
-                    logger.error(f"🔥🔥🔥 PCB GENERATOR: Starting bounding box calculation 🔥🔥🔥")
-                    logger.error(f"🔥 PCB GENERATOR: placement_algorithm = '{placement_algorithm}'")
-                    
-                    # Simplified placement calculation
                     def calculate_placement_bbox(footprints, margin=10.0):
                         if not footprints:
-                            logger.error(f"🔥 BBOX: No footprints, returning default bbox")
                             return -margin, -margin, margin, margin
-                        # Simple bounding box calculation
-                        logger.error(f"🔥 BBOX: Calculating bbox for {len(footprints)} footprints")
-                        for fp in footprints[:3]:  # Log first 3
-                            logger.error(f"🔥 BBOX:   {fp.reference}: ({fp.position.x}, {fp.position.y})")
                         min_x = min(fp.position.x for fp in footprints) - margin
                         min_y = min(fp.position.y for fp in footprints) - margin
                         max_x = max(fp.position.x for fp in footprints) + margin
                         max_y = max(fp.position.y for fp in footprints) + margin
-                        logger.error(f"🔥 BBOX: Calculated bbox: ({min_x}, {min_y}) to ({max_x}, {max_y})")
                         return min_x, min_y, max_x, max_y
 
                     footprints = list(pcb.footprints.values())
@@ -364,29 +343,20 @@ class PCBGenerator:
                     # Round up to nearest 5mm for cleaner dimensions
                     actual_width = ((max_x - min_x + 4) // 5) * 5
                     actual_height = ((max_y - min_y + 4) // 5) * 5
-                    logger.error(f"🔥 PCB GENERATOR: Calculated board dimensions: {actual_width}x{actual_height}mm")
 
                     # Update board outline to actual size needed (skip for external placement)
                     if placement_algorithm != "external":
-                        logger.error(f"🔥 PCB GENERATOR: NOT external - updating board outline to {actual_width}x{actual_height}")
                         pcb.set_board_outline_rect(0, 0, actual_width, actual_height)
                         logger.debug(
                             f"✓ Adjusted board size to actual needs: {actual_width}x{actual_height}mm"
                         )
                     else:
-                        logger.error(f"🔥 PCB GENERATOR: EXTERNAL PLACEMENT - preserving cutout rectangle")
                         logger.debug("Skipping board outline recalculation for external placement to preserve cutout")
 
                     # Debug: Check result and list components after placement
-                    logger.error(f"🔥🔥🔥 PCB GENERATOR: Final placement check 🔥🔥🔥")
                     logger.debug(f"Placement result: {result}")
                     footprints_after = pcb.list_footprints()
                     logger.debug(f"Components after placement: {len(footprints_after)}")
-                    logger.error(f"🔥 PCB GENERATOR: Components after ALL processing:")
-                    for ref, footprint_lib, x, y in footprints_after:  # Show ALL components
-                        logger.error(f"🔥   {ref} at ({x}, {y}) - {footprint_lib}")
-                    
-                    logger.error(f"🔥🔥🔥 PCB GENERATOR: About to write PCB file 🔥🔥🔥")
 
                 except ValueError as e:
                     if "Could not find valid position" in str(e):
@@ -439,30 +409,8 @@ class PCBGenerator:
                     logger.warning("⚠ Auto-routing failed, saving unrouted PCB")
 
             # Save PCB file
-            logger.error(f"🔥🔥🔥 PCB GENERATOR: ATTEMPTING TO SAVE PCB FILE 🔥🔥🔥")
-            logger.error(f"🔥 PCB GENERATOR: Target path: {self.pcb_path}")
-            logger.error(f"🔥 PCB GENERATOR: Path exists: {self.pcb_path.exists()}")
-            logger.error(f"🔥 PCB GENERATOR: Parent dir exists: {self.pcb_path.parent.exists()}")
-            logger.error(f"🔥 PCB GENERATOR: PCB object type: {type(pcb)}")
-            logger.error(f"🔥 PCB GENERATOR: PCB has save method: {hasattr(pcb, 'save')}")
-
-            try:
-                pcb.save(self.pcb_path)
-                logger.error(f"🔥🔥🔥 PCB GENERATOR: SAVE METHOD RETURNED SUCCESSFULLY 🔥🔥🔥")
-                logger.error(f"🔥 PCB GENERATOR: Checking if file was created...")
-                logger.error(f"🔥 PCB GENERATOR: File exists: {self.pcb_path.exists()}")
-                if self.pcb_path.exists():
-                    file_size = self.pcb_path.stat().st_size
-                    logger.error(f"🔥 PCB GENERATOR: File size: {file_size} bytes")
-                    logger.info(f"✅ PCB file saved successfully to: {self.pcb_path} ({file_size} bytes)")
-                else:
-                    logger.error(f"❌ PCB GENERATOR: SAVE METHOD COMPLETED BUT FILE DOES NOT EXIST!")
-                    logger.error(f"❌ PCB GENERATOR: This is the silent failure issue!")
-            except Exception as e:
-                logger.error(f"❌ PCB GENERATOR: EXCEPTION DURING SAVE: {e}", exc_info=True)
-                raise
-
-            logger.debug(f"PCB file saved to: {self.pcb_path}")
+            pcb.save(self.pcb_path)
+            logger.info(f"✓ PCB file saved to: {self.pcb_path}")
 
             # Generate ratsnest connections if requested (AFTER PCB save)
             if generate_ratsnest:
