@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from circuit_synth.core.circuit import Circuit
-from kicad_sch_api.core.parser import SExpressionParser
+import kicad_sch_api as ksa
 from circuit_synth.pcb import PCBBoard
 
 # Removed duplicate PCB API imports - using single implementation
@@ -503,8 +503,7 @@ class PCBGenerator:
         for sch_file in sch_files:
             try:
                 logger.debug(f"Reading schematic: {sch_file}")
-                parser = SExpressionParser()
-                schematic = parser.parse_file(str(sch_file))
+                schematic = ksa.Schematic.load(str(sch_file))
 
                 # Get components from this schematic
                 for comp in schematic.components:
@@ -651,8 +650,7 @@ class PCBGenerator:
 
             for sch_file in sch_files:
                 try:
-                    parser = SExpressionParser()
-                    schematic = parser.parse_file(str(sch_file))
+                    schematic = ksa.Schematic.load(str(sch_file))
 
                     # Extract nets from schematic
                     for net in schematic.nets:
