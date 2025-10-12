@@ -182,97 +182,32 @@ Visit the [kicad-sch-api repository](https://github.com/circuit-synth/kicad-sch-
 ### Claude Code Commands
 
 ```bash
-# AI agent commands (with Claude Code)
+# Component search
 /find-symbol STM32                    # Search KiCad symbols
-/find-footprint LQFP64                # Find footprints  
+/find-footprint LQFP64                # Find footprints
+/find-parts "STM32F407" --source jlcpcb   # Check JLCPCB availability
+/find-stm32 "3 SPIs, USB"             # STM32-specific search
+
+# Circuit generation
 /generate-validated-circuit "ESP32 IoT sensor" mcu
 
-# Circuit debugging commands (NEW!)
-/debug-start "Board not powering on" --board="my_board"
-/debug-measure "VCC: 3.3V, GND: 0V"
-/debug-analyze                        # Get AI analysis
-/debug-suggest                        # Next troubleshooting steps
+# Fast JLCPCB CLI (no agents, 80% faster)
+jlc-fast search STM32G4               # Direct search
+jlc-fast cheapest "10uF 0805"         # Find cheapest option
 ```
 
-### 🤖 Claude Code Agents
+### 🤖 AI Assistance
 
-Circuit-synth includes specialized AI agents for different aspects of circuit design. Each agent has deep expertise in their domain:
+When using Claude Code, you can ask for help with:
 
-#### **circuit-architect** - Master Circuit Design Coordinator
-- **Use for**: Complex multi-component designs, system-level architecture
-- **Expertise**: Circuit topology planning, component selection, design trade-offs
-- **Example**: *"Design a complete IoT sensor node with power management, wireless connectivity, and sensor interfaces"*
+- **Component Selection**: "Find me a 3.3V regulator available on JLCPCB"
+- **Circuit Design**: "Design a USB-C power supply with protection"
+- **KiCad Integration**: "What footprint should I use for LQFP-48?"
+- **Troubleshooting**: "My board isn't powering on - help debug"
+- **SPICE Simulation**: "Simulate this amplifier circuit"
+- **Test Planning**: "Generate test procedures for my power supply"
 
-#### **circuit-synth** - Circuit Code Generation Specialist  
-- **Use for**: Converting natural language to working Python circuit code
-- **Expertise**: circuit-synth syntax, KiCad integration, hierarchical design patterns
-- **Example**: *"Generate Python code for a USB-C PD trigger circuit with 20V output"*
-
-#### **simulation-expert** - SPICE Simulation and Circuit Validation
-- **Use for**: Circuit analysis, performance optimization, validation
-- **Expertise**: SPICE simulation setup, component modeling, performance analysis
-- **Example**: *"Simulate this amplifier circuit and optimize for 40dB gain with <100mW power"*
-
-#### **circuit-debugger** - AI-Powered PCB Troubleshooting Specialist (NEW!)
-- **Use for**: Hardware debugging, fault-finding, troubleshooting non-working boards
-- **Expertise**: Systematic debugging, test equipment usage, failure pattern recognition
-- **Example**: *"My board isn't powering on - help me debug the issue step by step"*
-
-#### **component-search** - Multi-Source Component Search
-- **Use for**: Component selection across all suppliers, price comparison, availability checking
-- **Expertise**: JLCPCB, DigiKey, and future suppliers (Mouser, LCSC, etc.)
-- **Example**: *"Find 0.1uF 0603 capacitors across all suppliers with pricing comparison"*
-
-#### **jlc-parts-finder** - JLCPCB Component Intelligence
-- **Use for**: Real-time component availability, pricing, and alternatives
-- **Expertise**: JLCPCB catalog search, stock levels, KiCad symbol verification
-- **Example**: *"Find STM32 with 3 SPIs available on JLCPCB under $5"*
-
-#### **general-purpose** - Research and Analysis
-- **Use for**: Open-ended research, codebase analysis, complex searches
-- **Expertise**: Technical research, documentation analysis, multi-step problem solving
-- **Example**: *"Research best practices for EMI reduction in switching power supplies"*
-
-#### **test-plan-creator** - Test Plan Generation and Validation
-- **Use for**: Creating comprehensive test procedures for circuit validation
-- **Expertise**: Functional, performance, safety, and manufacturing test plans
-- **Example**: *"Generate test plan for ESP32 dev board with power measurements"*
-
-#### **fmea-analyzer** - Failure Mode and Effects Analysis
-- **Use for**: Reliability analysis, risk assessment, failure prediction
-- **Expertise**: Component failure modes, physics of failure, IPC Class 3 compliance
-- **Example**: *"Analyze my circuit for potential failure modes and generate FMEA report"*
-
-### Using Agents Effectively
-
-```bash
-# Start with circuit-architect for complex projects
-"Design an ESP32-based environmental monitoring station"
-
-# Use circuit-synth for code generation
-"Generate circuit-synth code for the power supply section"
-
-# Validate with simulation-expert
-"Simulate this buck converter and verify 3.3V output ripple"
-
-# Optimize with component-search
-"Replace expensive components with JLCPCB alternatives"
-```
-
-**Pro Tip**: Let the **circuit-architect** coordinate complex projects - it will automatically delegate to other specialists as needed!
-
-### **Agent Categories:**
-- **Circuit Design**: circuit-architect, circuit-synth, simulation-expert, test-plan-creator
-- **Development**: circuit_generation_agent, contributor, first_setup_agent  
-- **Manufacturing**: component-search, jlc-parts-finder, stm32-mcu-finder
-
-### **Command Categories:**
-- **Circuit Design**: analyze-design, find-footprint, find-symbol, validate-existing-circuit
-- **Development**: dev-run-tests, dev-update-and-commit, dev-review-branch
-- **Manufacturing**: find-parts, find-mcu, find_stm32
-- **Library Setup**: cs-library-setup, cs-setup-snapeda-api, cs-setup-digikey-api
-- **Test Planning**: create-test-plan, generate-manufacturing-tests
-- **Setup**: setup-kicad-plugins, setup_circuit_synth
+The AI agents will automatically select the right tools and expertise for your request.
 
 ## 🚀 Commands
 
@@ -286,46 +221,26 @@ cs-new-project              # Complete project setup with ESP32-C6 example
 cd circuit-synth && uv run python example_project/circuit-synth/main.py    # Generate KiCad files from Python code
 ```
 
-### Claude Code Slash Commands
-Available when working with Claude Code in a circuit-synth project:
+### Available Commands
 
 ```bash
-# Component Search (with API fallback)
-/find-symbol STM32              # Local → DigiKey GitHub → SnapEDA/DigiKey APIs
-/find-footprint LQFP64          # Multi-source component search
-/find-stm32 "3 SPIs, USB"       # STM32 with specific peripherals
+# Component Search
+/find-symbol STM32              # Search KiCad symbols
+/find-footprint LQFP64          # Find footprints
+/find-parts "STM32F407" --source jlcpcb   # Check availability
+/find-stm32 "3 SPIs, USB"       # STM32-specific search
 
-# Circuit generation
+# Circuit Generation
 /generate-validated-circuit "ESP32 IoT sensor" mcu
-/validate-existing-circuit      # Validate current circuit code
+/validate-existing-circuit      # Validate circuit code
 
-# Component Intelligence  
-/find-parts "0.1uF 0603 X7R capacitor"               # Search all suppliers
-/find-parts "STM32F407" --source jlcpcb              # JLCPCB only
-/find-parts "LM358" --compare                        # Compare across suppliers
-/find-stm32 "3 SPIs, USB, available JLCPCB"          # STM32-specific search
+# Fast JLCPCB CLI
+jlc-fast search STM32G4         # Direct search
+jlc-fast cheapest "10uF 0805"   # Find cheapest option
 
-# Fast JLCPCB CLI (no agents, 80% faster)
-jlc-fast search STM32G4            # Direct search
-jlc-fast cheapest "10uF 0805"      # Find cheapest option
-jlc-fast most-available LM358      # Find highest stock
-
-# FMEA analysis
-/analyze-fmea my_circuit.py     # Run FMEA analysis on circuit
+# FMEA Analysis
+/analyze-fmea my_circuit.py     # Run reliability analysis
 ```
-
-### Specialized AI Agents
-
-When working with Claude Code, these agents provide domain expertise:
-
-- **circuit-architect**: Overall circuit design and system architecture
-- **circuit-synth**: Python code generation for circuits  
-- **simulation-expert**: SPICE simulation and validation
-- **component-guru**: Component selection and JLCPCB sourcing
-- **jlc-parts-finder**: Real-time JLCPCB availability checking
-- **stm32-mcu-finder**: STM32 peripheral search and selection
-- **test-plan-creator**: Automated test plan generation
-- **fmea-analyzer**: Reliability analysis and failure prediction
 
 ## ⚡ Atomic KiCad Operations
 

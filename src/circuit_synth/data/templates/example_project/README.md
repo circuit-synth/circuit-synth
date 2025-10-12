@@ -1,229 +1,200 @@
-# circuit-synth
+# circuit-synth Project
 
-A circuit-synth project for professional circuit design with hierarchical architecture.
+A professional circuit design project using circuit-synth with hierarchical architecture.
 
 ## 🚀 Quick Start
 
 ```bash
-# Run the ESP32-C6 development board example
+# Generate KiCad project from Python code
 uv run python circuit-synth/main.py
+
+# Open in KiCad
+open kicad-project/ESP32_C6_Dev_Board.kicad_pro
 ```
+
+That's it! You now have a complete ESP32-C6 development board with schematic and PCB.
 
 ## 📁 Project Structure
 
 ```
 my_kicad_project/
 ├── circuit-synth/        # Circuit-synth Python files
-│   ├── main.py           # Main ESP32-C6 development board (nets only)
-│   ├── usb_subcircuit.py # USB-C with CC resistors and ESD protection
-│   ├── power_supply_subcircuit.py # 5V to 3.3V power regulation
-│   ├── debug_header_subcircuit.py # Programming and debug interface
-│   ├── led_blinker_subcircuit.py  # Status LED with current limiting
-│   └── esp32_subcircuit.py        # ESP32-C6 microcontroller subcircuit
-├── kicad_plugins/        # KiCad plugin files for AI integration
-│   ├── circuit_synth_bom_plugin.py        # Schematic BOM plugin
-│   ├── circuit_synth_pcb_bom_bridge.py   # PCB editor plugin
-│   ├── install_plugin.py                 # Plugin installer script
-│   └── README_SIMPLIFIED.md              # Plugin setup instructions
-├── kicad-project/        # KiCad files (generated when circuits run)
-│   ├── ESP32_C6_Dev_Board.kicad_pro        # Main project file
-│   ├── ESP32_C6_Dev_Board.kicad_sch        # Top-level schematic  
-│   ├── ESP32_C6_Dev_Board.kicad_pcb        # PCB layout
-│   ├── USB_Port.kicad_sch                  # USB-C circuit sheet
-│   ├── Power_Supply.kicad_sch              # Power regulation circuit sheet
-│   ├── Debug_Header.kicad_sch              # Debug interface circuit sheet
-│   └── LED_Blinker.kicad_sch               # Status LED circuit sheet
-├── .claude/              # AI agents for Claude Code
-│   ├── agents/           # Specialized circuit design agents
-│   └── commands/         # Slash commands
+│   ├── main.py           # Main circuit (nets and subcircuits)
+│   ├── usb_subcircuit.py # USB-C circuit
+│   ├── power_supply_subcircuit.py # Power regulation
+│   ├── debug_header_subcircuit.py # Programming interface
+│   ├── led_blinker_subcircuit.py  # Status LED
+│   └── esp32_subcircuit.py        # ESP32-C6 MCU
+├── kicad-project/        # Generated KiCad files
+│   ├── ESP32_C6_Dev_Board.kicad_pro  # KiCad project
+│   ├── ESP32_C6_Dev_Board.kicad_sch  # Main schematic
+│   ├── ESP32_C6_Dev_Board.kicad_pcb  # PCB layout
+│   └── [subcircuit sheets]           # Hierarchical sheets
 ├── README.md            # This file
-└── CLAUDE.md            # Project-specific Claude guidance
+└── CLAUDE.md            # AI assistant guide
 ```
 
 ## 🏗️ Circuit-Synth Basics
 
-### **Hierarchical Design Philosophy**
+### Hierarchical Design
 
-Circuit-synth uses **hierarchical subcircuits** - each subcircuit is like a software function with single responsibility and clear interfaces. **The main circuit only defines nets and passes them to subcircuits:**
+Circuit-synth uses **hierarchical subcircuits** - each subcircuit is a self-contained module:
 
 ```python
-@circuit(name="ESP32_C6_Dev_Board_Main")
+from circuit_synth import *
+
+@circuit(name="Power_Supply")
+def power_supply_subcircuit(vbus_in, vcc_3v3_out, gnd):
+    """5V to 3.3V power regulation"""
+
+    # Create components
+    regulator = Component(
+        symbol="Regulator_Linear:AMS1117-3.3",
+        ref="U",
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+    )
+
+    cap_in = Component(
+        symbol="Device:C",
+        ref="C",
+        value="10uF",
+        footprint="Capacitor_SMD:C_0805_2012Metric"
+    )
+
+    # Connect components
+    regulator["VI"] += vbus_in
+    regulator["VO"] += vcc_3v3_out
+    regulator["GND"] += gnd
+
+    cap_in[1] += vbus_in
+    cap_in[2] += gnd
+
+@circuit(name="Main_Circuit")
 def main_circuit():
-    """Main circuit - ONLY nets and subcircuit connections"""
-    # Define shared nets (no components here!)
+    """Main circuit - only nets and subcircuit connections"""
+
+    # Define shared nets
+    vbus = Net('VBUS')
     vcc_3v3 = Net('VCC_3V3')
     gnd = Net('GND')
-    usb_dp = Net('USB_DP')
-    
-    # Pass nets to subcircuits
-    esp32 = esp32_subcircuit(vcc_3v3, gnd, usb_dp, ...)
-    power_supply = power_supply_subcircuit()
+
+    # Connect subcircuits
+    power = power_supply_subcircuit(vbus, vcc_3v3, gnd)
+
+# Generate KiCad project
+if __name__ == "__main__":
+    circuit = main_circuit()
+    circuit.generate_kicad_project(
+        project_name="my_design",
+        placement_algorithm="hierarchical",
+        generate_pcb=True
+    )
 ```
 
-### **Basic Component Creation**
+### Component Creation
 
 ```python
-# Create components with symbol, reference, and footprint
+# Create components with KiCad symbol and footprint
 mcu = Component(
-    symbol="RF_Module:ESP32-C6-MINI-1",       # KiCad symbol
-    ref="U",                                   # Reference prefix  
-    footprint="RF_Module:ESP32-C6-MINI-1"
+    symbol="RF_Module:ESP32-C6-MINI-1",  # KiCad symbol library:name
+    ref="U",                              # Reference prefix (U, R, C, etc.)
+    footprint="RF_Module:ESP32-C6-MINI-1" # KiCad footprint library:name
 )
 
 # Passive components with values
-resistor = Component(symbol="Device:R", ref="R", value="330", 
-                    footprint="Resistor_SMD:R_0805_2012Metric")
-```
-
-### **Net Connections**
-
-```python
-# Create nets for electrical connections
-vcc = Net("VCC_3V3")
-gnd = Net("GND")
-
-# Connect components to nets
-mcu["VDD"] += vcc      # Named pins
-mcu["VSS"] += gnd
-resistor[1] += vcc     # Numbered pins
-```
-
-### **Generate KiCad Projects**
-
-```python
-# Generate complete KiCad project
-circuit = my_circuit()
-circuit.generate_kicad_project(
-    project_name="my_design",
-    placement_algorithm="hierarchical",  # Professional layout
-    generate_pcb=True                   # Include PCB file
+resistor = Component(
+    symbol="Device:R",
+    ref="R",
+    value="330",
+    footprint="Resistor_SMD:R_0805_2012Metric"
 )
 ```
 
-## 🤖 AI-Powered Design with Claude Code
-
-**Circuit-synth is an agent-first library** - designed to be used with and by AI agents for intelligent circuit design.
-
-### **Available AI Agents**
-
-This project includes specialized circuit design agents registered in `.claude/agents/`:
-
-#### **🎯 circuit-synth Agent**
-- **Expertise**: Circuit-synth code generation and KiCad integration
-- **Usage**: `@Task(subagent_type="circuit-synth", description="Design power supply", prompt="Create 3.3V regulator circuit with USB-C input")`
-- **Capabilities**: 
-  - Generate production-ready circuit-synth code
-  - KiCad symbol/footprint verification
-  - JLCPCB component availability checking
-  - Manufacturing-ready designs with verified components
-
-#### **🔬 simulation-expert Agent**  
-- **Expertise**: SPICE simulation and circuit validation
-- **Usage**: `@Task(subagent_type="simulation-expert", description="Validate filter", prompt="Simulate and optimize this low-pass filter circuit")`
-- **Capabilities**:
-  - Professional SPICE analysis (DC, AC, transient)
-  - Hierarchical circuit validation
-  - Component value optimization
-  - Performance analysis and reporting
-
-### **Agent-First Design Philosophy**
-
-**Natural Language → Working Code:** Describe what you want, get production-ready circuit-synth code.
-
-```
-👤 "Design a motor controller with STM32, 3 half-bridges, and CAN bus"
-
-🤖 Claude (using circuit-synth agent):
-   ✅ Searches components with real JLCPCB availability
-   ✅ Generates hierarchical circuit-synth code
-   ✅ Creates professional KiCad project
-   ✅ Includes manufacturing data and alternatives
-```
-
-### **Component Intelligence Example**
-
-```
-👤 "Find STM32 with 3 SPIs available on JLCPCB"
-
-🤖 **STM32G431CBT6** - Found matching component  
-   📊 Stock: 83,737 units | Price: $2.50@100pcs
-   ✅ 3 SPIs: SPI1, SPI2, SPI3
-   
-   # Ready-to-use circuit-synth code:
-   mcu = Component(
-       symbol="MCU_ST_STM32G4:STM32G431CBTx",
-       ref="U", 
-       footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
-   )
-```
-
-### **Using Agents in Claude Code**
-
-1. **Direct Agent Tasks**: Use `@Task()` with specific agents
-2. **Natural Conversation**: Agents automatically activated based on context
-3. **Multi-Agent Workflows**: Agents collaborate (circuit-synth → simulation-expert)
-
-**Examples:**
-```
-# Design and validate workflow
-👤 "Create and simulate a buck converter for 5V→3.3V@2A"
-
-# Component search workflow  
-👤 "Find a low-noise op-amp for audio applications, check JLCPCB stock"
-
-# Hierarchical design workflow
-👤 "Design ESP32 IoT sensor node with power management and wireless"
-```
-
-## 🔬 SPICE Simulation
-
-Validate your designs with professional simulation:
+### Net Connections
 
 ```python
-# Add to any circuit for simulation
-circuit = my_circuit()
-sim = circuit.simulator()
+# Create nets
+vcc = Net("VCC_3V3")
+gnd = Net("GND")
 
-# DC analysis
-result = sim.operating_point()
-print(f"Output voltage: {result.get_voltage('VOUT'):.3f}V")
+# Connect to named pins
+mcu["VDD"] += vcc
+mcu["VSS"] += gnd
 
-# AC frequency response  
-ac_result = sim.ac_analysis(1, 100000)  # 1Hz to 100kHz
+# Connect to numbered pins
+resistor[1] += vcc
+resistor[2] += gnd
 ```
 
-## 📚 KiCad Libraries
+### Generate KiCad Output
 
-This project uses these KiCad symbol libraries:
-
-**Standard Libraries:**
-- Device (resistors, capacitors, LEDs)
-- Connector_Generic (headers, connectors)
-- MCU_ST_STM32F4 (STM32 microcontrollers)
-- Regulator_Linear (voltage regulators)
-- RF_Module (ESP32, wireless modules)
-
-
+```python
+# Generate complete KiCad project with PCB
+circuit = my_circuit()
+circuit.generate_kicad_project(
+    project_name="my_design",
+    placement_algorithm="hierarchical",  # Professional hierarchical layout
+    generate_pcb=True                    # Include PCB file
+)
+```
 
 ## 🛠️ Development Workflow
 
-1. **Design**: Create hierarchical circuits in Python
-2. **Validate**: Use SPICE simulation for critical circuits  
-3. **Generate**: Export to KiCad with proper hierarchical structure
-4. **Manufacture**: Components verified for JLCPCB availability
+1. **Design**: Create or modify circuits in Python files
+2. **Generate**: Run `uv run python circuit-synth/main.py`
+3. **Verify**: Open KiCad project and check schematic
+4. **Iterate**: Make changes and regenerate
 
-## 📖 Documentation
+## 🔍 Finding Components
 
-- Circuit-Synth: https://circuit-synth.readthedocs.io
-- KiCad: https://docs.kicad.org
-- Component Search: Use Claude Code agents for intelligent component selection
+If you need to find KiCad symbols or footprints, you can:
+
+**Using Claude Code (recommended):**
+```
+Ask: "Find me a KiCad symbol for STM32F411"
+Ask: "What footprint should I use for LQFP-48?"
+```
+
+**Manual search:**
+```bash
+# Search for symbols
+find /usr/share/kicad/symbols -name "*.kicad_sym" | xargs grep -l "STM32"
+
+# Search for footprints
+find /usr/share/kicad/footprints -name "*.kicad_mod" | grep -i lqfp
+```
+
+## 📦 Working Component Library
+
+These components are proven to work well:
+
+### Microcontrollers:
+- **ESP32-C6**: `RF_Module:ESP32-C6-MINI-1`
+- **STM32F4**: `MCU_ST_STM32F4:STM32F411CEUx` / `Package_QFP:LQFP-48_7x7mm_P0.5mm`
+
+### Power Components:
+- **Linear Reg**: `Regulator_Linear:AMS1117-3.3` / `Package_TO_SOT_SMD:SOT-223-3_TabPin2`
+
+### Passives:
+- **Resistor**: `Device:R` / `Resistor_SMD:R_0603_1608Metric`
+- **Capacitor**: `Device:C` / `Capacitor_SMD:C_0603_1608Metric`
+- **LED**: `Device:LED` / `LED_SMD:LED_0603_1608Metric`
+
+### Connectors:
+- **USB-C**: `Connector:USB_C_Receptacle_USB2.0_16P`
+- **Headers**: `Connector_Generic:Conn_01x10_Pin`
+
+## 📚 Resources
+
+- **Circuit-Synth Docs**: https://circuit-synth.readthedocs.io
+- **KiCad Docs**: https://docs.kicad.org
+- **Ask Claude Code**: Get help with component selection, circuit design, and troubleshooting
 
 ## 🚀 Next Steps
 
-1. Run the example circuits to familiarize yourself
-2. Use Claude Code for AI-assisted circuit design
-3. Create your own hierarchical circuits
-4. Validate designs with SPICE simulation
-5. Generate production-ready KiCad projects
+1. Explore the example circuits in `circuit-synth/`
+2. Modify `main.py` to customize your design
+3. Run `uv run python circuit-synth/main.py` to regenerate
+4. Open KiCad to view and edit your schematic and PCB
 
 **Happy circuit designing!** 🎛️
