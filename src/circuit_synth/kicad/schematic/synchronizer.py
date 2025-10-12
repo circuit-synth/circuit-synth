@@ -485,7 +485,88 @@ class APISynchronizer:
 
     def _save_schematic(self):
         """Save the modified schematic using kicad-sch-api's native save."""
+        print("💾 _save_schematic() called")
+        logger.info("_save_schematic() called")
+
+        # WORKAROUND: kicad-sch-api bug where WireCollection doesn't sync to _data["wires"]
+        # Manually sync wires from collection to _data before saving
+        self._sync_wires_to_data()
+
         # Use kicad-sch-api's built-in save method which handles all S-expression formatting
         # and lib_symbols automatically. This preserves format and includes wires/labels.
+        print(f"💾 Calling schematic.save({self.schematic_path})")
         self.schematic.save(str(self.schematic_path), preserve_format=True)
+        print(f"✅ Schematic saved successfully")
         logger.info(f"Saved schematic to {self.schematic_path}")
+
+    def _sync_wires_to_data(self):
+        """
+        Sync wires from WireCollection to _data dictionary.
+
+        WORKAROUND for kicad-sch-api bug: The WireCollection maintains wires in memory
+        but doesn't update _data["wires"], so when saving, wires are lost. This method
+        manually syncs the wire collection to _data before saving.
+        """
+        print("🔧 _sync_wires_to_data() called")
+        logger.info("🔧 _sync_wires_to_data() called")
+
+        if not hasattr(self.schematic, '_data'):
+            print("⚠️  Schematic has no _data attribute")
+            logger.warning("Schematic has no _data attribute")
+            return
+
+        if not hasattr(self.schematic, 'wires'):
+            print("⚠️  Schematic has no wires attribute")
+            logger.warning("Schematic has no wires attribute")
+            return
+
+        # Get all wires from the wire collection
+        try:
+            wires_list = list(self.schematic.wires)
+            print(f"📊 Retrieved {len(wires_list)} wires from collection")
+            logger.info(f"Retrieved {len(wires_list)} wires from collection")
+        except (TypeError, AttributeError) as e:
+            print(f"⚠️  Could not access wires collection: {e}")
+            logger.warning(f"Could not access wires collection: {e}")
+            return
+
+        if not wires_list:
+            # No wires to sync
+            print("📊 No wires to sync (empty list)")
+            logger.info("No wires to sync (empty list)")
+            return
+
+        print(f"🔄 Syncing {len(wires_list)} wires from collection to _data")
+        logger.info(f"🔄 Syncing {len(wires_list)} wires from collection to _data")
+
+        # Convert Wire objects to dictionaries for _data
+        wire_dicts = []
+        for wire in wires_list:
+            if not hasattr(wire, 'uuid') or not hasattr(wire, 'points'):
+                continue
+
+            # Build wire dictionary matching KiCad S-expression format
+            wire_dict = {
+                "uuid": wire.uuid,
+                "points": []
+            }
+
+            # Add points
+            for point in wire.points:
+                wire_dict["points"].append({
+                    "x": point.x,
+                    "y": point.y
+                })
+
+            # Add stroke info if present
+            if hasattr(wire, 'stroke_width') and wire.stroke_width > 0:
+                wire_dict["stroke"] = {
+                    "width": wire.stroke_width,
+                    "type": "default"
+                }
+
+            wire_dicts.append(wire_dict)
+
+        # Update _data["wires"]
+        self.schematic._data["wires"] = wire_dicts
+        logger.info(f"Synced {len(wire_dicts)} wires to _data")

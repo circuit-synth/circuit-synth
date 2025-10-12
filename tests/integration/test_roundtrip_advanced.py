@@ -319,7 +319,7 @@ class TestManualComponentPreservation:
             sch = ksa.Schematic.load(str(sch_path))
 
             # Add manual capacitor (simulating user adding in KiCad)
-            manual_cap_uuid = sch.add_component(
+            manual_cap = sch.components.add(
                 lib_id="Device:C",
                 reference="C1",
                 value="100n",
@@ -389,7 +389,7 @@ class TestPowerSymbols:
             sch = ksa.Schematic.load(str(sch_path))
 
             # Add VCC power symbol
-            vcc_uuid = sch.add_component(
+            vcc_comp = sch.components.add(
                 lib_id="power:VCC",
                 reference="#PWR01",
                 value="VCC",
@@ -397,7 +397,7 @@ class TestPowerSymbols:
             )
 
             # Add GND power symbol
-            gnd_uuid = sch.add_component(
+            gnd_comp = sch.components.add(
                 lib_id="power:GND",
                 reference="#PWR02",
                 value="GND",
