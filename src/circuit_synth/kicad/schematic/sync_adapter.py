@@ -69,11 +69,10 @@ class SyncAdapter:
     def _schematic_has_components(self, schematic_path: Path) -> bool:
         """Check if a schematic file contains actual components (not just a cover sheet)."""
         try:
-            # Use the parser to check for components
-            from kicad_sch_api.core.parser import SExpressionParser
+            # Use kicad-sch-api to check for components
+            import kicad_sch_api as ksa
 
-            parser = SExpressionParser()
-            schematic = parser.parse_file(str(schematic_path))
+            schematic = ksa.Schematic.load(str(schematic_path))
 
             # Check if schematic has non-power components
             component_count = 0

@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from kicad_sch_api.core.parser import SExpressionParser
+import kicad_sch_api as ksa
 from kicad_sch_api.core.types import Schematic, SchematicSymbol
 from .component_manager import ComponentManager
 from .connection_tracer import ConnectionTracer
@@ -74,7 +74,6 @@ class APISynchronizer:
         self.preserve_user_components = preserve_user_components
 
         # Load schematic
-        self.parser = SExpressionParser()
         self.schematic = self._load_schematic()
 
         # Store the file path in the schematic for instance hierarchy detection
@@ -98,7 +97,7 @@ class APISynchronizer:
     def _load_schematic(self) -> Schematic:
         """Load schematic from file and recursively load all hierarchical sheets."""
         # Load the main schematic
-        main_schematic = self.parser.parse_file(str(self.schematic_path))
+        main_schematic = ksa.Schematic.load(str(self.schematic_path))
 
         # Track loaded files to avoid infinite recursion
         loaded_files = set()
@@ -130,7 +129,7 @@ class APISynchronizer:
                 loaded_files.add(str(sheet_path.resolve()))
 
                 # Parse the sheet schematic
-                sheet_schematic = self.parser.parse_file(str(sheet_path))
+                sheet_schematic = ksa.Schematic.load(str(sheet_path))
 
                 # Add all components from the sheet to the main schematic
                 for comp in sheet_schematic.components:

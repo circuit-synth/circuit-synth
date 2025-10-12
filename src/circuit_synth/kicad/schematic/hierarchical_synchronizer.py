@@ -10,7 +10,7 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from kicad_sch_api.core.parser import SExpressionParser
+import kicad_sch_api as ksa
 from .synchronizer import APISynchronizer
 
 logger = logging.getLogger(__name__)
@@ -68,9 +68,6 @@ class HierarchicalSynchronizer:
         self.project_name = self.project_path.stem
         self.preserve_user_components = preserve_user_components
 
-        # Parser for loading schematics
-        self.parser = SExpressionParser()
-
         # Build hierarchical structure
         self.root_sheet = self._build_hierarchy()
 
@@ -95,8 +92,8 @@ class HierarchicalSynchronizer:
         logger.debug(f"Loading sheet: {sheet.file_path}")
 
         try:
-            # Parse the schematic
-            schematic = self.parser.parse_file(str(sheet.file_path))
+            # Parse the schematic using kicad-sch-api
+            schematic = ksa.Schematic.load(str(sheet.file_path))
             sheet.schematic = schematic
 
             logger.debug(f"Parsed schematic has {len(schematic.components)} components")

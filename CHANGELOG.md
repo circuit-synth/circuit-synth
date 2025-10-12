@@ -5,6 +5,21 @@ All notable changes to circuit-synth will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.40] - 2025-01-11
+
+### Fixed
+- **Parser API Bug (Complete Fix)**: Fixed all remaining instances of incorrect parser API usage across 7 files
+  - Files fixed: `hierarchical_synchronizer.py`, `synchronizer.py`, `main_generator.py`, `instance_utils.py`, `sync_adapter.py`, `hierarchy_navigator.py`, `sheet_manager.py`
+  - Root cause: Using `SExpressionParser().parse_file()` which returns dict instead of Schematic object with `.components` attribute
+  - Solution: Changed all occurrences to `ksa.Schematic.load()` which returns proper Schematic objects
+  - Impact: PCB generation now works reliably in all codepaths without `'dict' object has no attribute 'components'` errors
+  - This completes the fix started in v0.8.39, which only fixed one location in `pcb_generator.py`
+
+### Note
+- v0.8.39 fixed PCB generator but the same bug existed in 7 other files
+- v0.8.40 provides the comprehensive fix across all affected modules
+- If you're upgrading from v0.8.38 or v0.8.39 and experiencing parser errors, this version resolves them
+
 ## [0.8.39] - 2025-01-11
 
 ### Fixed

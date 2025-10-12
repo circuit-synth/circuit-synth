@@ -55,7 +55,7 @@ class LLMPlacementManager:
 # Use optimized symbol cache from core.component for better performance
 from circuit_synth.core.component import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
-from kicad_sch_api.core.parser import SExpressionParser
+import kicad_sch_api as ksa
 from kicad_sch_api.core.types import Point
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
@@ -1144,9 +1144,8 @@ class SchematicGenerator:
             if existing_sch_path.exists():
                 logger.info(f"Found existing schematic file: {existing_sch_path}")
                 try:
-                    # Read existing schematic using S-expression parser
-                    parser = SExpressionParser()
-                    schematic = parser.parse_file(str(existing_sch_path))
+                    # Read existing schematic using kicad-sch-api
+                    schematic = ksa.Schematic.load(str(existing_sch_path))
                     existing_components = schematic.components
                     logger.info(
                         f"Found {len(existing_components)} components in existing schematic"

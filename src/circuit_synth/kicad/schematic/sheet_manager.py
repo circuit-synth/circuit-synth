@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
-from kicad_sch_api.core.parser import SExpressionParser
+import kicad_sch_api as ksa
 from kicad_sch_api.core.types import Point, Schematic, SchematicSymbol, Sheet, SheetPin
 from ..core import BoundingBox
 
@@ -50,7 +50,6 @@ class SheetManager:
         self.schematic = schematic
         self.project_path = project_path or Path.cwd()
         self.sheets: Dict[str, SheetInfo] = {}
-        self._parser = SExpressionParser()
 
         # Index existing sheets
         self._index_sheets()
@@ -256,7 +255,7 @@ class SheetManager:
 
         try:
             # Parse sheet schematic
-            sheet_schematic = self._parser.parse_file(sheet_path)
+            sheet_schematic = ksa.Schematic.load(sheet_path)
             sheet_info.schematic = sheet_schematic
             return sheet_schematic
 
@@ -310,9 +309,7 @@ class SheetManager:
 
         # Save sheet schematic
         sheet_path = self._resolve_sheet_path(filename)
-        self._parser.write_file(
-            self._parser.from_schematic(sheet_schematic), sheet_path
-        )
+        sheet_schematic.save(str(sheet_path))
 
         # Cache the schematic
         self.sheets[sheet.uuid].schematic = sheet_schematic
