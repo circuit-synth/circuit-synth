@@ -9,7 +9,7 @@ are independent of placement location and all elements move together atomically.
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
-from ..core.types import SchematicSymbol, Label, Rectangle
+from kicad_sch_api.core.types import SchematicSymbol, Label, Rectangle
 
 
 @dataclass
@@ -76,13 +76,11 @@ class ComponentUnit:
         dy = new_center_y - old_y
 
         # Move component
-        self.component.position.x = new_center_x
-        self.component.position.y = new_center_y
+        self.component.position = Point(new_center_x, new_center_y)
 
         # Move all labels by the same offset
         for label in self.labels:
-            label.position.x += dx
-            label.position.y += dy
+            label.position = Point(label.position.x + dx, label.position.y + dy)
 
         # Move bounding box edges
         self.bbox_min_x += dx

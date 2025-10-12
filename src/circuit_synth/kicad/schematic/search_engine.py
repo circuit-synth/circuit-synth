@@ -11,8 +11,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from ..core.types import (
-    BoundingBox,
+from kicad_sch_api.core.types import (
     Junction,
     Label,
     LabelType,
@@ -22,6 +21,8 @@ from ..core.types import (
     SchematicSymbol,
     Wire,
 )
+
+from ..core import BoundingBox
 
 logger = logging.getLogger(__name__)
 

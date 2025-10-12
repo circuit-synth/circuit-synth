@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from ...kicad.kicad_symbol_parser import parse_kicad_sym_file
-from .types import Point, SchematicPin
+from kicad_sch_api.core.types import Point, SchematicPin
 
 logger = logging.getLogger(__name__)
 
@@ -411,11 +411,11 @@ class SymbolLibraryCache:
                 SchematicPin(
                     number=pin_data["number"],
                     name=pin_data["name"],
-                    type=pin_data["type"],
+                    pin_type=pin_data["type"],
                     position=Point(
                         pin_data["position"]["x"], pin_data["position"]["y"]
                     ),
-                    orientation=pin_data.get("orientation", 0),
+                    rotation=pin_data.get("orientation", 0),
                 )
             )
 
@@ -915,11 +915,11 @@ class SymbolLibraryCache:
                 pin = SchematicPin(
                     number=str(pin_data.get("number", "")),
                     name=str(pin_data.get("name", "~")),
-                    type=pin_data.get(
+                    pin_type=pin_data.get(
                         "electrical_type", pin_data.get("type", "passive")
                     ),
                     position=Point(x, y),
-                    orientation=orientation,
+                    rotation=orientation,
                     length=length,
                 )
 

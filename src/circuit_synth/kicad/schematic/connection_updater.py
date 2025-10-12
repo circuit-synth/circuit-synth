@@ -10,7 +10,7 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Tuple
 
-from ..core.types import (
+from kicad_sch_api.core.types import (
     Junction,
     Label,
     LabelType,

@@ -7,7 +7,7 @@ ensuring consistent behavior across all component creation paths.
 
 from typing import Optional
 
-from ..core.types import SchematicSymbol, SymbolInstance
+from kicad_sch_api.core.types import SchematicSymbol, SymbolInstance
 
 
 def add_symbol_instance(
@@ -26,7 +26,6 @@ def add_symbol_instance(
     """
     # Create the instance
     instance = SymbolInstance(
-        project=project_name,
         path=hierarchical_path,
         reference=symbol.reference,
         unit=symbol.unit if symbol.unit else 1,
@@ -51,7 +50,7 @@ def get_project_hierarchy_path(schematic_path: str) -> tuple[str, str]:
     """
     from pathlib import Path
 
-    from ..core.s_expression import SExpressionParser
+    from kicad_sch_api.core.parser import SExpressionParser
 
     try:
         path = Path(schematic_path)

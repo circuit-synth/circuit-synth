@@ -8,7 +8,7 @@ import time
 from enum import Enum
 from typing import List, Optional, Tuple
 
-from ..core.types import Point, Schematic, SchematicSymbol, Sheet
+from kicad_sch_api.core.types import Point, Schematic, SchematicSymbol, Sheet
 from .symbol_geometry import SymbolGeometry
 
 # Python-only implementation

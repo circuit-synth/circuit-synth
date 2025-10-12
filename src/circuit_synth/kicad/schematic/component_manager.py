@@ -9,7 +9,8 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 from ..core.symbol_cache import get_symbol_cache
-from ..core.types import Point, Schematic, SchematicSymbol
+from kicad_sch_api.core.types import Point, Schematic, SchematicSymbol
+from kicad_sch_api.core.components import Component
 from .instance_utils import add_symbol_instance
 from .placement import PlacementEngine, PlacementStrategy
 
@@ -143,8 +144,17 @@ class ComponentManager:
             hierarchical_path = "/"
         add_symbol_instance(component, project_name, hierarchical_path)
 
-        # Add to schematic
-        self.schematic.components.append(component)
+        # Add to schematic - need to handle both old and new (kicad-sch-api) schematic types
+        if hasattr(self.schematic, '_components'):
+            # kicad-sch-api Schematic - add to ComponentCollection properly
+            # Create Component wrapper and add to collection
+            comp_wrapper = Component(component, self.schematic._components)
+            self.schematic._components._add_to_indexes(comp_wrapper)
+            logger.debug(f"Added component to ComponentCollection: {reference}")
+        else:
+            # Fallback for older schematic types
+            self.schematic.components.append(component)
+
         self._component_index[reference] = component
 
         logger.debug(f"Added component {reference} ({library_id}) at {position}")

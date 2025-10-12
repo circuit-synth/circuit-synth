@@ -14,7 +14,7 @@ Or in Python:
     setup_claude_integration()
 """
 
-__version__ = "0.8.31"
+__version__ = "0.8.36"
 
 # Plugin integration
 from .ai_integration.plugins import AIDesignBridge
@@ -79,7 +79,7 @@ def setup_claude_integration():
 
 
 # KiCad API imports
-from .kicad.core.types import Junction, Label, Schematic, SchematicSymbol, Wire
+from .kicad.core import Junction, Label, Schematic, SchematicSymbol, Wire
 
 __all__ = [
     # Core

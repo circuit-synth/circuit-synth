@@ -10,7 +10,7 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Set, Tuple
 
-from ..core.types import (
+from kicad_sch_api.core.types import (
     Junction,
     Label,
     LabelType,

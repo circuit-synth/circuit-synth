@@ -70,7 +70,7 @@ class SyncAdapter:
         """Check if a schematic file contains actual components (not just a cover sheet)."""
         try:
             # Use the parser to check for components
-            from ..core.s_expression import SExpressionParser
+            from kicad_sch_api.core.parser import SExpressionParser
 
             parser = SExpressionParser()
             schematic = parser.parse_file(str(schematic_path))

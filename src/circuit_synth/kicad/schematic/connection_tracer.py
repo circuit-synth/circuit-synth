@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from ..core.types import (
+from kicad_sch_api.core.types import (
     Junction,
     Label,
     LabelType,
