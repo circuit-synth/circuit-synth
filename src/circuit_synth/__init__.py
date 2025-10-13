@@ -42,6 +42,7 @@ from .core.annotations import (
     Table,
     TextBox,
     TextProperty,
+    add_image,
     add_table,
     add_text,
     add_text_box,
@@ -96,6 +97,7 @@ __all__ = [
     "add_text",
     "add_text_box",
     "add_table",
+    "add_image",
     # Exceptions
     "ComponentError",
     "ValidationError",

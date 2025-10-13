@@ -131,6 +131,35 @@ class Table:
         }
 
 
+@dataclass
+class Image:
+    """Embedded image annotation for schematics.
+
+    Images are embedded as base64-encoded data directly in the KiCad schematic file.
+    The image file is read when the schematic is generated, so it only needs to exist
+    at generation time.
+    """
+
+    image_path: str  # Path to image file (PNG, JPG, etc.)
+    position: Tuple[float, float]  # (x, y) in mm
+    scale: float = 1.0  # Scale factor (1.0 = original size)
+    uuid: str = None
+
+    def __post_init__(self):
+        if self.uuid is None:
+            self.uuid = str(uuid.uuid4())
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert annotation to dictionary format for JSON export."""
+        return {
+            "type": "Image",
+            "image_path": self.image_path,
+            "position": self.position,
+            "scale": self.scale,
+            "uuid": self.uuid,
+        }
+
+
 class Graphic:
     """Factory class for creating graphic elements."""
 
@@ -211,3 +240,8 @@ def add_text_box(text: str, position: Tuple[float, float], **kwargs) -> TextBox:
 def add_table(data: List[List[str]], position: Tuple[float, float], **kwargs) -> Table:
     """Convenience function to create a Table."""
     return Table(data=data, position=position, **kwargs)
+
+
+def add_image(image_path: str, position: Tuple[float, float], **kwargs) -> Image:
+    """Convenience function to create an Image."""
+    return Image(image_path=image_path, position=position, **kwargs)

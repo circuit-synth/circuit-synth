@@ -1511,6 +1511,8 @@ class SchematicWriter:
                     self._add_text_annotation(annotation)
                 elif annotation_type == "Table":
                     self._add_table_annotation(annotation)
+                elif annotation_type == "Image":
+                    self._add_image_annotation(annotation)
                 else:
                     logger.warning(f"Unknown annotation type: {annotation_type}")
 
@@ -1652,6 +1654,96 @@ class SchematicWriter:
                     text_element._text_uuid = f"{uuid}_{row_idx}_{col_idx}"
 
                     self.schematic.add_text(text_element)
+
+    def _add_image_annotation(self, image):
+        """Add an Image annotation as an embedded image in the schematic."""
+        import base64
+        from pathlib import Path
+
+        # Handle both dictionary data and object data
+        if isinstance(image, dict):
+            image_path = image.get("image_path", "")
+            position = image.get("position", (100.0, 100.0))
+            scale = image.get("scale", 1.0)
+            uuid = image.get("uuid", "")
+        else:
+            image_path = image.image_path
+            position = image.position
+            scale = image.scale
+            uuid = image.uuid
+
+        # Ensure position is a tuple (not a list) for kicad-sch-api
+        # This can happen if the annotation was serialized/deserialized through JSON
+        if isinstance(position, list):
+            position = tuple(position)
+
+        # Read and encode the image file
+        try:
+            image_file = Path(image_path)
+            if not image_file.exists():
+                logger.error(f"Image file not found: {image_path}")
+                return
+
+            # Validate file size (max 10MB to prevent bloating schematics)
+            MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10MB
+            file_size = image_file.stat().st_size
+            if file_size > MAX_IMAGE_SIZE:
+                logger.error(
+                    f"Image file too large: {file_size / (1024*1024):.2f}MB "
+                    f"(max {MAX_IMAGE_SIZE / (1024*1024):.0f}MB). "
+                    f"File: {image_path}"
+                )
+                return
+
+            # Validate file type by checking magic bytes
+            with open(image_file, 'rb') as f:
+                header = f.read(8)
+
+                # Check for common image formats by magic bytes
+                is_valid_image = False
+                image_type = "unknown"
+
+                if header.startswith(b'\x89PNG\r\n\x1a\n'):
+                    is_valid_image = True
+                    image_type = "PNG"
+                elif header.startswith(b'\xff\xd8\xff'):
+                    is_valid_image = True
+                    image_type = "JPEG"
+                elif header.startswith(b'GIF87a') or header.startswith(b'GIF89a'):
+                    is_valid_image = True
+                    image_type = "GIF"
+                elif header.startswith(b'BM'):
+                    is_valid_image = True
+                    image_type = "BMP"
+                elif header.startswith(b'RIFF') and header[8:12] == b'WEBP':
+                    is_valid_image = True
+                    image_type = "WEBP"
+
+                if not is_valid_image:
+                    logger.error(
+                        f"Invalid or unsupported image file format. "
+                        f"Supported formats: PNG, JPEG, GIF, BMP, WEBP. "
+                        f"File: {image_path}"
+                    )
+                    return
+
+                logger.debug(f"Validated {image_type} image: {image_path} ({file_size / 1024:.1f}KB)")
+
+                # Read full file for encoding
+                f.seek(0)
+                image_data = base64.b64encode(f.read()).decode('utf-8')
+
+            # Add image using kicad-sch-api
+            image_uuid = self.schematic.add_image(
+                position=position,
+                data=image_data,
+                scale=scale
+            )
+
+            logger.debug(f"Added Image annotation: '{image_path}' at {position} with scale {scale}")
+
+        except Exception as e:
+            logger.error(f"Failed to add image annotation from {image_path}: {e}")
 
     def _add_paper_size(self, schematic_expr: list):
         """Add paper size to the schematic expression."""
