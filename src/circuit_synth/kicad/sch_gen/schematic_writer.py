@@ -1511,6 +1511,8 @@ class SchematicWriter:
                     self._add_text_annotation(annotation)
                 elif annotation_type == "Table":
                     self._add_table_annotation(annotation)
+                elif annotation_type == "Image":
+                    self._add_image_annotation(annotation)
                 else:
                     logger.warning(f"Unknown annotation type: {annotation_type}")
 
@@ -1652,6 +1654,50 @@ class SchematicWriter:
                     text_element._text_uuid = f"{uuid}_{row_idx}_{col_idx}"
 
                     self.schematic.add_text(text_element)
+
+    def _add_image_annotation(self, image):
+        """Add an Image annotation as an embedded image in the schematic."""
+        import base64
+        from pathlib import Path
+
+        # Handle both dictionary data and object data
+        if isinstance(image, dict):
+            image_path = image.get("image_path", "")
+            position = image.get("position", (100.0, 100.0))
+            scale = image.get("scale", 1.0)
+            uuid = image.get("uuid", "")
+        else:
+            image_path = image.image_path
+            position = image.position
+            scale = image.scale
+            uuid = image.uuid
+
+        # Ensure position is a tuple (not a list) for kicad-sch-api
+        # This can happen if the annotation was serialized/deserialized through JSON
+        if isinstance(position, list):
+            position = tuple(position)
+
+        # Read and encode the image file
+        try:
+            image_file = Path(image_path)
+            if not image_file.exists():
+                logger.error(f"Image file not found: {image_path}")
+                return
+
+            with open(image_file, 'rb') as f:
+                image_data = base64.b64encode(f.read()).decode('utf-8')
+
+            # Add image using kicad-sch-api
+            image_uuid = self.schematic.add_image(
+                position=position,
+                data=image_data,
+                scale=scale
+            )
+
+            logger.debug(f"Added Image annotation: '{image_path}' at {position} with scale {scale}")
+
+        except Exception as e:
+            logger.error(f"Failed to add image annotation from {image_path}: {e}")
 
     def _add_paper_size(self, schematic_expr: list):
         """Add paper size to the schematic expression."""

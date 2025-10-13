@@ -305,6 +305,41 @@ class Circuit:
             circuit_name=self.name,
         )
 
+    def add_image(self, image_path: str, position: tuple, scale: float = 1.0):
+        """
+        Add an embedded image to the schematic.
+
+        Images are embedded as base64-encoded data in the KiCad schematic file.
+        The image file is read when the schematic is generated, so it only needs
+        to exist at generation time.
+
+        Args:
+            image_path: Path to image file (PNG, JPG, etc.)
+            position: Tuple of (x, y) position in mm
+            scale: Scale factor (1.0 = original size, 2.0 = 2x larger, etc.)
+
+        Returns:
+            Image: The created Image annotation object
+
+        Example:
+            >>> circuit.add_image("logo.png", position=(100, 50), scale=2.0)
+        """
+        from .annotations import Image
+
+        img = Image(image_path=image_path, position=position, scale=scale)
+        self.add_annotation(img)
+
+        context_logger.debug(
+            "Added image to circuit",
+            component="CIRCUIT",
+            image_path=image_path,
+            position=position,
+            scale=scale,
+            circuit_name=self.name,
+        )
+
+        return img
+
     def to_dict(self) -> Dict[str, Any]:
         """
         Return a hierarchical dictionary representation of this circuit,
