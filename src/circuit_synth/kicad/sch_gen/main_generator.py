@@ -1380,15 +1380,12 @@ class SchematicGenerator:
                                     pin_net_map[pin.number] = pin.net.name
                                     logger.debug(f"🔍     ✅ Mapped {pin.number} -> {pin.net.name}")
                         elif hasattr(comp, 'pins'):
-                            logger.debug(f"🔍 Using pins list, count: {len(comp.pins)}")
-                            for pin in comp.pins:
-                                logger.debug(f"🔍   Pin: {pin}, has net: {hasattr(pin, 'net')}, has net_name: {hasattr(pin, 'net_name')}")
-                                if hasattr(pin, 'net') and pin.net:
-                                    pin_net_map[pin.number] = pin.net
-                                    logger.debug(f"🔍     ✅ Mapped via net: {pin.number} -> {pin.net}")
-                                elif hasattr(pin, 'net_name') and pin.net_name:
-                                    pin_net_map[pin.number] = pin.net_name
-                                    logger.debug(f"🔍     ✅ Mapped via net_name: {pin.number} -> {pin.net_name}")
+                            # SchematicSymbol from kicad-sch-api: pins don't have net information
+                            # Net connections are stored separately in the schematic's nets list
+                            # For bounding box calculation, we can use an empty pin_net_map
+                            logger.debug(f"🔍 Component has pins list (SchematicSymbol) - skipping net mapping")
+                            logger.debug(f"   (Net info not available on SchematicPin objects from kicad-sch-api)")
+                            # Leave pin_net_map empty - bounding box will be calculated without net labels
 
                         logger.debug(f"🔍 FINAL pin_net_map for {comp.reference}: {pin_net_map}")
                         logger.debug(f"🔍 Calling get_symbol_dimensions with pin_net_map")

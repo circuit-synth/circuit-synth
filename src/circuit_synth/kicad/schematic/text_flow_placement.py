@@ -25,7 +25,9 @@ def snap_to_grid(value: float, grid_size: float = 2.54) -> float:
     Returns:
         Value snapped to nearest grid point
     """
-    return round(value / grid_size) * grid_size
+    snapped = round(value / grid_size) * grid_size
+    logger.debug(f"snap_to_grid({value:.3f}) = {snapped:.3f} (grid={grid_size})")
+    return snapped
 
 
 @dataclass
