@@ -1,1 +1,0 @@
-# STM32 power template (abbreviated for space)
