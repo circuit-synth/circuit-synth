@@ -16,9 +16,13 @@ Round-trip preservation allows users to:
 ```
 docs/round-trip/
 ├── README.md                    # This file - overview and quick start
+├── ARCHITECTURE_ANALYSIS.md     # Round-trip architecture deep-dive
 ├── TEST_RESULTS_SUMMARY.md      # Automated test results (11/11 ✅)
 ├── MANUAL_TEST_PLAN.md          # Manual test plan (19 systematic tests)
-└── test1_basic_divider.py       # Starter script for manual testing
+├── examples/                    # Example test scripts
+│   └── test1_basic_divider.py   # Basic voltage divider starter script
+└── test-projects/               # Test project artifacts
+    └── voltage_divider/         # Example test project
 ```
 
 ## Files Explained
@@ -56,7 +60,18 @@ docs/round-trip/
 - Document test progress
 - Report bugs systematically
 
-### test1_basic_divider.py
+### ARCHITECTURE_ANALYSIS.md
+**Technical architecture deep-dive**
+- Round-trip update system analysis
+- Code path documentation (generation vs update)
+- Implementation details and design decisions
+
+**Use this file to:**
+- Understand how round-trip preservation works internally
+- Learn about the synchronizer architecture
+- See what's already implemented vs what's needed
+
+### examples/test1_basic_divider.py
 **Ready-to-run starter script**
 - Basic voltage divider circuit
 - Starting point for Test 1 in manual plan
@@ -67,6 +82,11 @@ docs/round-trip/
 - See example circuit-synth code
 - Generate initial test schematic
 
+### test-projects/voltage_divider/
+**Example test project artifacts**
+- Generated KiCad project from test1_basic_divider.py
+- Reference implementation for testing
+
 ## Quick Start - Manual Testing
 
 ```bash
@@ -74,10 +94,10 @@ docs/round-trip/
 cd ~/Desktop/circuit-synth/docs/round-trip
 
 # 2. Run the basic voltage divider test
-uv run python test1_basic_divider.py
+uv run python examples/test1_basic_divider.py
 
 # 3. Open the generated schematic in KiCad
-open voltage_divider/voltage_divider.kicad_sch
+open test-projects/voltage_divider/voltage_divider.kicad_sch
 
 # 4. Follow MANUAL_TEST_PLAN.md step by step
 ```

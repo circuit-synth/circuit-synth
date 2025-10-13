@@ -17,9 +17,11 @@
 ## Test Environment Setup
 
 ```bash
-# Create test directory
-mkdir -p ~/Desktop/roundtrip_manual_test
-cd ~/Desktop/roundtrip_manual_test
+# Navigate to test directory
+cd ~/Desktop/circuit-synth/docs/round-trip
+
+# Tests will create projects in test-projects/ subdirectory
+# You can also copy examples/test1_basic_divider.py to modify it
 ```
 
 ---
@@ -30,7 +32,7 @@ cd ~/Desktop/roundtrip_manual_test
 
 ### Steps
 
-1. Create `test1_basic_divider.py`:
+1. Use the provided `examples/test1_basic_divider.py` or create your own:
 ```python
 from circuit_synth import Component, Net, circuit
 
@@ -58,10 +60,10 @@ c.generate_kicad_project("voltage_divider", force_regenerate=True, generate_pcb=
 
 2. Run the script:
 ```bash
-uv run python test1_basic_divider.py
+uv run python examples/test1_basic_divider.py
 ```
 
-3. Open `voltage_divider/voltage_divider.kicad_sch` in KiCad
+3. Open `test-projects/voltage_divider/voltage_divider.kicad_sch` in KiCad
 
 ### Expected Results
 
@@ -117,7 +119,7 @@ uv run python test1_basic_divider.py
 
 1. Run the same Python script again (WITHOUT modifying the code):
 ```bash
-uv run python test1_basic_divider.py
+uv run python examples/test1_basic_divider.py
 ```
 
 2. Open the schematic in KiCad again
@@ -180,7 +182,7 @@ uv run python test1_basic_divider.py
 
 ### Steps
 
-1. Modify `test1_basic_divider.py` - change R1 value to 22k:
+1. Modify `examples/test1_basic_divider.py` - change R1 value to 22k:
 ```python
 r1 = Component("Device:R", ref="R1", value="22k",  # Changed from 10k
                footprint="Resistor_SMD:R_0603_1608Metric")
@@ -188,7 +190,7 @@ r1 = Component("Device:R", ref="R1", value="22k",  # Changed from 10k
 
 2. Run with `force_regenerate=False`:
 ```bash
-uv run python test1_basic_divider.py
+uv run python examples/test1_basic_divider.py
 ```
 
 3. Open schematic in KiCad
