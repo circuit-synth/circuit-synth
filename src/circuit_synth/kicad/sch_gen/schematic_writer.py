@@ -1684,7 +1684,53 @@ class SchematicWriter:
                 logger.error(f"Image file not found: {image_path}")
                 return
 
+            # Validate file size (max 10MB to prevent bloating schematics)
+            MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10MB
+            file_size = image_file.stat().st_size
+            if file_size > MAX_IMAGE_SIZE:
+                logger.error(
+                    f"Image file too large: {file_size / (1024*1024):.2f}MB "
+                    f"(max {MAX_IMAGE_SIZE / (1024*1024):.0f}MB). "
+                    f"File: {image_path}"
+                )
+                return
+
+            # Validate file type by checking magic bytes
             with open(image_file, 'rb') as f:
+                header = f.read(8)
+
+                # Check for common image formats by magic bytes
+                is_valid_image = False
+                image_type = "unknown"
+
+                if header.startswith(b'\x89PNG\r\n\x1a\n'):
+                    is_valid_image = True
+                    image_type = "PNG"
+                elif header.startswith(b'\xff\xd8\xff'):
+                    is_valid_image = True
+                    image_type = "JPEG"
+                elif header.startswith(b'GIF87a') or header.startswith(b'GIF89a'):
+                    is_valid_image = True
+                    image_type = "GIF"
+                elif header.startswith(b'BM'):
+                    is_valid_image = True
+                    image_type = "BMP"
+                elif header.startswith(b'RIFF') and header[8:12] == b'WEBP':
+                    is_valid_image = True
+                    image_type = "WEBP"
+
+                if not is_valid_image:
+                    logger.error(
+                        f"Invalid or unsupported image file format. "
+                        f"Supported formats: PNG, JPEG, GIF, BMP, WEBP. "
+                        f"File: {image_path}"
+                    )
+                    return
+
+                logger.debug(f"Validated {image_type} image: {image_path} ({file_size / 1024:.1f}KB)")
+
+                # Read full file for encoding
+                f.seek(0)
                 image_data = base64.b64encode(f.read()).decode('utf-8')
 
             # Add image using kicad-sch-api
