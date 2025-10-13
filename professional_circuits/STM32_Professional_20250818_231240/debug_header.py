@@ -1,1 +1,0 @@
-# SWD debug template (abbreviated for space)

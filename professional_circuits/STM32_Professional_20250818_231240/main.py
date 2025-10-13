@@ -1,1 +1,0 @@
-# STM32 main template (abbreviated for space)
