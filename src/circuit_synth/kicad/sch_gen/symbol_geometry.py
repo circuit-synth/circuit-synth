@@ -55,13 +55,11 @@ class SymbolBoundingBoxCalculator:
             raise ValueError("Symbol data is None or empty")
 
         import sys
-        print(f"\n=== CALCULATING BOUNDING BOX ===", file=sys.stderr, flush=True)
-        print(f"include_properties={include_properties}", file=sys.stderr, flush=True)
-        print(f"🎯 pin_net_map received: {pin_net_map}", file=sys.stderr, flush=True)
-        print(f"🎯 pin_net_map type: {type(pin_net_map)}", file=sys.stderr, flush=True)
-        print(f"🎯 pin_net_map is None: {pin_net_map is None}", file=sys.stderr, flush=True)
-        if pin_net_map:
-            print(f"🎯 pin_net_map contents: {dict(pin_net_map)}", file=sys.stderr, flush=True)
+        # Reduced logging frequency - only log if DEBUG environment variable is set
+        debug_enabled = os.getenv("CIRCUIT_SYNTH_DEBUG", "").lower() == "true"
+        if debug_enabled:
+            print(f"\n=== CALCULATING BOUNDING BOX ===", file=sys.stderr, flush=True)
+            print(f"include_properties={include_properties}", file=sys.stderr, flush=True)
 
         min_x = float("inf")
         min_y = float("inf")
@@ -504,20 +502,27 @@ class SymbolBoundingBoxCalculator:
             print(f"    label_width={name_width:.2f}, label_height={name_height:.2f} (len={len(label_text)})", file=sys.stderr, flush=True)
 
             # Adjust bounds based on pin orientation
-            # Labels are placed at the PIN ORIGIN and extend AWAY from the component
-            # Pin angle indicates where the pin points (into component), label goes opposite direction
-            if angle == 0:  # Pin points right (into component) - label extends LEFT (away from component)
-                print(f"    Angle 0 (Right pin): min_x {min_x:.2f} -> {x - name_width:.2f}", file=sys.stderr, flush=True)
-                min_x = min(min_x, x - name_width)
-            elif angle == 180:  # Pin points left (into component) - label extends RIGHT (away from component)
-                print(f"    Angle 180 (Left pin): max_x {max_x:.2f} -> {x + name_width:.2f}", file=sys.stderr, flush=True)
-                max_x = max(max_x, x + name_width)
-            elif angle == 90:  # Pin points up (into component) - label extends DOWN (away from component)
-                print(f"    Angle 90 (Up pin): min_y {min_y:.2f} -> {y - name_height:.2f}", file=sys.stderr, flush=True)
-                min_y = min(min_y, y - name_height)
-            elif angle == 270:  # Pin points down (into component) - label extends UP (away from component)
-                print(f"    Angle 270 (Down pin): max_y {max_y:.2f} -> {y + name_height:.2f}", file=sys.stderr, flush=True)
-                max_y = max(max_y, y + name_height)
+            # Labels are placed at PIN ENDPOINT with offset, extending AWAY from the component
+            # Pin angle indicates where the pin points (into component)
+            # Apply KiCad's standard pin name offset (0.508mm / 20 mils)
+            offset = cls.DEFAULT_PIN_NAME_OFFSET
+
+            if angle == 0:  # Pin points right - label extends LEFT from endpoint
+                label_x = end_x - offset - name_width
+                print(f"    Angle 0 (Right pin): min_x {min_x:.2f} -> {label_x:.2f} (offset={offset:.3f})", file=sys.stderr, flush=True)
+                min_x = min(min_x, label_x)
+            elif angle == 180:  # Pin points left - label extends RIGHT from endpoint
+                label_x = end_x + offset + name_width
+                print(f"    Angle 180 (Left pin): max_x {max_x:.2f} -> {label_x:.2f} (offset={offset:.3f})", file=sys.stderr, flush=True)
+                max_x = max(max_x, label_x)
+            elif angle == 90:  # Pin points up - label extends DOWN from endpoint
+                label_y = end_y - offset - name_height
+                print(f"    Angle 90 (Up pin): min_y {min_y:.2f} -> {label_y:.2f} (offset={offset:.3f})", file=sys.stderr, flush=True)
+                min_y = min(min_y, label_y)
+            elif angle == 270:  # Pin points down - label extends UP from endpoint
+                label_y = end_y + offset + name_height
+                print(f"    Angle 270 (Down pin): max_y {max_y:.2f} -> {label_y:.2f} (offset={offset:.3f})", file=sys.stderr, flush=True)
+                max_y = max(max_y, label_y)
 
         # Pin numbers are typically placed near the component body
         if pin_number:
