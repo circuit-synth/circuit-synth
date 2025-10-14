@@ -21,10 +21,11 @@ class SymbolBoundingBoxCalculator:
     DEFAULT_PIN_LENGTH = 2.54  # 100 mils
     DEFAULT_PIN_NAME_OFFSET = 0.508  # 20 mils
     DEFAULT_PIN_NUMBER_SIZE = 1.27  # 50 mils
-    # Increased text width ratio to better match KiCad's actual rendering
-    # KiCad uses proportional fonts where character width varies
+    # Improved text width ratio to match KiCad's proportional font rendering
+    # KiCad uses proportional fonts where average character width is ~0.65x height
+    # This prevents label text from extending beyond calculated bounding boxes
     DEFAULT_PIN_TEXT_WIDTH_RATIO = (
-        1.0  # Width to height ratio for pin text
+        0.65  # Width to height ratio for pin text (proportional font average)
     )
 
     @classmethod
