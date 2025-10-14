@@ -130,18 +130,23 @@ class SymbolBoundingBoxCalculator:
 
         # Include space for component properties (Reference, Value, Footprint)
         if include_properties:
-            # Reference is placed 5mm above center
-            # Value is placed 5mm below center
-            # Footprint is placed 10mm below center
-            # Assume average text width of 10mm for properties
-            property_width = 10.0  # Conservative estimate
+            # Use adaptive spacing based on component dimensions
+            component_width = max_x - min_x
+            component_height = max_y - min_y
+
+            # Adaptive property width: minimum 10mm or 80% of component width
+            property_width = max(10.0, component_width * 0.8)
             property_height = cls.DEFAULT_TEXT_HEIGHT
 
+            # Adaptive vertical spacing: minimum 5mm or 10% of component height
+            vertical_spacing_above = max(5.0, component_height * 0.1)
+            vertical_spacing_below = max(10.0, component_height * 0.15)
+
             # Reference label above
-            min_y -= 5.0 + property_height
+            min_y -= vertical_spacing_above + property_height
 
             # Value and Footprint labels below
-            max_y += 10.0 + property_height
+            max_y += vertical_spacing_below + property_height
 
             # Extend horizontally for property text
             center_x = (min_x + max_x) / 2
@@ -257,8 +262,9 @@ class SymbolBoundingBoxCalculator:
         max_y += margin
 
         # Add minimal space for component properties (Reference above, Value below)
-        # KiCad places these compactly, so use smaller padding than before
-        property_spacing = 3.0  # Reduced from 5.0mm
+        # Use adaptive spacing based on component height for better visual hierarchy
+        component_height = max_y - min_y
+        property_spacing = max(3.0, component_height * 0.15)  # Adaptive: minimum 3mm or 15% of height
         property_height = 1.27  # Reduced from 2.54mm
         min_y -= property_spacing + property_height  # Reference above
         max_y += property_spacing + property_height  # Value below

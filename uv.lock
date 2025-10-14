@@ -412,7 +412,7 @@ requires-dist = [
     { name = "google-adk", marker = "extra == 'fast-generation'", specifier = ">=0.1.0" },
     { name = "hypothesis", marker = "extra == 'test'", specifier = ">=6.0.0" },
     { name = "isort", marker = "extra == 'dev'", specifier = ">=5.10.0" },
-    { name = "kicad-sch-api", specifier = ">=0.3.0" },
+    { name = "kicad-sch-api", specifier = ">=0.3.2" },
     { name = "loguru", specifier = ">=0.5.0" },
     { name = "lxml", specifier = ">=6.0.0" },
     { name = "matplotlib", specifier = ">=3.3.0" },
@@ -1637,14 +1637,14 @@ wheels = [
 
 [[package]]
 name = "kicad-sch-api"
-version = "0.3.0"
+version = "0.3.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "sexpdata" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ca/5c/ba5af5fce64c3bda2baad41a5477c1606c175b6b61770a0503042cbc6aa7/kicad_sch_api-0.3.0.tar.gz", hash = "sha256:1b6698fd698566ca13a6b1a07da41578ef7349b3d2e6c989c9c71afa8d9d680b", size = 147880, upload-time = "2025-10-12T07:04:25.974Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2c/b1/e7030b9852c15d202374c80af5d7320fccd95d824577f32679395dc41f99/kicad_sch_api-0.3.2.tar.gz", hash = "sha256:bb04c26adb72c3245f0b872aa371a195decf650da5e0bd0d4f182ce8431d261f", size = 154753, upload-time = "2025-10-13T01:49:36.978Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5b/c9/3e48a3a96fea9719d3604585b33153153a2009209b9e7817fd42f5c3be1e/kicad_sch_api-0.3.0-py3-none-any.whl", hash = "sha256:41a43f9e7d07faa95771c5f3cf9f859aa9c44e46fee0faca2601ca2aa2ecabdb", size = 91927, upload-time = "2025-10-12T07:04:24.321Z" },
+    { url = "https://files.pythonhosted.org/packages/ca/b7/0b5357ed6871b0ef91adbf5fc4f13cdd444fdd962ae149d78687a33a3bf7/kicad_sch_api-0.3.2-py3-none-any.whl", hash = "sha256:6f6e54d89f3df2d2fe1650f61f16957a30d511a58cf525705d51cb2192112401", size = 95396, upload-time = "2025-10-13T01:49:35.634Z" },
 ]
 
 [[package]]
