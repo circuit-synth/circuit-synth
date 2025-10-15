@@ -708,12 +708,11 @@ class SchematicWriter:
                     # Fallback to reasonable defaults
                     width, height = 10.0, 10.0
                 else:
-                    # Calculate bounding box for PLACEMENT only (excludes pin labels and hierarchical labels)
-                    # This is just for spacing - visual bboxes are drawn separately based on actual labels
+                    # Calculate accurate bounding box including pin labels for proper collision detection
                     import sys
                     print(f"\n🔍 PLACEMENT: About to calculate bbox for {comp.reference} ({comp.lib_id})", file=sys.stderr, flush=True)
                     min_x, min_y, max_x, max_y = (
-                        SymbolBoundingBoxCalculator.calculate_placement_bounding_box(lib_data)
+                        SymbolBoundingBoxCalculator.calculate_bounding_box(lib_data, include_properties=True)
                     )
                     width = max_x - min_x
                     height = max_y - min_y
@@ -1279,14 +1278,14 @@ class SchematicWriter:
                 f"  Creating ComponentUnit for {comp_ref} with {len(labels)} labels"
             )
 
-            # 1. Get base bbox (component body + pins) in local coordinates
+            # 1. Get base bbox (component body + pins + labels) in local coordinates
             lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
             if not lib_data:
                 logger.warning(f"No symbol data for {comp_ref} ({comp.lib_id}), skipping")
                 continue
 
-            base_bbox = SymbolBoundingBoxCalculator.calculate_placement_bounding_box(
-                lib_data
+            base_bbox = SymbolBoundingBoxCalculator.calculate_bounding_box(
+                lib_data, include_properties=True
             )
 
             # 2. Convert base bbox to global coordinates
@@ -1417,11 +1416,11 @@ class SchematicWriter:
             try:
                 from .symbol_geometry import SymbolBoundingBoxCalculator
 
-                # Calculate base component bbox (without labels)
+                # Calculate component bbox including pin labels for accurate collision detection
                 print(f"\n🔍 BBOX: Calculating bbox for {comp.reference} at ({comp.position.x:.3f}, {comp.position.y:.3f})", file=sys.stderr, flush=True)
 
                 min_x, min_y, max_x, max_y = (
-                    SymbolBoundingBoxCalculator.calculate_placement_bounding_box(lib_data)
+                    SymbolBoundingBoxCalculator.calculate_bounding_box(lib_data, include_properties=True)
                 )
 
                 print(f"🔍 BBOX: Base component bbox: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})", file=sys.stderr, flush=True)
