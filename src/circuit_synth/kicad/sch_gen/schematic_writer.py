@@ -688,7 +688,7 @@ class SchematicWriter:
         # Use text-flow placement
         try:
             from ..schematic.text_flow_placement import place_with_text_flow
-            from .symbol_geometry import SymbolBoundingBoxCalculator
+            from kicad_sch_api.geometry import SymbolBoundingBoxCalculator
             from ..kicad_symbol_cache import SymbolLibCache
 
             placement_start = time.perf_counter()
@@ -1265,7 +1265,7 @@ class SchematicWriter:
         Returns:
             List of ComponentUnit objects
         """
-        from .symbol_geometry import SymbolBoundingBoxCalculator
+        from kicad_sch_api.geometry import SymbolBoundingBoxCalculator
 
         units = []
         logger.debug(f"Creating ComponentUnits for {len(self.schematic.components)} components")
@@ -1414,7 +1414,7 @@ class SchematicWriter:
                 continue
 
             try:
-                from .symbol_geometry import SymbolBoundingBoxCalculator
+                from kicad_sch_api.geometry import SymbolBoundingBoxCalculator
 
                 # Calculate component bbox including pin labels for accurate collision detection
                 print(f"\n🔍 BBOX: Calculating bbox for {comp.reference} at ({comp.position.x:.3f}, {comp.position.y:.3f})", file=sys.stderr, flush=True)
