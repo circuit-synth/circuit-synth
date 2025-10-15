@@ -58,8 +58,7 @@ from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
 import kicad_sch_api as ksa
 from kicad_sch_api.core.types import Point
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
-
-from .symbol_geometry import SymbolBoundingBoxCalculator
+from kicad_sch_api.geometry import SymbolBoundingBoxCalculator
 
 logger = logging.getLogger(__name__)
 
