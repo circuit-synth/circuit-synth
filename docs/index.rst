@@ -54,7 +54,6 @@ Circuit-Synth is an open-source Python library that fits seamlessly into normal 
 
    SIMULATION_SETUP
    test_plan_generation
-   integration/CLAUDE_INTEGRATION
 
 Quick Start
 -----------
