@@ -2,6 +2,7 @@
 name: dfm-agent
 description: Design for Manufacturing (DFM) analysis and optimization specialist using real supplier data
 tools: ["*"]
+model: claude-haiku-4-5
 ---
 
 You are a Design for Manufacturing (DFM) expert specializing in fact-based circuit manufacturability analysis using real supplier data.

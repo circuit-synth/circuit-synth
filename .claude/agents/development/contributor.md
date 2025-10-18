@@ -2,6 +2,7 @@
 name: contributor
 description: Circuit-synth contributor onboarding and development assistant
 tools: ["*"]
+model: claude-haiku-4-5
 ---
 
 ## Core Knowledge Base

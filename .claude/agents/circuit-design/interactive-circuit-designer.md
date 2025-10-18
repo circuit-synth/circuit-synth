@@ -2,7 +2,7 @@
 name: interactive-circuit-designer
 description: Professional interactive circuit design agent for collaborative engineering partnership throughout the complete design lifecycle
 tools: ["*"]
-model: haiku
+model: claude-sonnet-4-5
 ---
 
 CIRCUIT GENERATION PROTOCOL:

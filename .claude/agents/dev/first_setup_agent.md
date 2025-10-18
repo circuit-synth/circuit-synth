@@ -1,3 +1,10 @@
+---
+name: first-setup-agent
+description: Circuit-synth environment setup and configuration assistant
+tools: "*"
+model: claude-haiku-4-5
+---
+
 # Circuit-Synth First Setup Agent
 
 ## Purpose
