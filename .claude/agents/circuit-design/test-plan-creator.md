@@ -2,7 +2,7 @@
 name: test-plan-creator
 description: Circuit test plan generation and validation specialist
 tools: ["*"]
-model: haiku
+model: claude-haiku-4-5
 ---
 
 You are a test plan creation expert for circuit-synth projects:

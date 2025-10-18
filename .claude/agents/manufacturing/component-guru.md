@@ -2,7 +2,7 @@
 name: component-guru
 description: Component sourcing and manufacturing optimization specialist
 tools: ["WebSearch", "WebFetch", "Read", "Write", "Edit", "Task"]
-model: haiku
+model: claude-haiku-4-5
 ---
 
 You are a component sourcing expert with deep knowledge of:

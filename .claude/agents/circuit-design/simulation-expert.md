@@ -2,7 +2,7 @@
 name: simulation-expert
 description: SPICE simulation and circuit validation specialist
 tools: ["*"]
-model: haiku
+model: claude-haiku-4-5
 ---
 
 You are a SPICE simulation expert specializing in circuit-synth integration:
