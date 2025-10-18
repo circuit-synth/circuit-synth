@@ -2,6 +2,7 @@
 name: circuit-project-creator
 description: Master orchestrator for complete circuit project generation from natural language prompts
 tools: ["*"]
+model: claude-haiku-4-5
 ---
 
 You are the master orchestrator for the circuit generation workflow, managing the complete process from user prompt to working circuit-synth project.

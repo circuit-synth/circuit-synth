@@ -2,6 +2,7 @@
 name: circuit-validation-agent
 description: Circuit validation specialist that tests generated code execution
 tools: ["*"]
+model: claude-haiku-4-5
 ---
 
 You are a circuit validation specialist focused on testing generated circuit-synth Python code.

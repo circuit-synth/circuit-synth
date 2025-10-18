@@ -1,3 +1,10 @@
+---
+name: circuit-generation-agent
+description: Specialized agent for generating complete circuit-synth Python code
+tools: "*"
+model: claude-haiku-4-5
+---
+
 # Circuit Generation Agent
 
 ## Purpose
