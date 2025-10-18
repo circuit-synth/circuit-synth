@@ -43,11 +43,11 @@ def timed_operation(
         elapsed_ms = (time.perf_counter() - start_time) * 1000
 
         if elapsed_ms > threshold_ms:
-            logger.warning(
+            logger.debug(
                 f"🐌 SLOW OPERATION: {name} took {elapsed_ms:.2f}ms (threshold: {threshold_ms}ms)"
             )
             if details:
-                logger.warning(f"   Context: {details}")
+                logger.debug(f"   Context: {details}")
 
             # Track slow operations
             PERF_DATA["slow_operations"].append(
@@ -101,7 +101,7 @@ def log_symbol_lookup(
 
     # Warn if slow
     if time_ms > 50:
-        logger.warning(
+        logger.debug(
             f"🐌 SLOW SYMBOL LOOKUP: {lib_id} took {time_ms:.2f}ms from {source}"
         )
 
@@ -123,7 +123,7 @@ def log_net_label_creation(net_name: str, component_ref: str, pin: str, time_ms:
 
     # Warn if slow
     if time_ms > 5:
-        logger.warning(f"🐌 SLOW NET LABEL: {label_key} took {time_ms:.2f}ms")
+        logger.debug(f"🐌 SLOW NET LABEL: {label_key} took {time_ms:.2f}ms")
 
 
 def log_component_processing(
@@ -152,7 +152,7 @@ def log_component_processing(
 
     # Warn if slow
     if time_ms > 20:
-        logger.warning(
+        logger.debug(
             f"🐌 SLOW COMPONENT OPERATION: {component_ref} - {operation} took {time_ms:.2f}ms"
         )
 

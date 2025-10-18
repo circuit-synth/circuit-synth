@@ -84,14 +84,7 @@ class ComponentManager:
         """
         # Validate library ID
         symbol_cache = get_symbol_cache()
-        # Time symbol cache lookup
-        sym_start = time.perf_counter()
         symbol_def = symbol_cache.get_symbol(library_id)
-        sym_time = (time.perf_counter() - sym_start) * 1000
-        if PERF_DEBUG and sym_time > 10:
-            logger.warning(f"🐌 SLOW: get_symbol({library_id}) took {sym_time:.2f}ms")
-            if sym_time > 50:
-                logger.error(f"🔴 VERY SLOW: {library_id} - investigating...")
         if not symbol_def:
             logger.error(f"Unknown library ID: {library_id}")
             return None

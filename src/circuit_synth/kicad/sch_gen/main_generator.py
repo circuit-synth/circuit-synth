@@ -722,10 +722,10 @@ class SchematicGenerator:
 
         elif project_exists and force_regenerate:
             # User explicitly wants to regenerate
-            logger.warning(
-                f"WARNING: Force regenerating project at: {self.project_dir}"
+            logger.info(
+                f"Force regenerating project at: {self.project_dir}"
             )
-            logger.warning(
+            logger.info(
                 "   This will LOSE all manual work (component positions, wires, etc.)"
             )
 
@@ -1293,8 +1293,8 @@ class SchematicGenerator:
                     )
 
                 except Exception as e:
-                    logger.warning(f"Could not read existing schematic: {e}")
-                    logger.warning("Will use default placement for all components")
+                    logger.debug(f"Could not read existing schematic: {e}")
+                    logger.debug("Will use default placement for all components")
             else:
                 logger.debug("No existing schematic found - will use default placement")
 
@@ -1421,8 +1421,14 @@ class SchematicGenerator:
                         f"Placed new component {comp.reference} at: ({x}, {y})"
                     )
 
-            # Place sheet symbols
-            logger.debug(f"Placing {len(circ.child_instances)} sheet symbols...")
+            # Place sheet symbols at TOP in horizontal row
+            logger.debug(f"Placing {len(circ.child_instances)} sheet symbols at TOP...")
+
+            # Fixed placement: sheets go at top, not using collision manager
+            sheet_top_y = 12.7  # Top margin (0.5 inch)
+            sheet_current_x = 25.4  # Left margin (1 inch)
+            sheet_spacing = 15.0  # Space between sheets
+
             for child in circ.child_instances:
                 # Calculate sheet dimensions based on pin count
                 sub_name = child["sub_name"]
@@ -1431,56 +1437,50 @@ class SchematicGenerator:
                     pin_count = len(sub_circ.nets)
 
                     # Calculate height based on pin count
-                    # Each pin needs 2.54mm (100mil) spacing
                     pin_spacing = 2.54
-                    min_height = 20.32  # Minimum 0.8 inch
-                    padding = 5.08  # 200mil padding top and bottom
+                    min_height = 20.32
+                    padding = 5.08
                     calculated_height = (pin_count * pin_spacing) + (2 * padding)
                     sheet_height = max(min_height, calculated_height)
 
-                    # Calculate width based on sheet name and hierarchical labels
-                    min_width = 25.4  # Minimum 1 inch
-                    char_width = 1.5  # mm per character
-                    name_width = len(sub_name) * char_width + 10  # Add margin
+                    # Calculate width
+                    min_width = 25.4
+                    char_width = 1.5
+                    name_width = len(sub_name) * char_width + 10
 
-                    # Find the longest net name for hierarchical labels
                     max_label_length = 0
                     for net in sub_circ.nets:
                         label_length = len(net.name)
                         if label_length > max_label_length:
                             max_label_length = label_length
 
-                    # Calculate width needed for hierarchical labels
-                    # Labels are placed to the right of the sheet
-                    # Use 1.27mm (50 mils) per character as estimate
                     label_char_width = 1.27
-                    label_width = max_label_length * label_char_width + 10  # Add margin
-
-                    # Sheet width should accommodate both name and labels
-                    # Add extra space for the labels extending beyond the sheet
+                    label_width = max_label_length * label_char_width + 10
                     sheet_width = max(min_width, name_width, min_width + label_width)
 
-                    logger.debug(
-                        f"Sheet {sub_name}: name_width={name_width:.1f}mm, "
-                        f"max_label='{max_label_length}' chars, "
-                        f"label_width={label_width:.1f}mm, "
-                        f"final_width={sheet_width:.1f}mm"
-                    )
-
-                    # Store calculated dimensions
                     child["width"] = sheet_width
                     child["height"] = sheet_height
                 else:
-                    # Use defaults if subcircuit not found
-                    sheet_width = child.get("width", 50.8)  # Default 2 inches
-                    sheet_height = child.get("height", 25.4)  # Default 1 inch
+                    sheet_width = child.get("width", 50.8)
+                    sheet_height = child.get("height", 25.4)
 
-                x, y = cm.place_symbol(sheet_width, sheet_height)
+                # FIXED: Place at top with fixed y-coordinate
+                x = sheet_current_x + (sheet_width / 2)
+                y = sheet_top_y + (sheet_height / 2)
+
+                # Snap to grid
+                grid_size = 1.27
+                x = round(x / grid_size) * grid_size
+                y = round(y / grid_size) * grid_size
+
                 child["x"] = x
                 child["y"] = y
                 logger.debug(
-                    f"Placed sheet {child['sub_name']} ({sheet_width}x{sheet_height}mm) at: ({x}, {y})"
+                    f"Placed sheet {sub_name} at TOP: center=({x:.1f}, {y:.1f}), size={sheet_width:.1f}x{sheet_height:.1f}mm"
                 )
+
+                # Move to next horizontal position
+                sheet_current_x += sheet_width + sheet_spacing
 
             # Determine appropriate paper size based on placement
             self.paper_size = self._determine_paper_size(
