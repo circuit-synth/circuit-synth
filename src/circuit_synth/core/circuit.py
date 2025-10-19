@@ -200,7 +200,10 @@ class Circuit:
                 to_remove.append(key)
 
                 # Capture ref mapping for source rewriting
-                self._ref_mapping[prefix] = final_ref
+                # Use list to track multiple components with same prefix
+                if prefix not in self._ref_mapping:
+                    self._ref_mapping[prefix] = []
+                self._ref_mapping[prefix].append(final_ref)
 
                 context_logger.debug(
                     "Assigned final reference for prefix",
