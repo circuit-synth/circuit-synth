@@ -128,10 +128,130 @@ if __name__ == "__main__":
     circuit.generate_kicad_project("my_board")
 ```
 
+## 🔄 Automatic Source Reference Rewriting (Round-Trip Workflow)
+
+Circuit-synth automatically updates your Python source code when KiCad auto-numbers component references, solving the back-annotation problem and enabling seamless round-trip workflow.
+
+### The Problem (Without Source Rewriting)
+
+```python
+# Your Python code
+cap1 = Component(ref="C", value="10uF", ...)   # ref="C"
+cap2 = Component(ref="C", value="100nF", ...)  # ref="C"
+cap3 = Component(ref="C", value="1uF", ...)    # ref="C"
+
+# After KiCad generation: C1, C2, C3 in KiCad
+# But Python still has ref="C" everywhere!
+# Next generation fails with "duplicate reference C"
+```
+
+### The Solution (Automatic Source Update)
+
+```python
+# Your original code
+cap1 = Component(ref="C", value="10uF", ...)   # ref="C"
+
+# After generation, your source is automatically updated to:
+cap1 = Component(ref="C1", value="10uF", ...)  # ref="C1"  ← Auto-updated!
+cap2 = Component(ref="C2", value="100nF", ...) # ref="C2"  ← Auto-updated!
+cap3 = Component(ref="C3", value="1uF", ...)   # ref="C3"  ← Auto-updated!
+
+# Subsequent generations work perfectly - refs stay synchronized!
+```
+
+### How It Works
+
+When you call `generate_kicad_project()`, circuit-synth:
+
+1. **Auto-numbers** components: `ref="C"` → `C1`, `C2`, `C3`
+2. **Updates your Python source file** with the final refs
+3. **Preserves** comments, docstrings, and formatting
+4. **Handles multiple components** with the same prefix correctly
+
+### Usage
+
+```python
+circuit = main_circuit()
+
+# Automatic source update (default when not force_regenerate)
+circuit.generate_kicad_project("my_board")
+
+# Explicitly control source updates
+circuit.generate_kicad_project(
+    "my_board",
+    update_source_refs=True   # Force update
+)
+
+# Disable source updates
+circuit.generate_kicad_project(
+    "my_board",
+    update_source_refs=False   # Never update
+)
+```
+
+### What Gets Updated
+
+✅ **Updated:**
+- Component reference values: `ref="R"` → `ref="R1"`
+- Both quote styles: `ref="C"` and `ref='C'`
+- Multiple components with same prefix (ordered replacement)
+
+❌ **NOT Updated (Preserved):**
+- Comments: `# Component with ref="R"` stays unchanged
+- Docstrings: Documentation examples remain intact
+- String literals: Other occurrences of "R" in strings
+
+### Safety Features
+
+- **Atomic file operations**: Uses temp file + rename (no corruption risk)
+- **Encoding preservation**: Maintains UTF-8, line endings (CRLF/LF)
+- **Permission preservation**: Keeps original file permissions
+- **Git-friendly**: Changes are visible in `git diff`
+- **Error handling**: Graceful fallback if source file unavailable
+
+### Benefits
+
+🎯 **Solves Round-Trip Problem**: Refs stay synchronized between Python and KiCad forever
+📝 **User-Visible Changes**: See exactly what changed in git diff
+🔄 **Seamless Workflow**: Edit Python → Generate KiCad → Edit Python → Regenerate
+⚡ **Zero Configuration**: Works automatically by default
+
+### Example: See It In Action
+
+```bash
+# 1. Create circuit with unnumbered refs
+echo 'cap = Component(ref="C", ...)' > circuit.py
+
+# 2. Generate KiCad project
+python circuit.py  # Calls generate_kicad_project()
+
+# 3. Check your source file
+cat circuit.py
+# Output: cap = Component(ref="C1", ...)  ← Updated!
+
+# 4. See what changed
+git diff circuit.py
+# Shows: -ref="C"
+#        +ref="C1"
+```
+
+### When Source Updates Are Skipped
+
+Source rewriting is automatically disabled when:
+- `force_regenerate=True` (full regeneration mode)
+- Running in REPL/interactive mode (no source file)
+- File is read-only (permission error)
+- Source file cannot be determined (frozen apps)
+
+In these cases, KiCad generation still works normally - only the Python source update is skipped.
+
+---
+
 ## Core Features
 
+- **Automatic Source Reference Rewriting**: Keep Python and KiCad refs synchronized (see above)
 - **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files with modern kicad-sch-api integration
-- **Hierarchical Design**: Modular subcircuits like software modules  
+- **Hierarchical Design**: Modular subcircuits like software modules
 - **Atomic KiCad Operations**: Add/remove individual components from existing schematics with rollback safety
 - **Modern KiCad Integration**: Uses PyPI kicad-sch-api (v0.1.1+) for professional schematic generation
 - **Component Intelligence**: JLCPCB & DigiKey integration, symbol/footprint verification

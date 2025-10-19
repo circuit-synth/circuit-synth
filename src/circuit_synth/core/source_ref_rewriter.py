@@ -36,7 +36,10 @@ class SourceRefRewriter:
 
         Args:
             source_file: Path to Python source file to update
-            ref_mapping: Dict mapping old refs to new refs (e.g., {"R": "R1"})
+            ref_mapping: Dict mapping old refs to new refs
+                        Can be either:
+                        - {"R": "R1"} for single mapping
+                        - {"C": ["C1", "C2", "C3"]} for multiple components
         """
         self.source_file = Path(source_file)
         self.ref_mapping = ref_mapping
@@ -175,6 +178,7 @@ class SourceRefRewriter:
         - Multiline Component() calls
         - Comments (skips updates in comments)
         - Docstrings (skips updates in docstrings)
+        - Multiple components with same prefix (ordered replacement)
 
         Args:
             content: Original file content
@@ -186,6 +190,9 @@ class SourceRefRewriter:
         updated_lines = []
         in_docstring = False
         docstring_delimiter = None
+
+        # Track occurrence count for each prefix (for list-based mappings)
+        occurrence_count = {prefix: 0 for prefix in self.ref_mapping.keys()}
 
         for line in lines:
             # Track docstring state
@@ -220,23 +227,57 @@ class SourceRefRewriter:
 
             # Apply ref updates
             updated_line = line
-            for old_ref, new_ref in self.ref_mapping.items():
+            for old_ref, new_refs in self.ref_mapping.items():
+                # Normalize to list (handles both string and list values)
+                if isinstance(new_refs, str):
+                    ref_list = [new_refs]
+                else:
+                    ref_list = new_refs
+
                 # Match ref="R" or ref='R'
-                # Use word boundaries to avoid partial matches
                 patterns = [
-                    (f'ref="{re.escape(old_ref)}"', f'ref="{new_ref}"'),
-                    (f"ref='{re.escape(old_ref)}'", f"ref='{new_ref}'"),
+                    f'ref="{re.escape(old_ref)}"',
+                    f"ref='{re.escape(old_ref)}'",
                 ]
 
-                for pattern, replacement in patterns:
-                    # Only replace if not in a comment on this line
-                    if pattern in updated_line:
-                        # Check if it's after a # comment
-                        comment_pos = updated_line.find('#')
+                for pattern in patterns:
+                    # Find all occurrences of this pattern in the line
+                    while pattern in updated_line:
+                        # Find position of pattern
                         pattern_pos = updated_line.find(pattern)
 
-                        if comment_pos == -1 or pattern_pos < comment_pos:
-                            updated_line = updated_line.replace(pattern, replacement)
+                        # Check if it's in a comment
+                        comment_pos = updated_line.find('#')
+                        if comment_pos != -1 and pattern_pos > comment_pos:
+                            # Pattern is inside a comment, skip it
+                            break
+
+                        # Get the appropriate replacement based on occurrence count
+                        idx = occurrence_count[old_ref]
+                        if idx < len(ref_list):
+                            new_ref = ref_list[idx]
+                        else:
+                            # More occurrences than mappings - use last mapping
+                            new_ref = ref_list[-1]
+                            logger.warning(
+                                f"More occurrences of ref='{old_ref}' than mappings. "
+                                f"Using {new_ref} for occurrence {idx + 1}"
+                            )
+
+                        # Determine quote style
+                        if pattern.startswith('ref="'):
+                            replacement = f'ref="{new_ref}"'
+                        else:
+                            replacement = f"ref='{new_ref}'"
+
+                        # Replace only the first occurrence (before comment)
+                        updated_line = updated_line.replace(pattern, replacement, 1)
+
+                        # Increment occurrence count
+                        occurrence_count[old_ref] += 1
+
+                        # Break to avoid infinite loop (we already replaced this one)
+                        break
 
             updated_lines.append(updated_line)
 
