@@ -66,14 +66,14 @@ This circuit is now a **reusable function**. Need 5 power supplies? Call `power_
 
 Circuit-synth includes extensive Claude Code integration, making AI-assisted circuit design practical and powerful. When you create a circuit-synth project, you get:
 
-**17 Specialized AI Agents**: Domain experts for different aspects of circuit design:
+**Specialized AI Agents**: Domain experts for different aspects of circuit design:
 - `circuit-architect`: Complete system design from requirements
 - `circuit-synth`: Generate production-ready Python code
 - `simulation-expert`: SPICE analysis and optimization
 - `component-search`: Real-time component sourcing across suppliers
 - Plus agents for debugging, testing, FMEA analysis, and more
 
-**18 Slash Commands**: Quick access to common operations:
+**Slash Commands**: Quick access to common operations:
 - `/find-symbol STM32` - Search for KiCad symbols
 - `/find-parts "0.1uF 0603"` - Component availability and pricing
 - `/generate-validated-circuit "buck converter 5V to 3.3V"` - Natural language → working code
@@ -341,10 +341,11 @@ report_path = generator.generate_comprehensive_report(
 ```
 
 Features:
-- 300+ failure modes (component failures, solder joints, environmental stress)
-- Physics-based reliability models (Arrhenius, Coffin-Manson, Black's equation)
+- Comprehensive failure mode database covering all standard component types
+- Context-aware analysis adjusts risk ratings based on circuit environment and stress factors
+- Physics-based reliability models (Arrhenius, Coffin-Manson, Black's equation) referenced in reports
 - IPC Class 3 compliance checking
-- Risk Priority Number (RPN) calculations
+- Risk Priority Number (RPN) calculations (Severity × Occurrence × Detection)
 - Specific mitigation strategies for each failure mode
 
 ## Development Setup
