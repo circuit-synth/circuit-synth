@@ -168,6 +168,9 @@ tests/functional_tests/**/generated_output/
 cache/
 test_output/
 
+# Generated template (copied from /example_project/ during build)
+src/circuit_synth/data/templates/example_project/
+
 # Test artifact directories
 test_single_resistor/
 test_designator/

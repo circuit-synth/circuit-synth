@@ -14,7 +14,77 @@ Or in Python:
     setup_claude_integration()
 """
 
-__version__ = "0.9.2"
+__version__ = "0.10.2"
+
+
+def print_version_info():
+    """Print circuit-synth version information for debugging"""
+    import subprocess
+    import os
+    from pathlib import Path
+
+    print("=" * 60)
+    print("Circuit-Synth Version Information")
+    print("=" * 60)
+
+    # Version
+    print(f"Version: {__version__}")
+
+    # Source location
+    source_path = Path(__file__).parent
+    print(f"Source: {source_path}")
+
+    # Check if installed via pip or running from local source
+    if "site-packages" in str(source_path):
+        print("Install Type: pip/uv package")
+    else:
+        print("Install Type: local/editable source")
+
+    # Git information (if available)
+    try:
+        git_dir = source_path.parent.parent  # Go up to repo root
+
+        # Get current commit hash
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=git_dir,
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+        if result.returncode == 0:
+            commit_hash = result.stdout.strip()[:8]
+            print(f"Git Commit: {commit_hash}")
+
+            # Check if there's a tag at this commit
+            tag_result = subprocess.run(
+                ["git", "describe", "--exact-match", "--tags", "HEAD"],
+                cwd=git_dir,
+                capture_output=True,
+                text=True,
+                timeout=2
+            )
+            if tag_result.returncode == 0:
+                print(f"Git Tag: {tag_result.stdout.strip()}")
+
+            # Check for uncommitted changes
+            status_result = subprocess.run(
+                ["git", "status", "--porcelain"],
+                cwd=git_dir,
+                capture_output=True,
+                text=True,
+                timeout=2
+            )
+            if status_result.returncode == 0:
+                if status_result.stdout.strip():
+                    print("Git Status: DIRTY (uncommitted changes)")
+                else:
+                    print("Git Status: CLEAN")
+    except (subprocess.TimeoutExpired, FileNotFoundError, Exception):
+        print("Git Info: Not available")
+
+    print("=" * 60)
+
 
 # Plugin integration
 from .ai_integration.plugins import AIDesignBridge
@@ -124,4 +194,6 @@ __all__ = [
     "KiCadValidationError",
     # Claude Code integration
     "setup_claude_integration",
+    # Version utilities
+    "print_version_info",
 ]

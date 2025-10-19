@@ -177,7 +177,7 @@ class TestAPIIntegration:
 
             # Check that mapping was captured
             assert hasattr(circuit, '_ref_mapping')
-            assert circuit._ref_mapping == {"R": "R1"}
+            assert circuit._ref_mapping == {"R": ["R1"]}
         finally:
             set_current_circuit(None)
 
