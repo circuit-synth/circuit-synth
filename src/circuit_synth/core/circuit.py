@@ -621,13 +621,12 @@ class Circuit:
         draw_bounding_boxes: bool = False,
         generate_ratsnest: bool = True,
         update_source_refs: Optional[bool] = None,
-    ) -> None:
+    ) -> Dict[str, Any]:
         """
         Generate a complete KiCad project (schematic + PCB) from this circuit.
 
-        This method provides a simplified API that handles all the boilerplate setup
-        required for KiCad project generation, creating the project directory and
-        generating KiCad files directly without intermediate JSON files.
+        This method automatically generates a JSON netlist as the canonical
+        representation of the circuit, then creates KiCad files from it.
 
         Args:
             project_name: Name of the KiCad project and directory to create
@@ -641,9 +640,18 @@ class Circuit:
                                True: Always update source file
                                False: Never update source file
 
+        Returns:
+            dict: Result dictionary containing:
+                - success (bool): Whether generation succeeded
+                - json_path (Path): Path to the canonical JSON netlist
+                - project_path (Path): Path to the KiCad project directory
+                - error (str, optional): Error message if generation failed
+
         Example:
             >>> circuit = esp32s3_simple()
-            >>> circuit.generate_kicad_project("esp32s3_simple")
+            >>> result = circuit.generate_kicad_project("esp32s3_simple")
+            >>> print(f"JSON netlist: {result['json_path']}")
+            >>> print(f"KiCad project: {result['project_path']}")
         """
         try:
             from ..kicad.config import KiCadConfig, get_recommended_generator
@@ -693,48 +701,47 @@ class Circuit:
 
             context_logger.info("Using hybrid approach: legacy positioning + modern kicad-sch-api file writing", component="CIRCUIT")
 
-            # Create a temporary JSON file for the circuit (will be cleaned up)
-            import tempfile
+            # Generate JSON netlist in project directory (canonical format)
+            json_path = output_path / f"{project_name}.json"
+            context_logger.info(
+                "Generating canonical JSON netlist",
+                component="CIRCUIT",
+                json_path=str(json_path)
+            )
+            self._generate_hierarchical_json_netlist(str(json_path))
 
-            with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".json", delete=False
-            ) as temp_file:
-                temp_json_path = temp_file.name
-                self.generate_json_netlist(temp_json_path)
+            # Create schematic generator that outputs directly to the project directory
+            generator = SchematicGenerator(str(output_path.parent), project_name)
 
-            try:
-                # Create schematic generator that outputs directly to the project directory
-                generator = SchematicGenerator(str(output_path.parent), project_name)
+            # Generate the complete project using the JSON file
+            # Legacy system handles placement, modern API handles file writing via write_schematic_file
+            generation_result = generator.generate_project(
+                json_file=str(json_path),
+                placement_algorithm=placement_algorithm,  # PCB placement algorithm
+                schematic_placement="sequential",  # Use simple sequential for schematic
+                generate_pcb=generate_pcb,
+                force_regenerate=force_regenerate,
+                draw_bounding_boxes=draw_bounding_boxes,
+                generate_ratsnest=generate_ratsnest,
+            )
 
-                # Generate the complete project using the temporary JSON file
-                # Legacy system handles placement, modern API handles file writing via write_schematic_file
-                result = generator.generate_project(
-                    json_file=temp_json_path,
-                    placement_algorithm=placement_algorithm,  # PCB placement algorithm  
-                    schematic_placement="sequential",  # Use simple sequential for schematic
-                    generate_pcb=generate_pcb,
-                    force_regenerate=force_regenerate,
-                    draw_bounding_boxes=draw_bounding_boxes,
-                    generate_ratsnest=generate_ratsnest,
-                )
-            finally:
-                # Clean up the temporary JSON file
-                import os
-
-                try:
-                    os.unlink(temp_json_path)
-                except OSError:
-                    pass
-
-            if result.get("success", True):  # Default to success if not specified
+            if generation_result.get("success", True):  # Default to success if not specified
                 context_logger.info(
                     "KiCad project generated successfully",
                     component="CIRCUIT",
                     project_name=project_name,
                     output_path=str(output_path),
+                    json_path=str(json_path),
                 )
+
+                # Return success with paths to JSON and project
+                return {
+                    "success": True,
+                    "json_path": json_path,
+                    "project_path": output_path,
+                }
             else:
-                error_msg = result.get(
+                error_msg = generation_result.get(
                     "error", "Unknown error occurred during project generation"
                 )
                 context_logger.error(
@@ -743,18 +750,29 @@ class Circuit:
                     project_name=project_name,
                     error=error_msg,
                 )
-                raise CircuitSynthError(f"KiCad project generation failed: {error_msg}")
+                return {
+                    "success": False,
+                    "error": error_msg,
+                    "json_path": json_path,
+                    "project_path": output_path,
+                }
 
         except ImportError as e:
             error_msg = f"KiCad integration not available: {e}"
             context_logger.error(error_msg, component="CIRCUIT")
-            raise CircuitSynthError(error_msg) from e
+            return {
+                "success": False,
+                "error": error_msg,
+            }
         except Exception as e:
             error_msg = f"Failed to generate KiCad project '{project_name}': {e}"
             context_logger.error(
                 error_msg, component="CIRCUIT", project_name=project_name
             )
-            raise CircuitSynthError(error_msg) from e
+            return {
+                "success": False,
+                "error": error_msg,
+            }
 
     def simulate(self):
         """

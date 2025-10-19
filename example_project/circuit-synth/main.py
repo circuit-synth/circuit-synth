@@ -46,19 +46,20 @@ if __name__ == "__main__":
     # Generate KiCad netlist (required for ratsnest display)
     print("🔌 Generating KiCad netlist...")
     circuit.generate_kicad_netlist("ESP32_C6_Dev_Board.net")
-    
-    # Generate JSON netlist (for debugging and analysis)
-    print("📄 Generating JSON netlist...")
-    circuit.generate_json_netlist("ESP32_C6_Dev_Board.json")
-    
+
     # Create KiCad project with hierarchical sheets
-    print("🏗️  Generating KiCad project...")
-    circuit.generate_kicad_project(
+    # Note: JSON netlist is automatically generated in the project directory
+    print("🏗️  Generating KiCad project (with automatic JSON netlist)...")
+    result = circuit.generate_kicad_project(
         project_name="ESP32_C6_Dev_Board",
         placement_algorithm="external",
         generate_pcb=True,
         force_regenerate=True
     )
+
+    if not result["success"]:
+        print(f"❌ Error: {result['error']}")
+        exit(1)
     
     print("")
     print("✅ ESP32-C6 Development Board project generated!")
