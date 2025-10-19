@@ -357,6 +357,8 @@ class SchematicWriter:
 
         PERFORMANCE MONITORING: Times each major operation.
         """
+        with open("/tmp/circuit_synth_debug.log", "a") as f:
+            f.write(f"generate_s_expr called for circuit {self.circuit.name}\n")
         start_time = time.perf_counter()
         logger.info(
             f"🚀 GENERATE_S_EXPR: Starting schematic generation for circuit '{self.circuit.name}'"
@@ -840,6 +842,67 @@ class SchematicWriter:
             f"🏁 PLACE_COMPONENTS: ✅ PLACEMENT COMPLETE in {total_time*1000:.2f}ms"
         )
 
+    def _is_net_hierarchical(self, net_obj):
+        """
+        Check if a net should have a hierarchical label (vs local label).
+
+        A net needs a hierarchical label if it:
+        1. Is shared with the parent circuit (passed as parameter), OR
+        2. Is used by any child circuit (needs to connect down to children)
+
+        Local labels are ONLY for nets that are purely internal to this sheet.
+
+        Args:
+            net_obj: The Net object to check
+
+        Returns:
+            bool: True if net should have hierarchical label, False for local label
+        """
+        # TEMPORARY: Always use hierarchical labels for now
+        # We want all labels to be hierarchical until we're ready to differentiate
+        # between local (internal) and hierarchical (cross-circuit) nets.
+        # The logic below is correct but bypassed for now.
+        return True
+
+        # TODO: Enable this logic when ready to support local labels
+        # ============================================================
+        # # Check if shared with parent
+        # parent_circuit = None
+        # for circ_name, circ in self.all_subcircuits.items():
+        #     for child_info in circ.child_instances:
+        #         if child_info["sub_name"] == self.circuit.name:
+        #             parent_circuit = circ
+        #             break
+        #     if parent_circuit:
+        #         break
+        #
+        # if parent_circuit:
+        #     # Check if this Net OBJECT (not name) is used in the parent
+        #     parent_nets = parent_circuit.nets.values() if isinstance(parent_circuit.nets, dict) else parent_circuit.nets
+        #     for parent_net in parent_nets:
+        #         if parent_net is net_obj:  # Same object reference!
+        #             return True
+        #
+        #     # Fallback to name matching (for JSON-loaded circuits)
+        #     parent_net_names = {n.name for n in parent_nets}
+        #     if net_obj.name in parent_net_names:
+        #         return True
+        #
+        # # Check if used by any child circuit
+        # for child_info in self.circuit.child_instances:
+        #     child_circ = self.all_subcircuits[child_info["sub_name"]]
+        #     child_nets = child_circ.nets.values() if isinstance(child_circ.nets, dict) else child_circ.nets
+        #
+        #     for child_net in child_nets:
+        #         # Check object identity
+        #         if child_net is net_obj:
+        #             return True
+        #         # Fallback to name matching
+        #         if child_net.name == net_obj.name:
+        #             return True
+        #
+        # return False
+
     def _add_pin_level_net_labels(self):
         """
         Add local net labels at component pins for all nets.
@@ -852,6 +915,7 @@ class SchematicWriter:
 
         # Track which labels belong to which component
         component_labels = {}  # Dict[str, List[Label]]
+
 
         # Get component lookup from the API
         for net in self.circuit.nets:
@@ -922,12 +986,17 @@ class SchematicWriter:
                 label_angle = (pin_angle + 180) % 360
                 global_angle = (label_angle + comp.rotation) % 360
 
-                # Create hierarchical label using the API
+                # Determine label type: hierarchical if shared with parent OR used by children
+                # Local labels are ONLY for nets that are purely internal to this sheet
+                is_hierarchical = self._is_net_hierarchical(net)
+                label_type = LabelType.HIERARCHICAL if is_hierarchical else LabelType.LOCAL
+
+                # Create label using the API
                 label = Label(
                     uuid=str(uuid_module.uuid4()),
                     position=Point(global_x, global_y),
                     text=net_name,
-                    label_type=LabelType.HIERARCHICAL,
+                    label_type=label_type,
                     rotation=float(global_angle),
                 )
 
@@ -1016,10 +1085,65 @@ class SchematicWriter:
 
             child_circ = self.all_subcircuits[sub_name]
 
-            # Get all net names for this subcircuit to create sheet pins
-            # For hierarchical sheets, we need to include both internal nets AND
-            # the parameters passed to the subcircuit function
-            pin_list = sorted([n.name for n in child_circ.nets])
+            # Get only SHARED nets for this subcircuit to create sheet pins
+            # Check which child nets have the SAME OBJECT REFERENCE as parent nets
+            # (not just matching names - must be the same Net object passed from parent to child)
+
+            shared_net_names = []
+            internal_net_names = []
+
+            # Handle both dict and list forms of .nets
+            child_nets = child_circ.nets.values() if isinstance(child_circ.nets, dict) else child_circ.nets
+            parent_nets = self.circuit.nets.values() if isinstance(self.circuit.nets, dict) else self.circuit.nets
+
+            # First try object identity (works when circuits are created directly in Python)
+            for child_net in child_nets:
+                is_shared = False
+                for parent_net in parent_nets:
+                    if parent_net is child_net:  # Same object reference!
+                        is_shared = True
+                        break
+
+                if is_shared:
+                    shared_net_names.append(child_net.name)
+                else:
+                    internal_net_names.append(child_net.name)
+
+            # If object identity found no shared nets but we have nets to check, fall back to name matching
+            # (needed when circuits are loaded from JSON, which creates new Net objects)
+            if not shared_net_names and list(parent_nets) and list(child_nets):
+                shared_net_names = []
+                internal_net_names = []
+
+                parent_net_names_set = {n.name for n in parent_nets}
+                for child_net in child_nets:
+                    if child_net.name in parent_net_names_set:
+                        shared_net_names.append(child_net.name)
+                    else:
+                        internal_net_names.append(child_net.name)
+
+            # Special case: If parent has NO nets, infer shared nets by looking at sibling circuits
+            # Nets that appear in multiple children are likely shared parameters
+            if not list(parent_nets) and list(child_nets):
+                shared_net_names = []
+                internal_net_names = []
+
+                # Collect nets from all sibling circuits
+                sibling_net_names = set()
+                for sibling_info in self.circuit.child_instances:
+                    if sibling_info["sub_name"] != sub_name:  # Don't include current child
+                        sibling_circ = self.all_subcircuits[sibling_info["sub_name"]]
+                        sibling_nets = sibling_circ.nets.values() if isinstance(sibling_circ.nets, dict) else sibling_circ.nets
+                        sibling_net_names.update(n.name for n in sibling_nets)
+
+                # Nets that appear in both this child AND siblings are likely shared
+                for child_net in child_nets:
+                    if child_net.name in sibling_net_names:
+                        shared_net_names.append(child_net.name)
+                    else:
+                        internal_net_names.append(child_net.name)
+
+            pin_list = sorted(shared_net_names)
 
             # CRITICAL FIX: Also include the parameters from child circuit instances
             # For subcircuits that only contain other subcircuits (no components),

@@ -647,6 +647,11 @@ class Circuit:
         """
         try:
             from ..kicad.config import KiCadConfig, get_recommended_generator
+            from .. import print_version_info
+
+            # Print version information for debugging
+            print_version_info()
+            print()  # Blank line after version info
 
             # Finalize references before generation
             self.finalize_references()
