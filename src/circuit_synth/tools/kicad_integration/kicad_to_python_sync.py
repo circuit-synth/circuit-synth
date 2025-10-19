@@ -18,11 +18,13 @@ Usage:
 """
 
 import argparse
+import json
 import logging
 import os
 import subprocess
 import sys
 import tempfile
+import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -44,15 +46,53 @@ class KiCadToPythonSyncer:
 
     def __init__(
         self,
-        kicad_project: str,
+        kicad_project_or_json: str,
         python_file: str,
         preview_only: bool = True,
         create_backup: bool = True,
     ):
-        self.kicad_project = Path(kicad_project)
+        """
+        Initialize syncer with JSON or KiCad project path.
+
+        Args:
+            kicad_project_or_json: Path to .json netlist (preferred)
+                                   OR .kicad_pro file (deprecated)
+            python_file: Target Python file path
+            preview_only: If True, only preview changes
+            create_backup: Create backup before overwriting
+        """
         self.python_file_or_dir = Path(python_file)
         self.preview_only = preview_only
         self.create_backup = create_backup
+
+        # Determine input type and handle accordingly
+        input_path = Path(kicad_project_or_json)
+
+        if input_path.suffix == ".json":
+            # NEW PATH: Use JSON directly (preferred)
+            self.json_path = input_path
+            logger.info(f"Using JSON netlist: {self.json_path}")
+
+        elif input_path.suffix == ".kicad_pro" or input_path.is_dir():
+            # LEGACY PATH: Find or generate JSON (deprecated)
+            warnings.warn(
+                "Passing KiCad project directly is deprecated. "
+                "Pass JSON netlist path instead. "
+                "This will be removed in v2.0.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            self.json_path = self._find_or_generate_json(input_path)
+            logger.warning(f"Auto-generated/found JSON: {self.json_path}")
+
+        else:
+            raise ValueError(
+                f"Unsupported input: {input_path}. "
+                "Expected .json netlist or .kicad_pro project file."
+            )
+
+        # Load JSON data (unified path for both inputs)
+        self.json_data = self._load_json()
 
         # Determine if we're working with a file or directory
         if self.python_file_or_dir.exists() and self.python_file_or_dir.is_dir():
@@ -80,31 +120,241 @@ class KiCadToPythonSyncer:
             self.is_directory_mode = True
             self.python_file = self.python_file_or_dir / "main.py"
 
-        # Initialize components
-        self.parser = KiCadParser(str(self.kicad_project))
-
-        # Extract project name from KiCad project path for code generation
-        project_name = (
-            self.kicad_project.stem
-            if self.kicad_project.suffix == ".kicad_pro"
-            else self.kicad_project.name
-        )
+        # Extract project name from JSON for code generation
+        project_name = self.json_data.get("name", "circuit")
         self.code_generator = PythonCodeGenerator(project_name=project_name)
 
+        # Store for backward compatibility (some methods may still use it)
+        self.kicad_project = input_path
+
         logger.info(f"KiCadToPythonSyncer initialized")
-        logger.info(f"KiCad project: {self.kicad_project}")
+        logger.info(f"JSON input: {self.json_path}")
         logger.info(f"Python target: {self.python_file_or_dir}")
         logger.info(f"Directory mode: {self.is_directory_mode}")
         logger.info(f"Preview mode: {self.preview_only}")
 
-    def sync(self) -> bool:
-        """Perform the synchronization from KiCad to Python"""
-        logger.info("=== Starting KiCad to Python Synchronization ===")
+    def _find_or_generate_json(self, kicad_project: Path) -> Path:
+        """
+        Find existing JSON or generate from KiCad project.
+
+        Args:
+            kicad_project: Path to .kicad_pro or project directory
+
+        Returns:
+            Path to JSON netlist file
+
+        Raises:
+            RuntimeError: If JSON generation fails
+        """
+        # Determine project directory and name
+        if kicad_project.is_file():
+            project_dir = kicad_project.parent
+            project_name = kicad_project.stem
+        else:
+            project_dir = kicad_project
+            project_name = kicad_project.name
+
+        # Check for existing JSON
+        json_path = project_dir / f"{project_name}.json"
+
+        if json_path.exists():
+            logger.info(f"Found existing JSON: {json_path}")
+            return json_path
+
+        # Generate JSON from KiCad
+        logger.info(f"No JSON found, generating from KiCad project...")
+        return self._export_kicad_to_json(kicad_project)
+
+    def _export_kicad_to_json(self, kicad_project: Path) -> Path:
+        """
+        Export KiCad project to JSON format.
+
+        Uses KiCadSchematicParser (from #210) to parse .kicad_sch
+        and export to canonical JSON format.
+
+        If KiCadSchematicParser is not available (dependency #210 not merged),
+        falls back to using KiCadParser.
+
+        Args:
+            kicad_project: Path to .kicad_pro or project directory
+
+        Returns:
+            Path to generated JSON file
+
+        Raises:
+            RuntimeError: If export fails
+            FileNotFoundError: If schematic file not found
+        """
+        try:
+            from circuit_synth.tools.utilities.kicad_schematic_parser import (
+                KiCadSchematicParser,
+            )
+
+            # Find .kicad_sch file
+            if kicad_project.is_file():
+                project_dir = kicad_project.parent
+                project_name = kicad_project.stem
+                schematic_path = project_dir / f"{project_name}.kicad_sch"
+            else:
+                project_dir = kicad_project
+                # Find first .kicad_sch in directory
+                sch_files = list(project_dir.glob("*.kicad_sch"))
+                if not sch_files:
+                    raise FileNotFoundError(
+                        f"No .kicad_sch files found in {project_dir}"
+                    )
+                schematic_path = sch_files[0]
+                project_name = schematic_path.stem
+
+            if not schematic_path.exists():
+                raise FileNotFoundError(f"Schematic not found: {schematic_path}")
+
+            # Generate JSON output path
+            json_path = project_dir / f"{project_name}.json"
+
+            # Parse and export
+            logger.info(f"Parsing schematic: {schematic_path}")
+            parser = KiCadSchematicParser(schematic_path)
+            result = parser.parse_and_export(json_path)
+
+            if not result.get("success"):
+                raise RuntimeError(
+                    f"Failed to export KiCad to JSON: {result.get('error')}"
+                )
+
+            logger.info(f"Successfully exported JSON: {json_path}")
+            return Path(result["json_path"])
+
+        except (ImportError, ModuleNotFoundError):
+            # Fallback: KiCadSchematicParser not available (#210 not merged)
+            # Use KiCadParser to generate circuits, then export to JSON
+            logger.warning(
+                "KiCadSchematicParser not available, using fallback KiCadParser"
+            )
+
+            # Determine project directory and name
+            if kicad_project.is_file():
+                project_dir = kicad_project.parent
+                project_name = kicad_project.stem
+            else:
+                project_dir = kicad_project
+                project_name = kicad_project.name
+
+            json_path = project_dir / f"{project_name}.json"
+
+            # Use KiCadParser to parse circuits
+            parser = KiCadParser(str(kicad_project))
+            circuits = parser.parse_circuits()
+
+            if not circuits:
+                raise RuntimeError("Failed to parse KiCad project")
+
+            # Get main circuit
+            main_circuit = circuits.get("main") or list(circuits.values())[0]
+
+            # Convert circuit to JSON format
+            json_data = main_circuit.to_circuit_synth_json()
+
+            # Write JSON file
+            with open(json_path, "w", encoding="utf-8") as f:
+                json.dump(json_data, f, indent=2)
+
+            logger.info(f"Successfully exported JSON (fallback): {json_path}")
+            return json_path
+
+    def _load_json(self) -> dict:
+        """
+        Load and parse JSON netlist.
+
+        Returns:
+            Parsed JSON data as dictionary
+
+        Raises:
+            FileNotFoundError: If JSON file doesn't exist
+            ValueError: If JSON is malformed
+        """
+        if not self.json_path.exists():
+            raise FileNotFoundError(f"JSON netlist not found: {self.json_path}")
 
         try:
-            # Step 1: Parse KiCad circuits (hierarchical)
-            logger.info("Step 1: Parsing KiCad project")
-            circuits = self.parser.parse_circuits()
+            with open(self.json_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            logger.info(
+                f"Loaded JSON with {len(data.get('components', {}))} components"
+            )
+            return data
+
+        except json.JSONDecodeError as e:
+            raise ValueError(
+                f"Invalid JSON format in {self.json_path}: {e}"
+            ) from e
+
+    def _json_to_circuits(self) -> Dict[str, Circuit]:
+        """
+        Convert JSON data to Circuit objects.
+
+        Returns:
+            Dictionary mapping circuit names to Circuit objects
+        """
+        circuits = {}
+
+        # Parse main circuit
+        circuit_name = self.json_data.get("name", "main")
+
+        # Extract components from JSON dict format
+        components = []
+        for ref, comp_data in self.json_data.get("components", {}).items():
+            component = Component(
+                reference=comp_data.get("ref", ref),
+                lib_id=comp_data.get("symbol", ""),
+                value=comp_data.get("value", ""),
+                footprint=comp_data.get("footprint", ""),
+                position=(0.0, 0.0),  # Position not in JSON
+            )
+            components.append(component)
+
+        # Extract nets from JSON dict format
+        nets = []
+        for net_name, connections in self.json_data.get("nets", {}).items():
+            net_connections = []
+            for conn in connections:
+                comp_ref = conn.get("component")
+                pin_num = conn.get("pin", {}).get("number", "")
+                net_connections.append((comp_ref, pin_num))
+
+            net = Net(name=net_name, connections=net_connections)
+            nets.append(net)
+
+        # Create circuit object
+        circuit = Circuit(
+            name=circuit_name,
+            components=components,
+            nets=nets,
+            schematic_file=self.json_data.get("source_file", ""),
+            is_hierarchical_sheet=False,
+        )
+
+        circuits[circuit_name] = circuit
+
+        # Handle subcircuits if present in JSON
+        subcircuits = self.json_data.get("subcircuits", [])
+        if subcircuits:
+            logger.info(f"Found {len(subcircuits)} subcircuits in JSON")
+            # TODO: Implement hierarchical subcircuit support
+            # For now, just log that they exist
+
+        logger.info(f"Converted JSON to {len(circuits)} circuits")
+        return circuits
+
+    def sync(self) -> bool:
+        """Perform the synchronization from JSON to Python"""
+        logger.info("=== Starting JSON to Python Synchronization ===")
+
+        try:
+            # Step 1: Convert JSON to Circuit objects
+            logger.info("Step 1: Converting JSON to Circuit objects")
+            circuits = self._json_to_circuits()
 
             if not circuits:
                 logger.error("No circuits found in KiCad project")
