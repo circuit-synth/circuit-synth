@@ -131,12 +131,13 @@ if __name__ == "__main__":
 ## Core Features
 
 - **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files with modern kicad-sch-api integration
-- **Hierarchical Design**: Modular subcircuits like software modules  
+- **Circuit Patterns Library**: 7 pre-made, manufacturing-ready circuits (buck/boost converters, battery chargers, sensors, communication)
+- **Hierarchical Design**: Modular subcircuits like software modules
 - **Atomic KiCad Operations**: Add/remove individual components from existing schematics with rollback safety
 - **Modern KiCad Integration**: Uses PyPI kicad-sch-api (v0.1.1+) for professional schematic generation
 - **Component Intelligence**: JLCPCB & DigiKey integration, symbol/footprint verification
 - **Fast JLCPCB Search**: Direct search with 80% speed improvement, 90% less tokens
-- **AI Integration**: Claude Code agents for automated design assistance
+- **AI Integration**: Claude Code agents and skills for automated design assistance
 - **Circuit Debugging**: AI-powered PCB troubleshooting with systematic fault-finding
 - **FMEA Analysis**: Comprehensive reliability analysis with physics-based failure models
 - **Test Generation**: Automated test plans for validation
@@ -177,7 +178,92 @@ pip install kicad-sch-api
 
 Visit the [kicad-sch-api repository](https://github.com/circuit-synth/kicad-sch-api) for standalone usage examples.
 
+## Circuit Patterns Library
+
+Circuit-synth includes a curated library of 7 pre-made, manufacturing-ready circuit patterns for common design building blocks. Each pattern is a proven design with complete component selection, calculations, and PCB layout guidelines.
+
+### Available Patterns
+
+**Power Management:**
+- `buck_converter` - 12V→5V/3.3V step-down switching regulator (TPS54331, 3A)
+- `boost_converter` - 3.7V→5V step-up switching regulator (TPS61070, 1A)
+- `lipo_charger` - Li-ion/LiPo USB-C charging circuit (MCP73831, CC/CV)
+
+**Sensing & Measurement:**
+- `resistor_divider` - Parametric voltage divider for ADC scaling
+- `thermistor` - NTC thermistor temperature sensing circuit
+- `opamp_follower` - Unity-gain voltage buffer (MCP6001)
+
+**Communication:**
+- `rs485` - Industrial differential serial interface (MAX485, Modbus/BACnet)
+
+### Using Circuit Patterns
+
+```python
+from circuit_synth import *
+from buck_converter import buck_converter
+from thermistor import thermistor_sensor
+
+@circuit(name="Battery_Monitor")
+def battery_monitor():
+    # Power nets
+    vin_12v = Net('VIN_12V')
+    vout_5v = Net('VOUT_5V')
+    system_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+
+    # Use pre-made patterns
+    buck_converter(vin_12v, vout_5v, gnd, output_voltage="5V", max_current="3A")
+    buck_converter(vout_5v, system_3v3, gnd, output_voltage="3.3V", max_current="2A")
+    thermistor_sensor(system_3v3, adc_temp, gnd, thermistor_type="NTC_10k")
+```
+
+### Pattern Features
+
+Each pattern includes:
+- ✅ Verified KiCad symbols and footprints
+- ✅ Complete component selection with datasheets
+- ✅ Design calculations and theory of operation
+- ✅ PCB layout guidelines and thermal management
+- ✅ Manufacturing-ready specifications
+- ✅ Common failure modes and troubleshooting
+
+### Claude Code Integration
+
+When using Claude Code, the circuit-patterns skill provides intelligent access:
+
+```
+"What circuit patterns are available?"
+"Show me the buck converter circuit"
+"How do I customize the boost converter for 12V output?"
+```
+
+The skill uses progressive disclosure - loading only requested patterns to save context.
+
+See `example_project/circuit-synth/battery_monitor_example.py` and `power_systems_example.py` for complete usage examples.
+
 ## AI-Powered Design
+
+### Claude Code Skills
+
+Circuit-synth provides intelligent Claude Code skills for progressive disclosure:
+
+**circuit-patterns** - Circuit pattern library browser
+- Lists available pre-made circuits
+- Loads pattern details on demand
+- Shows customization options
+- Token efficient (only loads requested patterns)
+
+**component-search** - Fast JLCPCB component sourcing
+- Real-time stock and pricing from JLCPCB
+- Automatic caching for speed
+- Ranks by availability and price
+- Prefers Basic parts (no setup fee)
+
+**kicad-integration** - KiCad symbol/footprint finder
+- Multi-source search (local, DigiKey GitHub, SnapEDA, DigiKey API)
+- Symbol and footprint verification
+- Pin name extraction for accurate connections
 
 ### Claude Code Commands
 
@@ -200,14 +286,15 @@ jlc-fast cheapest "10uF 0805"         # Find cheapest option
 
 When using Claude Code, you can ask for help with:
 
-- **Component Selection**: "Find me a 3.3V regulator available on JLCPCB"
+- **Circuit Patterns**: "What circuit patterns are available?" → circuit-patterns skill
+- **Component Selection**: "Find me a 3.3V regulator available on JLCPCB" → component-search skill
+- **KiCad Integration**: "What footprint should I use for LQFP-48?" → kicad-integration skill
 - **Circuit Design**: "Design a USB-C power supply with protection"
-- **KiCad Integration**: "What footprint should I use for LQFP-48?"
 - **Troubleshooting**: "My board isn't powering on - help debug"
 - **SPICE Simulation**: "Simulate this amplifier circuit"
 - **Test Planning**: "Generate test procedures for my power supply"
 
-The AI agents will automatically select the right tools and expertise for your request.
+The AI agents and skills will automatically select the right tools and expertise for your request.
 
 ## 🚀 Commands
 
@@ -406,19 +493,37 @@ jlc-fast benchmark
 my_circuit_project/
 ├── example_project/
 │   ├── circuit-synth/
-│   │   ├── main.py              # ESP32-C6 dev board (hierarchical)
-│   │   ├── power_supply.py      # 5V→3.3V regulation
-│   │   ├── usb.py               # USB-C with CC resistors
-│   │   ├── esp32c6.py           # ESP32-C6 microcontroller
-│   │   └── led_blinker.py       # Status LED control
-│   └── ESP32_C6_Dev_Board/      # Generated KiCad files
+│   │   ├── main.py                      # ESP32-C6 dev board (hierarchical)
+│   │   ├── power_supply.py              # 5V→3.3V regulation
+│   │   ├── usb.py                       # USB-C with CC resistors
+│   │   ├── esp32c6.py                   # ESP32-C6 microcontroller
+│   │   ├── led_blinker.py               # Status LED control
+│   │   # Circuit Patterns Library
+│   │   ├── buck_converter.py            # Step-down switching regulator
+│   │   ├── boost_converter.py           # Step-up switching regulator
+│   │   ├── lipo_charger.py              # Li-ion/LiPo battery charger
+│   │   ├── resistor_divider.py          # Voltage divider for ADC
+│   │   ├── thermistor.py                # Temperature sensing
+│   │   ├── opamp_follower.py            # Unity-gain buffer
+│   │   ├── rs485.py                     # Industrial communication
+│   │   # Usage Examples
+│   │   ├── battery_monitor_example.py   # Multi-pattern integration
+│   │   └── power_systems_example.py     # Power conversion examples
+│   └── ESP32_C6_Dev_Board/              # Generated KiCad files
 │       ├── ESP32_C6_Dev_Board.kicad_pro
 │       ├── ESP32_C6_Dev_Board.kicad_sch
 │       ├── ESP32_C6_Dev_Board.kicad_pcb
 │       └── ESP32_C6_Dev_Board.net
-├── README.md                # Project guide
-├── CLAUDE.md                # AI assistant instructions
-└── pyproject.toml           # Project dependencies
+├── .claude/                             # Claude Code integration
+│   ├── agents/                          # AI agents
+│   ├── commands/                        # Slash commands
+│   └── skills/                          # Progressive disclosure skills
+│       ├── circuit-patterns/            # Circuit pattern library skill
+│       ├── component-search/            # JLCPCB sourcing skill
+│       └── kicad-integration/           # Symbol/footprint finder skill
+├── README.md                            # Project guide
+├── CLAUDE.md                            # AI assistant instructions
+└── pyproject.toml                       # Project dependencies
 ```
 
 
@@ -430,7 +535,8 @@ my_circuit_project/
 | Hunt through symbol libraries | Verified components with JLCPCB & DigiKey availability |
 | Visual net verification | Explicit Python connections |
 | GUI-based editing | Version-controlled Python files |
-| Copy-paste patterns | Reusable circuit functions |
+| Copy-paste patterns | Reusable circuit functions + 7 pre-made patterns |
+| Research reference designs | Import proven patterns: `from buck_converter import buck_converter` |
 | Manual FMEA documentation | Automated 50+ page reliability analysis |
 
 ## Resources
@@ -452,7 +558,37 @@ uv run pytest
 
 # Optional: Register Claude Code agents
 uv run register-agents
+
+# Build template for distribution (copies example_project to package data)
+python build.py
 ```
+
+### Claude Code Working Directory
+
+**Important for Contributors**: Circuit-synth has separate .claude configurations:
+
+- **Repository root** (`/.claude`): Reserved for circuit-synth development, testing, and repo maintenance
+- **Example project** (`/example_project/.claude`): For circuit design (this gets copied to user projects via `cs-new-project`)
+
+**Claude Code activates based on your current working directory:**
+
+```bash
+# ❌ DON'T work from repo root for circuit design
+cd circuit-synth/
+claude code              # Uses dev .claude (wrong context for design)
+
+# ✅ DO work from example_project for circuit design
+cd circuit-synth/example_project/
+claude code              # Uses design .claude (correct context)
+
+# ✅ DO work from repo root for library development
+cd circuit-synth/
+claude code              # Uses dev .claude (correct for development)
+```
+
+The repo root .claude is for contributors working on circuit-synth itself, not for using circuit-synth to design circuits.
+
+See `CLAUDE_FOLDER_STRUCTURE_RESEARCH.md` for detailed explanation of this architecture.
 
 
 For 6x performance improvement:

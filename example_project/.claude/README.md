@@ -1,149 +1,153 @@
-# Circuit-Synth Claude Code Integration
+# Circuit Design .claude Configuration
 
-This directory contains specialized agents and commands for circuit-synth development with Claude Code.
+This .claude folder provides circuit design tools and AI assistance for circuit-synth projects.
 
-## 🚀 Quick Start
+## Purpose
 
-### First Time Setup
+This configuration is specifically for **circuit design work** - creating circuits, selecting components, and generating KiCad projects. It gets copied to new projects when you run `cs-new-project`.
+
+**Note**: This is NOT the development .claude for circuit-synth library work. That's at the repository root.
+
+## Available Tools
+
+### Skills (Progressive Disclosure)
+- **circuit-patterns**: Browse and use pre-made circuit patterns
+- **component-search**: Fast JLCPCB component sourcing with caching
+- **kicad-integration**: Multi-source symbol/footprint finder
+
+### Slash Commands
+
+**Circuit Design:**
+- `/find-symbol` - Search KiCad symbols
+- `/find-footprint` - Find KiCad footprints
+- `/find-pins` - Get exact pin names for components
+- `/generate-validated-circuit` - AI-powered circuit generation
+- `/validate-existing-circuit` - Validate circuit code
+
+**Manufacturing:**
+- `/find-parts` - Search JLCPCB/DigiKey for components
+- `/find_stm32` - STM32-specific peripheral search
+- `/find-mcu` - General MCU search with requirements
+
+**Setup:**
+- `/setup-kicad-plugins` - Install KiCad plugins
+- `/setup_circuit_synth` - Configure circuit-synth
+
+**Development (for contributors):**
+- `/dev:run-tests` - Run test suite
+- `/dev:review-branch` - Review git branch
+- `/dev:update-and-commit` - Update docs and commit
+
+### AI Agents
+
+**Circuit Design:**
+- `circuit-architect` - Master circuit coordinator
+- `circuit-generation-agent` - Code generation specialist
+- `interactive-circuit-designer` - **PRIMARY** collaborative design interface
+- `circuit-syntax-fixer` - Fixes code errors
+- `circuit-validation-agent` - Tests generated code
+- `component-symbol-validator` - Validates KiCad symbols
+- `simulation-expert` - SPICE simulation
+
+**Component Sourcing:**
+- `stm32-mcu-finder` - STM32 selection with pin mapping
+- `jlc-parts-finder` - JLCPCB component search
+- `component-guru` - Manufacturing optimization
+- `dfm-agent` - Design for Manufacturing analysis
+
+**Orchestration:**
+- `circuit-project-creator` - Master orchestrator for complete projects
+
+**Development:**
+- `contributor` - Contributor onboarding and help
+
+## Using Claude Code
+
+### Starting a Session
+
 ```bash
-# In Claude Code, run:
-/setup_circuit_synth
+# Navigate to your project
+cd my_circuit_project/
+
+# Start Claude Code
+claude code
 ```
 
-This command will:
-- ✅ Install circuit-synth package and dependencies
-- ✅ Set up KiCad plugins for AI integration
-- ✅ Configure Claude Code agents and commands
-- ✅ Run validation tests to ensure everything works
-- ✅ Provide personalized quick start guide
+### Example Interactions
 
-## 🤖 Available Agents
-
-### 🛠️ first_setup_agent
-**Purpose**: Comprehensive environment setup from scratch
-- Detects platform and adapts installation steps
-- Installs circuit-synth, KiCad plugins, and Claude integration
-- Runs validation tests and provides troubleshooting
-- Gets users productive immediately
-
-### ⚡ circuit_generation_agent  
-**Purpose**: Expert circuit design and code generation
-- Specializes in manufacturing-ready circuit designs
-- Uses proven component templates and pin mappings
-- Integrates JLCPCB availability and KiCad compatibility
-- Generates production-quality circuit-synth code
-
-## 📋 Available Commands
-
-### 🔧 /setup_circuit_synth
-Complete environment setup with validation testing
-
-### 🔍 /find_stm32 `<requirements>`
-Search STM32 microcontrollers by peripheral requirements
-```bash
-/find_stm32 3 spi 2 uart usb available on jlcpcb
+**Using Skills:**
+```
+"What circuit patterns are available?"
+"Find a 10k resistor on JLCPCB"
+"What footprint should I use for LQFP-48?"
 ```
 
-### ⚙️ /generate_circuit `<description>`
-Generate complete circuit-synth code from description
-```bash
-/generate_circuit esp32 development board with usb-c power
+**Using Agents:**
+```
+# Let Claude choose the right agent
+"Design a 5V power supply with USB-C input"
+"Find an STM32 with 3 SPIs available on JLCPCB"
+"Help me fix this circuit code error"
 ```
 
-## 🎯 Workflow Examples
-
-### New User Setup
-```bash
-# Start here - complete setup
-/setup_circuit_synth
-
-# Find components for your project
-/find_stm32 stm32g4 with 2 spi usb available jlc
-
-# Generate circuit code
-/generate_circuit stm32g4 development board with usb debugger
+**Using Commands:**
+```
+/find-symbol STM32F411
+/find-parts "AMS1117-3.3" --source jlcpcb
+/generate-validated-circuit "LED blinker" simple
 ```
 
-### Experienced User Workflow
-```bash
-# Quick component search
-/find_stm32 low power 3 spi 2 uart for battery project
+## Project Structure
 
-# Generate and iterate
-/generate_circuit iot sensor node with esp32 lora and battery management
+Your project will have:
+```
+my_circuit_project/
+├── circuit-synth/           # Your Python circuit files
+│   ├── main.py
+│   ├── buck_converter.py    # Circuit patterns available
+│   └── ...
+├── .claude/                 # This folder (Claude Code config)
+└── Generated_Project/       # KiCad files output here
 ```
 
-## 🔗 Integration Points
+## Circuit Patterns Library
 
-### KiCad Plugins
-- **PCB Editor**: "Circuit-Synth AI (Simple)" toolbar button
-- **Schematic Editor**: BOM plugin with full Claude chat interface
-- **Auto-installation**: `/setup_circuit_synth` handles everything
+Import pre-made patterns directly:
 
-### Manufacturing Integration
-- **JLCPCB**: Real-time stock and pricing data
-- **Component Selection**: Prioritizes available, cost-effective parts
-- **Assembly Ready**: Considers manufacturing constraints
+```python
+from buck_converter import buck_converter
+from lipo_charger import lipo_charger
+from thermistor import thermistor_sensor
 
-### Development Tools
-- **Memory Bank**: Project context preservation across sessions
-- **Testing Infrastructure**: Automated validation of generated circuits
-- **Error Recovery**: Comprehensive troubleshooting and fallback options
-
-## 📖 Success Metrics
-
-After setup, you should be able to:
-
-1. ✅ **Generate Circuits**: Create working circuit-synth Python code
-2. ✅ **KiCad Integration**: Open generated projects without errors  
-3. ✅ **AI Assistance**: Chat with Claude through KiCad plugins
-4. ✅ **Component Search**: Find STM32s with specific peripherals
-5. ✅ **Manufacturing Ready**: All components in stock at JLCPCB
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-**KiCad Plugins Not Appearing**
-```bash
-# Restart KiCad after installation
-# Check: KiCad → Preferences → Plugin paths
+# Use in your circuit
+buck_converter(vin, vout, gnd, output_voltage="5V", max_current="3A")
 ```
 
-**Claude CLI Connection Failed**
-```bash
-# Verify Claude CLI installation
-claude --version
+Available patterns:
+- **Power**: buck_converter, boost_converter, lipo_charger
+- **Sensing**: resistor_divider, thermistor, opamp_follower
+- **Communication**: rs485
 
-# Re-authenticate if needed
-claude auth login
-```
+See the pattern files in `circuit-synth/` for details and documentation.
 
-**Circuit Generation Fails**
-```bash
-# Ensure circuit-synth is properly installed
-uv run python -c "import circuit_synth; print('OK')"
+## Getting Help
 
-# Run example to verify core functionality  
-uv run python examples/example_kicad_project.py
-```
+**Ask Claude directly:**
+- "How do I use the buck converter pattern?"
+- "What's the difference between the skills and agents?"
+- "Show me an example of using multiple patterns together"
 
-## 🔄 Updates
+**Check documentation:**
+- Main README: `../README.md`
+- CLAUDE.md: `CLAUDE.md` (AI assistant instructions)
+- Research docs in repo root: `CLAUDE_FOLDER_STRUCTURE_RESEARCH.md`
 
-To update the circuit-synth environment:
-```bash
-# Re-run setup to get latest agents and commands
-/setup_circuit_synth
+## For Contributors
 
-# Or manually update the package
-pip install --upgrade circuit-synth
-```
+If you're working on circuit-synth itself (not using it to design circuits):
 
-## 💡 Pro Tips
+1. Work from the repository root, not from example_project
+2. Use the root .claude configuration (development tools)
+3. See `CLAUDE_FOLDER_STRUCTURE_RESEARCH.md` for architecture details
 
-- **Use `/setup_circuit_synth` first** - it handles all the complex setup
-- **Start with examples** - run the working examples before creating custom circuits
-- **Test in KiCad** - always verify generated projects open correctly
-- **Leverage AI chat** - use the KiCad plugins for design guidance and optimization
-
-This integration makes circuit design as simple as describing what you want to build!
+This example_project .claude is specifically for **using** circuit-synth, not **developing** it.
