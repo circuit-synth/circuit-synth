@@ -366,7 +366,7 @@ def copy_example_project_template(project_path: Path) -> bool:
     circuit_synth_dir = Path(
         __file__
     ).parent.parent.parent  # Get to circuit_synth directory
-    template_dir = circuit_synth_dir / "data" / "templates" / "project_template"
+    template_dir = circuit_synth_dir / "data" / "templates" / "example_project"
 
     # Fallback: check for example_project in repo root (for development)
     if not template_dir.exists():
