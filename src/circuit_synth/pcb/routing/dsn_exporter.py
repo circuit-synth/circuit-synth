@@ -80,18 +80,51 @@ class DSNExporter:
     DEFAULT_VIA_SIZE = 0.8  # 31.5 mil
     DEFAULT_VIA_DRILL = 0.4  # 15.7 mil
 
-    def __init__(self, pcb_board: PCBBoard):
+    def __init__(
+        self,
+        pcb_board: PCBBoard,
+        routing_style: Optional[str] = None,
+        via_size: Optional[str] = None
+    ):
         """
         Initialize the DSN exporter.
 
         Args:
             pcb_board: The PCBBoard instance to export
+            routing_style: Routing style - "orthogonal" for 90° only routing, None for default
+            via_size: Via size in "drill_mm/annular_mm" format (e.g., "0.6/0.3")
         """
         self.board = pcb_board
         self.components: List[DSNComponent] = []
         self.nets: Dict[str, List[str]] = {}  # net_name -> list of pad names
         self.board_outline: List[Tuple[float, float]] = []
         self.layers: List[DSNLayer] = []
+        self.routing_style = routing_style
+
+        # Parse via size if provided
+        if via_size:
+            try:
+                drill_str, annular_str = via_size.split("/")
+                drill = float(drill_str)
+                annular = float(annular_str)
+                # Via diameter = drill + 2*annular ring
+                self.DEFAULT_VIA_DRILL = drill
+                self.DEFAULT_VIA_SIZE = drill + 2 * annular
+                logger.info(
+                    f"Using custom via size: drill={drill}mm, annular={annular}mm, "
+                    f"diameter={self.DEFAULT_VIA_SIZE}mm"
+                )
+            except (ValueError, AttributeError) as e:
+                logger.warning(
+                    f"Invalid via_size format '{via_size}', using defaults. Error: {e}"
+                )
+        elif routing_style == "orthogonal":
+            # Default via size for orthogonal routing (from issue #195)
+            self.DEFAULT_VIA_DRILL = 0.6
+            self.DEFAULT_VIA_SIZE = 1.2  # 0.6 + 2*0.3
+            logger.info(
+                "Orthogonal routing: using default via size 0.6/0.3 (1.2mm diameter)"
+            )
 
     def export(self, output_path: Path) -> None:
         """
@@ -172,10 +205,20 @@ class DSNExporter:
 
     def _extract_layers(self) -> None:
         """Extract layer information from the PCB."""
+        # Determine routing direction based on routing style
+        if self.routing_style == "orthogonal":
+            # For orthogonal routing, all layers use orthogonal direction
+            # This tells Freerouting to only use 90° angles
+            logger.info("Setting all layers to orthogonal routing (90° only)")
+            default_direction = "orthogonal"
+        else:
+            # Default: alternate horizontal/vertical for each layer
+            default_direction = None
+
         # For 2-layer boards, we have front and back
         self.layers = [
-            DSNLayer("front", "signal", "horizontal"),
-            DSNLayer("back", "signal", "vertical"),
+            DSNLayer("front", "signal", default_direction or "horizontal"),
+            DSNLayer("back", "signal", default_direction or "vertical"),
         ]
 
         # Check if there are inner layers
@@ -186,8 +229,12 @@ class DSNExporter:
             if layer.get("canonical_name", "").startswith("In"):
                 inner_count += 1
                 layer_name = f"inner{inner_count}"
-                # Alternate routing direction for inner layers
-                direction = "horizontal" if inner_count % 2 == 1 else "vertical"
+                # Use orthogonal for all layers if routing_style is orthogonal
+                # Otherwise alternate routing direction for inner layers
+                if default_direction:
+                    direction = default_direction
+                else:
+                    direction = "horizontal" if inner_count % 2 == 1 else "vertical"
                 self.layers.insert(-1, DSNLayer(layer_name, "signal", direction))
 
     def _extract_components(self) -> None:
@@ -723,13 +770,20 @@ class DSNExporter:
         return "9.0"
 
 
-def export_pcb_to_dsn(pcb_path: Path, dsn_path: Path) -> None:
+def export_pcb_to_dsn(
+    pcb_path: Path,
+    dsn_path: Path,
+    routing_style: Optional[str] = None,
+    via_size: Optional[str] = None
+) -> None:
     """
     Convenience function to export a KiCad PCB file to DSN format.
 
     Args:
         pcb_path: Path to the input .kicad_pcb file (str or Path)
         dsn_path: Path where the .dsn file will be saved (str or Path)
+        routing_style: Routing style - "orthogonal" for 90° only routing, None for default
+        via_size: Via size in "drill_mm/annular_mm" format (e.g., "0.6/0.3")
     """
     # Convert to Path objects if needed
     if isinstance(pcb_path, str):
@@ -740,6 +794,6 @@ def export_pcb_to_dsn(pcb_path: Path, dsn_path: Path) -> None:
     # Load the PCB
     board = PCBBoard(pcb_path)
 
-    # Create exporter and export
-    exporter = DSNExporter(board)
+    # Create exporter with routing configuration and export
+    exporter = DSNExporter(board, routing_style=routing_style, via_size=via_size)
     exporter.export(dsn_path)

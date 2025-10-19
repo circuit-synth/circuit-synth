@@ -162,8 +162,10 @@ class PCBGenerator:
         auto_route: bool = False,  # Disable auto-routing by default (can be slow)
         routing_passes: int = 4,  # Number of routing passes
         routing_effort: float = 1.0,  # Routing effort level
-        generate_ratsnest: bool = True,
-    ) -> bool:  # Generate ratsnest connections
+        generate_ratsnest: bool = True,  # Generate ratsnest connections
+        routing_style: Optional[str] = None,  # NEW: Routing style - "orthogonal" or None
+        via_size: Optional[str] = None,  # NEW: Via size in "drill/annular" format (e.g., "0.6/0.3")
+    ) -> bool:
         """
         Generate a PCB file from the schematic files in the project.
 
@@ -182,6 +184,8 @@ class PCBGenerator:
             routing_passes: Number of routing passes for Freerouting (1-99)
             routing_effort: Routing effort level (0.0-2.0, where 2.0 is maximum)
             generate_ratsnest: If True, generate ratsnest connections (default: True)
+            routing_style: Routing style - "orthogonal" for 90° only routing, None for default (default: None)
+            via_size: Via size specification in "drill_mm/annular_mm" format (e.g., "0.6/0.3")
 
         Returns:
             True if successful, False otherwise
@@ -401,7 +405,11 @@ class PCBGenerator:
             if auto_route:
                 logger.info("Starting auto-routing process...")
                 routing_success = self._auto_route_pcb(
-                    pcb, passes=routing_passes, effort=routing_effort
+                    pcb,
+                    passes=routing_passes,
+                    effort=routing_effort,
+                    routing_style=routing_style,
+                    via_size=via_size
                 )
                 if routing_success:
                     logger.info("✓ Auto-routing completed successfully")
@@ -903,7 +911,12 @@ class PCBGenerator:
             return False
 
     def _auto_route_pcb(
-        self, pcb: PCBBoard, passes: int = 4, effort: float = 1.0
+        self,
+        pcb: PCBBoard,
+        passes: int = 4,
+        effort: float = 1.0,
+        routing_style: Optional[str] = None,
+        via_size: Optional[str] = None
     ) -> bool:
         """
         Automatically route the PCB using Freerouting.
@@ -912,6 +925,8 @@ class PCBGenerator:
             pcb: The PCB board object
             passes: Number of routing passes (1-99)
             effort: Routing effort level (0.0-2.0)
+            routing_style: Routing style - "orthogonal" or None
+            via_size: Via size in "drill/annular" format
 
         Returns:
             True if routing was successful, False otherwise
@@ -962,9 +977,18 @@ class PCBGenerator:
                 dsn_file = temp_path / "temp_pcb.dsn"
                 logger.info("Exporting PCB to DSN format...")
                 logger.info(f"DSN file will be: {dsn_file}")
+                if routing_style:
+                    logger.info(f"Routing style: {routing_style}")
+                if via_size:
+                    logger.info(f"Via size: {via_size}")
 
                 try:
-                    export_pcb_to_dsn(str(temp_pcb_file), str(dsn_file))
+                    export_pcb_to_dsn(
+                        str(temp_pcb_file),
+                        str(dsn_file),
+                        routing_style=routing_style,
+                        via_size=via_size
+                    )
                 except Exception as e:
                     logger.error(f"DSN export failed: {e}")
                     return False

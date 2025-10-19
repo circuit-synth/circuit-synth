@@ -621,6 +621,8 @@ class Circuit:
         draw_bounding_boxes: bool = False,
         generate_ratsnest: bool = True,
         update_source_refs: Optional[bool] = None,
+        routing_style: Optional[str] = None,
+        via_size: Optional[str] = None,
     ) -> None:
         """
         Generate a complete KiCad project (schematic + PCB) from this circuit.
@@ -640,10 +642,20 @@ class Circuit:
                                None (default): Auto-update unless force_regenerate=True
                                True: Always update source file
                                False: Never update source file
+            routing_style: PCB routing style - "orthogonal" for 90° only routing, None for default (default: None)
+                          When "orthogonal", automatically enables blind/buried vias and sets via_size to "0.6/0.3" if not specified
+            via_size: Via size specification in "drill_mm/annular_mm" format (e.g., "0.6/0.3")
+                     If not specified with routing_style="orthogonal", defaults to "0.6/0.3"
 
         Example:
             >>> circuit = esp32s3_simple()
             >>> circuit.generate_kicad_project("esp32s3_simple")
+
+            >>> # With orthogonal routing
+            >>> circuit.generate_kicad_project("esp32s3_simple", routing_style="orthogonal")
+
+            >>> # With custom via size
+            >>> circuit.generate_kicad_project("esp32s3_simple", routing_style="orthogonal", via_size="0.8/0.4")
         """
         try:
             from ..kicad.config import KiCadConfig, get_recommended_generator
@@ -655,6 +667,15 @@ class Circuit:
 
             # Finalize references before generation
             self.finalize_references()
+
+            # Handle routing configuration
+            # When routing_style is "orthogonal", default via_size to 0.6/0.3 if not specified
+            if routing_style == "orthogonal" and via_size is None:
+                via_size = "0.6/0.3"
+                context_logger.info(
+                    "Orthogonal routing enabled - using default via size 0.6/0.3",
+                    component="CIRCUIT"
+                )
 
             # Determine if we should update source file
             should_update_source = update_source_refs
@@ -710,12 +731,14 @@ class Circuit:
                 # Legacy system handles placement, modern API handles file writing via write_schematic_file
                 result = generator.generate_project(
                     json_file=temp_json_path,
-                    placement_algorithm=placement_algorithm,  # PCB placement algorithm  
+                    placement_algorithm=placement_algorithm,  # PCB placement algorithm
                     schematic_placement="sequential",  # Use simple sequential for schematic
                     generate_pcb=generate_pcb,
                     force_regenerate=force_regenerate,
                     draw_bounding_boxes=draw_bounding_boxes,
                     generate_ratsnest=generate_ratsnest,
+                    routing_style=routing_style,  # Pass routing style to generator
+                    via_size=via_size,  # Pass via size to generator
                 )
             finally:
                 # Clean up the temporary JSON file
