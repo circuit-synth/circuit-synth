@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "circuit_synth"
-version = "0.8.31"
+dynamic = ["version"]
 description = "Pythonic circuit design for production-ready KiCad projects"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -38,7 +38,7 @@ dependencies = [
     # Cache and performance dependencies
     "cachetools>=5.3.0",
     # KiCad schematic API integration
-    "kicad-sch-api>=0.1.1",
+    "kicad-sch-api>=0.3.2",
     "packaging>=21.0",
     # Additional data processing
     "sexpdata>=0.0.3",
@@ -126,14 +126,17 @@ cs-library-setup = "circuit_synth.tools.setup.library_api_setup:show_library_set
 
 # Fast Generation Tools
 cs-fast-gen-demo = "circuit_synth.fast_generation.demo:main_cli"
-cs-fast-gen-setup = "fast_generation_setup:main"
+
+# Fast JLCPCB Search CLI
+jlc-fast = "circuit_synth.tools.jlc_fast_search_cli:cli"
 
 # Test Plan Generation - DISABLED: Files don't exist yet
 # create-test-plan = "circuit_synth.tools.test_plan_commands:create_test_plan"
 # generate-manufacturing-tests = "circuit_synth.tools.test_plan_commands:generate_manufacturing_tests"
 
-# Plugin Management
-install-kicad-plugins = "install_kicad_plugins:main"
+# Plugin Management - REMOVED: Modules don't exist
+# install-kicad-plugins = "install_kicad_plugins:main"  # BROKEN
+# cs-fast-gen-setup = "fast_generation_setup:main"  # BROKEN
 
 [project.urls]
 Homepage = "https://github.com/circuit-synth/circuit-synth"
@@ -144,6 +147,9 @@ Issues = "https://github.com/circuit-synth/circuit-synth/issues"
 [tool.setuptools]
 package-dir = {"" = "src"}
 
+[tool.setuptools.dynamic]
+version = {attr = "circuit_synth.__version__"}
+
 # Include all packages from src
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -152,13 +158,14 @@ where = ["src"]
 circuit_synth = [
     "py.typed",
     "data/templates/project/*",
-    "data/templates/claude/*", 
+    "data/templates/claude/*",
     "data/templates/memory_bank/*",
-    "data/templates/example_project/*",
-    "data/templates/example_project/circuit-synth/*",
-    "data/templates/example_project/.claude/*",
-    "data/templates/example_project/.claude/agents/*/*",
-    "data/templates/example_project/.claude/commands/*/*",
+    # Include all files in example_project recursively
+    "data/templates/example_project/**/*",
+    "data/templates/example_project/**/**/*",
+    "data/templates/example_project/**/**/**/*",
+    # Explicitly include hidden files in .claude directory
+    "data/templates/example_project/.claude/**/*",
     "data/templates/project_template/*",
     "data/templates/project_template/circuit-synth/*",
     "data/templates/project_template/.claude/*",

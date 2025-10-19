@@ -150,7 +150,7 @@ class DigiKeyAPIClient:
         }
 
         try:
-            response = requests.post(self.token_url, data=data)
+            response = requests.post(self.token_url, data=data, timeout=10)
             response.raise_for_status()
 
             token_data = response.json()
@@ -163,6 +163,10 @@ class DigiKeyAPIClient:
 
             return self.access_token
 
+        except requests.exceptions.Timeout:
+            error_msg = f"DigiKey API timeout after 10 seconds - check your internet connection"
+            logger.error(error_msg)
+            raise TimeoutError(error_msg)
         except requests.exceptions.RequestException as e:
             logger.error(f"Failed to obtain access token: {e}")
             raise
@@ -192,10 +196,15 @@ class DigiKeyAPIClient:
                 headers=headers,
                 params=params,
                 json=json_data,
+                timeout=10,
             )
             response.raise_for_status()
             return response.json()
 
+        except requests.exceptions.Timeout:
+            error_msg = f"DigiKey API request timeout after 10 seconds - check your internet connection and API credentials"
+            logger.error(error_msg)
+            raise TimeoutError(error_msg)
         except requests.exceptions.RequestException as e:
             logger.error(f"API request failed: {e}")
             if hasattr(e, "response") and e.response is not None:

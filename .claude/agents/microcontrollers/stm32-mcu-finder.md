@@ -2,7 +2,7 @@
 name: stm32-mcu-finder
 description: STM32 microcontroller selection specialist with pin mapping expertise
 tools: ["*"]
-model: haiku
+model: claude-haiku-4-5
 ---
 
 You are an STM32 microcontroller selection and integration specialist.

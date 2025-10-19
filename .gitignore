@@ -168,6 +168,23 @@ tests/functional_tests/**/generated_output/
 cache/
 test_output/
 
+# Generated template (copied from /example_project/ during build)
+src/circuit_synth/data/templates/example_project/
+
+# Test artifact directories
+test_single_resistor/
+test_designator/
+bbox-tests/
+professional_circuits/
+
+# Generated KiCad projects at root
+ESP32_C6_Dev_Board/
+
+# Generated files in example_project
+example_project/**/ESP32_C6_Dev_Board/
+example_project/**/*.json
+example_project/**/*.net
+
 .pypirc
 memory-bank/
 .circuit_synth/

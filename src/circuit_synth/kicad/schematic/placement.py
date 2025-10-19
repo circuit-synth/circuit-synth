@@ -8,7 +8,7 @@ import time
 from enum import Enum
 from typing import List, Optional, Tuple
 
-from ..core.types import Point, Schematic, SchematicSymbol, Sheet
+from kicad_sch_api.core.types import Point, Schematic, SchematicSymbol, Sheet
 from .symbol_geometry import SymbolGeometry
 
 # Python-only implementation
@@ -302,6 +302,16 @@ class PlacementEngine:
         spacing_x = 5.08  # 200 mil
         spacing_y = 5.08  # 200 mil
 
+        print(f"\n{'='*80}")
+        print(f"🔍 PLACEMENT START: {component.reference}")
+        print(f"{'='*80}")
+        print(f"Component size: ({component_size[0]:.1f}, {component_size[1]:.1f}) mm")
+        print(f"Spacing: ({spacing_x:.1f}, {spacing_y:.1f}) mm")
+        print(f"Sheet size: ({self.sheet_size[0]:.1f}, {self.sheet_size[1]:.1f}) mm")
+        print(f"Margin: {self.margin:.1f} mm")
+        print(f"Starting position: x={x:.1f}, y={y:.1f}")
+        print(f"Number of existing components: {len(occupied_bounds)}")
+
         logger.info(
             f"Dynamic placement for {component.reference}: "
             f"size=({component_size[0]:.1f}, {component_size[1]:.1f}) mm, "
@@ -311,6 +321,7 @@ class PlacementEngine:
         # Log existing components
         logger.debug(f"Existing components: {len(occupied_bounds)}")
         for i, bounds in enumerate(occupied_bounds):
+            print(f"  📦 Occupied[{i}]: x={bounds.x:.1f}-{bounds.right:.1f}, y={bounds.y:.1f}-{bounds.bottom:.1f}, type={bounds.element_type}")
             logger.debug(
                 f"  Occupied[{i}]: x={bounds.x:.1f}-{bounds.right:.1f}, y={bounds.y:.1f}-{bounds.bottom:.1f}"
             )
@@ -318,6 +329,8 @@ class PlacementEngine:
         # Grid search for available position
         max_attempts = 1000
         attempts = 0
+
+        print(f"\n🔄 Starting position search loop...")
 
         while attempts < max_attempts:
             # Create bounds for current position
@@ -328,13 +341,20 @@ class PlacementEngine:
                 component_size[1],
             )
 
+            print(f"\n  🎯 Attempt {attempts}: Testing position x={x:.1f}, y={y:.1f}")
+            print(f"     Test bounds: x={test_bounds.x:.1f}-{test_bounds.right:.1f}, y={test_bounds.y:.1f}-{test_bounds.bottom:.1f}")
+
             # Check if position is available
             collision = False
-            for occupied in occupied_bounds:
+            for i, occupied in enumerate(occupied_bounds):
                 if test_bounds.overlaps(occupied):
                     collision = True
+                    old_x = x
                     # If collision detected, jump past the occupied component
                     x = max(x, occupied.right + spacing_x + component_size[0] / 2)
+                    print(f"     ❌ COLLISION with Occupied[{i}]!")
+                    print(f"        Occupied bounds: x={occupied.x:.1f}-{occupied.right:.1f}, y={occupied.y:.1f}-{occupied.bottom:.1f}")
+                    print(f"        Jumping from x={old_x:.1f} to x={x:.1f}")
                     logger.debug(f"Collision detected, jumping to x={x:.1f}")
                     break
 
@@ -343,10 +363,19 @@ class PlacementEngine:
                 if self._check_within_bounds(
                     x, y, component_size[0], component_size[1]
                 ):
-                    return self._snap_to_grid((x, y))
+                    final_pos = self._snap_to_grid((x, y))
+                    print(f"     ✅ FOUND VALID POSITION!")
+                    print(f"        Before snap: ({x:.1f}, {y:.1f})")
+                    print(f"        After snap:  ({final_pos[0]:.1f}, {final_pos[1]:.1f})")
+                    print(f"{'='*80}\n")
+                    return final_pos
+                else:
+                    print(f"     ⚠️  Position out of bounds!")
+                    print(f"        Sheet boundaries: x=0-{self.sheet_size[0]:.1f}, y=0-{self.sheet_size[1]:.1f}")
 
             # Move to next position with dynamic spacing
             next_x = x + component_size[0] + spacing_x
+            print(f"     ➡️  Moving horizontally: x={x:.1f} → {next_x:.1f} (component_size={component_size[0]:.1f} + spacing={spacing_x:.1f})")
             logger.debug(
                 f"Moving from x={x:.1f} to x={next_x:.1f} (size={component_size[0]:.1f} + spacing={spacing_x:.1f})"
             )
@@ -354,25 +383,34 @@ class PlacementEngine:
 
             # Wrap to next row if we exceed sheet width
             if x + component_size[0] / 2 > self.sheet_size[0] - self.margin:
+                print(f"\n     🔽 WRAPPING TO NEXT ROW (exceeded width)")
+                print(f"        Current x={x:.1f} + half_width={component_size[0]/2:.1f} > sheet_width={self.sheet_size[0]:.1f} - margin={self.margin:.1f}")
+
                 # Find the starting x position for the next row
                 # This should be past any components that extend into this row
                 row_start_x = self.margin
+                old_y = y
+
+                print(f"        Checking for components that extend into next row...")
                 for occupied in occupied_bounds:
                     if (
                         occupied.y <= y + component_size[1] + spacing_y
                         and occupied.bottom > y
                     ):
-                        row_start_x = max(
-                            row_start_x,
-                            occupied.right + spacing_x + component_size[0] / 2,
-                        )
+                        new_row_start = occupied.right + spacing_x + component_size[0] / 2
+                        print(f"          Component at y={occupied.y:.1f}-{occupied.bottom:.1f} extends into row")
+                        print(f"          Adjusting row_start_x from {row_start_x:.1f} to {new_row_start:.1f}")
+                        row_start_x = max(row_start_x, new_row_start)
 
                 x = row_start_x
                 y += component_size[1] + spacing_y
+                print(f"        New row position: x={x:.1f}, y={old_y:.1f} → {y:.1f} (moved down by {component_size[1]:.1f} + {spacing_y:.1f})")
                 logger.debug(f"Wrapping to next row at x={x:.1f}, y={y:.1f}")
 
             # Check if we've exceeded sheet height
             if y + component_size[1] / 2 > self.sheet_size[1] - self.margin:
+                print(f"\n     ⛔ EXCEEDED SHEET HEIGHT!")
+                print(f"        y={y:.1f} + half_height={component_size[1]/2:.1f} > sheet_height={self.sheet_size[1]:.1f} - margin={self.margin:.1f}")
                 logger.warning(
                     f"Component {component.reference} exceeds sheet boundaries"
                 )
@@ -381,6 +419,9 @@ class PlacementEngine:
             attempts += 1
 
         # Fallback
+        print(f"\n⚠️  WARNING: Could not find available position after {attempts} attempts!")
+        print(f"   Falling back to origin: ({self.margin:.1f}, {self.margin:.1f})")
+        print(f"{'='*80}\n")
         logger.warning(
             "Could not find available position with dynamic spacing, using origin"
         )

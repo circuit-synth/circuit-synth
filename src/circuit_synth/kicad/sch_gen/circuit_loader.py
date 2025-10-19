@@ -13,7 +13,7 @@ import uuid as uuid_module
 from pathlib import Path
 from typing import Any, Dict
 
-from circuit_synth.kicad.core.types import Point, SchematicPin, SchematicSymbol
+from kicad_sch_api.core.types import Point, SchematicPin, SchematicSymbol
 
 logger = logging.getLogger(__name__)
 
@@ -205,9 +205,9 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             pin_obj = SchematicPin(
                 number=str(p.get("num", "")),
                 name=p.get("name", ""),
-                type=p.get("func", "passive"),  # function -> type
+                pin_type=p.get("func", "passive"),  # Changed from 'type' to 'pin_type'
                 position=Point(float(p.get("x", 0)), float(p.get("y", 0))),
-                orientation=int(float(p.get("orientation", 0))),
+                rotation=float(p.get("orientation", 0)),  # Changed from 'orientation' to 'rotation'
             )
             comp.pins.append(pin_obj)
 

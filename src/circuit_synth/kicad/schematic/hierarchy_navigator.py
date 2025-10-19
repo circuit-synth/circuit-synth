@@ -10,8 +10,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
-from ..core.s_expression import SExpressionParser
-from ..core.types import Schematic, Sheet, SheetPin
+import kicad_sch_api as ksa
+from kicad_sch_api.core.types import Schematic, Sheet, SheetPin
 from .sheet_manager import SheetManager
 
 logger = logging.getLogger(__name__)
@@ -88,7 +88,6 @@ class HierarchyNavigator:
         """
         self.root_schematic = root_schematic
         self.project_path = project_path
-        self._parser = SExpressionParser()
         self._schematic_cache: Dict[str, Schematic] = {}
         self._hierarchy_tree: Optional[HierarchyNode] = None
 
@@ -160,7 +159,7 @@ class HierarchyNavigator:
             return None
 
         try:
-            schematic = self._parser.parse_file(filepath)
+            schematic = ksa.Schematic.load(filepath)
             self._schematic_cache[filename] = schematic
             return schematic
         except Exception as e:

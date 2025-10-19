@@ -55,7 +55,8 @@ class LLMPlacementManager:
 # Use optimized symbol cache from core.component for better performance
 from circuit_synth.core.component import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
-from circuit_synth.kicad.core.s_expression import SExpressionParser
+import kicad_sch_api as ksa
+from kicad_sch_api.core.types import Point
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
 from .symbol_geometry import SymbolBoundingBoxCalculator
@@ -385,9 +386,18 @@ class SchematicGenerator:
         # Check for hierarchical projects: also look for root.kicad_sch
         root_sch_file = self.project_dir / "root.kicad_sch"
 
+        # Debug logging
+        logger.debug(f"🔍 _check_existing_project:")
+        logger.debug(f"   project_dir: {self.project_dir}")
+        logger.debug(f"   project_name: {self.project_name}")
+        logger.debug(f"   Checking .kicad_pro: {kicad_pro_file} -> exists={kicad_pro_file.exists()}")
+        logger.debug(f"   Checking .kicad_sch: {kicad_sch_file} -> exists={kicad_sch_file.exists()}")
+
         # Both files must exist for a valid project
         project_exists = kicad_pro_file.exists()
         schematic_exists = kicad_sch_file.exists() or root_sch_file.exists()
+
+        logger.debug(f"   Result: project_exists={project_exists}, schematic_exists={schematic_exists}")
 
         if project_exists and schematic_exists:
             return True
@@ -412,19 +422,34 @@ class SchematicGenerator:
         self, json_file: str, draw_bounding_boxes: bool = False
     ):
         """Update existing project using synchronizer to preserve manual work"""
+        print("\n" + "="*80)
+        print("🔧 DEBUG: _update_existing_project() CALLED")
+        print("="*80)
         logger.info("🔄 Updating existing project while preserving your work...")
+        logger.info(f"   json_file: {json_file}")
+        logger.info(f"   project_dir: {self.project_dir}")
+        print(f"📁 json_file: {json_file}")
+        print(f"📁 project_dir: {self.project_dir}")
 
         # Import here to avoid circular dependencies
-        from circuit_synth.kicad.schematic.hierarchical_synchronizer import (
-            HierarchicalSynchronizer,
-        )
-        from circuit_synth.kicad.schematic.sync_adapter import SyncAdapter
+        logger.debug("Importing synchronizers...")
+        try:
+            from circuit_synth.kicad.schematic.hierarchical_synchronizer import (
+                HierarchicalSynchronizer,
+            )
+            from circuit_synth.kicad.schematic.sync_adapter import SyncAdapter
+            logger.debug("   Synchronizers imported successfully")
+        except Exception as e:
+            logger.error(f"   Failed to import synchronizers: {e}")
+            raise
 
         # Load circuit from JSON using the same loader as generate
         logger.debug(f"Loading circuit from {json_file}")
         from .circuit_loader import load_circuit_hierarchy
 
+        logger.debug("Calling load_circuit_hierarchy...")
         top_circuit, sub_dict = load_circuit_hierarchy(json_file)
+        logger.info(f"   Loaded {len(sub_dict)} circuits from JSON")
 
         # For now, we'll use the top circuit for synchronization
         # In the future, this could be extended to handle hierarchical circuits
@@ -433,10 +458,27 @@ class SchematicGenerator:
         project_path = self.project_dir / f"{self.project_name}.kicad_pro"
 
         # Check if this is a hierarchical project
-        has_subcircuits = bool(sub_dict)
+        # Note: sub_dict always includes the main circuit, so check if there's more than one
+        print("\n" + "="*80)
+        print("🔍 DEBUG: Determining project type")
+        print("="*80)
+        print(f"📊 sub_dict keys: {list(sub_dict.keys())}")
+        print(f"📊 sub_dict length: {len(sub_dict)}")
+        has_subcircuits = len(sub_dict) > 1
+        print(f"📊 has_subcircuits = len(sub_dict) > 1 = {len(sub_dict)} > 1 = {has_subcircuits}")
+        print(f"📊 Project type: {'HIERARCHICAL' if has_subcircuits else 'FLAT'}")
+        print("="*80 + "\n")
+        logger.info(f"🔍 Project detection: sub_dict has {len(sub_dict)} circuits")
+        logger.info(f"   Circuit names: {list(sub_dict.keys())}")
+        logger.info(f"   has_subcircuits={has_subcircuits} (flat={not has_subcircuits})")
 
         if has_subcircuits:
             # Use hierarchical synchronizer for projects with subcircuits
+            print("\n" + "="*80)
+            print("🏗️ DEBUG: Creating HIERARCHICAL synchronizer")
+            print("="*80)
+            print(f"📍 project_path: {project_path}")
+            print(f"📍 Number of subcircuits: {len(sub_dict)}")
             logger.debug(
                 f"Creating hierarchical synchronizer for project: {project_path}"
             )
@@ -446,106 +488,53 @@ class SchematicGenerator:
             synchronizer = HierarchicalSynchronizer(
                 project_path=str(project_path), preserve_user_components=True
             )
+            print(f"✅ HierarchicalSynchronizer created: {type(synchronizer)}")
+            print("="*80 + "\n")
             # Show hierarchy info
             logger.info(synchronizer.get_hierarchy_info())
         else:
             # Use regular synchronizer for flat projects
+            print("\n" + "="*80)
+            print("🏗️ DEBUG: Creating FLAT (SyncAdapter) synchronizer")
+            print("="*80)
+            print(f"📍 project_path: {project_path}")
             logger.debug(f"Creating synchronizer for flat project: {project_path}")
             synchronizer = SyncAdapter(
                 project_path=str(project_path), preserve_user_components=True
             )
+            print(f"✅ SyncAdapter created: {type(synchronizer)}")
+            print("="*80 + "\n")
 
         # Perform synchronization
+        print("\n" + "="*80)
+        print("🔄 DEBUG: Starting synchronization")
+        print("="*80)
+        print(f"📊 Synchronizer type: {type(synchronizer).__name__}")
+        print(f"📊 has_subcircuits: {has_subcircuits}")
         logger.debug("Starting synchronization...")
         if has_subcircuits:
             # Pass subcircuit dictionary for hierarchical sync
+            print("📞 Calling synchronizer.sync_with_circuit(top_circuit, sub_dict)")
             sync_report = synchronizer.sync_with_circuit(top_circuit, sub_dict)
         else:
+            print("📞 Calling synchronizer.sync_with_circuit(top_circuit)")
             sync_report = synchronizer.sync_with_circuit(top_circuit)
+        print(f"✅ Synchronization completed!")
+        print(f"📊 Sync report keys: {list(sync_report.keys()) if isinstance(sync_report, dict) else 'N/A'}")
+        print("="*80 + "\n")
 
         # Add bounding boxes if requested
         if draw_bounding_boxes:
-            logger.debug("Adding bounding boxes to synchronized schematic...")
-            self._add_bounding_boxes_to_existing_project(synchronizer, top_circuit)
+            logger.info("📦 Adding bounding boxes to visualize component placement...")
+            self._add_bounding_boxes_to_schematic(top_circuit)
+
+        # FIX: Post-process all schematic files to fix missing project names
+        self._fix_all_schematic_project_names()
 
         # Log results
         self._log_sync_results(sync_report)
 
         return sync_report
-
-    def _add_bounding_boxes_to_existing_project(self, synchronizer, circuit):
-        """Add bounding boxes to an existing synchronized project."""
-        try:
-            # Import necessary classes
-            # Use optimized symbol cache from core.component for better performance
-            from circuit_synth.core.component import SymbolLibCache
-
-            from ...kicad.core.types import Point, Rectangle
-            from ..kicad_symbol_cache import SymbolLibCache
-            from .symbol_geometry import SymbolBoundingBoxCalculator
-
-            # Get the synchronized schematic
-            schematic = synchronizer.api_sync.schematic
-
-            logger.debug(
-                f"Adding bounding boxes for {len(schematic.components)} components"
-            )
-
-            # Track added rectangles for logging
-            added_count = 0
-
-            for comp in schematic.components:
-                # Get precise bounding box from existing calculator
-                lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
-                if not lib_data:
-                    logger.warning(
-                        f"No symbol data found for {comp.lib_id}, skipping bounding box"
-                    )
-                    continue
-
-                try:
-                    min_x, min_y, max_x, max_y = (
-                        SymbolBoundingBoxCalculator.calculate_bounding_box(lib_data)
-                    )
-
-                    # Create Rectangle using API types
-                    bbox_rect = Rectangle(
-                        start=Point(comp.position.x + min_x, comp.position.y + min_y),
-                        end=Point(comp.position.x + max_x, comp.position.y + max_y),
-                        stroke_width=0.127,  # Thin stroke (5 mils)
-                        stroke_type="solid",
-                        fill_type="none",
-                        # No stroke_color - KiCad uses default color
-                    )
-
-                    # Add to schematic using API method
-                    schematic.add_rectangle(bbox_rect)
-                    added_count += 1
-                    logger.debug(
-                        f"Added bounding box for {comp.reference} at ({comp.position.x + min_x:.2f}, {comp.position.y + min_y:.2f}) to ({comp.position.x + max_x:.2f}, {comp.position.y + max_y:.2f})"
-                    )
-
-                except Exception as e:
-                    logger.error(
-                        f"Failed to add bounding box for {comp.reference} ({comp.lib_id}): {e}"
-                    )
-                    continue
-
-            # Save and log results
-            if added_count > 0:
-                logger.info(
-                    f"Added {added_count} bounding boxes to synchronized schematic"
-                )
-                # Save the updated schematic using the synchronizer's save method
-                synchronizer.api_sync._save_schematic()
-                logger.debug(f"Updated schematic saved with bounding boxes")
-            else:
-                logger.warning("No bounding boxes were added")
-
-        except Exception as e:
-            logger.error(f"Failed to add bounding boxes to existing project: {e}")
-            # Don't fail the entire update process for bounding box issues
-            pass
 
     def _log_sync_results(self, sync_report):
         """Display synchronization results to user"""
@@ -595,6 +584,82 @@ class SchematicGenerator:
         logger.info("✓ All manual work preserved!")
         logger.info(f"\nProject updated successfully at: {self.project_dir}")
 
+    def _fix_all_schematic_project_names(self):
+        """
+        Fix missing project names in all schematic files in the project directory.
+
+        The kicad-sch-api auto-generates instance blocks but leaves project names empty.
+        This method post-processes all .kicad_sch files to add the project name.
+        """
+        import re
+        from pathlib import Path
+
+        logger.info("🔧 Fixing missing project names in schematic files...")
+
+        # Find all .kicad_sch files in the project directory
+        schematic_files = list(Path(self.project_dir).glob("*.kicad_sch"))
+
+        total_fixes = 0
+        for sch_file in schematic_files:
+            # Get project name from file name
+            project_name = sch_file.stem
+
+            # Read the schematic file
+            content = sch_file.read_text(encoding='utf-8')
+
+            # Fix empty (project blocks by adding the project name
+            # Pattern: (project\n\t\t\t(path -> (project "ProjectName"\n\t\t\t(path
+            pattern = r'(\(project)\n(\s+)\(path'
+            replacement = rf'\1 "{project_name}"\n\2(path'
+
+            fixed_content = re.sub(pattern, replacement, content)
+
+            # Count how many fixes were made in this file
+            fixes = content.count('(project\n')
+
+            if fixes > 0:
+                logger.info(f"  Fixed {fixes} empty project names in {sch_file.name}")
+                # Write the fixed content back
+                sch_file.write_text(fixed_content, encoding='utf-8')
+                total_fixes += fixes
+
+        if total_fixes > 0:
+            logger.info(f"✅ Fixed {total_fixes} total empty project names across {len(schematic_files)} files")
+        else:
+            logger.debug("No empty project names found")
+
+    def _add_bounding_boxes_to_schematic(self, circuit):
+        """
+        Add bounding boxes to existing schematic using kicad-sch-api.
+
+        This is used in update mode to visualize component placement areas.
+        """
+        try:
+            import kicad_sch_api as ksa
+
+            # Load the main schematic
+            sch_path = self.project_dir / f"{self.project_name}.kicad_sch"
+
+            if not sch_path.exists():
+                logger.warning(f"Schematic not found: {sch_path}")
+                return
+
+            logger.info(f"Loading schematic: {sch_path}")
+            schematic = ksa.load_schematic(str(sch_path))
+
+            logger.info(f"Adding bounding boxes for {len(schematic.components)} components")
+
+            # Use kicad-sch-api's built-in method to draw all component bounding boxes
+            schematic.draw_component_bounding_boxes()
+
+            # Save the updated schematic
+            schematic.save(str(sch_path), preserve_format=True)
+            logger.info(f"✅ Bounding boxes added and saved to {sch_path.name}")
+
+        except Exception as e:
+            logger.error(f"Failed to add bounding boxes: {e}")
+            logger.warning("Continuing without bounding boxes...")
+
     def generate_project(
         self,
         json_file: str,
@@ -616,11 +681,18 @@ class SchematicGenerator:
             schematic_placement: Schematic placement algorithm - "sequential" or "connection_aware" (default: "sequential")
             **pcb_kwargs: Additional keyword arguments passed to PCB generation
         """
+        logger.debug(f"🚀 generate_project() called: force_regenerate={force_regenerate}")
+
         # Check if project already exists
         project_exists = self._check_existing_project()
 
         if project_exists and not force_regenerate:
             # Auto-switch to update mode
+            print("\n" + "="*80)
+            print("🔄 DEBUG: generate_project() switching to UPDATE MODE")
+            print("="*80)
+            print(f"📁 Project exists: {project_exists}")
+            print(f"🚫 force_regenerate: {force_regenerate}")
             logger.info(f"Existing KiCad project detected at: {self.project_dir}")
             logger.info(
                 "🔄 Automatically switching to update mode to preserve your work"
@@ -630,18 +702,30 @@ class SchematicGenerator:
             )
 
             try:
-                return self._update_existing_project(json_file, draw_bounding_boxes)
+                print("📞 Calling _update_existing_project()...")
+                result = self._update_existing_project(json_file, draw_bounding_boxes)
+                print(f"✅ _update_existing_project() returned successfully!")
+                return result
             except Exception as e:
+                print("\n" + "="*80)
+                print("❌ DEBUG: EXCEPTION CAUGHT in generate_project()")
+                print("="*80)
+                print(f"🔥 Exception type: {type(e).__name__}")
+                print(f"🔥 Exception message: {e}")
+                import traceback
+                print(f"🔥 Traceback:")
+                traceback.print_exc()
+                print("="*80 + "\n")
                 logger.error(f"❌ Update failed: {e}")
                 logger.error("   Falling back to regeneration...")
                 # Fall through to regeneration
 
         elif project_exists and force_regenerate:
             # User explicitly wants to regenerate
-            logger.warning(
-                f"WARNING: Force regenerating project at: {self.project_dir}"
+            logger.info(
+                f"Force regenerating project at: {self.project_dir}"
             )
-            logger.warning(
+            logger.info(
                 "   This will LOSE all manual work (component positions, wires, etc.)"
             )
 
@@ -722,6 +806,7 @@ class SchematicGenerator:
         logger.info(f"  Main circuit name: {top_name}")
         logger.info(f"  Hierarchical path: {hierarchical_path}")
 
+        print(f"🚨 MAIN_GEN DEBUG: About to create SchematicWriter with draw_bounding_boxes={draw_bounding_boxes}")
         main_writer = SchematicWriter(
             sub_dict[top_name],
             sub_dict,
@@ -733,7 +818,9 @@ class SchematicGenerator:
             draw_bounding_boxes=draw_bounding_boxes,  # Pass bounding box flag
             uuid=root_uuid,  # Pass the root UUID to ensure consistency
         )
+        print(f"🚨 MAIN_GEN DEBUG: SchematicWriter created, calling generate_s_expr()")
         main_sch_expr = main_writer.generate_s_expr()
+        print(f"🚨 MAIN_GEN DEBUG: generate_s_expr() returned")
         sheet_uuids[top_name] = main_writer.uuid_top
         sheet_writers[top_name] = main_writer  # Store main writer for reference
 
@@ -1135,9 +1222,8 @@ class SchematicGenerator:
             if existing_sch_path.exists():
                 logger.info(f"Found existing schematic file: {existing_sch_path}")
                 try:
-                    # Read existing schematic using S-expression parser
-                    parser = SExpressionParser()
-                    schematic = parser.parse_file(str(existing_sch_path))
+                    # Read existing schematic using kicad-sch-api
+                    schematic = ksa.Schematic.load(str(existing_sch_path))
                     existing_components = schematic.components
                     logger.info(
                         f"Found {len(existing_components)} components in existing schematic"
@@ -1207,8 +1293,8 @@ class SchematicGenerator:
                     )
 
                 except Exception as e:
-                    logger.warning(f"Could not read existing schematic: {e}")
-                    logger.warning("Will use default placement for all components")
+                    logger.debug(f"Could not read existing schematic: {e}")
+                    logger.debug("Will use default placement for all components")
             else:
                 logger.debug("No existing schematic found - will use default placement")
 
@@ -1266,8 +1352,7 @@ class SchematicGenerator:
                 if comp.reference in existing_positions:
                     # Use existing position
                     x, y = existing_positions[comp.reference]
-                    comp.position.x = x
-                    comp.position.y = y
+                    comp.position = Point(x, y)
                     logger.debug(
                         f"Using preserved position for {comp.reference}: ({x}, {y})"
                     )
@@ -1279,9 +1364,35 @@ class SchematicGenerator:
                         if not symbol_data:
                             raise ValueError(f"No symbol data found for {comp.lib_id}")
 
+                        # Build pin-to-net mapping for accurate bounding box calculation
+                        logger.debug(f"🔍 Building pin_net_map for {comp.reference}")
+                        logger.debug(f"🔍 Component type: {type(comp)}")
+                        logger.debug(f"🔍 Has _pins: {hasattr(comp, '_pins')}")
+                        logger.debug(f"🔍 Has pins: {hasattr(comp, 'pins')}")
+
+                        pin_net_map = {}
+                        # Handle both Component (has _pins) and SchematicSymbol (has pins list)
+                        if hasattr(comp, '_pins'):
+                            logger.debug(f"🔍 Using _pins dict, count: {len(comp._pins)}")
+                            for pin_num, pin in comp._pins.items():
+                                logger.debug(f"🔍   Pin {pin_num}: number={pin.number}, net={pin.net}, net.name={pin.net.name if pin.net else 'None'}")
+                                if pin.net:
+                                    pin_net_map[pin.number] = pin.net.name
+                                    logger.debug(f"🔍     ✅ Mapped {pin.number} -> {pin.net.name}")
+                        elif hasattr(comp, 'pins'):
+                            # SchematicSymbol from kicad-sch-api: pins don't have net information
+                            # Net connections are stored separately in the schematic's nets list
+                            # For bounding box calculation, we can use an empty pin_net_map
+                            logger.debug(f"🔍 Component has pins list (SchematicSymbol) - skipping net mapping")
+                            logger.debug(f"   (Net info not available on SchematicPin objects from kicad-sch-api)")
+                            # Leave pin_net_map empty - bounding box will be calculated without net labels
+
+                        logger.debug(f"🔍 FINAL pin_net_map for {comp.reference}: {pin_net_map}")
+                        logger.debug(f"🔍 Calling get_symbol_dimensions with pin_net_map")
+
                         comp_width, comp_height = (
                             SymbolBoundingBoxCalculator.get_symbol_dimensions(
-                                symbol_data
+                                symbol_data, pin_net_map=pin_net_map
                             )
                         )
                         logger.debug(
@@ -1305,14 +1416,19 @@ class SchematicGenerator:
                     else:
                         x, y = cm.place_symbol(comp_width, comp_height)
 
-                    comp.position.x = x
-                    comp.position.y = y
+                    comp.position = Point(x, y)
                     logger.debug(
                         f"Placed new component {comp.reference} at: ({x}, {y})"
                     )
 
-            # Place sheet symbols
-            logger.debug(f"Placing {len(circ.child_instances)} sheet symbols...")
+            # Place sheet symbols at TOP in horizontal row
+            logger.debug(f"Placing {len(circ.child_instances)} sheet symbols at TOP...")
+
+            # Fixed placement: sheets go at top, not using collision manager
+            sheet_top_y = 12.7  # Top margin (0.5 inch)
+            sheet_current_x = 25.4  # Left margin (1 inch)
+            sheet_spacing = 15.0  # Space between sheets
+
             for child in circ.child_instances:
                 # Calculate sheet dimensions based on pin count
                 sub_name = child["sub_name"]
@@ -1321,56 +1437,50 @@ class SchematicGenerator:
                     pin_count = len(sub_circ.nets)
 
                     # Calculate height based on pin count
-                    # Each pin needs 2.54mm (100mil) spacing
                     pin_spacing = 2.54
-                    min_height = 20.32  # Minimum 0.8 inch
-                    padding = 5.08  # 200mil padding top and bottom
+                    min_height = 20.32
+                    padding = 5.08
                     calculated_height = (pin_count * pin_spacing) + (2 * padding)
                     sheet_height = max(min_height, calculated_height)
 
-                    # Calculate width based on sheet name and hierarchical labels
-                    min_width = 25.4  # Minimum 1 inch
-                    char_width = 1.5  # mm per character
-                    name_width = len(sub_name) * char_width + 10  # Add margin
+                    # Calculate width
+                    min_width = 25.4
+                    char_width = 1.5
+                    name_width = len(sub_name) * char_width + 10
 
-                    # Find the longest net name for hierarchical labels
                     max_label_length = 0
                     for net in sub_circ.nets:
                         label_length = len(net.name)
                         if label_length > max_label_length:
                             max_label_length = label_length
 
-                    # Calculate width needed for hierarchical labels
-                    # Labels are placed to the right of the sheet
-                    # Use 1.27mm (50 mils) per character as estimate
                     label_char_width = 1.27
-                    label_width = max_label_length * label_char_width + 10  # Add margin
-
-                    # Sheet width should accommodate both name and labels
-                    # Add extra space for the labels extending beyond the sheet
+                    label_width = max_label_length * label_char_width + 10
                     sheet_width = max(min_width, name_width, min_width + label_width)
 
-                    logger.debug(
-                        f"Sheet {sub_name}: name_width={name_width:.1f}mm, "
-                        f"max_label='{max_label_length}' chars, "
-                        f"label_width={label_width:.1f}mm, "
-                        f"final_width={sheet_width:.1f}mm"
-                    )
-
-                    # Store calculated dimensions
                     child["width"] = sheet_width
                     child["height"] = sheet_height
                 else:
-                    # Use defaults if subcircuit not found
-                    sheet_width = child.get("width", 50.8)  # Default 2 inches
-                    sheet_height = child.get("height", 25.4)  # Default 1 inch
+                    sheet_width = child.get("width", 50.8)
+                    sheet_height = child.get("height", 25.4)
 
-                x, y = cm.place_symbol(sheet_width, sheet_height)
+                # FIXED: Place at top with fixed y-coordinate
+                x = sheet_current_x + (sheet_width / 2)
+                y = sheet_top_y + (sheet_height / 2)
+
+                # Snap to grid
+                grid_size = 1.27
+                x = round(x / grid_size) * grid_size
+                y = round(y / grid_size) * grid_size
+
                 child["x"] = x
                 child["y"] = y
                 logger.debug(
-                    f"Placed sheet {child['sub_name']} ({sheet_width}x{sheet_height}mm) at: ({x}, {y})"
+                    f"Placed sheet {sub_name} at TOP: center=({x:.1f}, {y:.1f}), size={sheet_width:.1f}x{sheet_height:.1f}mm"
                 )
+
+                # Move to next horizontal position
+                sheet_current_x += sheet_width + sheet_spacing
 
             # Determine appropriate paper size based on placement
             self.paper_size = self._determine_paper_size(

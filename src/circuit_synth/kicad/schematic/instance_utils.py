@@ -7,7 +7,7 @@ ensuring consistent behavior across all component creation paths.
 
 from typing import Optional
 
-from ..core.types import SchematicSymbol, SymbolInstance
+from kicad_sch_api.core.types import SchematicSymbol, SymbolInstance
 
 
 def add_symbol_instance(
@@ -25,11 +25,14 @@ def add_symbol_instance(
         hierarchical_path: Hierarchical path in the schematic (default: "/" for root)
     """
     # Create the instance
+    unit_value = 1
+    if hasattr(symbol, 'unit') and symbol.unit:
+        unit_value = symbol.unit
+
     instance = SymbolInstance(
-        project=project_name,
         path=hierarchical_path,
         reference=symbol.reference,
-        unit=symbol.unit if symbol.unit else 1,
+        unit=unit_value,
     )
 
     # Set the instances list (replacing any existing)
@@ -51,7 +54,7 @@ def get_project_hierarchy_path(schematic_path: str) -> tuple[str, str]:
     """
     from pathlib import Path
 
-    from ..core.s_expression import SExpressionParser
+    import kicad_sch_api as ksa
 
     try:
         path = Path(schematic_path)
@@ -69,8 +72,7 @@ def get_project_hierarchy_path(schematic_path: str) -> tuple[str, str]:
 
             if main_project and main_project.exists():
                 # Parse the main project to get hierarchy info
-                parser = SExpressionParser()
-                main_schematic = parser.parse_file(str(main_project))
+                main_schematic = ksa.Schematic.load(str(main_project))
 
                 # Find the sheet that corresponds to our file
                 for sheet in main_schematic.sheets:

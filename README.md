@@ -120,6 +120,39 @@ You can import an existing KiCad project, modify it in Python (add a subcircuit,
 
 You get the best of both worlds: code-based definition with visual refinement.
 
+## 🚀 First Time User? Start Here!
+
+**Complete working example in 3 minutes:**
+
+```bash
+# 1. Install circuit-synth
+pip install circuit-synth
+
+# 2. Create a new project with working example
+uv run cs-new-project my_first_board
+
+# 3. Generate KiCad files from the example
+cd my_first_board/circuit-synth
+uv run python example_project/circuit-synth/main.py
+
+# 4. Open in KiCad (generated in ESP32_C6_Dev_Board/)
+open ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.kicad_pro
+```
+
+**That's it!** You now have a complete ESP32-C6 development board schematic and PCB.
+
+**What you just created:**
+- ✅ ESP32-C6 microcontroller with proper power connections
+- ✅ USB-C connector with CC resistors
+- ✅ 3.3V voltage regulator
+- ✅ LED with current-limiting resistor
+- ✅ Complete KiCad project ready to edit/manufacture
+
+**Next steps:**
+- Modify `example_project/circuit-synth/main.py` to customize your circuit
+- Re-run `uv run python example_project/circuit-synth/main.py` to regenerate KiCad files
+- Open KiCad to view/edit your schematic and PCB layout
+
 ## Installation
 
 ```bash
@@ -180,15 +213,135 @@ if __name__ == "__main__":
     circuit.generate_kicad_project("my_board")
 ```
 
-## Features
+## 🔄 Automatic Source Reference Rewriting (Round-Trip Workflow)
 
-- **Professional KiCad Output**: Generate complete .kicad_pro, .kicad_sch, .kicad_pcb projects
-- **Hierarchical Design**: Build modular circuits with reusable subcircuits like software functions
-- **Component Intelligence**: Real-time JLCPCB & DigiKey availability, pricing, and alternatives
-- **AI-Powered Design**: Specialized Claude Code agents for automated circuit generation and optimization
-- **SPICE Simulation**: Built-in circuit validation with DC, AC, and transient analysis
-- **Version Control Friendly**: Text-based Python definitions work seamlessly with git
-- **Manufacturing Ready**: Automatic BOM generation with verified component availability
+Circuit-synth automatically updates your Python source code when KiCad auto-numbers component references, solving the back-annotation problem and enabling seamless round-trip workflow.
+
+### The Problem (Without Source Rewriting)
+
+```python
+# Your Python code
+cap1 = Component(ref="C", value="10uF", ...)   # ref="C"
+cap2 = Component(ref="C", value="100nF", ...)  # ref="C"
+cap3 = Component(ref="C", value="1uF", ...)    # ref="C"
+
+# After KiCad generation: C1, C2, C3 in KiCad
+# But Python still has ref="C" everywhere!
+# Next generation fails with "duplicate reference C"
+```
+
+### The Solution (Automatic Source Update)
+
+```python
+# Your original code
+cap1 = Component(ref="C", value="10uF", ...)   # ref="C"
+
+# After generation, your source is automatically updated to:
+cap1 = Component(ref="C1", value="10uF", ...)  # ref="C1"  ← Auto-updated!
+cap2 = Component(ref="C2", value="100nF", ...) # ref="C2"  ← Auto-updated!
+cap3 = Component(ref="C3", value="1uF", ...)   # ref="C3"  ← Auto-updated!
+
+# Subsequent generations work perfectly - refs stay synchronized!
+```
+
+### How It Works
+
+When you call `generate_kicad_project()`, circuit-synth:
+
+1. **Auto-numbers** components: `ref="C"` → `C1`, `C2`, `C3`
+2. **Updates your Python source file** with the final refs
+3. **Preserves** comments, docstrings, and formatting
+4. **Handles multiple components** with the same prefix correctly
+
+### Usage
+
+```python
+circuit = main_circuit()
+
+# Automatic source update (default when not force_regenerate)
+circuit.generate_kicad_project("my_board")
+
+# Explicitly control source updates
+circuit.generate_kicad_project(
+    "my_board",
+    update_source_refs=True   # Force update
+)
+
+# Disable source updates
+circuit.generate_kicad_project(
+    "my_board",
+    update_source_refs=False   # Never update
+)
+```
+
+### What Gets Updated
+
+✅ **Updated:**
+- Component reference values: `ref="R"` → `ref="R1"`
+- Both quote styles: `ref="C"` and `ref='C'`
+- Multiple components with same prefix (ordered replacement)
+
+❌ **NOT Updated (Preserved):**
+- Comments: `# Component with ref="R"` stays unchanged
+- Docstrings: Documentation examples remain intact
+- String literals: Other occurrences of "R" in strings
+
+### Safety Features
+
+- **Atomic file operations**: Uses temp file + rename (no corruption risk)
+- **Encoding preservation**: Maintains UTF-8, line endings (CRLF/LF)
+- **Permission preservation**: Keeps original file permissions
+- **Git-friendly**: Changes are visible in `git diff`
+- **Error handling**: Graceful fallback if source file unavailable
+
+### Benefits
+
+🎯 **Solves Round-Trip Problem**: Refs stay synchronized between Python and KiCad forever
+📝 **User-Visible Changes**: See exactly what changed in git diff
+🔄 **Seamless Workflow**: Edit Python → Generate KiCad → Edit Python → Regenerate
+⚡ **Zero Configuration**: Works automatically by default
+
+### Example: See It In Action
+
+```bash
+# 1. Create circuit with unnumbered refs
+echo 'cap = Component(ref="C", ...)' > circuit.py
+
+# 2. Generate KiCad project
+python circuit.py  # Calls generate_kicad_project()
+
+# 3. Check your source file
+cat circuit.py
+# Output: cap = Component(ref="C1", ...)  ← Updated!
+
+# 4. See what changed
+git diff circuit.py
+# Shows: -ref="C"
+#        +ref="C1"
+```
+
+### When Source Updates Are Skipped
+
+Source rewriting is automatically disabled when:
+- `force_regenerate=True` (full regeneration mode)
+- Running in REPL/interactive mode (no source file)
+- File is read-only (permission error)
+- Source file cannot be determined (frozen apps)
+
+In these cases, KiCad generation still works normally - only the Python source update is skipped.
+
+---
+
+## Core Features
+
+- **Automatic Source Reference Rewriting**: Keep Python and KiCad refs synchronized (see above)
+- **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files with modern kicad-sch-api integration
+- **Circuit Patterns Library**: 7 pre-made, manufacturing-ready circuits (buck/boost converters, battery chargers, sensors, communication)
+- **Hierarchical Design**: Modular subcircuits like software modules
+- **Component Intelligence**: JLCPCB & DigiKey integration, symbol/footprint verification
+- **AI Integration**: Claude Code agents and skills for automated design assistance
+- **FMEA Analysis**: Comprehensive reliability analysis with physics-based failure models
+- **Version Control**: Git-friendly text-based circuit definitions
 
 ## Configuration
 
@@ -197,35 +350,156 @@ if __name__ == "__main__":
 export CIRCUIT_SYNTH_LOG_LEVEL=INFO  # ERROR, WARNING, INFO, DEBUG
 ```
 
-## Claude Code Integration
+## Circuit Patterns Library
 
-Circuit-synth projects include specialized AI agents for automated design workflows.
+Circuit-synth includes a curated library of 7 pre-made, manufacturing-ready circuit patterns for common design building blocks. Each pattern is a proven design with complete component selection, calculations, and PCB layout guidelines.
 
-### Available Slash Commands
+### Available Patterns
+
+**Power Management:**
+- `buck_converter` - 12V→5V/3.3V step-down switching regulator (TPS54331, 3A)
+- `boost_converter` - 3.7V→5V step-up switching regulator (TPS61070, 1A)
+- `lipo_charger` - Li-ion/LiPo USB-C charging circuit (MCP73831, CC/CV)
+
+**Sensing & Measurement:**
+- `resistor_divider` - Parametric voltage divider for ADC scaling
+- `thermistor` - NTC thermistor temperature sensing circuit
+- `opamp_follower` - Unity-gain voltage buffer (MCP6001)
+
+**Communication:**
+- `rs485` - Industrial differential serial interface (MAX485, Modbus/BACnet)
+
+### Using Circuit Patterns
+
+```python
+from circuit_synth import *
+from buck_converter import buck_converter
+from thermistor import thermistor_sensor
+
+@circuit(name="Battery_Monitor")
+def battery_monitor():
+    # Power nets
+    vin_12v = Net('VIN_12V')
+    vout_5v = Net('VOUT_5V')
+    system_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+
+    # Use pre-made patterns
+    buck_converter(vin_12v, vout_5v, gnd, output_voltage="5V", max_current="3A")
+    buck_converter(vout_5v, system_3v3, gnd, output_voltage="3.3V", max_current="2A")
+    thermistor_sensor(system_3v3, adc_temp, gnd, thermistor_type="NTC_10k")
+```
+
+### Pattern Features
+
+Each pattern includes:
+- ✅ Verified KiCad symbols and footprints
+- ✅ Complete component selection with datasheets
+- ✅ Design calculations and theory of operation
+- ✅ PCB layout guidelines and thermal management
+- ✅ Manufacturing-ready specifications
+- ✅ Common failure modes and troubleshooting
+
+### Claude Code Integration
+
+When using Claude Code, the circuit-patterns skill provides intelligent access:
+
+```
+"What circuit patterns are available?"
+"Show me the buck converter circuit"
+"How do I customize the boost converter for 12V output?"
+```
+
+The skill uses progressive disclosure - loading only requested patterns to save context.
+
+See `example_project/circuit-synth/battery_monitor_example.py` and `power_systems_example.py` for complete usage examples.
+
+## AI-Powered Design
+
+### Claude Code Skills
+
+Circuit-synth provides intelligent Claude Code skills for progressive disclosure:
+
+**circuit-patterns** - Circuit pattern library browser
+- Lists available pre-made circuits
+- Loads pattern details on demand
+- Shows customization options
+- Token efficient (only loads requested patterns)
+
+**component-search** - Fast JLCPCB component sourcing
+- Real-time stock and pricing from JLCPCB
+- Automatic caching for speed
+- Ranks by availability and price
+- Prefers Basic parts (no setup fee)
+
+**kicad-integration** - KiCad symbol/footprint finder
+- Multi-source search (local, DigiKey GitHub, SnapEDA, DigiKey API)
+- Symbol and footprint verification
+- Pin name extraction for accurate connections
+
+### Claude Code Commands
 
 ```bash
 # Component search
-/find-symbol STM32              # Search KiCad symbol libraries
-/find-footprint LQFP64          # Find component footprints
-/find-parts "0.1uF 0603"        # Search across all suppliers
-/find-stm32 "3 SPIs, USB"       # STM32-specific search
+/find-symbol STM32                    # Search KiCad symbols
+/find-footprint LQFP64                # Find footprints
+/find-parts "STM32F407" --source jlcpcb   # Check JLCPCB availability
+/find-stm32 "3 SPIs, USB"             # STM32-specific search
 
 # Circuit generation
 /generate-validated-circuit "ESP32 IoT sensor" mcu
-/validate-existing-circuit
 
-# Analysis
-/analyze-fmea my_circuit.py     # Reliability analysis
+# Fast JLCPCB CLI (no agents, 80% faster)
+jlc-fast search STM32G4               # Direct search
+jlc-fast cheapest "10uF 0805"         # Find cheapest option
 ```
 
-### AI Agents
+### 🤖 AI Assistance
 
-- **circuit-architect**: Complete system-level design and architecture planning
-- **circuit-synth**: Generate production-ready circuit-synth Python code
-- **simulation-expert**: SPICE simulation setup and performance optimization
-- **component-search**: Multi-source component search with price/availability comparison
-- **jlc-parts-finder**: Real-time JLCPCB stock levels and pricing
-- **test-plan-creator**: Automated test procedure generation
+When using Claude Code, you can ask for help with:
+
+- **Circuit Patterns**: "What circuit patterns are available?" → circuit-patterns skill
+- **Component Selection**: "Find me a 3.3V regulator available on JLCPCB" → component-search skill
+- **KiCad Integration**: "What footprint should I use for LQFP-48?" → kicad-integration skill
+- **Circuit Design**: "Design a USB-C power supply with protection"
+- **Troubleshooting**: "My board isn't powering on - help debug"
+- **SPICE Simulation**: "Simulate this amplifier circuit"
+- **Test Planning**: "Generate test procedures for my power supply"
+
+The AI agents and skills will automatically select the right tools and expertise for your request.
+
+## 🚀 Commands
+
+### Project Creation
+```bash
+cs-new-project              # Complete project setup with ESP32-C6 example
+```
+
+### Circuit Generation
+```bash
+cd circuit-synth && uv run python example_project/circuit-synth/main.py    # Generate KiCad files from Python code
+```
+
+### Available Commands
+
+```bash
+# Component Search
+/find-symbol STM32              # Search KiCad symbols
+/find-footprint LQFP64          # Find footprints
+/find-parts "STM32F407" --source jlcpcb   # Check availability
+/find-stm32 "3 SPIs, USB"       # STM32-specific search
+
+# Circuit Generation
+/generate-validated-circuit "ESP32 IoT sensor" mcu
+/validate-existing-circuit      # Validate circuit code
+
+# Fast JLCPCB CLI
+jlc-fast search STM32G4         # Direct search
+jlc-fast cheapest "10uF 0805"   # Find cheapest option
+
+# FMEA Analysis
+/analyze-fmea my_circuit.py     # Run reliability analysis
+```
 
 ## Component Search
 
@@ -340,13 +614,146 @@ report_path = generator.generate_comprehensive_report(
 )
 ```
 
-Features:
-- Comprehensive failure mode database covering all standard component types
-- Context-aware analysis adjusts risk ratings based on circuit environment and stress factors
-- Physics-based reliability models (Arrhenius, Coffin-Manson, Black's equation) referenced in reports
-- IPC Class 3 compliance checking
-- Risk Priority Number (RPN) calculations (Severity × Occurrence × Detection)
-- Specific mitigation strategies for each failure mode
+### What Gets Analyzed
+
+- **Comprehensive failure mode database** covering all standard component types
+- **Context-aware analysis** adjusts risk ratings based on circuit environment and stress factors
+- **Physics-based reliability models** (Arrhenius, Coffin-Manson, Black's equation) referenced in reports
+- **IPC Class 3 Compliance**: High-reliability assembly standards
+- **Risk Priority Number (RPN)** calculations (Severity × Occurrence × Detection)
+- **Mitigation Strategies**: Specific recommendations for each failure mode
+
+### Command Line FMEA
+
+```bash
+# Quick FMEA analysis
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py
+
+# Specify output file
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py -o FMEA_Report.pdf
+
+# Analyze with custom threshold
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py --threshold 150
+```
+
+See [FMEA Guide](docs/FMEA_GUIDE.md) for detailed documentation.
+
+## Library Sourcing System
+
+Hybrid component discovery across multiple sources with automatic fallback:
+
+### Setup
+```bash
+cs-library-setup                    # Show configuration status
+cs-setup-snapeda-api YOUR_KEY       # Optional: SnapEDA API access  
+cs-setup-digikey-api KEY CLIENT_ID  # Optional: DigiKey API access
+```
+
+### Usage
+Enhanced `/find-symbol` and `/find-footprint` commands automatically search:
+1. **Local KiCad** (user installation)
+2. **DigiKey GitHub** (150 curated libraries, auto-converted)
+3. **SnapEDA API** (millions of components)
+4. **DigiKey API** (supplier validation)
+
+Results show source tags: `[Local]`, `[DigiKey GitHub]`, `[SnapEDA]`, `[DigiKey API]`
+
+## Fast JLCPCB Component Search
+
+The optimized search API provides direct JLCPCB component lookup without agent overhead:
+
+### Python API
+
+```python
+from circuit_synth.manufacturing.jlcpcb import fast_jlc_search, find_cheapest_jlc
+
+# Fast search with filtering
+results = fast_jlc_search("STM32G4", min_stock=100, max_results=5)
+for r in results:
+    print(f"{r.part_number}: {r.description} (${r.price}, stock: {r.stock})")
+
+# Find cheapest option
+cheapest = find_cheapest_jlc("0.1uF 0603", min_stock=1000)
+print(f"Cheapest: {cheapest.part_number} at ${cheapest.price}")
+```
+
+### CLI Usage
+
+```bash
+# Search components
+jlc-fast search "USB-C connector" --min-stock 500
+
+# Find cheapest with stock
+jlc-fast cheapest "10k resistor" --min-stock 10000
+
+# Performance benchmark
+jlc-fast benchmark
+```
+
+### Performance Improvements
+
+- **80% faster**: ~0.5s vs ~30s with agent-based search
+- **90% less tokens**: 0 LLM tokens vs ~500 per search
+- **Intelligent caching**: Avoid repeated API calls
+- **Batch operations**: Search multiple components efficiently
+
+## Project Structure
+
+```
+my_circuit_project/
+├── example_project/
+│   ├── circuit-synth/
+│   │   ├── main.py                      # ESP32-C6 dev board (hierarchical)
+│   │   ├── power_supply.py              # 5V→3.3V regulation
+│   │   ├── usb.py                       # USB-C with CC resistors
+│   │   ├── esp32c6.py                   # ESP32-C6 microcontroller
+│   │   ├── led_blinker.py               # Status LED control
+│   │   # Circuit Patterns Library
+│   │   ├── buck_converter.py            # Step-down switching regulator
+│   │   ├── boost_converter.py           # Step-up switching regulator
+│   │   ├── lipo_charger.py              # Li-ion/LiPo battery charger
+│   │   ├── resistor_divider.py          # Voltage divider for ADC
+│   │   ├── thermistor.py                # Temperature sensing
+│   │   ├── opamp_follower.py            # Unity-gain buffer
+│   │   ├── rs485.py                     # Industrial communication
+│   │   # Usage Examples
+│   │   ├── battery_monitor_example.py   # Multi-pattern integration
+│   │   └── power_systems_example.py     # Power conversion examples
+│   └── ESP32_C6_Dev_Board/              # Generated KiCad files
+│       ├── ESP32_C6_Dev_Board.kicad_pro
+│       ├── ESP32_C6_Dev_Board.kicad_sch
+│       ├── ESP32_C6_Dev_Board.kicad_pcb
+│       └── ESP32_C6_Dev_Board.net
+├── .claude/                             # Claude Code integration
+│   ├── agents/                          # AI agents
+│   ├── commands/                        # Slash commands
+│   └── skills/                          # Progressive disclosure skills
+│       ├── circuit-patterns/            # Circuit pattern library skill
+│       ├── component-search/            # JLCPCB sourcing skill
+│       └── kicad-integration/           # Symbol/footprint finder skill
+├── README.md                            # Project guide
+├── CLAUDE.md                            # AI assistant instructions
+└── pyproject.toml                       # Project dependencies
+```
+
+
+## Why Circuit-Synth?
+
+| Traditional EE Workflow | With Circuit-Synth |
+|-------------------------|-------------------|
+| Manual component placement | `python example_project/circuit-synth/main.py` → Complete project |
+| Hunt through symbol libraries | Verified components with JLCPCB & DigiKey availability |
+| Visual net verification | Explicit Python connections |
+| GUI-based editing | Version-controlled Python files |
+| Copy-paste patterns | Reusable circuit functions + 7 pre-made patterns |
+| Research reference designs | Import proven patterns: `from buck_converter import buck_converter` |
+| Manual FMEA documentation | Automated 50+ page reliability analysis |
+
+## Resources
+
+- [Documentation](https://docs.circuit-synth.com)
+- [Examples](https://github.com/circuit-synth/examples)
+- [Contributing](CONTRIBUTING.md)
 
 ## Development Setup
 
@@ -357,6 +764,52 @@ uv sync
 
 # Run tests
 uv run pytest
+
+# Optional: Register Claude Code agents
+uv run register-agents
+
+# Build template for distribution (copies example_project to package data)
+python build.py
+```
+
+### Claude Code Working Directory
+
+**Important for Contributors**: Circuit-synth has separate .claude configurations:
+
+- **Repository root** (`/.claude`): Reserved for circuit-synth development, testing, and repo maintenance
+- **Example project** (`/example_project/.claude`): For circuit design (this gets copied to user projects via `cs-new-project`)
+
+**Claude Code activates based on your current working directory:**
+
+```bash
+# ❌ DON'T work from repo root for circuit design
+cd circuit-synth/
+claude code              # Uses dev .claude (wrong context for design)
+
+# ✅ DO work from example_project for circuit design
+cd circuit-synth/example_project/
+claude code              # Uses design .claude (correct context)
+
+# ✅ DO work from repo root for library development
+cd circuit-synth/
+claude code              # Uses dev .claude (correct for development)
+```
+
+The repo root .claude is for contributors working on circuit-synth itself, not for using circuit-synth to design circuits.
+
+See `CLAUDE_FOLDER_STRUCTURE_RESEARCH.md` for detailed explanation of this architecture.
+
+## Testing
+
+```bash
+# Run comprehensive tests
+./tools/testing/run_full_regression_tests.py
+
+# Python tests only
+uv run pytest --cov=circuit_synth
+
+# Pre-release regression test
+./tools/testing/run_full_regression_tests.py
 
 # Code quality
 black src/ && isort src/ && flake8 src/ && mypy src/

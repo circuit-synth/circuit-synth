@@ -11,8 +11,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from ..core.types import (
-    BoundingBox,
+from kicad_sch_api.core.types import (
     Junction,
     Label,
     LabelType,
@@ -22,6 +21,8 @@ from ..core.types import (
     SchematicSymbol,
     Wire,
 )
+
+from ..core import BoundingBox
 
 logger = logging.getLogger(__name__)
 
@@ -189,10 +190,11 @@ class SearchEngine:
 
         # Net index (simplified - full implementation would trace connections)
         self._nets_by_name = {}
-        for label in self.schematic.labels:
-            if label.text not in self._nets_by_name:
-                self._nets_by_name[label.text] = []
-            self._nets_by_name[label.text].append(label)
+        if hasattr(self.schematic, 'labels') and self.schematic.labels:
+            for label in self.schematic.labels:
+                if label.text not in self._nets_by_name:
+                    self._nets_by_name[label.text] = []
+                self._nets_by_name[label.text].append(label)
 
     def search_components(
         self,
@@ -341,13 +343,14 @@ class SearchEngine:
         results = set()
 
         # Search labels
-        for label in self.schematic.labels:
-            if use_regex:
-                if re.search(pattern, label.text):
-                    results.add(label.text)
-            else:
-                if pattern in label.text:
-                    results.add(label.text)
+        if hasattr(self.schematic, 'labels') and self.schematic.labels:
+            for label in self.schematic.labels:
+                if use_regex:
+                    if re.search(pattern, label.text):
+                        results.add(label.text)
+                else:
+                    if pattern in label.text:
+                        results.add(label.text)
 
         return sorted(list(results))
 
@@ -459,11 +462,12 @@ class SearchEngine:
 
         power_nets = set()
 
-        for label in self.schematic.labels:
-            for pattern in power_patterns:
-                if re.match(pattern, label.text):
-                    power_nets.add(label.text)
-                    break
+        if hasattr(self.schematic, 'labels') and self.schematic.labels:
+            for label in self.schematic.labels:
+                for pattern in power_patterns:
+                    if re.match(pattern, label.text):
+                        power_nets.add(label.text)
+                        break
 
         # Check power symbols
         for component in self.schematic.components:
@@ -500,7 +504,9 @@ class SearchEngine:
             Net object with all connections
         """
         # Find all labels with this net name
-        labels = [l for l in self.schematic.labels if l.text == net_name]
+        labels = []
+        if hasattr(self.schematic, 'labels') and self.schematic.labels:
+            labels = [l for l in self.schematic.labels if l.text == net_name]
         if not labels:
             return None
 

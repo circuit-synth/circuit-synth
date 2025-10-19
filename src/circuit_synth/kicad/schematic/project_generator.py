@@ -11,12 +11,13 @@ from typing import Optional
 
 import sexpdata
 
-from ..core.s_expression import SExpressionParser
-from ..core.types import Label, LabelType, Point, Schematic, SchematicSymbol, Sheet
+from kicad_sch_api.core.parser import SExpressionParser
+from kicad_sch_api.core.types import Label, LabelType, Point, Schematic, SchematicSymbol, Sheet
 from .component_manager import ComponentManager
 from .connection_updater import ConnectionUpdater
 from .geometry_utils import GeometryUtils
 from .instance_utils import add_symbol_instance
+from .layout_intermediate import generate_layout_intermediate
 from .placement import PlacementEngine, PlacementStrategy
 from .sheet_manager import SheetManager
 from .sheet_placement import SheetPlacement
@@ -93,15 +94,22 @@ class ProjectGenerator:
         has_components = hasattr(circuit, "_components") and circuit._components
         has_subcircuits = hasattr(circuit, "_subcircuits") and circuit._subcircuits
 
+        print(f"\n🔍 SCHEMATIC GENERATION PATH:")
+        print(f"   has_components: {has_components}")
+        print(f"   has_subcircuits: {has_subcircuits}")
+
         if has_components and has_subcircuits:
             # Mixed design: root has both components and subcircuits
             # Use unified placement to place both in the same schematic
+            print(f"   → Using: _generate_root_with_unified_placement\n")
             self._generate_root_with_unified_placement(circuit, schematic_path)
         elif has_subcircuits:
             # Pure hierarchical design: only subcircuits, no components in root
+            print(f"   → Using: _generate_hierarchical_design\n")
             self._generate_hierarchical_design(circuit, schematic_path)
         else:
             # Simple design: only components, no subcircuits
+            print(f"   → Using: _generate_simple_design\n")
             self._generate_simple_design(circuit, schematic_path)
 
     def _generate_simple_design(self, circuit, schematic_path: Path):
@@ -259,6 +267,17 @@ class ProjectGenerator:
                 sheet_info.append(
                     (sub_name, subcircuit, sub_sheet_path, sub_sheet_uuid, sheet)
                 )
+
+        # Generate intermediate layout file for LLM analysis
+        layout_intermediate_path = self.project_dir / f"{self.project_name}_layout.json"
+        metadata = {
+            "algorithm": "text_flow",
+            "spacing_mm": 5.08,
+            "margin_mm": 25.4,
+            "component_count": len(schematic.components),
+            "sheet_count": len(schematic.sheets) if hasattr(schematic, "sheets") else 0,
+        }
+        generate_layout_intermediate(schematic, layout_intermediate_path, metadata)
 
         # Phase 3: Place all elements using unified placement
         # Place components first
@@ -471,6 +490,16 @@ class ProjectGenerator:
                 component_map[comp_id] = kicad_comp
                 # Add instance using centralized utility with hierarchical path
                 add_symbol_instance(kicad_comp, self.project_name, hierarchical_path)
+
+        # Generate intermediate layout file for LLM analysis
+        layout_intermediate_path = sub_sheet_path.parent / f"{sub_sheet_path.stem}_layout.json"
+        metadata = {
+            "algorithm": "text_flow",
+            "spacing_mm": 5.08,
+            "margin_mm": 25.4,
+            "component_count": len(schematic.components),
+        }
+        generate_layout_intermediate(schematic, layout_intermediate_path, metadata)
 
         # Create hierarchical labels for each pin instead of wires
         # This is the preferred approach for now

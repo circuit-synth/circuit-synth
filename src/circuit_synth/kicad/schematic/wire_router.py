@@ -10,7 +10,7 @@ import math
 from dataclasses import dataclass
 from typing import List, Optional, Set, Tuple
 
-from ..core.types import Point
+from kicad_sch_api.core.types import Point
 
 logger = logging.getLogger(__name__)
 

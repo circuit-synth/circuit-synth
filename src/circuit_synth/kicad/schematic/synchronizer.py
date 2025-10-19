@@ -10,8 +10,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from ..core.s_expression import SExpressionParser
-from ..core.types import Schematic, SchematicSymbol
+import kicad_sch_api as ksa
+from kicad_sch_api.core.types import Schematic, SchematicSymbol
 from .component_manager import ComponentManager
 from .connection_tracer import ConnectionTracer
 from .net_matcher import NetMatcher
@@ -74,11 +74,10 @@ class APISynchronizer:
         self.preserve_user_components = preserve_user_components
 
         # Load schematic
-        self.parser = SExpressionParser()
         self.schematic = self._load_schematic()
 
-        # Store the file path in the schematic for instance hierarchy detection
-        self.schematic.file_path = str(self.schematic_path)
+        # NOTE: file_path is already set when the schematic is loaded from file
+        # The Schematic object's file_path property is read-only, so we can't set it
 
         # Initialize API components
         self.component_manager = ComponentManager(self.schematic)
@@ -98,7 +97,7 @@ class APISynchronizer:
     def _load_schematic(self) -> Schematic:
         """Load schematic from file and recursively load all hierarchical sheets."""
         # Load the main schematic
-        main_schematic = self.parser.parse_file(str(self.schematic_path))
+        main_schematic = ksa.Schematic.load(str(self.schematic_path))
 
         # Track loaded files to avoid infinite recursion
         loaded_files = set()
@@ -115,7 +114,23 @@ class APISynchronizer:
         self, schematic: Schematic, base_path: Path, loaded_files: set
     ):
         """Recursively load components from all hierarchical sheets."""
-        for sheet in schematic.sheets:
+        # Check if the schematic has sheets attribute and if it's iterable
+        if not hasattr(schematic, 'sheets') or schematic.sheets is None:
+            logger.debug(f"Schematic has no sheets attribute or it's None - skipping hierarchical loading")
+            return
+
+        # Check if sheets is empty
+        try:
+            sheets_list = list(schematic.sheets) if schematic.sheets else []
+        except (TypeError, AttributeError):
+            logger.debug(f"Schematic.sheets is not iterable - skipping hierarchical loading")
+            return
+
+        if not sheets_list:
+            logger.debug(f"Schematic has no sheets - skipping hierarchical loading")
+            return
+
+        for sheet in sheets_list:
             # Construct the full path to the sheet file
             sheet_path = base_path / sheet.filename
 
@@ -130,22 +145,31 @@ class APISynchronizer:
                 loaded_files.add(str(sheet_path.resolve()))
 
                 # Parse the sheet schematic
-                sheet_schematic = self.parser.parse_file(str(sheet_path))
+                sheet_schematic = ksa.Schematic.load(str(sheet_path))
 
                 # Add all components from the sheet to the main schematic
-                for comp in sheet_schematic.components:
-                    schematic.add_component(comp)
+                if hasattr(sheet_schematic, 'components') and sheet_schematic.components:
+                    for comp in sheet_schematic.components:
+                        schematic.add_component(comp)
 
-                # Add all wires from the sheet
-                for wire in sheet_schematic.wires:
-                    schematic.add_wire(wire)
+                # Add all wires from the sheet (if they exist)
+                if hasattr(sheet_schematic, 'wires') and sheet_schematic.wires:
+                    try:
+                        for wire in sheet_schematic.wires:
+                            schematic.add_wire(wire)
+                    except (TypeError, AttributeError) as e:
+                        logger.debug(f"Could not add wires from sheet: {e}")
 
-                # Add all labels from the sheet
-                for label in sheet_schematic.labels:
-                    schematic.add_label(label)
+                # Add all labels from the sheet (if they exist)
+                if hasattr(sheet_schematic, 'labels') and sheet_schematic.labels:
+                    try:
+                        for label in sheet_schematic.labels:
+                            schematic.add_label(label)
+                    except (TypeError, AttributeError) as e:
+                        logger.debug(f"Could not add labels from sheet: {e}")
 
-                # Recursively load any sub-sheets
-                if sheet_schematic.sheets:
+                # Recursively load any sub-sheets (if they exist)
+                if hasattr(sheet_schematic, 'sheets') and sheet_schematic.sheets:
                     self._load_sheets_recursively(schematic, base_path, loaded_files)
             else:
                 logger.warning(f"Sheet file not found: {sheet_path}")
@@ -459,62 +483,90 @@ class APISynchronizer:
         else:
             return "Device:R"  # Default
 
-    def _add_lib_symbols_to_sexp(self, sexp_data: list):
-        """Add lib_symbols definitions to the S-expression data."""
-        from sexpdata import Symbol
-
-        from circuit_synth.kicad.core.symbol_cache import SymbolLibraryCache
-
-        # Find or create lib_symbols block
-        lib_symbols_block = None
-        for item in sexp_data:
-            if (
-                isinstance(item, list)
-                and item
-                and isinstance(item[0], Symbol)
-                and item[0].value() == "lib_symbols"
-            ):
-                lib_symbols_block = item
-                break
-
-        if not lib_symbols_block:
-            # Create new lib_symbols block
-            lib_symbols_block = [Symbol("lib_symbols")]
-            # Insert after paper
-            for i, item in enumerate(sexp_data):
-                if isinstance(item, list) and item and item[0] == Symbol("paper"):
-                    sexp_data.insert(i + 1, lib_symbols_block)
-                    break
-
-        # Clear existing content (keep only the header)
-        lib_symbols_block[:] = [lib_symbols_block[0]]
-
-        # Get unique lib_ids from all components
-        lib_ids = set()
-        for comp in self.schematic.components:
-            if hasattr(comp, "lib_id") and comp.lib_id:
-                lib_ids.add(comp.lib_id)
-
-        # Add symbol definitions
-        symbol_cache = SymbolLibraryCache()
-        for lib_id in sorted(lib_ids):
-            try:
-                symbol_def = symbol_cache.get_symbol(lib_id)
-                if symbol_def:
-                    # Convert SymbolDefinition to S-expression format
-                    symbol_sexp = self.parser._symbol_definition_to_sexp(symbol_def)
-                    lib_symbols_block.append(symbol_sexp)
-                    logger.debug(f"Added symbol definition for {lib_id}")
-            except Exception as e:
-                logger.warning(f"Failed to add symbol definition for {lib_id}: {e}")
-
     def _save_schematic(self):
-        """Save the modified schematic."""
-        # Convert schematic to S-expression
-        sexp_data = self.parser.from_schematic(self.schematic)
+        """Save the modified schematic using kicad-sch-api's native save."""
+        print("💾 _save_schematic() called")
+        logger.info("_save_schematic() called")
 
-        # Add lib_symbols definitions for all components
-        self._add_lib_symbols_to_sexp(sexp_data)
+        # WORKAROUND: kicad-sch-api bug where WireCollection doesn't sync to _data["wires"]
+        # Manually sync wires from collection to _data before saving
+        self._sync_wires_to_data()
 
-        # Write to file
-        self.parser.write_file(sexp_data, str(self.schematic_path))
+        # Use kicad-sch-api's built-in save method which handles all S-expression formatting
+        # and lib_symbols automatically. This preserves format and includes wires/labels.
+        print(f"💾 Calling schematic.save({self.schematic_path})")
+        self.schematic.save(str(self.schematic_path), preserve_format=True)
+        print(f"✅ Schematic saved successfully")
+        logger.info(f"Saved schematic to {self.schematic_path}")
+
+    def _sync_wires_to_data(self):
+        """
+        Sync wires from WireCollection to _data dictionary.
+
+        WORKAROUND for kicad-sch-api bug: The WireCollection maintains wires in memory
+        but doesn't update _data["wires"], so when saving, wires are lost. This method
+        manually syncs the wire collection to _data before saving.
+        """
+        print("🔧 _sync_wires_to_data() called")
+        logger.info("🔧 _sync_wires_to_data() called")
+
+        if not hasattr(self.schematic, '_data'):
+            print("⚠️  Schematic has no _data attribute")
+            logger.warning("Schematic has no _data attribute")
+            return
+
+        if not hasattr(self.schematic, 'wires'):
+            print("⚠️  Schematic has no wires attribute")
+            logger.warning("Schematic has no wires attribute")
+            return
+
+        # Get all wires from the wire collection
+        try:
+            wires_list = list(self.schematic.wires)
+            print(f"📊 Retrieved {len(wires_list)} wires from collection")
+            logger.info(f"Retrieved {len(wires_list)} wires from collection")
+        except (TypeError, AttributeError) as e:
+            print(f"⚠️  Could not access wires collection: {e}")
+            logger.warning(f"Could not access wires collection: {e}")
+            return
+
+        if not wires_list:
+            # No wires to sync
+            print("📊 No wires to sync (empty list)")
+            logger.info("No wires to sync (empty list)")
+            return
+
+        print(f"🔄 Syncing {len(wires_list)} wires from collection to _data")
+        logger.info(f"🔄 Syncing {len(wires_list)} wires from collection to _data")
+
+        # Convert Wire objects to dictionaries for _data
+        wire_dicts = []
+        for wire in wires_list:
+            if not hasattr(wire, 'uuid') or not hasattr(wire, 'points'):
+                continue
+
+            # Build wire dictionary matching KiCad S-expression format
+            wire_dict = {
+                "uuid": wire.uuid,
+                "points": []
+            }
+
+            # Add points
+            for point in wire.points:
+                wire_dict["points"].append({
+                    "x": point.x,
+                    "y": point.y
+                })
+
+            # Add stroke info if present
+            if hasattr(wire, 'stroke_width') and wire.stroke_width > 0:
+                wire_dict["stroke"] = {
+                    "width": wire.stroke_width,
+                    "type": "default"
+                }
+
+            wire_dicts.append(wire_dict)
+
+        # Update _data["wires"]
+        self.schematic._data["wires"] = wire_dicts
+        logger.info(f"Synced {len(wire_dicts)} wires to _data")

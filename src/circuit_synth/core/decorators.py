@@ -55,6 +55,9 @@ def circuit(_func=None, *, name=None, comments=True):
                 auto_comments=use_comments,
             )
 
+            # Store reference to the circuit function for source rewriting
+            c._circuit_func = func
+
             # Link it as a subcircuit if there's a parent
             if parent_circuit is not None:
                 parent_circuit.add_subcircuit(c)

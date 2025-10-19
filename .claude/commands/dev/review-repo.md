@@ -1,3 +1,8 @@
+---
+name: review-repo
+description: Review Repo
+---
+
 # Comprehensive Repository Review Command
 
 **Purpose:** Complete repository analysis with automatic feature discovery to identify what's working, what's broken, and what needs attention. Automatically surveys the repository to ensure no features are missed.

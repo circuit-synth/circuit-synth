@@ -157,7 +157,7 @@ class FormatterTestHarness:
             return formatter.format_schematic(circuit_data)
 
         # Use current formatter
-        from circuit_synth.kicad.core.s_expression import SExpressionParser
+        from kicad_sch_api.core.parser import SExpressionParser
 
         # Build basic schematic structure
         schematic_sexp = [
