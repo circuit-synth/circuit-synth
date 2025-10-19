@@ -158,13 +158,14 @@ where = ["src"]
 circuit_synth = [
     "py.typed",
     "data/templates/project/*",
-    "data/templates/claude/*", 
+    "data/templates/claude/*",
     "data/templates/memory_bank/*",
-    "data/templates/example_project/*",
-    "data/templates/example_project/circuit-synth/*",
-    "data/templates/example_project/.claude/*",
-    "data/templates/example_project/.claude/agents/*/*",
-    "data/templates/example_project/.claude/commands/*/*",
+    # Include all files in example_project recursively
+    "data/templates/example_project/**/*",
+    "data/templates/example_project/**/**/*",
+    "data/templates/example_project/**/**/**/*",
+    # Explicitly include hidden files in .claude directory
+    "data/templates/example_project/.claude/**/*",
     "data/templates/project_template/*",
     "data/templates/project_template/circuit-synth/*",
     "data/templates/project_template/.claude/*",
