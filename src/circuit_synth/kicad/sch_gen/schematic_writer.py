@@ -858,42 +858,50 @@ class SchematicWriter:
         Returns:
             bool: True if net should have hierarchical label, False for local label
         """
-        # Check if shared with parent
-        parent_circuit = None
-        for circ_name, circ in self.all_subcircuits.items():
-            for child_info in circ.child_instances:
-                if child_info["sub_name"] == self.circuit.name:
-                    parent_circuit = circ
-                    break
-            if parent_circuit:
-                break
+        # TEMPORARY: Always use hierarchical labels for now
+        # We want all labels to be hierarchical until we're ready to differentiate
+        # between local (internal) and hierarchical (cross-circuit) nets.
+        # The logic below is correct but bypassed for now.
+        return True
 
-        if parent_circuit:
-            # Check if this Net OBJECT (not name) is used in the parent
-            parent_nets = parent_circuit.nets.values() if isinstance(parent_circuit.nets, dict) else parent_circuit.nets
-            for parent_net in parent_nets:
-                if parent_net is net_obj:  # Same object reference!
-                    return True
-
-            # Fallback to name matching (for JSON-loaded circuits)
-            parent_net_names = {n.name for n in parent_nets}
-            if net_obj.name in parent_net_names:
-                return True
-
-        # Check if used by any child circuit
-        for child_info in self.circuit.child_instances:
-            child_circ = self.all_subcircuits[child_info["sub_name"]]
-            child_nets = child_circ.nets.values() if isinstance(child_circ.nets, dict) else child_circ.nets
-
-            for child_net in child_nets:
-                # Check object identity
-                if child_net is net_obj:
-                    return True
-                # Fallback to name matching
-                if child_net.name == net_obj.name:
-                    return True
-
-        return False
+        # TODO: Enable this logic when ready to support local labels
+        # ============================================================
+        # # Check if shared with parent
+        # parent_circuit = None
+        # for circ_name, circ in self.all_subcircuits.items():
+        #     for child_info in circ.child_instances:
+        #         if child_info["sub_name"] == self.circuit.name:
+        #             parent_circuit = circ
+        #             break
+        #     if parent_circuit:
+        #         break
+        #
+        # if parent_circuit:
+        #     # Check if this Net OBJECT (not name) is used in the parent
+        #     parent_nets = parent_circuit.nets.values() if isinstance(parent_circuit.nets, dict) else parent_circuit.nets
+        #     for parent_net in parent_nets:
+        #         if parent_net is net_obj:  # Same object reference!
+        #             return True
+        #
+        #     # Fallback to name matching (for JSON-loaded circuits)
+        #     parent_net_names = {n.name for n in parent_nets}
+        #     if net_obj.name in parent_net_names:
+        #         return True
+        #
+        # # Check if used by any child circuit
+        # for child_info in self.circuit.child_instances:
+        #     child_circ = self.all_subcircuits[child_info["sub_name"]]
+        #     child_nets = child_circ.nets.values() if isinstance(child_circ.nets, dict) else child_circ.nets
+        #
+        #     for child_net in child_nets:
+        #         # Check object identity
+        #         if child_net is net_obj:
+        #             return True
+        #         # Fallback to name matching
+        #         if child_net.name == net_obj.name:
+        #             return True
+        #
+        # return False
 
     def _add_pin_level_net_labels(self):
         """
