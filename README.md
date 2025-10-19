@@ -1,8 +1,124 @@
 # circuit-synth
 
-**Python-based circuit design with KiCad integration and AI acceleration.**
+Python-based circuit design with KiCad integration and AI acceleration.
 
-Generate professional KiCad projects from Python code with hierarchical design, version control, and automated documentation.
+## What is Code-Based Circuit Design?
+
+Circuit-synth brings software engineering practices to hardware design by letting you define circuits in Python code instead of clicking and dragging in a GUI. Your circuit becomes a program: testable, version-controlled, and composable.
+
+### Traditional Visual CAD Workflow
+
+In traditional EDA tools like KiCad, Altium, or Eagle, you:
+- Click to place each component on a canvas
+- Manually draw wires between pins
+- Copy-paste repeated circuit patterns
+- Track changes with screenshots or "before/after" project files
+- Search through menus to find the right component symbol
+- Manually verify that all connections are correct
+
+This visual approach works for simple circuits, but becomes unwieldy as designs grow. Making systematic changes requires clicking through every instance. Reusing proven circuit blocks means copying between projects. Code review happens by comparing images or clicking through schematics.
+
+### Code-Based Circuit Design
+
+With circuit-synth, you write Python code:
+
+```python
+@circuit(name="Power_Supply")
+def power_supply(vbus_in, vcc_3v3_out, gnd):
+    regulator = Component(
+        symbol="Regulator_Linear:AMS1117-3.3",
+        ref="U",
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+    )
+
+    cap_in = Component(symbol="Device:C", ref="C", value="10uF")
+    cap_out = Component(symbol="Device:C", ref="C", value="22uF")
+
+    regulator["VI"] += vbus_in
+    regulator["VO"] += vcc_3v3_out
+    regulator["GND"] += gnd
+
+    cap_in[1] += vbus_in
+    cap_in[2] += gnd
+    cap_out[1] += vcc_3v3_out
+    cap_out[2] += gnd
+```
+
+This circuit is now a **reusable function**. Need 5 power supplies? Call `power_supply()` five times. Need to change all decoupling caps? Update one line. Want to review what changed? `git diff` shows exactly which connections were modified.
+
+### Key Benefits
+
+**Version Control**: Every change is tracked with git. See exactly what changed, when, and why. Branch to try alternative designs. Merge proven improvements from other engineers.
+
+**Modularity**: Build circuits from tested subcircuits. A USB-C power delivery circuit becomes a function you can reuse across projects. Change the implementation once, update everywhere.
+
+**Code Review**: Team members review circuit changes like code. Diff shows "changed R1 from 10k to 4.7k" instead of visual schematic comparison. Catch mistakes before manufacturing.
+
+**Automation**: Generate parametric designs. Write a function that creates a filter circuit for any cutoff frequency. Batch-generate variants for A/B testing.
+
+**Testing**: Validate circuits with unit tests. Assert that power supply output is 3.3V ±5%. Run SPICE simulation in CI/CD. Catch regressions automatically.
+
+**AI-Friendly**: LLMs can read and write circuit-synth code directly. Natural language → working circuit. This is one of the most powerful advantages of circuits-as-code: AI can understand, generate, and modify circuit designs through natural conversation.
+
+**Refactoring**: Extract repeated patterns into functions. Rename nets across entire design. Reorganize hierarchy without manual rewiring.
+
+### Claude Code Integration
+
+Circuit-synth includes extensive Claude Code integration, making AI-assisted circuit design practical and powerful. When you create a circuit-synth project, you get:
+
+**Specialized AI Agents**: Domain experts for different aspects of circuit design:
+- `circuit-architect`: Complete system design from requirements
+- `circuit-synth`: Generate production-ready Python code
+- `simulation-expert`: SPICE analysis and optimization
+- `component-search`: Real-time component sourcing across suppliers
+- Plus agents for debugging, testing, FMEA analysis, and more
+
+**Slash Commands**: Quick access to common operations:
+- `/find-symbol STM32` - Search for KiCad symbols
+- `/find-parts "0.1uF 0603"` - Component availability and pricing
+- `/generate-validated-circuit "buck converter 5V to 3.3V"` - Natural language → working code
+- `/analyze-fmea my_circuit.py` - Automated reliability analysis
+
+**Natural Language Circuit Design**: Describe what you want in plain English, get working circuit-synth code:
+```
+You: "Design a USB-C power delivery circuit with 20V output and overcurrent protection"
+Claude: [Generates complete power_supply.py with proper components, verified availability, and safety features]
+```
+
+This integration makes circuit-synth approachable for beginners while accelerating experts. The AI handles component selection, library lookups, and boilerplate code, letting you focus on design intent.
+
+### When Code-Based Design Excels
+
+- **Parametric designs**: Circuits that come in many variants (different voltages, channel counts, etc.)
+- **Repeated blocks**: Designs with multiple identical subcircuits (multi-channel systems, arrays)
+- **Team collaboration**: Multiple engineers working on the same design simultaneously
+- **Rapid iteration**: Frequent design changes that would require tedious manual updates
+- **Complex systems**: Large hierarchical designs that benefit from modular organization
+- **AI-assisted design**: Generating circuits from specifications or optimizing existing designs
+
+### Integration with KiCad
+
+Circuit-synth is designed to work **with** existing KiCad workflows, not replace them. You can adopt circuit-synth at any stage of your design process.
+
+**Bi-Directional Workflow**: Circuit-synth isn't just code → KiCad. It's fully bi-directional:
+- **Start in Python**: Generate initial design from circuit-synth code
+- **Start in KiCad**: Import existing .kicad_sch files into Python for modification
+- **Iterate**: Make changes in either Python or KiCad, re-import/re-export as needed
+- **Hybrid approach**: Use Python for hierarchical structure and repeated blocks, KiCad for custom layout
+
+You can import an existing KiCad project, modify it in Python (add a subcircuit, change component values, etc.), and export back to KiCad. This makes circuit-synth a powerful tool for:
+- Automating changes to existing designs
+- Extracting reusable subcircuits from legacy projects
+- Adding parametric generation to hand-drawn schematics
+- Batch-updating component values across multiple projects
+
+**After code generation**, use KiCad normally:
+- Visual schematic editing and verification
+- PCB layout and routing with KiCad's tools
+- DRC, ERC, and 3D visualization
+- Manufacturing export (Gerbers, drill files, BOM, pick-and-place)
+
+You get the best of both worlds: code-based definition with visual refinement.
 
 ## 🚀 First Time User? Start Here!
 
@@ -40,71 +156,45 @@ open ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.kicad_pro
 ## Installation
 
 ```bash
-# Install with uv (recommended)
 uv add circuit-synth
-
-# Or with pip
+# or
 pip install circuit-synth
 ```
-
-## Configuration
-
-### Logging Control
-
-By default, circuit-synth runs with minimal logging output (WARNING level). To enable detailed logs for debugging:
-
-```bash
-# Enable verbose logging via environment variable
-export CIRCUIT_SYNTH_LOG_LEVEL=INFO
-
-# Or set it in your Python script
-import os
-os.environ['CIRCUIT_SYNTH_LOG_LEVEL'] = 'INFO'
-```
-
-Available log levels:
-- `ERROR`: Only show errors
-- `WARNING`: Show warnings and errors (default)
-- `INFO`: Show informational messages, progress updates
-- `DEBUG`: Show detailed debugging information
 
 ## Quick Start
 
 ```bash
-# Create new project with example circuit
-uv run cs-new-project
+# Create new project with ESP32-C6 example
+cs-new-project
 
-# This generates a complete ESP32-C6 development board
-cd circuit-synth && uv run python example_project/circuit-synth/main.py
+# Generate KiCad files
+cd circuit-synth && uv run python circuit-synth/main.py
 ```
 
-## Example: Power Supply Circuit
+## Example Circuit
 
 ```python
 from circuit_synth import *
 
 @circuit(name="Power_Supply")
 def power_supply(vbus_in, vcc_3v3_out, gnd):
-    """5V to 3.3V power regulation subcircuit"""
-    
-    # Components with KiCad integration
+    """5V to 3.3V power regulation"""
+
     regulator = Component(
-        symbol="Regulator_Linear:AMS1117-3.3", 
+        symbol="Regulator_Linear:AMS1117-3.3",
         ref="U",
         footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
     )
-    
-    # Input/output capacitors
+
     cap_in = Component(symbol="Device:C", ref="C", value="10uF",
                       footprint="Capacitor_SMD:C_0805_2012Metric")
     cap_out = Component(symbol="Device:C", ref="C", value="22uF",
                        footprint="Capacitor_SMD:C_0805_2012Metric")
-    
-    # Explicit connections
-    regulator["VI"] += vbus_in    # Input pin
-    regulator["VO"] += vcc_3v3_out # Output pin
+
+    regulator["VI"] += vbus_in
+    regulator["VO"] += vcc_3v3_out
     regulator["GND"] += gnd
-    
+
     cap_in[1] += vbus_in
     cap_in[2] += gnd
     cap_out[1] += vcc_3v3_out
@@ -112,17 +202,12 @@ def power_supply(vbus_in, vcc_3v3_out, gnd):
 
 @circuit(name="Main_Circuit")
 def main_circuit():
-    """Complete circuit with hierarchical design"""
-    
-    # Create shared nets
     vbus = Net('VBUS')
     vcc_3v3 = Net('VCC_3V3')
     gnd = Net('GND')
-    
-    # Use the power supply subcircuit
+
     power_circuit = power_supply(vbus, vcc_3v3, gnd)
 
-# Generate KiCad project
 if __name__ == "__main__":
     circuit = main_circuit()
     circuit.generate_kicad_project("my_board")
@@ -253,50 +338,17 @@ In these cases, KiCad generation still works normally - only the Python source u
 - **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files with modern kicad-sch-api integration
 - **Circuit Patterns Library**: 7 pre-made, manufacturing-ready circuits (buck/boost converters, battery chargers, sensors, communication)
 - **Hierarchical Design**: Modular subcircuits like software modules
-- **Atomic KiCad Operations**: Add/remove individual components from existing schematics with rollback safety
-- **Modern KiCad Integration**: Uses PyPI kicad-sch-api (v0.1.1+) for professional schematic generation
 - **Component Intelligence**: JLCPCB & DigiKey integration, symbol/footprint verification
-- **Fast JLCPCB Search**: Direct search with 80% speed improvement, 90% less tokens
 - **AI Integration**: Claude Code agents and skills for automated design assistance
-- **Circuit Debugging**: AI-powered PCB troubleshooting with systematic fault-finding
 - **FMEA Analysis**: Comprehensive reliability analysis with physics-based failure models
-- **Test Generation**: Automated test plans for validation
 - **Version Control**: Git-friendly text-based circuit definitions
 
-## KiCad-sch-api Integration
-
-Circuit-synth integrates with the modern **kicad-sch-api** PyPI package - a valuable standalone tool that was extracted from circuit-synth for broader community use.
-
-### Benefits of kicad-sch-api
-- **Professional KiCad Files**: Generates industry-standard .kicad_sch files with proper formatting
-- **Symbol Library Integration**: Full access to KiCad's extensive symbol libraries  
-- **Hierarchical Support**: Clean handling of complex multi-sheet designs
-- **Version Compatibility**: Works with modern KiCad versions (v7.0+)
-
-### Hybrid Architecture
-Circuit-synth uses a hybrid approach combining the best of both worlds:
-- **Legacy System**: Handles component positioning and hierarchical structure
-- **Modern API**: Professional schematic file writing via kicad-sch-api
-- **Intelligent Selection**: Automatically chooses the right approach per schematic type
-
-```python
-# The modern API integration is automatic - just use circuit-synth as normal!
-@circuit(name="MyCircuit")
-def my_design():
-    # Your circuit design here
-    pass
-
-# Behind the scenes: circuit-synth + kicad-sch-api = professional results
-```
-
-### Standalone kicad-sch-api Usage
-The kicad-sch-api package is also valuable as a standalone tool for Python KiCad integration:
+## Configuration
 
 ```bash
-pip install kicad-sch-api
+# Enable detailed logging
+export CIRCUIT_SYNTH_LOG_LEVEL=INFO  # ERROR, WARNING, INFO, DEBUG
 ```
-
-Visit the [kicad-sch-api repository](https://github.com/circuit-synth/kicad-sch-api) for standalone usage examples.
 
 ## Circuit Patterns Library
 
@@ -449,75 +501,112 @@ jlc-fast cheapest "10uF 0805"   # Find cheapest option
 /analyze-fmea my_circuit.py     # Run reliability analysis
 ```
 
-## ⚡ Atomic KiCad Operations
+## Component Search
 
-Circuit-synth provides atomic operations for surgical modifications to existing KiCad schematics, enabling incremental updates without regenerating entire projects:
+### Multi-Source Search
 
-### Production API
+Search across JLCPCB, DigiKey, and other suppliers with unified interface:
 
 ```python
-from circuit_synth.kicad.atomic_integration import AtomicKiCadIntegration, migrate_circuit_to_atomic
+from circuit_synth.manufacturing import find_parts
 
-# Initialize atomic integration for a KiCad project
-atomic = AtomicKiCadIntegration("/path/to/project")
+# Search all suppliers
+results = find_parts("0.1uF 0603 X7R", sources="all")
 
-# Add components using atomic operations
-atomic.add_component_atomic("main", {
-    'symbol': 'Device:R',
-    'ref': 'R1',
-    'value': '10k',
-    'footprint': 'Resistor_SMD:R_0603_1608Metric',
-    'position': (100, 80)
-})
+# Specific supplier only
+jlc_results = find_parts("STM32F407", sources="jlcpcb")
+dk_results = find_parts("LM358", sources="digikey")
 
-# Remove components
-atomic.remove_component_atomic("main", "R1")
-
-# Fix hierarchical main schematics with sheet references
-subcircuits = [
-    {"name": "USB_Port", "filename": "USB_Port.kicad_sch", "position": (35, 35), "size": (43, 25)},
-    {"name": "Power_Supply", "filename": "Power_Supply.kicad_sch", "position": (95, 35), "size": (44, 20)}
-]
-atomic.fix_hierarchical_main_schematic(subcircuits)
-
-# Migrate JSON netlist to KiCad using atomic operations
-migrate_circuit_to_atomic("circuit.json", "output_project/")
+# Compare pricing and availability
+comparison = find_parts("3.3V regulator", sources="all", compare=True)
 ```
 
-### Key Benefits
+### Fast JLCPCB Search
 
-- **True Atomic Operations**: Add/remove individual components with rollback safety
-- **Hierarchical Sheet Management**: Fixes blank main schematics automatically
-- **Production Integration**: Seamless integration with existing circuit-synth pipeline  
-- **S-Expression Safety**: Proper parsing with backup/restore on failure
-- **JSON Pipeline Integration**: Full compatibility with circuit-synth JSON format
+Optimized direct search (80% faster, zero LLM tokens):
 
-### Use Cases
+```python
+from circuit_synth.manufacturing.jlcpcb import fast_jlc_search, find_cheapest_jlc
 
-- **Incremental Updates**: Add components to existing designs without full regeneration
-- **Debug and Fix**: Resolve blank schematic issues (like ESP32-C6 project)
-- **External Integration**: Third-party tools can manipulate circuit-synth schematics
-- **Advanced Workflows**: Power users building custom automation
+# Search with filtering
+results = fast_jlc_search("STM32G4", min_stock=100, max_results=5)
 
-## FMEA and Quality Assurance
+# Find cheapest option
+cheapest = find_cheapest_jlc("0.1uF 0603", min_stock=1000)
+```
 
-Circuit-synth includes comprehensive failure analysis capabilities to ensure your designs are reliable:
+CLI usage:
+```bash
+jlc-fast search "USB-C connector" --min-stock 500
+jlc-fast cheapest "10k resistor" --min-stock 10000
+```
 
-### Automated FMEA Analysis
+### DigiKey Setup
 
+Configure DigiKey API for access to 8M+ components:
+
+```bash
+python -m circuit_synth.manufacturing.digikey.config_manager
+python -m circuit_synth.manufacturing.digikey.test_connection
+```
+
+## Library Sourcing
+
+Multi-source component library search with automatic fallback:
+
+```bash
+cs-library-setup                     # Show configuration status
+cs-setup-snapeda-api YOUR_KEY        # Optional: Enable SnapEDA API
+cs-setup-digikey-api KEY CLIENT_ID   # Optional: Enable DigiKey API
+```
+
+The `/find-symbol` and `/find-footprint` commands automatically search in order:
+1. Local KiCad installation
+2. DigiKey GitHub libraries (150+ curated libraries)
+3. SnapEDA API (millions of components)
+4. DigiKey API (supplier validation)
+
+Results show source: `[Local]`, `[DigiKey GitHub]`, `[SnapEDA]`, `[DigiKey API]`
+
+## SPICE Simulation
+
+```python
+circuit = my_circuit()
+sim = circuit.simulator()
+
+# DC analysis
+result = sim.operating_point()
+print(f"Output: {result.get_voltage('VOUT'):.3f}V")
+
+# AC analysis
+ac_result = sim.ac_analysis(1, 100000)
+```
+
+## FMEA Analysis
+
+Automated reliability analysis with comprehensive failure mode detection:
+
+```bash
+# Generate FMEA report
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py
+
+# Specify output file and risk threshold
+uv run python -m circuit_synth.tools.quality_assurance.fmea_cli my_circuit.py -o report.pdf --threshold 150
+```
+
+Python API:
 ```python
 from circuit_synth.quality_assurance import EnhancedFMEAAnalyzer
 from circuit_synth.quality_assurance import ComprehensiveFMEAReportGenerator
 
-# Analyze your circuit for failures
 analyzer = EnhancedFMEAAnalyzer()
 circuit_context = {
-    'environment': 'industrial',    # Set operating environment
-    'safety_critical': True,        # Affects severity ratings
-    'production_volume': 'high'     # Influences detection ratings
+    'environment': 'industrial',       # Operating environment
+    'safety_critical': True,           # Affects severity ratings
+    'production_volume': 'high'        # Influences detection ratings
 }
 
-# Generate comprehensive PDF report (50+ pages)
+# Generate 50+ page PDF report
 generator = ComprehensiveFMEAReportGenerator("My Project")
 report_path = generator.generate_comprehensive_report(
     analysis_results,
@@ -527,10 +616,11 @@ report_path = generator.generate_comprehensive_report(
 
 ### What Gets Analyzed
 
-- **300+ Failure Modes**: Component failures, solder joints, environmental stress
-- **Physics-Based Models**: Arrhenius, Coffin-Manson, Black's equation
+- **Comprehensive failure mode database** covering all standard component types
+- **Context-aware analysis** adjusts risk ratings based on circuit environment and stress factors
+- **Physics-based reliability models** (Arrhenius, Coffin-Manson, Black's equation) referenced in reports
 - **IPC Class 3 Compliance**: High-reliability assembly standards
-- **Risk Assessment**: RPN (Risk Priority Number) calculations
+- **Risk Priority Number (RPN)** calculations (Severity × Occurrence × Detection)
 - **Mitigation Strategies**: Specific recommendations for each failure mode
 
 ### Command Line FMEA
@@ -668,7 +758,6 @@ my_circuit_project/
 ## Development Setup
 
 ```bash
-# Clone and install
 git clone https://github.com/circuit-synth/circuit-synth.git
 cd circuit-synth
 uv sync
@@ -710,16 +799,6 @@ The repo root .claude is for contributors working on circuit-synth itself, not f
 
 See `CLAUDE_FOLDER_STRUCTURE_RESEARCH.md` for detailed explanation of this architecture.
 
-
-For 6x performance improvement:
-
-```bash
-
-# Build modules
-
-# Test integration
-```
-
 ## Testing
 
 ```bash
@@ -736,9 +815,10 @@ uv run pytest --cov=circuit_synth
 black src/ && isort src/ && flake8 src/ && mypy src/
 ```
 
-## KiCad Requirements
+## Requirements
 
-KiCad 8.0+ required:
+- Python 3.9+
+- KiCad 8.0+
 
 ```bash
 # macOS
@@ -746,175 +826,10 @@ brew install kicad
 
 # Linux
 sudo apt install kicad
-
-# Windows
-# Download from kicad.org
 ```
 
-## Troubleshooting
+## Resources
 
-Install the AI-powered KiCad plugin for direct Claude Code integration:
-
-```bash
-# Install KiCad plugins
-uv run cs-setup-kicad-plugins
-```
-
-**Usage:**
-- **PCB Editor**: Tools → External Plugins → "Circuit-Synth AI"  
-- **Schematic Editor**: Tools → Generate BOM → "Circuit-Synth AI"
-
-## 🛠️ Advanced Configuration
-
-### Environment Variables
-
-```bash
-# Optional performance settings
-export CIRCUIT_SYNTH_PARALLEL_PROCESSING=true
-
-# KiCad path override (if needed)
-export KICAD_SYMBOL_DIR="/custom/path/to/symbols"
-export KICAD_FOOTPRINT_DIR="/custom/path/to/footprints"
-```
-
-### Component Database Configuration
-
-```bash
-# JLCPCB API configuration (optional)
-export JLCPCB_API_KEY="your_api_key"
-export JLCPCB_CACHE_DURATION=3600  # Cache for 1 hour
-
-# DigiKey API configuration (optional, for component search)
-export DIGIKEY_CLIENT_ID="your_client_id"
-export DIGIKEY_CLIENT_SECRET="your_client_secret"
-# Or run: python -m circuit_synth.manufacturing.digikey.config_manager
-```
-
-## 🔍 Component Sourcing
-
-circuit-synth provides integrated access to multiple component distributors for real-time availability, pricing, and specifications.
-
-### Unified Multi-Source Search (Recommended)
-Search across all suppliers with one interface:
-```python
-from circuit_synth.manufacturing import find_parts
-
-# Search all suppliers
-results = find_parts("0.1uF 0603 X7R", sources="all")
-
-# Search specific supplier
-jlc_results = find_parts("STM32F407", sources="jlcpcb")
-dk_results = find_parts("LM358", sources="digikey")
-
-# Compare across suppliers
-comparison = find_parts("3.3V regulator", sources="all", compare=True)
-print(comparison)  # Shows price/availability comparison table
-
-# Filter by requirements
-high_stock = find_parts("10k resistor", min_stock=10000, max_price=0.10)
-```
-
-### JLCPCB Integration
-Best for PCB assembly and production:
-```python
-from circuit_synth.manufacturing.jlcpcb import search_jlc_components_web
-
-# Find components available for assembly
-results = search_jlc_components_web("STM32F407", max_results=10)
-```
-
-### DigiKey Integration  
-Best for prototyping and wide selection:
-```python
-from circuit_synth.manufacturing.digikey import search_digikey_components
-
-# Search DigiKey's 8M+ component catalog
-results = search_digikey_components("0.1uF 0603 X7R", max_results=10)
-
-# Get detailed pricing and alternatives
-from circuit_synth.manufacturing.digikey import DigiKeyComponentSearch
-searcher = DigiKeyComponentSearch()
-component = searcher.get_component_details("399-1096-1-ND")
-alternatives = searcher.find_alternatives(component, max_results=5)
-```
-
-### DigiKey Setup
-```bash
-# Interactive configuration
-python -m circuit_synth.manufacturing.digikey.config_manager
-
-# Test connection
-python -m circuit_synth.manufacturing.digikey.test_connection
-```
-
-See [docs/DIGIKEY_SETUP.md](docs/DIGIKEY_SETUP.md) for detailed setup instructions.
-
-### Multi-Source Strategy
-- **Prototyping**: Use DigiKey for fast delivery and no minimums
-- **Small Batch**: Compare JLCPCB vs DigiKey for best value
-- **Production**: Optimize with JLCPCB for integrated assembly
-- **Risk Mitigation**: Maintain alternatives from multiple sources
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**KiCad Symbol/Footprint Not Found:**
-```bash
-# Verify KiCad installation
-kicad-cli version
-
-# Search for components (with Claude Code)
-/find-symbol STM32
-/find-footprint LQFP64
-```
-
-**Build Issues:**
-```bash
-# Clean rebuild
-```
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
-
-## 🏗️ Architecture Overview
-
-### Technical Stack
-- **Frontend**: Python 3.9+ with type hints
-- **KiCad Integration**: Direct file format support (.kicad_pro, .kicad_sch, .kicad_pcb)
-- **AI Integration**: Claude Code agents with specialized circuit design expertise
-
-### File Structure
-```
-circuit-synth/
-├── src/circuit_synth/           # Python package
-│   ├── core/                    # Core circuit representation
-│   ├── kicad/                   # KiCad file I/O
-│   ├── component_info/          # Component databases
-│   ├── manufacturing/           # JLCPCB, DigiKey, etc.
-│   └── simulation/              # SPICE integration
-├── example_project/             # Complete usage example
-├── tests/                       # Test suites
-└── tools/                       # Development and build tools (organized by category)
-```
-
-## 🤝 Contributing
-
-### Development Workflow
-1. **Fork repository** and create feature branch
-2. **Follow coding standards** (black, isort, mypy)
-3. **Add tests** for new functionality
-4. **Update documentation** as needed
-5. **Submit pull request** with clear description
-
-### Coding Standards
-- **Python**: Type hints, dataclasses, SOLID principles
-- **Documentation**: Clear docstrings and inline comments
-- **Testing**: Comprehensive test coverage for new features
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
-
----
-
-**Professional PCB Design with Python**
+- [Documentation](https://docs.circuit-synth.com)
+- [Examples](https://github.com/circuit-synth/examples)
+- [Contributing](CONTRIBUTING.md)
