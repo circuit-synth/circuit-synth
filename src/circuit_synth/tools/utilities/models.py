@@ -63,3 +63,61 @@ class Circuit:
             "is_hierarchical_sheet": self.is_hierarchical_sheet,
             "hierarchical_tree": self.hierarchical_tree,
         }
+
+    def to_circuit_synth_json(self) -> Dict[str, Any]:
+        """
+        Export to circuit-synth JSON format.
+
+        This converts the internal Circuit representation to the format
+        expected by circuit-synth JSON schema. Key transformations:
+
+        1. Components: List[Component] → Dict[ref, component_dict]
+        2. Nets: List[Net] → Dict[name, connections_list]
+        3. Add required fields: description, tstamps, source_file, etc.
+
+        Returns:
+            Dictionary matching circuit-synth JSON schema
+        """
+        # Transform components: list → dict keyed by reference
+        components_dict = {}
+        for comp in self.components:
+            comp_dict = {
+                "symbol": comp.lib_id,  # lib_id → symbol
+                "ref": comp.reference,  # reference → ref
+                "value": comp.value,
+                "footprint": comp.footprint,
+                "datasheet": "",  # Default
+                "description": "",  # Default
+                "properties": {},  # Default
+                "tstamps": "",  # Default
+                "pins": [],  # Default - could be populated from schematic
+            }
+            components_dict[comp.reference] = comp_dict
+
+        # Transform nets: list → dict keyed by name
+        nets_dict = {}
+        for net in self.nets:
+            connections = []
+            for ref, pin_num in net.connections:
+                connection = {
+                    "component": ref,
+                    "pin": {
+                        "number": str(pin_num),  # Ensure string
+                        "name": "~",  # Default - could lookup from component
+                        "type": "passive",  # Default
+                    },
+                }
+                connections.append(connection)
+            nets_dict[net.name] = connections
+
+        # Build final JSON structure matching circuit-synth schema
+        return {
+            "name": self.name,
+            "description": "",
+            "tstamps": "",
+            "source_file": self.schematic_file,
+            "components": components_dict,
+            "nets": nets_dict,
+            "subcircuits": [],  # TODO: Handle hierarchical circuits if needed
+            "annotations": [],
+        }
