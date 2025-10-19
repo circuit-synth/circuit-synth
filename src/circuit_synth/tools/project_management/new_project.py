@@ -25,7 +25,6 @@ from rich.text import Text
 
 # Import circuit-synth modules
 from circuit_synth.ai_integration.claude.agent_registry import register_circuit_agents
-from circuit_synth.ai_integration.memory_bank import init_memory_bank
 from circuit_synth.core.kicad_validator import validate_kicad_installation
 
 console = Console()
@@ -819,12 +818,7 @@ def power_supply():
     is_flag=True,
     help="Include contributor agents and dev tools for circuit-synth development",
 )
-@click.option(
-    "--no-memory-bank",
-    is_flag=True,
-    help="Skip memory-bank system initialization",
-)
-def main(skip_kicad_check: bool, minimal: bool, developer: bool, no_memory_bank: bool):
+def main(skip_kicad_check: bool, minimal: bool, developer: bool):
     """Setup circuit-synth in the current uv project directory
 
     Run this command from within your uv project directory after:
@@ -897,36 +891,52 @@ def main(skip_kicad_check: bool, minimal: bool, developer: bool, no_memory_bank:
 
     # Skip duplicate template step - already done in Step 2
 
-    # Step 5: Initialize Memory-Bank System
-    if not no_memory_bank:
-        console.print("\n🧠 Initializing Memory-Bank System...", style="yellow")
-        # Create default board names based on project
-        board_names = [f"{project_name.lower().replace(' ', '-')}-v1"]
+    # Step 5: Create circuit-synth directory with example main.py if not from template
+    if not template_copied and not minimal:
+        circuit_dir = project_path / "circuit-synth"
+        circuit_dir.mkdir(exist_ok=True)
 
-        # Initialize memory-bank system
-        success = init_memory_bank(
-            project_name=project_name,
-            board_names=board_names,
-            project_root=str(project_path),
-        )
+        # Create example main.py
+        example_circuit = '''"""Example circuit using circuit-synth"""
+from circuit_synth import Component, Net, circuit
 
-        if success:
-            console.print("✅ Memory-bank system initialized", style="green")
-            console.print(
-                f"📁 Created pcbs/{board_names[0]}/ with memory-bank structure",
-                style="cyan",
-            )
-            console.print(
-                "🔄 Use 'cs-switch-board' to switch between board contexts",
-                style="cyan",
-            )
-        else:
-            console.print(
-                "⚠️  Memory-bank initialization failed (continuing without it)",
-                style="yellow",
-            )
-    else:
-        console.print("⏭️  Skipped memory-bank system initialization", style="yellow")
+@circuit
+def simple_led_circuit():
+    """Simple LED circuit with current limiting resistor"""
+    # Create components
+    led = Component('Device:LED', 'D', value='Red LED')
+    resistor = Component('Device:R', 'R', value='220')
+
+    # Create nets
+    vcc = Net('VCC')
+    gnd = Net('GND')
+    led_anode = Net('LED_ANODE')
+
+    # Make connections
+    resistor[1] += vcc
+    resistor[2] += led_anode
+    led[1] += led_anode  # Anode
+    led[2] += gnd  # Cathode
+
+    return locals()
+
+if __name__ == '__main__':
+    # Generate the circuit
+    circuit = simple_led_circuit()
+
+    # Export to KiCad
+    circuit.generate_kicad_project('simple_led_test')
+
+    print("✅ Circuit generated successfully!")
+    print("📁 Output: simple_led_test/")
+    print("🔧 Open in KiCad: simple_led_test/simple_led_test.kicad_pro")
+'''
+
+        main_py = circuit_dir / "main.py"
+        with open(main_py, 'w') as f:
+            f.write(example_circuit)
+
+        console.print("✅ Created circuit-synth/main.py with example circuit", style="green")
 
     # Step 6: Documentation already included in template
     if template_copied:
@@ -938,14 +948,7 @@ def main(skip_kicad_check: bool, minimal: bool, developer: bool, no_memory_bank:
     else:
         console.print("\n📚 Creating project documentation...", style="yellow")
         create_project_readme(project_path, project_name, additional_libraries)
-        # Create memory-bank enhanced CLAUDE.md (or basic one if no memory-bank)
-        if not no_memory_bank:
-            # The memory-bank init_memory_bank function already creates CLAUDE.md with memory-bank docs
-            console.print(
-                "✅ Memory-bank enhanced CLAUDE.md already created", style="green"
-            )
-        else:
-            create_claude_md(project_path)
+        create_claude_md(project_path)
 
     # Success message
     console.print(
