@@ -10,7 +10,7 @@ from circuit_synth import Component, Net, circuit
 
 
 @circuit
-def orthogonal_test(circuit):
+def orthogonal_test():
     """
     Simple test circuit with a few components to verify orthogonal routing works.
 
@@ -56,18 +56,16 @@ def orthogonal_test(circuit):
     # Connect components
     vcc += r1[1]
     r1[2] += mid
-    mid += r2[1], c1[1]
+    mid += r2[1]
+    mid += c1[1]
+    mid += r3[1]
     r2[2] += gnd
     c1[2] += gnd
-    r3[1] += mid
     r3[2] += gnd
 
 
 if __name__ == "__main__":
     import sys
-
-    # Create the circuit
-    test_circuit = orthogonal_test()
 
     # Generate with orthogonal routing
     print("\n" + "=" * 80)
@@ -80,6 +78,10 @@ if __name__ == "__main__":
     print()
 
     try:
+        # Create the circuit instance by calling the decorated function
+        test_circuit = orthogonal_test()
+
+        # Generate KiCad project with orthogonal routing
         test_circuit.generate_kicad_project(
             "orthogonal_routing_test",
             routing_style="orthogonal",  # Enable orthogonal routing
