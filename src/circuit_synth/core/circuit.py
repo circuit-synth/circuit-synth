@@ -1,5 +1,6 @@
 # FILE: src/circuit_synth/core/circuit.py
 
+import inspect
 import json
 import os
 import re
@@ -32,6 +33,8 @@ class Circuit:
         self._component_list = []
         self._reference_manager = ReferenceManager()
         self._annotations = []  # Store TextProperty, TextBox, etc.
+        self._ref_mapping = {}  # Track prefix -> final ref mappings for source rewriting
+        self._circuit_func = None  # Store reference to the @circuit decorated function
 
     def validate_reference(self, ref: str) -> bool:
         """Check if reference is available in this circuit's scope"""
@@ -196,6 +199,9 @@ class Circuit:
                 newly_assigned[final_ref] = comp
                 to_remove.append(key)
 
+                # Capture ref mapping for source rewriting
+                self._ref_mapping[prefix] = final_ref
+
                 context_logger.debug(
                     "Assigned final reference for prefix",
                     component="CIRCUIT",
@@ -224,6 +230,127 @@ class Circuit:
         # Recursively finalize subcircuits
         for sc in self._subcircuits:
             sc.finalize_references()
+
+    def _get_source_file(self) -> Optional[Path]:
+        """Get the source file path for this circuit's function.
+
+        Uses Python's inspect module to find where the @circuit decorated
+        function was defined.
+
+        Returns:
+            Path to source file, or None if not available (REPL, exec, frozen app)
+        """
+        if not self._circuit_func:
+            context_logger.debug(
+                "No circuit function reference available",
+                component="CIRCUIT",
+                circuit_name=self.name
+            )
+            return None
+
+        try:
+            source_file = inspect.getfile(self._circuit_func)
+
+            # Check for special cases where source isn't available
+            if source_file == '<stdin>' or source_file == '<string>':
+                context_logger.warning(
+                    "Circuit defined in REPL/exec environment, source file not available",
+                    component="CIRCUIT",
+                    circuit_name=self.name
+                )
+                return None
+
+            # Check for frozen applications (PyInstaller, etc)
+            if getattr(inspect.sys, 'frozen', False):
+                context_logger.warning(
+                    "Running in frozen application, source file not available",
+                    component="CIRCUIT",
+                    circuit_name=self.name
+                )
+                return None
+
+            path = Path(source_file).resolve()
+
+            if not path.exists():
+                context_logger.warning(
+                    "Source file no longer exists",
+                    component="CIRCUIT",
+                    circuit_name=self.name,
+                    source_file=str(path)
+                )
+                return None
+
+            return path
+
+        except (TypeError, OSError) as e:
+            context_logger.warning(
+                "Could not determine source file",
+                component="CIRCUIT",
+                circuit_name=self.name,
+                error=str(e)
+            )
+            return None
+
+    def _update_source_refs(self, source_file: Path) -> bool:
+        """Update component refs in the source file.
+
+        Uses SourceRefRewriter to atomically update ref values in the
+        Python source file, preserving formatting and encoding.
+
+        Args:
+            source_file: Path to the Python source file to update
+
+        Returns:
+            True if update succeeded, False if skipped or failed
+        """
+        if not self._ref_mapping:
+            context_logger.debug(
+                "No ref mapping to apply",
+                component="CIRCUIT",
+                circuit_name=self.name
+            )
+            return False
+
+        try:
+            from .source_ref_rewriter import SourceRefRewriter
+
+            context_logger.info(
+                "Updating source file with finalized refs",
+                component="CIRCUIT",
+                circuit_name=self.name,
+                source_file=str(source_file),
+                ref_mapping=self._ref_mapping
+            )
+
+            rewriter = SourceRefRewriter(source_file, self._ref_mapping)
+            success = rewriter.update()
+
+            if success:
+                context_logger.info(
+                    "Source file updated successfully",
+                    component="CIRCUIT",
+                    circuit_name=self.name,
+                    refs_updated=len(self._ref_mapping)
+                )
+            else:
+                context_logger.debug(
+                    "Source file unchanged (no modifications needed)",
+                    component="CIRCUIT",
+                    circuit_name=self.name
+                )
+
+            return success
+
+        except Exception as e:
+            context_logger.error(
+                "Failed to update source file",
+                component="CIRCUIT",
+                circuit_name=self.name,
+                source_file=str(source_file),
+                error=str(e)
+            )
+            # Don't raise - source rewriting failure shouldn't break project generation
+            return False
 
     def _add_docstring_annotation(self):
         """Add a TextBox annotation with the circuit's docstring."""
@@ -490,6 +617,7 @@ class Circuit:
         placement_algorithm: str = "connection_centric",
         draw_bounding_boxes: bool = False,
         generate_ratsnest: bool = True,
+        update_source_refs: Optional[bool] = None,
     ) -> None:
         """
         Generate a complete KiCad project (schematic + PCB) from this circuit.
@@ -505,6 +633,10 @@ class Circuit:
             placement_algorithm: Component placement algorithm to use (default: "connection_centric")
             draw_bounding_boxes: Whether to draw visual bounding boxes around components (default: False)
             generate_ratsnest: Whether to generate ratsnest connections in PCB (default: True)
+            update_source_refs: Whether to update source file with finalized refs.
+                               None (default): Auto-update unless force_regenerate=True
+                               True: Always update source file
+                               False: Never update source file
 
         Example:
             >>> circuit = esp32s3_simple()
@@ -512,9 +644,27 @@ class Circuit:
         """
         try:
             from ..kicad.config import KiCadConfig, get_recommended_generator
-            
+
             # Finalize references before generation
             self.finalize_references()
+
+            # Determine if we should update source file
+            should_update_source = update_source_refs
+            if should_update_source is None:
+                # Auto mode: update unless force_regenerate
+                should_update_source = not force_regenerate
+
+            # Update source file with finalized refs if enabled
+            if should_update_source:
+                source_file = self._get_source_file()
+                if source_file:
+                    self._update_source_refs(source_file)
+                else:
+                    context_logger.debug(
+                        "Source file not available, skipping ref update",
+                        component="CIRCUIT",
+                        circuit_name=self.name
+                    )
 
             # Create output directory with the project name
             output_path = Path(project_name).resolve()
