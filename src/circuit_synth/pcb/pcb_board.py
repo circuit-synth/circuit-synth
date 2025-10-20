@@ -1254,6 +1254,151 @@ class PCBBoard:
 
         return BoundingBox(min_x=min_x, min_y=min_y, max_x=max_x, max_y=max_y)
 
+    def calculate_component_bounding_box(
+        self, margin: float = 0.0
+    ) -> Optional["BoundingBox"]:
+        """
+        Calculate the bounding box around all placed components.
+
+        Args:
+            margin: Additional margin to add around components in mm (default: 0.0)
+
+        Returns:
+            BoundingBox object representing the minimum area containing all components,
+            or None if no components are placed
+        """
+        from .placement.base import BoundingBox
+
+        if not self.footprints:
+            logger.warning("No components placed, cannot calculate bounding box")
+            return None
+
+        # Find min/max coordinates of all component positions
+        min_x = float("inf")
+        min_y = float("inf")
+        max_x = float("-inf")
+        max_y = float("-inf")
+
+        for footprint in self.footprints.values():
+            # Use component position
+            # Note: This is a simplified approach. A more accurate method would
+            # consider the actual footprint courtyard or bounding box
+            x = footprint.position.x
+            y = footprint.position.y
+
+            # Estimate component size based on footprint type
+            # This is a heuristic - actual courtyard would be more accurate
+            fp_name = f"{footprint.library}:{footprint.name}"
+
+            # Default size estimate
+            half_width = 2.5
+            half_height = 2.5
+
+            # Size estimates based on common footprint patterns
+            if "QFP" in fp_name or "LQFP" in fp_name:
+                half_width = half_height = 5.0
+            elif "SOT" in fp_name:
+                half_width = 3.5
+                half_height = 2.0
+            elif "USB" in fp_name:
+                half_width = 7.5
+                half_height = 5.0
+            elif "ESP" in fp_name or "RF_Module" in fp_name:
+                half_width = 10.0
+                half_height = 7.5
+            elif "LGA" in fp_name:
+                half_width = 1.75
+                half_height = 1.5
+            elif "Crystal" in fp_name:
+                half_width = 2.5
+                half_height = 1.6
+            elif "IDC" in fp_name or "Header" in fp_name:
+                half_width = 5.0
+                half_height = 4.0
+            elif "0603" in fp_name:
+                half_width = 0.8
+                half_height = 0.4
+            elif "0805" in fp_name:
+                half_width = 1.0
+                half_height = 0.625
+
+            # Update bounds
+            min_x = min(min_x, x - half_width)
+            min_y = min(min_y, y - half_height)
+            max_x = max(max_x, x + half_width)
+            max_y = max(max_y, y + half_height)
+
+        # Add margin
+        min_x -= margin
+        min_y -= margin
+        max_x += margin
+        max_y += margin
+
+        logger.info(
+            f"Calculated component bounding box: "
+            f"({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f}) "
+            f"with {margin}mm margin"
+        )
+
+        return BoundingBox(min_x=min_x, min_y=min_y, max_x=max_x, max_y=max_y)
+
+    def auto_generate_board_outline(
+        self,
+        margin: float = 5.0,
+        corner_radius: float = 0.0,
+        min_width: float = 20.0,
+        min_height: float = 20.0,
+    ) -> bool:
+        """
+        Automatically generate a board outline around placed components.
+
+        This method calculates the minimum bounding box around all components,
+        adds the specified margin, and creates a rectangular board outline.
+
+        Args:
+            margin: Margin around components in mm (default: 5.0mm)
+            corner_radius: Corner radius for rounded corners in mm (default: 0.0 for sharp corners)
+            min_width: Minimum board width in mm (default: 20.0mm)
+            min_height: Minimum board height in mm (default: 20.0mm)
+
+        Returns:
+            True if outline was generated successfully, False otherwise
+        """
+        # Calculate bounding box with margin
+        bbox = self.calculate_component_bounding_box(margin=margin)
+
+        if bbox is None:
+            logger.error("Cannot auto-generate board outline: no components placed")
+            return False
+
+        # Calculate board dimensions
+        width = bbox.width()
+        height = bbox.height()
+
+        # Apply minimum dimensions
+        width = max(width, min_width)
+        height = max(height, min_height)
+
+        # Round up to nearest 5mm for cleaner dimensions
+        width = ((width + 4.999) // 5) * 5
+        height = ((height + 4.999) // 5) * 5
+
+        logger.info(
+            f"Auto-generating board outline: {width:.1f}x{height:.1f}mm "
+            f"(margin: {margin}mm, corner_radius: {corner_radius}mm)"
+        )
+
+        # Set the board outline
+        self.set_board_outline_rect(
+            x=bbox.min_x,
+            y=bbox.min_y,
+            width=width,
+            height=height,
+            corner_radius=corner_radius,
+        )
+
+        return True
+
     def _add_graphic_item(self, item: Union[Line, Rectangle]):
         """Add a graphic item to the PCB."""
         if "graphics" not in self.pcb_data:

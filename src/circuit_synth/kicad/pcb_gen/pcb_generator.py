@@ -17,6 +17,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from circuit_synth.core.circuit import Circuit
 import kicad_sch_api as ksa
 from circuit_synth.pcb import PCBBoard
+from circuit_synth.pcb.drc import run_enhanced_drc
+from circuit_synth.pcb.validation import ValidationSeverity
 
 # Removed duplicate PCB API imports - using single implementation
 from circuit_synth.pcb.simple_ratsnest import add_ratsnest_to_pcb
@@ -163,6 +165,11 @@ class PCBGenerator:
         routing_passes: int = 4,  # Number of routing passes
         routing_effort: float = 1.0,  # Routing effort level
         generate_ratsnest: bool = True,
+        run_drc: bool = True,  # Run DRC validation after placement
+        drc_fail_on_error: bool = False,  # Whether to fail if DRC finds errors
+        board_outline: str = "auto",  # Board outline mode: "auto" or "manual"
+        board_margin_mm: float = 5.0,  # Margin for auto outline
+        corner_radius_mm: float = 0.0,  # Corner radius for rounded corners
     ) -> bool:  # Generate ratsnest connections
         """
         Generate a PCB file from the schematic files in the project.
@@ -182,6 +189,9 @@ class PCBGenerator:
             routing_passes: Number of routing passes for Freerouting (1-99)
             routing_effort: Routing effort level (0.0-2.0, where 2.0 is maximum)
             generate_ratsnest: If True, generate ratsnest connections (default: True)
+            board_outline: Board outline mode - "auto" (calculate from components) or "manual" (use fixed dimensions)
+            board_margin_mm: Margin around components when using auto outline in mm
+            corner_radius_mm: Corner radius for rounded corners in mm (0 for sharp corners)
 
         Returns:
             True if successful, False otherwise
@@ -325,33 +335,67 @@ class PCBGenerator:
                         f"✓ Placement successful with board size: {current_width}x{current_height}mm"
                     )
 
-                    # Calculate actual board size needed based on placement
-                    def calculate_placement_bbox(footprints, margin=10.0):
-                        if not footprints:
-                            return -margin, -margin, margin, margin
-                        min_x = min(fp.position.x for fp in footprints) - margin
-                        min_y = min(fp.position.y for fp in footprints) - margin
-                        max_x = max(fp.position.x for fp in footprints) + margin
-                        max_y = max(fp.position.y for fp in footprints) + margin
-                        return min_x, min_y, max_x, max_y
+                    # Update board outline based on mode
+                    if placement_algorithm == "external":
+                        # Skip for external placement to preserve custom cutouts
+                        logger.debug("Skipping board outline recalculation for external placement to preserve cutout")
+                    elif board_outline == "auto":
+                        # Use auto-generate board outline feature
+                        logger.info(
+                            f"Auto-generating board outline with {board_margin_mm}mm margin "
+                            f"and {corner_radius_mm}mm corner radius"
+                        )
+                        success = pcb.auto_generate_board_outline(
+                            margin=board_margin_mm,
+                            corner_radius=corner_radius_mm,
+                        )
+                        if success:
+                            logger.info("✓ Board outline auto-generated successfully")
+                        else:
+                            logger.warning("⚠ Auto-generate board outline failed, using manual method")
+                            # Fallback to manual calculation
+                            def calculate_placement_bbox(footprints, margin=10.0):
+                                if not footprints:
+                                    return -margin, -margin, margin, margin
+                                min_x = min(fp.position.x for fp in footprints) - margin
+                                min_y = min(fp.position.y for fp in footprints) - margin
+                                max_x = max(fp.position.x for fp in footprints) + margin
+                                max_y = max(fp.position.y for fp in footprints) + margin
+                                return min_x, min_y, max_x, max_y
 
-                    footprints = list(pcb.footprints.values())
-                    min_x, min_y, max_x, max_y = calculate_placement_bbox(
-                        footprints, margin=10.0
-                    )
+                            footprints = list(pcb.footprints.values())
+                            min_x, min_y, max_x, max_y = calculate_placement_bbox(
+                                footprints, margin=10.0
+                            )
 
-                    # Round up to nearest 5mm for cleaner dimensions
-                    actual_width = ((max_x - min_x + 4) // 5) * 5
-                    actual_height = ((max_y - min_y + 4) // 5) * 5
+                            # Round up to nearest 5mm for cleaner dimensions
+                            actual_width = ((max_x - min_x + 4) // 5) * 5
+                            actual_height = ((max_y - min_y + 4) // 5) * 5
+                            pcb.set_board_outline_rect(0, 0, actual_width, actual_height)
+                    else:
+                        # Manual mode - calculate actual size needed based on placement
+                        def calculate_placement_bbox(footprints, margin=10.0):
+                            if not footprints:
+                                return -margin, -margin, margin, margin
+                            min_x = min(fp.position.x for fp in footprints) - margin
+                            min_y = min(fp.position.y for fp in footprints) - margin
+                            max_x = max(fp.position.x for fp in footprints) + margin
+                            max_y = max(fp.position.y for fp in footprints) + margin
+                            return min_x, min_y, max_x, max_y
 
-                    # Update board outline to actual size needed (skip for external placement)
-                    if placement_algorithm != "external":
+                        footprints = list(pcb.footprints.values())
+                        min_x, min_y, max_x, max_y = calculate_placement_bbox(
+                            footprints, margin=10.0
+                        )
+
+                        # Round up to nearest 5mm for cleaner dimensions
+                        actual_width = ((max_x - min_x + 4) // 5) * 5
+                        actual_height = ((max_y - min_y + 4) // 5) * 5
+
                         pcb.set_board_outline_rect(0, 0, actual_width, actual_height)
                         logger.debug(
                             f"✓ Adjusted board size to actual needs: {actual_width}x{actual_height}mm"
                         )
-                    else:
-                        logger.debug("Skipping board outline recalculation for external placement to preserve cutout")
 
                     # Debug: Check result and list components after placement
                     logger.debug(f"Placement result: {result}")
@@ -396,6 +440,31 @@ class PCBGenerator:
                 logger.info("✓ Netlist successfully applied to PCB")
             else:
                 logger.warning("⚠ No netlist found or netlist application failed")
+
+            # Run DRC validation before routing
+            if run_drc:
+                logger.info("Running design rule check...")
+                drc_result, drc_fixes = self._run_enhanced_drc(pcb)
+
+                if drc_result.error_count > 0:
+                    logger.warning(f"DRC found {drc_result.error_count} errors")
+                    for issue in drc_result.issues:
+                        if issue.severity == ValidationSeverity.ERROR:
+                            logger.warning(f"  {issue}")
+
+                    if drc_fixes:
+                        logger.info(f"Available fixes: {len(drc_fixes)}")
+                        for fix in drc_fixes[:5]:  # Show first 5 fixes
+                            logger.info(f"  - {fix.description}")
+
+                    if drc_fail_on_error:
+                        logger.error("DRC validation failed, stopping PCB generation")
+                        return False
+                else:
+                    logger.info("✓ DRC validation passed with no errors")
+
+                if drc_result.warning_count > 0:
+                    logger.info(f"DRC found {drc_result.warning_count} warnings")
 
             # Auto-route if requested
             if auto_route:
@@ -1090,3 +1159,20 @@ class PCBGenerator:
             logger.info("AUTO-ROUTING PROCESS FAILED")
             logger.info("=" * 60)
             return False
+
+    def _run_enhanced_drc(self, pcb):
+        """
+        Run enhanced DRC validation on the PCB.
+
+        Args:
+            pcb: PCBBoard instance
+
+        Returns:
+            Tuple of (ValidationResult, List of DRCFix)
+        """
+        logger.debug("Running enhanced DRC validation...")
+
+        # Use enhanced DRC validator
+        result, fixes = run_enhanced_drc(pcb)
+
+        return result, fixes

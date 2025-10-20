@@ -35,6 +35,7 @@ class Circuit:
         self._annotations = []  # Store TextProperty, TextBox, etc.
         self._ref_mapping = {}  # Track prefix -> final ref mappings for source rewriting
         self._circuit_func = None  # Store reference to the @circuit decorated function
+        self._net_tie_inserter = None  # Lazy-initialized NetTieInserter
 
     def validate_reference(self, ref: str) -> bool:
         """Check if reference is available in this circuit's scope"""
@@ -621,6 +622,9 @@ class Circuit:
         draw_bounding_boxes: bool = False,
         generate_ratsnest: bool = True,
         update_source_refs: Optional[bool] = None,
+        board_outline: str = "auto",
+        board_margin_mm: float = 5.0,
+        corner_radius_mm: float = 0.0,
     ) -> None:
         """
         Generate a complete KiCad project (schematic + PCB) from this circuit.
@@ -640,10 +644,22 @@ class Circuit:
                                None (default): Auto-update unless force_regenerate=True
                                True: Always update source file
                                False: Never update source file
+            board_outline: Board outline generation mode (default: "auto")
+                          "auto": Automatically calculate outline around components
+                          "manual": Use fixed board dimensions
+            board_margin_mm: Margin around components when using auto outline in mm (default: 5.0)
+            corner_radius_mm: Corner radius for rounded corners in mm (default: 0.0 for sharp corners)
 
         Example:
             >>> circuit = esp32s3_simple()
             >>> circuit.generate_kicad_project("esp32s3_simple")
+            >>> # With custom board outline settings:
+            >>> circuit.generate_kicad_project(
+            ...     "esp32s3_simple",
+            ...     board_outline="auto",
+            ...     board_margin_mm=10.0,
+            ...     corner_radius_mm=2.0
+            ... )
         """
         try:
             from ..kicad.config import KiCadConfig, get_recommended_generator
@@ -710,12 +726,15 @@ class Circuit:
                 # Legacy system handles placement, modern API handles file writing via write_schematic_file
                 result = generator.generate_project(
                     json_file=temp_json_path,
-                    placement_algorithm=placement_algorithm,  # PCB placement algorithm  
+                    placement_algorithm=placement_algorithm,  # PCB placement algorithm
                     schematic_placement="sequential",  # Use simple sequential for schematic
                     generate_pcb=generate_pcb,
                     force_regenerate=force_regenerate,
                     draw_bounding_boxes=draw_bounding_boxes,
                     generate_ratsnest=generate_ratsnest,
+                    board_outline=board_outline,
+                    board_margin_mm=board_margin_mm,
+                    corner_radius_mm=corner_radius_mm,
                 )
             finally:
                 # Clean up the temporary JSON file
@@ -802,6 +821,97 @@ class Circuit:
             CircuitSimulator: Simulator object for running analyses
         """
         return self.simulate()
+
+    def insert_decoupling_net_ties(
+        self,
+        target_component: Optional["Component"] = None,
+        config: Optional["NetTieConfig"] = None
+    ) -> List["Component"]:
+        """
+        Insert net-ties for decoupling capacitors.
+
+        This makes power distribution topology explicit by inserting net-ties
+        between decoupling caps and their associated power rails. Creates the
+        topology: IC_PIN → CAP → NET_TIE → POWER_RAIL
+
+        Args:
+            target_component: If specified, only process decoupling caps for this component.
+                            If None, process all components in the circuit.
+            config: Net-tie configuration. If None, uses default settings.
+
+        Returns:
+            List of inserted net-tie components
+
+        Example:
+            >>> # Insert net-ties for all decoupling caps
+            >>> circuit.insert_decoupling_net_ties()
+            >>>
+            >>> # Insert net-ties only for a specific IC
+            >>> mcu = Component(symbol="MCU_ST_STM32F4:STM32F411CEUx", ref="U1")
+            >>> circuit.insert_decoupling_net_ties(target_component=mcu)
+        """
+        from .net_tie import NetTieInserter
+
+        if self._net_tie_inserter is None:
+            self._net_tie_inserter = NetTieInserter(config)
+
+        return self._net_tie_inserter.insert_decoupling_net_ties(self, target_component)
+
+    def insert_net_tie(
+        self,
+        component1: "Component",
+        pin1: str,
+        component2: "Component",
+        pin2: str,
+        power_net: Net
+    ) -> "Component":
+        """
+        Manually insert a net-tie between two components.
+
+        This creates explicit grouping: component1 and component2 should be placed
+        adjacent to each other and connect to power_net through the net-tie.
+
+        Args:
+            component1: First component to group
+            pin1: Pin name on component1
+            component2: Second component to group
+            pin2: Pin name on component2
+            power_net: The power net they should connect to via the net-tie
+
+        Returns:
+            The inserted net-tie component
+
+        Example:
+            >>> vcc = Net('VCC_3V3')
+            >>> cap1 = Component(symbol="Device:C", ref="C", value="100nF")
+            >>> cap2 = Component(symbol="Device:C", ref="C", value="10uF")
+            >>> # Group the two caps together
+            >>> net_tie = circuit.insert_net_tie(cap1, "1", cap2, "1", vcc)
+        """
+        from .net_tie import NetTieInserter
+
+        if self._net_tie_inserter is None:
+            self._net_tie_inserter = NetTieInserter()
+
+        return self._net_tie_inserter.insert_manual_net_tie(
+            self, component1, pin1, component2, pin2, power_net
+        )
+
+    def get_net_tie_groups(self) -> Dict[str, List[str]]:
+        """
+        Get component groupings defined by net-ties.
+
+        Returns:
+            Dict mapping net-tie reference to list of grouped component references
+
+        Example:
+            >>> groups = circuit.get_net_tie_groups()
+            >>> # {'NT1': ['C1', 'U1'], 'NT2': ['C2', 'C3']}
+        """
+        if self._net_tie_inserter is None:
+            return {}
+
+        return self._net_tie_inserter.get_net_tie_groups()
 
     @property
     def components(self):
