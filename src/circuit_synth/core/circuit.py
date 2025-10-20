@@ -1,20 +1,13 @@
 # FILE: src/circuit_synth/core/circuit.py
 
 import inspect
-import json
-import os
 import re
-import tempfile
 from pathlib import Path  # Import Path
 from typing import Any, Dict, List, Optional
 
 from ._logger import context_logger
-from .exception import CircuitSynthError, ValidationError
-from .json_encoder import CircuitSynthJSONEncoder
+from .exception import ValidationError
 from .net import Net
-
-# Import the exporter function
-from .netlist_exporter import NetlistExporter
 from .reference_manager import ReferenceManager
 
 
@@ -513,8 +506,6 @@ class Circuit:
         """
         import json
 
-        from .netlist_exporter import NetlistExporter
-
         # Collect all components and nets from this circuit and all subcircuits
         all_components = {}  # ref -> component_dict
         all_nets = {}  # net_name -> [connections]
@@ -655,7 +646,7 @@ class Circuit:
             >>> print(f"KiCad project: {result['project_path']}")
         """
         try:
-            from ..kicad.config import KiCadConfig, get_recommended_generator
+            from ..kicad.config import get_recommended_generator
             from .. import print_version_info
 
             # Print version information for debugging
