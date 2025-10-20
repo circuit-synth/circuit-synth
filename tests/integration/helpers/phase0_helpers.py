@@ -8,7 +8,7 @@ semantic comparisons for Phase 0 integration testing.
 import json
 import time
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 from circuit_synth import Component, Net, circuit
 from circuit_synth.core.circuit import Circuit
@@ -21,6 +21,7 @@ def create_simple_circuit() -> Circuit:
     Returns:
         Circuit: Simple circuit with 2 resistors and 3 nets
     """
+
     @circuit(name="voltage_divider")
     def voltage_divider():
         r1 = Component(
@@ -51,21 +52,29 @@ def create_simple_circuit() -> Circuit:
 
 def create_medium_circuit() -> Circuit:
     """
-    Create a medium-complexity decoupling network for testing.
+    Create a medium-complexity circuit for testing.
 
     Returns:
-        Circuit: Circuit with MCU and decoupling capacitors (5+ components)
+        Circuit: Circuit with multiple Rs, Cs, and LEDs (5+ components)
     """
-    @circuit(name="decoupling_network")
-    def decoupling_network():
-        # MCU
-        u1 = Component(
-            "MCU_Module:Arduino_Nano",
-            ref="U1",
-            footprint="Module:Arduino_Nano",
+
+    @circuit(name="medium_test_circuit")
+    def medium_test_circuit():
+        # Resistors
+        r1 = Component(
+            "Device:R",
+            ref="R1",
+            value="10k",
+            footprint="Resistor_SMD:R_0603_1608Metric",
+        )
+        r2 = Component(
+            "Device:R",
+            ref="R2",
+            value="1k",
+            footprint="Resistor_SMD:R_0603_1608Metric",
         )
 
-        # Decoupling capacitors
+        # Capacitors
         c1 = Component(
             "Device:C",
             ref="C1",
@@ -85,41 +94,39 @@ def create_medium_circuit() -> Circuit:
             footprint="Capacitor_SMD:C_0603_1608Metric",
         )
 
-        # Power resistor
-        r1 = Component(
-            "Device:R",
-            ref="R1",
-            value="10k",
-            footprint="Resistor_SMD:R_0603_1608Metric",
+        # LED
+        led1 = Component(
+            "Device:LED",
+            ref="LED1",
+            footprint="LED_SMD:LED_0603_1608Metric",
         )
 
         # Nets
         vcc = Net("VCC_3V3")
         gnd = Net("GND")
-        reset = Net("RESET")
+        led_net = Net("LED")
 
-        # Connections - VCC decoupling
-        u1["VCC"] += vcc
+        # Power rail connections
         c1[1] += vcc
         c1[2] += gnd
         c2[1] += vcc
         c2[2] += gnd
-
-        # Additional decoupling
         c3[1] += vcc
         c3[2] += gnd
 
-        # Reset pull-up
+        # LED circuit
         r1[1] += vcc
-        r1[2] += reset
-        u1["RESET"] += reset
+        r1[2] += led_net
+        led1[1] += led_net
+        led1[2] += gnd
 
-        # Ground connections
-        u1["GND"] += gnd
+        # Pull-down
+        r2[1] += led_net
+        r2[2] += gnd
 
-        return u1, c1, c2, c3, r1
+        return r1, r2, c1, c2, c3, led1
 
-    return decoupling_network()
+    return medium_test_circuit()
 
 
 def create_hierarchical_circuit() -> Circuit:
@@ -127,15 +134,17 @@ def create_hierarchical_circuit() -> Circuit:
     Create a hierarchical circuit with subcircuits for testing.
 
     Returns:
-        Circuit: Main circuit with power supply and sensor subcircuits
+        Circuit: Main circuit with RC filter subcircuit
     """
-    # Power supply subcircuit
-    @circuit(name="power_supply")
-    def power_supply():
-        u1 = Component(
-            "Regulator_Linear:AMS1117-3.3",
-            ref="U1",
-            footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2",
+
+    # RC filter subcircuit
+    @circuit(name="rc_filter")
+    def rc_filter():
+        r1 = Component(
+            "Device:R",
+            ref="R1",
+            value="1k",
+            footprint="Resistor_SMD:R_0603_1608Metric",
         )
         c1 = Component(
             "Device:C",
@@ -154,28 +163,27 @@ def create_hierarchical_circuit() -> Circuit:
         vout = Net("VOUT")
         gnd = Net("GND")
 
-        u1["VIN"] += vin
-        u1["VOUT"] += vout
-        u1["GND"] += gnd
+        r1[1] += vin
+        r1[2] += vout
 
-        c1[1] += vin
+        c1[1] += vout
         c1[2] += gnd
 
-        c2[1] += vout
+        c2[1] += vin
         c2[2] += gnd
 
-        return u1, c1, c2
+        return r1, c1, c2
 
     # Main circuit
     @circuit(name="main_hierarchical")
     def main_hierarchical():
-        # Use power supply subcircuit
-        ps = power_supply()
+        # Use RC filter subcircuit
+        filter_circuit = rc_filter()
 
         # Main circuit components
-        r1 = Component(
+        r2 = Component(
             "Device:R",
-            ref="R1",
+            ref="R2",
             value="10k",
             footprint="Resistor_SMD:R_0603_1608Metric",
         )
@@ -189,12 +197,12 @@ def create_hierarchical_circuit() -> Circuit:
         led_net = Net("LED")
         gnd = Net("GND")
 
-        r1[1] += vcc
-        r1[2] += led_net
+        r2[1] += vcc
+        r2[2] += led_net
         led1[1] += led_net
         led1[2] += gnd
 
-        return ps, r1, led1
+        return filter_circuit, r2, led1
 
     return main_hierarchical()
 
@@ -209,6 +217,7 @@ def create_large_circuit(num_components: int = 100) -> Circuit:
     Returns:
         Circuit: Large circuit with specified number of components
     """
+
     @circuit(name=f"large_circuit_{num_components}")
     def large_circuit():
         components = []
@@ -259,7 +268,7 @@ def validate_json_schema(json_path: Path) -> bool:
         bool: True if JSON is valid, False otherwise
     """
     try:
-        with open(json_path, 'r', encoding='utf-8') as f:
+        with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         # Check required top-level fields
@@ -308,7 +317,9 @@ def validate_json_schema(json_path: Path) -> bool:
         return False
 
 
-def compare_circuits_semantic(circuit1: Circuit, circuit2: Circuit) -> Tuple[bool, List[str]]:
+def compare_circuits_semantic(
+    circuit1: Circuit, circuit2: Circuit
+) -> Tuple[bool, List[str]]:
     """
     Compare two circuits for semantic equivalence.
 
@@ -332,8 +343,8 @@ def compare_circuits_semantic(circuit1: Circuit, circuit2: Circuit) -> Tuple[boo
         )
 
     # Compare component references
-    refs1 = {comp.reference for comp in circuit1.components}
-    refs2 = {comp.reference for comp in circuit2.components}
+    refs1 = {comp.ref for comp in circuit1.components}
+    refs2 = {comp.ref for comp in circuit2.components}
 
     missing_refs = refs1 - refs2
     extra_refs = refs2 - refs1
@@ -346,26 +357,23 @@ def compare_circuits_semantic(circuit1: Circuit, circuit2: Circuit) -> Tuple[boo
     # Compare component properties for matching refs
     common_refs = refs1 & refs2
     for ref in common_refs:
-        comp1 = next(c for c in circuit1.components if c.reference == ref)
-        comp2 = next(c for c in circuit2.components if c.reference == ref)
+        comp1 = next(c for c in circuit1.components if c.ref == ref)
+        comp2 = next(c for c in circuit2.components if c.ref == ref)
 
         if comp1.value != comp2.value:
             differences.append(
-                f"Component {ref} value mismatch: "
-                f"{comp1.value} vs {comp2.value}"
+                f"Component {ref} value mismatch: " f"{comp1.value} vs {comp2.value}"
             )
 
         if comp1.lib_id != comp2.lib_id:
             differences.append(
-                f"Component {ref} lib_id mismatch: "
-                f"{comp1.lib_id} vs {comp2.lib_id}"
+                f"Component {ref} lib_id mismatch: " f"{comp1.lib_id} vs {comp2.lib_id}"
             )
 
     # Compare net counts
     if len(circuit1.nets) != len(circuit2.nets):
         differences.append(
-            f"Net count mismatch: "
-            f"{len(circuit1.nets)} vs {len(circuit2.nets)}"
+            f"Net count mismatch: " f"{len(circuit1.nets)} vs {len(circuit2.nets)}"
         )
 
     # Compare net names
@@ -422,7 +430,7 @@ def load_json_netlist(json_path: Path) -> Dict[str, Any]:
     if not json_path.exists():
         raise FileNotFoundError(f"JSON file not found: {json_path}")
 
-    with open(json_path, 'r', encoding='utf-8') as f:
+    with open(json_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -469,13 +477,14 @@ def extract_connectivity_graph(circuit: Circuit) -> Dict[str, set]:
     """
     graph = {}
 
-    for net in circuit.nets:
+    for net in circuit.nets.values():
         connections = set()
 
-        for conn in net.connections:
-            if isinstance(conn, tuple) and len(conn) == 2:
-                component_ref, pin = conn
-                connections.add((component_ref, str(pin)))
+        for pin in net.pins:
+            if pin._component is not None:
+                component_ref = pin._component.ref
+                pin_num = pin.num
+                connections.add((component_ref, str(pin_num)))
 
         graph[net.name] = connections
 
