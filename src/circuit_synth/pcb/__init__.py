@@ -5,11 +5,13 @@ This module provides a simple API for working with KiCad PCB files,
 focusing on basic operations like adding, moving, and removing footprints.
 """
 
+from .drc import DRCCategory, DRCFix, DRCRule, EnhancedDRCValidator, run_enhanced_drc
 from .footprint_library import FootprintInfo, FootprintLibraryCache, get_footprint_cache
 from .kicad_cli import DRCResult, KiCadCLI, KiCadCLIError, get_kicad_cli
 from .pcb_board import PCBBoard
 from .pcb_parser import PCBParser
 from .types import Footprint, Layer, Pad
+from .validation import PCBValidator, ValidationResult, ValidationSeverity, validate_pcb
 
 __all__ = [
     "PCBBoard",
@@ -24,4 +26,13 @@ __all__ = [
     "FootprintLibraryCache",
     "FootprintInfo",
     "get_footprint_cache",
+    "PCBValidator",
+    "ValidationResult",
+    "ValidationSeverity",
+    "validate_pcb",
+    "DRCRule",
+    "DRCCategory",
+    "DRCFix",
+    "EnhancedDRCValidator",
+    "run_enhanced_drc",
 ]
