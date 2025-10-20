@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 from ._logger import context_logger
 from .exception import ValidationError
 from .net import Net
+from .netlist_exporter import NetlistExporter
 from .reference_manager import ReferenceManager
 
 
