@@ -148,7 +148,7 @@ Issues = "https://github.com/circuit-synth/circuit-synth/issues"
 package-dir = {"" = "src"}
 
 [tool.setuptools.dynamic]
-version = {attr = "circuit_synth.__version__"}
+version = "0.10.4"
 
 # Include all packages from src
 [tool.setuptools.packages.find]
