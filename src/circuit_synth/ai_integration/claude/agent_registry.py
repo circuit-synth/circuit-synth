@@ -134,7 +134,7 @@ def get_circuit_agents() -> Dict[str, CircuitSubAgent]:
 Use your architectural expertise to coordinate complex designs and delegate specialized tasks to other agents when appropriate.""",
         allowed_tools=["*"],
         expertise_area="Circuit Architecture & System Coordination",
-        model="haiku",
+        model="claude-haiku-4-5",
     )
 
     # Component Guru - Advanced manufacturing optimization
@@ -170,7 +170,7 @@ Use your architectural expertise to coordinate complex designs and delegate spec
 Focus on manufacturing optimization, supply chain management, and broad component expertise beyond JLCPCB-specific searches.""",
         allowed_tools=["WebSearch", "WebFetch", "Read", "Write", "Edit", "Task"],
         expertise_area="Component Sourcing & Manufacturing Optimization",
-        model="haiku",
+        model="claude-haiku-4-5",
     )
 
     # SPICE Simulation Expert
@@ -226,7 +226,7 @@ Your simulation approach:
 Always provide practical, working circuit-synth code with simulation examples that users can immediately run and validate.""",
         allowed_tools=["*"],
         expertise_area="SPICE Simulation & Circuit Validation",
-        model="haiku",
+        model="claude-haiku-4-5",
     )
 
     # Test Plan Creation Expert
@@ -275,7 +275,7 @@ Your approach:
 Always prioritize safety, include troubleshooting guidance, and optimize for practical execution in real-world environments.""",
         allowed_tools=["*"],
         expertise_area="Test Plan Creation & Circuit Validation",
-        model="haiku",
+        model="claude-haiku-4-5",
     )
 
     # Interactive Circuit Designer - PRIMARY CIRCUIT AGENT
@@ -522,7 +522,7 @@ After generating any circuit-synth Python file, you MUST:
 **NO EXCEPTIONS**: Circuit generation is only complete when the code executes successfully. This prevents debug cycles.""",
         allowed_tools=["*"],
         expertise_area="Interactive Circuit Design Partnership",
-        model="haiku",
+        model="claude-haiku-4-5",
     )
 
     return agents
