@@ -166,6 +166,8 @@ circuit_synth = [
     "data/templates/example_project/**/**/**/*",
     # Explicitly include hidden files in .claude directory
     "data/templates/example_project/.claude/**/*",
+    # Explicitly include Python source files in circuit-synth directory
+    "data/templates/example_project/circuit-synth/*.py",
     "data/templates/project_template/*",
     "data/templates/project_template/circuit-synth/*",
     "data/templates/project_template/.claude/*",
