@@ -175,23 +175,28 @@ fi
 # Update Version
 echo -e "\n${YELLOW}📝 Updating version to ${VERSION}...${NC}"
 
-# Update pyproject.toml
-sed -i.bak "s/^version = .*/version = \"$VERSION\"/" pyproject.toml
+# NOTE: We use dynamic versioning via pyproject.toml [tool.setuptools.dynamic]
+# DO NOT modify pyproject.toml - only update __init__.py
 
-# Update __init__.py if it exists
+# Update __init__.py (this is the source of truth for version)
 INIT_FILE="src/circuit_synth/__init__.py"
 if [ -f "$INIT_FILE" ]; then
     if grep -q "__version__" "$INIT_FILE"; then
         sed -i.bak "s/__version__ = .*/__version__ = \"$VERSION\"/" "$INIT_FILE"
+        rm -f "$INIT_FILE.bak"
+        echo -e "${GREEN}✅ Updated version in $INIT_FILE${NC}"
+    else
+        echo -e "${RED}❌ Could not find __version__ in $INIT_FILE${NC}"
+        exit 1
     fi
+else
+    echo -e "${RED}❌ Could not find $INIT_FILE${NC}"
+    exit 1
 fi
-
-# Remove backup files
-rm -f pyproject.toml.bak "$INIT_FILE.bak"
 
 # Commit version changes
 if ! git diff --quiet; then
-    git add pyproject.toml "$INIT_FILE" 2>/dev/null || git add pyproject.toml
+    git add "$INIT_FILE"
     git commit -m "🔖 Bump version to $VERSION"
     echo -e "${GREEN}✅ Version updated and committed${NC}"
 else
