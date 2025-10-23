@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     circuit_obj.generate_kicad_project(
         project_name="esp32_simple",
-        placement_algorithm="simple",
+        placement_algorithm="hierarchical",
         generate_pcb=True
     )
 

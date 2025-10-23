@@ -1672,27 +1672,19 @@ class SchematicWriter:
             border = textbox.border
             uuid = textbox.uuid
 
-        # Create a Text object (we'll handle the box in S-expression generation)
-        # Note: Text class expects uuid, position, text, rotation, size
+        # Use add_text_box() method from kicad-sch-api
         import uuid as uuid_module
-        text_element = Text(
-            uuid=uuid or str(uuid_module.uuid4()),
-            position=Point(position[0], position[1]),
+
+        textbox_uuid = self.schematic.add_text_box(
             text=text,
+            position=Point(position[0], position[1]),
+            size=Point(size[0], size[1]),
             rotation=rotation,
-            size=text_size,
+            font_size=text_size,
+            margins=margins,
+            exclude_from_sim=False
         )
 
-        # Store additional textbox properties for S-expression generation
-        text_element._is_textbox = True
-        text_element._textbox_size = size
-        text_element._textbox_margins = margins
-        text_element._textbox_background = background
-        text_element._textbox_background_color = background_color
-        text_element._textbox_border = border
-        text_element._textbox_uuid = uuid
-
-        self.schematic.add_text(text_element)
         logger.debug(f"Added TextBox annotation: '{text}' at {position}")
 
     def _add_text_annotation(self, text_prop):
@@ -1719,20 +1711,15 @@ class SchematicWriter:
             color = text_prop.color
             uuid = text_prop.uuid
 
-        text_element = Text(
-            content=text,
+        # Use add_text() method from kicad-sch-api with correct parameters
+        text_uuid = self.schematic.add_text(
+            text=text,
             position=Point(position[0], position[1]),
+            rotation=rotation,
             size=size,
-            orientation=rotation,
+            exclude_from_sim=False
         )
 
-        # Store additional text properties
-        text_element._text_bold = bold
-        text_element._text_italic = italic
-        text_element._text_color = color
-        text_element._text_uuid = uuid
-
-        self.schematic.add_text(text_element)
         logger.debug(f"Added TextProperty annotation: '{text}' at {position}")
 
     def _add_table_annotation(self, table):

@@ -149,7 +149,7 @@ if __name__ == '__main__':
 
     circuit_obj.generate_kicad_project(
         project_name="power_supply_module",
-        placement_algorithm="simple",
+        placement_algorithm="hierarchical",
         generate_pcb=True
     )
 

@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # Export to KiCad project files
     circuit_obj.generate_kicad_project(
         project_name="resistor_divider",  # Name for KiCad project files
-        placement_algorithm="simple",  # Simple placement for small circuits
+        placement_algorithm="hierarchical",  # Simple placement for small circuits
         generate_pcb=True  # Also create PCB file (.kicad_pcb)
     )
 

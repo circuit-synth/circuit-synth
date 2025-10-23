@@ -93,7 +93,7 @@ if __name__ == '__main__':
     # Export to KiCad project files
     circuit_obj.generate_kicad_project(
         project_name="led_blinker",
-        placement_algorithm="simple",
+        placement_algorithm="hierarchical",
         generate_pcb=True
     )
 
