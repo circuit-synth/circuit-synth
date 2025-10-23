@@ -38,17 +38,15 @@ def select_circuits() -> List[Circuit]:
 
     # Create options table
     table = Table(show_header=True, header_style="bold magenta")
-    table.add_column("", style="cyan", width=4)
-    table.add_column("Circuit", style="green", width=25)
-    table.add_column("Difficulty", style="yellow", width=18)
-    table.add_column("Description", width=50)
+    table.add_column("#", style="cyan", width=6)
+    table.add_column("Circuit", style="green")
+    table.add_column("Description")
 
     circuits = list(Circuit)
     for idx, circuit in enumerate(circuits, 1):
         table.add_row(
             str(idx),
             circuit.display_name,
-            circuit.difficulty,
             circuit.description
         )
 
@@ -65,7 +63,8 @@ def select_circuits() -> List[Circuit]:
     # Parse selections
     selected_circuits = []
     try:
-        indices = [int(x.strip()) for x in selection.split(',')]
+        # Split and filter out empty strings (handles trailing commas)
+        indices = [int(x.strip()) for x in selection.split(',') if x.strip()]
         for idx in indices:
             if 1 <= idx <= len(circuits):
                 selected_circuits.append(circuits[idx - 1])
@@ -82,7 +81,7 @@ def select_circuits() -> List[Circuit]:
     console.print()
     console.print(f"✅ Selected {len(selected_circuits)} circuit(s):")
     for circuit in selected_circuits:
-        console.print(f"   • [green]{circuit.display_name}[/green] ({circuit.difficulty})")
+        console.print(f"   • [green]{circuit.display_name}[/green]")
     console.print()
 
     return selected_circuits
