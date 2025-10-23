@@ -1673,11 +1673,14 @@ class SchematicWriter:
             uuid = textbox.uuid
 
         # Create a Text object (we'll handle the box in S-expression generation)
+        # Note: Text class expects uuid, position, text, rotation, size
+        import uuid as uuid_module
         text_element = Text(
-            content=text,
+            uuid=uuid or str(uuid_module.uuid4()),
             position=Point(position[0], position[1]),
+            text=text,
+            rotation=rotation,
             size=text_size,
-            orientation=rotation,
         )
 
         # Store additional textbox properties for S-expression generation
