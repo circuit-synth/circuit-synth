@@ -230,6 +230,9 @@ class APISynchronizer:
             # Save changes
             self._save_schematic()
 
+            # Print user-friendly synchronization summary
+            self._print_sync_summary(circuit_components, kicad_components, report)
+
             logger.info(
                 f"Synchronization complete: {len(report.matched)} matched, "
                 f"{len(report.added)} added, {len(report.modified)} modified"
@@ -245,6 +248,54 @@ class APISynchronizer:
             raise
 
         return report
+
+    def _print_sync_summary(
+        self, circuit_components: Dict, kicad_components: Dict, report: SyncReport
+    ):
+        """Print a user-friendly synchronization summary."""
+        print("\n" + "="*70)
+        print("📋 Synchronization Summary")
+        print("="*70)
+
+        # Components in schematic (KiCad)
+        kicad_refs = sorted(kicad_components.keys()) if kicad_components else []
+        print(f"Components in schematic: {', '.join(kicad_refs) if kicad_refs else '(none)'}")
+
+        # Components in Python code
+        circuit_refs = sorted([comp['reference'] for comp in circuit_components.values()])
+        print(f"Components in Python:    {', '.join(circuit_refs) if circuit_refs else '(none)'}")
+
+        print("\nActions:")
+
+        # Components that were kept (matched)
+        if report.matched:
+            matched_refs = sorted([kicad_ref for _, kicad_ref in report.matched.items()])
+            for ref in matched_refs:
+                print(f"   ✅ Keep: {ref} (matches Python)")
+
+        # Components that were added
+        if report.added:
+            added_refs = sorted(report.added)
+            for ref in added_refs:
+                print(f"   ➕ Add: {ref} (new in Python)")
+
+        # Components that were modified
+        if report.modified:
+            modified_refs = sorted(report.modified)
+            for ref in modified_refs:
+                print(f"   🔧 Update: {ref} (changed in Python)")
+
+        # Components that will be removed (in KiCad but not in Python)
+        matched_kicad_refs = set(report.matched.values())
+        removed_refs = sorted([ref for ref in kicad_refs if ref not in matched_kicad_refs and ref not in report.added])
+        if removed_refs:
+            for ref in removed_refs:
+                print(f"   ⚠️  Remove: {ref} (not in Python code)")
+
+        if not report.matched and not report.added and not report.modified and not removed_refs:
+            print("   (no changes)")
+
+        print("="*70 + "\n")
 
     def _extract_circuit_components(self, circuit) -> Dict[str, Dict[str, Any]]:
         """Extract component information from Circuit Synth circuit."""
