@@ -27,6 +27,11 @@ from rich.text import Text
 from circuit_synth.ai_integration.claude.agent_registry import register_circuit_agents
 from circuit_synth.core.kicad_validator import validate_kicad_installation
 
+# Import new interactive CLI modules
+from .interactive_cli import run_interactive_setup, parse_cli_flags
+from .template_manager import TemplateManager, READMEGenerator, CLAUDEMDGenerator
+from .project_config import get_default_config
+
 console = Console()
 
 
@@ -812,13 +817,12 @@ def power_supply():
 
 @click.command()
 @click.option("--skip-kicad-check", is_flag=True, help="Skip KiCad installation check")
-@click.option("--minimal", is_flag=True, help="Create minimal project (no examples)")
-@click.option(
-    "--developer",
-    is_flag=True,
-    help="Include contributor agents and dev tools for circuit-synth development",
-)
-def main(skip_kicad_check: bool, minimal: bool, developer: bool):
+@click.option("--quick", is_flag=True, help="Quick start with defaults (no prompts)")
+@click.option("--circuits", type=str, help="Comma-separated circuits: resistor,led,esp32,usb")
+@click.option("--no-agents", is_flag=True, help="Skip Claude AI agents setup")
+@click.option("--developer", is_flag=True, help="Include developer tools")
+def main(skip_kicad_check: bool, quick: bool, circuits: Optional[str],
+         no_agents: bool, developer: bool):
     """Setup circuit-synth in the current uv project directory
 
     Run this command from within your uv project directory after:
@@ -826,150 +830,142 @@ def main(skip_kicad_check: bool, minimal: bool, developer: bool):
     2. cd my-project
     3. uv add circuit-synth
     4. uv run cs-new-project
-    """
 
-    console.print(
-        Panel.fit(
-            Text("🚀 Circuit-Synth Project Setup", style="bold blue"), style="blue"
-        )
-    )
+    Examples:
+        # Interactive mode (default) - shows menu to select circuits
+        uv run cs-new-project
+
+        # Quick start with defaults (resistor divider)
+        uv run cs-new-project --quick
+
+        # Select specific circuits via flags
+        uv run cs-new-project --circuits resistor,led,esp32
+
+        # Minimal project without Claude agents
+        uv run cs-new-project --circuits minimal --no-agents
+    """
 
     # Use current directory as project path
     project_path = Path.cwd()
-    project_name = "circuit-synth"  # Always use 'circuit-synth' as project name
-
-    console.print(f"📁 Setting up circuit-synth in: {project_path}", style="green")
-    console.print(f"🏷️  Project name: {project_name}", style="cyan")
 
     # Remove default main.py created by uv init (we don't need it)
     default_main = project_path / "main.py"
     if default_main.exists():
         default_main.unlink()
-        console.print("🗑️  Removed default main.py (not needed)", style="yellow")
 
-    # Step 1: Check KiCad installation
+    # Step 1: Check KiCad installation (unless skipped)
+    kicad_installed = False
     if not skip_kicad_check:
         kicad_info = check_kicad_installation()
-        if not kicad_info.get("kicad_installed"):
+        kicad_installed = kicad_info.get("kicad_installed", False)
+        if not kicad_installed:
             if not Confirm.ask(
                 "Continue without KiCad? (You'll need it later for opening projects)"
             ):
                 console.print("❌ Aborted - Please install KiCad first", style="red")
                 sys.exit(1)
-    else:
-        console.print("⏭️  Skipped KiCad check", style="yellow")
 
-    # Step 2: Copy complete project template (includes .claude directory)
-    console.print("\n📝 Copying project template...", style="yellow")
-    template_copied = copy_example_project_template(project_path)
+    # Step 2: Determine project configuration
+    config = None
 
-    # Fallback: If template copy failed, setup Claude integration separately
-    if not template_copied:
+    if quick:
+        # Quick mode: use defaults, no prompts
+        console.print("[bold cyan]⚡ Quick Start Mode[/bold cyan]")
+        config = get_default_config()
         if developer:
-            console.print(
-                "\n🤖 Setting up Claude Code integration (developer mode)...",
-                style="yellow",
-            )
-        else:
-            console.print("\n🤖 Setting up Claude Code integration...", style="yellow")
-        try:
-            copy_complete_claude_setup(project_path, developer_mode=developer)
-            console.print("✅ Claude setup copied successfully", style="green")
-        except Exception as e:
-            console.print(f"⚠️  Could not copy Claude setup: {e}", style="yellow")
+            config.developer_mode = True
+        console.print(f"✅ Creating project with: [green]{', '.join([c.display_name for c in config.circuits])}[/green]")
+        console.print()
 
-    # KiCad plugins setup removed - use 'uv run cs-setup-kicad-plugins' if needed
-    if not skip_kicad_check and kicad_info.get("kicad_installed", False):
-        console.print("\n🔌 KiCad plugins available separately", style="cyan")
-        console.print(
-            "   Run 'uv run cs-setup-kicad-plugins' to install AI integration plugins",
-            style="dim",
-        )
+    elif circuits or no_agents:
+        # Flag-based mode: parse flags into configuration
+        config = parse_cli_flags(circuits, no_agents, developer)
+        if config is None:
+            sys.exit(1)  # parse_cli_flags already printed error
 
-    # Step 3: Skip library preferences (no user prompt needed)
-    additional_libraries = []
-
-    # Skip duplicate template step - already done in Step 2
-
-    # Step 5: Create circuit-synth directory with example main.py if not from template
-    if not template_copied and not minimal:
-        circuit_dir = project_path / "circuit-synth"
-        circuit_dir.mkdir(exist_ok=True)
-
-        # Create example main.py
-        example_circuit = '''"""Example circuit using circuit-synth"""
-from circuit_synth import Component, Net, circuit
-
-@circuit
-def simple_led_circuit():
-    """Simple LED circuit with current limiting resistor"""
-    # Create components
-    led = Component('Device:LED', 'D', value='Red LED')
-    resistor = Component('Device:R', 'R', value='220')
-
-    # Create nets
-    vcc = Net('VCC')
-    gnd = Net('GND')
-    led_anode = Net('LED_ANODE')
-
-    # Make connections
-    resistor[1] += vcc
-    resistor[2] += led_anode
-    led[1] += led_anode  # Anode
-    led[2] += gnd  # Cathode
-
-    return locals()
-
-if __name__ == '__main__':
-    # Generate the circuit
-    circuit = simple_led_circuit()
-
-    # Export to KiCad
-    circuit.generate_kicad_project('simple_led_test')
-
-    print("✅ Circuit generated successfully!")
-    print("📁 Output: simple_led_test/")
-    print("🔧 Open in KiCad: simple_led_test/simple_led_test.kicad_pro")
-'''
-
-        main_py = circuit_dir / "main.py"
-        with open(main_py, 'w') as f:
-            f.write(example_circuit)
-
-        console.print("✅ Created circuit-synth/main.py with example circuit", style="green")
-
-    # Step 6: Documentation already included in template
-    if template_copied:
-        console.print("\n📚 Project documentation included in template", style="green")
-        console.print("   ✅ README.md with comprehensive usage guide", style="cyan")
-        console.print(
-            "   ✅ CLAUDE.md with circuit-synth specific guidance", style="cyan"
-        )
     else:
-        console.print("\n📚 Creating project documentation...", style="yellow")
-        create_project_readme(project_path, project_name, additional_libraries)
-        create_claude_md(project_path)
+        # Interactive mode: run interactive CLI
+        config = run_interactive_setup(project_path, developer_mode=developer)
+        if config is None:
+            console.print("[yellow]Setup cancelled by user[/yellow]")
+            sys.exit(0)
+
+    # Step 3: Initialize template manager and generators
+    template_mgr = TemplateManager()
+    readme_gen = READMEGenerator()
+    claude_md_gen = CLAUDEMDGenerator()
+
+    # Step 4: Create circuit-synth directory and copy all selected circuits
+    console.print("\n[bold cyan]📝 Creating Project Files...[/bold cyan]")
+
+    if config.has_circuits():
+        for idx, circuit in enumerate(config.circuits):
+            try:
+                # First circuit becomes main.py, others use their own names
+                is_first = (idx == 0)
+                template_mgr.copy_circuit_to_project(circuit, project_path, is_first=is_first)
+
+                if is_first:
+                    console.print(f"✅ Created circuit-synth/main.py ({circuit.display_name})", style="green")
+                else:
+                    console.print(f"✅ Created circuit-synth/{circuit.value}.py ({circuit.display_name})", style="green")
+
+            except FileNotFoundError as e:
+                console.print(f"[yellow]⚠️  Could not add {circuit.display_name}: {e}[/yellow]")
+    else:
+        console.print("[yellow]⚠️  No circuits selected. Creating empty project.[/yellow]")
+
+    # Step 6: Setup Claude AI agents if requested
+    if config.include_agents:
+        console.print("\n[cyan]🤖 Setting up Claude Code integration...[/cyan]")
+        try:
+            copy_complete_claude_setup(project_path, developer_mode=config.developer_mode)
+            agents_count = len(list((project_path / '.claude' / 'agents').rglob('*.md')))
+            commands_count = len(list((project_path / '.claude' / 'commands').rglob('*.md')))
+            console.print(f"✅ Claude agents setup complete ({agents_count} agents, {commands_count} commands)", style="green")
+        except Exception as e:
+            console.print(f"[yellow]⚠️  Could not setup Claude agents: {e}[/yellow]")
+    else:
+        console.print("\n[dim]⏭️  Skipped Claude agents setup[/dim]")
+
+    # Step 7: Generate README.md and CLAUDE.md
+    console.print("\n[cyan]📚 Generating documentation...[/cyan]")
+
+    readme_content = readme_gen.generate(config, project_path)
+    readme_path = project_path / "README.md"
+    readme_path.write_text(readme_content)
+    console.print("✅ Created README.md", style="green")
+
+    claude_md_content = claude_md_gen.generate(config)
+    claude_md_path = project_path / "CLAUDE.md"
+    claude_md_path.write_text(claude_md_content)
+    console.print("✅ Created CLAUDE.md", style="green")
+
+    # Step 8: KiCad plugins note (if KiCad is installed)
+    if kicad_installed:
+        console.print("\n[cyan]🔌 KiCad plugins available separately[/cyan]")
+        console.print("[dim]   Run 'uv run cs-setup-kicad-plugins' to install AI integration plugins[/dim]")
 
     # Success message
-    console.print(
-        Panel.fit(
-            Text(
-                f"✅ Circuit-synth project '{project_name}' setup complete!",
-                style="bold green",
-            )
-            + Text(f"\n\n📁 Location: {project_path}")
-            + Text(f"\n🚀 Get started: uv run python circuit-synth/main.py")
-            + Text(
-                f"\n🤖 AI agents: {len(list((project_path / '.claude' / 'agents').rglob('*.md')))} agents available in Claude Code"
-            )
-            + Text(
-                f"\n⚡ Commands: {len(list((project_path / '.claude' / 'commands').rglob('*.md')))} slash commands available"
-            )
-            + Text(f"\n📖 Documentation: See README.md"),
-            title="🎉 Success!",
-            style="green",
-        )
+    console.print()
+    success_text = (
+        Text(f"✅ Circuit-synth project setup complete!", style="bold green")
+        + Text(f"\n\n📁 Location: {project_path}")
     )
+
+    if config.has_circuits():
+        circuits_names = ', '.join([c.display_name for c in config.circuits])
+        success_text += Text(f"\n🎛️  Circuits ({len(config.circuits)}): {circuits_names}")
+
+    success_text += Text(f"\n\n🚀 Get started: [cyan]uv run python circuit-synth/main.py[/cyan]")
+    success_text += Text(f"\n📖 Documentation: See README.md")
+
+    if config.include_agents:
+        agents_count = len(list((project_path / '.claude' / 'agents').rglob('*.md')))
+        commands_count = len(list((project_path / '.claude' / 'commands').rglob('*.md')))
+        success_text += Text(f"\n🤖 AI Agents: {agents_count} agents, {commands_count} commands available")
+
+    console.print(Panel.fit(success_text, title="🎉 Success!", style="green"))
 
 
 if __name__ == "__main__":
