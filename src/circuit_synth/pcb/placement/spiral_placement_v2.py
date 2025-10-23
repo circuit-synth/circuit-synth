@@ -8,11 +8,10 @@ Uses actual courtyard geometry for accurate collision detection.
 
 import math
 from dataclasses import dataclass
-
-# Using simplified placement - removed complex courtyard collision for now
 from typing import Dict, List, NamedTuple, Optional, Set, Tuple
 
 from circuit_synth.pcb.types import Footprint, Point
+from .courtyard_collision_improved import CourtyardCollisionDetector, Polygon
 
 
 class BoundingBox(NamedTuple):
