@@ -350,6 +350,45 @@ class SchematicWriter:
         if self.hierarchical_path and len(self.hierarchical_path) > 0:
             print(f"🔍 WRITER_INIT:   Root UUID (path[0])={self.hierarchical_path[0]}", file=sys.stderr, flush=True)
 
+    @staticmethod
+    def _escape_kicad_string(text: str) -> str:
+        r"""
+        Escape a string for safe inclusion in KiCad S-expression format.
+
+        KiCad's S-expression parser expects:
+        - Backslashes to be escaped: \ -> \\
+        - Quotes to be escaped: " -> \"
+        - Newlines to be escaped: \n (actual newline) -> \\n (escaped newline)
+
+        Unicode characters (including box-drawing characters and symbols) are preserved
+        as they are valid in UTF-8 strings.
+
+        Args:
+            text: The raw string to escape
+
+        Returns:
+            The escaped string safe for KiCad S-expression format
+        """
+        if not isinstance(text, str):
+            text = str(text)
+
+        # Escape backslashes first (must be done before other replacements)
+        text = text.replace("\\", "\\\\")
+
+        # Escape quotes
+        text = text.replace('"', '\\"')
+
+        # Escape newlines (convert actual newlines to escaped representation)
+        text = text.replace("\n", "\\n")
+
+        # Escape carriage returns
+        text = text.replace("\r", "\\r")
+
+        # Escape tabs
+        text = text.replace("\t", "\\t")
+
+        return text
+
     @quick_time("Generate S-Expression")
     def generate_s_expr(self) -> list:
         """
@@ -1675,8 +1714,11 @@ class SchematicWriter:
         # Use add_text_box() method from kicad-sch-api
         import uuid as uuid_module
 
+        # Escape the text for safe inclusion in KiCad S-expression format
+        escaped_text = self._escape_kicad_string(text)
+
         textbox_uuid = self.schematic.add_text_box(
-            text=text,
+            text=escaped_text,
             position=Point(position[0], position[1]),
             size=Point(size[0], size[1]),
             rotation=rotation,
