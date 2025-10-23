@@ -33,7 +33,7 @@ def check_python_path():
             return True
         else:
             print(f"   ❌ Using pip package: {location}")
-            print("   🔧 Run ./scripts/ensure-clean-environment.sh to fix")
+            print("   🔧 Run ./tools/maintenance/ensure-clean-environment.sh to fix")
             return False
             
     except ImportError as e:
@@ -129,7 +129,7 @@ def main():
         return 0
     else:
         print("❌ Some checks failed. Review the output above.")
-        print("🔧 Quick fix: ./scripts/ensure-clean-environment.sh")
+        print("🔧 Quick fix: ./tools/maintenance/ensure-clean-environment.sh")
         return 1
 
 if __name__ == "__main__":

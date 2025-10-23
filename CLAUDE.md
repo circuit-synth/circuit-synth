@@ -196,7 +196,7 @@ cs-setup-digikey-api API_KEY CLIENT_ID  # Configure DigiKey API
 
 **Environment Issues - Package Conflicts**:
 - **Problem**: Components placed incorrectly due to old pip-installed circuit-synth
-- **Solution**: Run `./scripts/ensure-clean-environment.sh` to remove conflicting packages
+- **Solution**: Run `./tools/maintenance/ensure-clean-environment.sh` to remove conflicting packages
 - **Prevention**: Always use the cleanup script before starting work
 - **Symptoms**: Layout doesn't match expected placement, import errors, outdated behavior
 

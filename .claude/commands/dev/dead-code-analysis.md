@@ -117,19 +117,19 @@ After analysis:
 
 ## Command Implementation
 This command is implemented via:
-- **Main script**: `scripts/dead-code-analysis.py` - Python implementation with AST parsing
-- **Shell wrapper**: `scripts/dead-code-analysis.sh` - Simple command-line interface
+- **Main script**: `tools/analysis/dead-code-analysis.py` - Python implementation with AST parsing
+- **Shell wrapper**: `tools/analysis/dead-code-analysis.sh` - Simple command-line interface
 
 ### Manual Usage
 ```bash
 # From repository root
-python scripts/dead-code-analysis.py [target-script]
+python tools/analysis/dead-code-analysis.py [target-script]
 
 # Or use the shell wrapper
-./scripts/dead-code-analysis.sh [target-script]
+./tools/analysis/dead-code-analysis.sh [target-script]
 
 # Restore backups if needed
-python scripts/dead-code-analysis.py --restore-backups
+python tools/analysis/dead-code-analysis.py --restore-backups
 ```
 
 ## Comprehensive Test Implementation
