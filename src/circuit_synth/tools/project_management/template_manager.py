@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Dict, Optional
 import shutil
 
-from .project_config import BaseCircuit, ExampleCircuit, ProjectConfig, CircuitTemplate
+from .project_config import Circuit, ProjectConfig, CircuitTemplate
 
 
 class TemplateManager:
@@ -21,11 +21,11 @@ class TemplateManager:
         self.base_circuits_dir = self.templates_dir / "base_circuits"
         self.example_circuits_dir = self.templates_dir / "example_circuits"
 
-    def load_base_circuit(self, circuit: BaseCircuit) -> str:
-        """Load base circuit template code
+    def load_circuit(self, circuit: Circuit) -> str:
+        """Load circuit template code
 
         Args:
-            circuit: BaseCircuit enum value
+            circuit: Circuit enum value
 
         Returns:
             Python code as string
@@ -33,174 +33,54 @@ class TemplateManager:
         Raises:
             FileNotFoundError: If template file doesn't exist
         """
-        template_file = self.base_circuits_dir / f"{circuit.value}.py"
+        # Get template directory based on circuit's template_dir attribute
+        template_dir = self.templates_dir / circuit.template_dir
+        template_file = template_dir / f"{circuit.value}.py"
 
         if not template_file.exists():
             raise FileNotFoundError(
-                f"Base circuit template not found: {template_file}\n"
-                f"Expected location: {self.base_circuits_dir}"
+                f"Circuit template not found: {template_file}\n"
+                f"Expected location: {template_dir}"
             )
 
         return template_file.read_text()
 
-    def load_example(self, example: ExampleCircuit) -> Dict[str, str]:
-        """Load example circuit (may be single or multiple files)
-
-        Args:
-            example: ExampleCircuit enum value
-
-        Returns:
-            Dictionary mapping filename to code content
-            For single-file examples: {"example.py": "code..."}
-            For multi-file examples: {"main.py": "...", "subcircuit.py": "..."}
-
-        Raises:
-            FileNotFoundError: If example template doesn't exist
-        """
-        example_dir = self.example_circuits_dir / example.value
-
-        # Check if it's a directory (multi-file example)
-        if example_dir.is_dir():
-            # Multi-file example - load all .py files
-            python_files = list(example_dir.glob("*.py"))
-            if not python_files:
-                raise FileNotFoundError(
-                    f"No Python files found in example directory: {example_dir}"
-                )
-
-            return {
-                f.name: f.read_text()
-                for f in python_files
-            }
-        else:
-            # Single-file example
-            example_file = example_dir.with_suffix(".py")
-
-            if not example_file.exists():
-                raise FileNotFoundError(
-                    f"Example template not found: {example_file}\n"
-                    f"Looked for directory: {example_dir}\n"
-                    f"Looked for file: {example_file}"
-                )
-
-            return {example_file.name: example_file.read_text()}
-
-    def copy_base_circuit_to_project(
+    def copy_circuit_to_project(
         self,
-        circuit: BaseCircuit,
+        circuit: Circuit,
         project_path: Path,
-        target_filename: str = "main.py"
+        is_first: bool = False
     ) -> None:
-        """Copy base circuit template to project directory
+        """Copy circuit template to project directory
 
         Args:
-            circuit: BaseCircuit to copy
+            circuit: Circuit to copy
             project_path: Destination project directory
-            target_filename: Name for the circuit file (default: main.py)
+            is_first: If True, name it main.py; otherwise use circuit name
         """
-        circuit_code = self.load_base_circuit(circuit)
+        circuit_code = self.load_circuit(circuit)
 
         # Create circuit-synth directory if it doesn't exist
         circuit_dir = project_path / "circuit-synth"
         circuit_dir.mkdir(exist_ok=True)
+
+        # Determine target filename
+        if is_first:
+            target_filename = "main.py"
+        else:
+            target_filename = f"{circuit.value}.py"
 
         # Write the circuit file
         target_file = circuit_dir / target_filename
         target_file.write_text(circuit_code)
 
-    def copy_example_to_project(
-        self,
-        example: ExampleCircuit,
-        project_path: Path
-    ) -> None:
-        """Copy example circuit(s) to project directory
-
-        Args:
-            example: ExampleCircuit to copy
-            project_path: Destination project directory
-        """
-        example_files = self.load_example(example)
-
-        # Create circuit-synth directory if it doesn't exist
-        circuit_dir = project_path / "circuit-synth"
-        circuit_dir.mkdir(exist_ok=True)
-
-        # Create examples subdirectory
-        examples_dir = circuit_dir / "examples"
-        examples_dir.mkdir(exist_ok=True)
-
-        # Create example-specific subdirectory for multi-file examples
-        if len(example_files) > 1:
-            example_subdir = examples_dir / example.value
-            example_subdir.mkdir(exist_ok=True)
-            target_dir = example_subdir
-        else:
-            target_dir = examples_dir
-
-        # Write all files
-        for filename, code in example_files.items():
-            target_file = target_dir / filename
-            target_file.write_text(code)
-
-    def get_template_info(self, circuit: BaseCircuit) -> CircuitTemplate:
-        """Get metadata about a circuit template
-
-        Args:
-            circuit: BaseCircuit to get info for
+    def list_available_circuits(self) -> list[Circuit]:
+        """Get list of all available circuits
 
         Returns:
-            CircuitTemplate with metadata
+            List of Circuit enums
         """
-        # Load the code to analyze it
-        code = self.load_base_circuit(circuit)
-
-        # Extract docstring for description
-        lines = code.split('\n')
-        description = ""
-        for line in lines:
-            if '"""' in line or "'''" in line:
-                # Found docstring start
-                desc_lines = []
-                in_docstring = True
-                for next_line in lines[lines.index(line)+1:]:
-                    if '"""' in next_line or "'''" in next_line:
-                        break
-                    desc_lines.append(next_line)
-                description = '\n'.join(desc_lines).strip()
-                break
-
-        # Map difficulty from enum
-        difficulty_map = {
-            "Beginner ⭐": "beginner",
-            "Intermediate ⭐⭐": "intermediate",
-            "Advanced ⭐⭐⭐": "advanced"
-        }
-        complexity_level = difficulty_map.get(circuit.difficulty, "beginner")
-
-        return CircuitTemplate(
-            name=circuit.value,
-            display_name=circuit.display_name,
-            difficulty=circuit.difficulty,
-            description=circuit.description,
-            code=code,
-            complexity_level=complexity_level
-        )
-
-    def list_available_base_circuits(self) -> list[BaseCircuit]:
-        """Get list of all available base circuits
-
-        Returns:
-            List of BaseCircuit enums
-        """
-        return list(BaseCircuit)
-
-    def list_available_examples(self) -> list[ExampleCircuit]:
-        """Get list of all available example circuits
-
-        Returns:
-            List of ExampleCircuit enums
-        """
-        return list(ExampleCircuit)
+        return list(Circuit)
 
     def validate_templates(self) -> Dict[str, bool]:
         """Validate that all template files exist
@@ -210,18 +90,11 @@ class TemplateManager:
         """
         results = {}
 
-        # Check base circuits
-        for circuit in BaseCircuit:
-            template_file = self.base_circuits_dir / f"{circuit.value}.py"
-            results[f"base:{circuit.value}"] = template_file.exists()
-
-        # Check examples
-        for example in ExampleCircuit:
-            example_path = self.example_circuits_dir / example.value
-            # Could be directory or file
-            example_file = example_path.with_suffix(".py")
-            exists = example_path.is_dir() or example_file.exists()
-            results[f"example:{example.value}"] = exists
+        # Check all circuits
+        for circuit in Circuit:
+            template_dir = self.templates_dir / circuit.template_dir
+            template_file = template_dir / f"{circuit.value}.py"
+            results[circuit.value] = template_file.exists()
 
         return results
 
@@ -257,28 +130,19 @@ This will generate KiCad project files that you can open in KiCad.
 
 """
 
-        # Add section about the base circuit
-        readme += f"""## 📁 Base Circuit: {config.base_circuit.display_name}
+        # Add section about included circuits
+        if config.has_circuits():
+            readme += f"""## 📁 Included Circuits ({len(config.circuits)})
 
-**Difficulty:** {config.base_circuit.difficulty}
-
-{config.base_circuit.description}
-
-The main circuit file is `circuit-synth/main.py`.
+This project includes the following circuit templates:
 
 """
+            for idx, circuit in enumerate(config.circuits, 1):
+                filename = "main.py" if idx == 1 else f"{circuit.value}.py"
+                readme += f"{idx}. **{circuit.display_name}** ({circuit.difficulty}): {circuit.description}\n"
+                readme += f"   - File: `circuit-synth/{filename}`\n\n"
 
-        # Add section about examples if any
-        if config.has_examples():
-            readme += """## 📚 Example Circuits Included
-
-This project includes additional example circuits in `circuit-synth/examples/`:
-
-"""
-            for example in config.examples:
-                readme += f"- **{example.display_name}** ({example.difficulty}): {example.description}\n"
-
-            readme += "\nYou can run any example circuit independently or use them as reference for your own designs.\n\n"
+            readme += "\nYou can run any circuit file independently or use them as reference for your own designs.\n\n"
 
         # Add circuit-synth basics
         readme += """## 🏗️ Circuit-Synth Basics
@@ -387,29 +251,20 @@ This is a **circuit-synth project** for PCB design with Python code.
 
 """
 
-        # Add info about base circuit
-        claude_md += f"""## 📝 Base Circuit
+        # Add info about included circuits
+        if config.has_circuits():
+            claude_md += f"""## 📝 Included Circuits ({len(config.circuits)})
 
-**Circuit Type:** {config.base_circuit.display_name}
-**Difficulty:** {config.base_circuit.difficulty}
-
-{config.base_circuit.description}
-
-The main circuit is in `circuit-synth/main.py`.
+This project includes the following circuit templates:
 
 """
+            for idx, circuit in enumerate(config.circuits, 1):
+                filename = "main.py" if idx == 1 else f"{circuit.value}.py"
+                claude_md += f"{idx}. **{circuit.display_name}** ({circuit.difficulty})\n"
+                claude_md += f"   - {circuit.description}\n"
+                claude_md += f"   - File: `circuit-synth/{filename}`\n\n"
 
-        # Add examples info if any
-        if config.has_examples():
-            claude_md += """## 📚 Example Circuits
-
-This project includes example circuits for reference:
-
-"""
-            for example in config.examples:
-                claude_md += f"- **{example.display_name}**: {example.description}\n"
-
-            claude_md += "\nThese examples are in `circuit-synth/examples/` and can be used as reference or starting points.\n\n"
+            claude_md += "You can modify these circuits or use them as reference for creating new designs.\n\n"
 
         # Add available tools
         if config.include_agents:

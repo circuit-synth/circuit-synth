@@ -818,13 +818,11 @@ def power_supply():
 @click.command()
 @click.option("--skip-kicad-check", is_flag=True, help="Skip KiCad installation check")
 @click.option("--quick", is_flag=True, help="Quick start with defaults (no prompts)")
-@click.option("--base", type=str, help="Base circuit: resistor, led, regulator, minimal")
-@click.option("--examples", type=str, help="Comma-separated examples: esp32,stm32,usb,power")
+@click.option("--circuits", type=str, help="Comma-separated circuits: resistor,led,esp32,usb")
 @click.option("--no-agents", is_flag=True, help="Skip Claude AI agents setup")
 @click.option("--developer", is_flag=True, help="Include developer tools")
-@click.option("--minimal", is_flag=True, hidden=True, help="(Deprecated) Use --base minimal instead")
-def main(skip_kicad_check: bool, quick: bool, base: Optional[str], examples: Optional[str],
-         no_agents: bool, developer: bool, minimal: bool):
+def main(skip_kicad_check: bool, quick: bool, circuits: Optional[str],
+         no_agents: bool, developer: bool):
     """Setup circuit-synth in the current uv project directory
 
     Run this command from within your uv project directory after:
@@ -834,17 +832,17 @@ def main(skip_kicad_check: bool, quick: bool, base: Optional[str], examples: Opt
     4. uv run cs-new-project
 
     Examples:
-        # Interactive mode (default)
+        # Interactive mode (default) - shows menu to select circuits
         uv run cs-new-project
 
-        # Quick start with defaults
+        # Quick start with defaults (resistor divider)
         uv run cs-new-project --quick
 
-        # Specify configuration via flags
-        uv run cs-new-project --base led --examples esp32,usb
+        # Select specific circuits via flags
+        uv run cs-new-project --circuits resistor,led,esp32
 
         # Minimal project without Claude agents
-        uv run cs-new-project --base minimal --no-agents
+        uv run cs-new-project --circuits minimal --no-agents
     """
 
     # Use current directory as project path
@@ -867,12 +865,6 @@ def main(skip_kicad_check: bool, quick: bool, base: Optional[str], examples: Opt
                 console.print("❌ Aborted - Please install KiCad first", style="red")
                 sys.exit(1)
 
-    # Handle deprecated --minimal flag
-    if minimal:
-        console.print("[yellow]⚠️  --minimal is deprecated. Use --base minimal instead[/yellow]")
-        if not base:
-            base = "minimal"
-
     # Step 2: Determine project configuration
     config = None
 
@@ -882,12 +874,12 @@ def main(skip_kicad_check: bool, quick: bool, base: Optional[str], examples: Opt
         config = get_default_config()
         if developer:
             config.developer_mode = True
-        console.print(f"✅ Creating project with base circuit: [green]{config.base_circuit.display_name}[/green]")
+        console.print(f"✅ Creating project with: [green]{', '.join([c.display_name for c in config.circuits])}[/green]")
         console.print()
 
-    elif base or examples or no_agents:
+    elif circuits or no_agents:
         # Flag-based mode: parse flags into configuration
-        config = parse_cli_flags(base, examples, no_agents, developer)
+        config = parse_cli_flags(circuits, no_agents, developer)
         if config is None:
             sys.exit(1)  # parse_cli_flags already printed error
 
@@ -903,29 +895,25 @@ def main(skip_kicad_check: bool, quick: bool, base: Optional[str], examples: Opt
     readme_gen = READMEGenerator()
     claude_md_gen = CLAUDEMDGenerator()
 
-    # Step 4: Create circuit-synth directory and copy base circuit
+    # Step 4: Create circuit-synth directory and copy all selected circuits
     console.print("\n[bold cyan]📝 Creating Project Files...[/bold cyan]")
 
-    try:
-        template_mgr.copy_base_circuit_to_project(
-            config.base_circuit,
-            project_path,
-            target_filename="main.py"
-        )
-        console.print(f"✅ Created circuit-synth/main.py ({config.base_circuit.display_name})", style="green")
-    except FileNotFoundError as e:
-        console.print(f"[red]❌ Error creating base circuit: {e}[/red]")
-        sys.exit(1)
-
-    # Step 5: Copy example circuits if any
-    if config.has_examples():
-        console.print(f"\n[cyan]Adding {len(config.examples)} example circuit(s)...[/cyan]")
-        for example in config.examples:
+    if config.has_circuits():
+        for idx, circuit in enumerate(config.circuits):
             try:
-                template_mgr.copy_example_to_project(example, project_path)
-                console.print(f"✅ Added example: {example.display_name}", style="green")
+                # First circuit becomes main.py, others use their own names
+                is_first = (idx == 0)
+                template_mgr.copy_circuit_to_project(circuit, project_path, is_first=is_first)
+
+                if is_first:
+                    console.print(f"✅ Created circuit-synth/main.py ({circuit.display_name})", style="green")
+                else:
+                    console.print(f"✅ Created circuit-synth/{circuit.value}.py ({circuit.display_name})", style="green")
+
             except FileNotFoundError as e:
-                console.print(f"[yellow]⚠️  Could not add {example.display_name}: {e}[/yellow]")
+                console.print(f"[yellow]⚠️  Could not add {circuit.display_name}: {e}[/yellow]")
+    else:
+        console.print("[yellow]⚠️  No circuits selected. Creating empty project.[/yellow]")
 
     # Step 6: Setup Claude AI agents if requested
     if config.include_agents:
@@ -963,11 +951,11 @@ def main(skip_kicad_check: bool, quick: bool, base: Optional[str], examples: Opt
     success_text = (
         Text(f"✅ Circuit-synth project setup complete!", style="bold green")
         + Text(f"\n\n📁 Location: {project_path}")
-        + Text(f"\n🎛️  Base Circuit: {config.base_circuit.display_name}")
     )
 
-    if config.has_examples():
-        success_text += Text(f"\n📚 Examples: {len(config.examples)} added")
+    if config.has_circuits():
+        circuits_names = ', '.join([c.display_name for c in config.circuits])
+        success_text += Text(f"\n🎛️  Circuits ({len(config.circuits)}): {circuits_names}")
 
     success_text += Text(f"\n\n🚀 Get started: [cyan]uv run python circuit-synth/main.py[/cyan]")
     success_text += Text(f"\n📖 Documentation: See README.md")

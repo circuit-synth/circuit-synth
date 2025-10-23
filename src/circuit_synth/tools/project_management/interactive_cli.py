@@ -11,7 +11,7 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.text import Text
 
-from .project_config import BaseCircuit, ExampleCircuit, ProjectConfig, get_default_config
+from .project_config import Circuit, ProjectConfig, get_default_config
 
 
 console = Console()
@@ -24,23 +24,26 @@ def display_welcome() -> None:
     console.print()
 
 
-def select_base_circuit() -> BaseCircuit:
-    """Interactive base circuit selection with rich UI
+def select_circuits() -> List[Circuit]:
+    """Interactive circuit selection with multi-select
 
     Returns:
-        Selected BaseCircuit enum value
+        List of selected Circuit enum values
     """
-    console.print("[bold cyan]Select Base Circuit[/bold cyan]")
+    console.print("[bold cyan]Select Circuit Templates[/bold cyan]")
+    console.print()
+    console.print("Choose which circuits to include in your project.")
+    console.print("You can select multiple circuits by entering comma-separated numbers (e.g., 1,2,5)")
     console.print()
 
     # Create options table
     table = Table(show_header=True, header_style="bold magenta")
-    table.add_column("Option", style="cyan", width=8)
-    table.add_column("Circuit", style="green", width=20)
+    table.add_column("", style="cyan", width=4)
+    table.add_column("Circuit", style="green", width=25)
     table.add_column("Difficulty", style="yellow", width=18)
     table.add_column("Description", width=50)
 
-    circuits = list(BaseCircuit)
+    circuits = list(Circuit)
     for idx, circuit in enumerate(circuits, 1):
         table.add_row(
             str(idx),
@@ -52,90 +55,37 @@ def select_base_circuit() -> BaseCircuit:
     console.print(table)
     console.print()
 
-    # Prompt for selection
-    choice = Prompt.ask(
-        "Select base circuit",
-        choices=[str(i) for i in range(1, len(circuits) + 1)],
-        default="1"
-    )
-
-    selected = circuits[int(choice) - 1]
-    console.print(f"✅ Selected: [bold green]{selected.display_name}[/bold green]")
-    console.print()
-
-    return selected
-
-
-def select_examples() -> List[ExampleCircuit]:
-    """Interactive example circuits selection (multi-select)
-
-    Returns:
-        List of selected ExampleCircuit enum values
-    """
-    console.print("[bold cyan]Add Optional Example Circuits?[/bold cyan]")
-    console.print()
-    console.print("Example circuits provide reference implementations for complex designs.")
-    console.print("You can select multiple examples or skip this step.")
-    console.print()
-
-    # Ask if user wants to add examples
-    if not Confirm.ask("Would you like to add example circuits?", default=False):
-        console.print("⏭️  Skipping examples")
-        console.print()
-        return []
-
-    # Create options table
-    table = Table(show_header=True, header_style="bold magenta")
-    table.add_column("Option", style="cyan", width=8)
-    table.add_column("Example", style="green", width=25)
-    table.add_column("Difficulty", style="yellow", width=18)
-    table.add_column("Description", width=45)
-
-    examples = list(ExampleCircuit)
-    for idx, example in enumerate(examples, 1):
-        table.add_row(
-            str(idx),
-            example.display_name,
-            example.difficulty,
-            example.description
-        )
-
-    console.print(table)
-    console.print()
-
     # Prompt for selections
-    console.print("[dim]Enter example numbers separated by commas (e.g., 1,3) or press Enter to skip[/dim]")
+    console.print("[dim]Enter circuit numbers separated by commas, or press Enter for default (Resistor Divider)[/dim]")
     selection = Prompt.ask(
-        "Select examples",
-        default=""
+        "Select circuits",
+        default="1"  # Default to resistor divider
     )
-
-    if not selection.strip():
-        console.print("⏭️  No examples selected")
-        console.print()
-        return []
 
     # Parse selections
-    selected_examples = []
+    selected_circuits = []
     try:
         indices = [int(x.strip()) for x in selection.split(',')]
         for idx in indices:
-            if 1 <= idx <= len(examples):
-                selected_examples.append(examples[idx - 1])
+            if 1 <= idx <= len(circuits):
+                selected_circuits.append(circuits[idx - 1])
             else:
                 console.print(f"[yellow]⚠️  Skipping invalid option: {idx}[/yellow]")
     except ValueError:
-        console.print("[red]❌ Invalid input format. No examples added.[/red]")
-        console.print()
-        return []
+        console.print("[red]❌ Invalid input format. Using default (Resistor Divider)[/red]")
+        selected_circuits = [Circuit.RESISTOR_DIVIDER]
 
-    if selected_examples:
-        console.print(f"✅ Selected {len(selected_examples)} example(s):")
-        for ex in selected_examples:
-            console.print(f"   • [green]{ex.display_name}[/green]")
+    if not selected_circuits:
+        console.print("[yellow]⚠️  No circuits selected. Using default (Resistor Divider)[/yellow]")
+        selected_circuits = [Circuit.RESISTOR_DIVIDER]
+
+    console.print()
+    console.print(f"✅ Selected {len(selected_circuits)} circuit(s):")
+    for circuit in selected_circuits:
+        console.print(f"   • [green]{circuit.display_name}[/green] ({circuit.difficulty})")
     console.print()
 
-    return selected_examples
+    return selected_circuits
 
 
 def select_configuration() -> dict:
@@ -189,13 +139,12 @@ def show_confirmation(config: ProjectConfig, project_path) -> bool:
     summary_table.add_column("Value", style="green")
 
     summary_table.add_row("Project Location", str(project_path))
-    summary_table.add_row("Base Circuit", config.base_circuit.display_name)
 
-    if config.has_examples():
-        examples_list = ", ".join([ex.display_name for ex in config.examples])
-        summary_table.add_row("Example Circuits", examples_list)
+    if config.has_circuits():
+        circuits_list = ", ".join([c.display_name for c in config.circuits])
+        summary_table.add_row(f"Circuits ({len(config.circuits)})", circuits_list)
     else:
-        summary_table.add_row("Example Circuits", "[dim]None[/dim]")
+        summary_table.add_row("Circuits", "[dim]None[/dim]")
 
     summary_table.add_row("Claude AI Agents", "✅ Yes" if config.include_agents else "❌ No")
     summary_table.add_row("KiCad Plugins", "✅ Yes" if config.include_kicad_plugins else "❌ No")
@@ -221,13 +170,10 @@ def run_interactive_setup(project_path, developer_mode: bool = False) -> Optiona
     """
     display_welcome()
 
-    # Step 1: Select base circuit
-    base_circuit = select_base_circuit()
+    # Step 1: Select circuits
+    circuits = select_circuits()
 
-    # Step 2: Select optional examples
-    examples = select_examples()
-
-    # Step 3: Additional configuration
+    # Step 2: Additional configuration
     config_options = select_configuration()
 
     # Override developer mode if passed as argument
@@ -236,14 +182,13 @@ def run_interactive_setup(project_path, developer_mode: bool = False) -> Optiona
 
     # Create configuration
     config = ProjectConfig(
-        base_circuit=base_circuit,
-        examples=examples,
+        circuits=circuits,
         include_agents=config_options['include_agents'],
         include_kicad_plugins=config_options['include_kicad_plugins'],
         developer_mode=config_options['developer_mode']
     )
 
-    # Step 4: Show summary and confirm
+    # Step 3: Show summary and confirm
     if not show_confirmation(config, project_path):
         console.print("[yellow]❌ Setup cancelled[/yellow]")
         return None
@@ -252,16 +197,14 @@ def run_interactive_setup(project_path, developer_mode: bool = False) -> Optiona
 
 
 def parse_cli_flags(
-    base: Optional[str],
-    examples: Optional[str],
+    circuits: Optional[str],
     no_agents: bool,
     developer: bool
 ) -> Optional[ProjectConfig]:
     """Parse command-line flags into ProjectConfig
 
     Args:
-        base: Base circuit name (e.g., "resistor", "led", "regulator", "minimal")
-        examples: Comma-separated example names (e.g., "esp32,usb")
+        circuits: Comma-separated circuit names (e.g., "resistor,led,esp32")
         no_agents: If True, don't include Claude agents
         developer: If True, enable developer mode
 
@@ -269,55 +212,48 @@ def parse_cli_flags(
         ProjectConfig if valid, None if invalid flags
     """
     # Map friendly names to enum values
-    base_circuit_map = {
-        "resistor": BaseCircuit.RESISTOR_DIVIDER,
-        "resistor_divider": BaseCircuit.RESISTOR_DIVIDER,
-        "led": BaseCircuit.LED_BLINKER,
-        "led_blinker": BaseCircuit.LED_BLINKER,
-        "regulator": BaseCircuit.VOLTAGE_REGULATOR,
-        "voltage_regulator": BaseCircuit.VOLTAGE_REGULATOR,
-        "minimal": BaseCircuit.MINIMAL,
-        "empty": BaseCircuit.MINIMAL
+    circuit_map = {
+        # Beginner
+        "resistor": Circuit.RESISTOR_DIVIDER,
+        "resistor_divider": Circuit.RESISTOR_DIVIDER,
+        "led": Circuit.LED_BLINKER,
+        "led_blinker": Circuit.LED_BLINKER,
+        # Intermediate
+        "regulator": Circuit.VOLTAGE_REGULATOR,
+        "voltage_regulator": Circuit.VOLTAGE_REGULATOR,
+        "usb": Circuit.USB_C_BASIC,
+        "usb_c": Circuit.USB_C_BASIC,
+        "usb_c_basic": Circuit.USB_C_BASIC,
+        "power": Circuit.POWER_SUPPLY,
+        "power_supply": Circuit.POWER_SUPPLY,
+        "power_supply_module": Circuit.POWER_SUPPLY,
+        # Advanced
+        "esp32": Circuit.ESP32_DEV_BOARD,
+        "esp32_dev_board": Circuit.ESP32_DEV_BOARD,
+        "stm32": Circuit.STM32_MINIMAL,
+        "stm32_minimal": Circuit.STM32_MINIMAL,
+        # Expert
+        "minimal": Circuit.MINIMAL,
+        "empty": Circuit.MINIMAL
     }
 
-    example_circuit_map = {
-        "esp32": ExampleCircuit.ESP32_DEV_BOARD,
-        "esp32_dev_board": ExampleCircuit.ESP32_DEV_BOARD,
-        "stm32": ExampleCircuit.STM32_MINIMAL,
-        "stm32_minimal": ExampleCircuit.STM32_MINIMAL,
-        "usb": ExampleCircuit.USB_C_BASIC,
-        "usb_c": ExampleCircuit.USB_C_BASIC,
-        "usb_c_basic": ExampleCircuit.USB_C_BASIC,
-        "power": ExampleCircuit.POWER_SUPPLY,
-        "power_supply": ExampleCircuit.POWER_SUPPLY,
-        "power_supply_module": ExampleCircuit.POWER_SUPPLY
-    }
-
-    # Parse base circuit
-    if base:
-        base_key = base.lower().strip()
-        if base_key not in base_circuit_map:
-            console.print(f"[red]❌ Invalid base circuit: {base}[/red]")
-            console.print(f"[yellow]Valid options: {', '.join(base_circuit_map.keys())}[/yellow]")
-            return None
-        base_circuit = base_circuit_map[base_key]
-    else:
-        base_circuit = BaseCircuit.RESISTOR_DIVIDER  # Default
-
-    # Parse examples
-    selected_examples = []
-    if examples:
-        example_names = [e.strip().lower() for e in examples.split(',')]
-        for name in example_names:
-            if name not in example_circuit_map:
-                console.print(f"[yellow]⚠️  Unknown example: {name} (skipping)[/yellow]")
-                console.print(f"[dim]Valid options: {', '.join(example_circuit_map.keys())}[/dim]")
+    # Parse circuits
+    selected_circuits = []
+    if circuits:
+        circuit_names = [c.strip().lower() for c in circuits.split(',')]
+        for name in circuit_names:
+            if name not in circuit_map:
+                console.print(f"[yellow]⚠️  Unknown circuit: {name} (skipping)[/yellow]")
+                console.print(f"[dim]Valid options: {', '.join(sorted(set(circuit_map.keys())))}[/dim]")
             else:
-                selected_examples.append(example_circuit_map[name])
+                selected_circuits.append(circuit_map[name])
+
+    # Use default if no circuits selected
+    if not selected_circuits:
+        selected_circuits = [Circuit.RESISTOR_DIVIDER]
 
     return ProjectConfig(
-        base_circuit=base_circuit,
-        examples=selected_examples,
+        circuits=selected_circuits,
         include_agents=not no_agents,
         include_kicad_plugins=False,
         developer_mode=developer
