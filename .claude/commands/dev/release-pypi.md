@@ -7,6 +7,27 @@ description: Release Pypi
 
 **Purpose:** Complete PyPI release pipeline - from testing to tagging to publishing.
 
+## ⚠️ RECOMMENDED: Test on TestPyPI First!
+
+**Before using this command**, test your release on TestPyPI:
+
+```bash
+# 1. Test release on TestPyPI first (RECOMMENDED)
+/dev-release-testpypi 0.7.0-test.1
+
+# 2. Verify package works from TestPyPI
+# 3. Only then proceed with production release
+/dev-release-pypi 0.7.0
+```
+
+**Why test on TestPyPI first?**
+- ✅ Catches packaging issues before production
+- ✅ Safe to experiment and iterate
+- ✅ No risk to production PyPI users
+- ✅ Can test same version multiple times
+
+See `/dev-release-testpypi` command for details.
+
 ## Usage
 ```bash
 /dev-release-pypi <version>
