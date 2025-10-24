@@ -195,8 +195,19 @@ class PCBGenerator:
             # Extract components from schematics
             components = self._extract_components_from_schematics()
             if not components:
-                logger.warning("No components found in schematics")
-                return False
+                logger.info("No components found in schematics - generating blank PCB")
+                # Generate blank PCB with default board settings
+                pcb.set_board_outline_rect(0, 0, 100.0, 100.0)  # Default blank board
+                logger.debug("Created blank PCB with default 100x100mm board")
+
+                # Save blank PCB file
+                pcb.save(self.pcb_path)
+                logger.info(f"✓ Blank PCB file saved to: {self.pcb_path}")
+
+                # Update project file to include PCB
+                self._update_project_file()
+
+                return True
 
             logger.debug(f"Found {len(components)} components to place")
 
