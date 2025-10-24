@@ -584,7 +584,7 @@ def main():
 
     # Create syncer and run
     syncer = KiCadToPythonSyncer(
-        kicad_project=str(kicad_project),
+        kicad_project_or_json=str(kicad_project),
         python_file=str(python_file),
         preview_only=False,  # Always apply changes
         create_backup=args.backup,
