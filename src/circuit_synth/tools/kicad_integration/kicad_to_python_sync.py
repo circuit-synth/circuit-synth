@@ -20,13 +20,10 @@ Usage:
 import argparse
 import json
 import logging
-import os
-import subprocess
 import sys
-import tempfile
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, Optional
 
 from circuit_synth.tools.utilities.kicad_parser import KiCadParser
 
@@ -70,8 +67,8 @@ class KiCadToPythonSyncer:
 
         if input_path.suffix == ".json":
             # NEW PATH: Use JSON directly (preferred)
-            self.json_path = input_path
-            logger.info(f"Using JSON netlist: {self.json_path}")
+            self._json_path = Path(input_path)
+            logger.info(f"Using JSON netlist: {self._json_path}")
 
         elif input_path.suffix == ".kicad_pro" or input_path.is_dir():
             # LEGACY PATH: Find or generate JSON (deprecated)
@@ -82,8 +79,8 @@ class KiCadToPythonSyncer:
                 DeprecationWarning,
                 stacklevel=2,
             )
-            self.json_path = self._find_or_generate_json(input_path)
-            logger.warning(f"Auto-generated/found JSON: {self.json_path}")
+            self._json_path = self._find_or_generate_json(input_path)
+            logger.warning(f"Auto-generated/found JSON: {self._json_path}")
 
         else:
             raise ValueError(
@@ -128,10 +125,25 @@ class KiCadToPythonSyncer:
         self.kicad_project = input_path
 
         logger.info(f"KiCadToPythonSyncer initialized")
-        logger.info(f"JSON input: {self.json_path}")
+        logger.info(f"JSON input: {self._json_path}")
         logger.info(f"Python target: {self.python_file_or_dir}")
         logger.info(f"Directory mode: {self.is_directory_mode}")
         logger.info(f"Preview mode: {self.preview_only}")
+
+    @property
+    def json_path(self) -> Path:
+        """
+        Path to the JSON netlist being used.
+
+        Returns:
+            Path to the JSON netlist file
+        """
+        return self._json_path
+
+    @json_path.setter
+    def json_path(self, value: Path) -> None:
+        """Set the JSON path."""
+        self._json_path = Path(value)
 
     def _find_or_generate_json(self, kicad_project: Path) -> Path:
         """
@@ -252,8 +264,36 @@ class KiCadToPythonSyncer:
             # Get main circuit
             main_circuit = circuits.get("main") or list(circuits.values())[0]
 
-            # Convert circuit to JSON format
-            json_data = main_circuit.to_circuit_synth_json()
+            # Convert circuit to JSON format (circuit-synth schema)
+            # Transform from models.Circuit format to circuit-synth JSON format
+            json_data = {
+                "name": main_circuit.name,
+                "components": {
+                    comp.reference: {
+                        "ref": comp.reference,
+                        "symbol": comp.lib_id,
+                        "value": comp.value,
+                        "footprint": comp.footprint,
+                    }
+                    for comp in main_circuit.components
+                },
+                "nets": {
+                    net.name: [
+                        {
+                            "component": conn[0],
+                            "pin_id": (
+                                int(conn[1]) if conn[1].isdigit() else conn[1]
+                            ),
+                        }
+                        for conn in net.connections
+                    ]
+                    for net in main_circuit.nets
+                },
+            }
+
+            # Add optional source_file if available
+            if main_circuit.schematic_file:
+                json_data["source_file"] = main_circuit.schematic_file
 
             # Write JSON file
             with open(json_path, "w", encoding="utf-8") as f:
