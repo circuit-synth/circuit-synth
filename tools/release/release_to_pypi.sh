@@ -47,7 +47,7 @@ UNWANTED_FILES=$(find . -maxdepth 1 \( \
     -type d -name "*_Dev_Board" -o \
     -type d -name "*_generated" -o \
     -type d -name "*_reference" \
-\) ! -path "./.git/*" ! -path "./.*" ! -name "README.md" ! -name "LICENSE" ! -name "CLAUDE.md" ! -name "Contributors.md" | grep -v "^\\./\\.")
+\) ! -path "./.git/*" ! -path "./.*" ! -name "README.md" ! -name "LICENSE" ! -name "CLAUDE.md" ! -name "Contributors.md" ! -name "CHANGELOG.md" ! -name "build.py" | grep -v "^\\./\\.")
 
 if [ -n "$UNWANTED_FILES" ]; then
     echo -e "${YELLOW}⚠️  Found files/directories that may not belong in the main branch:${NC}"
