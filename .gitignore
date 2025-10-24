@@ -176,6 +176,7 @@ test_single_resistor/
 test_designator/
 bbox-tests/
 professional_circuits/
+cs-new-project-artifacts/
 
 # Generated KiCad projects at root
 ESP32_C6_Dev_Board/
