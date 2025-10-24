@@ -5,6 +5,19 @@ All notable changes to circuit-synth will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.11] - 2025-10-23
+
+### Changed
+- **KiCad Integration**: Updated kicad-sch-api submodule to v0.3.4
+  - Removed excessive debug logging from pin symbol conversion (#8)
+  - Added geometry module for symbol bounding box calculations (#7)
+  - Added image support to KiCad schematics
+  - Fixed critical S-expression quote escaping bug
+  - Implemented wire/label/junction parsing for perfect round-trip preservation
+
+### Dependencies
+- Updated kicad-sch-api dependency from e4fee62 to db5aea7 (v0.3.4)
+
 ## [0.8.40] - 2025-01-11
 
 ### Fixed
