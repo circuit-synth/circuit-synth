@@ -160,6 +160,9 @@ circuit_synth = [
     "data/templates/project/*",
     "data/templates/claude/*",
     "data/templates/memory_bank/*",
+    # Include circuit template files (CRITICAL: needed for cs-new-project)
+    "data/templates/base_circuits/*.py",
+    "data/templates/example_circuits/*.py",
     # Include all files in example_project recursively
     "data/templates/example_project/**/*",
     "data/templates/example_project/**/**/*",

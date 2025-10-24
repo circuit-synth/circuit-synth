@@ -14,7 +14,7 @@ Or in Python:
     setup_claude_integration()
 """
 
-__version__ = "0.10.8"
+__version__ = "0.10.10"
 
 
 def print_version_info():
