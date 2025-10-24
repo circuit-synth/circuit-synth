@@ -150,7 +150,7 @@ class PCBGenerator:
     def generate_pcb(
         self,
         circuit_dict: Optional[Dict[str, Circuit]] = None,
-        placement_algorithm: str = "spiral",  # Changed default to spiral
+        placement_algorithm: str = "hierarchical",  # Default placement algorithm
         board_width: Optional[float] = None,  # Made optional
         board_height: Optional[float] = None,  # Made optional
         component_spacing: float = 5.0,  # Increased from 2.0 to account for courtyards
@@ -250,13 +250,6 @@ class PCBGenerator:
             logger.debug(f"Found {len(connections)} connections")
 
             # Apply placement algorithm
-            # Use spiral placement if we have connections, otherwise use hierarchical
-            if connections and placement_algorithm == "hierarchical":
-                logger.info(
-                    "Found connections, switching to spiral placement for better results"
-                )
-                placement_algorithm = "spiral"
-
             logger.debug(f"Applying {placement_algorithm} placement algorithm")
             logger.debug(
                 f"Component spacing: {component_spacing}mm, Group spacing: {group_spacing}mm"
@@ -314,7 +307,7 @@ class PCBGenerator:
                             connections=(
                                 connections
                                 if placement_algorithm
-                                in ["spiral", "force_directed", "connection_centric", "external"]
+                                in ["force_directed", "connection_centric", "external"]
                                 else None
                             ),
                         )
