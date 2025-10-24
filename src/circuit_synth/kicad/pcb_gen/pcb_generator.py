@@ -155,8 +155,6 @@ class PCBGenerator:
         board_height: Optional[float] = None,  # Made optional
         component_spacing: float = 5.0,  # Increased from 2.0 to account for courtyards
         group_spacing: float = 10.0,  # Increased from 5.0
-        spiral_step: float = 1.0,  # Step size for spiral search
-        max_spiral_radius: float = 30.0,  # Maximum search radius
         max_board_size: float = 500.0,  # Maximum allowed board dimension
         board_size_increment: float = 25.0,  # Reduced from 50.0
         auto_route: bool = False,  # Disable auto-routing by default (can be slow)
@@ -174,8 +172,6 @@ class PCBGenerator:
             board_height: Initial board height in mm (if None, auto-calculated)
             component_spacing: Spacing between components in mm
             group_spacing: Spacing between hierarchical groups in mm
-            spiral_step: Step size for spiral search
-            max_spiral_radius: Maximum search radius
             max_board_size: Maximum allowed board dimension in mm
             board_size_increment: Size increase per retry in mm
             auto_route: If True, automatically route the PCB using Freerouting (default: False)
@@ -302,8 +298,6 @@ class PCBGenerator:
                             group_spacing=group_spacing,
                             board_width=current_width,
                             board_height=current_height,
-                            spiral_step=spiral_step,
-                            max_spiral_radius=max_spiral_radius,
                             connections=(
                                 connections
                                 if placement_algorithm
