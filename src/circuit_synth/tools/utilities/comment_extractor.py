@@ -507,8 +507,8 @@ class CommentExtractor:
             # Extract user comments from inside the existing function
             user_comments_map = self.extract_comments_from_function(existing_file, function_name)
 
-            # Filter out standalone 'pass' statements if we have generated code
-            # 'pass' is only needed when there's no code in the function
+            # Filter out generated patterns and standalone 'pass' statements
+            # These should not be preserved as "user content"
             if user_comments_map and generated_func_body:
                 # Check if any generated line has actual component code (not just whitespace/comments)
                 has_real_code = any(
@@ -520,16 +520,60 @@ class CommentExtractor:
                 )
 
                 if has_real_code:
-                    # Remove standalone 'pass' statements since we have real code
+                    # Known generated comment patterns that should not be preserved
+                    generated_patterns = [
+                        'pass',  # Standalone pass statement
+                        '# Create components',  # Generated section marker
+                        '# Create nets',  # Generated section marker
+                        '# Create subcircuits',  # Generated section marker
+                    ]
+
+                    # Remove generated patterns and component code lines
                     filtered_comments = {}
                     for offset, lines in user_comments_map.items():
-                        filtered_lines = [
-                            line for line in lines
-                            if line.strip() != 'pass'
-                        ]
+                        filtered_lines = []
+                        for line in lines:
+                            stripped = line.strip()
+                            # Skip if it's a generated pattern
+                            if stripped in generated_patterns:
+                                continue
+                            # Skip if it looks like generated component code
+                            # (starts with variable assignment for common component patterns)
+                            if stripped and not stripped.startswith('#'):
+                                # Check if it's a component assignment (e.g., "r1 = Component(...)")
+                                if '= Component(' in stripped or '= Net(' in stripped:
+                                    continue
+                            filtered_lines.append(line)
+
                         if filtered_lines:  # Only keep if there's content after filtering
                             filtered_comments[offset] = filtered_lines
-                    user_comments_map = filtered_comments
+
+                    # Now remove leading blank-only entries, but keep blank lines between content
+                    if filtered_comments:
+                        # Find first and last non-blank entries
+                        sorted_offsets = sorted(filtered_comments.keys())
+                        first_non_blank = None
+                        last_non_blank = None
+
+                        for offset in sorted_offsets:
+                            has_content = any(line.strip() for line in filtered_comments[offset])
+                            if has_content:
+                                if first_non_blank is None:
+                                    first_non_blank = offset
+                                last_non_blank = offset
+
+                        # Keep only entries between first and last non-blank (inclusive)
+                        if first_non_blank is not None:
+                            user_comments_map = {
+                                offset: lines
+                                for offset, lines in filtered_comments.items()
+                                if first_non_blank <= offset <= last_non_blank
+                            }
+                        else:
+                            # All blank lines - discard
+                            user_comments_map = {}
+                    else:
+                        user_comments_map = {}
 
             # Merge: user comments first, then generated code
             if user_comments_map:
