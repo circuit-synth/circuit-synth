@@ -66,9 +66,7 @@ class TestKiCadToPythonSyncerRefactored:
 
         # Should trigger deprecation warning
         with pytest.warns(DeprecationWarning, match="Passing KiCad project directly"):
-            syncer = KiCadToPythonSyncer(
-                str(kicad_pro), str(tmp_path / "output.py")
-            )
+            syncer = KiCadToPythonSyncer(str(kicad_pro), str(tmp_path / "output.py"))
 
         # Verify JSON was loaded (fallback path)
         assert syncer.json_path == json_file
@@ -128,11 +126,14 @@ class TestKiCadToPythonSyncerRefactored:
         syncer = KiCadToPythonSyncer.__new__(KiCadToPythonSyncer)
 
         # Patch the import at the point where it's used
-        with patch.dict("sys.modules", {
-            "circuit_synth.tools.utilities.kicad_schematic_parser": Mock(
-                KiCadSchematicParser=mock_parser_class
-            )
-        }):
+        with patch.dict(
+            "sys.modules",
+            {
+                "circuit_synth.tools.utilities.kicad_schematic_parser": Mock(
+                    KiCadSchematicParser=mock_parser_class
+                )
+            },
+        ):
             result = syncer._export_kicad_to_json(kicad_pro)
 
             assert result == tmp_path / "test.json"
@@ -268,7 +269,9 @@ class TestKiCadToPythonSyncerRefactored:
         mock_circuit.nets = []  # Empty list of nets
         mock_circuit.generate_json_netlist = Mock()
 
-        with patch("circuit_synth.tools.kicad_integration.kicad_to_python_sync.KiCadParser") as mock_parser_class:
+        with patch(
+            "circuit_synth.tools.kicad_integration.kicad_to_python_sync.KiCadParser"
+        ) as mock_parser_class:
             mock_parser_instance = Mock()
             mock_parser_instance.parse_circuits.return_value = {"main": mock_circuit}
             mock_parser_class.return_value = mock_parser_instance
@@ -286,8 +289,15 @@ class TestKiCadToPythonSyncerRefactored:
         json_file = tmp_path / "test.json"
         json_data = {
             "name": "test_circuit",
-            "components": {"R1": {"ref": "R1", "symbol": "Device:R", "value": "10k", "footprint": "R_0603"}},
-            "nets": {}
+            "components": {
+                "R1": {
+                    "ref": "R1",
+                    "symbol": "Device:R",
+                    "value": "10k",
+                    "footprint": "R_0603",
+                }
+            },
+            "nets": {},
         }
         json_file.write_text(json.dumps(json_data))
 
