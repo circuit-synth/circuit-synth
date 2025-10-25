@@ -22,6 +22,7 @@ description: Review Branch
 - `--diff-context=5` - Lines of context for code analysis (default: 5)
 - `--auto-fix=false` - Suggest automated fixes for detected issues (default: false)
 - `--interactive=false` - Interactive mode for detailed issue exploration (default: false)
+- `--agent-review=auto` - Iterative agent review: `auto`, `always`, `never` (default: auto)
 
 ## What This Does
 
@@ -502,6 +503,109 @@ def check_documentation_quality(file_path):
 - Missing tests → Generate test templates
 - KiCad symbol issues → Library path validation
 
+### 12. Iterative Agent Review (Human-Like Code Review)
+
+After automated tool analysis completes, optionally launch independent Claude agents for iterative human-like code review.
+
+**When Agent Review Runs:**
+- `--agent-review=auto` (default): Only if automated tools found HIGH or CRITICAL issues
+- `--agent-review=always`: Always run agent review regardless of automated findings
+- `--agent-review=never`: Skip agent review, only use automated tools
+
+**Agent Review Process:**
+
+**Step 1: Initial Agent Review**
+Launch an independent general-purpose agent to comprehensively review the branch:
+- Analyze all code changes with fresh perspective
+- Identify bugs, logic errors, edge cases automated tools might miss
+- Check code quality, readability, maintainability
+- Verify tests are comprehensive
+- Review documentation accuracy
+- Provide status: **APPROVE** or **REQUEST CHANGES**
+- List issues by priority: CRITICAL, HIGH, MEDIUM, LOW
+
+**Step 2: Apply Fixes**
+If agent requests changes:
+- Fix issues in priority order (CRITICAL → HIGH → MEDIUM)
+- Run relevant tests to verify fixes work
+- Commit fixes with descriptive messages
+
+**Step 3: Second Agent Review**
+Launch a **new independent agent** (fresh perspective) to:
+- Verify previous issues were fixed correctly
+- **Catch mistakes introduced by the fixes** (this is critical!)
+- Identify any remaining issues
+- Provide verdict: APPROVE or REQUEST CHANGES
+
+**Step 4: Iterate Until APPROVE**
+Repeat the review → fix → review cycle until:
+- Agent status is **APPROVE**
+- All CRITICAL and HIGH issues resolved
+- Tests passing
+- No regressions introduced
+
+**Why Independent Agents?**
+Each review uses a fresh agent with no context from previous reviews. This catches:
+- Issues overlooked when "too familiar" with code
+- Mistakes introduced while fixing previous issues
+- Edge cases that emerge after changes
+- Regressions not caught by automated tests
+
+**Example Review Cycle:**
+
+```
+Automated Tools Complete → 3 HIGH issues, 5 MEDIUM issues found
+
+Agent Review 1:
+  → Finds: 2 CRITICAL bugs automated tools missed
+  → Finds: 7 HIGH priority issues (unused imports, logic errors)
+  → Status: REQUEST CHANGES
+
+Developer Applies Fixes:
+  → Fix critical bugs (commit abc123)
+  → Remove unused imports (commit def456)
+  → Run tests: ✅ passing
+
+Agent Review 2 (fresh agent):
+  ✅ Verified critical bugs fixed correctly
+  ❌ Found mistake: NetlistExporter import incorrectly removed
+  → Status: REQUEST CHANGES
+
+Developer Applies Fix:
+  → Restore NetlistExporter import (commit ghi789)
+  → Run tests: ✅ passing
+
+Agent Review 3 (fresh agent):
+  ✅ All fixes verified correct
+  ✅ All tests passing
+  ✅ No regressions detected
+  → Status: APPROVE ✅
+```
+
+**Agent Review Integration:**
+The agent review results are appended to the automated analysis report:
+
+```markdown
+## 🤖 Iterative Agent Review
+
+### Review Cycle Summary
+- **Cycle 1:** Found 2 CRITICAL, 7 HIGH issues → REQUEST CHANGES
+- **Fixes Applied:** Commits abc123, def456
+- **Cycle 2:** Caught NetlistExporter removal error → REQUEST CHANGES
+- **Fixes Applied:** Commit ghi789
+- **Cycle 3:** All issues resolved → APPROVE ✅
+
+### Agent Review Status: ✅ APPROVED
+
+This branch is ready for merge from both automated tools and human-like code review perspectives.
+```
+
+**Benefits:**
+- **Fresh perspective**: Each agent reviews without bias from previous context
+- **Catches fix mistakes**: Second/third reviews catch errors introduced while fixing issues
+- **Higher confidence**: Multiple independent reviews agreeing means code is truly ready
+- **Human-like review**: Complements automated tools with reasoning and context understanding
+
 ## Output Structure
 
 The command generates a comprehensive markdown report with:
@@ -526,7 +630,7 @@ The command generates a comprehensive markdown report with:
 ### 🏗️ Architectural Impact
 ### ⚠️ Risk Assessment Matrix
 ### 🧹 Code Quality Review
-### 🔒 Security Analysis  
+### 🔒 Security Analysis
 ### ⚡ Performance Impact
 ### 🧪 Testing Coverage
 ### 📚 Documentation Impact Assessment
@@ -537,8 +641,22 @@ The command generates a comprehensive markdown report with:
 
 ## 🔧 Automated Fix Suggestions
 ### Critical Issues (Auto-fixable)
-### Warning Issues (Suggestions)  
+### Warning Issues (Suggestions)
 ### Optimization Opportunities
+
+## 🤖 Iterative Agent Review (if --agent-review enabled)
+### Review Cycle Summary
+- Cycle 1: [status and findings]
+- Cycle 2: [verification and new findings]
+- Cycle N: [final status]
+
+### Agent Review Status
+- ✅ APPROVED or ⚠️ REQUEST CHANGES
+
+### Key Findings from Agent Review
+- Issues automated tools missed
+- Mistakes caught in fixes
+- Overall code quality assessment
 
 ## 🎯 Recommendations
 ### 🚨 Immediate Actions Required (Blocking)
@@ -734,17 +852,17 @@ python -m circuit_synth.ai_integration.memory_bank.validate_structure
 ## Example Usage
 
 ```bash
-# Quick security-focused review
+# Quick security-focused review (automated tools only)
 /dev-review-branch --depth=quick --focus=security
 
-# Full comprehensive review for major release
-/dev-review-branch --depth=full --target=main --auto-fix=true
+# Full comprehensive review with agent review for major release
+/dev-review-branch --depth=full --target=main --auto-fix=true --agent-review=always
 
 # Performance-focused review with JSON output
 /dev-review-branch --focus=performance --format=json --threshold=high
 
-# Circuit-synth specific deep analysis
-/dev-review-branch --focus=circuit-synth --depth=forensic --interactive=true
+# Circuit-synth specific deep analysis with agent review
+/dev-review-branch --focus=circuit-synth --depth=forensic --interactive=true --agent-review=always
 
 # Dependency-focused review with auto-suggestions
 /dev-review-branch --focus=dependencies --auto-fix=true --format=checklist
@@ -752,8 +870,14 @@ python -m circuit_synth.ai_integration.memory_bank.validate_structure
 # Interactive review for complex changes
 /dev-review-branch --depth=full --interactive=true --history=20
 
-# Pre-merge validation (strict mode)
-/dev-review-branch --threshold=critical --format=checklist --depth=full
+# Pre-merge validation (strict mode with agent review)
+/dev-review-branch --threshold=critical --format=checklist --depth=full --agent-review=always
+
+# Standard review with auto agent review (only if issues found)
+/dev-review-branch --agent-review=auto
+
+# Automated tools only, skip agent review
+/dev-review-branch --agent-review=never
 ```
 
 ## Integration Points
