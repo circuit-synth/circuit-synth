@@ -368,3 +368,65 @@ def main():
         # Check if there's a gap in the indices
         has_blank_between = (another_one_indices[3] - another_one_indices[2]) > 1
         assert has_blank_between, "Should preserve blank line between comment groups"
+
+    def test_strips_trailing_blank_lines(self, extractor, tmp_path):
+        """Test that trailing blank lines at end of function are removed"""
+        code = '''@circuit
+def main():
+    """Generated circuit from KiCad"""
+    # USER COMMENT: This is my first preserved comment!
+    """
+    look at these!"""
+
+    # another one!
+    # another one!
+    # another one!
+
+    # another one!
+    # another one!
+    # another one!
+    """ more comments"""
+    """ more comments"""
+    """ more comments"""
+
+    # suhp?
+
+
+if __name__ == '__main__':
+    circuit = main()
+'''
+        file_path = tmp_path / "circuit_with_trailing_blanks.py"
+        file_path.write_text(code)
+
+        # Generate new code
+        generated_code = '''@circuit
+def main():
+    """Generated circuit from KiCad"""
+
+
+'''
+        result = extractor.extract_and_reinsert(file_path, generated_code, "main")
+
+        # Find where function ends (before the generated circuit comment)
+        lines = result.split('\n')
+
+        # Find the last user content line (should be "# suhp?")
+        suhp_index = None
+        for i, line in enumerate(lines):
+            if "suhp?" in line:
+                suhp_index = i
+                break
+
+        assert suhp_index is not None, "Should find '# suhp?' comment"
+
+        # Check lines after "# suhp?" - should not have excessive blank lines
+        # Allow max 2 blank lines after last content
+        blank_count = 0
+        for i in range(suhp_index + 1, len(lines)):
+            line = lines[i]
+            if line.strip() == '':
+                blank_count += 1
+            else:
+                break  # Hit non-blank line
+
+        assert blank_count <= 2, f"Should not have more than 2 trailing blank lines, found {blank_count}"

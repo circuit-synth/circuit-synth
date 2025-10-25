@@ -265,11 +265,22 @@ class CommentExtractor:
                 # Content lines already have their indentation preserved
                 all_content.append(content_line)
 
+        # Strip trailing blank lines from user content
+        # (preserve blank lines BETWEEN content, but not at the end)
+        while all_content and all_content[-1].strip() == '':
+            all_content.pop()
+
+        # Also strip trailing blank lines from generated content
+        # to avoid excessive blank lines at function end
+        generated_lines_copy = list(generated_lines)  # Don't modify original
+        while generated_lines_copy and generated_lines_copy[-1].strip() == '':
+            generated_lines_copy.pop()
+
         # Insert all content at the beginning
         result_lines = all_content
 
-        # Add the rest of the generated lines
-        result_lines.extend(generated_lines)
+        # Add the rest of the generated lines (without trailing blanks)
+        result_lines.extend(generated_lines_copy)
 
         return result_lines
 
