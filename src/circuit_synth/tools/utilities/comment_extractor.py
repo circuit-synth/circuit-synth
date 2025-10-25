@@ -442,8 +442,9 @@ class CommentExtractor:
                 result_lines.extend(generated_func_body)
 
             # Part 3: Everything AFTER the function body (preserve user content after function)
-            if existing_func_end is not None and (existing_func_end + 1) < len(existing_lines):
-                for i in range(existing_func_end + 1, len(existing_lines)):
+            # existing_func_end is 1-indexed, so existing_lines[existing_func_end] is the line AFTER function end
+            if existing_func_end is not None and existing_func_end < len(existing_lines):
+                for i in range(existing_func_end, len(existing_lines)):
                     # Preserve line as-is but remove trailing newline
                     line = existing_lines[i]
                     if line.endswith('\n'):
