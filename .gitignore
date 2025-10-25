@@ -1,91 +1,26 @@
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# Python version management
-.python-version
-
-# Poetry
-poetry.lock
-
-# PEP 582
-__pypackages__/
-
-# Environments
-.env
-.venv
-env/
+# Virtual environments
+.venv/
 venv/
 ENV/
-env.bak/
-venv.bak/
 
-# mkdocs documentation
-/site
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
 
 # Type checking
 .mypy_cache/
-.dmypy.json
-dmypy.json
-.pyre/
-.pytype/
-
-# Cython debug symbols
-cython_debug/
 
 # IDEs
 .idea/
@@ -97,50 +32,13 @@ cython_debug/
 # Claude Code local settings
 .claude/local.md
 
-# KiCad backup files
+# KiCad auto-generated backup files
 *.kicad_pcb-bak
 *.kicad_sch-bak
 *.kicad_pro-bak
 *-backups/
 fp-info-cache
 
-# Test outputs and generated KiCad projects
-test_outputs/
-test_output/
-tests/functional_tests/**/generated_output/
-annotated_circuit/
-commented_circuit/
-complex_net_circuit/
-cycle_test_circuit/
-empty_circuit/
-example_project/
-hier_circuit/
-main_circuit/
-mixed_circuit/
-multi_level_circuit/
-net_circuit/
-perf_simple/
-perf_size/
-positioned_circuit/
-resistor_circuit/
-routed_circuit/
-stress_test_circuit/
-test_circuit/
-voltage_divider/
-
-# Build and cache artifacts
-cache/
+# User credentials (never commit)
+.env
 .pypirc
-memory-bank/
-.circuit_synth/
-.circuit-synth/
-coverage.json
-
-# Session notes and temporary documentation
-*_SUMMARY.md
-*_COMPLETE_*.md
-PLAN_*.md
-FIXES_*.md
-
-# External libraries
-libraries/digikey-kicad-converted/
