@@ -12,6 +12,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from circuit_synth.tools.utilities.comment_extractor import CommentExtractor
 from circuit_synth.tools.utilities.models import Circuit, Component, Net
 
 logger = logging.getLogger(__name__)
@@ -23,6 +24,7 @@ class PythonCodeGenerator:
     def __init__(self, project_name: Optional[str] = None):
         """Initialize the Python code generator"""
         self.project_name = project_name
+        self.comment_extractor = CommentExtractor()
 
     def _generate_project_call(self) -> str:
         """Generate the circuit.generate_kicad_netlist() and circuit.generate_kicad_project() calls"""
@@ -1307,20 +1309,30 @@ class PythonCodeGenerator:
                 updated_code = self._generate_flat_code(main_circuit)
 
             if updated_code:
-                logger.info(
-                    f"🔄 CODE_UPDATE: Generated updated code: {len(updated_code)} chars"
-                )
+                print(f"\n🔄 CODE_UPDATE: Generated updated code: {len(updated_code)} chars")
+
+                # COMMENT PRESERVATION: Extract and reinsert comments
+                if python_file.exists():
+                    print(f"📝 COMMENT_PRESERVATION: Extracting comments from {python_file}")
+                    updated_code_with_comments = self.comment_extractor.extract_and_reinsert(
+                        python_file, updated_code, "main"
+                    )
+                    print(f"📝 COMMENT_PRESERVATION: Comments reinserted into generated code")
+                    updated_code = updated_code_with_comments
+                else:
+                    print(f"📝 COMMENT_PRESERVATION: File does not exist yet, no comments to preserve")
+
                 if preview_only:
-                    logger.info("🔄 CODE_UPDATE: Preview mode - not writing to file")
+                    print("🔄 CODE_UPDATE: Preview mode - not writing to file")
                     return updated_code
                 else:
-                    logger.info("🔄 CODE_UPDATE: Writing updated code to file")
+                    print("🔄 CODE_UPDATE: Writing updated code to file")
                     python_file.parent.mkdir(parents=True, exist_ok=True)
                     python_file.write_text(updated_code)
-                    logger.info("🔄 CODE_UPDATE: ✅ File update completed")
+                    print("🔄 CODE_UPDATE: ✅ File update completed")
                     return updated_code
             else:
-                logger.error("🔄 CODE_UPDATE: ❌ Failed to generate updated code")
+                print("🔄 CODE_UPDATE: ❌ Failed to generate updated code")
                 return None
 
         except Exception as e:

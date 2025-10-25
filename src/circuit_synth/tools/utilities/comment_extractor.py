@@ -48,6 +48,7 @@ class CommentExtractor:
 
             tree = ast.parse(source_code)
             function_start_line = self._find_function_start_line(tree, function_name)
+            function_end_line = self._find_function_end_line(tree, function_name)
 
             if function_start_line is None:
                 logger.warning(f"Function '{function_name}' not found in {file_path}")
@@ -55,7 +56,7 @@ class CommentExtractor:
 
             # Extract comments using tokenize
             comments_map = self._extract_comments_with_tokenize(
-                file_path, function_start_line
+                file_path, function_start_line, function_end_line
             )
 
             logger.info(
@@ -86,8 +87,27 @@ class CommentExtractor:
                 return node.body[0].lineno if node.body else node.lineno
         return None
 
+    def _find_function_end_line(
+        self, tree: ast.AST, function_name: str
+    ) -> Optional[int]:
+        """
+        Find the ending line number of a function in the AST.
+
+        Args:
+            tree: Parsed AST tree
+            function_name: Name of function to find
+
+        Returns:
+            Line number (1-indexed) of last line of function, or None if not found
+        """
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and node.name == function_name:
+                # Return the end line of the function
+                return node.end_lineno
+        return None
+
     def _extract_comments_with_tokenize(
-        self, file_path: Path, function_start_line: int
+        self, file_path: Path, function_start_line: int, function_end_line: Optional[int] = None
     ) -> Dict[int, List[str]]:
         """
         Extract comments using the tokenize module.
@@ -95,6 +115,7 @@ class CommentExtractor:
         Args:
             file_path: Path to Python file
             function_start_line: Line number where function body starts
+            function_end_line: Line number where function ends (optional, for bounds checking)
 
         Returns:
             Dictionary mapping line offset to comments
@@ -110,14 +131,18 @@ class CommentExtractor:
                         line_num = tok.start[0]  # 1-indexed line number
                         comment_text = tok.string  # Includes the '#'
 
+                        # Only include comments within function bounds
+                        if line_num < function_start_line:
+                            continue
+                        if function_end_line is not None and line_num > function_end_line:
+                            continue
+
                         # Calculate offset relative to function start
                         line_offset = line_num - function_start_line
 
-                        # Only include comments inside or after the function
-                        if line_offset >= 0:
-                            if line_offset not in comments_map:
-                                comments_map[line_offset] = []
-                            comments_map[line_offset].append(comment_text)
+                        if line_offset not in comments_map:
+                            comments_map[line_offset] = []
+                        comments_map[line_offset].append(comment_text)
 
         except tokenize.TokenError as e:
             logger.warning(f"Tokenization error: {e}")
@@ -207,8 +232,10 @@ class CommentExtractor:
         comments_map = self.extract_comments_from_function(existing_file, function_name)
 
         if not comments_map:
-            logger.info("No comments found to preserve")
+            print(f"[DEBUG] No comments found to preserve from {existing_file}")
             return generated_code
+
+        print(f"[DEBUG] Extracted {len(comments_map)} comment locations: {comments_map}")
 
         # Find the function in generated code
         generated_lines = generated_code.split("\n")
@@ -217,10 +244,11 @@ class CommentExtractor:
         )
 
         if function_start_idx is None:
-            logger.warning(
-                f"Function '{function_name}' not found in generated code, cannot reinsert comments"
-            )
+            print(f"[DEBUG] Function '{function_name}' not found in generated code")
             return generated_code
+
+        print(f"[DEBUG] Found function '{function_name}' at line index {function_start_idx}")
+        print(f"[DEBUG] Generated function body has {len(generated_lines) - function_start_idx} lines")
 
         # Split code into: before function, function body, after function
         before_function = generated_lines[:function_start_idx]
@@ -248,6 +276,7 @@ class CommentExtractor:
         """
         in_function = False
         decorator_or_def_found = False
+        docstring_end_idx = None
 
         for i, line in enumerate(lines):
             stripped = line.strip()
@@ -264,13 +293,18 @@ class CommentExtractor:
             if in_function and decorator_or_def_found:
                 # Skip docstrings
                 if stripped.startswith('"""') or stripped.startswith("'''"):
+                    docstring_end_idx = i
                     continue
 
-                # Skip empty lines
-                if not stripped:
+                # Skip empty lines after docstring
+                if docstring_end_idx is not None and not stripped:
                     continue
 
-                # This is the first real line of the function body
+                # This is the first real line of the function body (or end of function)
                 return i
+
+        # If we reach here with a blank function, return the docstring line + 1
+        if docstring_end_idx is not None:
+            return docstring_end_idx + 1
 
         return None
