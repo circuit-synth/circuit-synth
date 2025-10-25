@@ -150,13 +150,11 @@ class PCBGenerator:
     def generate_pcb(
         self,
         circuit_dict: Optional[Dict[str, Circuit]] = None,
-        placement_algorithm: str = "spiral",  # Changed default to spiral
+        placement_algorithm: str = "hierarchical",  # Default placement algorithm
         board_width: Optional[float] = None,  # Made optional
         board_height: Optional[float] = None,  # Made optional
         component_spacing: float = 5.0,  # Increased from 2.0 to account for courtyards
         group_spacing: float = 10.0,  # Increased from 5.0
-        spiral_step: float = 1.0,  # Step size for spiral search
-        max_spiral_radius: float = 30.0,  # Maximum search radius
         max_board_size: float = 500.0,  # Maximum allowed board dimension
         board_size_increment: float = 25.0,  # Reduced from 50.0
         auto_route: bool = False,  # Disable auto-routing by default (can be slow)
@@ -174,8 +172,6 @@ class PCBGenerator:
             board_height: Initial board height in mm (if None, auto-calculated)
             component_spacing: Spacing between components in mm
             group_spacing: Spacing between hierarchical groups in mm
-            spiral_step: Step size for spiral search
-            max_spiral_radius: Maximum search radius
             max_board_size: Maximum allowed board dimension in mm
             board_size_increment: Size increase per retry in mm
             auto_route: If True, automatically route the PCB using Freerouting (default: False)
@@ -199,8 +195,19 @@ class PCBGenerator:
             # Extract components from schematics
             components = self._extract_components_from_schematics()
             if not components:
-                logger.warning("No components found in schematics")
-                return False
+                logger.info("No components found in schematics - generating blank PCB")
+                # Generate blank PCB with default board settings
+                pcb.set_board_outline_rect(0, 0, 100.0, 100.0)  # Default blank board
+                logger.debug("Created blank PCB with default 100x100mm board")
+
+                # Save blank PCB file
+                pcb.save(self.pcb_path)
+                logger.info(f"✓ Blank PCB file saved to: {self.pcb_path}")
+
+                # Update project file to include PCB
+                self._update_project_file()
+
+                return True
 
             logger.debug(f"Found {len(components)} components to place")
 
@@ -250,13 +257,6 @@ class PCBGenerator:
             logger.debug(f"Found {len(connections)} connections")
 
             # Apply placement algorithm
-            # Use spiral placement if we have connections, otherwise use hierarchical
-            if connections and placement_algorithm == "hierarchical":
-                logger.info(
-                    "Found connections, switching to spiral placement for better results"
-                )
-                placement_algorithm = "spiral"
-
             logger.debug(f"Applying {placement_algorithm} placement algorithm")
             logger.debug(
                 f"Component spacing: {component_spacing}mm, Group spacing: {group_spacing}mm"
@@ -309,12 +309,10 @@ class PCBGenerator:
                             group_spacing=group_spacing,
                             board_width=current_width,
                             board_height=current_height,
-                            spiral_step=spiral_step,
-                            max_spiral_radius=max_spiral_radius,
                             connections=(
                                 connections
                                 if placement_algorithm
-                                in ["spiral", "force_directed", "connection_centric", "external"]
+                                in ["force_directed", "connection_centric", "external"]
                                 else None
                             ),
                         )

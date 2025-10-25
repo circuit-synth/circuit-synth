@@ -1393,7 +1393,7 @@ class PCBBoard:
         Automatically place components using specified algorithm.
 
         Args:
-            algorithm: Placement algorithm to use ("hierarchical", "force_directed", "spiral", "advanced", "external", etc.)
+            algorithm: Placement algorithm to use ("hierarchical", "force_directed", "advanced", "external", etc.)
             **kwargs: Algorithm-specific parameters
                 For hierarchical placement:
                 - component_spacing: Spacing between components in mm (default: 0.5)
@@ -1407,10 +1407,6 @@ class PCBBoard:
                 - iterations_per_level: Number of iterations for each optimization level (default: 100)
                 - damping: Damping factor to prevent oscillations (default: 0.8)
                 - use_courtyard: Use courtyard geometry for collision detection (default: True)
-                For spiral placement:
-                - component_spacing: Minimum spacing between components (default: 5.0)
-                - spiral_step: Step size for spiral search (default: 0.5)
-                - use_courtyard: Use courtyard geometry for collision (default: True)
                 For advanced placement:
                 - signal_net_weight: Weight for signal nets (default: 1.0)
                 - power_net_weight: Weight for power/ground nets (default: 0.1)
@@ -1466,33 +1462,6 @@ class PCBBoard:
                 f"Completed {algorithm} placement with courtyard collision detection"
             )
 
-        elif algorithm == "spiral":
-            from .placement.spiral_placement_v2 import SpiralPlacementAlgorithmV2
-
-            # Extract connections if provided
-            connections = kwargs.get("connections", [])
-            spiral_kwargs = {
-                "component_spacing": kwargs.get("component_spacing", 5.0),
-                "spiral_step": kwargs.get("spiral_step", 0.5),
-                "use_courtyard": kwargs.get("use_courtyard", True),
-            }
-            placer = SpiralPlacementAlgorithmV2(**spiral_kwargs)
-
-            # Get board outline
-            board_outline = self.get_board_outline_bbox()
-
-            # Run placement directly with footprints
-            result = placer.place_components(
-                list(self.footprints.values()), board_outline, connections
-            )
-
-            if result.success:
-                logger.debug(f"Completed {algorithm} placement: {result.message}")
-                return result
-            else:
-                logger.error(f"Spiral placement failed: {result.message}")
-                raise ValueError(f"Placement failed: {result.message}")
-
         elif algorithm == "force_directed":
             from .placement.base import ComponentWrapper
             from .placement.force_directed_placement_fixed import ForceDirectedPlacement
@@ -1543,74 +1512,6 @@ class PCBBoard:
                     self.footprints[ref].position = pos
 
             logger.debug(f"Completed force-directed placement with two-level hierarchy")
-
-        elif algorithm == "spiral_hierarchical":
-            from .placement.base import ComponentWrapper
-            from .placement.spiral_hierarchical_placement import (
-                SpiralHierarchicalPlacer,
-            )
-
-            logger.debug(
-                f"Starting spiral placement with {len(self.footprints)} footprints"
-            )
-
-            # Create component wrappers
-            wrappers = []
-            for footprint in self.footprints.values():
-                wrapper = ComponentWrapper(footprint)
-                wrappers.append(wrapper)
-                logger.debug(
-                    f"Created wrapper for {footprint.reference} at ({footprint.position.x}, {footprint.position.y})"
-                )
-
-            # Extract connections from ratsnest
-            connections = []
-            ratsnest = self.get_ratsnest()
-            logger.debug(f"Ratsnest has {len(ratsnest)} connections")
-            for connection in ratsnest:
-                ref1 = connection["from_ref"]
-                ref2 = connection["to_ref"]
-                connections.append((ref1, ref2))
-                logger.debug(f"Connection: {ref1} <-> {ref2}")
-
-            # Get board dimensions (default to 100x100 if not specified)
-            board_width = kwargs.get("board_width", 100.0)
-            board_height = kwargs.get("board_height", 100.0)
-            logger.debug(f"Board dimensions: {board_width}x{board_height}mm")
-
-            # Create placer with specified parameters
-            placer = SpiralHierarchicalPlacer(
-                component_spacing=kwargs.get("component_spacing", 0.5),
-                group_spacing=kwargs.get("group_spacing", 2.5),
-                spiral_step=kwargs.get("spiral_step", 0.5),
-                max_spiral_radius=kwargs.get("max_spiral_radius", 50.0),
-            )
-            logger.debug(
-                f"Created spiral placer with spacing={kwargs.get('component_spacing', 0.5)}mm, spiral_step={kwargs.get('spiral_step', 0.5)}mm"
-            )
-
-            # Run placement
-            logger.debug("Running spiral placement algorithm...")
-            positions = placer.place(wrappers, connections, board_width, board_height)
-            logger.debug(f"Placement returned {len(positions)} positions")
-
-            # Update footprint positions
-            updated_count = 0
-            for ref, position in positions.items():
-                if ref in self.footprints:
-                    old_pos = self.footprints[ref].position
-                    self.footprints[ref].position = position
-                    logger.debug(
-                        f"Updated {ref}: ({old_pos.x}, {old_pos.y}) -> ({position.x}, {position.y})"
-                    )
-                    updated_count += 1
-                else:
-                    logger.warning(f"Position for unknown footprint: {ref}")
-
-            logger.debug(f"Updated {updated_count} footprint positions")
-            logger.debug(
-                f"Completed {algorithm} placement with {len(connections)} connections"
-            )
 
         elif algorithm == "advanced":
             from .placement.advanced_placement import (
@@ -1918,13 +1819,6 @@ class PCBBoard:
             
         else:
             raise ValueError(f"Unknown placement algorithm: {algorithm}")
-
-        # Return success for algorithms that don't have explicit return
-        from .placement.spiral_placement_v2 import PlacementResult
-
-        return PlacementResult(
-            success=True, message=f"Completed {algorithm} placement successfully"
-        )
 
     def get_placement_bbox(self) -> Optional[Tuple[float, float, float, float]]:
         """

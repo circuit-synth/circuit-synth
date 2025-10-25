@@ -233,15 +233,13 @@ def test_pcb_algorithms():
     """Test all PCB placement and routing algorithms"""
     from circuit_synth.pcb.placement.force_directed import ForceDirectedPlacer
     from circuit_synth.pcb.placement.hierarchical_placement import HierarchicalPlacer
-    from circuit_synth.pcb.placement.spiral_placement import SpiralPlacer
-    
+
     circuit = test_basic_circuits()
-    
+
     # Test different placement algorithms
     placement_algorithms = [
         "force_directed",
-        "hierarchical", 
-        "spiral",
+        "hierarchical",
         "connection_centric"
     ]
     
@@ -724,10 +722,8 @@ def test_advanced_pcb_comprehensive():
     placement_algorithms = [
         "force_directed",
         "hierarchical",
-        "spiral", 
         "connection_centric",
-        "connectivity_driven",
-        "spiral_hierarchical"
+        "connectivity_driven"
     ]
     
     for algorithm in placement_algorithms:

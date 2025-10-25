@@ -705,7 +705,7 @@ class Circuit:
             )
 
             # Create schematic generator that outputs directly to the project directory
-            generator = SchematicGenerator(str(output_path.parent), project_name)
+            generator = SchematicGenerator(str(output_path.parent), output_path.name)
 
             # Generate the complete project using the JSON file
             # Legacy system handles placement, modern API handles file writing via write_schematic_file

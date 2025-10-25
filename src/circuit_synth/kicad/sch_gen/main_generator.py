@@ -635,7 +635,7 @@ class SchematicGenerator:
             json_file: Path to circuit JSON file
             force_regenerate: If True, recreate project even if it exists (loses manual work!)
             generate_pcb: If True, generate PCB along with schematics (default: True)
-            placement_algorithm: PCB placement algorithm to use (spiral, hierarchical, force_directed, connection_centric)
+            placement_algorithm: PCB placement algorithm to use (hierarchical, force_directed, connection_centric, advanced, external)
             schematic_placement: Schematic placement algorithm - "sequential" or "connection_aware" (default: "sequential")
             **pcb_kwargs: Additional keyword arguments passed to PCB generation
         """
