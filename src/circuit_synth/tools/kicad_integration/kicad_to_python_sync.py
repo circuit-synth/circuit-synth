@@ -124,7 +124,7 @@ class KiCadToPythonSyncer:
         # Store for backward compatibility (some methods may still use it)
         self.kicad_project = input_path
 
-        logger.info(f"KiCadToPythonSyncer initialized")
+        logger.info("KiCadToPythonSyncer initialized")
         logger.info(f"JSON input: {self._json_path}")
         logger.info(f"Python target: {self.python_file_or_dir}")
         logger.info(f"Directory mode: {self.is_directory_mode}")
@@ -174,7 +174,7 @@ class KiCadToPythonSyncer:
             return json_path
 
         # Generate JSON from KiCad
-        logger.info(f"No JSON found, generating from KiCad project...")
+        logger.info("No JSON found, generating from KiCad project...")
         return self._export_kicad_to_json(kicad_project)
 
     def _export_kicad_to_json(self, kicad_project: Path) -> Path:
@@ -281,9 +281,7 @@ class KiCadToPythonSyncer:
                     net.name: [
                         {
                             "component": conn[0],
-                            "pin_id": (
-                                int(conn[1]) if conn[1].isdigit() else conn[1]
-                            ),
+                            "pin_id": (int(conn[1]) if conn[1].isdigit() else conn[1]),
                         }
                         for conn in net.connections
                     ]
@@ -301,6 +299,61 @@ class KiCadToPythonSyncer:
 
             logger.info(f"Successfully exported JSON (fallback): {json_path}")
             return json_path
+
+    def update_json_from_schematic(self) -> None:
+        """Regenerate JSON netlist from .kicad_sch file.
+
+        Parses the .kicad_sch schematic file using KiCadParser and regenerates
+        the JSON netlist. This ensures the JSON is always in sync with the latest
+        schematic edits.
+
+        Raises:
+            RuntimeError: If parsing fails or JSON generation fails
+            FileNotFoundError: If .kicad_sch file not found
+        """
+        try:
+            # Determine .kicad_sch file location
+            if self.kicad_project.suffix == ".kicad_pro":
+                project_dir = self.kicad_project.parent
+                project_name = self.kicad_project.stem
+                kicad_sch = project_dir / f"{project_name}.kicad_sch"
+            else:
+                project_dir = self.kicad_project
+                # Find first .kicad_sch in directory
+                sch_files = list(project_dir.glob("*.kicad_sch"))
+                if not sch_files:
+                    raise FileNotFoundError(
+                        f"No .kicad_sch files found in {project_dir}"
+                    )
+                kicad_sch = sch_files[0]
+
+            if not kicad_sch.exists():
+                raise FileNotFoundError(f"Schematic not found: {kicad_sch}")
+
+            logger.info(f"Regenerating JSON from schematic: {kicad_sch}")
+
+            # Parse .kicad_sch using KiCadParser
+            parser = KiCadParser(str(self.kicad_project))
+            circuits = parser.parse_circuits()
+
+            if not circuits:
+                raise RuntimeError("Failed to parse KiCad project - no circuits found")
+
+            # Get main circuit
+            main_circuit = circuits.get("main") or list(circuits.values())[0]
+
+            # Regenerate JSON netlist from parsed circuit
+            logger.info(f"Writing updated JSON to {self.json_path}")
+            main_circuit.generate_json_netlist(str(self.json_path))
+
+            logger.info(
+                f"JSON regenerated: {len(main_circuit.components)} components, "
+                f"{len(main_circuit.nets)} nets"
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to regenerate JSON from schematic: {e}")
+            raise
 
     def _load_json(self) -> dict:
         """
@@ -326,9 +379,7 @@ class KiCadToPythonSyncer:
             return data
 
         except json.JSONDecodeError as e:
-            raise ValueError(
-                f"Invalid JSON format in {self.json_path}: {e}"
-            ) from e
+            raise ValueError(f"Invalid JSON format in {self.json_path}: {e}") from e
 
     def _json_to_circuits(self) -> Dict[str, Circuit]:
         """
@@ -388,10 +439,28 @@ class KiCadToPythonSyncer:
         return circuits
 
     def sync(self) -> bool:
-        """Perform the synchronization from JSON to Python"""
-        logger.info("=== Starting JSON to Python Synchronization ===")
+        """Perform the synchronization from KiCad to Python.
+
+        Process:
+        1. Regenerate JSON from latest .kicad_sch edits
+        2. Convert JSON to Circuit objects
+        3. Generate Python code
+        """
+        logger.info("=== Starting KiCad to Python Synchronization ===")
 
         try:
+            # Step 0: Regenerate JSON from .kicad_sch (ensure latest edits)
+            logger.info("Step 0: Regenerating JSON from .kicad_sch")
+            try:
+                self.update_json_from_schematic()
+                # Reload JSON after regeneration
+                self.json_data = self._load_json()
+            except (FileNotFoundError, RuntimeError) as e:
+                logger.warning(
+                    f"Could not regenerate JSON from schematic ({e}). "
+                    f"Proceeding with existing JSON..."
+                )
+
             # Step 1: Convert JSON to Circuit objects
             logger.info("Step 1: Converting JSON to Circuit objects")
             circuits = self._json_to_circuits()
@@ -584,7 +653,7 @@ def main():
 
     # Create syncer and run
     syncer = KiCadToPythonSyncer(
-        kicad_project=str(kicad_project),
+        kicad_project_or_json=str(kicad_project),
         python_file=str(python_file),
         preview_only=False,  # Always apply changes
         create_backup=args.backup,
