@@ -1309,30 +1309,25 @@ class PythonCodeGenerator:
                 updated_code = self._generate_flat_code(main_circuit)
 
             if updated_code:
-                print(f"\n🔄 CODE_UPDATE: Generated updated code: {len(updated_code)} chars")
+                logger.info("Generated updated code")
 
                 # COMMENT PRESERVATION: Extract and reinsert comments
                 if python_file.exists():
-                    print(f"📝 COMMENT_PRESERVATION: Extracting comments from {python_file}")
                     updated_code_with_comments = self.comment_extractor.extract_and_reinsert(
                         python_file, updated_code, "main"
                     )
-                    print(f"📝 COMMENT_PRESERVATION: Comments reinserted into generated code")
                     updated_code = updated_code_with_comments
-                else:
-                    print(f"📝 COMMENT_PRESERVATION: File does not exist yet, no comments to preserve")
 
                 if preview_only:
-                    print("🔄 CODE_UPDATE: Preview mode - not writing to file")
+                    logger.info("Preview mode - not writing to file")
                     return updated_code
                 else:
-                    print("🔄 CODE_UPDATE: Writing updated code to file")
                     python_file.parent.mkdir(parents=True, exist_ok=True)
                     python_file.write_text(updated_code)
-                    print("🔄 CODE_UPDATE: ✅ File update completed")
+                    logger.info("File update completed")
                     return updated_code
             else:
-                print("🔄 CODE_UPDATE: ❌ Failed to generate updated code")
+                logger.error("Failed to generate updated code")
                 return None
 
         except Exception as e:

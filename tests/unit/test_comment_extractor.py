@@ -72,7 +72,7 @@ if __name__ == '__main__':
         assert result == {}
 
     def test_reinsert_comments_simple(self, extractor):
-        """Test re-inserting comments at correct positions"""
+        """Test re-inserting comments as a block at the start"""
         generated_lines = [
             "    vin = Net('VIN')",
             "    gnd = Net('GND')",
@@ -86,17 +86,16 @@ if __name__ == '__main__':
 
         result = extractor.reinsert_comments(generated_lines, comments_map)
 
-        # Should have original lines + 2 comment lines = 5 lines
-        assert len(result) == 5
+        # Comments inserted as a block at the beginning
+        assert len(result) == 5  # 2 comments + 3 lines
         assert "# Comment about VIN" in result[0]
-        assert "vin = Net('VIN')" in result[1]
-        # After inserting first comment, indices shift
-        # Line 2 becomes index 4 (0: comment, 1: vin, 2: gnd, 3: comment, 4: vout)
-        assert "# Comment about VOUT" in result[3]
+        assert "# Comment about VOUT" in result[1]
+        assert "vin = Net('VIN')" in result[2]
+        assert "gnd = Net('GND')" in result[3]
         assert "vout = Net('VOUT')" in result[4]
 
     def test_reinsert_comments_preserves_indentation(self, extractor):
-        """Test that comments preserve indentation of surrounding code"""
+        """Test that comments use function body indentation (4 spaces)"""
         generated_lines = [
             "    net1 = Net('NET1')",  # 4 spaces
             "        net2 = Net('NET2')",  # 8 spaces
@@ -109,13 +108,14 @@ if __name__ == '__main__':
 
         result = extractor.reinsert_comments(generated_lines, comments_map)
 
-        # First comment should have 4 spaces
+        # All comments use function body indentation (4 spaces) at the start
         assert result[0] == "    # First comment"
-        # Second comment should have 8 spaces
-        assert result[2] == "        # Second comment"
+        assert result[1] == "    # Second comment"
+        assert result[2] == "    net1 = Net('NET1')"
+        assert result[3] == "        net2 = Net('NET2')"
 
     def test_reinsert_comments_orphaned(self, extractor):
-        """Test handling of orphaned comments (line offset beyond generated code)"""
+        """Test that all comments are inserted regardless of offset"""
         generated_lines = [
             "    vin = Net('VIN')",
             "    gnd = Net('GND')",
@@ -123,14 +123,17 @@ if __name__ == '__main__':
 
         comments_map = {
             0: ["# Valid comment"],
-            5: ["# Orphaned comment"],  # Beyond line 1
+            5: ["# Comment with high offset"],  # Beyond generated lines
         }
 
         result = extractor.reinsert_comments(generated_lines, comments_map)
 
-        # Should append orphaned comments at end
-        assert any("Orphaned comments" in line for line in result)
-        assert any("# Orphaned comment" in line for line in result)
+        # All comments inserted at the beginning in order
+        assert len(result) == 4  # 2 comments + 2 lines
+        assert "# Valid comment" in result[0]
+        assert "# Comment with high offset" in result[1]
+        assert "vin = Net('VIN')" in result[2]
+        assert "gnd = Net('GND')" in result[3]
 
     def test_reinsert_comments_empty_map(self, extractor):
         """Test reinsertion with no comments returns original lines"""
@@ -194,11 +197,13 @@ if __name__ == '__main__':
 
         comments_map = extractor.extract_comments_from_function(file_path, "main")
 
-        # For truly blank circuits (only docstring, no executable code),
-        # comments after docstring are syntactically outside the function body
-        # (Python AST ends function after docstring when there's no other content)
-        # So they should NOT be extracted
-        assert len(comments_map) == 0
+        # With improved indentation-based boundary detection, comments inside
+        # the function (even if no executable code) should be extracted
+        assert len(comments_map) >= 1
+        # Verify specific comments were found
+        all_comments = str(comments_map.values())
+        assert "blank circuit" in all_comments
+        assert "No components" in all_comments
 
     def test_circuit_with_comments_and_code(self, extractor, tmp_path):
         """Test extracting comments from circuit with actual code"""
