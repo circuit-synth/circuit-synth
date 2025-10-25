@@ -1311,12 +1311,12 @@ class PythonCodeGenerator:
             if updated_code:
                 logger.info("Generated updated code")
 
-                # COMMENT PRESERVATION: Extract and reinsert comments
+                # COMMENT PRESERVATION: Merge preserving ALL user content
                 if python_file.exists():
-                    updated_code_with_comments = self.comment_extractor.extract_and_reinsert(
+                    updated_code_with_user_content = self.comment_extractor.merge_preserving_user_content(
                         python_file, updated_code, "main"
                     )
-                    updated_code = updated_code_with_comments
+                    updated_code = updated_code_with_user_content
 
                 if preview_only:
                     logger.info("Preview mode - not writing to file")

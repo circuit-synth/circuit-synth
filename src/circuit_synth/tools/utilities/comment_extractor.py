@@ -296,6 +296,167 @@ class CommentExtractor:
         """
         return line[: len(line) - len(line.lstrip())]
 
+    def extract_after_function_content(self, file_path: Path, function_name: str = "main") -> List[str]:
+        """
+        Extract content that appears AFTER the function ends but BEFORE if __name__.
+
+        This captures user-added content between the function definition and the
+        boilerplate code at the end of the file.
+
+        Args:
+            file_path: Path to Python file
+            function_name: Name of function to find
+
+        Returns:
+            List of lines that appear after the function
+        """
+        if not file_path.exists():
+            return []
+
+        try:
+            with open(file_path, "r") as f:
+                lines = f.readlines()
+
+            tree = ast.parse("".join(lines))
+            function_end_line = self._find_function_end_line(tree, function_name, file_path)
+
+            if function_end_line is None:
+                return []
+
+            # Find where "if __name__" starts
+            if_name_line = None
+            for i, line in enumerate(lines):
+                if line.strip().startswith("if __name__"):
+                    if_name_line = i + 1  # Convert to 1-indexed
+                    break
+
+            if if_name_line is None:
+                # No if __name__ block, extract everything after function
+                if_name_line = len(lines) + 1
+
+            # Extract lines between function end and if __name__
+            after_function_content = []
+            for line_num in range(function_end_line + 1, if_name_line):
+                line_idx = line_num - 1  # Convert to 0-indexed
+                if line_idx < len(lines):
+                    line = lines[line_idx].rstrip()
+                    after_function_content.append(line)
+
+            # Strip leading and trailing blank lines
+            while after_function_content and after_function_content[0].strip() == '':
+                after_function_content.pop(0)
+            while after_function_content and after_function_content[-1].strip() == '':
+                after_function_content.pop()
+
+            return after_function_content
+
+        except Exception as e:
+            logger.error(f"Failed to extract after-function content: {e}")
+            return []
+
+    def merge_preserving_user_content(
+        self,
+        existing_file: Path,
+        generated_template: str,
+        function_name: str = "main",
+    ) -> str:
+        """
+        Merge generated code with existing file, preserving ALL user content.
+
+        Strategy: Read existing file, extract generated component code from template,
+        replace ONLY that section, keep everything else untouched.
+
+        Args:
+            existing_file: Path to existing Python file with user content
+            generated_template: Newly generated template (full file)
+            function_name: Name of function to update
+
+        Returns:
+            Merged code with user content preserved and generated code updated
+        """
+        if not existing_file.exists():
+            # No existing file, return generated template as-is
+            return generated_template
+
+        try:
+            # Read existing file
+            with open(existing_file, "r") as f:
+                existing_lines = f.readlines()
+
+            # Parse both existing and generated code
+            existing_content = "".join(existing_lines)
+            generated_lines = generated_template.split("\n")
+
+            # Find function boundaries in EXISTING file
+            existing_tree = ast.parse(existing_content)
+            existing_func_start = self._find_function_start_line(existing_tree, function_name)
+            existing_func_end = self._find_function_end_line(existing_tree, function_name, existing_file)
+
+            if existing_func_start is None:
+                # Function doesn't exist in old file, return template
+                return generated_template
+
+            # Find function body content in GENERATED template (the new component code)
+            generated_func_start_idx = self._find_function_start_index(generated_lines, function_name)
+            if generated_func_start_idx is None:
+                # Can't find function in generated code, return existing
+                logger.warning(f"Could not find function '{function_name}' in generated code")
+                return existing_content
+
+            # Extract the NEW generated component code (everything after docstring in generated file)
+            generated_func_body = []
+            for i in range(generated_func_start_idx, len(generated_lines)):
+                line = generated_lines[i]
+                # Stop at "# Generate the circuit" or end of function indicators
+                if line.strip().startswith("# Generate the circuit") or \
+                   line.strip().startswith("if __name__"):
+                    break
+                generated_func_body.append(line)
+
+            # Strip trailing blank lines from generated body
+            while generated_func_body and generated_func_body[-1].strip() == '':
+                generated_func_body.pop()
+
+            # Now build the result: existing file with function body replaced
+            result_lines = []
+
+            # Part 1: Everything BEFORE the function body (header, imports, decorator, def line, docstring)
+            for i in range(existing_func_start):
+                # Preserve line as-is but remove trailing newline
+                line = existing_lines[i]
+                if line.endswith('\n'):
+                    line = line[:-1]
+                result_lines.append(line.rstrip())
+
+            # Part 2: User content from INSIDE old function + NEW generated code
+            # Extract user comments from inside the existing function
+            user_comments_map = self.extract_comments_from_function(existing_file, function_name)
+
+            # Merge: user comments first, then generated code
+            if user_comments_map:
+                # Reinsert user comments with generated code
+                merged_body = self.reinsert_comments(generated_func_body, user_comments_map)
+                result_lines.extend(merged_body)
+            else:
+                # No user comments, just use generated code
+                result_lines.extend(generated_func_body)
+
+            # Part 3: Everything AFTER the function body (preserve user content after function)
+            if existing_func_end is not None and (existing_func_end + 1) < len(existing_lines):
+                for i in range(existing_func_end + 1, len(existing_lines)):
+                    # Preserve line as-is but remove trailing newline
+                    line = existing_lines[i]
+                    if line.endswith('\n'):
+                        line = line[:-1]
+                    result_lines.append(line.rstrip())
+
+            return "\n".join(result_lines)
+
+        except Exception as e:
+            logger.error(f"Failed to merge preserving user content: {e}")
+            # On error, return generated template (safe fallback)
+            return generated_template
+
     def extract_and_reinsert(
         self,
         existing_file: Path,
@@ -304,6 +465,8 @@ class CommentExtractor:
     ) -> str:
         """
         Complete workflow: extract comments from existing file and reinsert into generated code.
+
+        DEPRECATED: Use merge_preserving_user_content() instead for comprehensive preservation.
 
         Args:
             existing_file: Path to existing Python file with comments
@@ -316,7 +479,10 @@ class CommentExtractor:
         # Extract comments from existing file
         comments_map = self.extract_comments_from_function(existing_file, function_name)
 
-        if not comments_map:
+        # Extract content after function (between function and if __name__)
+        after_function_content = self.extract_after_function_content(existing_file, function_name)
+
+        if not comments_map and not after_function_content:
             return generated_code
 
         # Find the function in generated code
@@ -335,8 +501,26 @@ class CommentExtractor:
         # Reinsert comments into function body
         function_with_comments = self.reinsert_comments(function_body, comments_map)
 
-        # Combine all parts
+        # Find where to insert after-function content (before "# Generate the circuit" or "if __name__")
         result_lines = before_function + function_with_comments
+
+        # Insert after-function content before the boilerplate
+        if after_function_content:
+            # Find the "# Generate the circuit" or "if __name__" line
+            insert_idx = None
+            for i, line in enumerate(result_lines):
+                if line.strip().startswith("# Generate the circuit") or \
+                   line.strip().startswith("if __name__"):
+                    insert_idx = i
+                    break
+
+            if insert_idx is not None:
+                # Insert after-function content before the boilerplate
+                result_lines = result_lines[:insert_idx] + [''] + after_function_content + [''] + result_lines[insert_idx:]
+            else:
+                # No boilerplate found, append at end
+                result_lines.extend([''] + after_function_content)
+
         return "\n".join(result_lines)
 
     def _find_function_start_index(

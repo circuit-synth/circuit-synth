@@ -430,3 +430,153 @@ def main():
                 break  # Hit non-blank line
 
         assert blank_count <= 2, f"Should not have more than 2 trailing blank lines, found {blank_count}"
+
+    def test_preserves_all_user_content_comprehensive(self, extractor, tmp_path):
+        """Test that ALL user content is preserved across the entire file
+
+        This is CRITICAL - users document design decisions, datasheets, test results, etc.
+        We must preserve EVERYTHING except the generated component/net code.
+        """
+        code = '''#!/usr/bin/env python3
+"""
+Circuit Generated from KiCad
+"""
+
+from circuit_synth import *
+
+# MODULE-LEVEL COMMENT: Design decision - using 0603 resistors for space constraints
+# See: https://example.com/datasheet.pdf
+
+VOLTAGE_RAIL = 3.3  # Global constant - main supply voltage
+
+@circuit
+def main():
+    """Generated circuit from KiCad"""
+    # DESIGN NOTE: Power supply section
+    # Tested with 10k pull-up, works reliably
+    # See lab notebook 2024-10-25 page 42
+
+    """
+    CRITICAL: This inline docstring contains test results
+    - Measured current: 3.2mA
+    - Temperature rise: 2.1°C
+    """
+
+    # Signal processing section
+
+"""
+POST-FUNCTION NOTE: Additional context about the design
+This should be preserved exactly where it is
+"""
+
+def helper_function():
+    """User added this helper"""
+    pass
+
+# Generate the circuit
+if __name__ == '__main__':
+    circuit = main()
+    # USER NOTE: Using specific project name for CI/CD pipeline
+    circuit.generate_kicad_project(project_name="main_generated")
+    circuit.generate_kicad_netlist("main_generated/main_generated.net")
+    # POST-GENERATION NOTE: This runs after generation
+
+# FINAL NOTE: File-level documentation at the end
+'''
+        file_path = tmp_path / "comprehensive_comments.py"
+        file_path.write_text(code)
+
+        # Simulate regeneration - only the main() body changes
+        generated_code = '''@circuit
+def main():
+    """Generated circuit from KiCad"""
+    # NEW GENERATED COMPONENT
+    r1 = Component("R1")
+
+
+# Generate the circuit
+if __name__ == '__main__':
+    circuit = main()
+'''
+
+        result = extractor.merge_preserving_user_content(file_path, generated_code, "main")
+
+        # Verify ALL user content is preserved
+        critical_content = [
+            "MODULE-LEVEL COMMENT",
+            "0603 resistors",
+            "https://example.com/datasheet.pdf",
+            "VOLTAGE_RAIL = 3.3",
+            "DESIGN NOTE: Power supply section",
+            "lab notebook 2024-10-25 page 42",
+            "CRITICAL: This inline docstring",
+            "Measured current: 3.2mA",
+            "Signal processing section",
+            "POST-FUNCTION NOTE",
+            "helper_function",
+            "USER NOTE: Using specific project name",
+            "POST-GENERATION NOTE",
+            "FINAL NOTE: File-level documentation",
+        ]
+
+        for content in critical_content:
+            assert content in result, f"LOST USER CONTENT: '{content}'"
+
+        print("✅ All user content preserved:")
+        for content in critical_content:
+            print(f"   ✓ {content[:50]}...")
+
+    def test_preserves_content_outside_function(self, extractor, tmp_path):
+        """Test that content OUTSIDE the function (after function, before if __name__) is preserved"""
+        code = '''@circuit
+def main():
+    """Generated circuit from KiCad"""
+    # Inside function comment
+
+"""
+one time!
+"""
+
+if __name__ == '__main__':
+    circuit = main()
+'''
+        file_path = tmp_path / "circuit_with_outside_content.py"
+        file_path.write_text(code)
+
+        # Test the after-function content extraction
+        after_function_content = extractor.extract_after_function_content(file_path, "main")
+
+        # Should find the docstring between function and if __name__
+        assert len(after_function_content) > 0, "Should extract content after function"
+        after_function_str = '\n'.join(after_function_content)
+        assert "one time!" in after_function_str, "Should preserve 'one time!' docstring"
+
+        # Test full round-trip with extract_and_reinsert
+        generated_code = '''@circuit
+def main():
+    """Generated circuit from KiCad"""
+
+
+# Generate the circuit
+if __name__ == '__main__':
+    circuit = main()
+'''
+        result = extractor.extract_and_reinsert(file_path, generated_code, "main")
+
+        # Verify the after-function content is preserved in the result
+        assert "one time!" in result, "After-function content should be preserved"
+        assert "# Inside function comment" in result, "Inside function comment should be preserved"
+
+        # Verify it's inserted BEFORE "# Generate the circuit"
+        lines = result.split('\n')
+        one_time_idx = None
+        generate_idx = None
+        for i, line in enumerate(lines):
+            if "one time!" in line:
+                one_time_idx = i
+            if "# Generate the circuit" in line:
+                generate_idx = i
+
+        assert one_time_idx is not None, "Should find 'one time!' in result"
+        assert generate_idx is not None, "Should find '# Generate the circuit' in result"
+        assert one_time_idx < generate_idx, "After-function content should appear BEFORE boilerplate"
