@@ -22,9 +22,10 @@ This document tracks all testing performed on circuit-synth, both automated and 
 **Test Scenario**:
 1. Create blank Python circuit with `pass` statement
 2. Generate KiCad project
-3. Manually add component in KiCad schematic
-4. Run `kicad-to-python` to sync back to Python
-5. Verify component appears correctly in Python code
+3. Test both sync directions:
+   - **KiCad → Python**: Add components in KiCad, sync to Python
+   - **Python → KiCad**: Add components in Python, generate to KiCad
+4. Verify idempotency (multiple syncs don't duplicate)
 
 **Steps**:
 ```bash
@@ -36,22 +37,34 @@ def main():
     pass
 EOF
 
-# 2. Generate KiCad project
+# 2. Generate initial KiCad project
 uv run python bidirectional_test/main.py
 
-# 3. Open KiCad, add R1 (Device:R, 10k, R_0603_1608Metric)
+# 3. Test KiCad → Python direction
+# Open KiCad, add R1 (Device:R, 10k, R_0603_1608Metric)
+uv run kicad-to-python BidirectionalTest/ main.py
 
-# 4. Sync back to Python
-uv run kicad-to-python bidirectional_test/BidirectionalTest/ bidirectional_test/main.py
+# 4. Test KiCad → Python again (add R2)
+# Open KiCad, add R2 (Device:R, 10k, R_0603_1608Metric)
+uv run kicad-to-python BidirectionalTest/ main.py
+
+# 5. Test Python → KiCad direction
+# Edit main.py, add R3 manually
+uv run python main.py
+# Open KiCad, verify R3 appears
+
+# 6. Test idempotency
+uv run kicad-to-python BidirectionalTest/ main.py  # Should be identical
 ```
 
 **Expected Result**:
-- `pass` statement removed
-- R1 component added with correct parameters
-- Proper indentation maintained
-- No duplicate code
+- `pass` statement removed when components added
+- Components sync correctly in both directions
+- No duplication on multiple syncs
+- Proper indentation and spacing
+- Auto-placement works for new components
 
-**Actual Result**:
+**Actual Result - KiCad → Python**:
 ```python
 @circuit(name="BidirectionalTest")
 def main():
@@ -59,13 +72,30 @@ def main():
 
     # Create components
     r1 = Component(symbol="Device:R", ref="R1", value="10k", footprint="Resistor_SMD:R_0603_1608Metric")
+    r2 = Component(symbol="Device:R", ref="R2", value="10k", footprint="Resistor_SMD:R_0603_1608Metric")
 ```
 
-**Issues Found**: None
+**Actual Result - Python → KiCad**:
+- R3 appeared in KiCad schematic at position (152.4, 55.9)
+- Auto-placement avoided collisions with R1 and R2
+- Sync summary: "➕ Add: R3 (new in Python)"
+
+**Actual Result - Idempotency**:
+- Second `kicad-to-python` produced identical file
+- No component duplication
+- No extra blank lines or formatting changes
+
+**Issues Found**:
+- ✅ Fixed: Idempotency bug (components were duplicating)
+- ✅ Fixed: Generated patterns preserved as user content
+- ✅ Fixed: `pass` statement not removed
 
 **Commits**:
 - `c7ee464` - Fix: Remove 'pass' statements when syncing components from KiCad
 - `4f9700b` - Test: Verify bidirectional sync with R1 component
+- `254d6c6` - Docs: Add comprehensive testing documentation
+- `efcaee6` - Fix: Resolve idempotency bug in bidirectional sync
+- `ca18476` - Test: Verify both directions of bidirectional sync
 
 ---
 
@@ -112,9 +142,10 @@ def main():
 |--------------|------------|-------------------|--------------|--------|
 | Comment Preservation | 17 | 4 | - | ✅ Complete |
 | Custom Function Names | 1 | - | - | ✅ Complete |
-| Pass Statement Filtering | - | - | 1 | ✅ Complete |
-| Bidirectional Sync | - | 4 | 1 | ✅ Complete |
-| Component Addition | - | - | 1 | ✅ Complete |
+| Pass Statement Filtering | 1 | - | 1 | ✅ Complete |
+| Bidirectional Sync | 7 | 4 | 1 | ✅ Complete |
+| Component Addition | 2 | - | 1 | ✅ Complete |
+| Idempotency | 1 | 1 | 1 | ✅ Complete |
 | Wire Routing | - | 1 | - | ⚠️ Known Issue |
 
 ---
