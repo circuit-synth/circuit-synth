@@ -5,9 +5,11 @@ from circuit_synth import *
 @circuit(name="BidirectionalTest")
 def main():
     """Bidirectional sync test circuit"""
-    pass
 
 
+
+    # Create components
+    r1 = Component(symbol="Device:R", ref="R1", value="10k", footprint="Resistor_SMD:R_0603_1608Metric")
 if __name__ == "__main__":
     circuit_obj = main()
     circuit_obj.generate_kicad_project(

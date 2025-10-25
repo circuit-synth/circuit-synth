@@ -507,6 +507,30 @@ class CommentExtractor:
             # Extract user comments from inside the existing function
             user_comments_map = self.extract_comments_from_function(existing_file, function_name)
 
+            # Filter out standalone 'pass' statements if we have generated code
+            # 'pass' is only needed when there's no code in the function
+            if user_comments_map and generated_func_body:
+                # Check if any generated line has actual component code (not just whitespace/comments)
+                has_real_code = any(
+                    line.strip() and
+                    not line.strip().startswith('#') and
+                    not line.strip().startswith('"""') and
+                    not line.strip().startswith("'''")
+                    for line in generated_func_body
+                )
+
+                if has_real_code:
+                    # Remove standalone 'pass' statements since we have real code
+                    filtered_comments = {}
+                    for offset, lines in user_comments_map.items():
+                        filtered_lines = [
+                            line for line in lines
+                            if line.strip() != 'pass'
+                        ]
+                        if filtered_lines:  # Only keep if there's content after filtering
+                            filtered_comments[offset] = filtered_lines
+                    user_comments_map = filtered_comments
+
             # Merge: user comments first, then generated code
             if user_comments_map:
                 # Reinsert user comments with generated code
