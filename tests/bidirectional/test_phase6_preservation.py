@@ -414,6 +414,159 @@ class TestPhase6Preservation:
             print(f"   - Net count preserved: {net_count_2}")
             print(f"   - Idempotency verified: ✓")
 
+    def test_6_5_user_comments_idempotency(self):
+        """Test 6.5: User comments idempotent across multiple imports
+
+        CRITICAL TEST: User adds comments, inline docstrings, and blank lines
+        in Python code. These must survive multiple KiCad → Python sync cycles
+        without accumulation or loss.
+
+        Validates:
+        - Create blank Python circuit with user comments
+        - Simulate KiCad → Python sync (3 times)
+        - Verify comments preserved identically each time
+        - No docstring duplication
+        - Blank lines between comment groups preserved
+        - No trailing blank line accumulation
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir_path = Path(tmpdir)
+
+            # Create the blank KiCad project directory structure
+            blank_dir = tmpdir_path / "blank"
+            blank_dir.mkdir()
+
+            # Create blank KiCad JSON (simulating a blank KiCad project)
+            blank_json = blank_dir / "blank.json"
+            blank_json.write_text(json.dumps({
+                "name": "blank",
+                "description": "",
+                "tstamps": "/blank-test/",
+                "source_file": "blank.kicad_sch",
+                "components": {},
+                "nets": {},
+                "subcircuits": [],
+                "annotations": []
+            }, indent=2))
+
+            # Create initial Python file with user comments
+            initial_code = '''#!/usr/bin/env python3
+"""
+Circuit Generated from KiCad
+"""
+
+from circuit_synth import *
+
+
+@circuit
+def main():
+    """Generated circuit from KiCad"""
+    # USER COMMENT: This is my first preserved comment!
+    """
+    look at these!"""
+
+    # another one!
+    # another one!
+    # another one!
+
+    # another one!
+    # another one!
+    # another one!
+    """ more comments"""
+    """ more comments"""
+    """ more comments"""
+
+    # suhp?
+
+
+# Generate the circuit
+if __name__ == "__main__":
+    circuit = main()
+    circuit.generate_kicad_project(project_name="blank_generated")
+    circuit.generate_kicad_netlist("blank_generated/blank_generated.net")
+'''
+
+            python_file = tmpdir_path / "test_blank.py"
+            python_file.write_text(initial_code)
+
+            # Run sync 3 times and verify idempotency
+            previous_content = initial_code
+            for i in range(1, 4):
+                syncer = KiCadToPythonSyncer(
+                    kicad_project_or_json=str(blank_json),
+                    python_file=str(python_file),
+                    preview_only=False,
+                    create_backup=False,
+                )
+
+                success = syncer.sync()
+                assert success, f"KiCad → Python sync {i} failed"
+
+                with open(python_file) as f:
+                    current_content = f.read()
+
+                # Verify critical preservation requirements
+                assert '"""Generated circuit from KiCad"""' in current_content
+                assert current_content.count('"""Generated circuit from KiCad"""') == 1, \
+                    f"Round {i}: Function docstring duplicated"
+
+                assert "USER COMMENT: This is my first preserved comment!" in current_content, \
+                    f"Round {i}: User comment lost"
+                assert "look at these!" in current_content, \
+                    f"Round {i}: Inline docstring lost"
+                assert "another one!" in current_content, \
+                    f"Round {i}: Comment group lost"
+                assert current_content.count("another one!") == 6, \
+                    f"Round {i}: Comment count changed"
+                assert "suhp?" in current_content, \
+                    f"Round {i}: Last comment lost"
+
+                # Verify blank lines preserved between comment groups
+                lines = current_content.split('\n')
+                another_one_indices = [i for i, line in enumerate(lines) if "another one!" in line]
+                assert len(another_one_indices) == 6, f"Round {i}: Should have 6 'another one!' comments"
+
+                # Check blank line between the two groups
+                has_blank_between = (another_one_indices[3] - another_one_indices[2]) > 1
+                assert has_blank_between, f"Round {i}: Blank line between comment groups lost"
+
+                # Verify no excessive trailing blank lines after "# suhp?"
+                suhp_index = None
+                for idx, line in enumerate(lines):
+                    if "suhp?" in line:
+                        suhp_index = idx
+                        break
+
+                assert suhp_index is not None, f"Round {i}: Could not find '# suhp?' comment"
+
+                # Count trailing blanks after suhp
+                blank_count = 0
+                for idx in range(suhp_index + 1, len(lines)):
+                    if lines[idx].strip() == '':
+                        blank_count += 1
+                    else:
+                        break
+
+                assert blank_count <= 4, \
+                    f"Round {i}: Too many trailing blanks ({blank_count}), should be ≤4"
+
+                # Verify idempotency - content should stabilize after round 2
+                if i >= 2:
+                    assert current_content == previous_content, \
+                        f"Round {i}: Content changed (not idempotent)"
+
+                previous_content = current_content
+
+                print(f"   Round {i}: ✓ Comments preserved, idempotent")
+
+            print(f"✅ Test 6.5 PASS: User comments idempotency")
+            print(f"   - Function docstring: no duplication ✓")
+            print(f"   - User comments: preserved ✓")
+            print(f"   - Inline docstrings: preserved ✓")
+            print(f"   - Blank lines: preserved ✓")
+            print(f"   - Trailing blanks: controlled ✓")
+            print(f"   - Idempotency: verified across 3 rounds ✓")
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "-s"])

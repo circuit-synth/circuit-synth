@@ -1,199 +1,44 @@
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Test outputs and generated files
-test_outputs/
-*.kicad_pcb-bak
-*.kicad_sch-bak
-
-# Submodules in development
-
-# C extensions
 *.so
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
-
-# Claude Code local settings
-.claude/local.md
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-.pybuilder/
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-.python-version
-
-# pipenv
-Pipfile.lock
-
-# poetry
-poetry.lock
-
-# pdm
-.pdm.toml
-
-# PEP 582
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
+# Virtual environments
+.venv/
 venv/
 ENV/
-env.bak/
-venv.bak/
 
-# Spyder project settings
-.spyderproject
-.spyproject
+# Build artifacts
+build/
+dist/
+*.egg-info/
 
-# Rope project settings
-.ropeproject
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
 
-# mkdocs documentation
-/site
-
-# mypy
+# Type checking
 .mypy_cache/
-.dmypy.json
-dmypy.json
 
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# PyCharm
+# IDEs
 .idea/
-
-# VS Code
 .vscode/
 
 # macOS
 .DS_Store
 
-# KiCad
+# Claude Code local settings
+.claude/local.md
+
+# KiCad auto-generated backup files
 *.kicad_pcb-bak
 *.kicad_sch-bak
 *.kicad_pro-bak
 *-backups/
 fp-info-cache
-# Functional test generated output
-tests/functional_tests/**/generated_output/
 
-
-# Build and test artifacts
-cache/
-test_output/
-
-# Generated template (copied from /example_project/ during build)
-src/circuit_synth/data/templates/example_project/
-
-# Test artifact directories
-test_single_resistor/
-test_designator/
-bbox-tests/
-professional_circuits/
-cs-new-project-artifacts/
-
-# Generated KiCad projects at root
-ESP32_C6_Dev_Board/
-
-# Generated files in example_project
-example_project/**/ESP32_C6_Dev_Board/
-example_project/**/*.json
-example_project/**/*.net
-
+# User credentials (never commit)
+.env
 .pypirc
-memory-bank/
-.circuit_synth/
-.circuit-synth/
-libraries/digikey-kicad-converted/
-
-# Test-generated KiCad projects
-*_circuit/
-voltage_divider/
-perf_*/
-coverage.json
