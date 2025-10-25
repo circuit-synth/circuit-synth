@@ -370,7 +370,7 @@ def main():
         assert has_blank_between, "Should preserve blank line between comment groups"
 
     def test_strips_trailing_blank_lines(self, extractor, tmp_path):
-        """Test that trailing blank lines at end of function are removed"""
+        """Test that trailing blank lines at end of function are limited to max 2"""
         code = '''@circuit
 def main():
     """Generated circuit from KiCad"""
@@ -405,7 +405,7 @@ def main():
 
 
 '''
-        result = extractor.extract_and_reinsert(file_path, generated_code, "main")
+        result = extractor.merge_preserving_user_content(file_path, generated_code, "main")
 
         # Find where function ends (before the generated circuit comment)
         lines = result.split('\n')
