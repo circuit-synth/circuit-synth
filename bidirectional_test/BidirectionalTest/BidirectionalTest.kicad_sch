@@ -133,6 +133,26 @@
 			(embedded_fonts no)
 		)
 	)
+	(text_box "Bidirectional sync test circuit"
+		(exclude_from_sim no)
+		(at 184 110 0)
+		(size 80 30)
+		(margins 1 1 1 1)
+		(stroke
+			(width 0)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+			)
+			(justify left top)
+		)
+		(uuid "b8eecc81-66a9-4bed-8b72-a5732e5073e4")
+	)
 	(symbol
 		(lib_id "Device:R")
 		(at 101.6 57.15 0)
@@ -187,6 +207,12 @@
 				)
 				(hide yes)
 			)
+		)
+		(pin "1"
+			(uuid "74375560-0fed-4ed0-93b9-c68e539e52b4")
+		)
+		(pin "2"
+			(uuid "242f3d02-d348-4f50-93f7-c2e45d15e015")
 		)
 		(instances
 			(project "simple_circuit"
@@ -252,6 +278,12 @@
 				(hide yes)
 			)
 		)
+		(pin "1"
+			(uuid "72addd1b-0fd2-4f6f-bd1c-fcf86ccd94cd")
+		)
+		(pin "2"
+			(uuid "ebd10e04-9fcd-4102-9a48-359378e0a5d3")
+		)
 		(instances
 			(project "simple_circuit"
 				(path "/fa00019f-a328-4dd4-aa75-20b935f97a3a"
@@ -298,6 +330,22 @@
 				(hide yes)
 			)
 		)
+		(property "Datasheet" ""
+			(at 152.4 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 152.4 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "234e894d-4824-40c1-9bc4-22a4678a3cb5")
 		)
@@ -313,25 +361,47 @@
 			)
 		)
 	)
-	(text_box "Bidirectional sync test circuit"
+	(sheet
+		(at 91.44 118.11)
+		(size 21.59 20.32)
 		(exclude_from_sim no)
-		(at 184 110 0.0000)
-		(size 80 30)
-		(margins 1 1 1 1)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
 		(stroke
-			(width 0.0000)
+			(width 0.1524)
 			(type solid)
 		)
 		(fill
-			(type none)
+			(color 0 0 0 0.0000)
 		)
-		(effects
-			(font
-				(size 1.2 1.2)
+		(uuid "f0651755-9815-4d54-ba93-6b3bccba6c7f")
+		(property "Sheetname" "sheet1_name"
+			(at 91.44 117.3984 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
 			)
-			(justify left top)
 		)
-		(uuid "b8eecc81-66a9-4bed-8b72-a5732e5073e4")
+		(property "Sheetfile" "shane1.kicad_sch"
+			(at 91.44 139.0146 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "BidirectionalTest"
+				(path "/fa00019f-a328-4dd4-aa75-20b935f97a3a"
+					(page "2")
+				)
+			)
+		)
 	)
 	(sheet_instances
 		(path "/"

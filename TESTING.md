@@ -89,6 +89,13 @@ def main():
 - ✅ Fixed: Idempotency bug (components were duplicating)
 - ✅ Fixed: Generated patterns preserved as user content
 - ✅ Fixed: `pass` statement not removed
+- ⚠️ **Known Limitation**: Hierarchical schematics not supported
+  - Adding sheet symbols in KiCad doesn't create corresponding Python files
+  - Parser shows: "Could not parse sheet block: name=None, file=None"
+  - **Expected behavior**: Should create separate Python file for each sheet
+  - **Current behavior**: Sheets are ignored, only root schematic synced
+  - **Workaround**: Use flat (non-hierarchical) schematics for now
+  - **Tracking**: Issue to be created for hierarchical schematic support
 
 **Commits**:
 - `c7ee464` - Fix: Remove 'pass' statements when syncing components from KiCad

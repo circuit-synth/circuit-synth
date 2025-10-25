@@ -1,150 +1,105 @@
 {
-  "name": "BidirectionalTest",
-  "description": "Bidirectional sync test circuit",
-  "tstamps": "/bidirectionaltest-4336725616/",
-  "source_file": "BidirectionalTest.kicad_sch",
+  "name": "main",
+  "description": "",
+  "tstamps": "",
+  "source_file": "main.kicad_sch",
   "components": {
     "R1": {
       "symbol": "Device:R",
       "ref": "R1",
       "value": "10k",
       "footprint": "Resistor_SMD:R_0603_1608Metric",
-      "datasheet": "~",
-      "description": "Resistor",
-      "properties": {
-        "ki_fp_filters": "R_*"
-      },
-      "_extra_fields": {
-        "ki_fp_filters": "R_*"
-      },
-      "pins": [
-        {
-          "pin_id": "1",
-          "name": "~",
-          "func": "passive",
-          "unit": 1,
-          "x": 0.0,
-          "y": 3.81,
-          "length": 1.27,
-          "orientation": 270.0
-        },
-        {
-          "pin_id": "2",
-          "name": "~",
-          "func": "passive",
-          "unit": 1,
-          "x": 0.0,
-          "y": -3.81,
-          "length": 1.27,
-          "orientation": 90.0
-        }
-      ]
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
     },
     "R2": {
       "symbol": "Device:R",
       "ref": "R2",
       "value": "10k",
       "footprint": "Resistor_SMD:R_0603_1608Metric",
-      "datasheet": "~",
-      "description": "Resistor",
-      "properties": {
-        "ki_fp_filters": "R_*"
-      },
-      "_extra_fields": {
-        "ki_fp_filters": "R_*"
-      },
-      "pins": [
-        {
-          "pin_id": "1",
-          "name": "~",
-          "func": "passive",
-          "unit": 1,
-          "x": 0.0,
-          "y": 3.81,
-          "length": 1.27,
-          "orientation": 270.0
-        },
-        {
-          "pin_id": "2",
-          "name": "~",
-          "func": "passive",
-          "unit": 1,
-          "x": 0.0,
-          "y": -3.81,
-          "length": 1.27,
-          "orientation": 90.0
-        }
-      ]
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
     },
     "R3": {
       "symbol": "Device:R",
       "ref": "R3",
       "value": "10k",
       "footprint": "Resistor_SMD:R_0603_1608Metric",
-      "datasheet": "~",
-      "description": "Resistor",
-      "properties": {
-        "ki_fp_filters": "R_*"
-      },
-      "_extra_fields": {
-        "ki_fp_filters": "R_*"
-      },
-      "pins": [
-        {
-          "pin_id": "1",
-          "name": "~",
-          "func": "passive",
-          "unit": 1,
-          "x": 0.0,
-          "y": 3.81,
-          "length": 1.27,
-          "orientation": 270.0
-        },
-        {
-          "pin_id": "2",
-          "name": "~",
-          "func": "passive",
-          "unit": 1,
-          "x": 0.0,
-          "y": -3.81,
-          "length": 1.27,
-          "orientation": 90.0
-        }
-      ]
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
     }
   },
-  "nets": {},
+  "nets": {
+    "unconnected-(R1-Pad1)": [
+      {
+        "component": "R1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R1-Pad2)": [
+      {
+        "component": "R1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R2-Pad1)": [
+      {
+        "component": "R2",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R2-Pad2)": [
+      {
+        "component": "R2",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R3-Pad1)": [
+      {
+        "component": "R3",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R3-Pad2)": [
+      {
+        "component": "R3",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ]
+  },
   "subcircuits": [],
-  "annotations": [
-    {
-      "type": "TextBox",
-      "text": "Bidirectional sync test circuit",
-      "position": [
-        184.0,
-        110.0
-      ],
-      "size": [
-        80.0,
-        30.0
-      ],
-      "margins": [
-        1.0,
-        1.0,
-        1.0,
-        1.0
-      ],
-      "text_size": 1.2,
-      "bold": true,
-      "italic": false,
-      "text_color": "black",
-      "background": true,
-      "background_color": "lightyellow",
-      "border": true,
-      "border_width": 0.1,
-      "border_color": "black",
-      "justify": "center center",
-      "rotation": 0,
-      "uuid": "41292819-89be-4a74-b061-6d0b1d3474dc"
-    }
-  ]
+  "annotations": []
 }
