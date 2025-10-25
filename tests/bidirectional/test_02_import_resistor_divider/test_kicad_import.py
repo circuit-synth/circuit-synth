@@ -258,7 +258,7 @@ def test_kicad_to_python_import():
 
         # Use the actual KiCadToPythonSyncer for real import functionality
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(kicad_project_file),
+            kicad_project_or_json=str(kicad_project_file),
             python_file=str(temp_output_dir),  # Directory for hierarchical output
             preview_only=False,  # Actually create the files
             create_backup=False,  # No backup needed for temporary files

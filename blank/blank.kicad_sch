@@ -1,0 +1,17 @@
+(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(generator_version "0.8.36")
+	(uuid "2b7d830f-f91b-4032-b8a0-58498fe91b97")
+	(paper "A4")
+	(title_block
+		(title "blank")
+	)
+	(lib_symbols)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
