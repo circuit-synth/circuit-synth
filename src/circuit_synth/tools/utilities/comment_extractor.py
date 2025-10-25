@@ -69,18 +69,18 @@ class CommentExtractor:
                     # Skip the docstring line - start extraction from next line
                     content_start_line = function_start_line + 1
 
-            # Extract all non-empty lines from the function body (after docstring)
+            # Extract ALL lines from the function body (after docstring), including blank lines
+            # This preserves spacing between comment groups
             content_map = {}
             for line_num in range(content_start_line, function_end_line + 1):
                 line_idx = line_num - 1  # Convert to 0-indexed
                 if line_idx < len(lines):
                     line = lines[line_idx].rstrip()  # Keep indentation, remove trailing whitespace
-                    # Include the line if it has content (not just whitespace)
-                    if line.strip():
-                        offset = line_num - content_start_line
-                        if offset not in content_map:
-                            content_map[offset] = []
-                        content_map[offset].append(line)
+                    # Include ALL lines - blank lines preserve spacing
+                    offset = line_num - content_start_line
+                    if offset not in content_map:
+                        content_map[offset] = []
+                    content_map[offset].append(line)
 
             logger.info(
                 f"Extracted {len(content_map)} content lines from {function_name}()"

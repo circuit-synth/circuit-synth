@@ -309,3 +309,62 @@ def main():
         # User comments should still be preserved
         assert "USER COMMENT" in result
         assert "look at these!" in result
+
+    def test_preserves_blank_lines_between_comments(self, extractor, tmp_path):
+        """Test that blank lines between comment groups are preserved"""
+        code = '''@circuit
+def main():
+    """Generated circuit from KiCad"""
+    # USER COMMENT: This is my first preserved comment!
+    # USER COMMENT: This is my second preserved comment!
+    #
+    #
+    #
+    """
+    look at these!"""
+
+    # another one!
+    # another one!
+    # another one!
+
+    # another one!
+    # another one!
+    # another one!
+    """ more comments"""
+    """ more comments"""
+    """ more comments"""
+
+if __name__ == '__main__':
+    circuit = main()
+'''
+        file_path = tmp_path / "circuit_with_blank_lines.py"
+        file_path.write_text(code)
+
+        # Generate new code
+        generated_code = '''@circuit
+def main():
+    """Generated circuit from KiCad"""
+
+
+'''
+        result = extractor.extract_and_reinsert(file_path, generated_code, "main")
+
+        # Should preserve blank lines between comment groups
+        # The blank line after "look at these!""" should be preserved
+        assert "look at these!\"\"\"\n\n    # another one!" in result or \
+               "look at these!\"\"\"\n    \n    # another one!" in result, \
+               "Blank line after inline docstring should be preserved"
+
+        # The blank line between the two "another one!" groups should be preserved
+        lines = result.split('\n')
+
+        # Find the lines with "another one!" comments
+        another_one_indices = [i for i, line in enumerate(lines) if "another one!" in line]
+
+        # Should have 6 occurrences
+        assert len(another_one_indices) == 6, f"Expected 6 'another one!' comments, found {len(another_one_indices)}"
+
+        # There should be a blank line in the middle (between index 2 and 3 of the another_one group)
+        # Check if there's a gap in the indices
+        has_blank_between = (another_one_indices[3] - another_one_indices[2]) > 1
+        assert has_blank_between, "Should preserve blank line between comment groups"
