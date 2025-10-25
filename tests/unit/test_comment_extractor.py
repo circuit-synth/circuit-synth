@@ -271,3 +271,41 @@ def main():
         assert '"""' in result or "'''" in result
         # Look for the inline docstring content (may be reformatted)
         assert "inline docstring" in result.lower() or "preserved" in result.lower()
+
+    def test_does_not_duplicate_function_docstring(self, extractor, tmp_path):
+        """Test that function's own docstring is not duplicated during round-trip"""
+        code = '''@circuit
+def main():
+    """Generated circuit from KiCad"""
+    # USER COMMENT: This is my first preserved comment!
+    # USER COMMENT: This is my second preserved comment!
+    #
+    #
+    #
+    """
+    look at these!"""
+
+if __name__ == '__main__':
+    circuit = main()
+'''
+        file_path = tmp_path / "circuit_with_comments.py"
+        file_path.write_text(code)
+
+        # Generate new code with same docstring
+        generated_code = '''@circuit
+def main():
+    """Generated circuit from KiCad"""
+
+
+'''
+        result = extractor.extract_and_reinsert(file_path, generated_code, "main")
+
+        # Count occurrences of the function docstring
+        docstring_count = result.count('"""Generated circuit from KiCad"""')
+
+        # Should only appear ONCE (not duplicated)
+        assert docstring_count == 1, f"Expected 1 occurrence of function docstring, found {docstring_count}"
+
+        # User comments should still be preserved
+        assert "USER COMMENT" in result
+        assert "look at these!" in result

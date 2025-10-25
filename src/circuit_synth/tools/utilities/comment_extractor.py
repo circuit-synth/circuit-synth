@@ -57,15 +57,27 @@ class CommentExtractor:
                 logger.warning(f"Function '{function_name}' not found in {file_path}")
                 return {}
 
-            # Extract all non-empty lines from the function body
+            # Find the def line to check for docstring
+            def_line_num = self._find_def_line(lines, function_name)
+
+            # Check if there's a docstring on the line after def
+            content_start_line = function_start_line
+            if def_line_num is not None and (def_line_num + 1) < len(lines):
+                # Look at the line after def (def_line_num is 0-indexed)
+                line_after_def = lines[def_line_num + 1].strip()
+                if line_after_def.startswith('"""') or line_after_def.startswith("'''"):
+                    # Skip the docstring line - start extraction from next line
+                    content_start_line = function_start_line + 1
+
+            # Extract all non-empty lines from the function body (after docstring)
             content_map = {}
-            for line_num in range(function_start_line, function_end_line + 1):
+            for line_num in range(content_start_line, function_end_line + 1):
                 line_idx = line_num - 1  # Convert to 0-indexed
                 if line_idx < len(lines):
                     line = lines[line_idx].rstrip()  # Keep indentation, remove trailing whitespace
                     # Include the line if it has content (not just whitespace)
                     if line.strip():
-                        offset = line_num - function_start_line
+                        offset = line_num - content_start_line
                         if offset not in content_map:
                             content_map[offset] = []
                         content_map[offset].append(line)
@@ -78,6 +90,22 @@ class CommentExtractor:
         except Exception as e:
             logger.error(f"Failed to extract content: {e}")
             return {}
+
+    def _find_def_line(self, lines: List[str], function_name: str) -> Optional[int]:
+        """
+        Find the line index (0-indexed) of the def statement for a function.
+
+        Args:
+            lines: List of lines from the file
+            function_name: Name of function to find
+
+        Returns:
+            Line index (0-indexed) of the def line, or None if not found
+        """
+        for i, line in enumerate(lines):
+            if line.strip().startswith(f"def {function_name}("):
+                return i
+        return None
 
     def _find_function_start_line(
         self, tree: ast.AST, function_name: str
