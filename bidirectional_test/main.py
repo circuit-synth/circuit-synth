@@ -6,6 +6,8 @@ from circuit_synth import *
 def main():
     """Bidirectional sync test circuit"""
 
+    # Create components
+
 
 
     # Create components
@@ -15,6 +17,6 @@ if __name__ == "__main__":
     circuit_obj.generate_kicad_project(
         project_name="BidirectionalTest",
         placement_algorithm="hierarchical",
-        generate_pcb=True
+        generate_pcb=True,
     )
     print("Generated BidirectionalTest/")
