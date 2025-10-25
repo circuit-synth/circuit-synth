@@ -95,20 +95,21 @@ if __name__ == '__main__':
         assert "vout = Net('VOUT')" in result[4]
 
     def test_reinsert_comments_preserves_indentation(self, extractor):
-        """Test that comments use function body indentation (4 spaces)"""
+        """Test that content preserves its original indentation"""
         generated_lines = [
             "    net1 = Net('NET1')",  # 4 spaces
             "        net2 = Net('NET2')",  # 8 spaces
         ]
 
+        # Content map now has full lines with indentation (as extracted)
         comments_map = {
-            0: ["# First comment"],
-            1: ["# Second comment"],
+            0: ["    # First comment"],  # With indentation
+            1: ["    # Second comment"],  # With indentation
         }
 
         result = extractor.reinsert_comments(generated_lines, comments_map)
 
-        # All comments use function body indentation (4 spaces) at the start
+        # Content preserves its original indentation
         assert result[0] == "    # First comment"
         assert result[1] == "    # Second comment"
         assert result[2] == "    net1 = Net('NET1')"
@@ -229,3 +230,44 @@ if __name__ == '__main__':
         all_comments = str(comments_map.values())
         assert "VIN" in all_comments
         assert "GND" in all_comments
+
+    def test_preserves_inline_docstrings(self, extractor, tmp_path):
+        """Test that inline docstrings inside function body are preserved"""
+        code = '''@circuit
+def main():
+    """Generated circuit from KiCad"""
+    # USER COMMENT: This is my first comment
+    # USER COMMENT: This is my second comment
+    #
+
+    """
+    This is an inline docstring that should be preserved!
+    """
+
+if __name__ == '__main__':
+    circuit = main()
+'''
+        file_path = tmp_path / "circuit_with_docstring.py"
+        file_path.write_text(code)
+
+        # Test extraction
+        comments_map = extractor.extract_comments_from_function(file_path, "main")
+
+        # Should find regular comments
+        assert len(comments_map) >= 1
+        all_comments = str(comments_map.values())
+        assert "USER COMMENT" in all_comments
+
+        # Test round-trip preservation
+        generated_code = '''@circuit
+def main():
+    """Generated circuit from KiCad"""
+
+
+'''
+        result = extractor.extract_and_reinsert(file_path, generated_code, "main")
+
+        # The inline docstring should be preserved in the result
+        assert '"""' in result or "'''" in result
+        # Look for the inline docstring content (may be reformatted)
+        assert "inline docstring" in result.lower() or "preserved" in result.lower()

@@ -27,15 +27,18 @@ class CommentExtractor:
         self, file_path: Path, function_name: str = "main"
     ) -> Dict[int, List[str]]:
         """
-        Extract all comments from a specific function with line offsets.
+        Extract all user-added content from a specific function.
+
+        This includes comments, inline docstrings, and any other code.
+        We extract everything after the first docstring to preserve it.
 
         Args:
             file_path: Path to Python file
-            function_name: Name of function to extract comments from
+            function_name: Name of function to extract content from
 
         Returns:
-            Dictionary mapping line offset (relative to function start) to list of comments
-            Example: {0: ["# Comment on first line"], 2: ["# Comment on third line"]}
+            Dictionary mapping line offset (relative to function start) to list of content lines
+            Example: {0: ["# Comment"], 2: ['docstring content']}
         """
         if not file_path.exists():
             logger.warning(f"File not found: {file_path}")
@@ -44,9 +47,9 @@ class CommentExtractor:
         try:
             # Parse AST to find function boundaries
             with open(file_path, "r") as f:
-                source_code = f.read()
+                lines = f.readlines()
 
-            tree = ast.parse(source_code)
+            tree = ast.parse("".join(lines))
             function_start_line = self._find_function_start_line(tree, function_name)
             function_end_line = self._find_function_end_line(tree, function_name, file_path)
 
@@ -54,18 +57,26 @@ class CommentExtractor:
                 logger.warning(f"Function '{function_name}' not found in {file_path}")
                 return {}
 
-            # Extract comments using tokenize
-            comments_map = self._extract_comments_with_tokenize(
-                file_path, function_start_line, function_end_line
-            )
+            # Extract all non-empty lines from the function body
+            content_map = {}
+            for line_num in range(function_start_line, function_end_line + 1):
+                line_idx = line_num - 1  # Convert to 0-indexed
+                if line_idx < len(lines):
+                    line = lines[line_idx].rstrip()  # Keep indentation, remove trailing whitespace
+                    # Include the line if it has content (not just whitespace)
+                    if line.strip():
+                        offset = line_num - function_start_line
+                        if offset not in content_map:
+                            content_map[offset] = []
+                        content_map[offset].append(line)
 
             logger.info(
-                f"Extracted {len(comments_map)} comment locations from {function_name}()"
+                f"Extracted {len(content_map)} content lines from {function_name}()"
             )
-            return comments_map
+            return content_map
 
         except Exception as e:
-            logger.error(f"Failed to extract comments: {e}")
+            logger.error(f"Failed to extract content: {e}")
             return {}
 
     def _find_function_start_line(
@@ -204,32 +215,30 @@ class CommentExtractor:
         self, generated_lines: List[str], comments_map: Dict[int, List[str]]
     ) -> List[str]:
         """
-        Re-insert comments as a block at the start of the function body.
+        Re-insert user content as a block at the start of the function body.
 
-        Simple strategy: Insert ALL comments right at the beginning of the function,
-        preserving their order. This is idempotent and doesn't try to match structure.
+        Simple strategy: Insert ALL user content right at the beginning of the function,
+        preserving order and original formatting. This is idempotent.
 
         Args:
             generated_lines: List of generated code lines (from after docstring)
-            comments_map: Dictionary mapping line offsets to comments
+            comments_map: Dictionary mapping line offsets to content lines
 
         Returns:
-            List of code lines with comments prepended
+            List of code lines with user content prepended
         """
         if not comments_map:
             return generated_lines
 
-        # Collect all comments in order
-        all_comments = []
+        # Collect all content lines in order, preserving their original formatting
+        all_content = []
         for offset in sorted(comments_map.keys()):
-            for comment in comments_map[offset]:
-                all_comments.append(comment)
+            for content_line in comments_map[offset]:
+                # Content lines already have their indentation preserved
+                all_content.append(content_line)
 
-        # Insert all comments at the beginning with function body indentation
-        function_body_indent = "    "
-        result_lines = []
-        for comment in all_comments:
-            result_lines.append(f"{function_body_indent}{comment}")
+        # Insert all content at the beginning
+        result_lines = all_content
 
         # Add the rest of the generated lines
         result_lines.extend(generated_lines)
