@@ -1,0 +1,105 @@
+{
+  "name": "main",
+  "description": "",
+  "tstamps": "",
+  "source_file": "main.kicad_sch",
+  "components": {
+    "R1": {
+      "symbol": "Device:R",
+      "ref": "R1",
+      "value": "10k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    },
+    "R2": {
+      "symbol": "Device:R",
+      "ref": "R2",
+      "value": "10k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    },
+    "R3": {
+      "symbol": "Device:R",
+      "ref": "R3",
+      "value": "10k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    }
+  },
+  "nets": {
+    "unconnected-(R1-Pad1)": [
+      {
+        "component": "R1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R1-Pad2)": [
+      {
+        "component": "R1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R2-Pad1)": [
+      {
+        "component": "R2",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R2-Pad2)": [
+      {
+        "component": "R2",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R3-Pad1)": [
+      {
+        "component": "R3",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R3-Pad2)": [
+      {
+        "component": "R3",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ]
+  },
+  "subcircuits": [],
+  "annotations": []
+}
