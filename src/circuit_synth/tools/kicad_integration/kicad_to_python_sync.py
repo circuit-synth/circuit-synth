@@ -124,7 +124,7 @@ class KiCadToPythonSyncer:
         # Store for backward compatibility (some methods may still use it)
         self.kicad_project = input_path
 
-        logger.info(f"KiCadToPythonSyncer initialized")
+        logger.info("KiCadToPythonSyncer initialized")
         logger.info(f"JSON input: {self._json_path}")
         logger.info(f"Python target: {self.python_file_or_dir}")
         logger.info(f"Directory mode: {self.is_directory_mode}")
@@ -174,7 +174,7 @@ class KiCadToPythonSyncer:
             return json_path
 
         # Generate JSON from KiCad
-        logger.info(f"No JSON found, generating from KiCad project...")
+        logger.info("No JSON found, generating from KiCad project...")
         return self._export_kicad_to_json(kicad_project)
 
     def _export_kicad_to_json(self, kicad_project: Path) -> Path:
@@ -281,9 +281,7 @@ class KiCadToPythonSyncer:
                     net.name: [
                         {
                             "component": conn[0],
-                            "pin_id": (
-                                int(conn[1]) if conn[1].isdigit() else conn[1]
-                            ),
+                            "pin_id": (int(conn[1]) if conn[1].isdigit() else conn[1]),
                         }
                         for conn in net.connections
                     ]
@@ -381,9 +379,7 @@ class KiCadToPythonSyncer:
             return data
 
         except json.JSONDecodeError as e:
-            raise ValueError(
-                f"Invalid JSON format in {self.json_path}: {e}"
-            ) from e
+            raise ValueError(f"Invalid JSON format in {self.json_path}: {e}") from e
 
     def _json_to_circuits(self) -> Dict[str, Circuit]:
         """
