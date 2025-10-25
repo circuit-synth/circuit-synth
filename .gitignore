@@ -191,3 +191,9 @@ memory-bank/
 .circuit_synth/
 .circuit-synth/
 libraries/digikey-kicad-converted/
+
+# Test-generated KiCad projects
+*_circuit/
+voltage_divider/
+perf_*/
+coverage.json

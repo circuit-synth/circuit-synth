@@ -37,9 +37,14 @@ class TestPhase9Performance:
         """
         @circuit(name="perf_simple")
         def perf_simple():
-            from circuit_synth import Resistor
+            from circuit_synth import Component, Net
 
-            r1 = Resistor("R1", value="1k")
+            r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="1k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
 
         circuit_obj = perf_simple()
 
@@ -74,7 +79,7 @@ class TestPhase9Performance:
         """
         @circuit(name="perf_medium")
         def perf_medium():
-            from circuit_synth import Resistor, Capacitor, Inductor
+            from circuit_synth import Component, Net
 
             # Create 20 components (various types)
             for i in range(1, 9):
@@ -131,7 +136,7 @@ class TestPhase9Performance:
         # Create a circuit with multiple components
         @circuit(name="perf_import")
         def perf_import():
-            from circuit_synth import Resistor, Capacitor
+            from circuit_synth import Component, Net
 
             for i in range(1, 6):
                 r = Resistor(f"R{i}", value="1k")
@@ -185,11 +190,26 @@ class TestPhase9Performance:
         """
         @circuit(name="perf_size")
         def perf_size():
-            from circuit_synth import Resistor, Capacitor
+            from circuit_synth import Component, Net
 
-            r1 = Resistor("R1", value="1k")
-            r2 = Resistor("R2", value="10k")
-            c1 = Capacitor("C1", value="100n")
+            r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="1k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+            r2 = Component(
+                symbol="Device:R",
+                ref="R2",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+            c1 = Component(
+                symbol="Device:C",
+                ref="C1",
+                value="100n",
+                footprint="Capacitor_SMD:C_0603_1608Metric"
+            )
 
         circuit_obj = perf_size()
 

@@ -33,10 +33,22 @@ class TestPhase2SingleComponent:
 
         @circuit(name="resistor_circuit")
         def resistor_circuit():
-            from circuit_synth import Resistor
+            from circuit_synth import Component, Net
+
+            # Create nets
+            gnd = Net("GND")
 
             # Add a simple resistor
-            r1 = Resistor("R1", value="10k")
+            r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+
+            # Connect to ground (minimal connection)
+            r1[1] += gnd
+            r1[2] += gnd
 
         return resistor_circuit()
 

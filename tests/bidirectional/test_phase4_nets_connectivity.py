@@ -33,7 +33,7 @@ class TestPhase4NetsConnectivity:
 
         @circuit(name="net_circuit")
         def net_circuit():
-            from circuit_synth import Resistor, Capacitor, Net
+            from circuit_synth import Component, Net
 
             # Create named nets
             vcc_net = Net("VCC")
@@ -41,9 +41,32 @@ class TestPhase4NetsConnectivity:
             signal_net = Net("SIGNAL")
 
             # Components
-            r1 = Resistor("R1", value="1k")
-            c1 = Capacitor("C1", value="100n")
-            r2 = Resistor("R2", value="10k")
+            r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="1k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+            c1 = Component(
+                symbol="Device:C",
+                ref="C1",
+                value="100n",
+                footprint="Capacitor_SMD:C_0603_1608Metric"
+            )
+            r2 = Component(
+                symbol="Device:R",
+                ref="R2",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+
+            # Connect components to nets
+            r1[1] += vcc_net
+            r1[2] += signal_net
+            c1[1] += signal_net
+            c1[2] += gnd_net
+            r2[1] += signal_net
+            r2[2] += gnd_net
 
         return net_circuit()
 
@@ -166,7 +189,7 @@ class TestPhase4NetsConnectivity:
             # Create circuit with more complex topology
             @circuit(name="complex_net_circuit")
             def complex_net_circuit():
-                from circuit_synth import Resistor, Capacitor, Inductor, Net
+                from circuit_synth import Component, Net
 
                 # Power rails
                 vcc = Net("VCC")
@@ -178,11 +201,36 @@ class TestPhase4NetsConnectivity:
                 mid1 = Net("MID1")
 
                 # Components that connect these nets
-                r1 = Resistor("R1", value="1k")
-                r2 = Resistor("R2", value="2k")
-                r3 = Resistor("R3", value="3k")
-                c1 = Capacitor("C1", value="100n")
-                l1 = Inductor("L1", value="10u")
+                r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="1k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+                r2 = Component(
+                symbol="Device:R",
+                ref="R2",
+                value="2k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+                r3 = Component(
+                symbol="Device:R",
+                ref="R3",
+                value="3k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+                c1 = Component(
+                symbol="Device:C",
+                ref="C1",
+                value="100n",
+                footprint="Capacitor_SMD:C_0603_1608Metric"
+            )
+                l1 = Component(
+                symbol="Device:L",
+                ref="L1",
+                value="10u",
+                footprint="Inductor_SMD:L_0603_1608Metric"
+            )
 
             circuit_obj = complex_net_circuit()
 

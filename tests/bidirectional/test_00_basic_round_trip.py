@@ -109,7 +109,6 @@ class TestBasicRoundTrip:
             assert "GND" in nets, "GND net not found in JSON"
 
             print("✅ Python → JSON: PASS")
-            return json_path
 
     def test_json_to_kicad_generation(self, simple_circuit):
         """Test step 2: JSON → KiCad"""
@@ -151,7 +150,6 @@ class TestBasicRoundTrip:
             # Note: JSON path may vary based on implementation
 
             print("✅ JSON → KiCad: PASS")
-            return kicad_sch
 
     def test_kicad_to_json_export(self, simple_circuit):
         """Test step 3: KiCad → JSON"""

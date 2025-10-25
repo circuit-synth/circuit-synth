@@ -33,11 +33,32 @@ class TestPhase3MultipleComponents:
 
         @circuit(name="voltage_divider")
         def voltage_divider():
-            from circuit_synth import Resistor
+            from circuit_synth import Component, Net
+
+            # Create nets
+            vin = Net("VIN")
+            vout = Net("VOUT")
+            gnd = Net("GND")
 
             # Classic voltage divider: VCC → R1 → R2 → GND
-            r1 = Resistor("R1", value="10k")
-            r2 = Resistor("R2", value="10k")
+            r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+            r2 = Component(
+                symbol="Device:R",
+                ref="R2",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+
+            # Create connections
+            r1[1] += vin
+            r1[2] += vout
+            r2[1] += vout
+            r2[2] += gnd
 
         return voltage_divider()
 
@@ -120,11 +141,38 @@ class TestPhase3MultipleComponents:
             # Create circuit with mixed components
             @circuit(name="mixed_circuit")
             def mixed_circuit():
-                from circuit_synth import Resistor, Capacitor, Inductor
+                from circuit_synth import Component, Net
 
-                r1 = Resistor("R1", value="1k")
-                c1 = Capacitor("C1", value="100n")
-                l1 = Inductor("L1", value="10u")
+                # Create nets
+                vin = Net("VIN")
+                gnd = Net("GND")
+
+                r1 = Component(
+                    symbol="Device:R",
+                    ref="R1",
+                    value="1k",
+                    footprint="Resistor_SMD:R_0603_1608Metric"
+                )
+                c1 = Component(
+                    symbol="Device:C",
+                    ref="C1",
+                    value="100n",
+                    footprint="Capacitor_SMD:C_0603_1608Metric"
+                )
+                l1 = Component(
+                    symbol="Device:L",
+                    ref="L1",
+                    value="10u",
+                    footprint="Inductor_SMD:L_0603_1608Metric"
+                )
+
+                # Connect components
+                r1[1] += vin
+                r1[2] += gnd
+                c1[1] += vin
+                c1[2] += gnd
+                l1[1] += vin
+                l1[2] += gnd
 
             circuit_obj = mixed_circuit()
 

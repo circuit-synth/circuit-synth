@@ -33,14 +33,24 @@ class TestPhase5HierarchicalCircuits:
 
         @circuit(name="main_circuit")
         def main_circuit():
-            from circuit_synth import Resistor, Capacitor
+            from circuit_synth import Component, Net
 
             # Main circuit components
-            r_main = Resistor("R_MAIN", value="1k")
+            r_main = Component(
+                symbol="Device:R",
+                ref="R_MAIN1",
+                value="1k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
 
             # In a real hierarchical circuit, we would reference subcircuits
             # For now, test with simple flat structure
-            c_main = Capacitor("C_MAIN", value="10u")
+            c_main = Component(
+                symbol="Device:C",
+                ref="C_MAIN1",
+                value="10u",
+                footprint="Capacitor_SMD:C_0603_1608Metric"
+            )
 
         return main_circuit()
 
@@ -110,11 +120,26 @@ class TestPhase5HierarchicalCircuits:
             # Create hierarchical circuit
             @circuit(name="hier_circuit")
             def hier_circuit():
-                from circuit_synth import Resistor, Capacitor, Inductor
+                from circuit_synth import Component, Net
 
-                r1 = Resistor("R1", value="1k")
-                c1 = Capacitor("C1", value="100n")
-                l1 = Inductor("L1", value="10u")
+                r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="1k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+                c1 = Component(
+                symbol="Device:C",
+                ref="C1",
+                value="100n",
+                footprint="Capacitor_SMD:C_0603_1608Metric"
+            )
+                l1 = Component(
+                symbol="Device:L",
+                ref="L1",
+                value="10u",
+                footprint="Inductor_SMD:L_0603_1608Metric"
+            )
 
             circuit_obj = hier_circuit()
 
@@ -173,15 +198,35 @@ class TestPhase5HierarchicalCircuits:
             # Create circuit with multiple component groups
             @circuit(name="multi_level_circuit")
             def multi_level_circuit():
-                from circuit_synth import Resistor, Capacitor, Inductor
+                from circuit_synth import Component, Net
 
                 # Power supply section
-                r_ps = Resistor("R_PS", value="100k")
-                c_ps = Capacitor("C_PS", value="47u")
+                r_ps = Component(
+                symbol="Device:R",
+                ref="R_PS1",
+                value="100k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+                c_ps = Component(
+                symbol="Device:C",
+                ref="C_PS1",
+                value="47u",
+                footprint="Capacitor_SMD:C_0603_1608Metric"
+            )
 
                 # Signal section
-                r_sig = Resistor("R_SIG", value="1k")
-                c_sig = Capacitor("C_SIG", value="100n")
+                r_sig = Component(
+                symbol="Device:R",
+                ref="R_SIG1",
+                value="1k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+                c_sig = Component(
+                symbol="Device:C",
+                ref="C_SIG1",
+                value="100n",
+                footprint="Capacitor_SMD:C_0603_1608Metric"
+            )
 
             circuit_obj = multi_level_circuit()
 

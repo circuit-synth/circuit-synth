@@ -35,20 +35,55 @@ class TestPhase8IdempotencyStress:
 
         @circuit(name="stress_test_circuit")
         def stress_test_circuit():
-            from circuit_synth import Resistor, Capacitor, Inductor, Diode
+            from circuit_synth import Component, Net
 
             # Power supply section
-            r1 = Resistor("R1", value="1k")
-            c1 = Capacitor("C1", value="100u")
+            r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="1k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+            c1 = Component(
+                symbol="Device:C",
+                ref="C1",
+                value="100u",
+                footprint="Capacitor_SMD:C_0603_1608Metric"
+            )
 
             # Signal processing section
-            r2 = Resistor("R2", value="10k")
-            r3 = Resistor("R3", value="10k")
-            c2 = Capacitor("C2", value="100n")
+            r2 = Component(
+                symbol="Device:R",
+                ref="R2",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+            r3 = Component(
+                symbol="Device:R",
+                ref="R3",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+            c2 = Component(
+                symbol="Device:C",
+                ref="C2",
+                value="100n",
+                footprint="Capacitor_SMD:C_0603_1608Metric"
+            )
 
             # Protection section
-            d1 = Diode("D1", value="1N4148")
-            l1 = Inductor("L1", value="10u")
+            d1 = Component(
+                symbol="Device:D",
+                ref="D1",
+                value="1N4148",
+                footprint="Diode_SMD:D_0603_1608Metric"
+            )
+            l1 = Component(
+                symbol="Device:L",
+                ref="L1",
+                value="10u",
+                footprint="Inductor_SMD:L_0603_1608Metric"
+            )
 
         return stress_test_circuit()
 
@@ -285,11 +320,26 @@ class TestPhase8IdempotencyStress:
             # Create initial circuit
             @circuit(name="cycle_test_circuit")
             def cycle_test_circuit():
-                from circuit_synth import Resistor, Capacitor
+                from circuit_synth import Component, Net
 
-                r1 = Resistor("R1", value="1k")
-                r2 = Resistor("R2", value="10k")
-                c1 = Capacitor("C1", value="100n")
+                r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="1k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+                r2 = Component(
+                symbol="Device:R",
+                ref="R2",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+                c1 = Component(
+                symbol="Device:C",
+                ref="C1",
+                value="100n",
+                footprint="Capacitor_SMD:C_0603_1608Metric"
+            )
 
             circuit_obj = cycle_test_circuit()
 

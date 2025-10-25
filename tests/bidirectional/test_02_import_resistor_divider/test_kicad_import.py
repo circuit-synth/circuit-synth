@@ -222,12 +222,12 @@ def test_kicad_to_python_import():
     if not reference_kicad_dir.exists():
         pytest.fail(f"Reference KiCad directory not found: {reference_kicad_dir}")
 
-    # Find the main KiCad project file
-    kicad_project_files = list(reference_kicad_dir.glob("*.kicad_pro"))
-    if not kicad_project_files:
-        pytest.fail(f"No .kicad_pro files found in: {reference_kicad_dir}")
+    # Find the JSON netlist (recommended API for KiCadToPythonSyncer)
+    json_netlists = list(reference_kicad_dir.glob("*.json"))
+    if not json_netlists:
+        pytest.fail(f"No .json netlist found in: {reference_kicad_dir}")
 
-    kicad_project_file = kicad_project_files[0]
+    kicad_project_file = json_netlists[0]  # Now using JSON netlist
 
     # Read reference Python code from the resistor_divider.py file
     with open(reference_resistor_divider_file, "r") as f:

@@ -45,12 +45,22 @@ class TestPhase6Preservation:
             # Create a Python circuit with comments
             @circuit(name="commented_circuit")
             def commented_circuit():
-                from circuit_synth import Resistor
+                from circuit_synth import Component, Net
 
                 # Power supply resistor - 10k pull-up
-                r1 = Resistor("R1", value="10k")
+                r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
                 # Input protection resistor
-                r2 = Resistor("R2", value="1k")
+                r2 = Component(
+                symbol="Device:R",
+                ref="R2",
+                value="1k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
 
             circuit_obj = commented_circuit()
 
@@ -114,10 +124,20 @@ class TestPhase6Preservation:
             # Create simple circuit
             @circuit(name="positioned_circuit")
             def positioned_circuit():
-                from circuit_synth import Resistor
+                from circuit_synth import Component, Net
 
-                r1 = Resistor("R1", value="10k")
-                r2 = Resistor("R2", value="20k")
+                r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+                r2 = Component(
+                symbol="Device:R",
+                ref="R2",
+                value="20k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
 
             circuit_obj = positioned_circuit()
 
@@ -211,11 +231,21 @@ class TestPhase6Preservation:
             # Create circuit with annotated components
             @circuit(name="annotated_circuit")
             def annotated_circuit():
-                from circuit_synth import Resistor, Capacitor
+                from circuit_synth import Component, Net
 
                 # High-frequency bypass capacitor
-                r1 = Resistor("R1", value="100")  # Pull-up
-                c1 = Capacitor("C1", value="100n")  # Bypass cap
+                r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="100",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )  # Pull-up
+                c1 = Component(
+                symbol="Device:C",
+                ref="C1",
+                value="100n",
+                footprint="Capacitor_SMD:C_0603_1608Metric"
+            )  # Bypass cap
 
             circuit_obj = annotated_circuit()
 
@@ -289,10 +319,20 @@ class TestPhase6Preservation:
             # Create circuit with nets
             @circuit(name="routed_circuit")
             def routed_circuit():
-                from circuit_synth import Resistor, Net
+                from circuit_synth import Component, Net
 
-                r1 = Resistor("R1", value="10k")
-                r2 = Resistor("R2", value="20k")
+                r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
+                r2 = Component(
+                symbol="Device:R",
+                ref="R2",
+                value="20k",
+                footprint="Resistor_SMD:R_0603_1608Metric"
+            )
 
                 # Create net connections
                 net_vcc = Net("VCC")

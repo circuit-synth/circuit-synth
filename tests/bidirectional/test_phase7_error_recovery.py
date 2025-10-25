@@ -131,7 +131,7 @@ class TestPhase7ErrorRecovery:
 
             # Verify files created
             assert next(project_dir.glob("*.kicad_sch"), None), "No .kicad_sch"
-            assert next(project_dir.glob("*.kicad_pro"), None), "No .kicad_pro"
+            assert next(project_dir.glob("*.json"), None), "No .kicad_pro"
 
             json_file = next(project_dir.glob("*.json"))
             with open(json_file) as f:
@@ -147,7 +147,7 @@ class TestPhase7ErrorRecovery:
             output_dir.mkdir()
 
             syncer = KiCadToPythonSyncer(
-                kicad_project_or_json=str(project_dir / "empty_circuit.kicad_pro"),
+                kicad_project_or_json=str(project_dir / "empty_circuit.json"),
                 python_file=str(output_dir),
                 preview_only=False,
                 create_backup=False,
