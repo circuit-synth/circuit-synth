@@ -1,0 +1,37 @@
+(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(generator_version "0.8.36")
+	(uuid "fa00019f-a328-4dd4-aa75-20b935f97a3a")
+	(paper "A4")
+	(title_block
+		(title "BidirectionalTest")
+	)
+	(lib_symbols)
+	(text_box "Bidirectional sync test circuit"
+		(exclude_from_sim no)
+		(at 184 110 0)
+		(size 80 30)
+		(margins 1 1 1 1)
+		(stroke
+			(width 0.0000)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+			)
+			(justify left top)
+		)
+		(uuid "b8eecc81-66a9-4bed-8b72-a5732e5073e4")
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

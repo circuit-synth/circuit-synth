@@ -1,0 +1,41 @@
+{
+  "name": "BidirectionalTest",
+  "description": "Bidirectional sync test circuit",
+  "tstamps": "/bidirectionaltest-4298049632/",
+  "source_file": "BidirectionalTest.kicad_sch",
+  "components": {},
+  "nets": {},
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Bidirectional sync test circuit",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "88f1cf4f-1008-4717-9ca5-c67da89270e5"
+    }
+  ]
+}
