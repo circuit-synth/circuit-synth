@@ -372,11 +372,53 @@ class CommentExtractor:
             logger.error(f"Failed to extract after-function content: {e}")
             return []
 
+    def find_circuit_function_name(self, file_path: Path) -> Optional[str]:
+        """
+        Find the name of the @circuit decorated function in a file.
+
+        Args:
+            file_path: Path to Python file
+
+        Returns:
+            Name of the circuit function, or None if not found
+        """
+        if not file_path.exists():
+            return None
+
+        try:
+            with open(file_path, "r") as f:
+                content = f.read()
+
+            tree = ast.parse(content)
+
+            # Look for function with @circuit decorator
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    # Check if it has @circuit decorator
+                    for decorator in node.decorator_list:
+                        # Handle both @circuit and @circuit(...)
+                        if isinstance(decorator, ast.Name) and decorator.id == "circuit":
+                            return node.name
+                        elif isinstance(decorator, ast.Call):
+                            if isinstance(decorator.func, ast.Name) and decorator.func.id == "circuit":
+                                return node.name
+
+            # Fallback: if no @circuit found, look for any function
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    return node.name
+
+            return None
+
+        except Exception as e:
+            logger.warning(f"Failed to find circuit function name: {e}")
+            return None
+
     def merge_preserving_user_content(
         self,
         existing_file: Path,
         generated_template: str,
-        function_name: str = "main",
+        function_name: Optional[str] = None,
     ) -> str:
         """
         Merge generated code with existing file, preserving ALL user content.
@@ -387,7 +429,7 @@ class CommentExtractor:
         Args:
             existing_file: Path to existing Python file with user content
             generated_template: Newly generated template (full file)
-            function_name: Name of function to update
+            function_name: Name of function to update (if None, auto-detect)
 
         Returns:
             Merged code with user content preserved and generated code updated
@@ -395,6 +437,15 @@ class CommentExtractor:
         if not existing_file.exists():
             # No existing file, return generated template as-is
             return generated_template
+
+        # Auto-detect function name if not provided
+        if function_name is None:
+            function_name = self.find_circuit_function_name(existing_file)
+            if function_name is None:
+                logger.warning("Could not find circuit function, using 'main' as fallback")
+                function_name = "main"
+            else:
+                logger.info(f"Auto-detected circuit function: {function_name}")
 
         try:
             # Read existing file
@@ -415,10 +466,16 @@ class CommentExtractor:
                 return generated_template
 
             # Find function body content in GENERATED template (the new component code)
+            # Try the detected function name first, then try "main" as fallback
             generated_func_start_idx = self._find_function_start_index(generated_lines, function_name)
+            if generated_func_start_idx is None and function_name != "main":
+                # Function not found, try "main" (the template default)
+                logger.info(f"Function '{function_name}' not in generated code, trying 'main' fallback")
+                generated_func_start_idx = self._find_function_start_index(generated_lines, "main")
+
             if generated_func_start_idx is None:
-                # Can't find function in generated code, return existing
-                logger.warning(f"Could not find function '{function_name}' in generated code")
+                # Can't find any function in generated code, return existing
+                logger.warning(f"Could not find function in generated code")
                 return existing_content
 
             # Extract the NEW generated component code (everything after docstring in generated file)

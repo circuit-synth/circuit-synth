@@ -1313,8 +1313,9 @@ class PythonCodeGenerator:
 
                 # COMMENT PRESERVATION: Merge preserving ALL user content
                 if python_file.exists():
+                    # Auto-detect function name from existing file (handles both "main" and custom names)
                     updated_code_with_user_content = self.comment_extractor.merge_preserving_user_content(
-                        python_file, updated_code, "main"
+                        python_file, updated_code, function_name=None  # Auto-detect
                     )
                     updated_code = updated_code_with_user_content
 
