@@ -186,6 +186,28 @@ if __name__ == '__main__':
     )
 ```
 
+### Manufacturing File Generation
+
+All circuit templates automatically generate manufacturing files:
+
+```python
+# After generate_kicad_project(), templates also generate:
+
+# 1. BOM (Bill of Materials) - CSV format for component ordering
+bom_result = circuit_obj.generate_bom(project_name="my_project")
+
+# 2. PDF Schematic - Documentation and review
+pdf_result = circuit_obj.generate_pdf_schematic(project_name="my_project")
+
+# 3. Gerber Files - PCB manufacturing (JLCPCB, PCBWay, etc.)
+gerber_result = circuit_obj.generate_gerbers(project_name="my_project")
+```
+
+**Generated files:**
+- `my_project/my_project_bom.csv` - Component list with references and values
+- `my_project/my_project_schematic.pdf` - Printable schematic documentation
+- `my_project/gerbers/` - Complete Gerber package for PCB fabrication
+
 """
 
         # Add documentation links
@@ -288,7 +310,8 @@ This project includes the following circuit templates:
 1. **Component Selection**: Use `/find-symbol` and `/find-footprint` to find KiCad components
 2. **Circuit Design**: Write Python code using circuit-synth
 3. **Generate KiCad**: Run the Python file to create KiCad project
-4. **Validate**: Open in KiCad and verify the design
+4. **Manufacturing Files**: Templates automatically generate BOM, PDF, and Gerbers
+5. **Validate**: Open in KiCad and verify the design
 
 ## 📚 Quick Reference
 
@@ -307,6 +330,19 @@ component = Component(
 vcc = Net("VCC_3V3")
 component[1] += vcc
 ```
+
+### Manufacturing Exports
+```python
+# All templates automatically generate manufacturing files:
+circuit_obj.generate_bom(project_name="my_project")          # BOM CSV
+circuit_obj.generate_pdf_schematic(project_name="my_project")  # PDF schematic
+circuit_obj.generate_gerbers(project_name="my_project")      # Gerber files
+```
+
+**Output:**
+- BOM: `my_project/my_project_bom.csv`
+- PDF: `my_project/my_project_schematic.pdf`
+- Gerbers: `my_project/gerbers/` (ready for JLCPCB, PCBWay, etc.)
 
 ---
 

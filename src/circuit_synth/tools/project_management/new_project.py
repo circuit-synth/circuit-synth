@@ -995,6 +995,11 @@ def main(
     )
     success_text += Text(f"\n📖 Documentation: See README.md")
 
+    if config.has_circuits():
+        success_text += Text(
+            f"\n📦 Manufacturing: Templates auto-generate BOM, PDF, and Gerbers"
+        )
+
     if config.include_agents:
         agents_count = len(list((project_path / ".claude" / "agents").rglob("*.md")))
         commands_count = len(
