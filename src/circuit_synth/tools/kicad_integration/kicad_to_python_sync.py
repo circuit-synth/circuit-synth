@@ -345,12 +345,32 @@ class KiCadToPythonSyncer:
             # Regenerate JSON netlist from parsed circuit
             logger.info(f"Writing updated JSON to {self.json_path}")
             json_data = main_circuit.to_circuit_synth_json()
+
+            # Add sheets to JSON if there are hierarchical circuits
+            sheet_circuits = {name: circuit for name, circuit in circuits.items()
+                            if circuit.is_hierarchical_sheet}
+
+            if sheet_circuits:
+                logger.info(f"🔍 CYCLE 4: Adding {len(sheet_circuits)} sheets to JSON")
+                sheets_data = []
+                for sheet_name, sheet_circuit in sheet_circuits.items():
+                    sheet_json = sheet_circuit.to_circuit_synth_json()
+                    sheets_data.append({
+                        "name": sheet_name,
+                        "file": sheet_circuit.schematic_file,
+                        "components": sheet_json.get("components", {}),
+                        "nets": sheet_json.get("nets", {})
+                    })
+                    logger.info(f"🔍 CYCLE 4: Added sheet '{sheet_name}' with {len(sheet_circuit.components)} components")
+
+                json_data["sheets"] = sheets_data
+
             with open(self.json_path, 'w') as f:
                 json.dump(json_data, f, indent=2)
 
             logger.info(
                 f"JSON regenerated: {len(main_circuit.components)} components, "
-                f"{len(main_circuit.nets)} nets"
+                f"{len(main_circuit.nets)} nets, {len(sheet_circuits)} sheets"
             )
 
         except Exception as e:
@@ -642,16 +662,24 @@ class KiCadToPythonSyncer:
                             break
 
                     if import_line_index is not None:
-                        # Insert sheet imports after circuit_synth import
+                        # Check which imports are already present
+                        existing_imports = set()
+                        for line in lines:
+                            if line.strip().startswith('from ') and ' import ' in line:
+                                existing_imports.add(line.strip())
+
+                        # Insert sheet imports after circuit_synth import (only if not already present)
                         sheet_imports = [f"from {module} import {module}_circuit" for module in sheet_module_names]
+                        imports_to_add = [imp for imp in sheet_imports if imp not in existing_imports]
+
                         # Insert after the circuit_synth import line
-                        for j, import_stmt in enumerate(sheet_imports):
+                        for j, import_stmt in enumerate(imports_to_add):
                             lines.insert(import_line_index + 1 + j, import_stmt)
 
                         # Write back to file
                         updated_main_content = '\n'.join(lines)
                         self.python_file.write_text(updated_main_content)
-                        logger.info(f"✅ Added {len(sheet_module_names)} sheet imports to main.py")
+                        logger.info(f"✅ Added {len(imports_to_add)} sheet imports to main.py (skipped {len(sheet_imports) - len(imports_to_add)} duplicates)")
                     else:
                         logger.warning("⚠️  Could not find circuit_synth import line, skipping sheet imports")
 
