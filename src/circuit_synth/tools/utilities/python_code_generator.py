@@ -187,7 +187,7 @@ class PythonCodeGenerator:
         # Create nets (filter out unconnected nets)
         if circuit.nets:
             connected_nets = [
-                net for net in circuit.nets.values() if not net.name.startswith("unconnected-")
+                net for net in circuit.nets if not net.name.startswith("unconnected-")
             ]
             if connected_nets:
                 code_lines.append("    # Create nets")
@@ -209,7 +209,7 @@ class PythonCodeGenerator:
         # Add connections (skip unconnected nets)
         if circuit.nets:
             connected_nets = [
-                net for net in circuit.nets.values() if not net.name.startswith("unconnected-")
+                net for net in circuit.nets if not net.name.startswith("unconnected-")
             ]
             if any(net.connections for net in connected_nets):
                 code_lines.append("    # Connections")
@@ -248,7 +248,7 @@ class PythonCodeGenerator:
         # Create nets for main circuit (filter out unconnected nets)
         if circuit.nets:
             connected_nets = [
-                net for net in circuit.nets.values() if not net.name.startswith("unconnected-")
+                net for net in circuit.nets if not net.name.startswith("unconnected-")
             ]
             if connected_nets:
                 code_lines.append("    # Main circuit nets")
@@ -280,7 +280,7 @@ class PythonCodeGenerator:
         # Add main circuit connections (skip unconnected nets)
         if circuit.nets:
             connected_nets = [
-                net for net in circuit.nets.values() if not net.name.startswith("unconnected-")
+                net for net in circuit.nets if not net.name.startswith("unconnected-")
             ]
             if any(net.connections for net in connected_nets):
                 code_lines.append("    # Main circuit connections")
@@ -328,7 +328,7 @@ class PythonCodeGenerator:
         # Create nets (filter out unconnected nets)
         if circuit.nets:
             connected_nets = [
-                net for net in circuit.nets.values() if not net.name.startswith("unconnected-")
+                net for net in circuit.nets if not net.name.startswith("unconnected-")
             ]
             if connected_nets:
                 code_parts.append("    # Create nets")
@@ -350,7 +350,7 @@ class PythonCodeGenerator:
         # Add connections (skip unconnected nets)
         if circuit.nets:
             connected_nets = [
-                net for net in circuit.nets.values() if not net.name.startswith("unconnected-")
+                net for net in circuit.nets if not net.name.startswith("unconnected-")
             ]
             if any(net.connections for net in connected_nets):
                 code_parts.append("    # Connections")
@@ -614,7 +614,7 @@ class PythonCodeGenerator:
         net_usage = {}  # net_name -> set of circuit names that use it
 
         for circuit_name, circuit in circuits.items():
-            for net in circuit.nets.values():
+            for net in circuit.nets:
                 if net.name not in net_usage:
                     net_usage[net.name] = set()
                 net_usage[net.name].add(circuit_name)
@@ -869,7 +869,7 @@ class PythonCodeGenerator:
         elif circuit.nets:
             # Fallback: create local nets by excluding shared ones
             local_circuit_nets = [
-                net for net in circuit.nets.values() if net.name not in shared_nets
+                net for net in circuit.nets if net.name not in shared_nets
             ]
             if local_circuit_nets:
                 code_lines.append("    # Create local nets (fallback)")
@@ -921,7 +921,7 @@ class PythonCodeGenerator:
         # Add connections (all nets, both shared and local)
         if circuit.nets:
             connected_nets = [
-                net for net in circuit.nets.values() if not net.name.startswith("unconnected-")
+                net for net in circuit.nets if not net.name.startswith("unconnected-")
             ]
             if any(net.connections for net in connected_nets):
                 code_lines.append("    # Connections")
@@ -1139,7 +1139,7 @@ class PythonCodeGenerator:
         # Generate connections for this circuit level
         if circuit.nets:
             connected_nets = [
-                net for net in circuit.nets.values() if not net.name.startswith("unconnected-")
+                net for net in circuit.nets if not net.name.startswith("unconnected-")
             ]
             net_connections_at_this_level = []
 
@@ -1197,7 +1197,7 @@ class PythonCodeGenerator:
         elif circuit.nets:
             # Fallback to circuit's own nets if no hierarchical analysis
             connected_nets = [
-                net for net in circuit.nets.values() if not net.name.startswith("unconnected-")
+                net for net in circuit.nets if not net.name.startswith("unconnected-")
             ]
             if connected_nets:
                 code_lines.append("    # Main circuit nets (fallback)")
@@ -1243,7 +1243,7 @@ class PythonCodeGenerator:
         # Add main circuit connections
         if circuit.nets:
             connected_nets = [
-                net for net in circuit.nets.values() if not net.name.startswith("unconnected-")
+                net for net in circuit.nets if not net.name.startswith("unconnected-")
             ]
             if any(net.connections for net in connected_nets):
                 code_lines.append("    # Main circuit connections")
@@ -1335,4 +1335,6 @@ class PythonCodeGenerator:
 
         except Exception as e:
             logger.error(f"🔄 CODE_UPDATE: Failed to update Python file: {e}")
+            import traceback
+            logger.error(f"Stack trace:\n{traceback.format_exc()}")
             return None
