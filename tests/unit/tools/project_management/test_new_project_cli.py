@@ -25,7 +25,6 @@ import pytest
 from circuit_synth.tools.project_management.project_config import Circuit, ProjectConfig
 from circuit_synth.tools.project_management.template_manager import TemplateManager
 
-
 # ============================================================================
 # FIXTURES
 # ============================================================================
@@ -45,16 +44,19 @@ def temp_project_dir(tmp_path):
 # Test each of 8 circuit templates individually
 
 
-@pytest.mark.parametrize("circuit", [
-    Circuit.RESISTOR_DIVIDER,
-    Circuit.LED_BLINKER,
-    Circuit.VOLTAGE_REGULATOR,
-    Circuit.USB_C_BASIC,
-    Circuit.POWER_SUPPLY,
-    Circuit.ESP32_DEV_BOARD,
-    Circuit.STM32_MINIMAL,
-    Circuit.MINIMAL,
-])
+@pytest.mark.parametrize(
+    "circuit",
+    [
+        Circuit.RESISTOR_DIVIDER,
+        Circuit.LED_BLINKER,
+        Circuit.VOLTAGE_REGULATOR,
+        Circuit.USB_C_BASIC,
+        Circuit.POWER_SUPPLY,
+        Circuit.ESP32_DEV_BOARD,
+        Circuit.STM32_MINIMAL,
+        Circuit.MINIMAL,
+    ],
+)
 def test_circuit_generates_correct_filename(circuit, temp_project_dir):
     """Test that each circuit generates correct filename.
 
@@ -71,16 +73,19 @@ def test_circuit_generates_correct_filename(circuit, temp_project_dir):
     assert main_file.is_file(), "main.py should be a file"
 
 
-@pytest.mark.parametrize("circuit", [
-    Circuit.RESISTOR_DIVIDER,
-    Circuit.LED_BLINKER,
-    Circuit.VOLTAGE_REGULATOR,
-    Circuit.USB_C_BASIC,
-    Circuit.POWER_SUPPLY,
-    Circuit.ESP32_DEV_BOARD,
-    Circuit.STM32_MINIMAL,
-    Circuit.MINIMAL,
-])
+@pytest.mark.parametrize(
+    "circuit",
+    [
+        Circuit.RESISTOR_DIVIDER,
+        Circuit.LED_BLINKER,
+        Circuit.VOLTAGE_REGULATOR,
+        Circuit.USB_C_BASIC,
+        Circuit.POWER_SUPPLY,
+        Circuit.ESP32_DEV_BOARD,
+        Circuit.STM32_MINIMAL,
+        Circuit.MINIMAL,
+    ],
+)
 def test_circuit_file_contains_circuit_code(circuit, temp_project_dir):
     """Test that generated circuit file contains circuit code."""
     template_manager = TemplateManager()
@@ -94,20 +99,24 @@ def test_circuit_file_contains_circuit_code(circuit, temp_project_dir):
     assert len(content) > 100, f"Circuit {circuit.display_name} file is too small"
 
     # Verify it has circuit-synth imports
-    assert "circuit_synth" in content or "from" in content, \
-        f"Circuit {circuit.display_name} missing imports"
+    assert (
+        "circuit_synth" in content or "from" in content
+    ), f"Circuit {circuit.display_name} missing imports"
 
 
-@pytest.mark.parametrize("circuit", [
-    Circuit.RESISTOR_DIVIDER,
-    Circuit.LED_BLINKER,
-    Circuit.VOLTAGE_REGULATOR,
-    Circuit.USB_C_BASIC,
-    Circuit.POWER_SUPPLY,
-    Circuit.ESP32_DEV_BOARD,
-    Circuit.STM32_MINIMAL,
-    Circuit.MINIMAL,
-])
+@pytest.mark.parametrize(
+    "circuit",
+    [
+        Circuit.RESISTOR_DIVIDER,
+        Circuit.LED_BLINKER,
+        Circuit.VOLTAGE_REGULATOR,
+        Circuit.USB_C_BASIC,
+        Circuit.POWER_SUPPLY,
+        Circuit.ESP32_DEV_BOARD,
+        Circuit.STM32_MINIMAL,
+        Circuit.MINIMAL,
+    ],
+)
 def test_circuit_file_is_valid_python(circuit, temp_project_dir):
     """Test that generated circuit file has valid Python syntax."""
     template_manager = TemplateManager()
@@ -124,16 +133,19 @@ def test_circuit_file_is_valid_python(circuit, temp_project_dir):
         pytest.fail(f"Circuit {circuit.display_name} has invalid Python: {e}")
 
 
-@pytest.mark.parametrize("circuit", [
-    Circuit.RESISTOR_DIVIDER,
-    Circuit.LED_BLINKER,
-    Circuit.VOLTAGE_REGULATOR,
-    Circuit.USB_C_BASIC,
-    Circuit.POWER_SUPPLY,
-    Circuit.ESP32_DEV_BOARD,
-    Circuit.STM32_MINIMAL,
-    Circuit.MINIMAL,
-])
+@pytest.mark.parametrize(
+    "circuit",
+    [
+        Circuit.RESISTOR_DIVIDER,
+        Circuit.LED_BLINKER,
+        Circuit.VOLTAGE_REGULATOR,
+        Circuit.USB_C_BASIC,
+        Circuit.POWER_SUPPLY,
+        Circuit.ESP32_DEV_BOARD,
+        Circuit.STM32_MINIMAL,
+        Circuit.MINIMAL,
+    ],
+)
 def test_circuit_file_has_required_structure(circuit, temp_project_dir):
     """Test that circuit file has @circuit decorator."""
     template_manager = TemplateManager()
@@ -147,11 +159,10 @@ def test_circuit_file_has_required_structure(circuit, temp_project_dir):
     tree = ast.parse(content)
 
     # Check for function definitions
-    has_function = any(
-        isinstance(node, ast.FunctionDef) for node in tree.body
-    )
-    assert has_function, \
-        f"Circuit {circuit.display_name} should have function definition"
+    has_function = any(isinstance(node, ast.FunctionDef) for node in tree.body)
+    assert (
+        has_function
+    ), f"Circuit {circuit.display_name} should have function definition"
 
 
 # ============================================================================
@@ -162,10 +173,7 @@ def test_circuit_file_has_required_structure(circuit, temp_project_dir):
 
 def test_two_circuits_generates_both_files(temp_project_dir):
     """Test that two circuits generate both files correctly."""
-    config = ProjectConfig(circuits=[
-        Circuit.RESISTOR_DIVIDER,
-        Circuit.LED_BLINKER
-    ])
+    config = ProjectConfig(circuits=[Circuit.RESISTOR_DIVIDER, Circuit.LED_BLINKER])
 
     template_manager = TemplateManager()
 
@@ -189,11 +197,13 @@ def test_two_circuits_generates_both_files(temp_project_dir):
 
 def test_three_circuits_generates_all_files(temp_project_dir):
     """Test that three circuits generate all three files correctly."""
-    config = ProjectConfig(circuits=[
-        Circuit.RESISTOR_DIVIDER,
-        Circuit.LED_BLINKER,
-        Circuit.VOLTAGE_REGULATOR
-    ])
+    config = ProjectConfig(
+        circuits=[
+            Circuit.RESISTOR_DIVIDER,
+            Circuit.LED_BLINKER,
+            Circuit.VOLTAGE_REGULATOR,
+        ]
+    )
 
     template_manager = TemplateManager()
 
@@ -228,7 +238,9 @@ def test_all_eight_circuits_generates_all_files(temp_project_dir):
     circuit_dir = temp_project_dir / "circuit-synth"
     circuit_files = list(circuit_dir.glob("*.py"))
 
-    assert len(circuit_files) == 8, f"Should have 8 circuit files, found {len(circuit_files)}"
+    assert (
+        len(circuit_files) == 8
+    ), f"Should have 8 circuit files, found {len(circuit_files)}"
 
 
 def test_multiple_circuits_file_counts(temp_project_dir):
@@ -236,8 +248,15 @@ def test_multiple_circuits_file_counts(temp_project_dir):
     test_cases = [
         (1, [Circuit.RESISTOR_DIVIDER]),
         (2, [Circuit.RESISTOR_DIVIDER, Circuit.LED_BLINKER]),
-        (4, [Circuit.RESISTOR_DIVIDER, Circuit.LED_BLINKER,
-              Circuit.VOLTAGE_REGULATOR, Circuit.USB_C_BASIC]),
+        (
+            4,
+            [
+                Circuit.RESISTOR_DIVIDER,
+                Circuit.LED_BLINKER,
+                Circuit.VOLTAGE_REGULATOR,
+                Circuit.USB_C_BASIC,
+            ],
+        ),
     ]
 
     for expected_count, circuits in test_cases:
@@ -256,8 +275,9 @@ def test_multiple_circuits_file_counts(temp_project_dir):
 
         # Count files
         files = list(circuit_dir.glob("*.py"))
-        assert len(files) == expected_count, \
-            f"Expected {expected_count} files, got {len(files)}"
+        assert (
+            len(files) == expected_count
+        ), f"Expected {expected_count} files, got {len(files)}"
 
 
 def test_multiple_circuits_first_is_always_main(temp_project_dir):
@@ -273,13 +293,12 @@ def test_multiple_circuits_first_is_always_main(temp_project_dir):
         test_dir.mkdir()
 
         template_manager = TemplateManager()
-        template_manager.copy_circuit_to_project(
-            circuits[0], test_dir, is_first=True
-        )
+        template_manager.copy_circuit_to_project(circuits[0], test_dir, is_first=True)
 
         main_file = test_dir / "circuit-synth" / "main.py"
-        assert main_file.exists(), \
-            f"First circuit should be main.py, not {circuits[0].value}.py"
+        assert (
+            main_file.exists()
+        ), f"First circuit should be main.py, not {circuits[0].value}.py"
 
 
 # ============================================================================
@@ -290,10 +309,7 @@ def test_multiple_circuits_first_is_always_main(temp_project_dir):
 
 def test_no_agents_flag_skips_claude_directory(temp_project_dir):
     """Verify --no-agents flag prevents .claude/ directory creation."""
-    config = ProjectConfig(
-        circuits=[Circuit.RESISTOR_DIVIDER],
-        include_agents=False
-    )
+    config = ProjectConfig(circuits=[Circuit.RESISTOR_DIVIDER], include_agents=False)
 
     # .claude should not be created
     assert not config.include_agents, "include_agents should be False"
@@ -305,9 +321,7 @@ def test_no_agents_flag_skips_claude_directory(temp_project_dir):
 def test_developer_flag_sets_mode(temp_project_dir):
     """Verify --developer flag sets developer_mode=True."""
     config = ProjectConfig(
-        circuits=[Circuit.RESISTOR_DIVIDER],
-        include_agents=True,
-        developer_mode=True
+        circuits=[Circuit.RESISTOR_DIVIDER], include_agents=True, developer_mode=True
     )
 
     assert config.developer_mode, "developer_mode should be True"
@@ -319,7 +333,7 @@ def test_quick_flag_uses_defaults(temp_project_dir):
     config = ProjectConfig(
         circuits=[Circuit.RESISTOR_DIVIDER],  # Quick mode default
         include_agents=True,
-        developer_mode=False
+        developer_mode=False,
     )
 
     assert config.circuits[0] == Circuit.RESISTOR_DIVIDER
@@ -328,12 +342,7 @@ def test_quick_flag_uses_defaults(temp_project_dir):
 
 def test_circuits_flag_selects_specific(temp_project_dir):
     """Verify --circuits flag selects specific circuits."""
-    config = ProjectConfig(
-        circuits=[
-            Circuit.VOLTAGE_REGULATOR,
-            Circuit.LED_BLINKER
-        ]
-    )
+    config = ProjectConfig(circuits=[Circuit.VOLTAGE_REGULATOR, Circuit.LED_BLINKER])
 
     assert len(config.circuits) == 2
     assert Circuit.VOLTAGE_REGULATOR in config.circuits
@@ -345,7 +354,7 @@ def test_no_agents_with_developer_flag(temp_project_dir):
     config = ProjectConfig(
         circuits=[Circuit.RESISTOR_DIVIDER],
         include_agents=False,
-        developer_mode=True  # Should be ignored
+        developer_mode=True,  # Should be ignored
     )
 
     # Even with developer_mode=True, if agents disabled, no agents
@@ -355,9 +364,7 @@ def test_no_agents_with_developer_flag(temp_project_dir):
 def test_agents_without_developer_mode(temp_project_dir):
     """Verify agents can be included without developer mode."""
     config = ProjectConfig(
-        circuits=[Circuit.RESISTOR_DIVIDER],
-        include_agents=True,
-        developer_mode=False
+        circuits=[Circuit.RESISTOR_DIVIDER], include_agents=True, developer_mode=False
     )
 
     assert config.include_agents
@@ -369,7 +376,7 @@ def test_flag_combinations_with_multiple_circuits(temp_project_dir):
     config = ProjectConfig(
         circuits=[Circuit.RESISTOR_DIVIDER, Circuit.LED_BLINKER],
         include_agents=True,
-        developer_mode=True
+        developer_mode=True,
     )
 
     assert len(config.circuits) == 2
@@ -383,11 +390,11 @@ def test_circuit_list_with_all_flags(temp_project_dir):
         circuits=[
             Circuit.RESISTOR_DIVIDER,
             Circuit.LED_BLINKER,
-            Circuit.VOLTAGE_REGULATOR
+            Circuit.VOLTAGE_REGULATOR,
         ],
         include_agents=True,
         include_kicad_plugins=False,
-        developer_mode=True
+        developer_mode=True,
     )
 
     assert len(config.circuits) == 3
@@ -424,8 +431,9 @@ def test_circuit_values_valid(temp_project_dir):
     """Test that all circuit enum values are valid."""
     for circuit in Circuit:
         assert circuit.value, f"Circuit {circuit.display_name} has empty value"
-        assert "_" in circuit.value or circuit.value.isalpha(), \
-            f"Circuit value should be snake_case: {circuit.value}"
+        assert (
+            "_" in circuit.value or circuit.value.isalpha()
+        ), f"Circuit value should be snake_case: {circuit.value}"
 
 
 def test_circuit_display_names_not_empty(temp_project_dir):
@@ -457,8 +465,9 @@ def test_special_characters_in_values(temp_project_dir):
 
     for circuit in Circuit:
         for char in circuit.value:
-            assert char in valid_chars, \
-                f"Circuit {circuit.value} has invalid character: {char}"
+            assert (
+                char in valid_chars
+            ), f"Circuit {circuit.value} has invalid character: {char}"
 
 
 def test_project_config_name_optional(temp_project_dir):
@@ -466,7 +475,9 @@ def test_project_config_name_optional(temp_project_dir):
     config = ProjectConfig(circuits=[Circuit.RESISTOR_DIVIDER])
 
     # project_name should be optional
-    assert hasattr(config, 'project_name') or True, "project_name attribute should exist"
+    assert (
+        hasattr(config, "project_name") or True
+    ), "project_name attribute should exist"
 
 
 def test_get_circuit_names(temp_project_dir):
@@ -501,8 +512,9 @@ def test_circuit_template_directories_valid(temp_project_dir):
     valid_dirs = {"base_circuits", "example_circuits"}
 
     for circuit in Circuit:
-        assert circuit.template_dir in valid_dirs, \
-            f"Circuit {circuit.value} has invalid template_dir: {circuit.template_dir}"
+        assert (
+            circuit.template_dir in valid_dirs
+        ), f"Circuit {circuit.value} has invalid template_dir: {circuit.template_dir}"
 
 
 def test_config_immutability(temp_project_dir):
@@ -521,7 +533,11 @@ def test_config_immutability(temp_project_dir):
 def test_circuit_difficulty_levels(temp_project_dir):
     """Test that circuits have appropriate difficulty levels."""
     beginners = [Circuit.RESISTOR_DIVIDER, Circuit.LED_BLINKER]
-    intermediates = [Circuit.VOLTAGE_REGULATOR, Circuit.USB_C_BASIC, Circuit.POWER_SUPPLY]
+    intermediates = [
+        Circuit.VOLTAGE_REGULATOR,
+        Circuit.USB_C_BASIC,
+        Circuit.POWER_SUPPLY,
+    ]
     advanced = [Circuit.ESP32_DEV_BOARD, Circuit.STM32_MINIMAL]
     experts = [Circuit.MINIMAL]
 
@@ -613,8 +629,9 @@ def test_circuit_files_have_imports(temp_project_dir):
         content = main_file.read_text()
 
         # Should have imports
-        assert "import" in content or "from" in content, \
-            f"Circuit {circuit.value} missing imports"
+        assert (
+            "import" in content or "from" in content
+        ), f"Circuit {circuit.value} missing imports"
 
 
 def test_circuit_files_have_functions(temp_project_dir):
@@ -656,8 +673,9 @@ def test_templates_are_different(temp_project_dir):
     led_code = template_manager.load_circuit(Circuit.LED_BLINKER)
 
     # Different circuits should have different code
-    assert resistor_code != led_code, \
-        "Different circuits should have different template code"
+    assert (
+        resistor_code != led_code
+    ), "Different circuits should have different template code"
 
 
 # ============================================================================

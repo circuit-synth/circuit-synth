@@ -13,6 +13,7 @@ USB-C Configuration:
 
 This circuit configures the device as a UFP (Upstream Facing Port / Device mode).
 """
+
 from circuit_synth import Component, Net, circuit
 
 
@@ -34,7 +35,7 @@ def usb_c_basic():
     usb_conn = Component(
         symbol="Connector:USB_C_Receptacle_USB2.0",
         ref="J",
-        footprint="Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12"
+        footprint="Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12",
     )
 
     # CC resistors - 5.1kΩ for UFP (device) mode
@@ -43,31 +44,31 @@ def usb_c_basic():
         symbol="Device:R",
         ref="R",
         value="5.1k",  # 5.1k Ohm - standard value for USB-C UFP
-        footprint="Resistor_SMD:R_0603_1608Metric"
+        footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
     cc2_resistor = Component(
         symbol="Device:R",
         ref="R",
         value="5.1k",
-        footprint="Resistor_SMD:R_0603_1608Metric"
+        footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
     # Define nets
-    vbus = Net('VBUS')      # USB power (5V from host)
-    gnd = Net('GND')        # Ground
-    usb_dp = Net('USB_DP')  # USB D+ data line
-    usb_dm = Net('USB_DM')  # USB D- data line
-    cc1 = Net('CC1')        # Configuration Channel 1
-    cc2 = Net('CC2')        # Configuration Channel 2
+    vbus = Net("VBUS")  # USB power (5V from host)
+    gnd = Net("GND")  # Ground
+    usb_dp = Net("USB_DP")  # USB D+ data line
+    usb_dm = Net("USB_DM")  # USB D- data line
+    cc1 = Net("CC1")  # Configuration Channel 1
+    cc2 = Net("CC2")  # Configuration Channel 2
 
     # Connect USB-C connector
     usb_conn["VBUS"] += vbus  # Power input
-    usb_conn["GND"] += gnd    # Ground (connector has multiple GND pins)
+    usb_conn["GND"] += gnd  # Ground (connector has multiple GND pins)
     usb_conn["D+"] += usb_dp  # USB Data+
     usb_conn["D-"] += usb_dm  # USB Data-
-    usb_conn["CC1"] += cc1    # Configuration Channel 1
-    usb_conn["CC2"] += cc2    # Configuration Channel 2
+    usb_conn["CC1"] += cc1  # Configuration Channel 1
+    usb_conn["CC2"] += cc2  # Configuration Channel 2
 
     # Connect CC resistors (pull CC pins to ground)
     # This configures the device in UFP mode
@@ -78,14 +79,14 @@ def usb_c_basic():
     cc2_resistor[2] += gnd
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Generate KiCad project
     circuit_obj = usb_c_basic()
 
     circuit_obj.generate_kicad_project(
         project_name="usb_c_basic",
         placement_algorithm="hierarchical",
-        generate_pcb=True
+        generate_pcb=True,
     )
 
     print("✅ USB-C basic circuit generated!")

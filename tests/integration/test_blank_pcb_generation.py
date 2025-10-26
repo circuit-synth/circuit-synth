@@ -24,6 +24,7 @@ class TestBlankPCBGeneration:
         schematic has no components, a blank .kicad_pcb file should still
         be generated.
         """
+
         # Define blank circuit
         @circuit(name="blank")
         def blank_circuit():
@@ -52,8 +53,12 @@ class TestBlankPCBGeneration:
 
         # Verify PCB file has proper KiCad structure
         pcb_content = pcb_file.read_text()
-        assert "(kicad_pcb" in pcb_content, "PCB file should contain KiCad PCB structure"
-        assert 'generator "pcbnew"' in pcb_content, "PCB file should have generator attribute"
+        assert (
+            "(kicad_pcb" in pcb_content
+        ), "PCB file should contain KiCad PCB structure"
+        assert (
+            'generator "pcbnew"' in pcb_content
+        ), "PCB file should have generator attribute"
 
     def test_blank_circuit_creates_all_three_core_files(self, tmp_path):
         """
@@ -64,6 +69,7 @@ class TestBlankPCBGeneration:
         - .kicad_sch (schematic file named after project directory)
         - .kicad_pcb (PCB file named after project directory)
         """
+
         @circuit(name="test_circuit")
         def blank_circuit():
             pass
@@ -88,6 +94,7 @@ class TestBlankPCBGeneration:
         """
         Test that blank PCB has valid KiCad 9.0 structure with default settings.
         """
+
         @circuit(name="blank_circuit")
         def blank_circuit():
             pass
@@ -116,6 +123,7 @@ class TestBlankPCBGeneration:
         This is a minimal validation test - it doesn't verify the file can
         actually open in KiCad, but it verifies the structure is parseable.
         """
+
         @circuit(name="blank_circuit")
         def blank_circuit():
             pass

@@ -16,6 +16,7 @@ For production designs, add:
 - Status LEDs
 - Boot/reset buttons
 """
+
 from circuit_synth import Component, Net, circuit
 
 
@@ -43,7 +44,7 @@ def esp32_simple():
     esp32 = Component(
         symbol="RF_Module:ESP32-C6-MINI-1",
         ref="U",
-        footprint="RF_Module:ESP32-C6-MINI-1"
+        footprint="RF_Module:ESP32-C6-MINI-1",
     )
 
     # Decoupling capacitors for power pins
@@ -52,27 +53,27 @@ def esp32_simple():
         symbol="Device:C",
         ref="C",
         value="10uF",
-        footprint="Capacitor_SMD:C_0805_2012Metric"
+        footprint="Capacitor_SMD:C_0805_2012Metric",
     )
 
     cap2 = Component(
         symbol="Device:C",
         ref="C",
         value="100nF",
-        footprint="Capacitor_SMD:C_0603_1608Metric"
+        footprint="Capacitor_SMD:C_0603_1608Metric",
     )
 
     # Boot button (GPIO9 to GND) for entering programming mode
     boot_button = Component(
         symbol="Switch:SW_Push",
         ref="SW",
-        footprint="Button_Switch_SMD:SW_SPST_CK_RS282G05A3"
+        footprint="Button_Switch_SMD:SW_SPST_CK_RS282G05A3",
     )
 
     # Define nets
-    vcc_3v3 = Net('VCC_3V3')  # 3.3V power supply
-    gnd = Net('GND')          # Ground
-    gpio9 = Net('GPIO9')      # Boot pin
+    vcc_3v3 = Net("VCC_3V3")  # 3.3V power supply
+    gnd = Net("GND")  # Ground
+    gpio9 = Net("GPIO9")  # Boot pin
 
     # Connect ESP32 power pins
     # ESP32-C6-MINI-1 has VDD on pin 8
@@ -94,14 +95,14 @@ def esp32_simple():
     boot_button[2] += gnd
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Generate KiCad project
     circuit_obj = esp32_simple()
 
     circuit_obj.generate_kicad_project(
         project_name="esp32_simple",
         placement_algorithm="hierarchical",
-        generate_pcb=True
+        generate_pcb=True,
     )
 
     print("✅ ESP32-C6 simple circuit generated!")

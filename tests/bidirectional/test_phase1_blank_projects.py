@@ -84,7 +84,9 @@ class TestPhase1BlankProjects:
 
             assert "components" in json_data, "JSON missing 'components' key"
             assert "nets" in json_data, "JSON missing 'nets' key"
-            assert len(json_data["components"]) == 0, "Blank circuit should have 0 components"
+            assert (
+                len(json_data["components"]) == 0
+            ), "Blank circuit should have 0 components"
             assert len(json_data["nets"]) == 0, "Blank circuit should have 0 nets"
 
             print(f"✅ Test 1.1 PASS: Blank Python → Blank KiCad")
@@ -141,14 +143,18 @@ class TestPhase1BlankProjects:
                 generated_code = f.read()
 
             # Verify circuit function exists (generator creates "def main()" for blank circuits)
-            assert "def main(" in generated_code or "@circuit" in generated_code, "Circuit function not found in generated code"
+            assert (
+                "def main(" in generated_code or "@circuit" in generated_code
+            ), "Circuit function not found in generated code"
 
             # Verify no Component() calls (blank circuit should be minimal)
             # Note: A truly blank circuit may have no components
             # This is acceptable - the import worked even if circuit is empty
 
             # Verify generated Python is valid syntax
-            assert "from circuit_synth import" in generated_code, "Missing circuit_synth imports"
+            assert (
+                "from circuit_synth import" in generated_code
+            ), "Missing circuit_synth imports"
 
             print(f"✅ Test 1.2 PASS: Blank KiCad → Blank Python")
             print(f"   - Generated: {main_py}")

@@ -19,7 +19,8 @@ def test_complete_workflow_with_source_update(tmp_path):
 
     # Step 1: Create a realistic circuit file
     circuit_file = tmp_path / "led_circuit.py"
-    original_source = dedent('''
+    original_source = dedent(
+        '''
         from circuit_synth.core import Circuit, Component, Net
         from circuit_synth.core.decorators import circuit
 
@@ -57,12 +58,14 @@ def test_complete_workflow_with_source_update(tmp_path):
 
         if __name__ == "__main__":
             c = led_blinker()
-    ''').strip()
+    '''
+    ).strip()
 
     circuit_file.write_text(original_source)
 
     # Step 2: Execute the circuit and finalize references
     import sys
+
     sys.path.insert(0, str(tmp_path))
 
     try:
@@ -71,14 +74,14 @@ def test_complete_workflow_with_source_update(tmp_path):
         exec(original_source, exec_globals)
 
         # Create circuit instance
-        c = exec_globals['led_blinker']()
+        c = exec_globals["led_blinker"]()
 
         # Finalize references (should assign D1, R1)
         c.finalize_references()
 
         # Verify components got correct refs
         components = list(c._components.values())
-        refs = sorted([comp.ref for comp in components if hasattr(comp, 'ref')])
+        refs = sorted([comp.ref for comp in components if hasattr(comp, "ref")])
         print(f"\nComponent refs: {refs}")
         assert "D1" in refs, f"Expected D1 in {refs}"
         assert "R1" in refs, f"Expected R1 in {refs}"
@@ -94,17 +97,18 @@ def test_complete_workflow_with_source_update(tmp_path):
         # Note: _get_source_file() doesn't work with exec'd code,
         # so we call _update_source_refs directly
         from circuit_synth.core.source_ref_rewriter import SourceRefRewriter
+
         rewriter = SourceRefRewriter(circuit_file, c._ref_mapping)
         rewriter.update()
 
         # Step 4: Verify source file was updated
         updated_source = circuit_file.read_text()
 
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("UPDATED SOURCE:")
-        print("="*70)
+        print("=" * 70)
         print(updated_source)
-        print("="*70)
+        print("=" * 70)
 
         # Check that refs were updated
         assert 'ref="D1"' in updated_source, "LED ref should be updated to D1"
@@ -127,7 +131,8 @@ def test_multiple_components_round_trip(tmp_path):
     """Test round-trip with multiple components of same type."""
 
     circuit_file = tmp_path / "power_supply.py"
-    original_source = dedent('''
+    original_source = dedent(
+        '''
         from circuit_synth.core import Circuit, Component, Net
         from circuit_synth.core.decorators import circuit
 
@@ -153,27 +158,33 @@ def test_multiple_components_round_trip(tmp_path):
 
         if __name__ == "__main__":
             c = power_supply()
-    ''').strip()
+    '''
+    ).strip()
 
     circuit_file.write_text(original_source)
 
     import sys
+
     sys.path.insert(0, str(tmp_path))
 
     try:
         # Execute and finalize
         exec_globals = {}
         exec(original_source, exec_globals)
-        c = exec_globals['power_supply']()
+        c = exec_globals["power_supply"]()
         c.finalize_references()
 
         # Check mapping
         print(f"\nRef mapping: {c._ref_mapping}")
-        assert c._ref_mapping["C"] == ["C1", "C2", "C3"], \
-            f"Expected C1, C2, C3 but got {c._ref_mapping['C']}"
+        assert c._ref_mapping["C"] == [
+            "C1",
+            "C2",
+            "C3",
+        ], f"Expected C1, C2, C3 but got {c._ref_mapping['C']}"
 
         # Update source
         from circuit_synth.core.source_ref_rewriter import SourceRefRewriter
+
         rewriter = SourceRefRewriter(circuit_file, c._ref_mapping)
         rewriter.update()
 
@@ -181,8 +192,8 @@ def test_multiple_components_round_trip(tmp_path):
         updated = circuit_file.read_text()
 
         print("\nUPDATED SOURCE:")
-        for i, line in enumerate(updated.split('\n'), 1):
-            if 'ref=' in line:
+        for i, line in enumerate(updated.split("\n"), 1):
+            if "ref=" in line:
                 print(f"  Line {i}: {line.strip()}")
 
         # Each cap should have unique ref
@@ -191,8 +202,9 @@ def test_multiple_components_round_trip(tmp_path):
         assert 'ref="C3", value="1uF"' in updated
 
         # Original refs should be gone
-        assert updated.count('ref="C",') == 0, \
-            "Original unnumbered refs should all be replaced"
+        assert (
+            updated.count('ref="C",') == 0
+        ), "Original unnumbered refs should all be replaced"
 
         print("\n✅ MULTIPLE COMPONENTS TEST PASSED!")
 
@@ -205,7 +217,8 @@ def test_comments_and_docstrings_preserved(tmp_path):
     """Test that comments and docstrings are not modified."""
 
     circuit_file = tmp_path / "documented_circuit.py"
-    original_source = dedent('''
+    original_source = dedent(
+        '''
         from circuit_synth.core import Circuit, Component, Net
         from circuit_synth.core.decorators import circuit
 
@@ -232,21 +245,24 @@ def test_comments_and_docstrings_preserved(tmp_path):
 
         if __name__ == "__main__":
             c = test_circuit()
-    ''').strip()
+    '''
+    ).strip()
 
     circuit_file.write_text(original_source)
 
     import sys
+
     sys.path.insert(0, str(tmp_path))
 
     try:
         exec_globals = {}
         exec(original_source, exec_globals)
-        c = exec_globals['test_circuit']()
+        c = exec_globals["test_circuit"]()
         c.finalize_references()
 
         # Update source
         from circuit_synth.core.source_ref_rewriter import SourceRefRewriter
+
         rewriter = SourceRefRewriter(circuit_file, c._ref_mapping)
         rewriter.update()
 
@@ -256,17 +272,21 @@ def test_comments_and_docstrings_preserved(tmp_path):
         print(updated)
 
         # Only the actual Component ref should change
-        assert updated.count('ref="R1"') == 1, \
-            "Exactly one ref should be updated (the Component)"
+        assert (
+            updated.count('ref="R1"') == 1
+        ), "Exactly one ref should be updated (the Component)"
 
         # Docstring and comments should be preserved
-        assert 'Example circuit shows Component(ref="R", value="10k")' in updated, \
-            "Docstring should preserve ref=\"R\""
-        assert '# Comment mentions ref="R"' in updated, \
-            "Comment line should preserve ref=\"R\""
-        assert 'comment should NOT change' in updated
-        assert 'ref="R" is auto-numbered' in updated, \
-            "Inline comment should preserve ref=\"R\""
+        assert (
+            'Example circuit shows Component(ref="R", value="10k")' in updated
+        ), 'Docstring should preserve ref="R"'
+        assert (
+            '# Comment mentions ref="R"' in updated
+        ), 'Comment line should preserve ref="R"'
+        assert "comment should NOT change" in updated
+        assert (
+            'ref="R" is auto-numbered' in updated
+        ), 'Inline comment should preserve ref="R"'
 
         print("\n✅ COMMENTS AND DOCSTRINGS PRESERVED!")
 

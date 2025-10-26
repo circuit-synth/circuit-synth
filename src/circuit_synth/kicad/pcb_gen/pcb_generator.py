@@ -14,8 +14,9 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from circuit_synth.core.circuit import Circuit
 import kicad_sch_api as ksa
+
+from circuit_synth.core.circuit import Circuit
 from circuit_synth.pcb import PCBBoard
 
 # Removed duplicate PCB API imports - using single implementation
@@ -349,7 +350,9 @@ class PCBGenerator:
                             f"✓ Adjusted board size to actual needs: {actual_width}x{actual_height}mm"
                         )
                     else:
-                        logger.debug("Skipping board outline recalculation for external placement to preserve cutout")
+                        logger.debug(
+                            "Skipping board outline recalculation for external placement to preserve cutout"
+                        )
 
                     # Debug: Check result and list components after placement
                     logger.debug(f"Placement result: {result}")

@@ -5,14 +5,14 @@ Provides rich, user-friendly interactive prompts for project configuration.
 """
 
 from typing import List, Optional
+
 from rich.console import Console
-from rich.prompt import Prompt, Confirm
-from rich.table import Table
 from rich.panel import Panel
+from rich.prompt import Confirm, Prompt
+from rich.table import Table
 from rich.text import Text
 
 from .project_config import Circuit, ProjectConfig, get_default_config
-
 
 console = Console()
 
@@ -33,7 +33,9 @@ def select_circuits() -> List[Circuit]:
     console.print("[bold cyan]Select Circuit Templates[/bold cyan]")
     console.print()
     console.print("Choose which circuits to include in your project.")
-    console.print("You can select multiple circuits by entering comma-separated numbers (e.g., 1,2,5)")
+    console.print(
+        "You can select multiple circuits by entering comma-separated numbers (e.g., 1,2,5)"
+    )
     console.print()
 
     # Create options table
@@ -44,38 +46,39 @@ def select_circuits() -> List[Circuit]:
 
     circuits = list(Circuit)
     for idx, circuit in enumerate(circuits, 1):
-        table.add_row(
-            str(idx),
-            circuit.display_name,
-            circuit.description
-        )
+        table.add_row(str(idx), circuit.display_name, circuit.description)
 
     console.print(table)
     console.print()
 
     # Prompt for selections
-    console.print("[dim]Enter circuit numbers separated by commas, or press Enter for default (Resistor Divider)[/dim]")
+    console.print(
+        "[dim]Enter circuit numbers separated by commas, or press Enter for default (Resistor Divider)[/dim]"
+    )
     selection = Prompt.ask(
-        "Select circuits",
-        default="1"  # Default to resistor divider
+        "Select circuits", default="1"  # Default to resistor divider
     )
 
     # Parse selections
     selected_circuits = []
     try:
         # Split and filter out empty strings (handles trailing commas)
-        indices = [int(x.strip()) for x in selection.split(',') if x.strip()]
+        indices = [int(x.strip()) for x in selection.split(",") if x.strip()]
         for idx in indices:
             if 1 <= idx <= len(circuits):
                 selected_circuits.append(circuits[idx - 1])
             else:
                 console.print(f"[yellow]⚠️  Skipping invalid option: {idx}[/yellow]")
     except ValueError:
-        console.print("[red]❌ Invalid input format. Using default (Resistor Divider)[/red]")
+        console.print(
+            "[red]❌ Invalid input format. Using default (Resistor Divider)[/red]"
+        )
         selected_circuits = [Circuit.RESISTOR_DIVIDER]
 
     if not selected_circuits:
-        console.print("[yellow]⚠️  No circuits selected. Using default (Resistor Divider)[/yellow]")
+        console.print(
+            "[yellow]⚠️  No circuits selected. Using default (Resistor Divider)[/yellow]"
+        )
         selected_circuits = [Circuit.RESISTOR_DIVIDER]
 
     console.print()
@@ -99,21 +102,18 @@ def select_configuration() -> dict:
     config = {}
 
     # Claude AI agents
-    config['include_agents'] = Confirm.ask(
-        "Include Claude AI agents for AI-powered design?",
-        default=True
+    config["include_agents"] = Confirm.ask(
+        "Include Claude AI agents for AI-powered design?", default=True
     )
 
     # KiCad plugins (usually not needed for new users)
-    config['include_kicad_plugins'] = Confirm.ask(
-        "Include KiCad plugin setup?",
-        default=False
+    config["include_kicad_plugins"] = Confirm.ask(
+        "Include KiCad plugin setup?", default=False
     )
 
     # Developer mode
-    config['developer_mode'] = Confirm.ask(
-        "Developer mode (includes contributor tools)?",
-        default=False
+    config["developer_mode"] = Confirm.ask(
+        "Developer mode (includes contributor tools)?", default=False
     )
 
     console.print()
@@ -145,8 +145,12 @@ def show_confirmation(config: ProjectConfig, project_path) -> bool:
     else:
         summary_table.add_row("Circuits", "[dim]None[/dim]")
 
-    summary_table.add_row("Claude AI Agents", "✅ Yes" if config.include_agents else "❌ No")
-    summary_table.add_row("KiCad Plugins", "✅ Yes" if config.include_kicad_plugins else "❌ No")
+    summary_table.add_row(
+        "Claude AI Agents", "✅ Yes" if config.include_agents else "❌ No"
+    )
+    summary_table.add_row(
+        "KiCad Plugins", "✅ Yes" if config.include_kicad_plugins else "❌ No"
+    )
 
     if config.developer_mode:
         summary_table.add_row("Developer Mode", "✅ Enabled")
@@ -157,7 +161,9 @@ def show_confirmation(config: ProjectConfig, project_path) -> bool:
     return Confirm.ask("✅ Create project with these settings?", default=True)
 
 
-def run_interactive_setup(project_path, developer_mode: bool = False) -> Optional[ProjectConfig]:
+def run_interactive_setup(
+    project_path, developer_mode: bool = False
+) -> Optional[ProjectConfig]:
     """Run the complete interactive setup workflow
 
     Args:
@@ -177,14 +183,14 @@ def run_interactive_setup(project_path, developer_mode: bool = False) -> Optiona
 
     # Override developer mode if passed as argument
     if developer_mode:
-        config_options['developer_mode'] = True
+        config_options["developer_mode"] = True
 
     # Create configuration
     config = ProjectConfig(
         circuits=circuits,
-        include_agents=config_options['include_agents'],
-        include_kicad_plugins=config_options['include_kicad_plugins'],
-        developer_mode=config_options['developer_mode']
+        include_agents=config_options["include_agents"],
+        include_kicad_plugins=config_options["include_kicad_plugins"],
+        developer_mode=config_options["developer_mode"],
     )
 
     # Step 3: Show summary and confirm
@@ -196,9 +202,7 @@ def run_interactive_setup(project_path, developer_mode: bool = False) -> Optiona
 
 
 def parse_cli_flags(
-    circuits: Optional[str],
-    no_agents: bool,
-    developer: bool
+    circuits: Optional[str], no_agents: bool, developer: bool
 ) -> Optional[ProjectConfig]:
     """Parse command-line flags into ProjectConfig
 
@@ -233,17 +237,19 @@ def parse_cli_flags(
         "stm32_minimal": Circuit.STM32_MINIMAL,
         # Expert
         "minimal": Circuit.MINIMAL,
-        "empty": Circuit.MINIMAL
+        "empty": Circuit.MINIMAL,
     }
 
     # Parse circuits
     selected_circuits = []
     if circuits:
-        circuit_names = [c.strip().lower() for c in circuits.split(',')]
+        circuit_names = [c.strip().lower() for c in circuits.split(",")]
         for name in circuit_names:
             if name not in circuit_map:
                 console.print(f"[yellow]⚠️  Unknown circuit: {name} (skipping)[/yellow]")
-                console.print(f"[dim]Valid options: {', '.join(sorted(set(circuit_map.keys())))}[/dim]")
+                console.print(
+                    f"[dim]Valid options: {', '.join(sorted(set(circuit_map.keys())))}[/dim]"
+                )
             else:
                 selected_circuits.append(circuit_map[name])
 
@@ -255,5 +261,5 @@ def parse_cli_flags(
         circuits=selected_circuits,
         include_agents=not no_agents,
         include_kicad_plugins=False,
-        developer_mode=developer
+        developer_mode=developer,
     )

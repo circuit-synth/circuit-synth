@@ -33,12 +33,24 @@ class TestCriticalBug1MultipleComponentsSamePrefix:
 
         try:
             # Add three components with same ref prefix
-            c1 = Component(symbol="Device:C", ref="C", value="10uF",
-                          footprint="Capacitor_SMD:C_0805_2012Metric")
-            c2 = Component(symbol="Device:C", ref="C", value="22uF",
-                          footprint="Capacitor_SMD:C_0805_2012Metric")
-            c3 = Component(symbol="Device:C", ref="C", value="100nF",
-                          footprint="Capacitor_SMD:C_0603_1608Metric")
+            c1 = Component(
+                symbol="Device:C",
+                ref="C",
+                value="10uF",
+                footprint="Capacitor_SMD:C_0805_2012Metric",
+            )
+            c2 = Component(
+                symbol="Device:C",
+                ref="C",
+                value="22uF",
+                footprint="Capacitor_SMD:C_0805_2012Metric",
+            )
+            c3 = Component(
+                symbol="Device:C",
+                ref="C",
+                value="100nF",
+                footprint="Capacitor_SMD:C_0603_1608Metric",
+            )
 
             # Finalize references (should assign C1, C2, C3)
             circuit.finalize_references()
@@ -46,7 +58,7 @@ class TestCriticalBug1MultipleComponentsSamePrefix:
             # Check that mapping contains all three components
             # Current buggy implementation: _ref_mapping = {"C": "C3"} ❌
             # Correct implementation: Need to track all mappings
-            assert hasattr(circuit, '_ref_mapping')
+            assert hasattr(circuit, "_ref_mapping")
 
             # The mapping should contain info about all three components
             # We need a way to distinguish C1 from C2 from C3
@@ -64,7 +76,8 @@ class TestCriticalBug1MultipleComponentsSamePrefix:
     def test_source_rewriting_multiple_same_prefix(self, tmp_path):
         """Test source file update with multiple components sharing prefix."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            '''
             from circuit_synth import *
 
             @circuit
@@ -82,7 +95,8 @@ class TestCriticalBug1MultipleComponentsSamePrefix:
                 # Line 15: Third capacitor
                 cap_bypass = Component(ref="C", value="100nF", symbol="Device:C",
                                       footprint="Capacitor_SMD:C_0603_1608Metric")
-        ''').strip()
+        '''
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -99,13 +113,21 @@ class TestCriticalBug1MultipleComponentsSamePrefix:
         # For now, let's test what SHOULD happen
 
         # Expected output:
-        expected = source_code.replace('ref="C", value="10uF"', 'ref="C1", value="10uF"', 1)
-        expected = expected.replace('ref="C", value="22uF"', 'ref="C2", value="22uF"', 1)
-        expected = expected.replace('ref="C", value="100nF"', 'ref="C3", value="100nF"', 1)
+        expected = source_code.replace(
+            'ref="C", value="10uF"', 'ref="C1", value="10uF"', 1
+        )
+        expected = expected.replace(
+            'ref="C", value="22uF"', 'ref="C2", value="22uF"', 1
+        )
+        expected = expected.replace(
+            'ref="C", value="100nF"', 'ref="C3", value="100nF"', 1
+        )
 
         # This test will fail with current implementation!
         # We need a new design that tracks component instances or line numbers
-        pytest.skip("Design needs to be fixed - current mapping structure can't handle this")
+        pytest.skip(
+            "Design needs to be fixed - current mapping structure can't handle this"
+        )
 
     def test_ref_mapping_structure_requirements(self):
         """Document what the ref mapping structure needs to support."""
@@ -141,14 +163,16 @@ class TestCriticalBug2InlineComments:
     def test_inline_comment_preservation(self, tmp_path):
         """Test that inline comments are NOT modified."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
             def main():
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")  # old ref="R" value
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -169,13 +193,15 @@ class TestCriticalBug2InlineComments:
     def test_multiple_refs_on_line_with_comment(self, tmp_path):
         """Test line with multiple refs and a comment."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
             def main():
                 r = Component(ref="R", value="10k", symbol="Device:R", footprint="Resistor_SMD:R_0603_1608Metric")  # Note: ref="R" is auto-numbered
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -192,7 +218,8 @@ class TestCriticalBug2InlineComments:
     def test_comment_at_various_positions(self, tmp_path):
         """Test comments at different positions relative to ref."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -201,7 +228,8 @@ class TestCriticalBug2InlineComments:
                 r = Component(ref="R", value="10k", symbol="Device:R",  # Inline ref="R"
                              footprint="Resistor_SMD:R_0603_1608Metric")
                 # After: ref="R"
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -226,7 +254,8 @@ class TestCriticalBug3DocstringDetection:
     def test_escaped_quotes_in_string(self, tmp_path):
         """Test that escaped quotes don't confuse docstring detection."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -234,7 +263,8 @@ class TestCriticalBug3DocstringDetection:
                 example = "string with \\"\\"\\" inside"
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -249,13 +279,15 @@ class TestCriticalBug3DocstringDetection:
     def test_code_after_single_line_docstring(self, tmp_path):
         """Test code on same line after single-line docstring."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            '''
             from circuit_synth import *
 
             @circuit
             def main():
                 """Docstring"""; r = Component(ref="R", value="10k", symbol="Device:R", footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        '''
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -270,7 +302,8 @@ class TestCriticalBug3DocstringDetection:
     def test_multiline_docstring_with_refs(self, tmp_path):
         """Test that refs inside multiline docstrings are NOT updated."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            '''
             from circuit_synth import *
 
             @circuit
@@ -282,7 +315,8 @@ class TestCriticalBug3DocstringDetection:
                 """
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        '''
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -292,9 +326,9 @@ class TestCriticalBug3DocstringDetection:
         updated = source_file.read_text()
 
         # Only the actual Component outside docstring should be updated
-        lines = updated.split('\n')
-        docstring_line = [l for l in lines if 'It mentions Component' in l][0]
-        component_line = [l for l in lines if 'r = Component' in l][0]
+        lines = updated.split("\n")
+        docstring_line = [l for l in lines if "It mentions Component" in l][0]
+        component_line = [l for l in lines if "r = Component" in l][0]
 
         assert 'ref="R"' in docstring_line  # Docstring unchanged
         assert 'ref="R1"' in component_line  # Component changed
@@ -322,8 +356,8 @@ class TestAmbiguityDetection:
 
         # At minimum, file should not be corrupted
         updated = source_file.read_text()
-        assert 'Component' in updated
-        assert 'Device:R' in updated
+        assert "Component" in updated
+        assert "Device:R" in updated
 
         # Document expected behavior
         pytest.skip("Ambiguous case - needs design decision on how to handle")

@@ -42,13 +42,13 @@ class TestPhase8IdempotencyStress:
                 symbol="Device:R",
                 ref="R1",
                 value="1k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
+                footprint="Resistor_SMD:R_0603_1608Metric",
             )
             c1 = Component(
                 symbol="Device:C",
                 ref="C1",
                 value="100u",
-                footprint="Capacitor_SMD:C_0603_1608Metric"
+                footprint="Capacitor_SMD:C_0603_1608Metric",
             )
 
             # Signal processing section
@@ -56,19 +56,19 @@ class TestPhase8IdempotencyStress:
                 symbol="Device:R",
                 ref="R2",
                 value="10k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
+                footprint="Resistor_SMD:R_0603_1608Metric",
             )
             r3 = Component(
                 symbol="Device:R",
                 ref="R3",
                 value="10k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
+                footprint="Resistor_SMD:R_0603_1608Metric",
             )
             c2 = Component(
                 symbol="Device:C",
                 ref="C2",
                 value="100n",
-                footprint="Capacitor_SMD:C_0603_1608Metric"
+                footprint="Capacitor_SMD:C_0603_1608Metric",
             )
 
             # Protection section
@@ -76,13 +76,13 @@ class TestPhase8IdempotencyStress:
                 symbol="Device:D",
                 ref="D1",
                 value="1N4148",
-                footprint="Diode_SMD:D_0603_1608Metric"
+                footprint="Diode_SMD:D_0603_1608Metric",
             )
             l1 = Component(
                 symbol="Device:L",
                 ref="L1",
                 value="10u",
-                footprint="Inductor_SMD:L_0603_1608Metric"
+                footprint="Inductor_SMD:L_0603_1608Metric",
             )
 
         return stress_test_circuit()
@@ -233,9 +233,7 @@ class TestPhase8IdempotencyStress:
                 # Compare structure
                 def get_comp_count(j):
                     comps = j.get("components", {})
-                    return (
-                        len(comps) if isinstance(comps, dict) else len(comps or [])
-                    )
+                    return len(comps) if isinstance(comps, dict) else len(comps or [])
 
                 comp_count_1 = get_comp_count(json_data_1)
                 comp_count_2 = get_comp_count(json_data_2)
@@ -282,16 +280,12 @@ class TestPhase8IdempotencyStress:
 
             # All checksums should be identical
             checksums = [r[1] for r in results]
-            assert (
-                len(set(checksums)) == 1
-            ), f"Checksums differ: {checksums}"
+            assert len(set(checksums)) == 1, f"Checksums differ: {checksums}"
 
             # Verify component counts are stable
             for gen_num, checksum, json_data in results:
                 comps = json_data.get("components", {})
-                comp_count = (
-                    len(comps) if isinstance(comps, dict) else len(comps or [])
-                )
+                comp_count = len(comps) if isinstance(comps, dict) else len(comps or [])
                 print(
                     f"   - Generation {gen_num}: {comp_count} components, "
                     f"checksum: {checksum[:8]}..."
@@ -323,23 +317,23 @@ class TestPhase8IdempotencyStress:
                 from circuit_synth import Component, Net
 
                 r1 = Component(
-                symbol="Device:R",
-                ref="R1",
-                value="1k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R1",
+                    value="1k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
                 r2 = Component(
-                symbol="Device:R",
-                ref="R2",
-                value="10k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R2",
+                    value="10k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
                 c1 = Component(
-                symbol="Device:C",
-                ref="C1",
-                value="100n",
-                footprint="Capacitor_SMD:C_0603_1608Metric"
-            )
+                    symbol="Device:C",
+                    ref="C1",
+                    value="100n",
+                    footprint="Capacitor_SMD:C_0603_1608Metric",
+                )
 
             circuit_obj = cycle_test_circuit()
 
@@ -380,9 +374,7 @@ class TestPhase8IdempotencyStress:
                 spec = __import__("importlib.util").util.spec_from_file_location(
                     "main", main_py
                 )
-                main_module = __import__("importlib.util").util.module_from_spec(
-                    spec
-                )
+                main_module = __import__("importlib.util").util.module_from_spec(spec)
                 spec.loader.exec_module(main_module)
 
                 circuit_func = getattr(main_module, "cycle_test_circuit", None)
@@ -402,16 +394,12 @@ class TestPhase8IdempotencyStress:
             # Verify stability: last two checksums should be identical
             import hashlib
 
-            checksums = [
-                hashlib.md5(c.encode()).hexdigest() for c in json_checksums
-            ]
+            checksums = [hashlib.md5(c.encode()).hexdigest() for c in json_checksums]
             print(f"   - Initial: {checksums[0][:8]}...")
             print(f"   - Cycle 0: {checksums[1][:8]}...")
             print(f"   - Cycle 1: {checksums[2][:8]}...")
 
-            assert (
-                checksums[1] == checksums[2]
-            ), "Checksums not stable after cycle 1"
+            assert checksums[1] == checksums[2], "Checksums not stable after cycle 1"
 
             print(f"✅ Test 8.4 PASS: Repeated import-export stable")
             print(f"   - Initial generation: {checksums[0][:8]}...")

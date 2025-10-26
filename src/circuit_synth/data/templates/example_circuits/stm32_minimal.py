@@ -20,6 +20,7 @@ Minimal STM32 circuit requirements:
 - SWD programming header
 - External crystal (8MHz) for accurate timing
 """
+
 from circuit_synth import Component, Net, circuit
 
 
@@ -45,7 +46,7 @@ def stm32_minimal():
     mcu = Component(
         symbol="MCU_ST_STM32F4:STM32F411CEUx",
         ref="U",
-        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm"
+        footprint="Package_QFP:LQFP-48_7x7mm_P0.5mm",
     )
 
     # 8MHz crystal oscillator for HSE (High Speed External)
@@ -54,7 +55,7 @@ def stm32_minimal():
         symbol="Device:Crystal",
         ref="Y",
         value="8MHz",
-        footprint="Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm"
+        footprint="Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm",
     )
 
     # Crystal load capacitors (typically 10-20pF for 8MHz)
@@ -63,14 +64,14 @@ def stm32_minimal():
         symbol="Device:C",
         ref="C",
         value="18pF",
-        footprint="Capacitor_SMD:C_0603_1608Metric"
+        footprint="Capacitor_SMD:C_0603_1608Metric",
     )
 
     cap_xtal2 = Component(
         symbol="Device:C",
         ref="C",
         value="18pF",
-        footprint="Capacitor_SMD:C_0603_1608Metric"
+        footprint="Capacitor_SMD:C_0603_1608Metric",
     )
 
     # Power decoupling capacitors
@@ -79,14 +80,14 @@ def stm32_minimal():
         symbol="Device:C",
         ref="C",
         value="100nF",
-        footprint="Capacitor_SMD:C_0603_1608Metric"
+        footprint="Capacitor_SMD:C_0603_1608Metric",
     )
 
     cap_vdd2 = Component(
         symbol="Device:C",
         ref="C",
         value="100nF",
-        footprint="Capacitor_SMD:C_0603_1608Metric"
+        footprint="Capacitor_SMD:C_0603_1608Metric",
     )
 
     # Bulk capacitor
@@ -94,7 +95,7 @@ def stm32_minimal():
         symbol="Device:C",
         ref="C",
         value="10uF",
-        footprint="Capacitor_SMD:C_0805_2012Metric"
+        footprint="Capacitor_SMD:C_0805_2012Metric",
     )
 
     # Boot0 pull-down resistor (boot from flash)
@@ -102,7 +103,7 @@ def stm32_minimal():
         symbol="Device:R",
         ref="R",
         value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric"
+        footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
     # Reset pull-up resistor
@@ -110,34 +111,34 @@ def stm32_minimal():
         symbol="Device:R",
         ref="R",
         value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric"
+        footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
     # SWD programming header (4-pin: VCC, GND, SWDIO, SWCLK)
     swd_header = Component(
         symbol="Connector_Generic:Conn_01x04",
         ref="J",
-        footprint="Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+        footprint="Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
     )
 
     # Define nets
-    vcc_3v3 = Net('VCC_3V3')  # 3.3V power
-    gnd = Net('GND')          # Ground
-    osc_in = Net('OSC_IN')    # Crystal input
-    osc_out = Net('OSC_OUT')  # Crystal output
-    swdio = Net('SWDIO')      # SWD data
-    swclk = Net('SWCLK')      # SWD clock
-    nrst = Net('NRST')        # Reset (active low)
-    boot0 = Net('BOOT0')      # Boot configuration
+    vcc_3v3 = Net("VCC_3V3")  # 3.3V power
+    gnd = Net("GND")  # Ground
+    osc_in = Net("OSC_IN")  # Crystal input
+    osc_out = Net("OSC_OUT")  # Crystal output
+    swdio = Net("SWDIO")  # SWD data
+    swclk = Net("SWCLK")  # SWD clock
+    nrst = Net("NRST")  # Reset (active low)
+    boot0 = Net("BOOT0")  # Boot configuration
 
     # Connect MCU power pins
     mcu["VDD"] += vcc_3v3
     mcu["VDDA"] += vcc_3v3  # Analog power
     mcu["VSS"] += gnd
-    mcu["VSSA"] += gnd      # Analog ground
+    mcu["VSSA"] += gnd  # Analog ground
 
     # Connect crystal oscillator
-    mcu["PH0"] += osc_in   # OSC_IN pin
+    mcu["PH0"] += osc_in  # OSC_IN pin
     mcu["PH1"] += osc_out  # OSC_OUT pin
 
     crystal[1] += osc_in
@@ -176,19 +177,19 @@ def stm32_minimal():
 
     # Connect SWD header
     swd_header[1] += vcc_3v3  # VCC
-    swd_header[2] += gnd      # GND
-    swd_header[3] += swdio    # SWDIO
-    swd_header[4] += swclk    # SWCLK
+    swd_header[2] += gnd  # GND
+    swd_header[3] += swdio  # SWDIO
+    swd_header[4] += swclk  # SWCLK
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Generate KiCad project
     circuit_obj = stm32_minimal()
 
     circuit_obj.generate_kicad_project(
         project_name="stm32_minimal",
         placement_algorithm="hierarchical",
-        generate_pcb=True
+        generate_pcb=True,
     )
 
     print("✅ STM32F411 minimal circuit generated!")

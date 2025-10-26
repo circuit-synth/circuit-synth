@@ -29,7 +29,8 @@ def test_end_to_end_multiple_capacitors(tmp_path):
 
     # Create a test circuit file
     circuit_file = tmp_path / "test_power_supply.py"
-    original_source = dedent('''
+    original_source = dedent(
+        '''
         from circuit_synth.core import Circuit, Component, Net
         from circuit_synth.core.decorators import circuit, set_current_circuit
 
@@ -77,12 +78,14 @@ def test_end_to_end_multiple_capacitors(tmp_path):
                 force_regenerate=False,
                 update_source_refs=True
             )
-    ''').strip()
+    '''
+    ).strip()
 
     circuit_file.write_text(original_source)
 
     # Import and execute the circuit
     import sys
+
     sys.path.insert(0, str(tmp_path))
 
     try:
@@ -91,16 +94,22 @@ def test_end_to_end_multiple_capacitors(tmp_path):
         exec(original_source, exec_globals)
 
         # Get the circuit
-        c = exec_globals['create_power_supply']()
+        c = exec_globals["create_power_supply"]()
 
         # Check components got assigned C1, C2, C3
         components = list(c._components.values())
-        refs = sorted([comp.ref for comp in components if hasattr(comp, 'ref') and comp.ref.startswith('C')])
+        refs = sorted(
+            [
+                comp.ref
+                for comp in components
+                if hasattr(comp, "ref") and comp.ref.startswith("C")
+            ]
+        )
 
         print(f"\nComponent refs after finalize: {refs}")
         print(f"Ref mapping: {c._ref_mapping}")
 
-        assert refs == ['C1', 'C2', 'C3'], f"Expected C1, C2, C3 but got {refs}"
+        assert refs == ["C1", "C2", "C3"], f"Expected C1, C2, C3 but got {refs}"
 
         # Now check the ref mapping - THIS IS THE BUG
         # Current implementation: _ref_mapping = {"C": "C3"}  ❌

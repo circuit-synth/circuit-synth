@@ -11,6 +11,7 @@ Use this template when:
 
 Documentation: https://circuit-synth.readthedocs.io
 """
+
 from circuit_synth import Component, Net, circuit
 
 
@@ -66,14 +67,14 @@ def my_circuit():
     pass  # Remove this when you add your code
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Generate KiCad project when run directly
     circuit_obj = my_circuit()
 
     circuit_obj.generate_kicad_project(
         project_name="my_circuit",
         placement_algorithm="hierarchical",  # Use "simple" for non-hierarchical
-        generate_pcb=True
+        generate_pcb=True,
     )
 
     print("✅ Circuit generated successfully!")

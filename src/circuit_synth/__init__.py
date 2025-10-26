@@ -19,8 +19,8 @@ __version__ = "0.10.12"
 
 def print_version_info():
     """Print circuit-synth version information for debugging"""
-    import subprocess
     import os
+    import subprocess
     from pathlib import Path
 
     print("=" * 60)
@@ -50,7 +50,7 @@ def print_version_info():
             cwd=git_dir,
             capture_output=True,
             text=True,
-            timeout=2
+            timeout=2,
         )
         if result.returncode == 0:
             commit_hash = result.stdout.strip()[:8]
@@ -62,7 +62,7 @@ def print_version_info():
                 cwd=git_dir,
                 capture_output=True,
                 text=True,
-                timeout=2
+                timeout=2,
             )
             if tag_result.returncode == 0:
                 print(f"Git Tag: {tag_result.stdout.strip()}")
@@ -73,7 +73,7 @@ def print_version_info():
                 cwd=git_dir,
                 capture_output=True,
                 text=True,
-                timeout=2
+                timeout=2,
             )
             if status_result.returncode == 0:
                 if status_result.stdout.strip():

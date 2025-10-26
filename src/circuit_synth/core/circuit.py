@@ -27,7 +27,9 @@ class Circuit:
         self._component_list = []
         self._reference_manager = ReferenceManager()
         self._annotations = []  # Store TextProperty, TextBox, etc.
-        self._ref_mapping = {}  # Track prefix -> final ref mappings for source rewriting
+        self._ref_mapping = (
+            {}
+        )  # Track prefix -> final ref mappings for source rewriting
         self._circuit_func = None  # Store reference to the @circuit decorated function
 
     def validate_reference(self, ref: str) -> bool:
@@ -241,7 +243,7 @@ class Circuit:
             context_logger.debug(
                 "No circuit function reference available",
                 component="CIRCUIT",
-                circuit_name=self.name
+                circuit_name=self.name,
             )
             return None
 
@@ -249,20 +251,20 @@ class Circuit:
             source_file = inspect.getfile(self._circuit_func)
 
             # Check for special cases where source isn't available
-            if source_file == '<stdin>' or source_file == '<string>':
+            if source_file == "<stdin>" or source_file == "<string>":
                 context_logger.warning(
                     "Circuit defined in REPL/exec environment, source file not available",
                     component="CIRCUIT",
-                    circuit_name=self.name
+                    circuit_name=self.name,
                 )
                 return None
 
             # Check for frozen applications (PyInstaller, etc)
-            if getattr(inspect.sys, 'frozen', False):
+            if getattr(inspect.sys, "frozen", False):
                 context_logger.warning(
                     "Running in frozen application, source file not available",
                     component="CIRCUIT",
-                    circuit_name=self.name
+                    circuit_name=self.name,
                 )
                 return None
 
@@ -273,7 +275,7 @@ class Circuit:
                     "Source file no longer exists",
                     component="CIRCUIT",
                     circuit_name=self.name,
-                    source_file=str(path)
+                    source_file=str(path),
                 )
                 return None
 
@@ -284,7 +286,7 @@ class Circuit:
                 "Could not determine source file",
                 component="CIRCUIT",
                 circuit_name=self.name,
-                error=str(e)
+                error=str(e),
             )
             return None
 
@@ -302,9 +304,7 @@ class Circuit:
         """
         if not self._ref_mapping:
             context_logger.debug(
-                "No ref mapping to apply",
-                component="CIRCUIT",
-                circuit_name=self.name
+                "No ref mapping to apply", component="CIRCUIT", circuit_name=self.name
             )
             return False
 
@@ -316,7 +316,7 @@ class Circuit:
                 component="CIRCUIT",
                 circuit_name=self.name,
                 source_file=str(source_file),
-                ref_mapping=self._ref_mapping
+                ref_mapping=self._ref_mapping,
             )
 
             rewriter = SourceRefRewriter(source_file, self._ref_mapping)
@@ -327,13 +327,13 @@ class Circuit:
                     "Source file updated successfully",
                     component="CIRCUIT",
                     circuit_name=self.name,
-                    refs_updated=len(self._ref_mapping)
+                    refs_updated=len(self._ref_mapping),
                 )
             else:
                 context_logger.debug(
                     "Source file unchanged (no modifications needed)",
                     component="CIRCUIT",
-                    circuit_name=self.name
+                    circuit_name=self.name,
                 )
 
             return success
@@ -344,7 +344,7 @@ class Circuit:
                 component="CIRCUIT",
                 circuit_name=self.name,
                 source_file=str(source_file),
-                error=str(e)
+                error=str(e),
             )
             # Don't raise - source rewriting failure shouldn't break project generation
             return False
@@ -647,8 +647,8 @@ class Circuit:
             >>> print(f"KiCad project: {result['project_path']}")
         """
         try:
-            from ..kicad.config import get_recommended_generator
             from .. import print_version_info
+            from ..kicad.config import get_recommended_generator
 
             # Print version information for debugging
             print_version_info()
@@ -672,7 +672,7 @@ class Circuit:
                     context_logger.debug(
                         "Source file not available, skipping ref update",
                         component="CIRCUIT",
-                        circuit_name=self.name
+                        circuit_name=self.name,
                     )
 
             # Create output directory with the project name
@@ -692,7 +692,10 @@ class Circuit:
             # Use legacy system for positioning/hierarchy, modern API for file writing
             from ..kicad.sch_gen.main_generator import SchematicGenerator
 
-            context_logger.info("Using hybrid approach: legacy positioning + modern kicad-sch-api file writing", component="CIRCUIT")
+            context_logger.info(
+                "Using hybrid approach: legacy positioning + modern kicad-sch-api file writing",
+                component="CIRCUIT",
+            )
 
             # Create JSON netlist in project directory (canonical format)
             json_path = output_path / f"{output_path.name}.json"

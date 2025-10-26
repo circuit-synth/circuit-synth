@@ -8,11 +8,11 @@ when re-generating projects with force_regenerate=False.
 import tempfile
 from pathlib import Path
 
-import pytest
-
 import kicad_sch_api as ksa
-from circuit_synth import Component, Net, circuit
+import pytest
 from kicad_sch_api.core.types import Point
+
+from circuit_synth import Component, Net, circuit
 
 
 class TestRoundTripPreservation:
@@ -306,6 +306,4 @@ class TestRoundTripPreservation:
                     ), "Label text not preserved"
                     break
 
-            assert (
-                label_found
-            ), f"Manual label with UUID {label_uuid} was not preserved"
+            assert label_found, f"Manual label with UUID {label_uuid} was not preserved"

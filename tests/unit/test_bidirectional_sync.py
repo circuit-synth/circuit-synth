@@ -5,11 +5,15 @@ These tests use pre-made KiCad fixture files to exercise the sync logic
 without requiring manual intervention or KiCad GUI interaction.
 """
 
-import pytest
-from pathlib import Path
-import tempfile
 import shutil
-from circuit_synth.tools.kicad_integration.kicad_to_python_sync import KiCadToPythonSyncer
+import tempfile
+from pathlib import Path
+
+import pytest
+
+from circuit_synth.tools.kicad_integration.kicad_to_python_sync import (
+    KiCadToPythonSyncer,
+)
 
 
 class TestBidirectionalSync:
@@ -39,7 +43,8 @@ class TestBidirectionalSync:
 
         # Create blank Python file
         python_file = temp_workspace / "blank_circuit.py"
-        python_file.write_text("""#!/usr/bin/env python3
+        python_file.write_text(
+            """#!/usr/bin/env python3
 from circuit_synth import *
 
 
@@ -52,13 +57,14 @@ def main():
 if __name__ == "__main__":
     circuit_obj = main()
     circuit_obj.generate_kicad_project(project_name="blank")
-""")
+"""
+        )
 
         # Sync KiCad -> Python
         syncer = KiCadToPythonSyncer(
             kicad_project_or_json=str(kicad_project / "blank.json"),
             python_file=str(python_file),
-            preview_only=False
+            preview_only=False,
         )
         success = syncer.sync()
 
@@ -83,7 +89,8 @@ if __name__ == "__main__":
 
         # Create Python file with just 'pass'
         python_file = temp_workspace / "resistor_circuit.py"
-        python_file.write_text("""#!/usr/bin/env python3
+        python_file.write_text(
+            """#!/usr/bin/env python3
 from circuit_synth import *
 
 
@@ -96,13 +103,14 @@ def main():
 if __name__ == "__main__":
     circuit_obj = main()
     circuit_obj.generate_kicad_project(project_name="single_resistor")
-""")
+"""
+        )
 
         # Sync KiCad -> Python
         syncer = KiCadToPythonSyncer(
             kicad_project_or_json=str(kicad_project / "single_resistor.json"),
             python_file=str(python_file),
-            preview_only=False
+            preview_only=False,
         )
         success = syncer.sync()
 
@@ -129,7 +137,8 @@ if __name__ == "__main__":
 
         # Create Python file with user comments
         python_file = temp_workspace / "commented_circuit.py"
-        python_file.write_text("""#!/usr/bin/env python3
+        python_file.write_text(
+            """#!/usr/bin/env python3
 from circuit_synth import *
 
 
@@ -144,13 +153,14 @@ def main():
 if __name__ == "__main__":
     circuit_obj = main()
     circuit_obj.generate_kicad_project(project_name="single_resistor")
-""")
+"""
+        )
 
         # Sync KiCad -> Python
         syncer = KiCadToPythonSyncer(
             kicad_project_or_json=str(kicad_project / "single_resistor.json"),
             python_file=str(python_file),
-            preview_only=False
+            preview_only=False,
         )
         success = syncer.sync()
 
@@ -158,8 +168,12 @@ if __name__ == "__main__":
 
         # Verify result
         result = python_file.read_text()
-        assert "# User note: This is a test circuit" in result, "User comment should be preserved"
-        assert "# TODO: Add more components later" in result, "TODO comment should be preserved"
+        assert (
+            "# User note: This is a test circuit" in result
+        ), "User comment should be preserved"
+        assert (
+            "# TODO: Add more components later" in result
+        ), "TODO comment should be preserved"
         assert "R1" in result, "Component should be added"
         assert "pass" not in result, "'pass' should be removed"
 
@@ -176,7 +190,8 @@ if __name__ == "__main__":
 
         # Create Python file with custom function name
         python_file = temp_workspace / "custom_circuit.py"
-        python_file.write_text("""#!/usr/bin/env python3
+        python_file.write_text(
+            """#!/usr/bin/env python3
 from circuit_synth import *
 
 
@@ -189,13 +204,14 @@ def my_circuit():
 if __name__ == "__main__":
     circuit_obj = my_circuit()
     circuit_obj.generate_kicad_project(project_name="single_resistor")
-""")
+"""
+        )
 
         # Sync KiCad -> Python
         syncer = KiCadToPythonSyncer(
             kicad_project_or_json=str(kicad_project / "single_resistor.json"),
             python_file=str(python_file),
-            preview_only=False
+            preview_only=False,
         )
         success = syncer.sync()
 
@@ -204,9 +220,13 @@ if __name__ == "__main__":
         # Verify result
         result = python_file.read_text()
         assert "def my_circuit():" in result, "Custom function name should be preserved"
-        assert "@circuit(name=\"CustomCircuit\")" in result, "Custom decorator should be preserved"
+        assert (
+            '@circuit(name="CustomCircuit")' in result
+        ), "Custom decorator should be preserved"
         assert "R1" in result, "Component should be added"
-        assert "circuit_obj = my_circuit()" in result, "Function call should use custom name"
+        assert (
+            "circuit_obj = my_circuit()" in result
+        ), "Function call should use custom name"
 
     def test_sync_idempotent(self, fixtures_dir, temp_workspace):
         """Test that multiple syncs produce identical results (idempotency).
@@ -221,7 +241,8 @@ if __name__ == "__main__":
 
         # Create Python file
         python_file = temp_workspace / "idempotent_circuit.py"
-        python_file.write_text("""#!/usr/bin/env python3
+        python_file.write_text(
+            """#!/usr/bin/env python3
 from circuit_synth import *
 
 
@@ -234,13 +255,14 @@ def main():
 if __name__ == "__main__":
     circuit_obj = main()
     circuit_obj.generate_kicad_project(project_name="single_resistor")
-""")
+"""
+        )
 
         # First sync
         syncer1 = KiCadToPythonSyncer(
             kicad_project_or_json=str(kicad_project / "single_resistor.json"),
             python_file=str(python_file),
-            preview_only=False
+            preview_only=False,
         )
         success1 = syncer1.sync()
         assert success1, "First sync should succeed"
@@ -250,20 +272,26 @@ if __name__ == "__main__":
         syncer2 = KiCadToPythonSyncer(
             kicad_project_or_json=str(kicad_project / "single_resistor.json"),
             python_file=str(python_file),
-            preview_only=False
+            preview_only=False,
         )
         success2 = syncer2.sync()
         assert success2, "Second sync should succeed"
         result2 = python_file.read_text()
 
         # Results should be identical
-        assert result1 == result2, "Multiple syncs should produce identical results (idempotent)"
+        assert (
+            result1 == result2
+        ), "Multiple syncs should produce identical results (idempotent)"
 
         # Verify no duplicate content
         assert result2.count("R1") == 1, "Component should not be duplicated"
-        assert result2.count("# Create components") <= 1, "Comment should not be duplicated"
+        assert (
+            result2.count("# Create components") <= 1
+        ), "Comment should not be duplicated"
 
-    def test_sync_preserves_blank_lines_between_comments(self, fixtures_dir, temp_workspace):
+    def test_sync_preserves_blank_lines_between_comments(
+        self, fixtures_dir, temp_workspace
+    ):
         """Test that blank lines between comment groups are preserved.
 
         Fixture: single_resistor/ - Circuit with R1
@@ -276,7 +304,8 @@ if __name__ == "__main__":
 
         # Create Python file with spaced comments
         python_file = temp_workspace / "spaced_circuit.py"
-        python_file.write_text("""#!/usr/bin/env python3
+        python_file.write_text(
+            """#!/usr/bin/env python3
 from circuit_synth import *
 
 
@@ -294,13 +323,14 @@ def main():
 if __name__ == "__main__":
     circuit_obj = main()
     circuit_obj.generate_kicad_project(project_name="single_resistor")
-""")
+"""
+        )
 
         # Sync KiCad -> Python
         syncer = KiCadToPythonSyncer(
             kicad_project_or_json=str(kicad_project / "single_resistor.json"),
             python_file=str(python_file),
-            preview_only=False
+            preview_only=False,
         )
         success = syncer.sync()
 
@@ -308,16 +338,22 @@ if __name__ == "__main__":
 
         # Verify result
         result = python_file.read_text()
-        lines = result.split('\n')
+        lines = result.split("\n")
 
         # Find the comment lines
-        first_comment_idx = next(i for i, line in enumerate(lines) if "First comment group" in line)
-        second_comment_idx = next(i for i, line in enumerate(lines) if "Second comment group" in line)
+        first_comment_idx = next(
+            i for i, line in enumerate(lines) if "First comment group" in line
+        )
+        second_comment_idx = next(
+            i for i, line in enumerate(lines) if "Second comment group" in line
+        )
 
         # There should be blank lines between them
-        between_lines = lines[first_comment_idx + 2:second_comment_idx]
-        blank_lines = [line for line in between_lines if line.strip() == '']
-        assert len(blank_lines) > 0, "Blank lines between comment groups should be preserved"
+        between_lines = lines[first_comment_idx + 2 : second_comment_idx]
+        blank_lines = [line for line in between_lines if line.strip() == ""]
+        assert (
+            len(blank_lines) > 0
+        ), "Blank lines between comment groups should be preserved"
 
     def test_sync_limits_trailing_blank_lines(self, fixtures_dir, temp_workspace):
         """Test that trailing blank lines are limited to max 2.
@@ -332,7 +368,8 @@ if __name__ == "__main__":
 
         # Create Python file with many trailing blanks
         python_file = temp_workspace / "trailing_circuit.py"
-        python_file.write_text("""#!/usr/bin/env python3
+        python_file.write_text(
+            """#!/usr/bin/env python3
 from circuit_synth import *
 
 
@@ -351,13 +388,14 @@ def main():
 if __name__ == "__main__":
     circuit_obj = main()
     circuit_obj.generate_kicad_project(project_name="single_resistor")
-""")
+"""
+        )
 
         # Sync KiCad -> Python
         syncer = KiCadToPythonSyncer(
             kicad_project_or_json=str(kicad_project / "single_resistor.json"),
             python_file=str(python_file),
-            preview_only=False
+            preview_only=False,
         )
         success = syncer.sync()
 
@@ -367,11 +405,15 @@ if __name__ == "__main__":
         result = python_file.read_text()
 
         # Find the component line and count trailing blanks before if __name__
-        lines = result.split('\n')
-        component_idx = next((i for i, line in enumerate(lines) if "Component" in line), None)
+        lines = result.split("\n")
+        component_idx = next(
+            (i for i, line in enumerate(lines) if "Component" in line), None
+        )
         if_name_idx = next(i for i, line in enumerate(lines) if "if __name__" in line)
 
         if component_idx:
-            between_lines = lines[component_idx + 1:if_name_idx]
-            blank_count = sum(1 for line in between_lines if line.strip() == '')
-            assert blank_count <= 2, f"Should have max 2 trailing blank lines, found {blank_count}"
+            between_lines = lines[component_idx + 1 : if_name_idx]
+            blank_count = sum(1 for line in between_lines if line.strip() == "")
+            assert (
+                blank_count <= 2
+            ), f"Should have max 2 trailing blank lines, found {blank_count}"

@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import kicad_sch_api as ksa
 from kicad_sch_api.core.types import Schematic, SchematicSymbol
+
 from .component_manager import ComponentManager
 from .connection_tracer import ConnectionTracer
 from .net_matcher import NetMatcher
@@ -115,15 +116,19 @@ class APISynchronizer:
     ):
         """Recursively load components from all hierarchical sheets."""
         # Check if the schematic has sheets attribute and if it's iterable
-        if not hasattr(schematic, 'sheets') or schematic.sheets is None:
-            logger.debug(f"Schematic has no sheets attribute or it's None - skipping hierarchical loading")
+        if not hasattr(schematic, "sheets") or schematic.sheets is None:
+            logger.debug(
+                f"Schematic has no sheets attribute or it's None - skipping hierarchical loading"
+            )
             return
 
         # Check if sheets is empty
         try:
             sheets_list = list(schematic.sheets) if schematic.sheets else []
         except (TypeError, AttributeError):
-            logger.debug(f"Schematic.sheets is not iterable - skipping hierarchical loading")
+            logger.debug(
+                f"Schematic.sheets is not iterable - skipping hierarchical loading"
+            )
             return
 
         if not sheets_list:
@@ -148,12 +153,15 @@ class APISynchronizer:
                 sheet_schematic = ksa.Schematic.load(str(sheet_path))
 
                 # Add all components from the sheet to the main schematic
-                if hasattr(sheet_schematic, 'components') and sheet_schematic.components:
+                if (
+                    hasattr(sheet_schematic, "components")
+                    and sheet_schematic.components
+                ):
                     for comp in sheet_schematic.components:
                         schematic.add_component(comp)
 
                 # Add all wires from the sheet (if they exist)
-                if hasattr(sheet_schematic, 'wires') and sheet_schematic.wires:
+                if hasattr(sheet_schematic, "wires") and sheet_schematic.wires:
                     try:
                         for wire in sheet_schematic.wires:
                             schematic.add_wire(wire)
@@ -161,7 +169,7 @@ class APISynchronizer:
                         logger.debug(f"Could not add wires from sheet: {e}")
 
                 # Add all labels from the sheet (if they exist)
-                if hasattr(sheet_schematic, 'labels') and sheet_schematic.labels:
+                if hasattr(sheet_schematic, "labels") and sheet_schematic.labels:
                     try:
                         for label in sheet_schematic.labels:
                             schematic.add_label(label)
@@ -169,7 +177,7 @@ class APISynchronizer:
                         logger.debug(f"Could not add labels from sheet: {e}")
 
                 # Recursively load any sub-sheets (if they exist)
-                if hasattr(sheet_schematic, 'sheets') and sheet_schematic.sheets:
+                if hasattr(sheet_schematic, "sheets") and sheet_schematic.sheets:
                     self._load_sheets_recursively(schematic, base_path, loaded_files)
             else:
                 logger.warning(f"Sheet file not found: {sheet_path}")
@@ -253,23 +261,31 @@ class APISynchronizer:
         self, circuit_components: Dict, kicad_components: Dict, report: SyncReport
     ):
         """Print a user-friendly synchronization summary."""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("📋 Synchronization Summary")
-        print("="*70)
+        print("=" * 70)
 
         # Components in schematic (KiCad)
         kicad_refs = sorted(kicad_components.keys()) if kicad_components else []
-        print(f"Components in schematic: {', '.join(kicad_refs) if kicad_refs else '(none)'}")
+        print(
+            f"Components in schematic: {', '.join(kicad_refs) if kicad_refs else '(none)'}"
+        )
 
         # Components in Python code
-        circuit_refs = sorted([comp['reference'] for comp in circuit_components.values()])
-        print(f"Components in Python:    {', '.join(circuit_refs) if circuit_refs else '(none)'}")
+        circuit_refs = sorted(
+            [comp["reference"] for comp in circuit_components.values()]
+        )
+        print(
+            f"Components in Python:    {', '.join(circuit_refs) if circuit_refs else '(none)'}"
+        )
 
         print("\nActions:")
 
         # Components that were kept (matched)
         if report.matched:
-            matched_refs = sorted([kicad_ref for _, kicad_ref in report.matched.items()])
+            matched_refs = sorted(
+                [kicad_ref for _, kicad_ref in report.matched.items()]
+            )
             for ref in matched_refs:
                 print(f"   ✅ Keep: {ref} (matches Python)")
 
@@ -287,15 +303,26 @@ class APISynchronizer:
 
         # Components that will be removed (in KiCad but not in Python)
         matched_kicad_refs = set(report.matched.values())
-        removed_refs = sorted([ref for ref in kicad_refs if ref not in matched_kicad_refs and ref not in report.added])
+        removed_refs = sorted(
+            [
+                ref
+                for ref in kicad_refs
+                if ref not in matched_kicad_refs and ref not in report.added
+            ]
+        )
         if removed_refs:
             for ref in removed_refs:
                 print(f"   ⚠️  Remove: {ref} (not in Python code)")
 
-        if not report.matched and not report.added and not report.modified and not removed_refs:
+        if (
+            not report.matched
+            and not report.added
+            and not report.modified
+            and not removed_refs
+        ):
             print("   (no changes)")
 
-        print("="*70 + "\n")
+        print("=" * 70 + "\n")
 
     def _extract_circuit_components(self, circuit) -> Dict[str, Dict[str, Any]]:
         """Extract component information from Circuit Synth circuit."""
@@ -555,11 +582,11 @@ class APISynchronizer:
         but doesn't update _data["wires"], so when saving, wires are lost. This method
         manually syncs the wire collection to _data before saving.
         """
-        if not hasattr(self.schematic, '_data'):
+        if not hasattr(self.schematic, "_data"):
             logger.warning("Schematic has no _data attribute")
             return
 
-        if not hasattr(self.schematic, 'wires'):
+        if not hasattr(self.schematic, "wires"):
             logger.warning("Schematic has no wires attribute")
             return
 
@@ -581,28 +608,19 @@ class APISynchronizer:
         # Convert Wire objects to dictionaries for _data
         wire_dicts = []
         for wire in wires_list:
-            if not hasattr(wire, 'uuid') or not hasattr(wire, 'points'):
+            if not hasattr(wire, "uuid") or not hasattr(wire, "points"):
                 continue
 
             # Build wire dictionary matching KiCad S-expression format
-            wire_dict = {
-                "uuid": wire.uuid,
-                "points": []
-            }
+            wire_dict = {"uuid": wire.uuid, "points": []}
 
             # Add points
             for point in wire.points:
-                wire_dict["points"].append({
-                    "x": point.x,
-                    "y": point.y
-                })
+                wire_dict["points"].append({"x": point.x, "y": point.y})
 
             # Add stroke info if present
-            if hasattr(wire, 'stroke_width') and wire.stroke_width > 0:
-                wire_dict["stroke"] = {
-                    "width": wire.stroke_width,
-                    "type": "default"
-                }
+            if hasattr(wire, "stroke_width") and wire.stroke_width > 0:
+                wire_dict["stroke"] = {"width": wire.stroke_width, "type": "default"}
 
             wire_dicts.append(wire_dict)
 

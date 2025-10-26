@@ -19,6 +19,7 @@ from kicad_sch_api.core.types import (
     SchematicSymbol,
     Wire,
 )
+
 from .instance_utils import add_symbol_instance
 from .wire_manager import WireManager
 from .wire_router import RoutingConstraints, WireRouter

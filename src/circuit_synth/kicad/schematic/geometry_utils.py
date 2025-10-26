@@ -6,7 +6,13 @@ import logging
 import math
 from typing import Dict, List, Optional, Tuple
 
-from kicad_sch_api.core.types import Label, LabelType, Point, SchematicPin, SchematicSymbol
+from kicad_sch_api.core.types import (
+    Label,
+    LabelType,
+    Point,
+    SchematicPin,
+    SchematicSymbol,
+)
 
 # Create logger for this module
 logger = logging.getLogger(__name__)

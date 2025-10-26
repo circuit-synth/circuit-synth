@@ -345,7 +345,7 @@ class KiCadToPythonSyncer:
             # Regenerate JSON netlist from parsed circuit
             logger.info(f"Writing updated JSON to {self.json_path}")
             json_data = main_circuit.to_circuit_synth_json()
-            with open(self.json_path, 'w') as f:
+            with open(self.json_path, "w") as f:
                 json.dump(json_data, f, indent=2)
 
             logger.info(

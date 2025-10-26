@@ -10,9 +10,16 @@ from pathlib import Path
 from typing import Optional
 
 import sexpdata
-
 from kicad_sch_api.core.parser import SExpressionParser
-from kicad_sch_api.core.types import Label, LabelType, Point, Schematic, SchematicSymbol, Sheet
+from kicad_sch_api.core.types import (
+    Label,
+    LabelType,
+    Point,
+    Schematic,
+    SchematicSymbol,
+    Sheet,
+)
+
 from .component_manager import ComponentManager
 from .connection_updater import ConnectionUpdater
 from .geometry_utils import GeometryUtils
@@ -492,7 +499,9 @@ class ProjectGenerator:
                 add_symbol_instance(kicad_comp, self.project_name, hierarchical_path)
 
         # Generate intermediate layout file for LLM analysis
-        layout_intermediate_path = sub_sheet_path.parent / f"{sub_sheet_path.stem}_layout.json"
+        layout_intermediate_path = (
+            sub_sheet_path.parent / f"{sub_sheet_path.stem}_layout.json"
+        )
         metadata = {
             "algorithm": "text_flow",
             "spacing_mm": 5.08,

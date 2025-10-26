@@ -41,6 +41,7 @@ class TestBasicRoundTrip:
     @pytest.fixture
     def simple_circuit(self):
         """Create a minimal resistor divider circuit for testing."""
+
         @circuit(name="voltage_divider")
         def voltage_divider():
             # Create nets
@@ -100,7 +101,9 @@ class TestBasicRoundTrip:
             r1_json = components["R1"]
             assert r1_json["value"] == "10k", "R1 value mismatch in JSON"
             assert r1_json["symbol"] == "Device:R", "R1 symbol mismatch in JSON"
-            assert r1_json["footprint"] == "Resistor_SMD:R_0603_1608Metric", "R1 footprint mismatch"
+            assert (
+                r1_json["footprint"] == "Resistor_SMD:R_0603_1608Metric"
+            ), "R1 footprint mismatch"
 
             # Verify nets in JSON
             nets = json_data["nets"]
@@ -137,8 +140,12 @@ class TestBasicRoundTrip:
 
             # Get project path (result can have either project_path or project_file)
             project_dir = self._get_project_dir(result)
-            assert project_dir is not None, "Could not extract project directory from result"
-            assert project_dir.exists(), f"KiCad project directory not found: {project_dir}"
+            assert (
+                project_dir is not None
+            ), "Could not extract project directory from result"
+            assert (
+                project_dir.exists()
+            ), f"KiCad project directory not found: {project_dir}"
 
             # Verify schematic file exists
             kicad_sch = next(project_dir.glob("*.kicad_sch"), None)
@@ -188,12 +195,16 @@ class TestBasicRoundTrip:
                     exported_json = json.load(f)
 
                 # Verify structure
-                assert "components" in exported_json, "Exported JSON missing 'components'"
+                assert (
+                    "components" in exported_json
+                ), "Exported JSON missing 'components'"
                 assert "nets" in exported_json, "Exported JSON missing 'nets'"
 
                 # Verify we have the resistors
                 components = exported_json.get("components", {})
-                assert len(components) >= 2, f"Expected >=2 components, got {len(components)}"
+                assert (
+                    len(components) >= 2
+                ), f"Expected >=2 components, got {len(components)}"
 
                 print("✅ KiCad → JSON: PASS")
             else:
