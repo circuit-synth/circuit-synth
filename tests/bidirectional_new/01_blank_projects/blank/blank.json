@@ -1,7 +1,7 @@
 {
   "name": "blank",
   "description": "Blank circuit with no components or nets.",
-  "tstamps": "/blank-4375431792/",
+  "tstamps": "/blank-4373842496/",
   "source_file": "blank.kicad_sch",
   "components": {},
   "nets": {},
@@ -35,7 +35,7 @@
       "border_color": "black",
       "justify": "center center",
       "rotation": 0,
-      "uuid": "ace5b277-ed84-42da-bea8-7e06380b6de9"
+      "uuid": "2f5928ba-9652-4225-be8c-8144f1ab8f0b"
     }
   ]
 }

@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "0.8.36")
-	(uuid "55c77ea0-927e-46c5-911f-fe63524c78d4")
+	(uuid "79f896a9-fb13-4915-8c6a-ed37a12cd270")
 	(paper "A4")
 	(title_block
 		(title "blank")
@@ -26,7 +26,7 @@
 			)
 			(justify left top)
 		)
-		(uuid "abd4a607-c69f-4c27-b498-3ff775c8ede8")
+		(uuid "d91783fc-b826-4522-8c17-ed33574fcf7e")
 	)
 	(sheet_instances
 		(path "/"
