@@ -207,7 +207,9 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
                 name=p.get("name", ""),
                 pin_type=p.get("func", "passive"),  # Changed from 'type' to 'pin_type'
                 position=Point(float(p.get("x", 0)), float(p.get("y", 0))),
-                rotation=float(p.get("orientation", 0)),  # Changed from 'orientation' to 'rotation'
+                rotation=float(
+                    p.get("orientation", 0)
+                ),  # Changed from 'orientation' to 'rotation'
             )
             comp.pins.append(pin_obj)
 

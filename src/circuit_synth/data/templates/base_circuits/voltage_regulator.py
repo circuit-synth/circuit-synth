@@ -19,6 +19,7 @@ Decoupling capacitors (CRITICAL for stability):
 - Output cap (C2): 22µF - reduces output ripple, improves transient response
 - Place capacitors as close as possible to regulator pins!
 """
+
 from circuit_synth import Component, Net, circuit
 
 
@@ -59,7 +60,7 @@ def voltage_regulator():
     vreg = Component(
         symbol="Regulator_Linear:AMS1117-3.3",  # Fixed 3.3V version
         ref="U",  # Reference prefix for ICs (U1, U2, etc.)
-        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"  # SOT-223 with tab
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2",  # SOT-223 with tab
     )
     # Note: TabPin2 means the tab is connected to pin 2 (GND in this case)
 
@@ -70,7 +71,7 @@ def voltage_regulator():
         symbol="Device:C",  # Generic capacitor symbol
         ref="C",  # Reference prefix for capacitors
         value="10uF",  # 10 microfarads
-        footprint="Capacitor_SMD:C_0805_2012Metric"  # 0805 SMD (bigger for µF range)
+        footprint="Capacitor_SMD:C_0805_2012Metric",  # 0805 SMD (bigger for µF range)
     )
     # Note: Use 0805 or larger for µF capacitors (0603 typically maxes at 1µF)
 
@@ -81,33 +82,33 @@ def voltage_regulator():
         symbol="Device:C",
         ref="C",
         value="22uF",  # 22 microfarads (larger than input for better filtering)
-        footprint="Capacitor_SMD:C_0805_2012Metric"
+        footprint="Capacitor_SMD:C_0805_2012Metric",
     )
     # Larger output cap helps when load current changes quickly (e.g., WiFi bursts)
 
     # Define power nets
-    vin_5v = Net('VIN_5V')      # Input: 5V unregulated (can have ripple/noise)
-    vout_3v3 = Net('VOUT_3V3')  # Output: 3.3V regulated (clean, stable)
-    gnd = Net('GND')            # Ground plane (0V reference)
+    vin_5v = Net("VIN_5V")  # Input: 5V unregulated (can have ripple/noise)
+    vout_3v3 = Net("VOUT_3V3")  # Output: 3.3V regulated (clean, stable)
+    gnd = Net("GND")  # Ground plane (0V reference)
 
     # Connect voltage regulator
     # AMS1117 pinout (SOT-223):
     #   Pin 1: GND (also connected to tab)
     #   Pin 2: VOUT (3.3V output)
     #   Pin 3: VIN (5V input)
-    vreg["GND"] += gnd      # Ground pin (and tab)
+    vreg["GND"] += gnd  # Ground pin (and tab)
     vreg["VOUT"] += vout_3v3  # 3.3V regulated output
-    vreg["VIN"] += vin_5v   # 5V input from source
+    vreg["VIN"] += vin_5v  # 5V input from source
 
     # Connect input capacitor
     # Placed between VIN and GND to filter input voltage
-    cap_in[1] += vin_5v   # Positive terminal to VIN
-    cap_in[2] += gnd      # Negative terminal to GND
+    cap_in[1] += vin_5v  # Positive terminal to VIN
+    cap_in[2] += gnd  # Negative terminal to GND
 
     # Connect output capacitor
     # Placed between VOUT and GND to filter output voltage
     cap_out[1] += vout_3v3  # Positive terminal to VOUT
-    cap_out[2] += gnd       # Negative terminal to GND
+    cap_out[2] += gnd  # Negative terminal to GND
 
     # PCB Layout Tips:
     # 1. Keep capacitors within 5mm of regulator pins
@@ -116,7 +117,7 @@ def voltage_regulator():
     # 4. Add thermal vias under SOT-223 tab for heat dissipation
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # This code runs when you execute: uv run python circuit-synth/main.py
 
     # Generate the circuit
@@ -126,7 +127,7 @@ if __name__ == '__main__':
     circuit_obj.generate_kicad_project(
         project_name="voltage_regulator",
         placement_algorithm="hierarchical",
-        generate_pcb=True
+        generate_pcb=True,
     )
 
     print("✅ Voltage regulator circuit generated!")
@@ -154,4 +155,6 @@ if __name__ == '__main__':
     print("   1. Open the KiCad project")
     print("   2. Note the capacitor placement near the regulator")
     print("   3. Consider adding a power LED to indicate output")
-    print("   4. For battery projects, consider a buck converter instead (higher efficiency)")
+    print(
+        "   4. For battery projects, consider a buck converter instead (higher efficiency)"
+    )

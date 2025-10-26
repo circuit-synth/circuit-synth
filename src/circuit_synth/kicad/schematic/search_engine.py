@@ -190,7 +190,7 @@ class SearchEngine:
 
         # Net index (simplified - full implementation would trace connections)
         self._nets_by_name = {}
-        if hasattr(self.schematic, 'labels') and self.schematic.labels:
+        if hasattr(self.schematic, "labels") and self.schematic.labels:
             for label in self.schematic.labels:
                 if label.text not in self._nets_by_name:
                     self._nets_by_name[label.text] = []
@@ -343,7 +343,7 @@ class SearchEngine:
         results = set()
 
         # Search labels
-        if hasattr(self.schematic, 'labels') and self.schematic.labels:
+        if hasattr(self.schematic, "labels") and self.schematic.labels:
             for label in self.schematic.labels:
                 if use_regex:
                     if re.search(pattern, label.text):
@@ -462,7 +462,7 @@ class SearchEngine:
 
         power_nets = set()
 
-        if hasattr(self.schematic, 'labels') and self.schematic.labels:
+        if hasattr(self.schematic, "labels") and self.schematic.labels:
             for label in self.schematic.labels:
                 for pattern in power_patterns:
                     if re.match(pattern, label.text):
@@ -505,7 +505,7 @@ class SearchEngine:
         """
         # Find all labels with this net name
         labels = []
-        if hasattr(self.schematic, 'labels') and self.schematic.labels:
+        if hasattr(self.schematic, "labels") and self.schematic.labels:
             labels = [l for l in self.schematic.labels if l.text == net_name]
         if not labels:
             return None

@@ -7,11 +7,11 @@ These tests ensure that all template circuits:
 3. Have proper configuration
 """
 
-import pytest
-import importlib.util
 import ast
+import importlib.util
 from pathlib import Path
 
+import pytest
 
 # Valid PCB placement algorithms
 VALID_PLACEMENT_ALGORITHMS = {"hierarchical", "grid", "force_directed"}
@@ -35,7 +35,7 @@ def get_all_template_files():
 
 def extract_placement_algorithm(file_path):
     """Extract placement_algorithm value from Python file."""
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         content = f.read()
 
     # Parse the Python file
@@ -45,10 +45,13 @@ def extract_placement_algorithm(file_path):
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):
             # Check if this is generate_kicad_project call
-            if hasattr(node.func, 'attr') and node.func.attr == 'generate_kicad_project':
+            if (
+                hasattr(node.func, "attr")
+                and node.func.attr == "generate_kicad_project"
+            ):
                 # Look for placement_algorithm keyword argument
                 for keyword in node.keywords:
-                    if keyword.arg == 'placement_algorithm':
+                    if keyword.arg == "placement_algorithm":
                         if isinstance(keyword.value, ast.Constant):
                             return keyword.value.value
 
@@ -60,18 +63,20 @@ def test_template_uses_valid_placement_algorithm(template_file):
     """Test that template file uses a valid placement algorithm."""
     placement_algorithm = extract_placement_algorithm(template_file)
 
-    assert placement_algorithm is not None, \
-        f"{template_file.name} does not specify a placement_algorithm"
+    assert (
+        placement_algorithm is not None
+    ), f"{template_file.name} does not specify a placement_algorithm"
 
-    assert placement_algorithm in VALID_PLACEMENT_ALGORITHMS, \
-        f"{template_file.name} uses invalid placement algorithm '{placement_algorithm}'. " \
+    assert placement_algorithm in VALID_PLACEMENT_ALGORITHMS, (
+        f"{template_file.name} uses invalid placement algorithm '{placement_algorithm}'. "
         f"Valid algorithms: {', '.join(VALID_PLACEMENT_ALGORITHMS)}"
+    )
 
 
 @pytest.mark.parametrize("template_file", get_all_template_files())
 def test_template_syntax_valid(template_file):
     """Test that template file has valid Python syntax."""
-    with open(template_file, 'r') as f:
+    with open(template_file, "r") as f:
         content = f.read()
 
     try:
@@ -83,11 +88,12 @@ def test_template_syntax_valid(template_file):
 @pytest.mark.parametrize("template_file", get_all_template_files())
 def test_template_imports_circuit_synth(template_file):
     """Test that template file imports from circuit_synth."""
-    with open(template_file, 'r') as f:
+    with open(template_file, "r") as f:
         content = f.read()
 
-    assert "from circuit_synth import" in content or "import circuit_synth" in content, \
-        f"{template_file.name} does not import circuit_synth"
+    assert (
+        "from circuit_synth import" in content or "import circuit_synth" in content
+    ), f"{template_file.name} does not import circuit_synth"
 
 
 def test_all_template_directories_exist():
@@ -101,8 +107,7 @@ def test_at_least_one_template_in_each_directory():
     for template_dir in TEMPLATE_DIRS:
         if template_dir.exists():
             template_files = list(template_dir.glob("*.py"))
-            assert len(template_files) > 0, \
-                f"No template files found in {template_dir}"
+            assert len(template_files) > 0, f"No template files found in {template_dir}"
 
 
 if __name__ == "__main__":

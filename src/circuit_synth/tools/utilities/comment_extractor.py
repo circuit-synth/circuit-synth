@@ -51,7 +51,9 @@ class CommentExtractor:
 
             tree = ast.parse("".join(lines))
             function_start_line = self._find_function_start_line(tree, function_name)
-            function_end_line = self._find_function_end_line(tree, function_name, file_path)
+            function_end_line = self._find_function_end_line(
+                tree, function_name, file_path
+            )
 
             if function_start_line is None:
                 logger.warning(f"Function '{function_name}' not found in {file_path}")
@@ -75,7 +77,9 @@ class CommentExtractor:
             for line_num in range(content_start_line, function_end_line + 1):
                 line_idx = line_num - 1  # Convert to 0-indexed
                 if line_idx < len(lines):
-                    line = lines[line_idx].rstrip()  # Keep indentation, remove trailing whitespace
+                    line = lines[
+                        line_idx
+                    ].rstrip()  # Keep indentation, remove trailing whitespace
                     # Include ALL lines - blank lines preserve spacing
                     offset = line_num - content_start_line
                     if offset not in content_map:
@@ -197,7 +201,10 @@ class CommentExtractor:
         return last_function_line
 
     def _extract_comments_with_tokenize(
-        self, file_path: Path, function_start_line: int, function_end_line: Optional[int] = None
+        self,
+        file_path: Path,
+        function_start_line: int,
+        function_end_line: Optional[int] = None,
     ) -> Dict[int, List[str]]:
         """
         Extract comments using the tokenize module.
@@ -224,7 +231,10 @@ class CommentExtractor:
                         # Only include comments within function bounds
                         if line_num < function_start_line:
                             continue
-                        if function_end_line is not None and line_num > function_end_line:
+                        if (
+                            function_end_line is not None
+                            and line_num > function_end_line
+                        ):
                             continue
 
                         # Calculate offset relative to function start
@@ -269,7 +279,7 @@ class CommentExtractor:
         # Count trailing blanks
         trailing_blank_count = 0
         for line in reversed(all_content):
-            if line.strip() == '':
+            if line.strip() == "":
                 trailing_blank_count += 1
             else:
                 break
@@ -284,7 +294,7 @@ class CommentExtractor:
         generated_lines_copy = list(generated_lines)  # Don't modify original
         trailing_gen_blank_count = 0
         for line in reversed(generated_lines_copy):
-            if line.strip() == '':
+            if line.strip() == "":
                 trailing_gen_blank_count += 1
             else:
                 break
@@ -314,7 +324,9 @@ class CommentExtractor:
         """
         return line[: len(line) - len(line.lstrip())]
 
-    def extract_after_function_content(self, file_path: Path, function_name: str = "main") -> List[str]:
+    def extract_after_function_content(
+        self, file_path: Path, function_name: str = "main"
+    ) -> List[str]:
         """
         Extract content that appears AFTER the function ends but BEFORE if __name__.
 
@@ -336,7 +348,9 @@ class CommentExtractor:
                 lines = f.readlines()
 
             tree = ast.parse("".join(lines))
-            function_end_line = self._find_function_end_line(tree, function_name, file_path)
+            function_end_line = self._find_function_end_line(
+                tree, function_name, file_path
+            )
 
             if function_end_line is None:
                 return []
@@ -361,9 +375,9 @@ class CommentExtractor:
                     after_function_content.append(line)
 
             # Strip leading and trailing blank lines
-            while after_function_content and after_function_content[0].strip() == '':
+            while after_function_content and after_function_content[0].strip() == "":
                 after_function_content.pop(0)
-            while after_function_content and after_function_content[-1].strip() == '':
+            while after_function_content and after_function_content[-1].strip() == "":
                 after_function_content.pop()
 
             return after_function_content
@@ -397,10 +411,16 @@ class CommentExtractor:
                     # Check if it has @circuit decorator
                     for decorator in node.decorator_list:
                         # Handle both @circuit and @circuit(...)
-                        if isinstance(decorator, ast.Name) and decorator.id == "circuit":
+                        if (
+                            isinstance(decorator, ast.Name)
+                            and decorator.id == "circuit"
+                        ):
                             return node.name
                         elif isinstance(decorator, ast.Call):
-                            if isinstance(decorator.func, ast.Name) and decorator.func.id == "circuit":
+                            if (
+                                isinstance(decorator.func, ast.Name)
+                                and decorator.func.id == "circuit"
+                            ):
                                 return node.name
 
             # Fallback: if no @circuit found, look for any function
@@ -442,7 +462,9 @@ class CommentExtractor:
         if function_name is None:
             function_name = self.find_circuit_function_name(existing_file)
             if function_name is None:
-                logger.warning("Could not find circuit function, using 'main' as fallback")
+                logger.warning(
+                    "Could not find circuit function, using 'main' as fallback"
+                )
                 function_name = "main"
             else:
                 logger.info(f"Auto-detected circuit function: {function_name}")
@@ -458,8 +480,12 @@ class CommentExtractor:
 
             # Find function boundaries in EXISTING file
             existing_tree = ast.parse(existing_content)
-            existing_func_start = self._find_function_start_line(existing_tree, function_name)
-            existing_func_end = self._find_function_end_line(existing_tree, function_name, existing_file)
+            existing_func_start = self._find_function_start_line(
+                existing_tree, function_name
+            )
+            existing_func_end = self._find_function_end_line(
+                existing_tree, function_name, existing_file
+            )
 
             if existing_func_start is None:
                 # Function doesn't exist in old file, return template
@@ -467,11 +493,17 @@ class CommentExtractor:
 
             # Find function body content in GENERATED template (the new component code)
             # Try the detected function name first, then try "main" as fallback
-            generated_func_start_idx = self._find_function_start_index(generated_lines, function_name)
+            generated_func_start_idx = self._find_function_start_index(
+                generated_lines, function_name
+            )
             if generated_func_start_idx is None and function_name != "main":
                 # Function not found, try "main" (the template default)
-                logger.info(f"Function '{function_name}' not in generated code, trying 'main' fallback")
-                generated_func_start_idx = self._find_function_start_index(generated_lines, "main")
+                logger.info(
+                    f"Function '{function_name}' not in generated code, trying 'main' fallback"
+                )
+                generated_func_start_idx = self._find_function_start_index(
+                    generated_lines, "main"
+                )
 
             if generated_func_start_idx is None:
                 # Can't find any function in generated code, return existing
@@ -483,13 +515,14 @@ class CommentExtractor:
             for i in range(generated_func_start_idx, len(generated_lines)):
                 line = generated_lines[i]
                 # Stop at "# Generate the circuit" or end of function indicators
-                if line.strip().startswith("# Generate the circuit") or \
-                   line.strip().startswith("if __name__"):
+                if line.strip().startswith(
+                    "# Generate the circuit"
+                ) or line.strip().startswith("if __name__"):
                     break
                 generated_func_body.append(line)
 
             # Strip trailing blank lines from generated body
-            while generated_func_body and generated_func_body[-1].strip() == '':
+            while generated_func_body and generated_func_body[-1].strip() == "":
                 generated_func_body.pop()
 
             # Now build the result: existing file with function body replaced
@@ -499,33 +532,35 @@ class CommentExtractor:
             for i in range(existing_func_start):
                 # Preserve line as-is but remove trailing newline
                 line = existing_lines[i]
-                if line.endswith('\n'):
+                if line.endswith("\n"):
                     line = line[:-1]
                 result_lines.append(line.rstrip())
 
             # Part 2: User content from INSIDE old function + NEW generated code
             # Extract user comments from inside the existing function
-            user_comments_map = self.extract_comments_from_function(existing_file, function_name)
+            user_comments_map = self.extract_comments_from_function(
+                existing_file, function_name
+            )
 
             # Filter out generated patterns and standalone 'pass' statements
             # These should not be preserved as "user content"
             if user_comments_map and generated_func_body:
                 # Check if any generated line has actual component code (not just whitespace/comments)
                 has_real_code = any(
-                    line.strip() and
-                    not line.strip().startswith('#') and
-                    not line.strip().startswith('"""') and
-                    not line.strip().startswith("'''")
+                    line.strip()
+                    and not line.strip().startswith("#")
+                    and not line.strip().startswith('"""')
+                    and not line.strip().startswith("'''")
                     for line in generated_func_body
                 )
 
                 if has_real_code:
                     # Known generated comment patterns that should not be preserved
                     generated_patterns = [
-                        'pass',  # Standalone pass statement
-                        '# Create components',  # Generated section marker
-                        '# Create nets',  # Generated section marker
-                        '# Create subcircuits',  # Generated section marker
+                        "pass",  # Standalone pass statement
+                        "# Create components",  # Generated section marker
+                        "# Create nets",  # Generated section marker
+                        "# Create subcircuits",  # Generated section marker
                     ]
 
                     # Remove generated patterns and component code lines
@@ -539,13 +574,15 @@ class CommentExtractor:
                                 continue
                             # Skip if it looks like generated component code
                             # (starts with variable assignment for common component patterns)
-                            if stripped and not stripped.startswith('#'):
+                            if stripped and not stripped.startswith("#"):
                                 # Check if it's a component assignment (e.g., "r1 = Component(...)")
-                                if '= Component(' in stripped or '= Net(' in stripped:
+                                if "= Component(" in stripped or "= Net(" in stripped:
                                     continue
                             filtered_lines.append(line)
 
-                        if filtered_lines:  # Only keep if there's content after filtering
+                        if (
+                            filtered_lines
+                        ):  # Only keep if there's content after filtering
                             filtered_comments[offset] = filtered_lines
 
                     # Now remove leading blank-only entries, but keep blank lines between content
@@ -556,7 +593,9 @@ class CommentExtractor:
                         last_non_blank = None
 
                         for offset in sorted_offsets:
-                            has_content = any(line.strip() for line in filtered_comments[offset])
+                            has_content = any(
+                                line.strip() for line in filtered_comments[offset]
+                            )
                             if has_content:
                                 if first_non_blank is None:
                                     first_non_blank = offset
@@ -578,7 +617,9 @@ class CommentExtractor:
             # Merge: user comments first, then generated code
             if user_comments_map:
                 # Reinsert user comments with generated code
-                merged_body = self.reinsert_comments(generated_func_body, user_comments_map)
+                merged_body = self.reinsert_comments(
+                    generated_func_body, user_comments_map
+                )
                 result_lines.extend(merged_body)
             else:
                 # No user comments, just use generated code
@@ -586,11 +627,13 @@ class CommentExtractor:
 
             # Part 3: Everything AFTER the function body (preserve user content after function)
             # existing_func_end is 1-indexed, so existing_lines[existing_func_end] is the line AFTER function end
-            if existing_func_end is not None and existing_func_end < len(existing_lines):
+            if existing_func_end is not None and existing_func_end < len(
+                existing_lines
+            ):
                 for i in range(existing_func_end, len(existing_lines)):
                     # Preserve line as-is but remove trailing newline
                     line = existing_lines[i]
-                    if line.endswith('\n'):
+                    if line.endswith("\n"):
                         line = line[:-1]
                     result_lines.append(line.rstrip())
 
@@ -624,7 +667,9 @@ class CommentExtractor:
         comments_map = self.extract_comments_from_function(existing_file, function_name)
 
         # Extract content after function (between function and if __name__)
-        after_function_content = self.extract_after_function_content(existing_file, function_name)
+        after_function_content = self.extract_after_function_content(
+            existing_file, function_name
+        )
 
         if not comments_map and not after_function_content:
             return generated_code
@@ -653,17 +698,24 @@ class CommentExtractor:
             # Find the "# Generate the circuit" or "if __name__" line
             insert_idx = None
             for i, line in enumerate(result_lines):
-                if line.strip().startswith("# Generate the circuit") or \
-                   line.strip().startswith("if __name__"):
+                if line.strip().startswith(
+                    "# Generate the circuit"
+                ) or line.strip().startswith("if __name__"):
                     insert_idx = i
                     break
 
             if insert_idx is not None:
                 # Insert after-function content before the boilerplate
-                result_lines = result_lines[:insert_idx] + [''] + after_function_content + [''] + result_lines[insert_idx:]
+                result_lines = (
+                    result_lines[:insert_idx]
+                    + [""]
+                    + after_function_content
+                    + [""]
+                    + result_lines[insert_idx:]
+                )
             else:
                 # No boilerplate found, append at end
-                result_lines.extend([''] + after_function_content)
+                result_lines.extend([""] + after_function_content)
 
         return "\n".join(result_lines)
 

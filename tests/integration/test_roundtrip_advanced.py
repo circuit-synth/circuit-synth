@@ -12,11 +12,11 @@ Tests for professional workflows including:
 import tempfile
 from pathlib import Path
 
-import pytest
-
 import kicad_sch_api as ksa
-from circuit_synth import Component, Net, circuit
+import pytest
 from kicad_sch_api.core.types import Point
+
+from circuit_synth import Component, Net, circuit
 
 
 class TestComponentRotation:
@@ -43,7 +43,9 @@ class TestComponentRotation:
                 return r1
 
             c = simple_circuit()
-            c.generate_kicad_project(str(output_path), force_regenerate=True, generate_pcb=False)
+            c.generate_kicad_project(
+                str(output_path), force_regenerate=True, generate_pcb=False
+            )
 
             # Find schematic
             sch_path = self._find_schematic(output_path, tmpdir)
@@ -54,9 +56,9 @@ class TestComponentRotation:
             r1 = sch.components.get("R1")
             assert r1 is not None, "R1 not found"
 
-            original_angle = r1.angle if hasattr(r1, 'angle') else 0
+            original_angle = r1.angle if hasattr(r1, "angle") else 0
             new_angle = 90  # Rotate 90 degrees
-            if hasattr(r1, 'angle'):
+            if hasattr(r1, "angle"):
                 r1.angle = new_angle
 
             sch.save(str(sch_path), preserve_format=True)
@@ -77,20 +79,22 @@ class TestComponentRotation:
                 return r1
 
             c2 = updated_circuit()
-            c2.generate_kicad_project(str(output_path), force_regenerate=False, generate_pcb=False)
+            c2.generate_kicad_project(
+                str(output_path), force_regenerate=False, generate_pcb=False
+            )
 
             # Step 4: Verify rotation preserved and value updated
             sch_after = ksa.Schematic.load(str(sch_path))
             r1_after = sch_after.components.get("R1")
 
-            if hasattr(r1_after, 'angle'):
-                assert r1_after.angle == new_angle, (
-                    f"Rotation not preserved: expected {new_angle}, got {r1_after.angle}"
-                )
+            if hasattr(r1_after, "angle"):
+                assert (
+                    r1_after.angle == new_angle
+                ), f"Rotation not preserved: expected {new_angle}, got {r1_after.angle}"
 
-            assert r1_after.value == "22k", (
-                f"Value not updated: expected '22k', got '{r1_after.value}'"
-            )
+            assert (
+                r1_after.value == "22k"
+            ), f"Value not updated: expected '22k', got '{r1_after.value}'"
 
     def _find_schematic(self, output_path, tmpdir):
         """Helper to find schematic file."""
@@ -127,7 +131,9 @@ class TestFootprintUpdates:
                 return r1
 
             c = circuit_v1()
-            c.generate_kicad_project(str(output_path), force_regenerate=True, generate_pcb=False)
+            c.generate_kicad_project(
+                str(output_path), force_regenerate=True, generate_pcb=False
+            )
 
             sch_path = self._find_schematic(output_path, tmpdir)
             assert sch_path is not None
@@ -155,17 +161,23 @@ class TestFootprintUpdates:
                 return r1
 
             c2 = circuit_v2()
-            c2.generate_kicad_project(str(output_path), force_regenerate=False, generate_pcb=False)
+            c2.generate_kicad_project(
+                str(output_path), force_regenerate=False, generate_pcb=False
+            )
 
             # Step 4: Verify footprint updated but position preserved
             sch_after = ksa.Schematic.load(str(sch_path))
             r1_after = sch_after.components.get("R1")
 
-            assert abs(r1_after.position.x - new_pos.x) < 0.01, "Position X not preserved"
-            assert abs(r1_after.position.y - new_pos.y) < 0.01, "Position Y not preserved"
-            assert "R_0805_2012Metric" in r1_after.footprint, (
-                f"Footprint not updated: got '{r1_after.footprint}'"
-            )
+            assert (
+                abs(r1_after.position.x - new_pos.x) < 0.01
+            ), "Position X not preserved"
+            assert (
+                abs(r1_after.position.y - new_pos.y) < 0.01
+            ), "Position Y not preserved"
+            assert (
+                "R_0805_2012Metric" in r1_after.footprint
+            ), f"Footprint not updated: got '{r1_after.footprint}'"
 
     def _find_schematic(self, output_path, tmpdir):
         """Helper to find schematic file."""
@@ -197,7 +209,9 @@ class TestComponentLifecycle:
                 return r1
 
             c = circuit_v1()
-            c.generate_kicad_project(str(output_path), force_regenerate=True, generate_pcb=False)
+            c.generate_kicad_project(
+                str(output_path), force_regenerate=True, generate_pcb=False
+            )
 
             sch_path = self._find_schematic(output_path, tmpdir)
             assert sch_path is not None
@@ -222,7 +236,9 @@ class TestComponentLifecycle:
                 return r1, r2
 
             c2 = circuit_v2()
-            c2.generate_kicad_project(str(output_path), force_regenerate=False, generate_pcb=False)
+            c2.generate_kicad_project(
+                str(output_path), force_regenerate=False, generate_pcb=False
+            )
 
             # Step 3: Verify R2 was added
             sch_after = ksa.Schematic.load(str(sch_path))
@@ -250,7 +266,9 @@ class TestComponentLifecycle:
                 return r1, r2
 
             c = circuit_v1()
-            c.generate_kicad_project(str(output_path), force_regenerate=True, generate_pcb=False)
+            c.generate_kicad_project(
+                str(output_path), force_regenerate=True, generate_pcb=False
+            )
 
             sch_path = self._find_schematic(output_path, tmpdir)
             assert sch_path is not None
@@ -271,7 +289,9 @@ class TestComponentLifecycle:
                 return r1
 
             c2 = circuit_v2()
-            c2.generate_kicad_project(str(output_path), force_regenerate=False, generate_pcb=False)
+            c2.generate_kicad_project(
+                str(output_path), force_regenerate=False, generate_pcb=False
+            )
 
             # Step 3: Verify R2 was removed (if preserve_user_components=False)
             # Note: By default preserve_user_components=True, so R2 will be preserved
@@ -310,7 +330,9 @@ class TestManualComponentPreservation:
                 return r1
 
             c = circuit_v1()
-            c.generate_kicad_project(str(output_path), force_regenerate=True, generate_pcb=False)
+            c.generate_kicad_project(
+                str(output_path), force_regenerate=True, generate_pcb=False
+            )
 
             sch_path = self._find_schematic(output_path, tmpdir)
             assert sch_path is not None
@@ -323,7 +345,7 @@ class TestManualComponentPreservation:
                 lib_id="Device:C",
                 reference="C1",
                 value="100n",
-                position=Point(100.0, 100.0)
+                position=Point(100.0, 100.0),
             )
             sch.save(str(sch_path), preserve_format=True)
 
@@ -338,7 +360,9 @@ class TestManualComponentPreservation:
                 return r1
 
             c2 = circuit_v2()
-            c2.generate_kicad_project(str(output_path), force_regenerate=False, generate_pcb=False)
+            c2.generate_kicad_project(
+                str(output_path), force_regenerate=False, generate_pcb=False
+            )
 
             # Step 4: Verify manual component preserved
             sch_after = ksa.Schematic.load(str(sch_path))
@@ -380,7 +404,9 @@ class TestPowerSymbols:
                 return r1
 
             c = simple_circuit()
-            c.generate_kicad_project(str(output_path), force_regenerate=True, generate_pcb=False)
+            c.generate_kicad_project(
+                str(output_path), force_regenerate=True, generate_pcb=False
+            )
 
             sch_path = self._find_schematic(output_path, tmpdir)
             assert sch_path is not None
@@ -393,7 +419,7 @@ class TestPowerSymbols:
                 lib_id="power:VCC",
                 reference="#PWR01",
                 value="VCC",
-                position=Point(80.0, 80.0)
+                position=Point(80.0, 80.0),
             )
 
             # Add GND power symbol
@@ -401,7 +427,7 @@ class TestPowerSymbols:
                 lib_id="power:GND",
                 reference="#PWR02",
                 value="GND",
-                position=Point(80.0, 120.0)
+                position=Point(80.0, 120.0),
             )
 
             sch.save(str(sch_path), preserve_format=True)
@@ -417,7 +443,9 @@ class TestPowerSymbols:
                 return r1
 
             c2 = updated_circuit()
-            c2.generate_kicad_project(str(output_path), force_regenerate=False, generate_pcb=False)
+            c2.generate_kicad_project(
+                str(output_path), force_regenerate=False, generate_pcb=False
+            )
 
             # Step 4: Verify power symbols preserved
             sch_after = ksa.Schematic.load(str(sch_path))
@@ -462,7 +490,9 @@ class TestComponentMovementWithLabels:
                 return r1, r2
 
             c = circuit_v1()
-            c.generate_kicad_project(str(output_path), force_regenerate=True, generate_pcb=False)
+            c.generate_kicad_project(
+                str(output_path), force_regenerate=True, generate_pcb=False
+            )
 
             sch_path = self._find_schematic(output_path, tmpdir)
             assert sch_path is not None
@@ -476,7 +506,7 @@ class TestComponentMovementWithLabels:
 
             # Add a label on the MID net (between resistors)
             label_pos = Point((r1.position.x + r2.position.x) / 2, r1.position.y)
-            if hasattr(sch, 'labels'):
+            if hasattr(sch, "labels"):
                 # Add label using kicad-sch-api if available
                 # For now, we'll use a simpler approach and just verify preservation
                 pass
@@ -485,7 +515,7 @@ class TestComponentMovementWithLabels:
 
             # Get initial label count
             sch_before = ksa.Schematic.load(str(sch_path))
-            labels_before = getattr(sch_before, 'labels', [])
+            labels_before = getattr(sch_before, "labels", [])
             initial_label_count = len(labels_before)
 
             # Step 3: Move R1 to a new position
@@ -510,30 +540,32 @@ class TestComponentMovementWithLabels:
                 return r1, r2
 
             c2 = circuit_v2()
-            c2.generate_kicad_project(str(output_path), force_regenerate=False, generate_pcb=False)
+            c2.generate_kicad_project(
+                str(output_path), force_regenerate=False, generate_pcb=False
+            )
 
             # Step 5: Verify component moved and labels preserved
             sch_after = ksa.Schematic.load(str(sch_path))
             r1_after = sch_after.components.get("R1")
 
             # Verify R1 position was preserved
-            assert abs(r1_after.position.x - new_r1_pos.x) < 0.01, (
-                f"R1 X position not preserved: expected {new_r1_pos.x}, got {r1_after.position.x}"
-            )
-            assert abs(r1_after.position.y - new_r1_pos.y) < 0.01, (
-                f"R1 Y position not preserved: expected {new_r1_pos.y}, got {r1_after.position.y}"
-            )
+            assert (
+                abs(r1_after.position.x - new_r1_pos.x) < 0.01
+            ), f"R1 X position not preserved: expected {new_r1_pos.x}, got {r1_after.position.x}"
+            assert (
+                abs(r1_after.position.y - new_r1_pos.y) < 0.01
+            ), f"R1 Y position not preserved: expected {new_r1_pos.y}, got {r1_after.position.y}"
 
             # Verify value was updated
-            assert r1_after.value == "15k", (
-                f"R1 value not updated: expected '15k', got '{r1_after.value}'"
-            )
+            assert (
+                r1_after.value == "15k"
+            ), f"R1 value not updated: expected '15k', got '{r1_after.value}'"
 
             # Verify labels are still present (count should be preserved)
-            labels_after = getattr(sch_after, 'labels', [])
-            assert len(labels_after) == initial_label_count, (
-                f"Label count changed: expected {initial_label_count}, got {len(labels_after)}"
-            )
+            labels_after = getattr(sch_after, "labels", [])
+            assert (
+                len(labels_after) == initial_label_count
+            ), f"Label count changed: expected {initial_label_count}, got {len(labels_after)}"
 
     def _find_schematic(self, output_path, tmpdir):
         """Helper to find schematic file."""

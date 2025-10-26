@@ -52,11 +52,12 @@ class LLMPlacementManager:
         return placements
 
 
+import kicad_sch_api as ksa
+from kicad_sch_api.core.types import Point
+
 # Use optimized symbol cache from core.component for better performance
 from circuit_synth.core.component import SymbolLibCache
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
-import kicad_sch_api as ksa
-from kicad_sch_api.core.types import Point
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
 from .symbol_geometry import SymbolBoundingBoxCalculator
@@ -390,14 +391,20 @@ class SchematicGenerator:
         logger.debug(f"🔍 _check_existing_project:")
         logger.debug(f"   project_dir: {self.project_dir}")
         logger.debug(f"   project_name: {self.project_name}")
-        logger.debug(f"   Checking .kicad_pro: {kicad_pro_file} -> exists={kicad_pro_file.exists()}")
-        logger.debug(f"   Checking .kicad_sch: {kicad_sch_file} -> exists={kicad_sch_file.exists()}")
+        logger.debug(
+            f"   Checking .kicad_pro: {kicad_pro_file} -> exists={kicad_pro_file.exists()}"
+        )
+        logger.debug(
+            f"   Checking .kicad_sch: {kicad_sch_file} -> exists={kicad_sch_file.exists()}"
+        )
 
         # Both files must exist for a valid project
         project_exists = kicad_pro_file.exists()
         schematic_exists = kicad_sch_file.exists() or root_sch_file.exists()
 
-        logger.debug(f"   Result: project_exists={project_exists}, schematic_exists={schematic_exists}")
+        logger.debug(
+            f"   Result: project_exists={project_exists}, schematic_exists={schematic_exists}"
+        )
 
         if project_exists and schematic_exists:
             return True
@@ -431,6 +438,7 @@ class SchematicGenerator:
                 HierarchicalSynchronizer,
             )
             from circuit_synth.kicad.schematic.sync_adapter import SyncAdapter
+
             logger.debug("   Synchronizers imported successfully")
         except Exception as e:
             logger.error(f"   Failed to import synchronizers: {e}")
@@ -453,7 +461,9 @@ class SchematicGenerator:
         # Check if this is a hierarchical project
         # Note: sub_dict always includes the main circuit, so check if there's more than one
         has_subcircuits = len(sub_dict) > 1
-        logger.debug(f"Project has {len(sub_dict)} circuits: {'hierarchical' if has_subcircuits else 'flat'}")
+        logger.debug(
+            f"Project has {len(sub_dict)} circuits: {'hierarchical' if has_subcircuits else 'flat'}"
+        )
 
         if has_subcircuits:
             # Use hierarchical synchronizer for projects with subcircuits
@@ -563,26 +573,28 @@ class SchematicGenerator:
             project_name = sch_file.stem
 
             # Read the schematic file
-            content = sch_file.read_text(encoding='utf-8')
+            content = sch_file.read_text(encoding="utf-8")
 
             # Fix empty (project blocks by adding the project name
             # Pattern: (project\n\t\t\t(path -> (project "ProjectName"\n\t\t\t(path
-            pattern = r'(\(project)\n(\s+)\(path'
+            pattern = r"(\(project)\n(\s+)\(path"
             replacement = rf'\1 "{project_name}"\n\2(path'
 
             fixed_content = re.sub(pattern, replacement, content)
 
             # Count how many fixes were made in this file
-            fixes = content.count('(project\n')
+            fixes = content.count("(project\n")
 
             if fixes > 0:
                 logger.info(f"  Fixed {fixes} empty project names in {sch_file.name}")
                 # Write the fixed content back
-                sch_file.write_text(fixed_content, encoding='utf-8')
+                sch_file.write_text(fixed_content, encoding="utf-8")
                 total_fixes += fixes
 
         if total_fixes > 0:
-            logger.info(f"✅ Fixed {total_fixes} total empty project names across {len(schematic_files)} files")
+            logger.info(
+                f"✅ Fixed {total_fixes} total empty project names across {len(schematic_files)} files"
+            )
         else:
             logger.debug("No empty project names found")
 
@@ -605,7 +617,9 @@ class SchematicGenerator:
             logger.info(f"Loading schematic: {sch_path}")
             schematic = ksa.load_schematic(str(sch_path))
 
-            logger.info(f"Adding bounding boxes for {len(schematic.components)} components")
+            logger.info(
+                f"Adding bounding boxes for {len(schematic.components)} components"
+            )
 
             # Use kicad-sch-api's built-in method to draw all component bounding boxes
             schematic.draw_component_bounding_boxes()
@@ -639,7 +653,9 @@ class SchematicGenerator:
             schematic_placement: Schematic placement algorithm - "sequential" or "connection_aware" (default: "sequential")
             **pcb_kwargs: Additional keyword arguments passed to PCB generation
         """
-        logger.debug(f"🚀 generate_project() called: force_regenerate={force_regenerate}")
+        logger.debug(
+            f"🚀 generate_project() called: force_regenerate={force_regenerate}"
+        )
 
         # Check if project already exists
         project_exists = self._check_existing_project()
@@ -661,18 +677,17 @@ class SchematicGenerator:
                 print(f"🔥 Exception type: {type(e).__name__}")
                 print(f"🔥 Exception message: {e}")
                 import traceback
+
                 print(f"🔥 Traceback:")
                 traceback.print_exc()
-                print("="*80 + "\n")
+                print("=" * 80 + "\n")
                 logger.error(f"❌ Update failed: {e}")
                 logger.error("   Falling back to regeneration...")
                 # Fall through to regeneration
 
         elif project_exists and force_regenerate:
             # User explicitly wants to regenerate
-            logger.info(
-                f"Force regenerating project at: {self.project_dir}"
-            )
+            logger.info(f"Force regenerating project at: {self.project_dir}")
             logger.info(
                 "   This will LOSE all manual work (component positions, wires, etc.)"
             )
@@ -1317,23 +1332,37 @@ class SchematicGenerator:
 
                         pin_net_map = {}
                         # Handle both Component (has _pins) and SchematicSymbol (has pins list)
-                        if hasattr(comp, '_pins'):
-                            logger.debug(f"🔍 Using _pins dict, count: {len(comp._pins)}")
+                        if hasattr(comp, "_pins"):
+                            logger.debug(
+                                f"🔍 Using _pins dict, count: {len(comp._pins)}"
+                            )
                             for pin_num, pin in comp._pins.items():
-                                logger.debug(f"🔍   Pin {pin_num}: number={pin.number}, net={pin.net}, net.name={pin.net.name if pin.net else 'None'}")
+                                logger.debug(
+                                    f"🔍   Pin {pin_num}: number={pin.number}, net={pin.net}, net.name={pin.net.name if pin.net else 'None'}"
+                                )
                                 if pin.net:
                                     pin_net_map[pin.number] = pin.net.name
-                                    logger.debug(f"🔍     ✅ Mapped {pin.number} -> {pin.net.name}")
-                        elif hasattr(comp, 'pins'):
+                                    logger.debug(
+                                        f"🔍     ✅ Mapped {pin.number} -> {pin.net.name}"
+                                    )
+                        elif hasattr(comp, "pins"):
                             # SchematicSymbol from kicad-sch-api: pins don't have net information
                             # Net connections are stored separately in the schematic's nets list
                             # For bounding box calculation, we can use an empty pin_net_map
-                            logger.debug(f"🔍 Component has pins list (SchematicSymbol) - skipping net mapping")
-                            logger.debug(f"   (Net info not available on SchematicPin objects from kicad-sch-api)")
+                            logger.debug(
+                                f"🔍 Component has pins list (SchematicSymbol) - skipping net mapping"
+                            )
+                            logger.debug(
+                                f"   (Net info not available on SchematicPin objects from kicad-sch-api)"
+                            )
                             # Leave pin_net_map empty - bounding box will be calculated without net labels
 
-                        logger.debug(f"🔍 FINAL pin_net_map for {comp.reference}: {pin_net_map}")
-                        logger.debug(f"🔍 Calling get_symbol_dimensions with pin_net_map")
+                        logger.debug(
+                            f"🔍 FINAL pin_net_map for {comp.reference}: {pin_net_map}"
+                        )
+                        logger.debug(
+                            f"🔍 Calling get_symbol_dimensions with pin_net_map"
+                        )
 
                         comp_width, comp_height = (
                             SymbolBoundingBoxCalculator.get_symbol_dimensions(

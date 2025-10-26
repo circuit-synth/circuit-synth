@@ -21,6 +21,7 @@ from kicad_sch_api.core.types import (
     SchematicSymbol,
     Wire,
 )
+
 from .connection_tracer import ConnectionTracer, NetTrace
 
 logger = logging.getLogger(__name__)

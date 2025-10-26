@@ -164,7 +164,9 @@ class DigiKeyAPIClient:
             return self.access_token
 
         except requests.exceptions.Timeout:
-            error_msg = f"DigiKey API timeout after 10 seconds - check your internet connection"
+            error_msg = (
+                f"DigiKey API timeout after 10 seconds - check your internet connection"
+            )
             logger.error(error_msg)
             raise TimeoutError(error_msg)
         except requests.exceptions.RequestException as e:

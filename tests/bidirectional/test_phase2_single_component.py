@@ -43,7 +43,7 @@ class TestPhase2SingleComponent:
                 symbol="Device:R",
                 ref="R1",
                 value="10k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
+                footprint="Resistor_SMD:R_0603_1608Metric",
             )
 
             # Connect to ground (minimal connection)
@@ -91,10 +91,13 @@ class TestPhase2SingleComponent:
 
             # Verify R1 is in components
             components = json_data["components"]
-            r1_found = any(
-                comp.get("ref") == "R1" or key == "R1" for key, comp in components.items()
-            ) if isinstance(components, dict) else any(
-                comp.get("ref") == "R1" for comp in components
+            r1_found = (
+                any(
+                    comp.get("ref") == "R1" or key == "R1"
+                    for key, comp in components.items()
+                )
+                if isinstance(components, dict)
+                else any(comp.get("ref") == "R1" for comp in components)
             )
             assert r1_found, "R1 resistor not found in JSON components"
 
@@ -301,17 +304,17 @@ class TestPhase2SingleComponent:
             assert "R1" in generated_code, "Component reference R1 not preserved"
 
             # Verify value preserved (10k)
-            assert "10k" in generated_code or "10K" in generated_code, (
-                "Component value not preserved"
-            )
+            assert (
+                "10k" in generated_code or "10K" in generated_code
+            ), "Component value not preserved"
 
             # Verify circuit structure preserved
-            assert (
-                "def " in generated_code
-            ), "Circuit function not in generated code"
+            assert "def " in generated_code, "Circuit function not in generated code"
 
             print(f"✅ Test 2.4 PASS: Verify component parameters preserved")
-            print(f"   - Original JSON components: {len(original_json.get('components', {}))}")
+            print(
+                f"   - Original JSON components: {len(original_json.get('components', {}))}"
+            )
             print(f"   - Component reference preserved: ✓")
             print(f"   - Component value preserved: ✓")
             print(f"   - Circuit structure preserved: ✓")

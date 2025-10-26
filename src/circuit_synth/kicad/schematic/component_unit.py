@@ -9,7 +9,7 @@ are independent of placement location and all elements move together atomically.
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
-from kicad_sch_api.core.types import SchematicSymbol, Label, Rectangle
+from kicad_sch_api.core.types import Label, Rectangle, SchematicSymbol
 
 
 @dataclass
@@ -37,7 +37,9 @@ class ComponentUnit:
     bbox_max_y: float  # Bottom edge
 
     # Visual element
-    bbox_graphic: Optional[Rectangle] = None  # The drawn rectangle (if draw_bounding_boxes=True)
+    bbox_graphic: Optional[Rectangle] = (
+        None  # The drawn rectangle (if draw_bounding_boxes=True)
+    )
 
     @property
     def width(self) -> float:

@@ -45,13 +45,13 @@ class TestPhase3MultipleComponents:
                 symbol="Device:R",
                 ref="R1",
                 value="10k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
+                footprint="Resistor_SMD:R_0603_1608Metric",
             )
             r2 = Component(
                 symbol="Device:R",
                 ref="R2",
                 value="10k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
+                footprint="Resistor_SMD:R_0603_1608Metric",
             )
 
             # Create connections
@@ -102,9 +102,7 @@ class TestPhase3MultipleComponents:
             output_dir.mkdir()
 
             syncer = KiCadToPythonSyncer(
-                kicad_project_or_json=str(
-                    project_dir / "voltage_divider.kicad_pro"
-                ),
+                kicad_project_or_json=str(project_dir / "voltage_divider.kicad_pro"),
                 python_file=str(output_dir),
                 preview_only=False,
                 create_backup=False,
@@ -151,19 +149,19 @@ class TestPhase3MultipleComponents:
                     symbol="Device:R",
                     ref="R1",
                     value="1k",
-                    footprint="Resistor_SMD:R_0603_1608Metric"
+                    footprint="Resistor_SMD:R_0603_1608Metric",
                 )
                 c1 = Component(
                     symbol="Device:C",
                     ref="C1",
                     value="100n",
-                    footprint="Capacitor_SMD:C_0603_1608Metric"
+                    footprint="Capacitor_SMD:C_0603_1608Metric",
                 )
                 l1 = Component(
                     symbol="Device:L",
                     ref="L1",
                     value="10u",
-                    footprint="Inductor_SMD:L_0603_1608Metric"
+                    footprint="Inductor_SMD:L_0603_1608Metric",
                 )
 
                 # Connect components
@@ -259,9 +257,7 @@ class TestPhase3MultipleComponents:
             output_dir.mkdir()
 
             syncer = KiCadToPythonSyncer(
-                kicad_project_or_json=str(
-                    project_dir / "voltage_divider.kicad_pro"
-                ),
+                kicad_project_or_json=str(project_dir / "voltage_divider.kicad_pro"),
                 python_file=str(output_dir),
                 preview_only=False,
                 create_backup=False,
@@ -276,9 +272,9 @@ class TestPhase3MultipleComponents:
                 generated_code = f.read()
 
             # Both resistors should be present
-            assert "R1" in generated_code and "R2" in generated_code, (
-                "Interconnected components not preserved"
-            )
+            assert (
+                "R1" in generated_code and "R2" in generated_code
+            ), "Interconnected components not preserved"
 
             print(f"✅ Test 3.3 PASS: Component interconnections preserved")
             print(f"   - Original net count: {net_count_1}")
@@ -337,9 +333,9 @@ class TestPhase3MultipleComponents:
                 else len(components_2) if components_2 else 0
             )
 
-            assert comp_count_1 == comp_count_2, (
-                f"Component count changed: {comp_count_1} → {comp_count_2}"
-            )
+            assert (
+                comp_count_1 == comp_count_2
+            ), f"Component count changed: {comp_count_1} → {comp_count_2}"
 
             # Content should be identical or nearly identical
             # (allowing for minor timestamp differences)

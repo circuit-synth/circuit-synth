@@ -26,7 +26,7 @@ def add_symbol_instance(
     """
     # Create the instance
     unit_value = 1
-    if hasattr(symbol, 'unit') and symbol.unit:
+    if hasattr(symbol, "unit") and symbol.unit:
         unit_value = symbol.unit
 
     instance = SymbolInstance(

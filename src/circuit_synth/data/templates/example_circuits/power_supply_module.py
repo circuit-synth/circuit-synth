@@ -9,6 +9,7 @@ This example demonstrates:
 This circuit provides both 5V and 3.3V regulated outputs from a higher input voltage.
 Useful for projects that need both voltage rails (e.g., 5V for peripherals, 3.3V for MCU).
 """
+
 from circuit_synth import Component, Net, circuit
 
 
@@ -30,14 +31,14 @@ def power_supply_module():
     vreg_5v = Component(
         symbol="Regulator_Linear:AMS1117-5.0",
         ref="U",
-        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2",
     )
 
     # 3.3V voltage regulator
     vreg_3v3 = Component(
         symbol="Regulator_Linear:AMS1117-3.3",
         ref="U",
-        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2",
     )
 
     # Input decoupling capacitors
@@ -45,14 +46,14 @@ def power_supply_module():
         symbol="Device:C",
         ref="C",
         value="10uF",
-        footprint="Capacitor_SMD:C_0805_2012Metric"
+        footprint="Capacitor_SMD:C_0805_2012Metric",
     )
 
     cap_in_3v3 = Component(
         symbol="Device:C",
         ref="C",
         value="10uF",
-        footprint="Capacitor_SMD:C_0805_2012Metric"
+        footprint="Capacitor_SMD:C_0805_2012Metric",
     )
 
     # Output decoupling capacitors
@@ -60,14 +61,14 @@ def power_supply_module():
         symbol="Device:C",
         ref="C",
         value="22uF",
-        footprint="Capacitor_SMD:C_0805_2012Metric"
+        footprint="Capacitor_SMD:C_0805_2012Metric",
     )
 
     cap_out_3v3 = Component(
         symbol="Device:C",
         ref="C",
         value="22uF",
-        footprint="Capacitor_SMD:C_0805_2012Metric"
+        footprint="Capacitor_SMD:C_0805_2012Metric",
     )
 
     # Power indicator LEDs
@@ -75,14 +76,14 @@ def power_supply_module():
         symbol="Device:LED",
         ref="D",
         value="Green",
-        footprint="LED_SMD:LED_0603_1608Metric"
+        footprint="LED_SMD:LED_0603_1608Metric",
     )
 
     led_3v3 = Component(
         symbol="Device:LED",
         ref="D",
         value="Green",
-        footprint="LED_SMD:LED_0603_1608Metric"
+        footprint="LED_SMD:LED_0603_1608Metric",
     )
 
     # Current limiting resistors for LEDs
@@ -90,21 +91,21 @@ def power_supply_module():
         symbol="Device:R",
         ref="R",
         value="330",
-        footprint="Resistor_SMD:R_0603_1608Metric"
+        footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
     r_led_3v3 = Component(
         symbol="Device:R",
         ref="R",
         value="330",
-        footprint="Resistor_SMD:R_0603_1608Metric"
+        footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
     # Define power nets
-    vin = Net('VIN')           # Input voltage (6.5V-12V)
-    vout_5v = Net('VOUT_5V')   # 5V regulated output
-    vout_3v3 = Net('VOUT_3V3') # 3.3V regulated output
-    gnd = Net('GND')           # Ground
+    vin = Net("VIN")  # Input voltage (6.5V-12V)
+    vout_5v = Net("VOUT_5V")  # 5V regulated output
+    vout_3v3 = Net("VOUT_3V3")  # 3.3V regulated output
+    gnd = Net("GND")  # Ground
 
     # Connect 5V regulator
     vreg_5v["VIN"] += vin
@@ -132,25 +133,25 @@ def power_supply_module():
 
     # Connect 5V power indicator LED
     r_led_5v[1] += vout_5v
-    r_led_5v[2] += Net('LED_5V_ANODE')
-    led_5v["A"] += Net('LED_5V_ANODE')
+    r_led_5v[2] += Net("LED_5V_ANODE")
+    led_5v["A"] += Net("LED_5V_ANODE")
     led_5v["K"] += gnd
 
     # Connect 3.3V power indicator LED
     r_led_3v3[1] += vout_3v3
-    r_led_3v3[2] += Net('LED_3V3_ANODE')
-    led_3v3["A"] += Net('LED_3V3_ANODE')
+    r_led_3v3[2] += Net("LED_3V3_ANODE")
+    led_3v3["A"] += Net("LED_3V3_ANODE")
     led_3v3["K"] += gnd
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Generate KiCad project
     circuit_obj = power_supply_module()
 
     circuit_obj.generate_kicad_project(
         project_name="power_supply_module",
         placement_algorithm="hierarchical",
-        generate_pcb=True
+        generate_pcb=True,
     )
 
     print("✅ Dual-rail power supply circuit generated!")

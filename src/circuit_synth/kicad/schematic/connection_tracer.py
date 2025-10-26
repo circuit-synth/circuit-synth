@@ -184,30 +184,30 @@ class ConnectionTracer:
     def _build_connection_graph(self):
         """Build the connection graph from schematic elements."""
         # Add wire endpoints and intermediate points as nodes
-        if hasattr(self.schematic, 'wires') and self.schematic.wires:
+        if hasattr(self.schematic, "wires") and self.schematic.wires:
             for wire in self.schematic.wires:
                 prev_node = None
                 for i, point in enumerate(wire.points):
                     node = self._get_or_create_node(point, "wire_point")
-                    if hasattr(wire, 'uuid'):
+                    if hasattr(wire, "uuid"):
                         node.connected_elements.add(wire.uuid)
 
-                    if prev_node and hasattr(wire, 'uuid'):
+                    if prev_node and hasattr(wire, "uuid"):
                         self.graph.add_edge(prev_node, node, wire.uuid)
                     prev_node = node
 
         # Add junctions as nodes
-        if hasattr(self.schematic, 'junctions') and self.schematic.junctions:
+        if hasattr(self.schematic, "junctions") and self.schematic.junctions:
             for junction in self.schematic.junctions:
                 node = self._get_or_create_node(junction.position, "junction")
-                if hasattr(junction, 'uuid'):
+                if hasattr(junction, "uuid"):
                     node.connected_elements.add(junction.uuid)
 
         # Add labels as nodes
-        if hasattr(self.schematic, 'labels') and self.schematic.labels:
+        if hasattr(self.schematic, "labels") and self.schematic.labels:
             for label in self.schematic.labels:
                 node = self._get_or_create_node(label.position, "label")
-                if hasattr(label, 'uuid'):
+                if hasattr(label, "uuid"):
                     node.connected_elements.add(label.uuid)
                 node.net_name = label.text
 
@@ -216,7 +216,7 @@ class ConnectionTracer:
             # For now, just add the component position as a pin
             # Real implementation would get actual pin positions
             node = self._get_or_create_node(component.position, "pin")
-            if hasattr(component, 'uuid'):
+            if hasattr(component, "uuid"):
                 node.connected_elements.add(component.uuid)
 
     def _get_or_create_node(self, position: Point, node_type: str) -> ConnectionNode:
@@ -248,7 +248,7 @@ class ConnectionTracer:
         if isinstance(start_point, str):
             # Net name - find a label with this name
             start_node = None
-            if hasattr(self.schematic, 'labels') and self.schematic.labels:
+            if hasattr(self.schematic, "labels") and self.schematic.labels:
                 for label in self.schematic.labels:
                     if label.text == start_point:
                         start_node = self.graph.get_node_at(label.position)
@@ -418,7 +418,7 @@ class ConnectionTracer:
         floating_nets = []
 
         # Check each label
-        if hasattr(self.schematic, 'labels') and self.schematic.labels:
+        if hasattr(self.schematic, "labels") and self.schematic.labels:
             for label in self.schematic.labels:
                 trace = self.trace_net(label.text)
 
@@ -439,7 +439,7 @@ class ConnectionTracer:
         net_nodes = {}  # net_name -> set of nodes
 
         # Build net to nodes mapping
-        if hasattr(self.schematic, 'labels') and self.schematic.labels:
+        if hasattr(self.schematic, "labels") and self.schematic.labels:
             for label in self.schematic.labels:
                 trace = self.trace_net(label.text)
                 net_nodes[label.text] = set(trace.nodes)
@@ -482,7 +482,7 @@ class ConnectionTracer:
 
         # Find all unique nets
         net_names = set()
-        if hasattr(self.schematic, 'labels') and self.schematic.labels:
+        if hasattr(self.schematic, "labels") and self.schematic.labels:
             for label in self.schematic.labels:
                 net_names.add(label.text)
 

@@ -27,6 +27,9 @@ from kicad_sch_api.core.types import (
     Wire,
 )
 
+# Import symbol cache (circuit-synth specific)
+from .symbol_cache import SymbolDefinition, SymbolLibraryCache, get_symbol_cache
+
 # Import circuit-synth specific extensions
 from .types_extensions import (
     BoundingBox,
@@ -40,9 +43,6 @@ from .types_extensions import (
     WireRoutingStyle,
     WireStyle,
 )
-
-# Import symbol cache (circuit-synth specific)
-from .symbol_cache import SymbolDefinition, SymbolLibraryCache, get_symbol_cache
 
 __all__ = [
     # Enums

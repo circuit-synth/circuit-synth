@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import kicad_sch_api as ksa
+
 from .synchronizer import APISynchronizer
 
 logger = logging.getLogger(__name__)

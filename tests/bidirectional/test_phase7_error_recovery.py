@@ -139,7 +139,11 @@ class TestPhase7ErrorRecovery:
 
             # Verify empty structure
             components = json_data.get("components", {})
-            comp_count = len(components) if isinstance(components, dict) else len(components or [])
+            comp_count = (
+                len(components)
+                if isinstance(components, dict)
+                else len(components or [])
+            )
             assert comp_count == 0, "Empty circuit should have 0 components"
 
             # Import back to Python
@@ -243,11 +247,11 @@ class TestPhase7ErrorRecovery:
                     with open(main_py) as f:
                         content = f.read()
 
-                    handled = sum(
-                        1 for ref in unusual_values if ref in content
-                    )
+                    handled = sum(1 for ref in unusual_values if ref in content)
                     print(f"✅ Test 7.3 PASS: Unusual values handled")
-                    print(f"   - Components with unusual values: {handled}/{len(unusual_values)}")
+                    print(
+                        f"   - Components with unusual values: {handled}/{len(unusual_values)}"
+                    )
                     for ref, value in unusual_values.items():
                         if ref in content:
                             print(f"     - {ref} ({value}): ✓")

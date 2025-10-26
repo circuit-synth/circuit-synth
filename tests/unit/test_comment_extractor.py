@@ -304,7 +304,9 @@ def main():
         docstring_count = result.count('"""Generated circuit from KiCad"""')
 
         # Should only appear ONCE (not duplicated)
-        assert docstring_count == 1, f"Expected 1 occurrence of function docstring, found {docstring_count}"
+        assert (
+            docstring_count == 1
+        ), f"Expected 1 occurrence of function docstring, found {docstring_count}"
 
         # User comments should still be preserved
         assert "USER COMMENT" in result
@@ -351,18 +353,23 @@ def main():
 
         # Should preserve blank lines between comment groups
         # The blank line after "look at these!""" should be preserved
-        assert "look at these!\"\"\"\n\n    # another one!" in result or \
-               "look at these!\"\"\"\n    \n    # another one!" in result, \
-               "Blank line after inline docstring should be preserved"
+        assert (
+            'look at these!"""\n\n    # another one!' in result
+            or 'look at these!"""\n    \n    # another one!' in result
+        ), "Blank line after inline docstring should be preserved"
 
         # The blank line between the two "another one!" groups should be preserved
-        lines = result.split('\n')
+        lines = result.split("\n")
 
         # Find the lines with "another one!" comments
-        another_one_indices = [i for i, line in enumerate(lines) if "another one!" in line]
+        another_one_indices = [
+            i for i, line in enumerate(lines) if "another one!" in line
+        ]
 
         # Should have 6 occurrences
-        assert len(another_one_indices) == 6, f"Expected 6 'another one!' comments, found {len(another_one_indices)}"
+        assert (
+            len(another_one_indices) == 6
+        ), f"Expected 6 'another one!' comments, found {len(another_one_indices)}"
 
         # There should be a blank line in the middle (between index 2 and 3 of the another_one group)
         # Check if there's a gap in the indices
@@ -405,10 +412,12 @@ def main():
 
 
 '''
-        result = extractor.merge_preserving_user_content(file_path, generated_code, "main")
+        result = extractor.merge_preserving_user_content(
+            file_path, generated_code, "main"
+        )
 
         # Find where function ends (before the generated circuit comment)
-        lines = result.split('\n')
+        lines = result.split("\n")
 
         # Find the last user content line (should be "# suhp?")
         suhp_index = None
@@ -424,12 +433,14 @@ def main():
         blank_count = 0
         for i in range(suhp_index + 1, len(lines)):
             line = lines[i]
-            if line.strip() == '':
+            if line.strip() == "":
                 blank_count += 1
             else:
                 break  # Hit non-blank line
 
-        assert blank_count <= 2, f"Should not have more than 2 trailing blank lines, found {blank_count}"
+        assert (
+            blank_count <= 2
+        ), f"Should not have more than 2 trailing blank lines, found {blank_count}"
 
     def test_preserves_all_user_content_comprehensive(self, extractor, tmp_path):
         """Test that ALL user content is preserved across the entire file
@@ -499,7 +510,9 @@ if __name__ == '__main__':
     circuit = main()
 '''
 
-        result = extractor.merge_preserving_user_content(file_path, generated_code, "main")
+        result = extractor.merge_preserving_user_content(
+            file_path, generated_code, "main"
+        )
 
         # Verify ALL user content is preserved
         critical_content = [
@@ -544,12 +557,16 @@ if __name__ == '__main__':
         file_path.write_text(code)
 
         # Test the after-function content extraction
-        after_function_content = extractor.extract_after_function_content(file_path, "main")
+        after_function_content = extractor.extract_after_function_content(
+            file_path, "main"
+        )
 
         # Should find the docstring between function and if __name__
         assert len(after_function_content) > 0, "Should extract content after function"
-        after_function_str = '\n'.join(after_function_content)
-        assert "one time!" in after_function_str, "Should preserve 'one time!' docstring"
+        after_function_str = "\n".join(after_function_content)
+        assert (
+            "one time!" in after_function_str
+        ), "Should preserve 'one time!' docstring"
 
         # Test full round-trip with extract_and_reinsert
         generated_code = '''@circuit
@@ -565,10 +582,12 @@ if __name__ == '__main__':
 
         # Verify the after-function content is preserved in the result
         assert "one time!" in result, "After-function content should be preserved"
-        assert "# Inside function comment" in result, "Inside function comment should be preserved"
+        assert (
+            "# Inside function comment" in result
+        ), "Inside function comment should be preserved"
 
         # Verify it's inserted BEFORE "# Generate the circuit"
-        lines = result.split('\n')
+        lines = result.split("\n")
         one_time_idx = None
         generate_idx = None
         for i, line in enumerate(lines):
@@ -578,5 +597,9 @@ if __name__ == '__main__':
                 generate_idx = i
 
         assert one_time_idx is not None, "Should find 'one time!' in result"
-        assert generate_idx is not None, "Should find '# Generate the circuit' in result"
-        assert one_time_idx < generate_idx, "After-function content should appear BEFORE boilerplate"
+        assert (
+            generate_idx is not None
+        ), "Should find '# Generate the circuit' in result"
+        assert (
+            one_time_idx < generate_idx
+        ), "After-function content should appear BEFORE boilerplate"

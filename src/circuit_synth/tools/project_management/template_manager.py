@@ -4,11 +4,11 @@ Template Manager for circuit-synth project creation
 Handles loading and managing circuit templates for base circuits and examples.
 """
 
+import shutil
 from pathlib import Path
 from typing import Dict, Optional
-import shutil
 
-from .project_config import Circuit, ProjectConfig, CircuitTemplate
+from .project_config import Circuit, CircuitTemplate, ProjectConfig
 
 
 class TemplateManager:
@@ -46,10 +46,7 @@ class TemplateManager:
         return template_file.read_text()
 
     def copy_circuit_to_project(
-        self,
-        circuit: Circuit,
-        project_path: Path,
-        is_first: bool = False
+        self, circuit: Circuit, project_path: Path, is_first: bool = False
     ) -> None:
         """Copy circuit template to project directory
 
@@ -260,7 +257,9 @@ This project includes the following circuit templates:
 """
             for idx, circuit in enumerate(config.circuits, 1):
                 filename = "main.py" if idx == 1 else f"{circuit.value}.py"
-                claude_md += f"{idx}. **{circuit.display_name}** ({circuit.difficulty})\n"
+                claude_md += (
+                    f"{idx}. **{circuit.display_name}** ({circuit.difficulty})\n"
+                )
                 claude_md += f"   - {circuit.description}\n"
                 claude_md += f"   - File: `circuit-synth/{filename}`\n\n"
 

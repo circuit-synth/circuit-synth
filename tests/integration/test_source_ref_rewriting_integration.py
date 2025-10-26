@@ -20,7 +20,8 @@ class TestEndToEnd:
         """Test complete roundtrip: Python → KiCad → edit → Python."""
         # Create test circuit file
         circuit_file = tmp_path / "main.py"
-        source_code = dedent('''
+        source_code = dedent(
+            '''
             from circuit_synth import *
 
             @circuit(name="test_circuit")
@@ -50,7 +51,8 @@ class TestEndToEnd:
                     force_regenerate=False,  # Enable source rewriting
                     update_source_refs=True  # Explicitly enable
                 )
-        ''').strip()
+        '''
+        ).strip()
 
         circuit_file.write_text(source_code)
 
@@ -68,7 +70,8 @@ class TestEndToEnd:
     def test_force_regenerate_disabled(self, tmp_path):
         """Test that force_regenerate=True disables source rewriting."""
         circuit_file = tmp_path / "main.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit(name="test_circuit")
@@ -82,7 +85,8 @@ class TestEndToEnd:
                     project_name="test",
                     force_regenerate=True  # Should NOT update source
                 )
-        ''').strip()
+        """
+        ).strip()
 
         circuit_file.write_text(source_code)
         original = circuit_file.read_text()
@@ -108,7 +112,8 @@ class TestRealWorldScenarios:
     def test_esp32_circuit(self, tmp_path):
         """Test with ESP32-style circuit (many components)."""
         circuit_file = tmp_path / "esp32.py"
-        source_code = dedent('''
+        source_code = dedent(
+            '''
             from circuit_synth import *
 
             @circuit(name="esp32_circuit")
@@ -134,7 +139,8 @@ class TestRealWorldScenarios:
             if __name__ == "__main__":
                 circuit = esp32_simple()
                 circuit.generate_kicad_project("esp32", force_regenerate=False)
-        ''').strip()
+        '''
+        ).strip()
 
         circuit_file.write_text(source_code)
 
@@ -169,14 +175,18 @@ class TestAPIIntegration:
 
         try:
             # Add component with unnumbered ref (this adds it to current circuit)
-            r = Component(symbol="Device:R", ref="R", value="10k",
-                         footprint="Resistor_SMD:R_0603_1608Metric")
+            r = Component(
+                symbol="Device:R",
+                ref="R",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric",
+            )
 
             # Finalize (assigns R1)
             circuit.finalize_references()
 
             # Check that mapping was captured
-            assert hasattr(circuit, '_ref_mapping')
+            assert hasattr(circuit, "_ref_mapping")
             assert circuit._ref_mapping == {"R": ["R1"]}
         finally:
             set_current_circuit(None)
@@ -196,14 +206,16 @@ class TestBackupAndRecovery:
     def test_backup_file_created(self, tmp_path):
         """Test that .py.backup file is created."""
         circuit_file = tmp_path / "main.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
             def main():
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         circuit_file.write_text(source_code)
 

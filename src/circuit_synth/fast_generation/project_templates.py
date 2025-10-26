@@ -6,14 +6,15 @@ with separate subcircuit files and a main orchestrator.
 """
 
 import os
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
-from dataclasses import dataclass
 
 
 @dataclass
 class SubcircuitSpec:
     """Specification for a subcircuit module"""
+
     name: str
     filename: str  # e.g., "power_supply.py"
     function_name: str  # e.g., "power_supply"
@@ -26,13 +27,13 @@ class SubcircuitSpec:
 
 class ProjectTemplateGenerator:
     """Generate hierarchical project structures for fast generation"""
-    
+
     def __init__(self):
         self.templates = self._define_templates()
-    
+
     def _define_templates(self) -> Dict[str, Dict]:
         """Define project templates with hierarchical structure"""
-        
+
         templates = {
             "esp32_complete_board": {
                 "name": "ESP32_Complete_Development_Board",
@@ -40,23 +41,27 @@ class ProjectTemplateGenerator:
                 "subcircuits": [
                     SubcircuitSpec(
                         name="USB Power",
-                        filename="usb_power.py", 
+                        filename="usb_power.py",
                         function_name="usb_power",
                         description="USB-C power input with CC resistors and protection",
                         nets_in=[],
                         nets_out=["VBUS", "GND", "USB_DP", "USB_DM"],
-                        components=["USB-C connector", "CC resistors", "Protection fuse"],
-                        code_template=self._get_usb_power_template()
+                        components=[
+                            "USB-C connector",
+                            "CC resistors",
+                            "Protection fuse",
+                        ],
+                        code_template=self._get_usb_power_template(),
                     ),
                     SubcircuitSpec(
                         name="Power Supply",
                         filename="power_supply.py",
-                        function_name="power_supply", 
+                        function_name="power_supply",
                         description="5V to 3.3V power regulation",
                         nets_in=["VBUS", "GND"],
                         nets_out=["VCC_3V3", "GND"],
                         components=["AMS1117-3.3", "Input/Output capacitors"],
-                        code_template=self._get_power_supply_template()
+                        code_template=self._get_power_supply_template(),
                     ),
                     SubcircuitSpec(
                         name="ESP32 MCU",
@@ -64,9 +69,19 @@ class ProjectTemplateGenerator:
                         function_name="esp32_mcu",
                         description="ESP32-S3 microcontroller with support circuits",
                         nets_in=["VCC_3V3", "GND", "USB_DP", "USB_DM"],
-                        nets_out=["VCC_3V3", "GND", "DEBUG_TX", "DEBUG_RX", "LED_CONTROL"],
-                        components=["ESP32-S3-WROOM-1", "Decoupling caps", "EN pull-up"],
-                        code_template=self._get_esp32_mcu_template()
+                        nets_out=[
+                            "VCC_3V3",
+                            "GND",
+                            "DEBUG_TX",
+                            "DEBUG_RX",
+                            "LED_CONTROL",
+                        ],
+                        components=[
+                            "ESP32-S3-WROOM-1",
+                            "Decoupling caps",
+                            "EN pull-up",
+                        ],
+                        code_template=self._get_esp32_mcu_template(),
                     ),
                     SubcircuitSpec(
                         name="Debug Header",
@@ -76,55 +91,7 @@ class ProjectTemplateGenerator:
                         nets_in=["VCC_3V3", "GND", "DEBUG_TX", "DEBUG_RX"],
                         nets_out=[],
                         components=["Debug connector"],
-                        code_template=self._get_debug_header_template()
-                    ),
-                    SubcircuitSpec(
-                        name="Status LED",
-                        filename="led_status.py",
-                        function_name="led_status", 
-                        description="Status LED with current limiting",
-                        nets_in=["VCC_3V3", "GND", "LED_CONTROL"],
-                        nets_out=[],
-                        components=["LED", "Current limiting resistor"],
-                        code_template=self._get_led_status_template()
-                    )
-                ],
-                "main_template": self._get_esp32_main_template()
-            },
-            
-            "stm32_complete_board": {
-                "name": "STM32_Complete_Development_Board", 
-                "description": "Professional STM32F411 development board with hierarchical design",
-                "subcircuits": [
-                    SubcircuitSpec(
-                        name="Power Supply",
-                        filename="power_supply.py",
-                        function_name="power_supply",
-                        description="Power input and regulation", 
-                        nets_in=[],
-                        nets_out=["VCC_3V3", "GND"],
-                        components=["Power connector", "Decoupling caps"],
-                        code_template=self._get_stm32_power_template()
-                    ),
-                    SubcircuitSpec(
-                        name="STM32 MCU",
-                        filename="stm32_mcu.py", 
-                        function_name="stm32_mcu",
-                        description="STM32F411 microcontroller with crystal and support circuits",
-                        nets_in=["VCC_3V3", "GND"],
-                        nets_out=["VCC_3V3", "GND", "SWDIO", "SWCLK", "LED_CONTROL"],
-                        components=["STM32F411", "HSE crystal", "Load caps", "Reset circuit"],
-                        code_template=self._get_stm32_mcu_template()
-                    ),
-                    SubcircuitSpec(
-                        name="Debug Header",
-                        filename="debug_header.py",
-                        function_name="debug_header", 
-                        description="SWD debug and programming interface",
-                        nets_in=["VCC_3V3", "GND", "SWDIO", "SWCLK"],
-                        nets_out=[],
-                        components=["SWD connector"],
-                        code_template=self._get_swd_debug_template()
+                        code_template=self._get_debug_header_template(),
                     ),
                     SubcircuitSpec(
                         name="Status LED",
@@ -134,36 +101,90 @@ class ProjectTemplateGenerator:
                         nets_in=["VCC_3V3", "GND", "LED_CONTROL"],
                         nets_out=[],
                         components=["LED", "Current limiting resistor"],
-                        code_template=self._get_led_status_template()
-                    )
+                        code_template=self._get_led_status_template(),
+                    ),
                 ],
-                "main_template": self._get_stm32_main_template()
-            }
+                "main_template": self._get_esp32_main_template(),
+            },
+            "stm32_complete_board": {
+                "name": "STM32_Complete_Development_Board",
+                "description": "Professional STM32F411 development board with hierarchical design",
+                "subcircuits": [
+                    SubcircuitSpec(
+                        name="Power Supply",
+                        filename="power_supply.py",
+                        function_name="power_supply",
+                        description="Power input and regulation",
+                        nets_in=[],
+                        nets_out=["VCC_3V3", "GND"],
+                        components=["Power connector", "Decoupling caps"],
+                        code_template=self._get_stm32_power_template(),
+                    ),
+                    SubcircuitSpec(
+                        name="STM32 MCU",
+                        filename="stm32_mcu.py",
+                        function_name="stm32_mcu",
+                        description="STM32F411 microcontroller with crystal and support circuits",
+                        nets_in=["VCC_3V3", "GND"],
+                        nets_out=["VCC_3V3", "GND", "SWDIO", "SWCLK", "LED_CONTROL"],
+                        components=[
+                            "STM32F411",
+                            "HSE crystal",
+                            "Load caps",
+                            "Reset circuit",
+                        ],
+                        code_template=self._get_stm32_mcu_template(),
+                    ),
+                    SubcircuitSpec(
+                        name="Debug Header",
+                        filename="debug_header.py",
+                        function_name="debug_header",
+                        description="SWD debug and programming interface",
+                        nets_in=["VCC_3V3", "GND", "SWDIO", "SWCLK"],
+                        nets_out=[],
+                        components=["SWD connector"],
+                        code_template=self._get_swd_debug_template(),
+                    ),
+                    SubcircuitSpec(
+                        name="Status LED",
+                        filename="led_status.py",
+                        function_name="led_status",
+                        description="Status LED with current limiting",
+                        nets_in=["VCC_3V3", "GND", "LED_CONTROL"],
+                        nets_out=[],
+                        components=["LED", "Current limiting resistor"],
+                        code_template=self._get_led_status_template(),
+                    ),
+                ],
+                "main_template": self._get_stm32_main_template(),
+            },
         }
-        
+
         return templates
-    
-    def generate_project(self, template_name: str, output_dir: Path, project_name: str = None) -> bool:
+
+    def generate_project(
+        self, template_name: str, output_dir: Path, project_name: str = None
+    ) -> bool:
         """Generate a complete hierarchical project"""
         if template_name not in self.templates:
             return False
-        
+
         template = self.templates[template_name]
         actual_project_name = project_name or template_name
         project_dir = output_dir / actual_project_name
         project_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Generate subcircuit files
         for subcircuit in template["subcircuits"]:
             subcircuit_file = project_dir / subcircuit.filename
             subcircuit_file.write_text(subcircuit.code_template)
-        
+
         # Generate main.py
         main_file = project_dir / "main.py"
         main_file.write_text(template["main_template"])
-        
+
         return True
-    
+
     def _get_usb_power_template(self) -> str:
         return '''#!/usr/bin/env python3
 """
@@ -541,7 +562,7 @@ def power_supply(vcc_3v3_out, gnd):
     cap_bypass[1] += vcc_3v3_out
     cap_bypass[2] += gnd
 '''
-    
+
     def _get_stm32_mcu_template(self) -> str:
         return '''#!/usr/bin/env python3
 """
@@ -653,7 +674,7 @@ def stm32_mcu(vcc_3v3, gnd, swdio, swclk, led_control):
     cap_bypass[1] += vcc_3v3
     cap_bypass[2] += gnd
 '''
-    
+
     def _get_swd_debug_template(self) -> str:
         return '''#!/usr/bin/env python3
 """
@@ -680,7 +701,7 @@ def debug_header(vcc_3v3, gnd, swdio, swclk):
     swd_conn[3] += swdio    # SWDIO
     swd_conn[4] += swclk    # SWCLK
 '''
-    
+
     def _get_stm32_main_template(self) -> str:
         return '''#!/usr/bin/env python3
 """

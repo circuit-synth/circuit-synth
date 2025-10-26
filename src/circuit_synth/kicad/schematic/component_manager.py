@@ -8,9 +8,10 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
-from ..core.symbol_cache import get_symbol_cache
-from kicad_sch_api.core.types import Point, Schematic, SchematicSymbol
 from kicad_sch_api.core.components import Component
+from kicad_sch_api.core.types import Point, Schematic, SchematicSymbol
+
+from ..core.symbol_cache import get_symbol_cache
 from .instance_utils import add_symbol_instance
 from .placement import PlacementEngine, PlacementStrategy
 
@@ -138,7 +139,7 @@ class ComponentManager:
         add_symbol_instance(component, project_name, hierarchical_path)
 
         # Add to schematic - need to handle both old and new (kicad-sch-api) schematic types
-        if hasattr(self.schematic, '_components'):
+        if hasattr(self.schematic, "_components"):
             # kicad-sch-api Schematic - add to ComponentCollection properly
             # Create Component wrapper and add to collection
             comp_wrapper = Component(component, self.schematic._components)
@@ -226,7 +227,11 @@ class ComponentManager:
         component.on_board = True
 
         # Ensure component has proper instance information for reference display
-        if not hasattr(component, 'instances') or not component.instances or len(component.instances) == 0:
+        if (
+            not hasattr(component, "instances")
+            or not component.instances
+            or len(component.instances) == 0
+        ):
             from .instance_utils import add_symbol_instance, get_project_hierarchy_path
 
             schematic_path = getattr(self.schematic, "file_path", "")

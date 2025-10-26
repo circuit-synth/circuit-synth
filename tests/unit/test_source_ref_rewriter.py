@@ -22,7 +22,8 @@ class TestBasicRewriting:
         """Test updating a single unnumbered ref to numbered."""
         # Create test source file
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            '''
             from circuit_synth import *
 
             @circuit
@@ -34,7 +35,8 @@ class TestBasicRewriting:
             if __name__ == "__main__":
                 circuit = main()
                 circuit.generate_kicad_project("test")
-        ''').strip()
+        '''
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -51,7 +53,8 @@ class TestBasicRewriting:
     def test_multiple_refs_same_file(self, tmp_path):
         """Test updating multiple different refs in one file."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -62,7 +65,8 @@ class TestBasicRewriting:
                              footprint="Capacitor_SMD:C_0603_1608Metric")
                 l = Component(ref="L", value="10uH", symbol="Device:L",
                              footprint="Inductor_SMD:L_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -85,7 +89,8 @@ class TestBasicRewriting:
     def test_preserve_formatting(self, tmp_path):
         """Test that formatting (indentation, spacing) is preserved."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -94,7 +99,8 @@ class TestBasicRewriting:
                 r    =    Component(  ref="R",   value="10k",
                                      symbol="Device:R",
                                      footprint="Resistor_SMD:R_0603_1608Metric"  )
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -109,7 +115,8 @@ class TestBasicRewriting:
     def test_mixed_quotes(self, tmp_path):
         """Test handling both single and double quotes."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -118,12 +125,15 @@ class TestBasicRewriting:
                               footprint="Resistor_SMD:R_0603_1608Metric")
                 r2 = Component(ref='R', value='10k', symbol='Device:R',
                               footprint='Resistor_SMD:R_0603_1608Metric')
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
         # Both should be updated
-        expected = source_code.replace('ref="R"', 'ref="R1"').replace("ref='R'", "ref='R1'")
+        expected = source_code.replace('ref="R"', 'ref="R1"').replace(
+            "ref='R'", "ref='R1'"
+        )
 
         rewriter = SourceRefRewriter(source_file, {"R": "R1"})
         rewriter.update()
@@ -133,7 +143,8 @@ class TestBasicRewriting:
     def test_no_refs_to_update(self, tmp_path):
         """Test when mapping is empty (no unnumbered refs)."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -141,7 +152,8 @@ class TestBasicRewriting:
                 # Already numbered
                 r1 = Component(ref="R1", value="10k", symbol="Device:R",
                               footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
         original_content = source_file.read_text()
@@ -159,14 +171,16 @@ class TestBasicRewriting:
     def test_empty_mapping(self, tmp_path):
         """Test with None or empty mapping."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
             def main():
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
         original = source_file.read_text()
@@ -181,7 +195,8 @@ class TestEdgeCases:
     def test_refs_in_comments(self, tmp_path):
         """Test that refs in comments are NOT updated."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -190,7 +205,8 @@ class TestEdgeCases:
                 # Component(ref="R", ...) - example
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -208,7 +224,8 @@ class TestEdgeCases:
     def test_refs_in_docstrings(self, tmp_path):
         """Test that refs in docstrings are NOT updated."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            '''
             from circuit_synth import *
 
             @circuit
@@ -218,7 +235,8 @@ class TestEdgeCases:
                 """
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        '''
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -235,7 +253,8 @@ class TestEdgeCases:
     def test_refs_in_string_literals(self, tmp_path):
         """Test that refs in other string literals are NOT updated."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -243,7 +262,8 @@ class TestEdgeCases:
                 example = "Component(ref='R', value='10k')"
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -253,7 +273,8 @@ class TestEdgeCases:
     def test_multiline_component_calls(self, tmp_path):
         """Test handling of multiline Component() calls."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -264,7 +285,8 @@ class TestEdgeCases:
                     symbol="Device:R",
                     footprint="Resistor_SMD:R_0603_1608Metric"
                 )
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -279,13 +301,15 @@ class TestEdgeCases:
     def test_multiple_components_per_line(self, tmp_path):
         """Test multiple Component calls on same line (edge case)."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
             def main():
                 r1 = Component(ref="R", value="10k", symbol="Device:R", footprint="Resistor_SMD:R_0603_1608Metric"); r2 = Component(ref="R", value="47k", symbol="Device:R", footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -298,7 +322,8 @@ class TestEdgeCases:
     def test_dynamic_refs(self, tmp_path):
         """Test that dynamic refs (variables, f-strings) are skipped."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -308,7 +333,8 @@ class TestEdgeCases:
                               footprint="Resistor_SMD:R_0603_1608Metric")
                 r2 = Component(ref=f"R{1}", value="10k", symbol="Device:R",
                               footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -324,14 +350,16 @@ class TestFileHandling:
     def test_readonly_file(self, tmp_path):
         """Test handling of read-only files."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
             def main():
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -366,19 +394,21 @@ class TestFileHandling:
         """Test handling of symlinked files."""
         # Create actual file
         actual_file = tmp_path / "actual.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
             def main():
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
         actual_file.write_text(source_code)
 
         # Create symlink
         symlink_file = tmp_path / "link.py"
-        if os.name != 'nt':  # Skip on Windows
+        if os.name != "nt":  # Skip on Windows
             symlink_file.symlink_to(actual_file)
 
             # Should update the target file
@@ -389,7 +419,8 @@ class TestFileHandling:
     def test_encoding_preservation(self, tmp_path):
         """Test that file encoding is preserved."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            '''
             # -*- coding: utf-8 -*-
             from circuit_synth import *
 
@@ -398,24 +429,25 @@ class TestFileHandling:
                 """Circuit with émoji 🔥"""
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        '''
+        ).strip()
 
-        source_file.write_text(source_code, encoding='utf-8')
+        source_file.write_text(source_code, encoding="utf-8")
 
         # Should preserve UTF-8 encoding and special characters
         rewriter = SourceRefRewriter(source_file, {"R": "R1"})
         rewriter.update()
 
-        updated = source_file.read_text(encoding='utf-8')
+        updated = source_file.read_text(encoding="utf-8")
         assert '"""Circuit with émoji 🔥"""' in updated
         assert 'ref="R1"' in updated
 
     def test_line_ending_preservation(self, tmp_path):
         """Test that line endings (CRLF vs LF) are preserved."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = "from circuit_synth import *\r\n\r\n@circuit\r\ndef main():\r\n    r = Component(ref=\"R\", value=\"10k\", symbol=\"Device:R\", footprint=\"Resistor_SMD:R_0603_1608Metric\")\r\n"
+        source_code = 'from circuit_synth import *\r\n\r\n@circuit\r\ndef main():\r\n    r = Component(ref="R", value="10k", symbol="Device:R", footprint="Resistor_SMD:R_0603_1608Metric")\r\n'
 
-        source_file.write_bytes(source_code.encode('utf-8'))
+        source_file.write_bytes(source_code.encode("utf-8"))
 
         # Should preserve CRLF line endings
         pytest.skip("SourceRefRewriter not yet implemented")
@@ -423,17 +455,19 @@ class TestFileHandling:
     def test_bom_preservation(self, tmp_path):
         """Test that UTF-8 BOM is preserved."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
             def main():
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         # Write with BOM
-        source_file.write_bytes(b'\xef\xbb\xbf' + source_code.encode('utf-8'))
+        source_file.write_bytes(b"\xef\xbb\xbf" + source_code.encode("utf-8"))
 
         # Should preserve BOM
         pytest.skip("SourceRefRewriter not yet implemented")
@@ -441,14 +475,16 @@ class TestFileHandling:
     def test_atomic_write(self, tmp_path):
         """Test that writes are atomic (temp file + rename)."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
             def main():
                 r = Component(ref="R", value="10k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -463,7 +499,8 @@ class TestCircuitStructure:
     def test_multiple_circuits_per_file(self, tmp_path):
         """Test file with multiple @circuit decorated functions."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -475,7 +512,8 @@ class TestCircuitStructure:
             def circuit2():
                 r = Component(ref="R", value="47k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -486,7 +524,8 @@ class TestCircuitStructure:
     def test_nested_functions(self, tmp_path):
         """Test circuit with nested helper functions."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -498,7 +537,8 @@ class TestCircuitStructure:
 
                 r = Component(ref="R", value="47k", symbol="Device:R",
                              footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -508,7 +548,8 @@ class TestCircuitStructure:
     def test_circuit_in_main_block(self, tmp_path):
         """Test circuit defined in if __name__ == '__main__' block."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             if __name__ == "__main__":
@@ -519,7 +560,8 @@ class TestCircuitStructure:
 
                 circuit = main()
                 circuit.generate_kicad_project("test")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -542,7 +584,7 @@ class TestErrorHandling:
         source_file = tmp_path / "test_circuit.py"
 
         # Write invalid UTF-8
-        source_file.write_bytes(b'\xff\xfe invalid utf-8 \xff')
+        source_file.write_bytes(b"\xff\xfe invalid utf-8 \xff")
 
         # Should handle gracefully
         pytest.skip("SourceRefRewriter not yet implemented")
@@ -559,7 +601,8 @@ class TestRefMapping:
     def test_same_ref_multiple_times(self, tmp_path):
         """Test when same ref prefix is used multiple times (invalid but possible)."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
@@ -568,7 +611,8 @@ class TestRefMapping:
                               footprint="Resistor_SMD:R_0603_1608Metric")
                 r2 = Component(ref="R", value="47k", symbol="Device:R",
                               footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
 
@@ -579,14 +623,16 @@ class TestRefMapping:
     def test_already_numbered_refs(self, tmp_path):
         """Test that numbered refs are not updated."""
         source_file = tmp_path / "test_circuit.py"
-        source_code = dedent('''
+        source_code = dedent(
+            """
             from circuit_synth import *
 
             @circuit
             def main():
                 r1 = Component(ref="R1", value="10k", symbol="Device:R",
                               footprint="Resistor_SMD:R_0603_1608Metric")
-        ''').strip()
+        """
+        ).strip()
 
         source_file.write_text(source_code)
         original = source_file.read_text()

@@ -35,6 +35,7 @@ class TestPhase9Performance:
         - Blank circuit generates in < 1 second
         - No performance regressions
         """
+
         @circuit(name="perf_simple")
         def perf_simple():
             from circuit_synth import Component, Net
@@ -43,7 +44,7 @@ class TestPhase9Performance:
                 symbol="Device:R",
                 ref="R1",
                 value="1k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
+                footprint="Resistor_SMD:R_0603_1608Metric",
             )
 
         circuit_obj = perf_simple()
@@ -77,6 +78,7 @@ class TestPhase9Performance:
         - Circuit with ~20 components generates in < 2 seconds
         - No performance regressions with larger circuits
         """
+
         @circuit(name="perf_medium")
         def perf_medium():
             from circuit_synth import Component, Net
@@ -117,7 +119,9 @@ class TestPhase9Performance:
 
             components = json_data.get("components", {})
             comp_count = (
-                len(components) if isinstance(components, dict) else len(components or [])
+                len(components)
+                if isinstance(components, dict)
+                else len(components or [])
             )
             assert comp_count >= 18, f"Expected ~20 components, got {comp_count}"
 
@@ -133,6 +137,7 @@ class TestPhase9Performance:
         - Importing KiCad project to Python < 3 seconds
         - No performance regressions with larger imports
         """
+
         # Create a circuit with multiple components
         @circuit(name="perf_import")
         def perf_import():
@@ -188,6 +193,7 @@ class TestPhase9Performance:
         - No bloat from repeated generations
         - File size doesn't grow across cycles
         """
+
         @circuit(name="perf_size")
         def perf_size():
             from circuit_synth import Component, Net
@@ -196,19 +202,19 @@ class TestPhase9Performance:
                 symbol="Device:R",
                 ref="R1",
                 value="1k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
+                footprint="Resistor_SMD:R_0603_1608Metric",
             )
             r2 = Component(
                 symbol="Device:R",
                 ref="R2",
                 value="10k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
+                footprint="Resistor_SMD:R_0603_1608Metric",
             )
             c1 = Component(
                 symbol="Device:C",
                 ref="C1",
                 value="100n",
-                footprint="Capacitor_SMD:C_0603_1608Metric"
+                footprint="Capacitor_SMD:C_0603_1608Metric",
             )
 
         circuit_obj = perf_size()
@@ -234,15 +240,11 @@ class TestPhase9Performance:
                 print(f"   - Generation {gen_num}: {size} bytes")
 
                 # Should be relatively small for just 3 components
-                assert (
-                    size < 5000
-                ), f"JSON file too large: {size} bytes (target: <5KB)"
+                assert size < 5000, f"JSON file too large: {size} bytes (target: <5KB)"
 
             # Verify sizes are stable (shouldn't grow)
             size_growth = sizes[-1][1] - sizes[0][1]
-            assert (
-                size_growth <= 10
-            ), f"File size grew too much: {size_growth} bytes"
+            assert size_growth <= 10, f"File size grew too much: {size_growth} bytes"
 
             print(f"✅ Test 9.4 PASS: JSON file size reasonable")
             print(f"   - Initial size: {sizes[0][1]} bytes")

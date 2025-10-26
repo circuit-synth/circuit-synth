@@ -6,8 +6,8 @@ Implements the algorithm defined in text_flow_placement_prd.md
 """
 
 import logging
-from typing import List, Tuple
 from dataclasses import dataclass
+from typing import List, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +33,7 @@ def snap_to_grid(value: float, grid_size: float = 2.54) -> float:
 @dataclass
 class SheetDef:
     """Sheet size definition."""
+
     name: str
     width: float  # Total sheet width in mm
     height: float  # Total sheet height in mm
@@ -94,7 +95,9 @@ class TextFlowPlacer:
         # Try each sheet size
         for sheet in SHEET_SIZES:
             print(f"Trying {sheet.name} ({sheet.width}×{sheet.height}mm)")
-            print(f"  Usable area: ({sheet.min_x}, {sheet.min_y}) to ({sheet.max_x}, {sheet.max_y})")
+            print(
+                f"  Usable area: ({sheet.min_x}, {sheet.min_y}) to ({sheet.max_x}, {sheet.max_y})"
+            )
 
             placements, success = self._try_place_on_sheet(component_bboxes, sheet)
 
@@ -112,9 +115,7 @@ class TextFlowPlacer:
         )
 
     def _try_place_on_sheet(
-        self,
-        component_bboxes: List[Tuple[str, float, float]],
-        sheet: SheetDef
+        self, component_bboxes: List[Tuple[str, float, float]], sheet: SheetDef
     ) -> Tuple[List[Tuple[str, float, float]], bool]:
         """
         Try to place components on given sheet size.
@@ -135,19 +136,23 @@ class TextFlowPlacer:
         sorted_bboxes = sorted(
             component_bboxes,
             key=lambda x: (x[1] * x[2], x[1]),  # (area, width)
-            reverse=True
+            reverse=True,
         )
 
         print(f"  Sorted components (largest first):")
         for i, (ref, width, height) in enumerate(sorted_bboxes[:5]):
-            print(f"    [{i+1}] {ref}: {width:.1f}×{height:.1f}mm (area={width*height:.1f}mm²)")
+            print(
+                f"    [{i+1}] {ref}: {width:.1f}×{height:.1f}mm (area={width*height:.1f}mm²)"
+            )
         if len(sorted_bboxes) > 5:
             print(f"    ... and {len(sorted_bboxes)-5} more")
         print()
 
         # Initialize bounding box position (top-left corner)
         # Add extra left margin for first component to account for leftward hierarchical labels
-        LEFT_MARGIN_PADDING = 12.0  # Extra space for labels extending left from first component
+        LEFT_MARGIN_PADDING = (
+            12.0  # Extra space for labels extending left from first component
+        )
         bbox_x = sheet.min_x + LEFT_MARGIN_PADDING
         bbox_y = sheet.min_y
         current_row_height = 0.0
@@ -163,7 +168,9 @@ class TextFlowPlacer:
 
             # Check if component fits on sheet vertically
             if bbox_y + height > sheet.max_y:
-                print(f"  ⚠️  Component {ref} overflows at y={bbox_y:.1f}mm (max={sheet.max_y:.1f}mm)")
+                print(
+                    f"  ⚠️  Component {ref} overflows at y={bbox_y:.1f}mm (max={sheet.max_y:.1f}mm)"
+                )
                 return placements, False
 
             # Calculate component center position and snap to grid
@@ -189,8 +196,7 @@ class TextFlowPlacer:
 
 
 def place_with_text_flow(
-    component_bboxes: List[Tuple[str, float, float]],
-    spacing: float = 2.54
+    component_bboxes: List[Tuple[str, float, float]], spacing: float = 2.54
 ) -> Tuple[List[Tuple[str, float, float]], str]:
     """
     Convenience function for text-flow placement.

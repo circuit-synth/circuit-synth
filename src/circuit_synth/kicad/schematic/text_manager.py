@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 from kicad_sch_api.core.types import Point, Schematic, Text
+
 from .connection_utils import points_equal, snap_to_grid
 
 logger = logging.getLogger(__name__)
