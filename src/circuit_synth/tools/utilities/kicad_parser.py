@@ -266,16 +266,16 @@ class KiCadParser:
                     )
             else:
                 logger.info("🔍 HIERARCHICAL DEBUG: Using flat circuit approach")
-                # Single flat circuit
+                # Single flat circuit - use project name instead of hardcoded "main"
                 circuit = Circuit(
-                    name="main",
+                    name=self.kicad_project.stem,
                     components=components,
                     nets=nets,
                     schematic_file=f"{self.kicad_project.stem}.kicad_sch",
                     is_hierarchical_sheet=False,
                     hierarchical_tree=hierarchical_tree,
                 )
-                circuits["main"] = circuit
+                circuits[self.kicad_project.stem] = circuit
                 logger.info(
                     f"🔍 HIERARCHICAL DEBUG: Created flat circuit: {len(components)} components, {len(nets)} nets"
                 )
@@ -335,9 +335,8 @@ class KiCadParser:
             components, net_names = self._parse_schematic_file(sch_file)
 
             # Determine circuit name and type
+            # Use the schematic file stem as the circuit name
             circuit_name = sch_file.stem
-            if circuit_name == self.kicad_project.stem:
-                circuit_name = "main"
 
             logger.info(
                 f"🔍 HIERARCHICAL DEBUG: Circuit '{circuit_name}' from {sch_file.name}:"
@@ -366,9 +365,8 @@ class KiCadParser:
         schematic_files = list(self.project_dir.glob("*.kicad_sch"))
 
         for sch_file in schematic_files:
+            # Use schematic file stem as circuit name
             circuit_name = sch_file.stem
-            if circuit_name == self.kicad_project.stem:
-                circuit_name = "main"
 
             # Parse this schematic file for sheet instances
             logger.info(
@@ -573,9 +571,8 @@ class KiCadParser:
                     not is_main_schematic and sch_file.stem != "root"
                 )
 
+                # Use schematic file stem as circuit name
                 circuit_name = sch_file.stem
-                if is_main_schematic:
-                    circuit_name = "main"
 
                 circuit = Circuit(
                     name=circuit_name,

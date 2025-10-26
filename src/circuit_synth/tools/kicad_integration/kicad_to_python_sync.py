@@ -261,13 +261,13 @@ class KiCadToPythonSyncer:
             if not circuits:
                 raise RuntimeError("Failed to parse KiCad project")
 
-            # Get main circuit
-            main_circuit = circuits.get("main") or list(circuits.values())[0]
+            # Get circuit by project name, fallback to first circuit
+            main_circuit = circuits.get(project_name) or list(circuits.values())[0]
 
             # Convert circuit to JSON format (circuit-synth schema)
             # Transform from models.Circuit format to circuit-synth JSON format
             json_data = {
-                "name": main_circuit.name,
+                "name": project_name,  # Use project name from .kicad_pro, not circuit.name
                 "components": {
                     comp.reference: {
                         "ref": comp.reference,
@@ -289,9 +289,8 @@ class KiCadToPythonSyncer:
                 },
             }
 
-            # Add optional source_file if available
-            if main_circuit.schematic_file:
-                json_data["source_file"] = main_circuit.schematic_file
+            # Add source_file using project name
+            json_data["source_file"] = f"{project_name}.kicad_sch"
 
             # Write JSON file
             with open(json_path, "w", encoding="utf-8") as f:

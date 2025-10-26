@@ -91,8 +91,12 @@ class KiCadSchematicParser:
                     schematic_file=self.schematic_path.name,
                 )
 
-            # Return the main circuit (or first circuit if multiple)
-            if "main" in circuits:
+            # Return the circuit by schematic name, or first circuit if not found
+            circuit_name = self.schematic_path.stem
+            if circuit_name in circuits:
+                circuit = circuits[circuit_name]
+            elif "main" in circuits:
+                # Fallback for old behavior
                 circuit = circuits["main"]
             else:
                 circuit = list(circuits.values())[0]
