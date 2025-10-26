@@ -25,44 +25,71 @@ from circuit_synth.tools.kicad_integration.kicad_to_python_sync import KiCadToPy
 PRESERVE_ARTIFACTS = os.getenv("PRESERVE_TEST_ARTIFACTS", "").lower() in ("1", "true", "yes")
 
 
-@pytest.fixture(autouse=True)
-def setup_and_cleanup():
-    """Setup: Clean generated directories. Cleanup: Remove or preserve artifacts."""
+def get_test_artifacts_dir():
+    """Get or create test_artifacts directory."""
+    test_dir = Path(__file__).parent
+    artifacts_dir = test_dir / "test_artifacts"
+
+    if PRESERVE_ARTIFACTS:
+        artifacts_dir.mkdir(exist_ok=True)
+
+    return artifacts_dir
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_session():
+    """Setup session: Clean test directories before all tests."""
     test_dir = Path(__file__).parent
 
-    # Directories to clean before each test
-    generated_dirs = [
-        test_dir / "blank",  # Generated KiCad project
-        test_dir / "test_artifacts",  # Preserved artifacts
-    ]
+    # Only clean test_artifacts at start of session
+    artifacts_dir = test_dir / "test_artifacts"
+    if artifacts_dir.exists():
+        shutil.rmtree(artifacts_dir)
 
-    # Clean up before test
-    for dir_path in generated_dirs:
-        if dir_path.exists():
-            shutil.rmtree(dir_path)
+    yield  # Run all tests
+
+    # After all tests: preserve or cleanup
+    if PRESERVE_ARTIFACTS:
+        artifacts_dir = get_test_artifacts_dir()
+        print(f"\n📁 All test artifacts preserved in: {artifacts_dir}")
+    else:
+        # Clean up only generated blank directory
+        blank_dir = test_dir / "blank"
+        if blank_dir.exists():
+            shutil.rmtree(blank_dir)
+
+
+@pytest.fixture(autouse=True)
+def cleanup_before_test():
+    """Before each test: Clean the generated blank directory."""
+    test_dir = Path(__file__).parent
+    blank_dir = test_dir / "blank"
+
+    # Always clean before test to ensure fresh start
+    if blank_dir.exists():
+        shutil.rmtree(blank_dir)
 
     yield  # Run the test
 
-    # After test: preserve or cleanup
+    # After each test: preserve to test_artifacts or clean
     if PRESERVE_ARTIFACTS:
-        # Preserve all artifacts in test_artifacts/
-        artifacts_dir = test_dir / "test_artifacts"
-        artifacts_dir.mkdir(exist_ok=True)
-
-        # Move generated files to artifacts directory
+        artifacts_dir = get_test_artifacts_dir()
         blank_dir = test_dir / "blank"
+
         if blank_dir.exists():
-            dest = artifacts_dir / "blank"
+            # Copy to artifacts directory with test name
+            test_name = os.environ.get("PYTEST_CURRENT_TEST", "unknown").split("::")[1].split(" ")[0]
+            dest = artifacts_dir / test_name
+
             if dest.exists():
                 shutil.rmtree(dest)
             shutil.copytree(blank_dir, dest)
-
-        print(f"\n📁 Test artifacts preserved in: {artifacts_dir}")
+            shutil.rmtree(blank_dir)  # Remove original after copying
     else:
-        # Clean up generated directories
-        for dir_path in generated_dirs:
-            if dir_path.exists():
-                shutil.rmtree(dir_path)
+        # Clean up immediately if not preserving
+        blank_dir = test_dir / "blank"
+        if blank_dir.exists():
+            shutil.rmtree(blank_dir)
 
 
 def test_01_generate_blank_kicad_from_python():
