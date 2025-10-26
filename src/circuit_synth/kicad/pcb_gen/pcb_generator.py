@@ -182,11 +182,8 @@ class PCBGenerator:
 
         Returns:
             True if successful, False otherwise
-
-        Raises:
-            ValueError: If an invalid placement algorithm is specified
         """
-        # Validate placement algorithm early
+        # Validate placement algorithm and use default if invalid
         VALID_ALGORITHMS = {
             "hierarchical",
             "force_directed",
@@ -195,14 +192,15 @@ class PCBGenerator:
             "connection_centric",
             "external",
         }
+        DEFAULT_ALGORITHM = "hierarchical"
+
         if placement_algorithm not in VALID_ALGORITHMS:
-            error_msg = (
-                f"❌ INVALID PLACEMENT ALGORITHM: '{placement_algorithm}'\n"
+            logger.warning(
+                f"⚠️  INVALID PLACEMENT ALGORITHM: '{placement_algorithm}'\n"
                 f"Valid algorithms are: {', '.join(sorted(VALID_ALGORITHMS))}\n"
-                f"This would result in PCB generation failing silently!"
+                f"Using default algorithm '{DEFAULT_ALGORITHM}' instead"
             )
-            logger.error(error_msg)
-            raise ValueError(error_msg)
+            placement_algorithm = DEFAULT_ALGORITHM
 
         retry_count = 0
         max_retries = 10
