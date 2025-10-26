@@ -601,10 +601,20 @@ class PCBGenerator:
                 try:
                     schematic = ksa.Schematic.load(str(sch_file))
 
-                    # Extract nets from schematic
-                    for net in schematic.nets:
-                        if len(net.nodes) >= 2:
-                            net_name = net.name
+                    # Extract nets from schematic (stored in internal _data dict)
+                    # Note: ksa.Schematic doesn't expose a .nets property, use _data instead
+                    schematic_nets = schematic._data.get('nets', [])
+
+                    for net in schematic_nets:
+                        if isinstance(net, dict):
+                            net_name = net.get('name')
+                            net_nodes = net.get('nodes', [])
+                        else:
+                            # Fallback for object representation
+                            net_name = getattr(net, 'name', None)
+                            net_nodes = getattr(net, 'nodes', [])
+
+                        if net_name and len(net_nodes) >= 2:
                             # Skip power nets
                             if net_name in ["GND", "3V3", "5V", "VCC", "VDD", "VSS"]:
                                 continue
@@ -612,11 +622,13 @@ class PCBGenerator:
                             if net_name not in nets:
                                 nets[net_name] = set()
 
-                            for node in net.nodes:
-                                nets[net_name].add(node.component_ref)
+                            for node in net_nodes:
+                                ref = node.get('ref') if isinstance(node, dict) else getattr(node, 'ref', None)
+                                if ref:
+                                    nets[net_name].add(ref)
 
                 except Exception as e:
-                    logger.error(f"Error extracting connections from {sch_file}: {e}")
+                    logger.debug(f"Note: Could not extract connections from {sch_file}: {e}")
                     continue
 
         # Convert nets to connection pairs
