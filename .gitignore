@@ -42,3 +42,9 @@ fp-info-cache
 # User credentials (never commit)
 .env
 .pypirc
+
+# Test-generated artifacts
+BidirectionalTest/
+bidirectional_test/BidirectionalTest/
+bidirectional_test/main_generated/
+blank/
