@@ -1,87 +1,47 @@
-# Test 06: Round-Trip Validation
+# Test 06: Round-Trip Validation - Full Cycle Correctness
 
-## Purpose
+**Priority:** P0 (CRITICAL) ⚠️
+**Category:** Foundation - Cycle Integrity
+**Tests:** 5 total
+**Status:** In Development
 
-🔴 **CRITICAL TEST** - Validates that circuits survive complete round-trip cycles without data loss.
+## Overview
+
+CRITICAL tests validating complete Python → KiCad → Python → KiCad cycles work correctly and produce stable results.
+
+This test suite validates that:
+- Full cycle completes without errors or data loss
+- Generated code is syntactically valid after import
+- Circuit properties identical before and after cycle
+- Idempotency: repeated cycles produce identical results
+- No data accumulation or corruption through cycles
+- Performance acceptable for large circuits
+
+**Why P0 CRITICAL:** Full cycle correctness is the foundation of bidirectional sync. If cycles break, the entire feature is broken.
 
 ## Test Cases
 
-### Test 6.1: Python → KiCad → Python (Resistor Divider)
-```
-Input: resistor_divider.py
-  ↓ Generate
-KiCad project
-  ↓ Import
-Output: resistor_divider_generated.py
+### Test 6.1: Simple Circuit Full Cycle (3 iterations)
+**What:** Python circuit → KiCad → Python → KiCad → Python
+**Validates:** 3-cycle stability, idempotency proof
 
-Expected: Output matches input (semantically)
-```
+### Test 6.2: Full Cycle Data Integrity
+**What:** All component properties identical after cycle
+**Validates:** No silent data corruption
 
-### Test 6.2: KiCad → Python → KiCad (Resistor Divider)
-```
-Input: resistor_divider.kicad_pro
-  ↓ Import
-Python code
-  ↓ Generate
-Output: resistor_divider_generated.kicad_pro
+### Test 6.3: Generated Code Quality
+**What:** Imported Python code is properly formatted and importable
+**Validates:** Code usability, no syntax/import errors
 
-Expected: Netlist equivalence (electrical identity)
-```
+### Test 6.4: Large Circuit Full Cycle
+**What:** 10+ component circuit cycles correctly
+**Validates:** Scalability, no degradation with size
 
-### Test 6.3: Multiple Cycles (P→K→P→K→P→K)
-- Run 3 complete round-trips
-- Expected: Cycle 3 output = Cycle 1 output
-- No data drift or accumulation
+### Test 6.5: Cycle Performance
+**What:** Single cycle completes in reasonable time
+**Validates:** No exponential slowdown
 
-### Test 6.4: Netlist Equivalence
-- Compare netlists using `kicad-cli`
-- Verify electrical equivalence (not byte-for-byte)
-- Allow for:
-  - Different UUIDs
-  - Different component ordering (if electrically same)
-  - Minor formatting differences
+## Related Tests
 
-### Test 6.5: Hierarchical Circuit Round-Trip
-- 2-level hierarchy: main + subcircuit
-- Full round-trip preserves structure
-- Subcircuit still separate file
-
-## Success Criteria
-
-- ✅ Single round-trip preserves circuit function
-- ✅ Multiple cycles are stable (no drift)
-- ✅ Netlists are electrically equivalent
-- ✅ Hierarchical structure preserved
-
-## Known Acceptable Differences
-
-**Python Code**:
-- Variable names may change (if auto-generated)
-- Comment formatting may differ
-- Whitespace differences OK
-- Import order may differ
-
-**KiCad Files**:
-- UUIDs will differ (expected)
-- Component ordering may differ
-- Formatting/indentation may differ
-- Timestamps will differ
-
-## Not Acceptable
-
-**Data Loss**:
-- Missing components
-- Missing connections
-- Wrong component values
-- Lost net names
-
-**Data Accumulation**:
-- File size growing each cycle
-- Duplicate comments/data
-- Phantom components appearing
-
----
-
-**Status**: 🚧 Setup required
-**Priority**: P0 🔴 CRITICAL
-**Time**: 20 min
+- **Previous:** 05_nets_connectivity
+- **Critical Set:** 03, 06, 07, 08 (all must pass)

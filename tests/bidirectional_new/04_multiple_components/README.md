@@ -1,62 +1,62 @@
-# Test 04: Multiple Components
+# Test 04: Multiple Components - Multi-Element Circuit Handling
 
-## Purpose
+**Priority:** P1 (Core Functionality)
+**Category:** Foundation
+**Tests:** 7 total
+**Status:** In Development
 
-Validates handling of circuits with multiple components and their interconnections.
+## Overview
+
+Tests circuit generation and import with multiple components (resistors, capacitors, etc.) to validate proper handling of component collections and their relationships.
+
+This test suite validates that:
+- Multiple components can be created and generated to KiCad
+- All components extracted correctly when importing from KiCad
+- Component relationships preserved (no loss or duplication)
+- Different component types handled correctly
+- Component collection maintains integrity through round-trip
+- No interference between components
 
 ## Test Cases
 
-### Test 4.1: Resistor Divider (2 Components)
-- R1, R2 connected in series
-- VIN → R1 → VOUT → R2 → GND
-- Python → KiCad → verify both components + connections
+### Test 4.1: Generate Two Resistors to KiCad
+**What:** Python circuit with 2 resistors generates KiCad schematic
+**Validates:** Multiple components created and placed correctly
 
-### Test 4.2: Three Different Component Types
-- Resistor (R1), Capacitor (C1), LED (D1)
-- All connected to common net
-- Verify type-specific properties
+### Test 4.2: Generate Mixed Component Types
+**What:** Resistor + Capacitor circuit generates correctly
+**Validates:** Different component types coexist properly
 
-### Test 4.3: Ten Resistors (Scaling Test)
-- R1-R10 with different values
-- Various connections
-- Test performance with moderate component count
+### Test 4.3: Import Multiple Components from KiCad
+**What:** KiCad project with 3+ components imports to valid Python
+**Validates:** All components extracted, correct references
 
-### Test 4.4: Series Chain (R1-R2-R3)
-- Three resistors in series
-- VIN → R1 → MID1 → R2 → MID2 → R3 → GND
-- Verify all intermediate nets
+### Test 4.4: Multiple Component Round-Trip
+**What:** Python → KiCad → Python preserves all components
+**Validates:** No loss, duplication, or corruption
 
-### Test 4.5: Parallel Resistors
-- R1 || R2 || R3
-- All share same two nets (VIN, GND)
-- Verify parallel connections
+### Test 4.5: Component Count Stability
+**What:** Repeated round-trips maintain exact component count
+**Validates:** No spurious components added or lost
 
-### Test 4.6: Add Third Component to Existing Pair
-- Start with R1-R2 divider
-- Add C1 decoupling cap to VOUT
-- Verify new component + connection added
+### Test 4.6: Component Property Preservation (Multiple)
+**What:** All component properties preserved with multiple components
+**Validates:** Values, references, footprints all correct
 
-### Test 4.7: Remove Middle Component from Chain
-- Start with R1-R2-R3 chain
-- Remove R2
-- Verify R1-R3 now directly connected (or disconnected - TBD behavior)
+### Test 4.7: Large Component Count
+**What:** 20+ component circuit handles correctly
+**Validates:** Scalability and performance
 
-## Manual Setup
+## Manual Setup Required
 
-**Fixtures needed:**
-- `resistor_divider/` - R1, R2 classic divider
-- `three_types/` - R, C, LED mix
-- `series_chain/` - R1-R2-R3 chain
+Create KiCad fixture with multiple components:
+- R1: 10k resistor
+- R2: 47k resistor  
+- C1: 100nF capacitor
 
-## Success Criteria
+Reference in: `04_kicad_ref/` directory
 
-- ✅ Multiple components generated/imported correctly
-- ✅ Connections between components preserved
-- ✅ Component properties maintained
-- ✅ No missing or extra components
+## Related Tests
 
----
-
-**Status**: 🚧 Setup required
-**Priority**: P1
-**Time**: 30 min
+- **Previous:** 03_position_preservation
+- **Next:** 05_nets_connectivity

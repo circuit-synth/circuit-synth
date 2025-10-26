@@ -1,67 +1,57 @@
-# Test 05: Nets & Connectivity
+# Test 05: Nets & Connectivity - Connection Integrity
 
-## Purpose
+**Priority:** P1 (Core Functionality)
+**Category:** Foundation
+**Tests:** 8 total
+**Status:** In Development
 
-Validates net handling: named nets, complex topologies, implicit vs explicit nets.
+## Overview
+
+Tests net creation, connectivity preservation, and electrical connections through bidirectional sync.
+
+This test suite validates that:
+- Nets (electrical connections) created correctly in Python
+- Net connections extracted from KiCad accurately
+- Connection integrity preserved through round-trip
+- Multi-node nets (3+ connections) handled properly
+- No spurious connections or missing nets
+- Net names preserved when specified
 
 ## Test Cases
 
-### Test 5.1: Named Nets (VCC, GND, SIG)
-- Create nets with specific names in Python
-- Verify names preserved in KiCad
-- Verify names preserved in round-trip
+### Test 5.1: Generate Single Net to KiCad
+**What:** Python circuit with VCC and GND nets generates correctly
+**Validates:** Basic net creation and routing
 
-### Test 5.2: Rename Net (VCC → VDD)
-- Start with VCC net
-- Rename to VDD in Python
-- Verify all connections updated
+### Test 5.2: Import Nets from KiCad
+**What:** KiCad project with connected components imports nets correctly
+**Validates:** Net extraction and naming
 
-### Test 5.3: Multi-Point Net
-- 5 components all connected to VCC
-- Verify single net with 5 connection points
-- No separate nets created
+### Test 5.3: Multi-Node Net Preservation
+**What:** Net connected to 3+ component pins preserved
+**Validates:** Complex net topology handling
 
-### Test 5.4: Implicit vs Explicit Nets
-- Implicit: `r1[1] & r2[1]` (auto-named)
-- Explicit: `VCC = Net("VCC")` then `r1[1] & VCC`
-- Verify both work
+### Test 5.4: Net Round-Trip Stability
+**What:** Net connections survive full round-trip cycle
+**Validates:** Connection integrity maintained
 
-### Test 5.5: Split Net (Disconnect Components)
-- Start with R1-R2-R3 on same net
-- Disconnect R3
-- Verify R1-R2 still connected, R3 separate
+### Test 5.5: Multiple Nets Independence
+**What:** Multiple independent nets don't interfere
+**Validates:** Net isolation and independence
 
-### Test 5.6: Merge Nets (Connect Components)
-- Start with two separate nets
-- Connect them via new wire in KiCad
-- Import to Python → verify single net
+### Test 5.6: Named Nets Preservation
+**What:** Custom net names (VCC, GND, SIGNAL) preserved
+**Validates:** Net naming convention support
 
-### Test 5.7: Power Nets (VCC, GND Symbols)
-- Use KiCad power symbols
-- Verify imported as nets in Python
-- Verify connections to components
+### Test 5.7: Unconnected Components
+**What:** Components without nets handled properly
+**Validates:** Partial circuit support
 
-### Test 5.8: Complex Topology (Star Network)
-- Central node connected to 6 components
-- All on same net
-- Verify topology preserved
+### Test 5.8: Net Connectivity Verification
+**What:** Net connectivity matches schematic connections
+**Validates:** Electrical correctness
 
-## Manual Setup
+## Related Tests
 
-**Fixtures needed:**
-- `named_nets/` - VCC, GND, SIG examples
-- `power_symbols/` - KiCad power symbol usage
-- `complex_topology/` - Star or mesh network
-
-## Success Criteria
-
-- ✅ Named nets preserved both directions
-- ✅ Multi-point nets work correctly
-- ✅ Net modifications detected and applied
-- ✅ No phantom nets or lost connections
-
----
-
-**Status**: 🚧 Setup required
-**Priority**: P1
-**Time**: 30 min
+- **Previous:** 04_multiple_components
+- **Parallel:** 03_position_preservation (position + connectivity)
