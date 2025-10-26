@@ -13,9 +13,10 @@ Validates the absolute foundation of bidirectional sync: empty circuits with no 
 - No crashes or errors on minimal input
 
 ### File Generation
-- Valid `.kicad_pro` file created
-- Valid `.kicad_sch` file created
-- Valid `.kicad_pcb` file created (if applicable)
+- Valid `.kicad_pro` project file created
+- Valid `.kicad_sch` schematic file created (empty, no components)
+- Valid `.kicad_pcb` PCB file created (empty, no footprints)
+- Valid `.kicad_prl` project-local settings file created
 - Python file has valid syntax (can be imported)
 
 ## Test Cases
@@ -28,20 +29,25 @@ def blank():
     pass
 
 # Expected Output:
-# - blank.kicad_pro (valid project)
+# - blank.kicad_pro (valid project file)
 # - blank.kicad_sch (valid schematic, no components)
-# - blank.kicad_pcb (valid PCB, no components)
+# - blank.kicad_pcb (valid PCB file, no footprints)
+# - blank.kicad_prl (project-local settings file)
 ```
 
 **Validates**:
 - Project file generation
-- Schematic structure generation
+- Schematic structure generation (empty but valid)
+- PCB file generation (empty but valid)
 - No components = no errors
-- Valid KiCad 8 format
+- No footprints = no errors
+- Valid KiCad 8 format for all files
 
 ### Test 1.2: Generate Blank Python from Blank KiCad
 ```python
-# Input: blank.kicad_pro with blank.kicad_sch (no components)
+# Input: blank.kicad_pro with:
+#   - blank.kicad_sch (no components)
+#   - blank.kicad_pcb (no footprints)
 
 # Expected Output: blank_generated.py
 @circuit
@@ -51,20 +57,25 @@ def blank():
 
 **Validates**:
 - Empty schematic parsing
+- Empty PCB file handling
 - Python code generation with no components
 - Valid Python syntax
 - Proper imports generated
+- No spurious footprint data added
 
 ### Test 1.3: Round-Trip Blank Circuit
 ```python
-# Cycle: Python → KiCad → Python → KiCad
+# Cycle: Python → KiCad (schematic + PCB) → Python → KiCad
 # Expected: All outputs identical (or semantically equivalent)
 ```
 
 **Validates**:
-- No data accumulation
-- Stable round-trip behavior
+- No data accumulation in schematic or PCB
+- Stable round-trip behavior for both files
 - Idempotency on blank projects
+- PCB remains empty through cycles
+- No spurious components or footprints added
+- File structure preserved (except UUIDs)
 
 ## Files
 

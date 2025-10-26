@@ -7,15 +7,16 @@
 
 ## Overview
 
-CRITICAL tests validating that component positions on the schematic are preserved through bidirectional sync cycles.
+CRITICAL tests validating that component positions on the schematic AND PCB are preserved through bidirectional sync cycles.
 
 This test suite validates that:
-- Component X,Y coordinates extracted from KiCad schematic files
-- Position information preserved when re-exporting to KiCad
+- Component X,Y coordinates extracted from KiCad schematic and PCB files
+- Position information preserved when re-exporting to KiCad (both schematic and PCB)
 - Manual position changes in KiCad survive import→export cycle
 - Multiple components maintain correct relative positions
 - No spurious position drift on repeated cycles
-- Position data survives round-trip with <0.1mm tolerance
+- Position data (schematic + PCB footprint) survives round-trip with <0.1mm tolerance
+- Footprint placement on PCB matches schematic positioning
 
 **Why P0 CRITICAL:** Position preservation is essential for:
 - Maintaining user-intentional manual routing/layout
@@ -26,67 +27,82 @@ This test suite validates that:
 ## Test Cases
 
 ### Test 3.1: Extract Component Position from KiCad
-**What:** Import KiCad schematic and extract R1's X,Y coordinates
+**What:** Import KiCad schematic and PCB, extract R1's X,Y coordinates and footprint placement
 **Validates:**
 - Position coordinates correctly extracted from .kicad_sch file
+- Footprint coordinates correctly extracted from .kicad_pcb file
 - Coordinates match manual placement in KiCad
 - Coordinate format preserved (millimeters, exact precision)
 - Position data includes rotation angle
+- Schematic position and PCB placement match
 
 ### Test 3.2: Preserve Position on Export
-**What:** KiCad → Python → KiCad preserves component position
+**What:** KiCad → Python → KiCad (schematic + PCB) preserves component position and footprint placement
 **Validates:**
-- Extracted position exported back to KiCad format
+- Extracted schematic position exported back to KiCad schematic format
+- Extracted PCB footprint placement exported back to PCB format
 - Position remains within tolerance (<0.1mm deviation)
 - No spurious position movement on cycle
-- Rotation preserved (if component rotated)
+- Rotation preserved (if component rotated) in both files
+- Footprint placement matches schematic after round-trip
 
 ### Test 3.3: Multiple Component Position Stability
-**What:** 3+ components with different positions maintain relative layout
+**What:** 3+ components with different positions on schematic and PCB maintain relative layout
 **Validates:**
-- All component positions extracted correctly
+- All component positions extracted correctly from schematic
+- All footprint placements extracted correctly from PCB
 - Relative positions preserved (distance between components stable)
 - No components drift into unexpected coordinates
-- Layout integrity maintained
+- Layout integrity maintained in both schematic and PCB
+- Footprint spacing matches schematic spacing
 
 ### Test 3.4: Manual Position Changes Survive Round-Trip
-**What:** User manually moves component in KiCad, imports, position preserved
+**What:** User manually moves component in KiCad schematic and PCB, imports, position preserved
 **Validates:**
-- Manual position changes preserved through import
+- Manual schematic position changes preserved through import
+- Manual PCB footprint placement changes preserved through import
 - Not overwritten by generation algorithm
 - User intent respected in round-trip
 - Position retained exactly (not approximated)
+- Schematic and PCB positions remain synchronized
 
 ### Test 3.5: Position Stability on Repeated Cycles
-**What:** Multiple round-trip cycles don't cause position drift
+**What:** Multiple round-trip cycles (schematic + PCB) don't cause position drift
 **Validates:**
-- Position remains stable after 1st round-trip
+- Position remains stable after 1st round-trip (schematic + PCB)
 - No further drift on 2nd, 3rd round-trips
-- Cumulative drift less than 0.01mm after 3 cycles
+- Cumulative drift less than 0.01mm after 3 cycles (both files)
 - Idempotent position preservation
+- Footprint placement stable across cycles
+- No rounding errors accumulating
 
 ### Test 3.6: Rotated Component Position
-**What:** Component with rotation preserved through round-trip
+**What:** Component with rotation (schematic + PCB footprint) preserved through round-trip
 **Validates:**
-- Rotation angle extracted from KiCad
-- Rotation preserved when re-exporting
+- Rotation angle extracted from KiCad schematic
+- Footprint rotation extracted from KiCad PCB
+- Rotation preserved when re-exporting (both files)
 - Position + rotation maintained together
 - No interaction between position and rotation
+- Footprint rotation matches schematic after round-trip
 
 ## Test Fixtures
 
 Required files in `03_kicad_ref/`:
 - `03_kicad_ref.kicad_pro` - KiCad project with positioned components
 - `03_kicad_ref.kicad_sch` - Schematic with R1 at specific coordinates
+- `03_kicad_ref.kicad_pcb` - PCB with footprint placed at matching coordinates
 - `03_kicad_ref.kicad_prl` - Project-local settings
 
 **Fixture Setup:**
-- R1 (10k) positioned at X=30mm, Y=40mm, rotation=0°
+- R1 (10k) positioned at X=30mm, Y=40mm, rotation=0° in schematic
+- R1 footprint placed at X=30mm, Y=40mm on PCB (must match schematic)
 - Single component to isolate position behavior
+- Both schematic and PCB must have synchronized positioning
 
 ## Manual Setup Required
 
-You must create a KiCad project with a positioned resistor:
+You must create a KiCad project with a positioned resistor in both schematic and PCB:
 
 1. Open KiCad
 2. Create new project: `03_kicad_ref`
@@ -94,12 +110,16 @@ You must create a KiCad project with a positioned resistor:
    - Add symbol: Device → R (Resistor)
    - Set reference: R1
    - Set value: 10k
-   - Save schematic
-4. Manually move component:
-   - Click and drag R1 to position X=30mm, Y=40mm
+   - Manually move component to position X=30mm, Y=40mm
    - Verify position in Properties panel
-5. Save schematic
-6. Copy project files to `03_kicad_ref/` directory
+   - Save schematic
+4. In PCB editor:
+   - Tools → Update PCB from Schematic (to create footprint)
+   - Place footprint at X=30mm, Y=40mm (must match schematic)
+   - Verify footprint position matches schematic in Properties panel
+   - Save PCB
+5. Copy project files to `03_kicad_ref/` directory:
+   - Verify all files present: .kicad_pro, .kicad_sch, .kicad_pcb, .kicad_prl
 
 ## Implementation Notes
 

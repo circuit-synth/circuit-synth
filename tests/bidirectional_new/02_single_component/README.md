@@ -19,65 +19,86 @@ This test suite validates that:
 ## Test Cases
 
 ### Test 2.1: Generate Single Resistor to KiCad
-**What:** Python circuit with single 10kΩ resistor generates valid KiCad project
+**What:** Python circuit with single 10kΩ resistor generates valid KiCad project (schematic + PCB)
 **Validates:**
 - Component creation in Python works
 - Footprint selection works
-- KiCad generation with single component succeeds
+- KiCad schematic generation with single component succeeds
+- KiCad PCB generation with footprint succeeds
 - Schematic has exactly 1 component
+- PCB has exactly 1 footprint placed
 
 ### Test 2.2: Import Single Resistor from KiCad
-**What:** KiCad project with single resistor imports to valid Python
+**What:** KiCad project with single resistor (schematic + PCB) imports to valid Python
 **Validates:**
-- KiCad → Python import works
+- KiCad schematic → Python import works
+- KiCad PCB footprint information recognized
 - Component reference extracted correctly (R1)
 - Component value extracted correctly (10k)
-- Component footprint extracted correctly
+- Component footprint extracted correctly from PCB
+- Component position preserved from PCB placement
 - Generated Python has valid syntax
 
 ### Test 2.3: Single Component Round-Trip
-**What:** Python → KiCad → Python preserves single component
+**What:** Python → KiCad (schematic + PCB) → Python preserves single component and position
 **Validates:**
-- No data loss through cycle
+- No data loss through cycle (schematic and PCB)
 - Component properties identical before/after
+- Component position preserved (from PCB placement)
 - No spurious components added/removed
-- File size remains stable
+- Both schematic and PCB files valid after cycle
+- Footprint placement remains stable
 
 ### Test 2.4: Resistor Value Modification
-**What:** Change resistor value in Python, generate, import back
+**What:** Change resistor value in Python, generate (schematic + PCB), import back
 **Validates:**
-- Value changes propagate correctly
+- Value changes propagate correctly to schematic
+- PCB footprint remains and moves correctly
 - Modified value preserved through round-trip
+- Component reference unchanged
 - No other properties affected
+- Position stable despite value change
 
 ### Test 2.5: Resistor Footprint Change
-**What:** Change resistor footprint in Python, verify in KiCad
+**What:** Change resistor footprint in Python, verify in KiCad schematic and PCB
 **Validates:**
 - Footprint selection works for resistor
+- New footprint appears in PCB editor
 - Footprint change persists through round-trip
 - Correct footprint library references
+- PCB footprint dimensions updated for new footprint
+- Old footprint completely removed, not duplicated
 
 ### Test 2.6: Component Reference Preservation
-**What:** Custom component reference (R_LOAD instead of R1) preserved
+**What:** Custom component reference (R_LOAD instead of R1) preserved in schematic and PCB
 **Validates:**
 - Custom references work in Python
-- References correctly exported to KiCad
+- References correctly exported to KiCad schematic
+- References updated in PCB footprint designator
 - References reimported without modification
+- PCB footprint shows correct designator after import
 
 ### Test 2.7: Component Position Stability
-**What:** Component placement in KiCad preserved through round-trip
+**What:** Footprint placement (X, Y, rotation) in KiCad PCB preserved through round-trip
 **Validates:**
-- Component X,Y position extracted from KiCad
-- Position preserved when re-exporting
+- Component X, Y position extracted from KiCad PCB
+- Component rotation extracted from KiCad PCB
+- Position and rotation preserved when re-exporting
 - No spurious position changes
+- PCB footprint placed exactly at same coordinates
+- Rotation angle unchanged after round-trip
 
 ### Test 2.8: Switching Components
-**What:** Replace one resistor with different value
+**What:** Replace one resistor with different value in Python, verify in schematic and PCB
 **Validates:**
-- Component replacement works
-- Old component completely removed
-- New component correctly added
-- No ghost components remain
+- Component replacement works in schematic
+- Old component completely removed from schematic
+- New component correctly added to schematic
+- Old footprint completely removed from PCB
+- New footprint correctly placed on PCB
+- No ghost components remain in schematic or PCB
+- Reference maintained (still R1)
+- Position maintained (footprint placed at same location)
 
 ## Test Fixtures
 
