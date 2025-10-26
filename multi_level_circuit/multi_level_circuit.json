@@ -1,0 +1,136 @@
+{
+  "name": "main",
+  "description": "",
+  "tstamps": "",
+  "source_file": "main.kicad_sch",
+  "components": {
+    "C_PS1": {
+      "symbol": "Device:C",
+      "ref": "C_PS1",
+      "value": "47u",
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    },
+    "C_SIG1": {
+      "symbol": "Device:C",
+      "ref": "C_SIG1",
+      "value": "100n",
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    },
+    "R_PS1": {
+      "symbol": "Device:R",
+      "ref": "R_PS1",
+      "value": "100k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    },
+    "R_SIG1": {
+      "symbol": "Device:R",
+      "ref": "R_SIG1",
+      "value": "1k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    }
+  },
+  "nets": {
+    "unconnected-(C_PS1-Pad1)": [
+      {
+        "component": "C_PS1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(C_PS1-Pad2)": [
+      {
+        "component": "C_PS1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(C_SIG1-Pad1)": [
+      {
+        "component": "C_SIG1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(C_SIG1-Pad2)": [
+      {
+        "component": "C_SIG1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R_PS1-Pad1)": [
+      {
+        "component": "R_PS1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R_PS1-Pad2)": [
+      {
+        "component": "R_PS1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R_SIG1-Pad1)": [
+      {
+        "component": "R_SIG1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R_SIG1-Pad2)": [
+      {
+        "component": "R_SIG1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ]
+  },
+  "subcircuits": [],
+  "annotations": []
+}

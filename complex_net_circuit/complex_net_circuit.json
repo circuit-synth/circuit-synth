@@ -1,0 +1,167 @@
+{
+  "name": "main",
+  "description": "",
+  "tstamps": "",
+  "source_file": "main.kicad_sch",
+  "components": {
+    "C1": {
+      "symbol": "Device:C",
+      "ref": "C1",
+      "value": "100n",
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    },
+    "L1": {
+      "symbol": "Device:L",
+      "ref": "L1",
+      "value": "10u",
+      "footprint": "Inductor_SMD:L_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    },
+    "R1": {
+      "symbol": "Device:R",
+      "ref": "R1",
+      "value": "1k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    },
+    "R2": {
+      "symbol": "Device:R",
+      "ref": "R2",
+      "value": "2k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    },
+    "R3": {
+      "symbol": "Device:R",
+      "ref": "R3",
+      "value": "3k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    }
+  },
+  "nets": {
+    "unconnected-(C1-Pad1)": [
+      {
+        "component": "C1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(C1-Pad2)": [
+      {
+        "component": "C1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(L1-Pad1)": [
+      {
+        "component": "L1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(L1-Pad2)": [
+      {
+        "component": "L1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R1-Pad1)": [
+      {
+        "component": "R1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R1-Pad2)": [
+      {
+        "component": "R1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R2-Pad1)": [
+      {
+        "component": "R2",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R2-Pad2)": [
+      {
+        "component": "R2",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R3-Pad1)": [
+      {
+        "component": "R3",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R3-Pad2)": [
+      {
+        "component": "R3",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ]
+  },
+  "subcircuits": [],
+  "annotations": []
+}

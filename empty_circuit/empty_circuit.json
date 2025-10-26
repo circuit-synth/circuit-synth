@@ -1,8 +1,8 @@
 {
-  "name": "blank",
+  "name": "main",
   "description": "",
-  "tstamps": "/blank-4422256080/",
-  "source_file": "blank.kicad_sch",
+  "tstamps": "",
+  "source_file": "main.kicad_sch",
   "components": {},
   "nets": {},
   "subcircuits": [],

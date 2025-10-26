@@ -111,8 +111,8 @@ class TestLibrarySourceConfig:
         # SnapEDA should not be configured initially
         assert self.config.is_source_configured(LibrarySource.SNAPEDA) is False
 
-        # DigiKey should not be configured initially
-        assert self.config.is_source_configured(LibrarySource.DIGIKEY) is False
+        # DigiKey API should not be configured initially
+        assert self.config.is_source_configured(LibrarySource.DIGIKEY_API) is False
 
 
 class TestLibraryOrchestrator:
@@ -206,9 +206,10 @@ class TestSearchQuery:
 
         expected_sources = [
             LibrarySource.LOCAL_KICAD,
+            LibrarySource.DIGIKEY_GITHUB,
             LibrarySource.HTTP_LIBRARY,
             LibrarySource.SNAPEDA,
-            LibrarySource.DIGIKEY,
+            LibrarySource.DIGIKEY_API,
         ]
 
         assert query.preferred_sources == expected_sources
@@ -222,7 +223,7 @@ class TestSearchQuery:
         )
 
         assert len(query.preferred_sources) == 2
-        assert LibrarySource.DIGIKEY not in query.preferred_sources
+        assert LibrarySource.DIGIKEY_API not in query.preferred_sources
 
 
 class TestComponentSearchResult:
