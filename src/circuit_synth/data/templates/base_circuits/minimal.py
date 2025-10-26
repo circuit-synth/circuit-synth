@@ -79,3 +79,35 @@ if __name__ == "__main__":
 
     print("✅ Circuit generated successfully!")
     print("📁 Open in KiCad: my_circuit/my_circuit.kicad_pro")
+    print()
+
+    # Generate manufacturing files (BOM, PDF, Gerbers)
+    print("📦 Generating manufacturing files...")
+    print()
+
+    # Generate BOM for component ordering
+    bom_result = circuit_obj.generate_bom(project_name="my_circuit")
+    if bom_result["success"]:
+        print(f"✅ BOM generated: {bom_result['file']}")
+        print(f"   Components: {bom_result['component_count']}")
+    else:
+        print(f"⚠️  BOM generation failed: {bom_result.get('error')}")
+    print()
+
+    # Generate PDF schematic for documentation
+    pdf_result = circuit_obj.generate_pdf_schematic(project_name="my_circuit")
+    if pdf_result["success"]:
+        print(f"✅ PDF schematic generated: {pdf_result['file']}")
+    else:
+        print(f"⚠️  PDF generation failed: {pdf_result.get('error')}")
+    print()
+
+    # Generate Gerber files for manufacturing
+    gerber_result = circuit_obj.generate_gerbers(project_name="my_circuit")
+    if gerber_result["success"]:
+        print(f"✅ Gerber files generated: {gerber_result['output_dir']}")
+        print(f"   Gerber files: {len(gerber_result['gerber_files'])}")
+        if gerber_result["drill_files"]:
+            print(f"   Drill files: {gerber_result['drill_files']}")
+    else:
+        print(f"⚠️  Gerber generation failed: {gerber_result.get('error')}")
