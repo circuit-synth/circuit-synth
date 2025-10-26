@@ -769,6 +769,133 @@ class Circuit:
                 "error": error_msg,
             }
 
+    def generate_bom(
+        self,
+        output_file: Optional[str] = None,
+        project_name: Optional[str] = None,
+        fields: Optional[str] = None,
+        labels: Optional[str] = None,
+        group_by: Optional[str] = None,
+        exclude_dnp: bool = False,
+    ) -> Dict[str, Any]:
+        """
+        Generate a Bill of Materials (BOM) from this circuit as a CSV file.
+
+        This method creates a KiCad project if one doesn't already exist, then
+        exports the schematic to a CSV BOM file using kicad-cli.
+
+        Args:
+            output_file: Path where CSV BOM should be written. If not provided,
+                        defaults to {project_name}/{project_name}.csv
+            project_name: Name of the KiCad project directory. If not provided,
+                         defaults to the circuit name. Required if output_file is provided
+                         but needs a project.
+            fields: Comma-separated fields to export from schematic. If not specified,
+                   KiCad will export default fields (Refs, Value, Footprint, etc.)
+            labels: Comma-separated column headers for the BOM. Must match the number
+                   of fields if fields are specified.
+            group_by: Field to group references by when exporting. Common values:
+                     "Value" (group by component value), "Footprint", etc.
+            exclude_dnp: If True, exclude "Do not populate" components from BOM
+
+        Returns:
+            dict: Result dictionary containing:
+                - success (bool): True if BOM was successfully generated
+                - file (Path): Path to the generated CSV file
+                - component_count (int): Number of components in the BOM
+                - project_path (Path): Path to the KiCad project directory
+                - error (str, optional): Error message if generation failed
+
+        Example:
+            >>> circuit = led_blinker()
+            >>> result = circuit.generate_bom(project_name="led_blinker")
+            >>> print(f"BOM exported to: {result['file']}")
+            >>> print(f"Component count: {result['component_count']}")
+
+        Raises:
+            FileNotFoundError: If kicad-cli is not available
+            RuntimeError: If BOM export fails
+        """
+        from ..kicad.bom_exporter import BOMExporter
+
+        # Determine project name
+        if project_name is None:
+            project_name = self.name
+
+        # Determine output file
+        if output_file is None:
+            output_path = Path(project_name)
+            output_file = output_path / f"{project_name}.csv"
+        else:
+            output_file = Path(output_file)
+
+        try:
+            # Generate KiCad project if needed
+            project_path = Path(project_name).resolve()
+            project_base_name = project_path.name
+            sch_file = project_path / f"{project_base_name}.kicad_sch"
+
+            if not sch_file.exists():
+                context_logger.info(
+                    "Generating KiCad project for BOM export",
+                    component="CIRCUIT",
+                    circuit_name=self.name,
+                    project_name=project_name,
+                )
+
+                project_result = self.generate_kicad_project(
+                    project_name=project_name,
+                    generate_pcb=False,  # Only need schematic for BOM
+                )
+
+                if not project_result.get("success"):
+                    error_msg = f"Failed to generate KiCad project: {project_result.get('error')}"
+                    context_logger.error(
+                        error_msg, component="CIRCUIT", project_name=project_name
+                    )
+                    return {"success": False, "error": error_msg}
+
+            else:
+                context_logger.debug(
+                    "Using existing KiCad project for BOM export",
+                    component="CIRCUIT",
+                    project_path=str(project_path),
+                )
+
+            # Export BOM using kicad-cli
+            context_logger.info(
+                "Exporting BOM",
+                component="CIRCUIT",
+                schematic_file=str(sch_file),
+                output_file=str(output_file),
+            )
+
+            bom_result = BOMExporter.export_csv(
+                schematic_file=sch_file,
+                output_file=output_file,
+                fields=fields,
+                labels=labels,
+                group_by=group_by,
+                exclude_dnp=exclude_dnp,
+            )
+
+            # Add project path to result
+            bom_result["project_path"] = project_path
+
+            return bom_result
+
+        except FileNotFoundError as e:
+            error_msg = f"Cannot export BOM: {e}"
+            context_logger.error(error_msg, component="CIRCUIT")
+            return {"success": False, "error": error_msg}
+
+        except Exception as e:
+            error_msg = f"Failed to generate BOM: {e}"
+            context_logger.error(
+                error_msg, component="CIRCUIT", exception=str(e)
+            )
+            return {"success": False, "error": error_msg}
+
     def simulate(self):
         """
         Create a simulator instance for this circuit.

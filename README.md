@@ -332,9 +332,104 @@ In these cases, KiCad generation still works normally - only the Python source u
 
 ---
 
+## 📋 Bill of Materials (BOM) Export
+
+Generate manufacturing-ready BOMs directly from your circuit code. Circuit-synth can export BOMs in standard CSV format for ordering components and manufacturing.
+
+### Quick Start
+
+```python
+from circuit_synth import circuit, Component
+
+@circuit(name="MyBoard")
+def my_board():
+    r1 = Component(symbol="Device:R", value="10k", ref="R1")
+    r2 = Component(symbol="Device:R", value="1k", ref="R2")
+    c1 = Component(symbol="Device:C", value="100nF", ref="C1")
+    return locals()
+
+circuit = my_board()
+
+# Generate BOM
+result = circuit.generate_bom(project_name="my_board")
+print(f"BOM exported to: {result['file']}")
+print(f"Component count: {result['component_count']}")
+```
+
+Generated BOM (`my_board/my_board.csv`):
+```csv
+"Refs","Value","Footprint","Qty","DNP"
+"C1","100nF","","1",""
+"R1","10k","","1",""
+"R2","1k","","1",""
+```
+
+### Features
+
+- ✅ **One-Line Export**: Single method call generates complete BOM
+- ✅ **CSV Format**: Standard format compatible with JLCPCB, PCBWay, OSH Park
+- ✅ **Auto Project Generation**: Creates KiCad project if needed
+- ✅ **Custom Output**: Specify output file path and format options
+- ✅ **KiCad CLI Powered**: Uses official KiCad kicad-cli tool (KiCad 8.0+)
+- ✅ **Component Grouping**: Optional grouping by value, footprint, or other fields
+- ✅ **DNP Handling**: Exclude "Do not populate" components when needed
+
+### Advanced Usage
+
+```python
+# Custom output path
+result = circuit.generate_bom(
+    project_name="my_board",
+    output_file="manufacturing/bom.csv"
+)
+
+# Group components by value (consolidate identical parts)
+result = circuit.generate_bom(
+    project_name="my_board",
+    group_by="Value"
+)
+
+# Exclude "Do not populate" components
+result = circuit.generate_bom(
+    project_name="my_board",
+    exclude_dnp=True
+)
+
+# Custom fields
+result = circuit.generate_bom(
+    project_name="my_board",
+    fields="Reference,Value,Footprint,Quantity",
+    labels="Designator,Part Value,Package,Qty"
+)
+```
+
+### Return Value
+
+```python
+{
+    "success": True,
+    "file": Path("my_board/my_board.csv"),
+    "component_count": 15,
+    "project_path": Path("my_board")
+}
+```
+
+### Requirements
+
+- KiCad 8.0 or later
+- `kicad-cli` must be available in PATH
+
+### Next Steps
+
+Once you have your BOM:
+1. **Ordering**: Upload to JLCPCB, PCBWay, or your preferred manufacturer
+2. **Pricing**: Use component search tools to find best suppliers
+3. **Manufacturing**: Submit with Gerber files and assembly drawings
+
 ## Core Features
 
 - **Automatic Source Reference Rewriting**: Keep Python and KiCad refs synchronized (see above)
+- **Bill of Materials Export**: Generate manufacturing-ready BOMs in CSV format (see above)
 - **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files with modern kicad-sch-api integration
 - **Circuit Patterns Library**: 7 pre-made, manufacturing-ready circuits (buck/boost converters, battery chargers, sensors, communication)
 - **Hierarchical Design**: Modular subcircuits like software modules
