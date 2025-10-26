@@ -70,13 +70,13 @@ def get_recommended_generator() -> str:
 
 ### Version Requirements
 
-- **kicad-sch-api**: >= 0.1.1 (PyPI package)
+- **kicad-sch-api**: >= 0.3.4 (PyPI package)
 - **packaging**: >= 21.0 (for version checking)
 
 Add to your `pyproject.toml`:
 ```toml
 dependencies = [
-    "kicad-sch-api>=0.1.1",
+    "kicad-sch-api>=0.3.4",
     "packaging>=21.0",
 ]
 ```
@@ -161,7 +161,7 @@ def write_positioned_schematic(self, positioned_components: List[Dict],
 The kicad-sch-api package is valuable as a standalone tool:
 
 ```bash
-pip install kicad-sch-api
+pip install kicad-sch-api>=0.3.4
 ```
 
 ```python
@@ -213,7 +213,7 @@ INFO: Using legacy writer for hierarchical schematic: ESP32_C6_Dev_Board.kicad_s
 ### Version Conflicts
 If you encounter issues:
 ```bash
-pip install --upgrade kicad-sch-api packaging
+pip install --upgrade "kicad-sch-api>=0.3.4" packaging
 ```
 
 ### Fallback Behavior
