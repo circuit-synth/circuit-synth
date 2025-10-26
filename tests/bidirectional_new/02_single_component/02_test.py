@@ -134,16 +134,80 @@ def test_01_generate_single_resistor_to_kicad():
     # Parse generated schematic using kicad-sch-api
     generated = ksa.Schematic.load(str(kicad_sch))
     assert generated is not None, "Failed to parse generated schematic"
+    print(f"  ✓ kicad-sch-api: Parsed schematic successfully")
 
-    # Verify schematic has exactly 1 component
-    assert len(generated.components) == 1, f"Expected 1 component, found {len(generated.components)}"
+    # Exercise kicad-sch-api: Verify schematic has exactly 1 component
+    components = generated.components
+    assert len(components) == 1, f"Expected 1 component, found {len(components)}"
+    print(f"  ✓ kicad-sch-api: Found {len(components)} component (expected 1)")
 
-    # Verify component properties
-    r1 = generated.components[0]
-    assert r1.reference == "R1", f"Expected reference 'R1', got '{r1.reference}'"
-    assert r1.value == "10k", f"Expected value '10k', got '{r1.value}'"
-    assert r1.footprint == "Resistor_SMD:R_0603_1608Metric", f"Expected footprint 'Resistor_SMD:R_0603_1608Metric', got '{r1.footprint}'"
-    assert r1.lib_id == "Device:R", f"Expected lib_id 'Device:R', got '{r1.lib_id}'"
+    # Exercise kicad-sch-api: Get component and verify all properties
+    r1 = components[0]
+
+    # Test reference property
+    reference = r1.reference
+    assert reference == "R1", f"Expected reference 'R1', got '{reference}'"
+    print(f"  ✓ kicad-sch-api: Component.reference = '{reference}'")
+
+    # Test value property
+    value = r1.value
+    assert value == "10k", f"Expected value '10k', got '{value}'"
+    print(f"  ✓ kicad-sch-api: Component.value = '{value}'")
+
+    # Test footprint property
+    footprint = r1.footprint
+    assert footprint == "Resistor_SMD:R_0603_1608Metric", f"Expected footprint 'Resistor_SMD:R_0603_1608Metric', got '{footprint}'"
+    print(f"  ✓ kicad-sch-api: Component.footprint = '{footprint}'")
+
+    # Test lib_id property
+    lib_id = r1.lib_id
+    assert lib_id == "Device:R", f"Expected lib_id 'Device:R', got '{lib_id}'"
+    print(f"  ✓ kicad-sch-api: Component.lib_id = '{lib_id}'")
+
+    # Exercise kicad-sch-api: Check wires and other properties
+    wires = generated.wires
+    print(f"  ✓ kicad-sch-api: Found {len(wires)} wires")
+
+    junctions = generated.junctions
+    print(f"  ✓ kicad-sch-api: Found {len(junctions)} junctions")
+
+    version = generated.version
+    print(f"  ✓ kicad-sch-api: Version = {version}")
+
+    uuid = generated.uuid
+    print(f"  ✓ kicad-sch-api: UUID = {uuid}")
+
+    # Exercise kicad-sch-api: Access additional schematic elements via _data
+    # These are currently only accessible through _data, not public properties
+    texts = generated._data.get('texts', [])
+    print(f"  ✓ kicad-sch-api: Found {len(texts)} text elements (via _data)")
+
+    text_boxes = generated._data.get('text_boxes', [])
+    print(f"  ✓ kicad-sch-api: Found {len(text_boxes)} text boxes (via _data)")
+
+    labels = generated._data.get('labels', [])
+    print(f"  ✓ kicad-sch-api: Found {len(labels)} labels (via _data)")
+
+    hierarchical_labels = generated._data.get('hierarchical_labels', [])
+    print(f"  ✓ kicad-sch-api: Found {len(hierarchical_labels)} hierarchical labels (via _data)")
+
+    rectangles = generated._data.get('rectangles', [])
+    print(f"  ✓ kicad-sch-api: Found {len(rectangles)} rectangles (via _data)")
+
+    polylines = generated._data.get('polylines', [])
+    print(f"  ✓ kicad-sch-api: Found {len(polylines)} polylines (via _data)")
+
+    circles = generated._data.get('circles', [])
+    print(f"  ✓ kicad-sch-api: Found {len(circles)} circles (via _data)")
+
+    arcs = generated._data.get('arcs', [])
+    print(f"  ✓ kicad-sch-api: Found {len(arcs)} arcs (via _data)")
+
+    beziers = generated._data.get('beziers', [])
+    print(f"  ✓ kicad-sch-api: Found {len(beziers)} beziers (via _data)")
+
+    images = generated._data.get('images', [])
+    print(f"  ✓ kicad-sch-api: Found {len(images)} images (via _data)")
 
     # Load reference schematic and compare
     ref_kicad_dir = test_dir / "02_kicad_ref"
@@ -151,20 +215,39 @@ def test_01_generate_single_resistor_to_kicad():
         ref_sch_file = ref_kicad_dir / "02_kicad_ref.kicad_sch"
         if ref_sch_file.exists():
             reference = ksa.Schematic.load(str(ref_sch_file))
+            print(f"  ✓ kicad-sch-api: Parsed reference schematic")
 
-            # Compare key properties
-            assert len(reference.components) == len(generated.components), \
-                f"Component count mismatch: reference has {len(reference.components)}, generated has {len(generated.components)}"
+            # Compare component counts
+            ref_components = reference.components
+            assert len(ref_components) == len(components), \
+                f"Component count mismatch: reference has {len(ref_components)}, generated has {len(components)}"
+            print(f"  ✓ kicad-sch-api: Component count matches (both have {len(components)})")
 
-            for ref_comp, gen_comp in zip(reference.components, generated.components):
-                assert ref_comp.reference == gen_comp.reference, \
-                    f"Reference mismatch: {ref_comp.reference} != {gen_comp.reference}"
-                assert ref_comp.value == gen_comp.value, \
-                    f"Value mismatch for {gen_comp.reference}: {ref_comp.value} != {gen_comp.value}"
-                assert ref_comp.footprint == gen_comp.footprint, \
-                    f"Footprint mismatch for {gen_comp.reference}: {ref_comp.footprint} != {gen_comp.footprint}"
-                assert ref_comp.lib_id == gen_comp.lib_id, \
-                    f"Library ID mismatch for {gen_comp.reference}: {ref_comp.lib_id} != {gen_comp.lib_id}"
+            # Compare each component property
+            for ref_comp, gen_comp in zip(ref_components, components):
+                ref_ref = ref_comp.reference
+                gen_ref = gen_comp.reference
+                assert ref_ref == gen_ref, \
+                    f"Reference mismatch: {ref_ref} != {gen_ref}"
+                print(f"  ✓ kicad-sch-api: Reference matches: {gen_ref}")
+
+                ref_val = ref_comp.value
+                gen_val = gen_comp.value
+                assert ref_val == gen_val, \
+                    f"Value mismatch for {gen_ref}: {ref_val} != {gen_val}"
+                print(f"  ✓ kicad-sch-api: Value matches: {gen_val}")
+
+                ref_fp = ref_comp.footprint
+                gen_fp = gen_comp.footprint
+                assert ref_fp == gen_fp, \
+                    f"Footprint mismatch for {gen_ref}: {ref_fp} != {gen_fp}"
+                print(f"  ✓ kicad-sch-api: Footprint matches: {gen_fp}")
+
+                ref_lib = ref_comp.lib_id
+                gen_lib = gen_comp.lib_id
+                assert ref_lib == gen_lib, \
+                    f"Library ID mismatch for {gen_ref}: {ref_lib} != {gen_lib}"
+                print(f"  ✓ kicad-sch-api: Library ID matches: {gen_lib}")
 
     print("✅ Test 2.1 PASSED: Single resistor schematic matches reference")
 

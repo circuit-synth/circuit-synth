@@ -138,13 +138,67 @@ def test_01_generate_blank_kicad_from_python():
     schematic = ksa.Schematic.load(str(kicad_sch))
     assert schematic is not None, "Failed to parse schematic with kicad-sch-api"
 
-    # Verify schematic is blank (no components)
-    assert len(schematic.components) == 0, f"Blank circuit should have no components, found {len(schematic.components)}"
-    assert len(schematic.wires) == 0, f"Blank circuit should have no wires, found {len(schematic.wires)}"
+    # Exercise kicad-sch-api: Verify schematic is blank (no components)
+    components = schematic.components
+    assert len(components) == 0, f"Blank circuit should have no components, found {len(components)}"
+    print(f"  ✓ kicad-sch-api: Found {len(components)} components (expected 0)")
 
-    # Verify basic schematic properties
-    assert schematic.version is not None, "Schematic should have a version"
-    assert schematic.uuid is not None, "Schematic should have a UUID"
+    # Exercise kicad-sch-api: Verify no wires/junctions
+    wires = schematic.wires
+    assert len(wires) == 0, f"Blank circuit should have no wires, found {len(wires)}"
+    print(f"  ✓ kicad-sch-api: Found {len(wires)} wires (expected 0)")
+
+    junctions = schematic.junctions
+    assert len(junctions) == 0, f"Blank circuit should have no junctions, found {len(junctions)}"
+    print(f"  ✓ kicad-sch-api: Found {len(junctions)} junctions (expected 0)")
+
+    # Exercise kicad-sch-api: Verify basic schematic properties
+    version = schematic.version
+    assert version is not None, "Schematic should have a version"
+    print(f"  ✓ kicad-sch-api: Version = {version}")
+
+    uuid = schematic.uuid
+    assert uuid is not None, "Schematic should have a UUID"
+    print(f"  ✓ kicad-sch-api: UUID = {uuid}")
+
+    generator = schematic.generator
+    print(f"  ✓ kicad-sch-api: Generator = {generator}")
+
+    title_block = schematic.title_block
+    assert isinstance(title_block, dict), "Title block should be a dictionary"
+    print(f"  ✓ kicad-sch-api: Title block is dict with {len(title_block)} properties")
+
+    # Exercise kicad-sch-api: Access additional schematic elements via _data
+    # These are currently only accessible through _data, not public properties
+    texts = schematic._data.get('texts', [])
+    print(f"  ✓ kicad-sch-api: Found {len(texts)} text elements (via _data)")
+
+    text_boxes = schematic._data.get('text_boxes', [])
+    print(f"  ✓ kicad-sch-api: Found {len(text_boxes)} text boxes (via _data)")
+
+    labels = schematic._data.get('labels', [])
+    print(f"  ✓ kicad-sch-api: Found {len(labels)} labels (via _data)")
+
+    hierarchical_labels = schematic._data.get('hierarchical_labels', [])
+    print(f"  ✓ kicad-sch-api: Found {len(hierarchical_labels)} hierarchical labels (via _data)")
+
+    rectangles = schematic._data.get('rectangles', [])
+    print(f"  ✓ kicad-sch-api: Found {len(rectangles)} rectangles (via _data)")
+
+    polylines = schematic._data.get('polylines', [])
+    print(f"  ✓ kicad-sch-api: Found {len(polylines)} polylines (via _data)")
+
+    circles = schematic._data.get('circles', [])
+    print(f"  ✓ kicad-sch-api: Found {len(circles)} circles (via _data)")
+
+    arcs = schematic._data.get('arcs', [])
+    print(f"  ✓ kicad-sch-api: Found {len(arcs)} arcs (via _data)")
+
+    beziers = schematic._data.get('beziers', [])
+    print(f"  ✓ kicad-sch-api: Found {len(beziers)} beziers (via _data)")
+
+    images = schematic._data.get('images', [])
+    print(f"  ✓ kicad-sch-api: Found {len(images)} images (via _data)")
 
     print("✅ Test 1.1 PASSED: Blank KiCad project generated successfully")
 
