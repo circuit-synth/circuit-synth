@@ -334,6 +334,12 @@ class TestPhase6Preservation:
                 net_vcc = Net("VCC")
                 net_gnd = Net("GND")
 
+                # Connect nets to component pins
+                net_vcc += r1[1]  # Connect VCC to R1 pin 1
+                net_gnd += r1[2]  # Connect GND to R1 pin 2
+                net_vcc += r2[1]  # Connect VCC to R2 pin 1
+                net_gnd += r2[2]  # Connect GND to R2 pin 2
+
             circuit_obj = routed_circuit()
 
             # Step 1: Generate KiCad project
@@ -380,9 +386,14 @@ class TestPhase6Preservation:
             main_module = __import__("importlib.util").util.module_from_spec(spec)
             spec.loader.exec_module(main_module)
 
-            # Get circuit from generated module
-            circuit_func = getattr(main_module, "routed_circuit", None)
+            # Get circuit from generated module - try both expected name and fallback
+            circuit_func = getattr(main_module, "routed_circuit", None) or getattr(main_module, "main", None)
+
             if circuit_func:
+                # Clear any existing circuit context to avoid reference collisions
+                from circuit_synth.core.decorators import set_current_circuit
+                set_current_circuit(None)
+
                 regen_circuit = circuit_func()
                 result2 = regen_circuit.generate_kicad_project(
                     project_name="routed_circuit_regen",
@@ -402,11 +413,13 @@ class TestPhase6Preservation:
                     net_count_1 == net_count_2
                 ), f"Net count changed: {net_count_1} → {net_count_2}"
 
-            print(f"✅ Test 6.4 PASS: Wire routing idempotency")
-            print(f"   - Original nets: {net_count_1}")
-            print(f"   - Imported and regenerated: ✓")
-            print(f"   - Net count preserved: {net_count_2}")
-            print(f"   - Idempotency verified: ✓")
+                print(f"✅ Test 6.4 PASS: Wire routing idempotency")
+                print(f"   - Original nets: {net_count_1}")
+                print(f"   - Imported and regenerated: ✓")
+                print(f"   - Net count preserved: {net_count_2}")
+                print(f"   - Idempotency verified: ✓")
+            else:
+                raise AssertionError("circuit function not found in generated module")
 
     def test_6_5_user_comments_idempotency(self):
         """Test 6.5: User comments idempotent across multiple imports

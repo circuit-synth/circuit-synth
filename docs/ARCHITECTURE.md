@@ -20,7 +20,7 @@ Circuit-synth is built around a **JSON-centric architecture** with modern **kica
 2. **JSON Serialization**: The `Circuit.to_dict()` method converts the circuit hierarchy to JSON
 3. **KiCad Generation**: JSON is processed with hybrid architecture:
    - **Legacy positioning system**: Handles component placement and hierarchical structure
-   - **Modern kicad-sch-api**: Professional schematic file generation via PyPI package (v0.1.1+)
+   - **Modern kicad-sch-api**: Professional schematic file generation via PyPI package (v0.3.4+)
    - **Intelligent selection**: Automatically chooses optimal approach per schematic type
 
 ### KiCad → JSON → Python
