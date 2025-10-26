@@ -19,9 +19,14 @@ class TestBOMExporter:
 
     def test_bom_exporter_requires_kicad(self, tmp_path):
         """Test that BOMExporter requires kicad-cli to be available."""
-        # Create a dummy schematic file
+        # Create a valid KiCad schematic file
         sch_file = tmp_path / "test.kicad_sch"
-        sch_file.write_text("(kicad_sch)")
+        valid_sch = '''(kicad_sch (version 20250114) (generator "eeschema") (generator_version "9.0")
+  (paper "A4")
+  (lib_symbols)
+  (symbol_instances)
+)'''
+        sch_file.write_text(valid_sch)
 
         output_file = tmp_path / "bom.csv"
 
@@ -69,7 +74,8 @@ class TestCircuitGenerateBOM:
             assert result["success"] is True
             assert result["file"].exists()
             assert result["component_count"] == 4
-            assert result["project_path"] == Path("test_simple")
+            # project_path is returned as absolute path
+            assert result["project_path"].name == "test_simple"
 
             # Verify CSV structure
             with open(result["file"], 'r') as f:

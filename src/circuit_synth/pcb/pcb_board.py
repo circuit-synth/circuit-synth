@@ -1427,6 +1427,26 @@ class PCBBoard:
         Raises:
             ValueError: If unknown algorithm is specified
         """
+        # List of valid algorithms
+        VALID_ALGORITHMS = {
+            "hierarchical",
+            "force_directed",
+            "advanced",
+            "connectivity_driven",
+            "connection_centric",
+            "external",
+        }
+        DEFAULT_ALGORITHM = "hierarchical"
+
+        # Use default if algorithm is invalid
+        if algorithm not in VALID_ALGORITHMS:
+            logger.warning(
+                f"⚠️  INVALID PLACEMENT ALGORITHM: '{algorithm}'\n"
+                f"Valid algorithms are: {', '.join(sorted(VALID_ALGORITHMS))}\n"
+                f"Using default algorithm '{DEFAULT_ALGORITHM}' instead"
+            )
+            algorithm = DEFAULT_ALGORITHM
+
         if algorithm == "hierarchical":
             from .placement.hierarchical_placement_v2 import HierarchicalPlacerV2
 
@@ -1832,9 +1852,6 @@ class PCBBoard:
             logger.info(
                 f"Added cutout rectangle: ({cutout_start_x}, {cutout_start_y}) to ({cutout_end_x}, {cutout_end_y})"
             )
-
-        else:
-            raise ValueError(f"Unknown placement algorithm: {algorithm}")
 
     def get_placement_bbox(self) -> Optional[Tuple[float, float, float, float]]:
         """
