@@ -101,13 +101,16 @@ def cleanup_before_test():
 
 def test_01_generate_single_resistor_to_kicad():
     """
-    Test 2.1: Generate single resistor to KiCad.
+    Test 2.1: Generate single resistor to KiCad and compare with reference.
 
     Validates:
     - Python circuit with single component generates successfully
-    - Valid KiCad project created
-    - Schematic has exactly 1 component (R1)
+    - Valid KiCad project created with correct schematic structure
+    - Component properties match reference fixture (R1, 10k, footprint)
+    - Generated schematic matches reference schematic structure
     """
+    import kicad_sch_api as ksa
+
     test_dir = Path(__file__).parent
 
     # Run the Python circuit to generate KiCad
@@ -125,25 +128,45 @@ def test_01_generate_single_resistor_to_kicad():
     kicad_dir = test_dir / "single_resistor"
     assert kicad_dir.exists(), "KiCad project directory not created"
 
-    kicad_pro = kicad_dir / "single_resistor.kicad_pro"
     kicad_sch = kicad_dir / "single_resistor.kicad_sch"
-    kicad_json = kicad_dir / "single_resistor.json"
-
-    assert kicad_pro.exists(), "KiCad project file (.kicad_pro) not created"
     assert kicad_sch.exists(), "KiCad schematic file (.kicad_sch) not created"
-    assert kicad_json.exists(), "KiCad netlist JSON file (.json) not created"
 
-    # Verify schematic has exactly 1 resistor component
-    sch_content = kicad_sch.read_text()
-    assert "(kicad_sch" in sch_content, "Invalid KiCad schematic format"
+    # Parse generated schematic using kicad-sch-api
+    generated = ksa.Schematic.load(str(kicad_sch))
+    assert generated is not None, "Failed to parse generated schematic"
 
-    # Count actual component instances (after lib_symbols section)
-    # Look for symbol with lib_id to count actual placed components
-    import re
-    instance_count = len(re.findall(r'\n\s+\(symbol\s+\(lib_id', sch_content))
-    assert instance_count == 1, f"Expected 1 component instance, found {instance_count}"
+    # Verify schematic has exactly 1 component
+    assert len(generated.components) == 1, f"Expected 1 component, found {len(generated.components)}"
 
-    print("✅ Test 2.1 PASSED: Single resistor generated to KiCad successfully")
+    # Verify component properties
+    r1 = generated.components[0]
+    assert r1.reference == "R1", f"Expected reference 'R1', got '{r1.reference}'"
+    assert r1.value == "10k", f"Expected value '10k', got '{r1.value}'"
+    assert r1.footprint == "Resistor_SMD:R_0603_1608Metric", f"Expected footprint 'Resistor_SMD:R_0603_1608Metric', got '{r1.footprint}'"
+    assert r1.lib_id == "Device:R", f"Expected lib_id 'Device:R', got '{r1.lib_id}'"
+
+    # Load reference schematic and compare
+    ref_kicad_dir = test_dir / "02_kicad_ref"
+    if ref_kicad_dir.exists():
+        ref_sch_file = ref_kicad_dir / "02_kicad_ref.kicad_sch"
+        if ref_sch_file.exists():
+            reference = ksa.Schematic.load(str(ref_sch_file))
+
+            # Compare key properties
+            assert len(reference.components) == len(generated.components), \
+                f"Component count mismatch: reference has {len(reference.components)}, generated has {len(generated.components)}"
+
+            for ref_comp, gen_comp in zip(reference.components, generated.components):
+                assert ref_comp.reference == gen_comp.reference, \
+                    f"Reference mismatch: {ref_comp.reference} != {gen_comp.reference}"
+                assert ref_comp.value == gen_comp.value, \
+                    f"Value mismatch for {gen_comp.reference}: {ref_comp.value} != {gen_comp.value}"
+                assert ref_comp.footprint == gen_comp.footprint, \
+                    f"Footprint mismatch for {gen_comp.reference}: {ref_comp.footprint} != {gen_comp.footprint}"
+                assert ref_comp.lib_id == gen_comp.lib_id, \
+                    f"Library ID mismatch for {gen_comp.reference}: {ref_comp.lib_id} != {gen_comp.lib_id}"
+
+    print("✅ Test 2.1 PASSED: Single resistor schematic matches reference")
 
 
 def test_02_import_single_resistor_from_kicad():

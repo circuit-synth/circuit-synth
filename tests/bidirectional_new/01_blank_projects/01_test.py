@@ -105,7 +105,7 @@ def test_01_generate_blank_kicad_from_python():
     Validates:
     - Python → KiCad generation works with empty circuit
     - Valid project files created
-    - No crashes on minimal input
+    - Schematic structure matches expected format using kicad-sch-api
     """
     test_dir = Path(__file__).parent
 
@@ -132,10 +132,19 @@ def test_01_generate_blank_kicad_from_python():
     assert kicad_sch.exists(), "KiCad schematic file (.kicad_sch) not created"
     assert kicad_pcb.exists(), "KiCad PCB file (.kicad_pcb) not created"
 
-    # Verify schematic is valid and has no components
-    sch_content = kicad_sch.read_text()
-    assert "(kicad_sch" in sch_content, "Invalid KiCad schematic format"
-    assert "(symbol" not in sch_content, "Blank circuit should have no components"
+    # Use kicad-sch-api to parse and verify schematic structure
+    import kicad_sch_api as ksa
+
+    schematic = ksa.Schematic.load(str(kicad_sch))
+    assert schematic is not None, "Failed to parse schematic with kicad-sch-api"
+
+    # Verify schematic is blank (no components)
+    assert len(schematic.components) == 0, f"Blank circuit should have no components, found {len(schematic.components)}"
+    assert len(schematic.wires) == 0, f"Blank circuit should have no wires, found {len(schematic.wires)}"
+
+    # Verify basic schematic properties
+    assert schematic.version is not None, "Schematic should have a version"
+    assert schematic.uuid is not None, "Schematic should have a UUID"
 
     print("✅ Test 1.1 PASSED: Blank KiCad project generated successfully")
 
