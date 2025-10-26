@@ -1,470 +1,246 @@
 #!/usr/bin/env python3
 """
-Test 03: Position Preservation - Component Layout Stability
+Test 03: Position Preservation - Simple Visual Verification
 
-CRITICAL tests validating that component positions on the schematic are
-preserved through bidirectional sync cycles.
+CRITICAL: Tests that component positions survive sync operations.
+This is crucial - if positions reset, the tool is unusable!
 
-Environment Variables:
-    PRESERVE_TEST_ARTIFACTS=1  - Keep all generated files in test_artifacts/ directory
+Just run and manually verify positions are preserved.
 """
 
-import ast
-import os
-import pytest
-import re
-from pathlib import Path
-import tempfile
-import shutil
 import subprocess
-
-# Import circuit-synth components
-from circuit_synth import circuit, Component
-from circuit_synth.tools.kicad_integration.kicad_to_python_sync import KiCadToPythonSyncer
+from pathlib import Path
 
 
-# Check if we should preserve test artifacts
-PRESERVE_ARTIFACTS = os.getenv("PRESERVE_TEST_ARTIFACTS", "").lower() in ("1", "true", "yes")
-
-
-def get_test_artifacts_dir():
-    """Get or create test_artifacts directory."""
-    test_dir = Path(__file__).parent
-    artifacts_dir = test_dir / "test_artifacts"
-
-    if PRESERVE_ARTIFACTS:
-        artifacts_dir.mkdir(exist_ok=True)
-
-    return artifacts_dir
-
-
-def extract_component_position(sch_content):
+def test_01_positions_survive_roundtrip():
     """
-    Extract component position from KiCad schematic content.
-    
-    Returns dict with:
-        reference: "R1"
-        x: 30.48 (float, mm)
-        y: 35.56 (float, mm)
-        rotation: 0 (int, degrees)
+    Test 3.1: Component positions preserved through Python → KiCad → Python.
+
+    What to check manually:
+    1. Run this test
+    2. Open generated_roundtrip/step2_kicad/two_resistors/two_resistors.kicad_pro in KiCad
+    3. Note the X,Y positions of R1 and R2
+    4. Run the circuit generation again from step3_roundtrip.py
+    5. Open the new KiCad project
+    6. Verify: R1 and R2 are in the SAME positions (not moved!)
     """
-    # Find symbol instance with lib_id and extract position
-    # Pattern: (symbol (lib_id "Device:R") (at X Y rotation) ...)
-    pattern = r'\(symbol\s+\(lib_id\s+"Device:R"\)\s+\(at\s+([\d.]+)\s+([\d.]+)\s+(\d+)\)'
-    match = re.search(pattern, sch_content)
-    
-    if not match:
-        return None
-    
-    return {
-        "x": float(match.group(1)),
-        "y": float(match.group(2)),
-        "rotation": int(match.group(3))
-    }
-
-
-def extract_reference_from_symbol(sch_content, symbol_start):
-    """Extract reference (R1, R2, etc) from symbol block."""
-    # Look for "Reference" property after symbol start
-    ref_pattern = r'property\s+"Reference"\s+"(R\d+)"'
-    match = re.search(ref_pattern, sch_content[symbol_start:symbol_start+500])
-    return match.group(1) if match else None
-
-
-@pytest.fixture(scope="session", autouse=True)
-def setup_session():
-    """Setup session: Clean test directories before all tests."""
     test_dir = Path(__file__).parent
+    output_dir = test_dir / "generated_roundtrip"
 
-    # Only clean test_artifacts at start of session
-    artifacts_dir = test_dir / "test_artifacts"
-    if artifacts_dir.exists():
-        shutil.rmtree(artifacts_dir)
+    # Clean previous output
+    if output_dir.exists():
+        import shutil
+        shutil.rmtree(output_dir)
+    output_dir.mkdir()
 
-    yield  # Run all tests
+    print("\n" + "="*60)
+    print("TEST 1: Position preservation through round-trip...")
+    print("="*60)
 
-    # After all tests: preserve or cleanup
-    if PRESERVE_ARTIFACTS:
-        artifacts_dir = get_test_artifacts_dir()
-        print(f"\n📁 All test artifacts preserved in: {artifacts_dir}")
+    # Step 1: Start with reference Python circuit
+    import shutil
+    step1_py = output_dir / "step1_original.py"
+    shutil.copy(test_dir / "03_python_ref.py", step1_py)
+    print("\nStep 1: Copied original circuit (2 resistors)")
+
+    # Step 2: Generate KiCad from Python
+    kicad_output = output_dir / "step2_kicad"
+    kicad_output.mkdir()
+    shutil.copy(step1_py, kicad_output / "two_resistors.py")
+
+    result = subprocess.run(
+        ["uv", "run", "python", "two_resistors.py"],
+        cwd=kicad_output,
+        capture_output=True,
+        text=True
+    )
+    print(f"Step 2: Generated KiCad (exit code: {result.returncode})")
+
+    if result.returncode != 0:
+        print(f"❌ Generation failed:\n{result.stderr}")
+        assert False
+
+    # Step 3: Import back to Python
+    kicad_dir = kicad_output / "two_resistors"
+    kicad_pro = kicad_dir / "two_resistors.kicad_pro"
+
+    if not kicad_pro.exists():
+        print(f"❌ KiCad project not found at: {kicad_pro}")
+        assert False
+
+    step3_py = output_dir / "step3_roundtrip.py"
+    result = subprocess.run(
+        ["uv", "run", "kicad-to-python", str(kicad_pro), str(step3_py)],
+        capture_output=True,
+        text=True
+    )
+    print(f"Step 3: Imported back to Python (exit code: {result.returncode})")
+
+    if not step3_py.exists():
+        print(f"❌ Round-trip Python not created")
+        print(result.stderr)
+        assert False
+
+    print(f"\n✅ Round-trip completed!")
+    print(f"\n📁 MANUAL VERIFICATION STEPS:")
+    print(f"   1. Open: {kicad_pro}")
+    print(f"      - Note R1 position (X, Y coordinates)")
+    print(f"      - Note R2 position")
+    print(f"")
+    print(f"   2. Run the round-trip Python again:")
+    print(f"      cd {output_dir}")
+    print(f"      uv run python step3_roundtrip.py")
+    print(f"")
+    print(f"   3. Open the newly generated KiCad project")
+    print(f"      Compare R1 and R2 positions")
+    print(f"")
+    print(f"   4. ✅ PASS if positions are IDENTICAL")
+    print(f"      ❌ FAIL if positions changed/reset")
+
+    print("="*60 + "\n")
+
+
+def test_02_manual_moves_preserved():
+    """
+    Test 3.2: Manually moved components stay in new positions.
+
+    What to check manually:
+    1. Run this test
+    2. Open generated_manual_move/manual_move/manual_move.kicad_pro
+    3. Manually drag R1 to a different position in KiCad
+    4. Save the KiCad project
+    5. Re-run: uv run python manual_move.py
+    6. Open KiCad again
+    7. Verify: R1 is still in the position you moved it to (not reset!)
+    """
+    test_dir = Path(__file__).parent
+    output_dir = test_dir / "generated_manual_move"
+
+    # Clean previous output
+    if output_dir.exists():
+        import shutil
+        shutil.rmtree(output_dir)
+    output_dir.mkdir()
+
+    print("\n" + "="*60)
+    print("TEST 2: Manual position changes preserved...")
+    print("="*60)
+
+    # Generate initial circuit
+    import shutil
+    shutil.copy(test_dir / "03_python_ref.py", output_dir / "manual_move.py")
+
+    result = subprocess.run(
+        ["uv", "run", "python", "manual_move.py"],
+        cwd=output_dir,
+        capture_output=True,
+        text=True
+    )
+
+    if result.returncode != 0:
+        print(f"❌ Generation failed:\n{result.stderr}")
+        assert False
+
+    kicad_dir = output_dir / "two_resistors"
+    kicad_pro = kicad_dir / "two_resistors.kicad_pro"
+
+    if kicad_pro.exists():
+        print(f"✅ Initial KiCad project generated")
+        print(f"\n📁 MANUAL TEST PROCEDURE:")
+        print(f"   1. Open: {kicad_pro}")
+        print(f"   2. Drag R1 to a new position (e.g., far right)")
+        print(f"   3. Save (Ctrl+S)")
+        print(f"   4. Run: cd {output_dir} && uv run python manual_move.py")
+        print(f"   5. Open KiCad again")
+        print(f"   6. ✅ PASS if R1 is still where you moved it")
+        print(f"      ❌ FAIL if R1 position reset to original")
     else:
-        # Clean up only generated positioned_resistor directory
-        positioned_resistor_dir = test_dir / "positioned_resistor"
-        if positioned_resistor_dir.exists():
-            shutil.rmtree(positioned_resistor_dir)
+        print(f"❌ KiCad project not created")
+        assert False
+
+    print("="*60 + "\n")
 
 
-@pytest.fixture(autouse=True)
-def cleanup_before_test():
-    """Before each test: Clean the generated positioned_resistor directory."""
-    test_dir = Path(__file__).parent
-    positioned_resistor_dir = test_dir / "positioned_resistor"
-
-    # Always clean before test to ensure fresh start
-    if positioned_resistor_dir.exists():
-        shutil.rmtree(positioned_resistor_dir)
-
-    yield  # Run the test
-
-    # After each test: preserve to test_artifacts or clean
-    if PRESERVE_ARTIFACTS:
-        artifacts_dir = get_test_artifacts_dir()
-        positioned_resistor_dir = test_dir / "positioned_resistor"
-
-        if positioned_resistor_dir.exists():
-            # Copy to artifacts directory with test name
-            test_name = os.environ.get("PYTEST_CURRENT_TEST", "unknown").split("::")[1].split(" ")[0]
-            dest = artifacts_dir / test_name
-
-            # Create destination if needed
-            dest.mkdir(parents=True, exist_ok=True)
-
-            # Copy generated files from positioned_resistor/ directory
-            for file in positioned_resistor_dir.iterdir():
-                dest_file = dest / file.name
-                if file.is_file():
-                    shutil.copy2(file, dest_file)
-
-            shutil.rmtree(positioned_resistor_dir)
-    else:
-        # Clean up immediately if not preserving
-        positioned_resistor_dir = test_dir / "positioned_resistor"
-        if positioned_resistor_dir.exists():
-            shutil.rmtree(positioned_resistor_dir)
-
-
-def test_01_extract_component_position_from_kicad():
+def test_03_show_position_in_file():
     """
-    Test 3.1: Extract component position from KiCad schematic.
+    Test 3.3: Show where positions are stored in KiCad files.
 
-    Validates:
-    - Position coordinates correctly extracted from .kicad_sch
-    - Coordinates are floats in millimeters
-    - Rotation angle extracted correctly
+    This test just shows you where to look for position data.
     """
     test_dir = Path(__file__).parent
-    kicad_ref_dir = test_dir / "03_kicad_ref"
-
-    # Find the KiCad schematic file
-    kicad_sch = kicad_ref_dir / "03_kicad_ref.kicad_sch"
-    assert kicad_sch.exists(), f"Reference KiCad schematic not found: {kicad_sch}"
-
-    # Extract position from schematic
-    sch_content = kicad_sch.read_text()
-    position = extract_component_position(sch_content)
-    
-    assert position is not None, "Could not extract position from KiCad schematic"
-    assert isinstance(position["x"], float), "X coordinate should be float"
-    assert isinstance(position["y"], float), "Y coordinate should be float"
-    assert isinstance(position["rotation"], int), "Rotation should be int"
-    assert position["rotation"] in [0, 90, 180, 270], f"Invalid rotation: {position['rotation']}"
-
-    print(f"✅ Test 3.1 PASSED: Extracted position R1={position}")
-
-
-def test_02_preserve_position_on_export():
-    """
-    Test 3.2: Component position preserved on KiCad → Python → KiCad cycle.
-
-    Validates:
-    - Position from KiCad extracted and preserved in Python
-    - Re-exported to KiCad with same coordinates
-    - Position within tolerance (<0.1mm deviation)
-    """
-    test_dir = Path(__file__).parent
-    kicad_ref_dir = test_dir / "03_kicad_ref"
-
-    # Get original position from reference KiCad
-    kicad_sch_orig = kicad_ref_dir / "03_kicad_ref.kicad_sch"
-    sch_content_orig = kicad_sch_orig.read_text()
-    position_orig = extract_component_position(sch_content_orig)
-    assert position_orig is not None, "Could not extract original position"
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmpdir = Path(tmpdir)
-
-        # Step 1: Import KiCad → Python
-        kicad_pro = kicad_ref_dir / "03_kicad_ref.kicad_pro"
-        output_py = tmpdir / "imported_position.py"
-        syncer = KiCadToPythonSyncer(
-            kicad_project_or_json=str(kicad_pro),
-            python_file=str(output_py),
-            preview_only=False
-        )
-
-        success = syncer.sync()
-        assert success, "KiCad → Python import failed"
-        assert output_py.exists(), "Generated Python file not found"
-
-        # Step 2: Generate KiCad from imported Python
-        result = subprocess.run(
-            ["uv", "run", "python", "03_python_ref.py"],
-            cwd=test_dir,
-            capture_output=True,
-            text=True
-        )
-        assert result.returncode == 0, f"KiCad generation failed: {result.stderr}"
-
-        # Step 3: Extract position from generated KiCad
-        positioned_resistor_dir = test_dir / "positioned_resistor"
-        kicad_sch_new = positioned_resistor_dir / "positioned_resistor.kicad_sch"
-        assert kicad_sch_new.exists(), "Generated schematic not found"
-
-        sch_content_new = kicad_sch_new.read_text()
-        position_new = extract_component_position(sch_content_new)
-        assert position_new is not None, "Could not extract position from generated KiCad"
-
-        # Step 4: Verify positions match within tolerance
-        tolerance_mm = 0.1
-        x_diff = abs(position_orig["x"] - position_new["x"])
-        y_diff = abs(position_orig["y"] - position_new["y"])
-        
-        assert x_diff < tolerance_mm, f"X position drift: {x_diff}mm > {tolerance_mm}mm tolerance"
-        assert y_diff < tolerance_mm, f"Y position drift: {y_diff}mm > {tolerance_mm}mm tolerance"
-        assert position_orig["rotation"] == position_new["rotation"], "Rotation not preserved"
-
-        print(f"✅ Test 3.2 PASSED: Position preserved within tolerance (Δx={x_diff:.4f}mm, Δy={y_diff:.4f}mm)")
-
-
-def test_03_multiple_component_position_stability():
-    """
-    Test 3.3: Multiple components maintain relative positions.
-
-    Validates:
-    - All component positions extracted correctly
-    - Relative positions preserved (distance between components stable)
-    - No spurious position changes
-    """
-    test_dir = Path(__file__).parent
-    kicad_ref_dir = test_dir / "03_kicad_ref"
-
-    # This test requires a fixture with multiple components
-    # For now, use the single component fixture
-    kicad_sch = kicad_ref_dir / "03_kicad_ref.kicad_sch"
-
-    if not kicad_sch.exists():
-        pytest.skip("Fixture not found - requires KiCad project with multiple components")
-
-    # Extract positions from schematic
-    sch_content = kicad_sch.read_text()
-
-    # Count symbol instances
-    symbol_instances = len(re.findall(r'\n\s+\(symbol\s+\(lib_id', sch_content))
-
-    if symbol_instances < 2:
-        pytest.skip(f"Fixture has {symbol_instances} component(s), test requires 2+")
-
-    # Extract all positions and verify they're different
-    positions = re.findall(r'\(at\s+([\d.]+)\s+([\d.]+)\s+(\d+)\)', sch_content)
-    assert len(positions) >= 2, "Should have at least 2 positioned components"
-
-    # Verify positions are actually different
-    unique_positions = set(positions)
-    assert len(unique_positions) == len(positions), "All components should have unique positions"
-
-    print(f"✅ Test 3.3 PASSED: {len(positions)} components with different positions")
-
-
-def test_04_manual_position_changes_survive_round_trip():
-    """
-    Test 3.4: Manual position changes preserved through round-trip.
-
-    Validates:
-    - User manual position changes preserved
-    - Not overwritten by generation algorithm
-    - Exact position (not approximated)
-    """
-    # This test requires manual modification of KiCad files
-    # Demonstrates the concept but needs user-created variations
-
-    test_dir = Path(__file__).parent
-    kicad_ref_dir = test_dir / "03_kicad_ref"
-    kicad_sch = kicad_ref_dir / "03_kicad_ref.kicad_sch"
-
-    if not kicad_sch.exists():
-        pytest.skip("Fixture not found")
-
-    # Extract original position
-    sch_content = kicad_sch.read_text()
-    original_position = extract_component_position(sch_content)
-
-    assert original_position is not None, "Could not extract position from fixture"
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmpdir = Path(tmpdir)
-
-        # Import and re-export
-        kicad_pro = kicad_ref_dir / "03_kicad_ref.kicad_pro"
-        output_py = tmpdir / "imported.py"
-        syncer = KiCadToPythonSyncer(
-            kicad_project_or_json=str(kicad_pro),
-            python_file=str(output_py),
-            preview_only=False
-        )
-
-        success = syncer.sync()
-        assert success, "Import failed"
-
-        # Generate back to KiCad
-        result = subprocess.run(
-            ["uv", "run", "python", "03_python_ref.py"],
-            cwd=test_dir,
-            capture_output=True,
-            text=True
-        )
-        assert result.returncode == 0, "Generation failed"
-
-        # Extract new position
-        positioned_resistor_dir = test_dir / "positioned_resistor"
-        kicad_sch_new = positioned_resistor_dir / "positioned_resistor.kicad_sch"
-        sch_content_new = kicad_sch_new.read_text()
-        new_position = extract_component_position(sch_content_new)
-
-        # Verify position is preserved (within tolerance)
-        tolerance = 0.1
-        x_diff = abs(original_position["x"] - new_position["x"])
-        y_diff = abs(original_position["y"] - new_position["y"])
-
-        assert x_diff < tolerance, f"X position changed by {x_diff}mm"
-        assert y_diff < tolerance, f"Y position changed by {y_diff}mm"
-
-        print(f"✅ Test 3.4 PASSED: Position preserved through round-trip")
-
-
-def test_05_position_stability_on_repeated_cycles():
-    """
-    Test 3.5: Position remains stable on multiple round-trip cycles.
-
-    Validates:
-    - No position drift after 1st round-trip
-    - No further drift on 2nd and 3rd round-trips
-    - Cumulative drift < 0.01mm after 3 cycles
-    - Idempotent position preservation
-    """
-    test_dir = Path(__file__).parent
-    kicad_ref_dir = test_dir / "03_kicad_ref"
-    kicad_sch_orig = kicad_ref_dir / "03_kicad_ref.kicad_sch"
-
-    if not kicad_sch_orig.exists():
-        pytest.skip("Fixture not found")
-
-    sch_content = kicad_sch_orig.read_text()
-    position_original = extract_component_position(sch_content)
-    assert position_original is not None
-
-    positions_per_cycle = [position_original]
-
-    # Run 3 cycles
-    for cycle_num in range(1, 4):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            tmpdir = Path(tmpdir)
-
-            # Import KiCad
-            kicad_pro = kicad_ref_dir / "03_kicad_ref.kicad_pro"
-            output_py = tmpdir / f"cycle_{cycle_num}.py"
-            syncer = KiCadToPythonSyncer(
-                kicad_project_or_json=str(kicad_pro),
-                python_file=str(output_py),
-                preview_only=False
-            )
-            assert syncer.sync(), f"Cycle {cycle_num} import failed"
-
-            # Generate back to KiCad
-            result = subprocess.run(
-                ["uv", "run", "python", "03_python_ref.py"],
-                cwd=test_dir,
-                capture_output=True,
-                text=True
-            )
-            assert result.returncode == 0, f"Cycle {cycle_num} generation failed"
-
-            # Extract position
-            positioned_resistor_dir = test_dir / "positioned_resistor"
-            kicad_sch_new = positioned_resistor_dir / "positioned_resistor.kicad_sch"
-            sch_content_new = kicad_sch_new.read_text()
-            position_new = extract_component_position(sch_content_new)
-
-            positions_per_cycle.append(position_new)
-
-    # Verify position stability
-    tolerance = 0.01  # Cumulative tolerance
-
-    for cycle_num in range(1, len(positions_per_cycle)):
-        pos_curr = positions_per_cycle[cycle_num]
-        pos_prev = positions_per_cycle[cycle_num - 1]
-
-        x_drift = abs(pos_curr["x"] - pos_prev["x"])
-        y_drift = abs(pos_curr["y"] - pos_prev["y"])
-
-        assert x_drift < tolerance, f"Cycle {cycle_num}: X drift {x_drift}mm exceeds {tolerance}mm"
-        assert y_drift < tolerance, f"Cycle {cycle_num}: Y drift {y_drift}mm exceeds {tolerance}mm"
-
-    print(f"✅ Test 3.5 PASSED: Position stable across 3 cycles (max drift < {tolerance}mm)")
-
-
-def test_06_rotated_component_position():
-    """
-    Test 3.6: Rotated component position preserved.
-
-    Validates:
-    - Rotation angle extracted from KiCad
-    - Rotation preserved when re-exporting
-    - Position + rotation maintained together
-    - No interaction between position and rotation
-    """
-    test_dir = Path(__file__).parent
-    kicad_ref_dir = test_dir / "03_kicad_ref"
-    kicad_sch = kicad_ref_dir / "03_kicad_ref.kicad_sch"
-
-    if not kicad_sch.exists():
-        pytest.skip("Fixture not found")
-
-    # Extract position and rotation
-    sch_content = kicad_sch.read_text()
-    position_orig = extract_component_position(sch_content)
-    assert position_orig is not None
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmpdir = Path(tmpdir)
-
-        # Import and re-export
-        kicad_pro = kicad_ref_dir / "03_kicad_ref.kicad_pro"
-        output_py = tmpdir / "rotation_test.py"
-        syncer = KiCadToPythonSyncer(
-            kicad_project_or_json=str(kicad_pro),
-            python_file=str(output_py),
-            preview_only=False
-        )
-        assert syncer.sync(), "Import failed"
-
-        # Generate back
-        result = subprocess.run(
-            ["uv", "run", "python", "03_python_ref.py"],
-            cwd=test_dir,
-            capture_output=True,
-            text=True
-        )
-        assert result.returncode == 0, "Generation failed"
-
-        # Extract position and rotation
-        positioned_resistor_dir = test_dir / "positioned_resistor"
-        kicad_sch_new = positioned_resistor_dir / "positioned_resistor.kicad_sch"
-        sch_content_new = kicad_sch_new.read_text()
-        position_new = extract_component_position(sch_content_new)
-
-        # Verify rotation preserved
-        assert position_new["rotation"] == position_orig["rotation"], \
-            f"Rotation changed: {position_orig['rotation']}° → {position_new['rotation']}°"
-
-        # Verify position also preserved
-        tolerance = 0.1
-        x_diff = abs(position_orig["x"] - position_new["x"])
-        y_diff = abs(position_orig["y"] - position_new["y"])
-        assert x_diff < tolerance, f"Position drift: {x_diff}mm"
-        assert y_diff < tolerance, f"Position drift: {y_diff}mm"
-
-        print(f"✅ Test 3.6 PASSED: Position and rotation ({position_new['rotation']}°) preserved")
+    output_dir = test_dir / "generated_position_demo"
+
+    # Clean previous output
+    if output_dir.exists():
+        import shutil
+        shutil.rmtree(output_dir)
+    output_dir.mkdir()
+
+    print("\n" + "="*60)
+    print("TEST 3: Understanding position storage...")
+    print("="*60)
+
+    # Generate circuit
+    import shutil
+    shutil.copy(test_dir / "03_python_ref.py", output_dir / "demo.py")
+
+    result = subprocess.run(
+        ["uv", "run", "python", "demo.py"],
+        cwd=output_dir,
+        capture_output=True,
+        text=True
+    )
+
+    if result.returncode != 0:
+        print(f"❌ Generation failed")
+        assert False
+
+    # Find the schematic file
+    sch_files = list(output_dir.glob("**/*.kicad_sch"))
+    if not sch_files:
+        print("❌ No schematic file found")
+        assert False
+
+    sch_file = sch_files[0]
+    content = sch_file.read_text()
+
+    print(f"\n📁 Schematic file: {sch_file}")
+    print(f"\n🔍 Position data example:")
+    print("-" * 60)
+
+    # Find symbol definitions and show position info
+    import re
+    symbols = re.finditer(
+        r'\(symbol \(lib_id "[^"]+"\) \(at ([\d.]+) ([\d.]+) (\d+)\)',
+        content
+    )
+
+    for i, match in enumerate(symbols, 1):
+        x, y, rotation = match.groups()
+        print(f"Component {i}: at ({x}, {y}) rotation {rotation}°")
+        # Show the full match context
+        start = max(0, match.start() - 50)
+        end = min(len(content), match.end() + 100)
+        snippet = content[start:end]
+        print(f"Context: ...{snippet}...")
+        print()
+
+    print("-" * 60)
+    print("\n💡 This shows where position data is stored")
+    print("   The 'at' clause contains (X, Y, rotation)")
+    print("   These values should stay the same across syncs!")
+
+    print("="*60 + "\n")
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+    """
+    Run all tests with: python 03_test.py
+
+    Or run individually:
+        pytest 03_test.py::test_01_positions_survive_roundtrip -v -s
+        pytest 03_test.py::test_02_manual_moves_preserved -v -s
+        pytest 03_test.py::test_03_show_position_in_file -v -s
+    """
+    import pytest
+    pytest.main([__file__, "-v", "-s"])

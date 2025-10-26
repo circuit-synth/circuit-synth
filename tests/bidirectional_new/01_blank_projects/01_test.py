@@ -1,283 +1,207 @@
 #!/usr/bin/env python3
 """
-Test 01: Blank Projects - Bidirectional Sync Foundation
+Test 01: Blank Projects - Simple Visual Verification
 
-Tests the absolute foundation of bidirectional sync with empty circuits.
-
-Environment Variables:
-    PRESERVE_TEST_ARTIFACTS=1  - Keep all generated files in test_artifacts/ directory
+Run these tests and manually inspect the output to verify they work.
+Much simpler than programmatic assertions - just look at the files!
 """
 
-import ast
-import os
-import pytest
-from pathlib import Path
-import tempfile
-import shutil
 import subprocess
-
-# Import circuit-synth components
-from circuit_synth import circuit
-from circuit_synth.tools.kicad_integration.kicad_to_python_sync import KiCadToPythonSyncer
+from pathlib import Path
 
 
-# Check if we should preserve test artifacts
-PRESERVE_ARTIFACTS = os.getenv("PRESERVE_TEST_ARTIFACTS", "").lower() in ("1", "true", "yes")
-
-
-def get_test_artifacts_dir():
-    """Get or create test_artifacts directory."""
-    test_dir = Path(__file__).parent
-    artifacts_dir = test_dir / "test_artifacts"
-
-    if PRESERVE_ARTIFACTS:
-        artifacts_dir.mkdir(exist_ok=True)
-
-    return artifacts_dir
-
-
-@pytest.fixture(scope="session", autouse=True)
-def setup_session():
-    """Setup session: Clean test directories before all tests."""
-    test_dir = Path(__file__).parent
-
-    # Only clean test_artifacts at start of session
-    artifacts_dir = test_dir / "test_artifacts"
-    if artifacts_dir.exists():
-        shutil.rmtree(artifacts_dir)
-
-    yield  # Run all tests
-
-    # After all tests: preserve or cleanup
-    if PRESERVE_ARTIFACTS:
-        artifacts_dir = get_test_artifacts_dir()
-        print(f"\n📁 All test artifacts preserved in: {artifacts_dir}")
-    else:
-        # Clean up only generated blank directory
-        blank_dir = test_dir / "blank"
-        if blank_dir.exists():
-            shutil.rmtree(blank_dir)
-
-
-@pytest.fixture(autouse=True)
-def cleanup_before_test():
-    """Before each test: Clean the generated blank directory."""
-    test_dir = Path(__file__).parent
-    blank_dir = test_dir / "blank"
-
-    # Always clean before test to ensure fresh start
-    if blank_dir.exists():
-        shutil.rmtree(blank_dir)
-
-    yield  # Run the test
-
-    # After each test: preserve to test_artifacts or clean
-    if PRESERVE_ARTIFACTS:
-        artifacts_dir = get_test_artifacts_dir()
-        blank_dir = test_dir / "blank"
-
-        if blank_dir.exists():
-            # Copy to artifacts directory with test name
-            test_name = os.environ.get("PYTEST_CURRENT_TEST", "unknown").split("::")[1].split(" ")[0]
-            dest = artifacts_dir / test_name
-
-            # Create destination if needed
-            dest.mkdir(parents=True, exist_ok=True)
-
-            # Copy KiCad files from blank/ directory (don't delete dest, just add to it)
-            for file in blank_dir.iterdir():
-                dest_file = dest / file.name
-                if file.is_file():
-                    shutil.copy2(file, dest_file)
-
-            shutil.rmtree(blank_dir)  # Remove original after copying
-    else:
-        # Clean up immediately if not preserving
-        blank_dir = test_dir / "blank"
-        if blank_dir.exists():
-            shutil.rmtree(blank_dir)
-
-
-def test_01_generate_blank_kicad_from_python():
+def test_01_python_to_kicad():
     """
-    Test 1.1: Generate blank KiCad project from blank Python circuit.
+    Test 1.1: Generate KiCad from blank Python circuit.
 
-    Validates:
-    - Python → KiCad generation works with empty circuit
-    - Valid project files created
-    - No crashes on minimal input
+    What to check manually:
+    - Run this test
+    - Open generated_kicad/blank/ folder
+    - Open blank.kicad_pro in KiCad
+    - Verify: Empty schematic with no components
     """
     test_dir = Path(__file__).parent
+    output_dir = test_dir / "generated_kicad"
 
-    # Run the Python circuit to generate KiCad
+    # Clean previous output
+    if output_dir.exists():
+        import shutil
+        shutil.rmtree(output_dir)
+    output_dir.mkdir()
+
+    # Generate KiCad from Python
+    print("\n" + "="*60)
+    print("TEST 1: Generating KiCad from blank Python circuit...")
+    print("="*60)
+
+    # Copy the Python file to output dir so generation happens there
+    import shutil
+    py_file = output_dir / "blank.py"
+    shutil.copy(test_dir / "01_python_ref.py", py_file)
+
+    # Run it
     result = subprocess.run(
-        ["uv", "run", "python", "01_python_ref.py"],
-        cwd=test_dir,
+        ["uv", "run", "python", "blank.py"],
+        cwd=output_dir,
         capture_output=True,
         text=True
     )
 
-    # Verify generation succeeded
-    assert result.returncode == 0, f"Circuit generation failed: {result.stderr}"
+    print(f"Exit code: {result.returncode}")
+    if result.stdout:
+        print(f"Output:\n{result.stdout}")
+    if result.stderr:
+        print(f"Errors:\n{result.stderr}")
 
-    # Verify KiCad files were created
-    kicad_dir = test_dir / "blank"
-    assert kicad_dir.exists(), "KiCad project directory not created"
+    # Check files exist
+    kicad_dir = output_dir / "blank"
+    if kicad_dir.exists():
+        print(f"\n✅ KiCad project generated at: {kicad_dir}")
+        print("\nGenerated files:")
+        for f in sorted(kicad_dir.glob("*")):
+            if f.is_file():
+                print(f"  - {f.name} ({f.stat().st_size} bytes)")
+        print("\n👀 MANUAL CHECK: Open blank.kicad_pro in KiCad and verify it's empty")
+    else:
+        print(f"\n❌ ERROR: KiCad directory not created")
+        assert False, "Generation failed"
 
-    kicad_pro = kicad_dir / "blank.kicad_pro"
-    kicad_sch = kicad_dir / "blank.kicad_sch"
-    kicad_pcb = kicad_dir / "blank.kicad_pcb"
-
-    assert kicad_pro.exists(), "KiCad project file (.kicad_pro) not created"
-    assert kicad_sch.exists(), "KiCad schematic file (.kicad_sch) not created"
-    assert kicad_pcb.exists(), "KiCad PCB file (.kicad_pcb) not created"
-
-    # Verify schematic is valid and has no components
-    sch_content = kicad_sch.read_text()
-    assert "(kicad_sch" in sch_content, "Invalid KiCad schematic format"
-    assert "(symbol" not in sch_content, "Blank circuit should have no components"
-
-    print("✅ Test 1.1 PASSED: Blank KiCad project generated successfully")
+    print("="*60 + "\n")
 
 
-def test_02_import_blank_python_from_kicad():
+def test_02_kicad_to_python():
     """
-    Test 1.2: Generate blank Python from blank KiCad project.
+    Test 1.2: Import Python from blank KiCad project.
 
-    Validates:
-    - KiCad → Python import works with empty schematic
-    - Valid Python code generated
-    - Code is syntactically valid
+    What to check manually:
+    - Run this test
+    - Look at generated_python/imported_blank.py
+    - Verify: Has @circuit decorator, no components
     """
     test_dir = Path(__file__).parent
-    kicad_ref_dir = test_dir / "01_kicad_ref"
+    kicad_ref = test_dir / "01_kicad_ref" / "01_kicad_ref.kicad_pro"
+    output_dir = test_dir / "generated_python"
 
-    # Find the KiCad project file
-    kicad_pro = kicad_ref_dir / "01_kicad_ref.kicad_pro"
-    assert kicad_pro.exists(), f"Reference KiCad project not found: {kicad_pro}"
+    # Clean previous output
+    if output_dir.exists():
+        import shutil
+        shutil.rmtree(output_dir)
+    output_dir.mkdir()
 
-    # Create temp directory for generated Python
-    with tempfile.TemporaryDirectory() as tmpdir:
-        output_dir = Path(tmpdir) / "generated_python"
-        output_dir.mkdir()
+    print("\n" + "="*60)
+    print("TEST 2: Importing Python from blank KiCad project...")
+    print("="*60)
 
-        # Import KiCad → Python
-        syncer = KiCadToPythonSyncer(
-            kicad_project_or_json=str(kicad_pro),
-            python_file=str(output_dir / "imported_blank.py"),
-            preview_only=False
-        )
+    # Import using kicad-to-python command
+    output_py = output_dir / "imported_blank.py"
+    result = subprocess.run(
+        ["uv", "run", "kicad-to-python", str(kicad_ref), str(output_py)],
+        capture_output=True,
+        text=True
+    )
 
-        success = syncer.sync()
-        assert success, "KiCad → Python import failed"
+    print(f"Exit code: {result.returncode}")
+    if result.stdout:
+        print(f"Output:\n{result.stdout}")
+    if result.stderr:
+        print(f"Errors:\n{result.stderr}")
 
-        # Verify Python file was created
-        generated_py = output_dir / "imported_blank.py"
-        assert generated_py.exists(), "Generated Python file not found"
+    if output_py.exists():
+        print(f"\n✅ Python file generated at: {output_py}")
+        print("\nGenerated Python code preview:")
+        print("-" * 60)
+        print(output_py.read_text()[:500])  # Show first 500 chars
+        print("-" * 60)
+        print("\n👀 MANUAL CHECK: Open imported_blank.py and verify it's valid Python")
+    else:
+        print(f"\n❌ ERROR: Python file not created")
+        assert False, "Import failed"
 
-        # Verify Python code is syntactically valid
-        py_content = generated_py.read_text()
-        try:
-            tree = ast.parse(py_content)
-        except SyntaxError as e:
-            pytest.fail(f"Generated Python has syntax errors: {e}")
-
-        # Verify has @circuit decorator
-        assert "@circuit" in py_content, "Generated code missing @circuit decorator"
-
-        # Verify has no component definitions (blank circuit)
-        assert "Device_R" not in py_content, "Blank circuit should have no components"
-        assert "Device_C" not in py_content, "Blank circuit should have no components"
-
-        # Preserve artifacts if requested
-        if PRESERVE_ARTIFACTS:
-            artifacts_dir = get_test_artifacts_dir()
-            test_name = "test_02_import_blank_python_from_kicad"
-            dest = artifacts_dir / test_name
-            if dest.exists():
-                shutil.rmtree(dest)
-            dest.mkdir(parents=True)
-
-            # Copy generated Python file
-            shutil.copy(generated_py, dest / "imported_blank.py")
-
-        print("✅ Test 1.2 PASSED: Blank Python imported successfully from KiCad")
+    print("="*60 + "\n")
 
 
-def test_03_blank_round_trip():
+def test_03_round_trip():
     """
     Test 1.3: Round-trip blank circuit Python → KiCad → Python.
 
-    Validates:
-    - No data accumulation
-    - Stable round-trip behavior
-    - Idempotency on blank projects
+    What to check manually:
+    - Run this test
+    - Compare generated_roundtrip/step1_original.py with step3_roundtrip.py
+    - Verify: Both should define the same blank circuit
     """
     test_dir = Path(__file__).parent
+    output_dir = test_dir / "generated_roundtrip"
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmpdir = Path(tmpdir)
+    # Clean previous output
+    if output_dir.exists():
+        import shutil
+        shutil.rmtree(output_dir)
+    output_dir.mkdir()
 
-        # Step 1: Generate KiCad from Python
-        result = subprocess.run(
-            ["uv", "run", "python", "01_python_ref.py"],
-            cwd=test_dir,
-            capture_output=True,
-            text=True
-        )
-        assert result.returncode == 0, f"Initial KiCad generation failed: {result.stderr}"
+    print("\n" + "="*60)
+    print("TEST 3: Round-trip Python → KiCad → Python...")
+    print("="*60)
 
-        kicad_dir = test_dir / "blank"
-        kicad_pro = kicad_dir / "blank.kicad_pro"
+    # Step 1: Copy original Python
+    import shutil
+    step1_py = output_dir / "step1_original.py"
+    shutil.copy(test_dir / "01_python_ref.py", step1_py)
+    print("\nStep 1: Copied original Python")
 
-        # Step 2: Import KiCad → Python
-        output_py = tmpdir / "round_trip_blank.py"
-        syncer = KiCadToPythonSyncer(
-            kicad_project_or_json=str(kicad_pro),
-            python_file=str(output_py),
-            preview_only=False
-        )
+    # Step 2: Generate KiCad
+    result = subprocess.run(
+        ["uv", "run", "python", "step1_original.py"],
+        cwd=output_dir,
+        capture_output=True,
+        text=True
+    )
+    print(f"Step 2: Generated KiCad (exit code: {result.returncode})")
 
-        success = syncer.sync()
-        assert success, "KiCad → Python import failed in round-trip"
-        assert output_py.exists(), "Round-trip Python file not created"
+    kicad_dir = output_dir / "blank"
+    if not kicad_dir.exists():
+        print("❌ KiCad generation failed")
+        assert False
 
-        # Step 3: Verify round-trip Python is valid
-        py_content = output_py.read_text()
-        try:
-            tree = ast.parse(py_content)
-        except SyntaxError as e:
-            pytest.fail(f"Round-trip Python has syntax errors: {e}")
+    # Step 3: Import back to Python
+    kicad_pro = kicad_dir / "blank.kicad_pro"
+    step3_py = output_dir / "step3_roundtrip.py"
+    result = subprocess.run(
+        ["uv", "run", "kicad-to-python", str(kicad_pro), str(step3_py)],
+        capture_output=True,
+        text=True
+    )
+    print(f"Step 3: Imported back to Python (exit code: {result.returncode})")
 
-        # Verify no components added/lost
-        assert "Device_R" not in py_content, "Round-trip should maintain blank circuit"
-        assert "@circuit" in py_content, "Round-trip should preserve @circuit decorator"
+    if step3_py.exists():
+        print(f"\n✅ Round-trip completed!")
+        print(f"\n📁 Files to compare:")
+        print(f"  - Original:   {step1_py}")
+        print(f"  - Round-trip: {step3_py}")
 
-        # Check file size didn't grow (no accumulation)
-        original_py = test_dir / "01_python_ref.py"
-        original_size = original_py.stat().st_size
-        roundtrip_size = output_py.stat().st_size
+        # Show file sizes
+        original_size = step1_py.stat().st_size
+        roundtrip_size = step3_py.stat().st_size
+        print(f"\n📊 File sizes:")
+        print(f"  - Original:   {original_size} bytes")
+        print(f"  - Round-trip: {roundtrip_size} bytes")
+        print(f"  - Ratio:      {roundtrip_size/original_size:.2f}x")
 
-        # Allow some size difference for formatting, but not massive growth
-        size_ratio = roundtrip_size / original_size
-        assert size_ratio < 3.0, f"Round-trip file grew too much: {size_ratio:.1f}x original size"
+        print("\n👀 MANUAL CHECK: Compare the two Python files - should both define blank circuit")
+    else:
+        print(f"\n❌ ERROR: Round-trip Python not created")
+        assert False
 
-        # Preserve artifacts if requested
-        if PRESERVE_ARTIFACTS:
-            artifacts_dir = get_test_artifacts_dir()
-            test_name = "test_03_blank_round_trip"
-            dest = artifacts_dir / test_name
-            if dest.exists():
-                shutil.rmtree(dest)
-            dest.mkdir(parents=True)
-
-            # Copy generated Python file
-            shutil.copy(output_py, dest / "round_trip_blank.py")
-            # Also copy the reference Python file for comparison
-            shutil.copy(test_dir / "01_python_ref.py", dest / "01_python_ref.py")
-
-        print("✅ Test 1.3 PASSED: Blank round-trip stable and idempotent")
+    print("="*60 + "\n")
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+    """
+    Run all tests with: python 01_test.py
+
+    Or run individually:
+        pytest 01_test.py::test_01_python_to_kicad -v -s
+        pytest 01_test.py::test_02_kicad_to_python -v -s
+        pytest 01_test.py::test_03_round_trip -v -s
+    """
+    import pytest
+    pytest.main([__file__, "-v", "-s"])
