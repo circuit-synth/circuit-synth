@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test: Component properties preserved through generation and import.
+Test 04: Component properties preserved through generation and import.
 
 Tests ONLY: Property preservation (reference, value, footprint)
 - Generates KiCad from Python
@@ -29,7 +29,7 @@ from test_utils import (
 )
 
 
-def test_properties_preserved():
+def test_properties():
     """
     Test: Component properties survive Python → KiCad → Python.
 
@@ -40,11 +40,11 @@ def test_properties_preserved():
 
     Expected: All properties preserved exactly
     """
-    print_test_header("Component Properties Preserved")
+    print_test_header("04: Component Properties Preserved")
 
-    # Setup
+    # Setup - use shared generated/ directory
     test_file = Path(__file__)
-    output_dir = get_test_output_dir(test_file, "properties")
+    output_dir = get_test_output_dir(test_file, "04_properties")
     clean_output_dir(output_dir)
 
     # Get fixture
@@ -116,4 +116,4 @@ def test_properties_preserved():
 
 
 if __name__ == "__main__":
-    test_properties_preserved()
+    test_properties()

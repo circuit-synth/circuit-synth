@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test: Import Python from single component KiCad project.
+Test 03: Import Python from KiCad project.
 
 Tests ONLY: KiCad → Python import
 - Starts with existing KiCad project
@@ -27,32 +27,31 @@ from test_utils import (
 )
 
 
-def test_import_single_component():
+def test_import():
     """
     Test: KiCad → Python import with single resistor.
 
     Steps:
-    1. Use reference KiCad project (from 02_kicad_ref)
+    1. Use reference KiCad project (from 02_single_component/02_kicad_ref)
     2. Import to Python using kicad-to-python
     3. Assert Python file was created
     4. Assert R1 component exists in Python
 
     Expected: Python file with Component(ref="R1", ...)
     """
-    print_test_header("Import Single Component")
+    print_test_header("03: Import Python from KiCad")
 
-    # Setup
+    # Setup - use shared generated/ directory
     test_file = Path(__file__)
-    test_dir = test_file.parent
-    output_dir = get_test_output_dir(test_file, "import")
+    output_dir = get_test_output_dir(test_file, "03_import")
     clean_output_dir(output_dir)
 
-    # Get reference KiCad project
-    kicad_ref = test_dir / "02_kicad_ref" / "02_kicad_ref.kicad_pro"
+    # Get reference KiCad project (from legacy test directory)
+    kicad_ref = Path(__file__).parent.parent / "02_single_component" / "02_kicad_ref" / "02_kicad_ref.kicad_pro"
 
     if not kicad_ref.exists():
         print(f"❌ Reference KiCad project not found: {kicad_ref}")
-        print("Note: Run test_01_generate_single_component.py first to create reference")
+        print("Note: Run test 02_generate first to create reference")
         print_test_footer(success=False)
         assert False, f"Reference KiCad project missing: {kicad_ref}"
 
@@ -99,4 +98,4 @@ def test_import_single_component():
 
 
 if __name__ == "__main__":
-    test_import_single_component()
+    test_import()

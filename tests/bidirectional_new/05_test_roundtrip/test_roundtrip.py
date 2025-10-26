@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test: Simple round-trip cycle works.
+Test 05: Simple round-trip cycle works.
 
 Tests ONLY: Complete cycle (Python → KiCad → Python → KiCad)
 - Generates KiCad from Python
@@ -30,7 +30,7 @@ from test_utils import (
 )
 
 
-def test_simple_roundtrip():
+def test_roundtrip():
     """
     Test: Complete round-trip cycle preserves circuit.
 
@@ -42,11 +42,11 @@ def test_simple_roundtrip():
 
     Expected: Component exists in both original and roundtrip KiCad
     """
-    print_test_header("Simple Round-Trip Cycle")
+    print_test_header("05: Simple Round-Trip Cycle")
 
-    # Setup
+    # Setup - use shared generated/ directory
     test_file = Path(__file__)
-    output_dir = get_test_output_dir(test_file, "roundtrip")
+    output_dir = get_test_output_dir(test_file, "05_roundtrip")
     clean_output_dir(output_dir)
 
     # Get fixture
@@ -124,4 +124,4 @@ def test_simple_roundtrip():
 
 
 if __name__ == "__main__":
-    test_simple_roundtrip()
+    test_roundtrip()

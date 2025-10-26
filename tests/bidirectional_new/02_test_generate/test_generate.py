@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test: Generate KiCad from single component circuit.
+Test 02: Generate KiCad from Python circuit.
 
 Tests ONLY: Python → KiCad generation
 - Creates single resistor circuit in Python
@@ -28,7 +28,7 @@ from test_utils import (
 )
 
 
-def test_generate_single_component():
+def test_generate():
     """
     Test: Python → KiCad generation with single resistor.
 
@@ -40,11 +40,11 @@ def test_generate_single_component():
 
     Expected: KiCad project generated with R1 resistor
     """
-    print_test_header("Generate Single Component")
+    print_test_header("02: Generate KiCad from Python")
 
-    # Setup
+    # Setup - use shared generated/ directory
     test_file = Path(__file__)
-    output_dir = get_test_output_dir(test_file, "generate")
+    output_dir = get_test_output_dir(test_file, "02_generate")
     clean_output_dir(output_dir)
 
     # Get fixture
@@ -81,4 +81,4 @@ def test_generate_single_component():
 
 
 if __name__ == "__main__":
-    test_generate_single_component()
+    test_generate()

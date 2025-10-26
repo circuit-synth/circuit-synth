@@ -213,19 +213,34 @@ def assert_component_properties(
             f"Component {reference} doesn't have footprint containing '{footprint}' in {py_file}"
 
 
-def get_test_output_dir(test_file: Path, subdir_name: str) -> Path:
+def get_test_output_dir(test_file: Path, test_name: str) -> Path:
     """
     Get standardized output directory for a test.
 
+    All tests use a shared generated/ directory at the root of bidirectional_new/.
+    Each test gets its own subdirectory within generated/.
+
     Args:
         test_file: Path to test file (__file__)
-        subdir_name: Name of subdirectory for this test's output
+        test_name: Name of this test (e.g., "02_generate", "03_import")
 
     Returns:
-        Path to output directory (parent_dir/generated_<subdir_name>)
+        Path to output directory (bidirectional_new/generated/<test_name>)
     """
-    test_dir = Path(test_file).parent
-    return test_dir / f"generated_{subdir_name}"
+    # Find the bidirectional_new root directory
+    test_path = Path(test_file).resolve()
+
+    # Walk up until we find bidirectional_new
+    current = test_path.parent
+    while current.name != "bidirectional_new" and current.parent != current:
+        current = current.parent
+
+    if current.name != "bidirectional_new":
+        # Fallback: use test file's parent
+        return Path(test_file).parent / "generated" / test_name
+
+    # Use shared generated directory
+    return current / "generated" / test_name
 
 
 def print_test_header(test_name: str) -> None:
