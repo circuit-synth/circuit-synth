@@ -441,7 +441,7 @@ class KiCadParser:
         return sheet_instances
 
     def _extract_sheet_blocks(self, content: str) -> List[str]:
-        """Extract (sheet ...) blocks from schematic content"""
+        """Extract (sheet ...) blocks from schematic content (not sheet_instances)"""
         blocks = []
         pos = 0
 
@@ -449,6 +449,15 @@ class KiCadParser:
             start = content.find("(sheet", pos)
             if start == -1:
                 break
+
+            # Check if this is actually "(sheet " (with space/newline) not "(sheet_instances"
+            # Look at the character after "(sheet"
+            if start + 6 < len(content):
+                next_char = content[start + 6]
+                # If next char is not whitespace or newline, skip (e.g., "(sheet_instances")
+                if next_char not in (' ', '\t', '\n', '\r'):
+                    pos = start + 6
+                    continue
 
             # Find the matching closing parenthesis
             depth = 0
