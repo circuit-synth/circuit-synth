@@ -105,5 +105,23 @@ def test_08_net_connectivity_verification():
     """Test 5.8: Net connectivity verification."""
     pytest.skip("Requires detailed net connectivity analysis")
 
+def test_09_net_connectivity_changes():
+    """Test 5.9: Changing net connectivity (rewiring connections).
+
+    IMPORTANT: Tests that we can change which pins are connected to which nets.
+    This is distinct from position preservation - it's about electrical topology changes.
+
+    Example: Change a resistor from connected to GND to connected to VCC
+    - Before: R1.pin2 → GND
+    - After: R1.pin2 → VCC
+
+    This test validates:
+    - Net connections can be modified in Python
+    - Modified connections correctly exported to KiCad schematic
+    - KiCad schematic shows updated connections
+    - Reimporting preserves the new connectivity
+    """
+    pytest.skip("Requires fixture: Create schematic with components on nets, then modify connections in Python")
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

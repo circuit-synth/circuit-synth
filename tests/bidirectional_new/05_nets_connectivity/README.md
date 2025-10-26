@@ -2,7 +2,7 @@
 
 **Priority:** P1 (Core Functionality)
 **Category:** Foundation
-**Tests:** 8 total
+**Tests:** 9 total
 **Status:** In Development
 
 ## Overview
@@ -16,6 +16,7 @@ This test suite validates that:
 - Multi-node nets (3+ connections) handled properly
 - No spurious connections or missing nets
 - Net names preserved when specified
+- **Changing connectivity: Rewiring nets in Python reflects in KiCad** (NEW!)
 
 ## Test Cases
 
@@ -50,6 +51,15 @@ This test suite validates that:
 ### Test 5.8: Net Connectivity Verification
 **What:** Net connectivity matches schematic connections
 **Validates:** Electrical correctness
+
+### Test 5.9: Changing Net Connectivity (Rewiring)
+**What:** Modify which pins are connected to which nets in Python, verify in KiCad
+**Validates:**
+- Net connections can be changed programmatically
+- Changed connections correctly exported to schematic
+- KiCad schematic reflects the rewired connections
+- Reimporting shows the new topology
+- Electrical connections update properly (not just position)
 
 ## Related Tests
 
