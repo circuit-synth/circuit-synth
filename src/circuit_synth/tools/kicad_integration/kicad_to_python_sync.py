@@ -437,6 +437,51 @@ class KiCadToPythonSyncer:
             # TODO: Implement hierarchical subcircuit support
             # For now, just log that they exist
 
+        # Handle sheets (hierarchical schematics)
+        sheets = self.json_data.get("sheets", [])
+        if sheets:
+            logger.info(f"🔍 CYCLE 1: Found {len(sheets)} sheets in JSON: {sheets}")
+            for sheet in sheets:
+                sheet_name = sheet.get("name", "unknown")
+                sheet_file = sheet.get("file", "")
+                logger.info(f"🔍 CYCLE 1: Processing sheet '{sheet_name}' from file '{sheet_file}'")
+
+                # Extract components from sheet
+                sheet_components = []
+                for ref, comp_data in sheet.get("components", {}).items():
+                    component = Component(
+                        reference=comp_data.get("ref", ref),
+                        lib_id=comp_data.get("symbol", ""),
+                        value=comp_data.get("value", ""),
+                        footprint=comp_data.get("footprint", ""),
+                        position=(0.0, 0.0),
+                    )
+                    sheet_components.append(component)
+
+                # Extract nets from sheet
+                sheet_nets = []
+                for net_name, connections in sheet.get("nets", {}).items():
+                    net_connections = []
+                    for conn in connections:
+                        comp_ref = conn.get("component")
+                        pin_num = conn.get("pin", {}).get("number", "")
+                        net_connections.append((comp_ref, pin_num))
+
+                    net = Net(name=net_name, connections=net_connections)
+                    sheet_nets.append(net)
+
+                # Create circuit object for sheet
+                sheet_circuit = Circuit(
+                    name=sheet_name,
+                    components=sheet_components,
+                    nets=sheet_nets,
+                    schematic_file=sheet_file,
+                    is_hierarchical_sheet=True,
+                )
+
+                circuits[sheet_name] = sheet_circuit
+                logger.info(f"🔍 CYCLE 1: Created circuit for sheet '{sheet_name}' with {len(sheet_components)} components")
+
         logger.info(f"Converted JSON to {len(circuits)} circuits")
         return circuits
 
@@ -497,8 +542,56 @@ class KiCadToPythonSyncer:
                 else:
                     logger.warning("Failed to create backup")
 
-            # Step 4: Extract hierarchical tree and update Python file
-            logger.info("Step 4: Updating Python file")
+            # Step 4: Separate main circuit from sheet circuits
+            logger.info("Step 4: Separating main circuit from sheets")
+
+            main_circuit = None
+            sheet_circuits = {}
+
+            for name, circuit in circuits.items():
+                if circuit.is_hierarchical_sheet:
+                    sheet_circuits[name] = circuit
+                    logger.info(f"🔍 CYCLE 2: Identified sheet circuit: {name}")
+                else:
+                    main_circuit = circuit
+                    logger.info(f"🔍 CYCLE 2: Identified main circuit: {name}")
+
+            # Step 5: Generate Python files for sheet circuits
+            sheet_module_names = []  # Track sheet module names for imports
+
+            if sheet_circuits and self.is_directory_mode:
+                logger.info(f"Step 5: Generating Python files for {len(sheet_circuits)} sheets")
+
+                for sheet_name, sheet_circuit in sheet_circuits.items():
+                    # Get the sheet filename from schematic_file (e.g., "psu.kicad_sch" -> "psu.py")
+                    sheet_file = sheet_circuit.schematic_file
+                    if sheet_file:
+                        # Extract basename without extension
+                        sheet_basename = Path(sheet_file).stem  # "psu.kicad_sch" -> "psu"
+                        sheet_python_file = self.python_file_or_dir / f"{sheet_basename}.py"
+                        sheet_module_names.append(sheet_basename)
+
+                        logger.info(f"🔍 CYCLE 3: Generating {sheet_basename}.py for sheet '{sheet_name}'")
+
+                        if not self.preview_only:
+                            # Create the sheet Python file with just the circuit
+                            sheet_circuits_dict = {sheet_name: sheet_circuit}
+                            updated_code = self.code_generator.update_python_file(
+                                sheet_python_file,
+                                sheet_circuits_dict,
+                                self.preview_only,
+                                hierarchical_tree=None
+                            )
+
+                            if updated_code:
+                                logger.info(f"✅ Generated {sheet_basename}.py successfully")
+                            else:
+                                logger.error(f"❌ Failed to generate {sheet_basename}.py")
+                    else:
+                        logger.warning(f"⚠️  Sheet '{sheet_name}' has no schematic_file, skipping Python file generation")
+
+            # Step 6: Update main Python file
+            logger.info("Step 6: Updating main Python file")
 
             # Extract hierarchical tree from circuits (all circuits should have the same tree)
             hierarchical_tree = None
@@ -525,11 +618,43 @@ class KiCadToPythonSyncer:
                         "# Generated by circuit-synth KiCad-to-Python sync\n"
                     )
 
+            # For main file, only pass main circuit (not sheets)
+            main_circuits = {main_circuit.name: main_circuit} if main_circuit else {}
+
             updated_code = self.code_generator.update_python_file(
-                self.python_file, circuits, self.preview_only, hierarchical_tree
+                self.python_file, main_circuits, self.preview_only, hierarchical_tree
             )
 
             if updated_code:
+                # Step 7: Add imports for sheet modules to main.py
+                if sheet_module_names and self.is_directory_mode and not self.preview_only:
+                    logger.info(f"Step 7: Adding imports for {len(sheet_module_names)} sheet modules to main.py")
+
+                    # Read the current main.py content
+                    main_content = self.python_file.read_text()
+
+                    # Find the line with "from circuit_synth import *"
+                    lines = main_content.split('\n')
+                    import_line_index = None
+                    for i, line in enumerate(lines):
+                        if 'from circuit_synth import' in line:
+                            import_line_index = i
+                            break
+
+                    if import_line_index is not None:
+                        # Insert sheet imports after circuit_synth import
+                        sheet_imports = [f"from {module} import {module}_circuit" for module in sheet_module_names]
+                        # Insert after the circuit_synth import line
+                        for j, import_stmt in enumerate(sheet_imports):
+                            lines.insert(import_line_index + 1 + j, import_stmt)
+
+                        # Write back to file
+                        updated_main_content = '\n'.join(lines)
+                        self.python_file.write_text(updated_main_content)
+                        logger.info(f"✅ Added {len(sheet_module_names)} sheet imports to main.py")
+                    else:
+                        logger.warning("⚠️  Could not find circuit_synth import line, skipping sheet imports")
+
                 if self.preview_only:
                     logger.info("=== PREVIEW MODE - Updated Code ===")
                     print(updated_code)
