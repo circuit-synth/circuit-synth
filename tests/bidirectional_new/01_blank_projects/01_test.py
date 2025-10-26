@@ -81,9 +81,15 @@ def cleanup_before_test():
             test_name = os.environ.get("PYTEST_CURRENT_TEST", "unknown").split("::")[1].split(" ")[0]
             dest = artifacts_dir / test_name
 
-            if dest.exists():
-                shutil.rmtree(dest)
-            shutil.copytree(blank_dir, dest)
+            # Create destination if needed
+            dest.mkdir(parents=True, exist_ok=True)
+
+            # Copy KiCad files from blank/ directory (don't delete dest, just add to it)
+            for file in blank_dir.iterdir():
+                dest_file = dest / file.name
+                if file.is_file():
+                    shutil.copy2(file, dest_file)
+
             shutil.rmtree(blank_dir)  # Remove original after copying
     else:
         # Clean up immediately if not preserving
@@ -183,6 +189,18 @@ def test_02_import_blank_python_from_kicad():
         assert "Device_R" not in py_content, "Blank circuit should have no components"
         assert "Device_C" not in py_content, "Blank circuit should have no components"
 
+        # Preserve artifacts if requested
+        if PRESERVE_ARTIFACTS:
+            artifacts_dir = get_test_artifacts_dir()
+            test_name = "test_02_import_blank_python_from_kicad"
+            dest = artifacts_dir / test_name
+            if dest.exists():
+                shutil.rmtree(dest)
+            dest.mkdir(parents=True)
+
+            # Copy generated Python file
+            shutil.copy(generated_py, dest / "imported_blank.py")
+
         print("✅ Test 1.2 PASSED: Blank Python imported successfully from KiCad")
 
 
@@ -243,6 +261,20 @@ def test_03_blank_round_trip():
         # Allow some size difference for formatting, but not massive growth
         size_ratio = roundtrip_size / original_size
         assert size_ratio < 3.0, f"Round-trip file grew too much: {size_ratio:.1f}x original size"
+
+        # Preserve artifacts if requested
+        if PRESERVE_ARTIFACTS:
+            artifacts_dir = get_test_artifacts_dir()
+            test_name = "test_03_blank_round_trip"
+            dest = artifacts_dir / test_name
+            if dest.exists():
+                shutil.rmtree(dest)
+            dest.mkdir(parents=True)
+
+            # Copy generated Python file
+            shutil.copy(output_py, dest / "round_trip_blank.py")
+            # Also copy the reference Python file for comparison
+            shutil.copy(test_dir / "01_python_ref.py", dest / "01_python_ref.py")
 
         print("✅ Test 1.3 PASSED: Blank round-trip stable and idempotent")
 
