@@ -517,6 +517,93 @@ class KiCadCLI:
 
         return output_path
 
+    def export_schematic_pdf(
+        self,
+        schematic_file: Union[str, Path],
+        output_path: Union[str, Path],
+        all_pages: bool = True,
+        black_and_white: bool = False,
+    ) -> Path:
+        """
+        Export schematic as PDF.
+
+        Args:
+            schematic_file: Path to the schematic (.kicad_sch) file
+            output_path: Output PDF file path
+            all_pages: Export all schematic pages (default: True)
+            black_and_white: Export in black and white (default: False)
+
+        Returns:
+            Path to generated PDF file
+        """
+        sch_path = Path(schematic_file)
+        output_file = Path(output_path)
+
+        args = [
+            "sch",
+            "export",
+            "pdf",
+            "--output",
+            str(output_file),
+        ]
+
+        if not all_pages:
+            args.append("--no-all-pages")
+
+        if black_and_white:
+            args.append("--black-and-white")
+
+        args.append(str(sch_path))
+
+        self.run_command(args, cwd=sch_path.parent)
+
+        return output_file
+
+    def export_bom(
+        self,
+        schematic_file: Union[str, Path],
+        output_path: Union[str, Path],
+        format: str = "csv",
+    ) -> Path:
+        """
+        Export Bill of Materials (BOM) from schematic.
+
+        Args:
+            schematic_file: Path to the schematic (.kicad_sch) file
+            output_path: Output BOM file path
+            format: Output format - csv, tsv, txt, json, xml (default: csv)
+
+        Returns:
+            Path to generated BOM file
+
+        Raises:
+            ValueError: If unsupported format is specified
+        """
+        supported_formats = ["csv", "tsv", "txt", "json", "xml"]
+        if format not in supported_formats:
+            raise ValueError(
+                f"Unsupported format: {format}. Must be one of {supported_formats}"
+            )
+
+        sch_path = Path(schematic_file)
+        output_file = Path(output_path)
+
+        args = [
+            "sch",
+            "export",
+            "bom",
+            "--output",
+            str(output_file),
+            "--format",
+            format,
+        ]
+
+        args.append(str(sch_path))
+
+        self.run_command(args, cwd=sch_path.parent)
+
+        return output_file
+
 
 # Convenience function for creating CLI instance
 def get_kicad_cli(kicad_cli_path: Optional[str] = None) -> KiCadCLI:
