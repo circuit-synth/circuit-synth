@@ -426,6 +426,8 @@ Once you have your BOM:
 2. **Pricing**: Use component search tools to find best suppliers
 3. **Manufacturing**: Submit with Gerber files and assembly drawings
 
+---
+
 ## 📄 PDF Schematic Export
 
 Export your circuit schematics as professional PDF documents with a single method call. Perfect for documentation, sharing designs, and archival.
@@ -500,11 +502,68 @@ result = circuit.generate_pdf_schematic(
 - KiCad 7.0 or later
 - `kicad-cli` must be available in PATH
 
+---
+
+## 🔧 Gerber Manufacturing Files Export
+
+Export Gerber files for professional PCB manufacturing with a single method call. Generate all necessary manufacturing files (Gerbers, drill files) directly from your circuit.
+
+### Quick Start
+
+```python
+# Generate all manufacturing files in one line
+result = circuit.generate_gerbers(project_name="my_board")
+print(f"Gerbers exported to: {result['output_dir']}")
+print(f"Files: {len(result['gerber_files'])} Gerber files")
+```
+
+### Features
+
+- ✅ **Complete Manufacturing Package**: Gerber + drill files in one call
+- ✅ **Standard Layers**: Automatically exports all necessary layers for PCB manufacturing
+- ✅ **Protel Format**: Uses standard Protel filename format compatible with all manufacturers
+- ✅ **Auto Project Generation**: Creates PCB layout if needed
+- ✅ **Drill Files**: Optionally generates Excellon or Gerber drill files
+- ✅ **KiCad CLI Powered**: Uses official KiCad kicad-cli tool (KiCad 8.0+)
+- ✅ **Manufacturer Ready**: Submit directly to JLCPCB, PCBWay, OSH Park, etc.
+
+### Return Value
+
+```python
+{
+    "success": True,
+    "gerber_files": [Path("my_board/gerbers/my_board-F.Cu.gbr"), ...],
+    "drill_files": (Path("my_board/gerbers/my_board-PTH.xln"), Path("my_board/gerbers/my_board-NPTH.xln")),
+    "project_path": Path("my_board"),
+    "output_dir": Path("my_board/gerbers")
+}
+```
+
+### Exported Layers
+
+Automatically exports all standard PCB layers:
+- **F.Cu** - Front copper layer
+- **B.Cu** - Back copper layer
+- **F.Mask** - Front solder mask
+- **B.Mask** - Back solder mask
+- **F.SilkS** - Front silkscreen (component labels)
+- **B.SilkS** - Back silkscreen
+- **F.Paste** - Front solder paste (SMT stencil)
+- **B.Paste** - Back solder paste
+- **Edge.Cuts** - Board outline/dimensions
+
+### Requirements
+
+- KiCad 8.0 or later
+- `kicad-cli` must be available in PATH
+
+---
 ## Core Features
 
 - **Automatic Source Reference Rewriting**: Keep Python and KiCad refs synchronized (see above)
 - **Bill of Materials Export**: Generate manufacturing-ready BOMs in CSV format (see above)
 - **PDF Schematic Export**: Generate professional PDF schematics with formatting options (see above)
+- **Gerber Manufacturing Files**: Generate complete PCB manufacturing files (Gerbers + drill) (see above)
 - **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files with modern kicad-sch-api integration
 - **Circuit Patterns Library**: 7 pre-made, manufacturing-ready circuits (buck/boost converters, battery chargers, sensors, communication)
 - **Hierarchical Design**: Modular subcircuits like software modules
