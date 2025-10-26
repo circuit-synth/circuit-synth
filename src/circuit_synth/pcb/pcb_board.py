@@ -1834,7 +1834,21 @@ class PCBBoard:
             )
 
         else:
-            raise ValueError(f"Unknown placement algorithm: {algorithm}")
+            valid_algorithms = [
+                "hierarchical",
+                "force_directed",
+                "advanced",
+                "connectivity_driven",
+                "connection_centric",
+                "external",
+            ]
+            error_msg = (
+                f"❌ INVALID PLACEMENT ALGORITHM: '{algorithm}'\n"
+                f"Valid algorithms are: {', '.join(valid_algorithms)}\n"
+                f"Without a valid algorithm, PCB file will not be generated!"
+            )
+            logger.error(error_msg)
+            raise ValueError(error_msg)
 
     def get_placement_bbox(self) -> Optional[Tuple[float, float, float, float]]:
         """
