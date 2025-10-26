@@ -9,6 +9,7 @@ across KiCad ↔ Python synchronization cycles.
 
 import ast
 import logging
+import subprocess
 import tokenize
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -23,8 +24,35 @@ class CommentExtractor:
         """Initialize the comment extractor."""
         pass
 
+    def _format_code_with_black(self, code: str, line_length: int = 88) -> str:
+        """
+        Format Python code using Black formatter.
+
+        Args:
+            code: Python code to format
+            line_length: Maximum line length (default 88, use 200+ to force single-line)
+
+        Returns:
+            Formatted code, or original code if Black fails
+        """
+        try:
+            import black
+
+            # Format the code using Black
+            mode = black.Mode(
+                line_length=line_length,
+                string_normalization=True,
+                is_pyi=False,
+            )
+            formatted = black.format_str(code, mode=mode)
+            logger.debug(f"Successfully formatted code with Black (line_length={line_length})")
+            return formatted
+        except Exception as e:
+            logger.warning(f"Failed to format code with Black: {e}, using original code")
+            return code
+
     def extract_comments_from_function(
-        self, file_path: Path, function_name: str = "main"
+        self, file_path: Path, function_name: str = "main", content: Optional[str] = None
     ) -> Dict[int, List[str]]:
         """
         Extract all user-added content from a specific function.
@@ -35,23 +63,29 @@ class CommentExtractor:
         Args:
             file_path: Path to Python file
             function_name: Name of function to extract content from
+            content: Optional pre-formatted content to use instead of reading file
 
         Returns:
             Dictionary mapping line offset (relative to function start) to list of content lines
             Example: {0: ["# Comment"], 2: ['docstring content']}
         """
-        if not file_path.exists():
+        if content is None and not file_path.exists():
             logger.warning(f"File not found: {file_path}")
             return {}
 
         try:
             # Parse AST to find function boundaries
-            with open(file_path, "r") as f:
-                lines = f.readlines()
+            if content is not None:
+                lines = content.splitlines(keepends=True)
+            else:
+                with open(file_path, "r") as f:
+                    lines = f.readlines()
 
             tree = ast.parse("".join(lines))
             function_start_line = self._find_function_start_line(tree, function_name)
-            function_end_line = self._find_function_end_line(tree, function_name, file_path)
+            # Pass content if available, otherwise reads from file
+            lines_str = "".join(lines) if content else None
+            function_end_line = self._find_function_end_line(tree, function_name, file_path, content=lines_str)
 
             if function_start_line is None:
                 logger.warning(f"Function '{function_name}' not found in {file_path}")
@@ -127,7 +161,7 @@ class CommentExtractor:
         return None
 
     def _find_function_end_line(
-        self, tree: ast.AST, function_name: str, file_path: Path
+        self, tree: ast.AST, function_name: str, file_path: Path, content: Optional[str] = None
     ) -> Optional[int]:
         """
         Find the ending line number of a function by analyzing indentation.
@@ -139,6 +173,7 @@ class CommentExtractor:
             tree: Parsed AST tree
             function_name: Name of function to find
             file_path: Path to the source file for indentation analysis
+            content: Optional pre-formatted content to use instead of reading file
 
         Returns:
             Line number (1-indexed) of last line with function-level indentation
@@ -156,8 +191,11 @@ class CommentExtractor:
             return None
 
         # Now scan the file to find actual function end by indentation
-        with open(file_path, "r") as f:
-            lines = f.readlines()
+        if content is not None:
+            lines = content.splitlines(keepends=True)
+        else:
+            with open(file_path, "r") as f:
+                lines = f.readlines()
 
         # Find the def line and determine function indentation
         def_line_idx = None
@@ -435,8 +473,8 @@ class CommentExtractor:
             Merged code with user content preserved and generated code updated
         """
         if not existing_file.exists():
-            # No existing file, return generated template as-is
-            return generated_template
+            # No existing file, return generated template formatted
+            return self._format_code_with_black(generated_template)
 
         # Auto-detect function name if not provided
         if function_name is None:
@@ -448,18 +486,27 @@ class CommentExtractor:
                 logger.info(f"Auto-detected circuit function: {function_name}")
 
         try:
-            # Read existing file
+            # Read existing file and normalize formatting with Black
             with open(existing_file, "r") as f:
-                existing_lines = f.readlines()
+                existing_content_raw = f.read()
+
+            # Format existing file with Black using VERY LONG line length (200)
+            # This forces multi-line Component() calls to be single-line,
+            # making them easier to detect and remove during merge
+            existing_content = self._format_code_with_black(existing_content_raw, line_length=200)
+            existing_lines = existing_content.split("\n")
+            # Add back newlines for compatibility
+            existing_lines = [line + "\n" if i < len(existing_lines) - 1 else line
+                            for i, line in enumerate(existing_lines)]
 
             # Parse both existing and generated code
-            existing_content = "".join(existing_lines)
             generated_lines = generated_template.split("\n")
 
             # Find function boundaries in EXISTING file
             existing_tree = ast.parse(existing_content)
             existing_func_start = self._find_function_start_line(existing_tree, function_name)
-            existing_func_end = self._find_function_end_line(existing_tree, function_name, existing_file)
+            # IMPORTANT: Pass formatted content so indentation analysis uses formatted version
+            existing_func_end = self._find_function_end_line(existing_tree, function_name, existing_file, content=existing_content)
 
             if existing_func_start is None:
                 # Function doesn't exist in old file, return template
@@ -475,7 +522,7 @@ class CommentExtractor:
 
             if generated_func_start_idx is None:
                 # Can't find any function in generated code, return existing
-                logger.warning(f"Could not find function in generated code")
+                logger.warning(f"Could not find function in generated code (searched for '{function_name}')")
                 return existing_content
 
             # Extract the NEW generated component code (everything after docstring in generated file)
@@ -505,7 +552,10 @@ class CommentExtractor:
 
             # Part 2: User content from INSIDE old function + NEW generated code
             # Extract user comments from inside the existing function
-            user_comments_map = self.extract_comments_from_function(existing_file, function_name)
+            # IMPORTANT: Pass the formatted content so we process the single-line version
+            user_comments_map = self.extract_comments_from_function(
+                existing_file, function_name, content=existing_content
+            )
 
             # Filter out generated patterns and standalone 'pass' statements
             # These should not be preserved as "user content"
@@ -529,20 +579,43 @@ class CommentExtractor:
                     ]
 
                     # Remove generated patterns and component code lines
+                    # Parse the content to identify component assignments using AST
+                    component_line_ranges = set()
+                    try:
+                        # Parse the formatted existing content to find Component/Net assignments
+                        tree = ast.parse(existing_content)
+                        for node in ast.walk(tree):
+                            if isinstance(node, ast.Assign):
+                                # Check if RHS is a Call to Component or Net
+                                if isinstance(node.value, ast.Call):
+                                    if isinstance(node.value.func, ast.Name):
+                                        if node.value.func.id in ('Component', 'Net'):
+                                            # Add all lines from this assignment to the exclusion set
+                                            # Convert to 0-indexed and account for function start
+                                            start_line = node.lineno - 1  # AST is 1-indexed
+                                            end_line = node.end_lineno - 1 if node.end_lineno else start_line
+                                            for line_num in range(start_line, end_line + 1):
+                                                component_line_ranges.add(line_num)
+                    except Exception as e:
+                        logger.warning(f"Failed to parse AST for component detection: {e}")
+
                     filtered_comments = {}
                     for offset, lines in user_comments_map.items():
                         filtered_lines = []
-                        for line in lines:
+                        for i, line in enumerate(lines):
                             stripped = line.strip()
                             # Skip if it's a generated pattern
                             if stripped in generated_patterns:
                                 continue
-                            # Skip if it looks like generated component code
-                            # (starts with variable assignment for common component patterns)
-                            if stripped and not stripped.startswith('#'):
-                                # Check if it's a component assignment (e.g., "r1 = Component(...)")
-                                if '= Component(' in stripped or '= Net(' in stripped:
-                                    continue
+
+                            # Calculate absolute line number in the file
+                            # offset is relative to function start, so add existing_func_start
+                            abs_line_num = existing_func_start + offset + i
+
+                            # Skip if this line is part of a Component/Net assignment
+                            if abs_line_num in component_line_ranges:
+                                continue
+
                             filtered_lines.append(line)
 
                         if filtered_lines:  # Only keep if there's content after filtering
@@ -584,9 +657,11 @@ class CommentExtractor:
                 # No user comments, just use generated code
                 result_lines.extend(generated_func_body)
 
+
             # Part 3: Everything AFTER the function body (preserve user content after function)
             # existing_func_end is 1-indexed, so existing_lines[existing_func_end] is the line AFTER function end
             if existing_func_end is not None and existing_func_end < len(existing_lines):
+                after_lines_count = len(existing_lines) - existing_func_end
                 for i in range(existing_func_end, len(existing_lines)):
                     # Preserve line as-is but remove trailing newline
                     line = existing_lines[i]
@@ -594,7 +669,9 @@ class CommentExtractor:
                         line = line[:-1]
                     result_lines.append(line.rstrip())
 
-            return "\n".join(result_lines)
+            # Format the final result with Black before returning
+            merged_code = "\n".join(result_lines)
+            return self._format_code_with_black(merged_code)
 
         except Exception as e:
             logger.error(f"Failed to merge preserving user content: {e}")
@@ -665,7 +742,9 @@ class CommentExtractor:
                 # No boilerplate found, append at end
                 result_lines.extend([''] + after_function_content)
 
-        return "\n".join(result_lines)
+        # Format the final result with Black before returning
+        merged_code = "\n".join(result_lines)
+        return self._format_code_with_black(merged_code)
 
     def _find_function_start_index(
         self, lines: List[str], function_name: str
