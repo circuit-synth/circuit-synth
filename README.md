@@ -426,10 +426,85 @@ Once you have your BOM:
 2. **Pricing**: Use component search tools to find best suppliers
 3. **Manufacturing**: Submit with Gerber files and assembly drawings
 
+## 📄 PDF Schematic Export
+
+Export your circuit schematics as professional PDF documents with a single method call. Perfect for documentation, sharing designs, and archival.
+
+### Quick Start
+
+```python
+from circuit_synth import circuit, Component
+
+@circuit(name="MyCircuit")
+def my_circuit():
+    r1 = Component(symbol="Device:R", value="10k", ref="R1")
+    return locals()
+
+circuit = my_circuit()
+
+# Generate PDF schematic
+result = circuit.generate_pdf_schematic(project_name="my_circuit")
+print(f"PDF exported to: {result['file']}")
+```
+
+### Features
+
+- ✅ **One-Line Export**: Single method call generates professional PDF
+- ✅ **Color & B/W**: Export in color or black and white
+- ✅ **Page Control**: Export specific pages or page ranges
+- ✅ **Theme Support**: Use different color themes for export
+- ✅ **Drawing Sheet Control**: Include or exclude title blocks and borders
+- ✅ **Auto Project Generation**: Creates KiCad project if needed
+- ✅ **KiCad CLI Powered**: Uses official KiCad kicad-cli tool (KiCad 7.0+)
+
+### Advanced Usage
+
+```python
+# Black and white export
+result = circuit.generate_pdf_schematic(
+    project_name="my_circuit",
+    black_and_white=True
+)
+
+# Custom output path
+result = circuit.generate_pdf_schematic(
+    project_name="my_circuit",
+    output_file="docs/schematics.pdf"
+)
+
+# Exclude drawing sheet (title block/border)
+result = circuit.generate_pdf_schematic(
+    project_name="my_circuit",
+    exclude_drawing_sheet=True
+)
+
+# Export specific pages
+result = circuit.generate_pdf_schematic(
+    project_name="my_circuit",
+    pages="1,3-5"  # Page 1, and pages 3-5
+)
+```
+
+### Return Value
+
+```python
+{
+    "success": True,
+    "file": Path("my_circuit/my_circuit.pdf"),
+    "project_path": Path("my_circuit")
+}
+```
+
+### Requirements
+
+- KiCad 7.0 or later
+- `kicad-cli` must be available in PATH
+
 ## Core Features
 
 - **Automatic Source Reference Rewriting**: Keep Python and KiCad refs synchronized (see above)
 - **Bill of Materials Export**: Generate manufacturing-ready BOMs in CSV format (see above)
+- **PDF Schematic Export**: Generate professional PDF schematics with formatting options (see above)
 - **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files with modern kicad-sch-api integration
 - **Circuit Patterns Library**: 7 pre-made, manufacturing-ready circuits (buck/boost converters, battery chargers, sensors, communication)
 - **Hierarchical Design**: Modular subcircuits like software modules
