@@ -1018,6 +1018,171 @@ class Circuit:
             )
             return {"success": False, "error": error_msg}
 
+    def generate_gerbers(
+        self,
+        output_dir: Optional[str] = None,
+        project_name: Optional[str] = None,
+        include_drill: bool = True,
+        drill_format: str = "excellon",
+    ) -> Dict[str, Any]:
+        """
+        Generate Gerber files for PCB manufacturing from this circuit.
+
+        This method creates a complete KiCad project (including PCB) if one doesn't
+        already exist, then exports Gerber files for manufacturing using kicad-cli.
+        Gerbers can be submitted directly to manufacturers like JLCPCB, PCBWay, etc.
+
+        Args:
+            output_dir: Directory where Gerber files should be written. If not provided,
+                       defaults to {project_name}/gerbers
+            project_name: Name of the KiCad project directory. If not provided,
+                         defaults to the circuit name.
+            include_drill: Also export drill files along with Gerbers (default: True)
+            drill_format: Format for drill files: "excellon" (default) or "gerber"
+
+        Returns:
+            dict: Result dictionary containing:
+                - success (bool): True if Gerbers were successfully generated
+                - gerber_files (list): List of Path objects to generated .gbr files
+                - drill_files (tuple): Tuple of (plated_holes_file, non_plated_holes_file) or None
+                - project_path (Path): Path to the KiCad project directory
+                - output_dir (Path): Directory where Gerbers were exported
+                - error (str, optional): Error message if generation failed
+
+        Example:
+            >>> circuit = esp32_board()
+            >>> result = circuit.generate_gerbers(project_name="esp32_board")
+            >>> print(f"Gerbers exported to: {result['output_dir']}")
+            >>> print(f"Files: {len(result['gerber_files'])} Gerber files")
+
+        Requirements:
+            - KiCad 8.0 or later
+            - kicad-cli must be available in PATH
+            - Circuit must be complete with all components and connections
+
+        Notes:
+            - First run generates full KiCad project including PCB (slower)
+            - Subsequent runs reuse existing project (faster)
+            - Default layers: F.Cu, B.Cu, F.Mask, B.Mask, F.SilkS, B.SilkS, F.Paste, B.Paste, Edge.Cuts
+            - Gerbers use standard Protel file extension format (.gbr, .gbl, etc.)
+            - Compatible with JLCPCB, PCBWay, OSH Park, and most PCB manufacturers
+        """
+        # Determine project name
+        if project_name is None:
+            project_name = self.name
+
+        # Determine output directory
+        if output_dir is None:
+            output_path = Path(project_name) / "gerbers"
+        else:
+            output_path = Path(output_dir)
+
+        try:
+            # Generate full KiCad project (including PCB) if needed
+            project_path = Path(project_name).resolve()
+            project_base_name = project_path.name
+            pcb_file = project_path / f"{project_base_name}.kicad_pcb"
+
+            if not pcb_file.exists():
+                context_logger.info(
+                    "Generating complete KiCad project for Gerber export",
+                    component="CIRCUIT",
+                    circuit_name=self.name,
+                    project_name=project_name,
+                )
+
+                project_result = self.generate_kicad_project(
+                    project_name=project_name,
+                    generate_pcb=True,  # Need PCB for Gerber export
+                )
+
+                if not project_result.get("success"):
+                    error_msg = f"Failed to generate KiCad project: {project_result.get('error')}"
+                    context_logger.error(
+                        error_msg, component="CIRCUIT", project_name=project_name
+                    )
+                    return {"success": False, "error": error_msg}
+
+            else:
+                context_logger.debug(
+                    "Using existing KiCad project for Gerber export",
+                    component="CIRCUIT",
+                    project_path=str(project_path),
+                )
+
+            # Create output directory
+            output_path.mkdir(parents=True, exist_ok=True)
+
+            context_logger.info(
+                "Exporting Gerber files",
+                component="CIRCUIT",
+                pcb_file=str(pcb_file),
+                output_dir=str(output_path),
+            )
+
+            # Import PCB utilities for Gerber export
+            from ..pcb.kicad_cli import get_kicad_cli
+
+            cli = get_kicad_cli()
+
+            # Export Gerbers with standard layer set
+            standard_layers = [
+                "F.Cu",          # Front copper
+                "B.Cu",          # Back copper
+                "F.Mask",        # Front solder mask
+                "B.Mask",        # Back solder mask
+                "F.SilkS",       # Front silkscreen
+                "B.SilkS",       # Back silkscreen
+                "F.Paste",       # Front solder paste
+                "B.Paste",       # Back solder paste
+                "Edge.Cuts",     # Board outline
+            ]
+
+            gerber_files = cli.export_gerbers(
+                pcb_file=pcb_file,
+                output_dir=output_path,
+                layers=standard_layers,
+                protel_extensions=True,  # Use .gbr, .gbl format for compatibility
+            )
+
+            context_logger.info(
+                "Gerber export successful",
+                component="CIRCUIT",
+                gerber_count=len(gerber_files),
+                output_dir=str(output_path),
+            )
+
+            # Export drill files if requested
+            drill_files = None
+            if include_drill:
+                context_logger.debug(
+                    "Exporting drill files",
+                    component="CIRCUIT",
+                    format=drill_format,
+                )
+
+                drill_files = cli.export_drill(
+                    pcb_file=pcb_file,
+                    output_dir=output_path,
+                    format=drill_format,
+                    units="mm",
+                )
+
+            return {
+                "success": True,
+                "gerber_files": gerber_files,
+                "drill_files": drill_files,
+                "project_path": project_path,
+                "output_dir": output_path,
+            }
+
+        except Exception as e:
+            error_msg = f"Failed to generate Gerbers: {e}"
+            context_logger.error(
+                error_msg, component="CIRCUIT", exception=str(e)
+            )
+            return {"success": False, "error": error_msg}
+
     def simulate(self):
         """
         Create a simulator instance for this circuit.
