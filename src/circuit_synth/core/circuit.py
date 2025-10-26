@@ -896,6 +896,128 @@ class Circuit:
             )
             return {"success": False, "error": error_msg}
 
+    def generate_pdf_schematic(
+        self,
+        output_file: Optional[str] = None,
+        project_name: Optional[str] = None,
+        black_and_white: bool = False,
+        theme: Optional[str] = None,
+        exclude_drawing_sheet: bool = False,
+        pages: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Generate a PDF schematic from this circuit.
+
+        This method creates a KiCad project if one doesn't already exist, then
+        exports the schematic to a PDF file using kicad-cli.
+
+        Args:
+            output_file: Path where PDF should be written. If not provided,
+                        defaults to {project_name}/{project_name}.pdf
+            project_name: Name of the KiCad project directory. If not provided,
+                         defaults to the circuit name.
+            black_and_white: Export in black and white instead of color (default: False)
+            theme: Color theme to use for export (optional). Theme name depends on KiCad installation.
+            exclude_drawing_sheet: Exclude the drawing sheet/border from PDF (default: False)
+            pages: Page range to export (e.g., "1,3-5" for pages 1, 3, 4, 5).
+                  If not specified, all pages are exported.
+
+        Returns:
+            dict: Result dictionary containing:
+                - success (bool): True if PDF was successfully generated
+                - file (Path): Path to the generated PDF file
+                - project_path (Path): Path to the KiCad project directory
+                - error (str, optional): Error message if generation failed
+
+        Example:
+            >>> circuit = led_blinker()
+            >>> result = circuit.generate_pdf_schematic(project_name="led_blinker")
+            >>> print(f"PDF exported to: {result['file']}")
+
+        Raises:
+            FileNotFoundError: If kicad-cli is not available
+            RuntimeError: If PDF export fails
+        """
+        from ..kicad.pdf_exporter import PDFExporter
+
+        # Determine project name
+        if project_name is None:
+            project_name = self.name
+
+        # Determine output file
+        if output_file is None:
+            output_path = Path(project_name)
+            output_file = output_path / f"{project_name}.pdf"
+        else:
+            output_file = Path(output_file)
+
+        try:
+            # Generate KiCad project if needed
+            project_path = Path(project_name).resolve()
+            project_base_name = project_path.name
+            sch_file = project_path / f"{project_base_name}.kicad_sch"
+
+            if not sch_file.exists():
+                context_logger.info(
+                    "Generating KiCad project for PDF export",
+                    component="CIRCUIT",
+                    circuit_name=self.name,
+                    project_name=project_name,
+                )
+
+                project_result = self.generate_kicad_project(
+                    project_name=project_name,
+                    generate_pcb=False,  # Only need schematic for PDF
+                )
+
+                if not project_result.get("success"):
+                    error_msg = f"Failed to generate KiCad project: {project_result.get('error')}"
+                    context_logger.error(
+                        error_msg, component="CIRCUIT", project_name=project_name
+                    )
+                    return {"success": False, "error": error_msg}
+
+            else:
+                context_logger.debug(
+                    "Using existing KiCad project for PDF export",
+                    component="CIRCUIT",
+                    project_path=str(project_path),
+                )
+
+            # Export PDF using kicad-cli
+            context_logger.info(
+                "Exporting PDF schematic",
+                component="CIRCUIT",
+                schematic_file=str(sch_file),
+                output_file=str(output_file),
+            )
+
+            pdf_result = PDFExporter.export_pdf(
+                schematic_file=sch_file,
+                output_file=output_file,
+                black_and_white=black_and_white,
+                theme=theme,
+                exclude_drawing_sheet=exclude_drawing_sheet,
+                pages=pages,
+            )
+
+            # Add project path to result
+            pdf_result["project_path"] = project_path
+
+            return pdf_result
+
+        except FileNotFoundError as e:
+            error_msg = f"Cannot export PDF: {e}"
+            context_logger.error(error_msg, component="CIRCUIT")
+            return {"success": False, "error": error_msg}
+
+        except Exception as e:
+            error_msg = f"Failed to generate PDF schematic: {e}"
+            context_logger.error(
+                error_msg, component="CIRCUIT", exception=str(e)
+            )
+            return {"success": False, "error": error_msg}
+
     def simulate(self):
         """
         Create a simulator instance for this circuit.
