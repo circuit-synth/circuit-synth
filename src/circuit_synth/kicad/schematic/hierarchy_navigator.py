@@ -12,6 +12,7 @@ from typing import Dict, List, Optional, Set, Tuple
 
 import kicad_sch_api as ksa
 from kicad_sch_api.core.types import Schematic, Sheet, SheetPin
+
 from .sheet_manager import SheetManager
 
 logger = logging.getLogger(__name__)

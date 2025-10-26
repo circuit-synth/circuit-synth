@@ -40,7 +40,7 @@ class TestPhase5HierarchicalCircuits:
                 symbol="Device:R",
                 ref="R_MAIN1",
                 value="1k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
+                footprint="Resistor_SMD:R_0603_1608Metric",
             )
 
             # In a real hierarchical circuit, we would reference subcircuits
@@ -49,7 +49,7 @@ class TestPhase5HierarchicalCircuits:
                 symbol="Device:C",
                 ref="C_MAIN1",
                 value="10u",
-                footprint="Capacitor_SMD:C_0603_1608Metric"
+                footprint="Capacitor_SMD:C_0603_1608Metric",
             )
 
         return main_circuit()
@@ -123,23 +123,23 @@ class TestPhase5HierarchicalCircuits:
                 from circuit_synth import Component, Net
 
                 r1 = Component(
-                symbol="Device:R",
-                ref="R1",
-                value="1k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R1",
+                    value="1k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
                 c1 = Component(
-                symbol="Device:C",
-                ref="C1",
-                value="100n",
-                footprint="Capacitor_SMD:C_0603_1608Metric"
-            )
+                    symbol="Device:C",
+                    ref="C1",
+                    value="100n",
+                    footprint="Capacitor_SMD:C_0603_1608Metric",
+                )
                 l1 = Component(
-                symbol="Device:L",
-                ref="L1",
-                value="10u",
-                footprint="Inductor_SMD:L_0603_1608Metric"
-            )
+                    symbol="Device:L",
+                    ref="L1",
+                    value="10u",
+                    footprint="Inductor_SMD:L_0603_1608Metric",
+                )
 
             circuit_obj = hier_circuit()
 
@@ -202,31 +202,31 @@ class TestPhase5HierarchicalCircuits:
 
                 # Power supply section
                 r_ps = Component(
-                symbol="Device:R",
-                ref="R_PS1",
-                value="100k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R_PS1",
+                    value="100k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
                 c_ps = Component(
-                symbol="Device:C",
-                ref="C_PS1",
-                value="47u",
-                footprint="Capacitor_SMD:C_0603_1608Metric"
-            )
+                    symbol="Device:C",
+                    ref="C_PS1",
+                    value="47u",
+                    footprint="Capacitor_SMD:C_0603_1608Metric",
+                )
 
                 # Signal section
                 r_sig = Component(
-                symbol="Device:R",
-                ref="R_SIG1",
-                value="1k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R_SIG1",
+                    value="1k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
                 c_sig = Component(
-                symbol="Device:C",
-                ref="C_SIG1",
-                value="100n",
-                footprint="Capacitor_SMD:C_0603_1608Metric"
-            )
+                    symbol="Device:C",
+                    ref="C_SIG1",
+                    value="100n",
+                    footprint="Capacitor_SMD:C_0603_1608Metric",
+                )
 
             circuit_obj = multi_level_circuit()
 
@@ -324,17 +324,17 @@ class TestPhase5HierarchicalCircuits:
                 else len(components_2) if components_2 else 0
             )
 
-            assert comp_count_1 == comp_count_2, (
-                f"Component count changed: {comp_count_1} → {comp_count_2}"
-            )
+            assert (
+                comp_count_1 == comp_count_2
+            ), f"Component count changed: {comp_count_1} → {comp_count_2}"
 
             # Verify net structure unchanged
             net_count_1 = len(nets_1) if nets_1 else 0
             net_count_2 = len(nets_2) if nets_2 else 0
 
-            assert net_count_1 == net_count_2, (
-                f"Net count changed: {net_count_1} → {net_count_2}"
-            )
+            assert (
+                net_count_1 == net_count_2
+            ), f"Net count changed: {net_count_1} → {net_count_2}"
 
             # JSON should be identical
             assert (
@@ -342,8 +342,12 @@ class TestPhase5HierarchicalCircuits:
             ), "Hierarchical circuit JSON not deterministic"
 
             print(f"✅ Test 5.4 PASS: Hierarchical idempotency")
-            print(f"   - First generation: {comp_count_1} components, {net_count_1} nets")
-            print(f"   - Second generation: {comp_count_2} components, {net_count_2} nets")
+            print(
+                f"   - First generation: {comp_count_1} components, {net_count_1} nets"
+            )
+            print(
+                f"   - Second generation: {comp_count_2} components, {net_count_2} nets"
+            )
             print(f"   - JSON deterministic: ✓")
             print(f"   - Idempotency verified: ✓")
 

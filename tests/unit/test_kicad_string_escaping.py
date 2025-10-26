@@ -11,6 +11,7 @@ Unicode box-drawing characters.
 """
 
 import pytest
+
 from circuit_synth.kicad.sch_gen.schematic_writer import SchematicWriter
 
 
@@ -88,7 +89,7 @@ class TestKiCadStringEscaping:
 
         This is the real-world case from the resistor_divider template.
         """
-        text = '''5V to 3.3V voltage divider for logic level shifting
+        text = """5V to 3.3V voltage divider for logic level shifting
 
     This circuit converts 5V signals to 3.3V levels, commonly used for:
     - Arduino (5V) to ESP32 (3.3V) communication
@@ -103,13 +104,13 @@ class TestKiCadStringEscaping:
             ┌┴┐ R2 (2kΩ)
             └┬┘
              │
-            GND'''
+            GND"""
 
         result = SchematicWriter._escape_kicad_string(text)
 
         # Verify newlines are escaped
         assert "\n" not in result  # No literal newlines
-        assert "\\n" in result     # Should have escaped newlines
+        assert "\\n" in result  # Should have escaped newlines
 
         # Verify Unicode is preserved
         assert "│" in result
@@ -253,9 +254,10 @@ class TestEscapingIntegration:
     def test_escape_function_is_static_method(self):
         """Verify the escape function is a static method."""
         import inspect
+
         assert isinstance(
             inspect.getattr_static(SchematicWriter, "_escape_kicad_string"),
-            staticmethod
+            staticmethod,
         )
 
 

@@ -53,12 +53,28 @@ class TestKiCadSyncerJSONWorkflow:
                 },
             },
             "nets": {
-                "VIN": [{"component": "R1", "pin": {"number": "1", "name": "~", "type": "passive"}}],
-                "VOUT": [
-                    {"component": "R1", "pin": {"number": "2", "name": "~", "type": "passive"}},
-                    {"component": "R2", "pin": {"number": "1", "name": "~", "type": "passive"}},
+                "VIN": [
+                    {
+                        "component": "R1",
+                        "pin": {"number": "1", "name": "~", "type": "passive"},
+                    }
                 ],
-                "GND": [{"component": "R2", "pin": {"number": "2", "name": "~", "type": "passive"}}],
+                "VOUT": [
+                    {
+                        "component": "R1",
+                        "pin": {"number": "2", "name": "~", "type": "passive"},
+                    },
+                    {
+                        "component": "R2",
+                        "pin": {"number": "1", "name": "~", "type": "passive"},
+                    },
+                ],
+                "GND": [
+                    {
+                        "component": "R2",
+                        "pin": {"number": "2", "name": "~", "type": "passive"},
+                    }
+                ],
             },
             "subcircuits": [],
             "annotations": [],
@@ -129,12 +145,8 @@ class TestKiCadSyncerJSONWorkflow:
         ), "Should contain circuit function"
 
         # Should contain component references (case-insensitive)
-        assert (
-            "R1" in content or "r1" in content.lower()
-        ), "Should contain R1 component"
-        assert (
-            "R2" in content or "r2" in content.lower()
-        ), "Should contain R2 component"
+        assert "R1" in content or "r1" in content.lower(), "Should contain R1 component"
+        assert "R2" in content or "r2" in content.lower(), "Should contain R2 component"
 
         # Should contain circuit-synth imports
         assert (

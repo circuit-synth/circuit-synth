@@ -27,7 +27,9 @@ class Circuit:
         self._component_list = []
         self._reference_manager = ReferenceManager()
         self._annotations = []  # Store TextProperty, TextBox, etc.
-        self._ref_mapping = {}  # Track prefix -> final ref mappings for source rewriting
+        self._ref_mapping = (
+            {}
+        )  # Track prefix -> final ref mappings for source rewriting
         self._circuit_func = None  # Store reference to the @circuit decorated function
 
     def validate_reference(self, ref: str) -> bool:
@@ -241,7 +243,7 @@ class Circuit:
             context_logger.debug(
                 "No circuit function reference available",
                 component="CIRCUIT",
-                circuit_name=self.name
+                circuit_name=self.name,
             )
             return None
 
@@ -249,20 +251,20 @@ class Circuit:
             source_file = inspect.getfile(self._circuit_func)
 
             # Check for special cases where source isn't available
-            if source_file == '<stdin>' or source_file == '<string>':
+            if source_file == "<stdin>" or source_file == "<string>":
                 context_logger.warning(
                     "Circuit defined in REPL/exec environment, source file not available",
                     component="CIRCUIT",
-                    circuit_name=self.name
+                    circuit_name=self.name,
                 )
                 return None
 
             # Check for frozen applications (PyInstaller, etc)
-            if getattr(inspect.sys, 'frozen', False):
+            if getattr(inspect.sys, "frozen", False):
                 context_logger.warning(
                     "Running in frozen application, source file not available",
                     component="CIRCUIT",
-                    circuit_name=self.name
+                    circuit_name=self.name,
                 )
                 return None
 
@@ -273,7 +275,7 @@ class Circuit:
                     "Source file no longer exists",
                     component="CIRCUIT",
                     circuit_name=self.name,
-                    source_file=str(path)
+                    source_file=str(path),
                 )
                 return None
 
@@ -284,7 +286,7 @@ class Circuit:
                 "Could not determine source file",
                 component="CIRCUIT",
                 circuit_name=self.name,
-                error=str(e)
+                error=str(e),
             )
             return None
 
@@ -302,9 +304,7 @@ class Circuit:
         """
         if not self._ref_mapping:
             context_logger.debug(
-                "No ref mapping to apply",
-                component="CIRCUIT",
-                circuit_name=self.name
+                "No ref mapping to apply", component="CIRCUIT", circuit_name=self.name
             )
             return False
 
@@ -316,7 +316,7 @@ class Circuit:
                 component="CIRCUIT",
                 circuit_name=self.name,
                 source_file=str(source_file),
-                ref_mapping=self._ref_mapping
+                ref_mapping=self._ref_mapping,
             )
 
             rewriter = SourceRefRewriter(source_file, self._ref_mapping)
@@ -327,13 +327,13 @@ class Circuit:
                     "Source file updated successfully",
                     component="CIRCUIT",
                     circuit_name=self.name,
-                    refs_updated=len(self._ref_mapping)
+                    refs_updated=len(self._ref_mapping),
                 )
             else:
                 context_logger.debug(
                     "Source file unchanged (no modifications needed)",
                     component="CIRCUIT",
-                    circuit_name=self.name
+                    circuit_name=self.name,
                 )
 
             return success
@@ -344,7 +344,7 @@ class Circuit:
                 component="CIRCUIT",
                 circuit_name=self.name,
                 source_file=str(source_file),
-                error=str(e)
+                error=str(e),
             )
             # Don't raise - source rewriting failure shouldn't break project generation
             return False
@@ -647,8 +647,8 @@ class Circuit:
             >>> print(f"KiCad project: {result['project_path']}")
         """
         try:
-            from ..kicad.config import get_recommended_generator
             from .. import print_version_info
+            from ..kicad.config import get_recommended_generator
 
             # Print version information for debugging
             print_version_info()
@@ -672,7 +672,7 @@ class Circuit:
                     context_logger.debug(
                         "Source file not available, skipping ref update",
                         component="CIRCUIT",
-                        circuit_name=self.name
+                        circuit_name=self.name,
                     )
 
             # Create output directory with the project name
@@ -692,7 +692,10 @@ class Circuit:
             # Use legacy system for positioning/hierarchy, modern API for file writing
             from ..kicad.sch_gen.main_generator import SchematicGenerator
 
-            context_logger.info("Using hybrid approach: legacy positioning + modern kicad-sch-api file writing", component="CIRCUIT")
+            context_logger.info(
+                "Using hybrid approach: legacy positioning + modern kicad-sch-api file writing",
+                component="CIRCUIT",
+            )
 
             # Create JSON netlist in project directory (canonical format)
             json_path = output_path / f"{output_path.name}.json"
@@ -765,6 +768,133 @@ class Circuit:
                 "success": False,
                 "error": error_msg,
             }
+
+    def generate_bom(
+        self,
+        output_file: Optional[str] = None,
+        project_name: Optional[str] = None,
+        fields: Optional[str] = None,
+        labels: Optional[str] = None,
+        group_by: Optional[str] = None,
+        exclude_dnp: bool = False,
+    ) -> Dict[str, Any]:
+        """
+        Generate a Bill of Materials (BOM) from this circuit as a CSV file.
+
+        This method creates a KiCad project if one doesn't already exist, then
+        exports the schematic to a CSV BOM file using kicad-cli.
+
+        Args:
+            output_file: Path where CSV BOM should be written. If not provided,
+                        defaults to {project_name}/{project_name}.csv
+            project_name: Name of the KiCad project directory. If not provided,
+                         defaults to the circuit name. Required if output_file is provided
+                         but needs a project.
+            fields: Comma-separated fields to export from schematic. If not specified,
+                   KiCad will export default fields (Refs, Value, Footprint, etc.)
+            labels: Comma-separated column headers for the BOM. Must match the number
+                   of fields if fields are specified.
+            group_by: Field to group references by when exporting. Common values:
+                     "Value" (group by component value), "Footprint", etc.
+            exclude_dnp: If True, exclude "Do not populate" components from BOM
+
+        Returns:
+            dict: Result dictionary containing:
+                - success (bool): True if BOM was successfully generated
+                - file (Path): Path to the generated CSV file
+                - component_count (int): Number of components in the BOM
+                - project_path (Path): Path to the KiCad project directory
+                - error (str, optional): Error message if generation failed
+
+        Example:
+            >>> circuit = led_blinker()
+            >>> result = circuit.generate_bom(project_name="led_blinker")
+            >>> print(f"BOM exported to: {result['file']}")
+            >>> print(f"Component count: {result['component_count']}")
+
+        Raises:
+            FileNotFoundError: If kicad-cli is not available
+            RuntimeError: If BOM export fails
+        """
+        from ..kicad.bom_exporter import BOMExporter
+
+        # Determine project name
+        if project_name is None:
+            project_name = self.name
+
+        # Determine output file
+        if output_file is None:
+            output_path = Path(project_name)
+            output_file = output_path / f"{project_name}.csv"
+        else:
+            output_file = Path(output_file)
+
+        try:
+            # Generate KiCad project if needed
+            project_path = Path(project_name).resolve()
+            project_base_name = project_path.name
+            sch_file = project_path / f"{project_base_name}.kicad_sch"
+
+            if not sch_file.exists():
+                context_logger.info(
+                    "Generating KiCad project for BOM export",
+                    component="CIRCUIT",
+                    circuit_name=self.name,
+                    project_name=project_name,
+                )
+
+                project_result = self.generate_kicad_project(
+                    project_name=project_name,
+                    generate_pcb=False,  # Only need schematic for BOM
+                )
+
+                if not project_result.get("success"):
+                    error_msg = f"Failed to generate KiCad project: {project_result.get('error')}"
+                    context_logger.error(
+                        error_msg, component="CIRCUIT", project_name=project_name
+                    )
+                    return {"success": False, "error": error_msg}
+
+            else:
+                context_logger.debug(
+                    "Using existing KiCad project for BOM export",
+                    component="CIRCUIT",
+                    project_path=str(project_path),
+                )
+
+            # Export BOM using kicad-cli
+            context_logger.info(
+                "Exporting BOM",
+                component="CIRCUIT",
+                schematic_file=str(sch_file),
+                output_file=str(output_file),
+            )
+
+            bom_result = BOMExporter.export_csv(
+                schematic_file=sch_file,
+                output_file=output_file,
+                fields=fields,
+                labels=labels,
+                group_by=group_by,
+                exclude_dnp=exclude_dnp,
+            )
+
+            # Add project path to result
+            bom_result["project_path"] = project_path
+
+            return bom_result
+
+        except FileNotFoundError as e:
+            error_msg = f"Cannot export BOM: {e}"
+            context_logger.error(error_msg, component="CIRCUIT")
+            return {"success": False, "error": error_msg}
+
+        except Exception as e:
+            error_msg = f"Failed to generate BOM: {e}"
+            context_logger.error(
+                error_msg, component="CIRCUIT", exception=str(e)
+            )
+            return {"success": False, "error": error_msg}
 
     def simulate(self):
         """

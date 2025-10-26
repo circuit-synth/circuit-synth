@@ -81,7 +81,9 @@ class SourceRefRewriter:
             # Write atomically
             self._write_file_atomic(updated_content, encoding, newline)
 
-            logger.info(f"Updated source refs in {self.source_file}: {self.ref_mapping}")
+            logger.info(
+                f"Updated source refs in {self.source_file}: {self.ref_mapping}"
+            )
             return True
 
         except PermissionError:
@@ -105,7 +107,7 @@ class SourceRefRewriter:
         encoding = self._detect_encoding()
 
         # Read with newline=None to preserve line endings
-        with open(self.source_file, 'r', encoding=encoding, newline='') as f:
+        with open(self.source_file, "r", encoding=encoding, newline="") as f:
             content = f.read()
 
         # Detect line ending type
@@ -124,27 +126,25 @@ class SourceRefRewriter:
         """
         # Try UTF-8 first (most common)
         try:
-            with open(self.source_file, 'r', encoding='utf-8') as f:
+            with open(self.source_file, "r", encoding="utf-8") as f:
                 f.read()
-            return 'utf-8'
+            return "utf-8"
         except UnicodeDecodeError:
             pass
 
         # Look for encoding declaration in first two lines
         # Format: # -*- coding: <encoding> -*-
-        encoding_pattern = re.compile(
-            rb'coding[=:]\s*([-\w.]+)', re.IGNORECASE
-        )
+        encoding_pattern = re.compile(rb"coding[=:]\s*([-\w.]+)", re.IGNORECASE)
 
-        with open(self.source_file, 'rb') as f:
+        with open(self.source_file, "rb") as f:
             for _ in range(2):
                 line = f.readline()
                 match = encoding_pattern.search(line)
                 if match:
-                    return match.group(1).decode('ascii')
+                    return match.group(1).decode("ascii")
 
         # Fall back to UTF-8 (will raise error if not compatible)
-        return 'utf-8'
+        return "utf-8"
 
     def _detect_newline(self, content: str) -> Optional[str]:
         """Detect line ending type in content.
@@ -156,17 +156,17 @@ class SourceRefRewriter:
             str or None: '\\r\\n' (Windows), '\\n' (Unix), '\\r' (Mac), or None (mixed/unknown)
         """
         # Count different line ending types
-        crlf_count = content.count('\r\n')
-        lf_count = content.count('\n') - crlf_count
-        cr_count = content.count('\r') - crlf_count
+        crlf_count = content.count("\r\n")
+        lf_count = content.count("\n") - crlf_count
+        cr_count = content.count("\r") - crlf_count
 
         # Return most common type
         if crlf_count > lf_count and crlf_count > cr_count:
-            return '\r\n'
+            return "\r\n"
         elif lf_count > crlf_count and lf_count > cr_count:
-            return '\n'
+            return "\n"
         elif cr_count > 0:
-            return '\r'
+            return "\r"
 
         return None  # Use universal newlines
 
@@ -220,7 +220,7 @@ class SourceRefRewriter:
 
             # Check if line is a comment
             stripped = line.lstrip()
-            if stripped.startswith('#'):
+            if stripped.startswith("#"):
                 # Skip updates in comment lines
                 updated_lines.append(line)
                 continue
@@ -247,7 +247,7 @@ class SourceRefRewriter:
                         pattern_pos = updated_line.find(pattern)
 
                         # Check if it's in a comment
-                        comment_pos = updated_line.find('#')
+                        comment_pos = updated_line.find("#")
                         if comment_pos != -1 and pattern_pos > comment_pos:
                             # Pattern is inside a comment, skip it
                             break
@@ -281,7 +281,7 @@ class SourceRefRewriter:
 
             updated_lines.append(updated_line)
 
-        return ''.join(updated_lines)
+        return "".join(updated_lines)
 
     def _write_file_atomic(self, content: str, encoding: str, newline: Optional[str]):
         """Write file atomically using temp file + rename.
@@ -303,13 +303,13 @@ class SourceRefRewriter:
         # (ensures atomic rename works on same filesystem)
         temp_fd, temp_path = tempfile.mkstemp(
             dir=self.source_file.parent,
-            prefix=f'.{self.source_file.name}.',
-            suffix='.tmp'
+            prefix=f".{self.source_file.name}.",
+            suffix=".tmp",
         )
 
         try:
             # Write content
-            with open(temp_fd, 'w', encoding=encoding, newline=newline) as f:
+            with open(temp_fd, "w", encoding=encoding, newline=newline) as f:
                 f.write(content)
 
             # Restore original permissions

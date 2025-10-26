@@ -13,6 +13,7 @@ from typing import Dict, List, Optional, Set, Tuple
 
 import kicad_sch_api as ksa
 from kicad_sch_api.core.types import Point, Schematic, SchematicSymbol, Sheet, SheetPin
+
 from ..core import BoundingBox
 
 logger = logging.getLogger(__name__)

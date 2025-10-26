@@ -317,6 +317,20 @@ class KiCadToPythonSyncer:
                 project_dir = self.kicad_project.parent
                 project_name = self.kicad_project.stem
                 kicad_sch = project_dir / f"{project_name}.kicad_sch"
+            elif self.kicad_project.suffix == ".json":
+                # Handle JSON file paths - extract parent directory and look for .kicad_sch
+                project_dir = self.kicad_project.parent
+                project_name = self.kicad_project.stem
+                kicad_sch = project_dir / f"{project_name}.kicad_sch"
+
+                # If not found with same base name, look for any .kicad_sch file
+                if not kicad_sch.exists():
+                    sch_files = list(project_dir.glob("*.kicad_sch"))
+                    if not sch_files:
+                        raise FileNotFoundError(
+                            f"No .kicad_sch files found in {project_dir}"
+                        )
+                    kicad_sch = sch_files[0]
             else:
                 project_dir = self.kicad_project
                 # Find first .kicad_sch in directory
@@ -333,7 +347,8 @@ class KiCadToPythonSyncer:
             logger.info(f"Regenerating JSON from schematic: {kicad_sch}")
 
             # Parse .kicad_sch using KiCadParser
-            parser = KiCadParser(str(self.kicad_project))
+            # Use the project directory, not self.kicad_project (which might be a JSON file)
+            parser = KiCadParser(str(project_dir))
             circuits = parser.parse_circuits()
 
             if not circuits:
@@ -345,7 +360,7 @@ class KiCadToPythonSyncer:
             # Regenerate JSON netlist from parsed circuit
             logger.info(f"Writing updated JSON to {self.json_path}")
             json_data = main_circuit.to_circuit_synth_json()
-            with open(self.json_path, 'w') as f:
+            with open(self.json_path, "w") as f:
                 json.dump(json_data, f, indent=2)
 
             logger.info(

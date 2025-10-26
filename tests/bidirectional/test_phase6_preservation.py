@@ -49,18 +49,18 @@ class TestPhase6Preservation:
 
                 # Power supply resistor - 10k pull-up
                 r1 = Component(
-                symbol="Device:R",
-                ref="R1",
-                value="10k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R1",
+                    value="10k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
                 # Input protection resistor
                 r2 = Component(
-                symbol="Device:R",
-                ref="R2",
-                value="1k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R2",
+                    value="1k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
 
             circuit_obj = commented_circuit()
 
@@ -75,9 +75,7 @@ class TestPhase6Preservation:
             output_dir.mkdir()
 
             syncer = KiCadToPythonSyncer(
-                kicad_project_or_json=str(
-                    project_dir / "commented_circuit.kicad_pro"
-                ),
+                kicad_project_or_json=str(project_dir / "commented_circuit.kicad_pro"),
                 python_file=str(output_dir),
                 preview_only=False,
                 create_backup=False,
@@ -127,17 +125,17 @@ class TestPhase6Preservation:
                 from circuit_synth import Component, Net
 
                 r1 = Component(
-                symbol="Device:R",
-                ref="R1",
-                value="10k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R1",
+                    value="10k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
                 r2 = Component(
-                symbol="Device:R",
-                ref="R2",
-                value="20k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R2",
+                    value="20k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
 
             circuit_obj = positioned_circuit()
 
@@ -162,9 +160,7 @@ class TestPhase6Preservation:
             output_dir.mkdir()
 
             syncer = KiCadToPythonSyncer(
-                kicad_project_or_json=str(
-                    project_dir / "positioned_circuit.kicad_pro"
-                ),
+                kicad_project_or_json=str(project_dir / "positioned_circuit.kicad_pro"),
                 python_file=str(output_dir),
                 preview_only=False,
                 create_backup=False,
@@ -235,17 +231,17 @@ class TestPhase6Preservation:
 
                 # High-frequency bypass capacitor
                 r1 = Component(
-                symbol="Device:R",
-                ref="R1",
-                value="100",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )  # Pull-up
+                    symbol="Device:R",
+                    ref="R1",
+                    value="100",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )  # Pull-up
                 c1 = Component(
-                symbol="Device:C",
-                ref="C1",
-                value="100n",
-                footprint="Capacitor_SMD:C_0603_1608Metric"
-            )  # Bypass cap
+                    symbol="Device:C",
+                    ref="C1",
+                    value="100n",
+                    footprint="Capacitor_SMD:C_0603_1608Metric",
+                )  # Bypass cap
 
             circuit_obj = annotated_circuit()
 
@@ -322,21 +318,27 @@ class TestPhase6Preservation:
                 from circuit_synth import Component, Net
 
                 r1 = Component(
-                symbol="Device:R",
-                ref="R1",
-                value="10k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R1",
+                    value="10k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
                 r2 = Component(
-                symbol="Device:R",
-                ref="R2",
-                value="20k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R2",
+                    value="20k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
 
                 # Create net connections
                 net_vcc = Net("VCC")
                 net_gnd = Net("GND")
+
+                # Connect nets to component pins
+                net_vcc += r1[1]  # Connect VCC to R1 pin 1
+                net_gnd += r1[2]  # Connect GND to R1 pin 2
+                net_vcc += r2[1]  # Connect VCC to R2 pin 1
+                net_gnd += r2[2]  # Connect GND to R2 pin 2
 
             circuit_obj = routed_circuit()
 
@@ -352,9 +354,7 @@ class TestPhase6Preservation:
                 json_data_1 = json.load(f)
 
             nets_1 = json_data_1.get("nets", {})
-            assert (
-                len(nets_1) > 0
-            ), "Expected nets in JSON but found none"
+            assert len(nets_1) > 0, "Expected nets in JSON but found none"
 
             # Record net count
             net_count_1 = len(nets_1)
@@ -386,9 +386,14 @@ class TestPhase6Preservation:
             main_module = __import__("importlib.util").util.module_from_spec(spec)
             spec.loader.exec_module(main_module)
 
-            # Get circuit from generated module
-            circuit_func = getattr(main_module, "routed_circuit", None)
+            # Get circuit from generated module - try both expected name and fallback
+            circuit_func = getattr(main_module, "routed_circuit", None) or getattr(main_module, "main", None)
+
             if circuit_func:
+                # Clear any existing circuit context to avoid reference collisions
+                from circuit_synth.core.decorators import set_current_circuit
+                set_current_circuit(None)
+
                 regen_circuit = circuit_func()
                 result2 = regen_circuit.generate_kicad_project(
                     project_name="routed_circuit_regen",
@@ -408,11 +413,188 @@ class TestPhase6Preservation:
                     net_count_1 == net_count_2
                 ), f"Net count changed: {net_count_1} → {net_count_2}"
 
-            print(f"✅ Test 6.4 PASS: Wire routing idempotency")
-            print(f"   - Original nets: {net_count_1}")
-            print(f"   - Imported and regenerated: ✓")
-            print(f"   - Net count preserved: {net_count_2}")
-            print(f"   - Idempotency verified: ✓")
+                print(f"✅ Test 6.4 PASS: Wire routing idempotency")
+                print(f"   - Original nets: {net_count_1}")
+                print(f"   - Imported and regenerated: ✓")
+                print(f"   - Net count preserved: {net_count_2}")
+                print(f"   - Idempotency verified: ✓")
+            else:
+                raise AssertionError("circuit function not found in generated module")
+
+    def test_6_5_user_comments_idempotency(self):
+        """Test 6.5: User comments idempotent across multiple imports
+
+        CRITICAL TEST: User adds comments, inline docstrings, and blank lines
+        in Python code. These must survive multiple KiCad → Python sync cycles
+        without accumulation or loss.
+
+        Validates:
+        - Create blank Python circuit with user comments
+        - Simulate KiCad → Python sync (3 times)
+        - Verify comments preserved identically each time
+        - No docstring duplication
+        - Blank lines between comment groups preserved
+        - No trailing blank line accumulation
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir_path = Path(tmpdir)
+
+            # Create the blank KiCad project directory structure
+            blank_dir = tmpdir_path / "blank"
+            blank_dir.mkdir()
+
+            # Create blank KiCad JSON (simulating a blank KiCad project)
+            blank_json = blank_dir / "blank.json"
+            blank_json.write_text(
+                json.dumps(
+                    {
+                        "name": "blank",
+                        "description": "",
+                        "tstamps": "/blank-test/",
+                        "source_file": "blank.kicad_sch",
+                        "components": {},
+                        "nets": {},
+                        "subcircuits": [],
+                        "annotations": [],
+                    },
+                    indent=2,
+                )
+            )
+
+            # Create initial Python file with user comments
+            initial_code = '''#!/usr/bin/env python3
+"""
+Circuit Generated from KiCad
+"""
+
+from circuit_synth import *
+
+
+@circuit
+def main():
+    """Generated circuit from KiCad"""
+    # USER COMMENT: This is my first preserved comment!
+    """
+    look at these!"""
+
+    # another one!
+    # another one!
+    # another one!
+
+    # another one!
+    # another one!
+    # another one!
+    """ more comments"""
+    """ more comments"""
+    """ more comments"""
+
+    # suhp?
+
+
+# Generate the circuit
+if __name__ == "__main__":
+    circuit = main()
+    circuit.generate_kicad_project(project_name="blank_generated")
+    circuit.generate_kicad_netlist("blank_generated/blank_generated.net")
+'''
+
+            python_file = tmpdir_path / "test_blank.py"
+            python_file.write_text(initial_code)
+
+            # Run sync 3 times and verify idempotency
+            previous_content = initial_code
+            for i in range(1, 4):
+                syncer = KiCadToPythonSyncer(
+                    kicad_project_or_json=str(blank_json),
+                    python_file=str(python_file),
+                    preview_only=False,
+                    create_backup=False,
+                )
+
+                success = syncer.sync()
+                assert success, f"KiCad → Python sync {i} failed"
+
+                with open(python_file) as f:
+                    current_content = f.read()
+
+                # Verify critical preservation requirements
+                assert '"""Generated circuit from KiCad"""' in current_content
+                assert (
+                    current_content.count('"""Generated circuit from KiCad"""') == 1
+                ), f"Round {i}: Function docstring duplicated"
+
+                assert (
+                    "USER COMMENT: This is my first preserved comment!"
+                    in current_content
+                ), f"Round {i}: User comment lost"
+                assert (
+                    "look at these!" in current_content
+                ), f"Round {i}: Inline docstring lost"
+                assert (
+                    "another one!" in current_content
+                ), f"Round {i}: Comment group lost"
+                assert (
+                    current_content.count("another one!") == 6
+                ), f"Round {i}: Comment count changed"
+                assert "suhp?" in current_content, f"Round {i}: Last comment lost"
+
+                # Verify blank lines preserved between comment groups
+                lines = current_content.split("\n")
+                another_one_indices = [
+                    i for i, line in enumerate(lines) if "another one!" in line
+                ]
+                assert (
+                    len(another_one_indices) == 6
+                ), f"Round {i}: Should have 6 'another one!' comments"
+
+                # Check blank line between the two groups
+                has_blank_between = (
+                    another_one_indices[3] - another_one_indices[2]
+                ) > 1
+                assert (
+                    has_blank_between
+                ), f"Round {i}: Blank line between comment groups lost"
+
+                # Verify no excessive trailing blank lines after "# suhp?"
+                suhp_index = None
+                for idx, line in enumerate(lines):
+                    if "suhp?" in line:
+                        suhp_index = idx
+                        break
+
+                assert (
+                    suhp_index is not None
+                ), f"Round {i}: Could not find '# suhp?' comment"
+
+                # Count trailing blanks after suhp
+                blank_count = 0
+                for idx in range(suhp_index + 1, len(lines)):
+                    if lines[idx].strip() == "":
+                        blank_count += 1
+                    else:
+                        break
+
+                assert (
+                    blank_count <= 4
+                ), f"Round {i}: Too many trailing blanks ({blank_count}), should be ≤4"
+
+                # Verify idempotency - content should stabilize after round 2
+                if i >= 2:
+                    assert (
+                        current_content == previous_content
+                    ), f"Round {i}: Content changed (not idempotent)"
+
+                previous_content = current_content
+
+                print(f"   Round {i}: ✓ Comments preserved, idempotent")
+
+            print(f"✅ Test 6.5 PASS: User comments idempotency")
+            print(f"   - Function docstring: no duplication ✓")
+            print(f"   - User comments: preserved ✓")
+            print(f"   - Inline docstrings: preserved ✓")
+            print(f"   - Blank lines: preserved ✓")
+            print(f"   - Trailing blanks: controlled ✓")
+            print(f"   - Idempotency: verified across 3 rounds ✓")
 
     def test_6_5_user_comments_idempotency(self):
         """Test 6.5: User comments idempotent across multiple imports

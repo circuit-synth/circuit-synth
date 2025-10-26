@@ -91,7 +91,9 @@ class TestKiCadToJSONExportIntegration:
         result = parser.parse_and_export(json_path)
 
         if not result["success"]:
-            pytest.skip(f"Parser not fully implemented yet: {result.get('error', 'Unknown')}")
+            pytest.skip(
+                f"Parser not fully implemented yet: {result.get('error', 'Unknown')}"
+            )
 
         assert json_path.exists()
 
@@ -114,6 +116,7 @@ class TestKiCadToJSONExportIntegration:
 
     def test_json_matches_circuit_generate_hierarchical_format(self, temp_dir):
         """Test that exported JSON matches Circuit._generate_hierarchical_json_netlist format."""
+
         # Create a circuit in Python
         @circuit(name="test_comparison")
         def test_circuit():
@@ -141,11 +144,9 @@ class TestKiCadToJSONExportIntegration:
             existing_data = json.load(f)
 
         # Create equivalent circuit using models.Circuit
-        from circuit_synth.tools.utilities.models import (
-            Circuit as ModelCircuit,
-            Component as ModelComponent,
-            Net as ModelNet,
-        )
+        from circuit_synth.tools.utilities.models import Circuit as ModelCircuit
+        from circuit_synth.tools.utilities.models import Component as ModelComponent
+        from circuit_synth.tools.utilities.models import Net as ModelNet
 
         components = [
             ModelComponent(

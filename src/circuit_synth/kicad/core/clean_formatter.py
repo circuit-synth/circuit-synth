@@ -48,7 +48,9 @@ class FormattingRules:
         self.rules["generator"] = FormatRule(inline=True, quote_indices={1})
         self.rules["generator_version"] = FormatRule(inline=True, quote_indices={1})
         self.rules["uuid"] = FormatRule(inline=True)
-        self.rules["paper"] = FormatRule(inline=True)  # No quotes for paper size (A4, A3, etc.)
+        self.rules["paper"] = FormatRule(
+            inline=True
+        )  # No quotes for paper size (A4, A3, etc.)
 
         # Properties - special KiCad format: (property "Name" "Value" ...)
         self.rules["property"] = FormatRule(

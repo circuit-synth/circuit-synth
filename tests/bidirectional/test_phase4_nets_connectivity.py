@@ -45,19 +45,19 @@ class TestPhase4NetsConnectivity:
                 symbol="Device:R",
                 ref="R1",
                 value="1k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
+                footprint="Resistor_SMD:R_0603_1608Metric",
             )
             c1 = Component(
                 symbol="Device:C",
                 ref="C1",
                 value="100n",
-                footprint="Capacitor_SMD:C_0603_1608Metric"
+                footprint="Capacitor_SMD:C_0603_1608Metric",
             )
             r2 = Component(
                 symbol="Device:R",
                 ref="R2",
                 value="10k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
+                footprint="Resistor_SMD:R_0603_1608Metric",
             )
 
             # Connect components to nets
@@ -94,7 +94,9 @@ class TestPhase4NetsConnectivity:
 
             nets = json_data.get("nets", {})
             net_names = (
-                list(nets.keys()) if isinstance(nets, dict) else [n.get("name") for n in nets]
+                list(nets.keys())
+                if isinstance(nets, dict)
+                else [n.get("name") for n in nets]
             )
 
             # Verify named nets exist
@@ -142,7 +144,9 @@ class TestPhase4NetsConnectivity:
 
             original_nets = json_data.get("nets", {})
             original_net_count = (
-                len(original_nets) if isinstance(original_nets, dict) else len(original_nets or [])
+                len(original_nets)
+                if isinstance(original_nets, dict)
+                else len(original_nets or [])
             )
 
             # Import to Python
@@ -165,9 +169,9 @@ class TestPhase4NetsConnectivity:
                 generated_code = f.read()
 
             # Check for component references (nets connect components)
-            assert "R1" in generated_code or "C1" in generated_code, (
-                "No component references in generated Python"
-            )
+            assert (
+                "R1" in generated_code or "C1" in generated_code
+            ), "No component references in generated Python"
 
             print(f"✅ Test 4.2 PASS: Net connections in imported Python")
             print(f"   - Original nets: {original_net_count}")
@@ -202,35 +206,35 @@ class TestPhase4NetsConnectivity:
 
                 # Components that connect these nets
                 r1 = Component(
-                symbol="Device:R",
-                ref="R1",
-                value="1k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R1",
+                    value="1k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
                 r2 = Component(
-                symbol="Device:R",
-                ref="R2",
-                value="2k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R2",
+                    value="2k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
                 r3 = Component(
-                symbol="Device:R",
-                ref="R3",
-                value="3k",
-                footprint="Resistor_SMD:R_0603_1608Metric"
-            )
+                    symbol="Device:R",
+                    ref="R3",
+                    value="3k",
+                    footprint="Resistor_SMD:R_0603_1608Metric",
+                )
                 c1 = Component(
-                symbol="Device:C",
-                ref="C1",
-                value="100n",
-                footprint="Capacitor_SMD:C_0603_1608Metric"
-            )
+                    symbol="Device:C",
+                    ref="C1",
+                    value="100n",
+                    footprint="Capacitor_SMD:C_0603_1608Metric",
+                )
                 l1 = Component(
-                symbol="Device:L",
-                ref="L1",
-                value="10u",
-                footprint="Inductor_SMD:L_0603_1608Metric"
-            )
+                    symbol="Device:L",
+                    ref="L1",
+                    value="10u",
+                    footprint="Inductor_SMD:L_0603_1608Metric",
+                )
 
             circuit_obj = complex_net_circuit()
 
@@ -245,9 +249,7 @@ class TestPhase4NetsConnectivity:
                 json_data_1 = json.load(f)
 
             nets_1 = json_data_1.get("nets", {})
-            net_count_1 = (
-                len(nets_1) if isinstance(nets_1, dict) else len(nets_1 or [])
-            )
+            net_count_1 = len(nets_1) if isinstance(nets_1, dict) else len(nets_1 or [])
             comps_1 = json_data_1.get("components", {})
             comp_count_1 = (
                 len(comps_1) if isinstance(comps_1, dict) else len(comps_1 or [])
@@ -310,16 +312,18 @@ class TestPhase4NetsConnectivity:
                 )
 
                 # Verify counts preserved
-                assert comp_count_1 == comp_count_2, (
-                    f"Component count changed: {comp_count_1} → {comp_count_2}"
-                )
-                assert net_count_1 == net_count_2, (
-                    f"Net count changed: {net_count_1} → {net_count_2}"
-                )
+                assert (
+                    comp_count_1 == comp_count_2
+                ), f"Component count changed: {comp_count_1} → {comp_count_2}"
+                assert (
+                    net_count_1 == net_count_2
+                ), f"Net count changed: {net_count_1} → {net_count_2}"
 
             print(f"✅ Test 4.3 PASS: Complex net topology preserved")
             print(f"   - Original: {comp_count_1} components, {net_count_1} nets")
-            print(f"   - After round-trip: {comp_count_2} components, {net_count_2} nets")
+            print(
+                f"   - After round-trip: {comp_count_2} components, {net_count_2} nets"
+            )
             print(f"   - Topology preserved: ✓")
 
     def test_4_4_net_name_idempotency(self, circuit_with_named_nets):
@@ -372,9 +376,9 @@ class TestPhase4NetsConnectivity:
                     f"names: {net_names[:3]}..."
                 )
                 sorted_names = sorted(net_names)
-                assert sorted_names == first_net_names, (
-                    f"Net names changed in generation {gen_num}"
-                )
+                assert (
+                    sorted_names == first_net_names
+                ), f"Net names changed in generation {gen_num}"
 
             print(f"✅ Test 4.4 PASS: Net name idempotency")
             print(f"   - 3 generations with same net count: ✓")

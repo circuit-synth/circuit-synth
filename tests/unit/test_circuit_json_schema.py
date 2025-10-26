@@ -110,7 +110,10 @@ class TestCircuitJSONSchemaConversion:
         nets = []
 
         circuit = Circuit(
-            name="test_mcu", components=components, nets=nets, schematic_file="mcu.kicad_sch"
+            name="test_mcu",
+            components=components,
+            nets=nets,
+            schematic_file="mcu.kicad_sch",
         )
 
         json_data = circuit.to_circuit_synth_json()
@@ -130,7 +133,10 @@ class TestCircuitJSONSchemaConversion:
         nets = []
 
         circuit = Circuit(
-            name="minimal", components=components, nets=nets, schematic_file="min.kicad_sch"
+            name="minimal",
+            components=components,
+            nets=nets,
+            schematic_file="min.kicad_sch",
         )
 
         json_data = circuit.to_circuit_synth_json()
@@ -159,7 +165,10 @@ class TestCircuitJSONSchemaConversion:
         nets = [Net(name="VCC", connections=[("R1", "1"), ("R2", "1")])]
 
         circuit = Circuit(
-            name="test_pins", components=components, nets=nets, schematic_file="test.kicad_sch"
+            name="test_pins",
+            components=components,
+            nets=nets,
+            schematic_file="test.kicad_sch",
         )
 
         json_data = circuit.to_circuit_synth_json()
@@ -214,7 +223,10 @@ class TestCircuitJSONSchemaConversion:
         nets = []
 
         circuit = Circuit(
-            name="empty", components=components, nets=nets, schematic_file="empty.kicad_sch"
+            name="empty",
+            components=components,
+            nets=nets,
+            schematic_file="empty.kicad_sch",
         )
 
         json_data = circuit.to_circuit_synth_json()
@@ -256,13 +268,20 @@ class TestCircuitJSONSchemaConversion:
     def test_net_with_multiple_connections(self):
         """Test net with multiple component connections."""
         components = [
-            Component(reference=f"R{i}", lib_id="Device:R", value="10k") for i in range(1, 6)
+            Component(reference=f"R{i}", lib_id="Device:R", value="10k")
+            for i in range(1, 6)
         ]
         # Net connecting 5 resistors
         nets = [
             Net(
                 name="COMMON",
-                connections=[("R1", "1"), ("R2", "1"), ("R3", "1"), ("R4", "1"), ("R5", "1")],
+                connections=[
+                    ("R1", "1"),
+                    ("R2", "1"),
+                    ("R3", "1"),
+                    ("R4", "1"),
+                    ("R5", "1"),
+                ],
             )
         ]
 
@@ -290,7 +309,10 @@ class TestCircuitJSONSchemaConversion:
         nets = [Net(name="VCC", connections=[("R1", 1)])]  # Integer pin number
 
         circuit = Circuit(
-            name="pin_test", components=components, nets=nets, schematic_file="test.kicad_sch"
+            name="pin_test",
+            components=components,
+            nets=nets,
+            schematic_file="test.kicad_sch",
         )
 
         json_data = circuit.to_circuit_synth_json()
@@ -330,7 +352,9 @@ class TestCircuitJSONSchemaConversion:
     def test_component_without_footprint(self):
         """Test component with missing footprint field."""
         components = [
-            Component(reference="TP1", lib_id="Connector:TestPoint", value="", footprint="")
+            Component(
+                reference="TP1", lib_id="Connector:TestPoint", value="", footprint=""
+            )
         ]
         nets = []
 

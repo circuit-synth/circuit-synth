@@ -10,6 +10,7 @@ Voltage divider formula: Vout = Vin * (R2 / (R1 + R2))
 For 5V → 3.3V: R1=1kΩ, R2=2kΩ
 Actual output: 5V * (2kΩ / 3kΩ) = 3.33V ✓
 """
+
 from circuit_synth import Component, Net, circuit
 
 
@@ -43,7 +44,7 @@ def resistor_divider():
         symbol="Device:R",  # Generic resistor symbol
         ref="R",  # Reference prefix (will become R1, R2, etc.)
         value="1k",  # Resistance value in ohms
-        footprint="Resistor_SMD:R_0603_1608Metric"  # 0603 SMD package
+        footprint="Resistor_SMD:R_0603_1608Metric",  # 0603 SMD package
     )
 
     # R2 = 2kΩ (lower resistor)
@@ -52,29 +53,29 @@ def resistor_divider():
         symbol="Device:R",
         ref="R",
         value="2k",  # 2000 ohms
-        footprint="Resistor_SMD:R_0603_1608Metric"
+        footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
     # Define electrical nets (connections)
     # Nets represent wires/traces that connect component pins
-    vin_5v = Net('VIN_5V')      # Input: 5V from source
-    vout_3v3 = Net('VOUT_3V3')  # Output: 3.3V to destination
-    gnd = Net('GND')            # Ground reference (0V)
+    vin_5v = Net("VIN_5V")  # Input: 5V from source
+    vout_3v3 = Net("VOUT_3V3")  # Output: 3.3V to destination
+    gnd = Net("GND")  # Ground reference (0V)
 
     # Connect resistors to form voltage divider
     # The += operator connects a component pin to a net
     # For resistors, pins are numbered 1 and 2
 
-    r1[1] += vin_5v    # R1 pin 1 connects to 5V input
+    r1[1] += vin_5v  # R1 pin 1 connects to 5V input
     r1[2] += vout_3v3  # R1 pin 2 connects to output (junction point)
     r2[1] += vout_3v3  # R2 pin 1 connects to output (junction point)
-    r2[2] += gnd       # R2 pin 2 connects to ground
+    r2[2] += gnd  # R2 pin 2 connects to ground
 
     # Note: R1[2] and R2[1] both connect to VOUT_3V3
     # This creates the junction between the two resistors
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # This code runs when you execute: uv run python circuit-synth/main.py
 
     # Generate the circuit
@@ -84,7 +85,7 @@ if __name__ == '__main__':
     circuit_obj.generate_kicad_project(
         project_name="resistor_divider",  # Name for KiCad project files
         placement_algorithm="hierarchical",  # Simple placement for small circuits
-        generate_pcb=True  # Also create PCB file (.kicad_pcb)
+        generate_pcb=True,  # Also create PCB file (.kicad_pcb)
     )
 
     print("✅ Resistor divider circuit generated!")

@@ -1017,7 +1017,7 @@ class PCBParser:
 
         # Add position with rotation
         at_expr = [sexpdata.Symbol("at"), pad.position.x, pad.position.y]
-        if hasattr(pad, 'rotation') and pad.rotation != 0:
+        if hasattr(pad, "rotation") and pad.rotation != 0:
             at_expr.append(pad.rotation)
         sexp.append(at_expr)
 

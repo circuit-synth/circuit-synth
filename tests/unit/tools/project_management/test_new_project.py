@@ -12,7 +12,7 @@ Tests the circuit-synth project creation workflow including:
 
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch, call
+from unittest.mock import MagicMock, Mock, call, patch
 
 import pytest
 
@@ -24,7 +24,6 @@ from circuit_synth.tools.project_management.new_project import (
     create_claude_md,
     create_project_readme,
 )
-
 
 # ============================================================================
 # Fixtures
@@ -135,13 +134,17 @@ class TestClaudeDirectoryStructure:
         self, mock_register, temp_project_dir, mock_console, mock_template_dir
     ):
         """Test .claude directory is created"""
-        with patch("circuit_synth.tools.project_management.new_project.Path") as mock_path_class:
+        with patch(
+            "circuit_synth.tools.project_management.new_project.Path"
+        ) as mock_path_class:
             # Setup mock to return our template directory
             mock_path_instance = MagicMock()
             mock_path_instance.parent.parent.parent = mock_template_dir.parent.parent
             mock_path_class.return_value = mock_path_instance
 
-            create_claude_directory_from_templates(temp_project_dir, developer_mode=False)
+            create_claude_directory_from_templates(
+                temp_project_dir, developer_mode=False
+            )
 
             claude_dir = temp_project_dir / ".claude"
             assert claude_dir.exists(), ".claude directory should be created"
@@ -153,7 +156,9 @@ class TestClaudeDirectoryStructure:
         """Test agent category subdirectories are created"""
         with patch("circuit_synth.tools.project_management.new_project.Path"):
             # This will trigger fallback to basic setup
-            create_claude_directory_from_templates(temp_project_dir, developer_mode=False)
+            create_claude_directory_from_templates(
+                temp_project_dir, developer_mode=False
+            )
 
             claude_dir = temp_project_dir / ".claude"
             agents_dir = claude_dir / "agents"
@@ -172,7 +177,9 @@ class TestClaudeDirectoryStructure:
         source_dir = temp_project_dir / "source" / ".claude"
         source_dir.mkdir(parents=True)
 
-        with patch("circuit_synth.tools.project_management.new_project.Path") as mock_path_class:
+        with patch(
+            "circuit_synth.tools.project_management.new_project.Path"
+        ) as mock_path_class:
             mock_path_instance = MagicMock()
             mock_path_instance.parent.parent.parent.parent = temp_project_dir / "source"
             mock_path_class.return_value = mock_path_instance
@@ -184,7 +191,9 @@ class TestClaudeDirectoryStructure:
             # Verify copytree was called
             assert mock_copytree.called, "Should copy .claude directory"
 
-    @patch("circuit_synth.tools.project_management.new_project.create_claude_directory_from_templates")
+    @patch(
+        "circuit_synth.tools.project_management.new_project.create_claude_directory_from_templates"
+    )
     @patch("circuit_synth.tools.project_management.new_project.register_circuit_agents")
     def test_keeps_dev_agents_in_developer_mode(
         self, mock_register, mock_create_templates, temp_project_dir, mock_console
@@ -231,10 +240,17 @@ class TestTemplateManagement:
     @patch("circuit_synth.tools.project_management.new_project.shutil.copy2")
     @patch("circuit_synth.tools.project_management.new_project.shutil.copytree")
     def test_copy_template_success(
-        self, mock_copytree, mock_copy2, temp_project_dir, mock_console, mock_template_dir
+        self,
+        mock_copytree,
+        mock_copy2,
+        temp_project_dir,
+        mock_console,
+        mock_template_dir,
     ):
         """Test successful template copy"""
-        with patch("circuit_synth.tools.project_management.new_project.Path") as mock_path_class:
+        with patch(
+            "circuit_synth.tools.project_management.new_project.Path"
+        ) as mock_path_class:
             mock_path_instance = MagicMock()
             mock_path_instance.parent.parent.parent = mock_template_dir.parent
             mock_path_class.return_value = mock_path_instance
@@ -245,7 +261,10 @@ class TestTemplateManagement:
                 with patch.object(
                     Path,
                     "iterdir",
-                    return_value=[mock_template_dir / "main.py", mock_template_dir / "README.md"],
+                    return_value=[
+                        mock_template_dir / "main.py",
+                        mock_template_dir / "README.md",
+                    ],
                 ):
                     result = copy_example_project_template(temp_project_dir)
                     # This will fail in current implementation due to mocking complexity
@@ -274,7 +293,9 @@ class TestTemplateManagement:
 class TestKiCadInstallation:
     """Test KiCad installation checking"""
 
-    @patch("circuit_synth.tools.project_management.new_project.validate_kicad_installation")
+    @patch(
+        "circuit_synth.tools.project_management.new_project.validate_kicad_installation"
+    )
     def test_kicad_found(self, mock_validate, mock_console):
         """Test successful KiCad detection"""
         mock_validate.return_value = {
@@ -291,17 +312,23 @@ class TestKiCadInstallation:
         assert result["kicad_installed"] is True, "Should detect KiCad as installed"
         mock_console.print.assert_any_call("✅ KiCad found!", style="green")
 
-    @patch("circuit_synth.tools.project_management.new_project.validate_kicad_installation")
+    @patch(
+        "circuit_synth.tools.project_management.new_project.validate_kicad_installation"
+    )
     def test_kicad_not_found(self, mock_validate, mock_console):
         """Test KiCad not found"""
         mock_validate.return_value = {"cli_available": False}
 
         result = check_kicad_installation()
 
-        assert result["kicad_installed"] is False, "Should detect KiCad as not installed"
+        assert (
+            result["kicad_installed"] is False
+        ), "Should detect KiCad as not installed"
         mock_console.print.assert_any_call("❌ KiCad not found", style="red")
 
-    @patch("circuit_synth.tools.project_management.new_project.validate_kicad_installation")
+    @patch(
+        "circuit_synth.tools.project_management.new_project.validate_kicad_installation"
+    )
     def test_kicad_check_error(self, mock_validate, mock_console):
         """Test error during KiCad check"""
         mock_validate.side_effect = Exception("Test error")
@@ -458,7 +485,9 @@ class TestEdgeCases:
         self, mock_register, temp_project_dir, mock_console
     ):
         """Test fallback to basic agent registration when templates fail"""
-        with patch("circuit_synth.tools.project_management.new_project.Path") as mock_path:
+        with patch(
+            "circuit_synth.tools.project_management.new_project.Path"
+        ) as mock_path:
             # Mock Path to simulate template not found
             mock_instance = MagicMock()
             mock_instance.parent.parent.parent = temp_project_dir / "nonexistent"
