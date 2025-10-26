@@ -18,11 +18,11 @@ def test_01_positions_survive_roundtrip():
 
     What to check manually:
     1. Run this test
-    2. Open generated_roundtrip/step2_kicad/two_resistors/two_resistors.kicad_pro in KiCad
-    3. Note the X,Y positions of R1 and R2
+    2. Open generated_roundtrip/step2_kicad/positioned_resistor/positioned_resistor.kicad_pro in KiCad
+    3. Note the X,Y position of R1
     4. Run the circuit generation again from step3_roundtrip.py
     5. Open the new KiCad project
-    6. Verify: R1 and R2 are in the SAME positions (not moved!)
+    6. Verify: R1 is in the SAME position (not moved!)
     """
     test_dir = Path(__file__).parent
     output_dir = test_dir / "generated_roundtrip"
@@ -41,15 +41,15 @@ def test_01_positions_survive_roundtrip():
     import shutil
     step1_py = output_dir / "step1_original.py"
     shutil.copy(test_dir / "03_python_ref.py", step1_py)
-    print("\nStep 1: Copied original circuit (2 resistors)")
+    print("\nStep 1: Copied original circuit (positioned resistor)")
 
     # Step 2: Generate KiCad from Python
     kicad_output = output_dir / "step2_kicad"
     kicad_output.mkdir()
-    shutil.copy(step1_py, kicad_output / "two_resistors.py")
+    shutil.copy(step1_py, kicad_output / "positioned_resistor.py")
 
     result = subprocess.run(
-        ["uv", "run", "python", "two_resistors.py"],
+        ["uv", "run", "python", "positioned_resistor.py"],
         cwd=kicad_output,
         capture_output=True,
         text=True
@@ -61,8 +61,8 @@ def test_01_positions_survive_roundtrip():
         assert False
 
     # Step 3: Import back to Python
-    kicad_dir = kicad_output / "two_resistors"
-    kicad_pro = kicad_dir / "two_resistors.kicad_pro"
+    kicad_dir = kicad_output / "positioned_resistor"
+    kicad_pro = kicad_dir / "positioned_resistor.kicad_pro"
 
     if not kicad_pro.exists():
         print(f"❌ KiCad project not found at: {kicad_pro}")
@@ -141,8 +141,8 @@ def test_02_manual_moves_preserved():
         print(f"❌ Generation failed:\n{result.stderr}")
         assert False
 
-    kicad_dir = output_dir / "two_resistors"
-    kicad_pro = kicad_dir / "two_resistors.kicad_pro"
+    kicad_dir = output_dir / "positioned_resistor"
+    kicad_pro = kicad_dir / "positioned_resistor.kicad_pro"
 
     if kicad_pro.exists():
         print(f"✅ Initial KiCad project generated")
