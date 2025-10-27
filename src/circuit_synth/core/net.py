@@ -155,6 +155,37 @@ class Net:
 
         return self
 
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize Net to dictionary for JSON encoding."""
+        return {
+            "name": self.name,
+            "is_power": self.is_power,
+            "power_symbol": self.power_symbol,
+            "trace_current": self.trace_current,
+            "impedance": self.impedance,
+            "properties": self.properties,
+        }
+
+    @staticmethod
+    def from_dict(data: Dict[str, Any]) -> "Net":
+        """
+        Deserialize Net from dictionary.
+
+        Note: This creates a Net outside of circuit context, so it won't
+        auto-register. Caller must manually add to circuit._nets.
+        """
+        # Create Net with minimal circuit context handling
+        # We'll manually construct it to avoid circuit registration
+        net = object.__new__(Net)
+        net.name = data.get("name")
+        net._pins = set()
+        net.is_power = data.get("is_power", False)
+        net.power_symbol = data.get("power_symbol")
+        net.trace_current = data.get("trace_current")
+        net.impedance = data.get("impedance")
+        net.properties = data.get("properties", {})
+        return net
+
     def __repr__(self):
         nm = self.name if self.name else "unnamed"
         flags = []

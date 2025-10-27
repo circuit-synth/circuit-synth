@@ -118,9 +118,16 @@ class TestCircuit:
         assert len(circuit_dict["components"]) == 1
         # The nets dict includes the GND net we added (only if it has connections)
         assert "GND" in circuit_dict["nets"]
-        # Verify the net has the expected connection
-        assert len(circuit_dict["nets"]["GND"]) == 1
-        assert circuit_dict["nets"]["GND"][0]["component"] == "R1"
+
+        # Verify the net has the expected connection (new format: dict with metadata)
+        gnd_net = circuit_dict["nets"]["GND"]
+        assert isinstance(gnd_net, dict)
+        assert "connections" in gnd_net
+        assert "is_power" in gnd_net
+        assert gnd_net["is_power"] is True  # GND is auto-detected as power net
+        assert gnd_net["power_symbol"] == "power:GND"
+        assert len(gnd_net["connections"]) == 1
+        assert gnd_net["connections"][0]["component"] == "R1"
 
 
 class TestComponent:

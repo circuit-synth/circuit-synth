@@ -258,9 +258,23 @@ class NetlistExporter:
                 }
                 net_to_pins[net_name].append(pin_connection)
 
-        # Store them in data["nets"] - keep original Python format for compatibility
+        # Store them in data["nets"] - include both connections and Net properties
         for net_name, pin_list in net_to_pins.items():
-            data["nets"][net_name] = pin_list
+            # Find the Net object to include its metadata
+            net_obj = self.circuit._nets.get(net_name)
+            if net_obj:
+                # Include Net properties along with connections
+                data["nets"][net_name] = {
+                    "connections": pin_list,
+                    "is_power": net_obj.is_power,
+                    "power_symbol": net_obj.power_symbol,
+                    "trace_current": net_obj.trace_current,
+                    "impedance": net_obj.impedance,
+                    "properties": net_obj.properties,
+                }
+            else:
+                # Fallback: just connections (for backward compatibility)
+                data["nets"][net_name] = pin_list
 
         # 3) Recursively gather subcircuits
         for sc in self.circuit._subcircuits:
