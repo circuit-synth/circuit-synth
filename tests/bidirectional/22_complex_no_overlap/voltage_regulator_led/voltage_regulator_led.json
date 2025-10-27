@@ -1,0 +1,329 @@
+{
+  "name": "voltage_regulator_led",
+  "description": "Voltage regulator circuit with LED indicator\n\n    Initial circuit: LM7805 voltage regulator with input/output capacitors\n    Then add: LED with current-limiting resistor\n\n    Tests that added LED+resistor don't overlap with existing regulator circuit.\n    ",
+  "tstamps": "/voltage_regulator_led-4346619440/",
+  "source_file": "voltage_regulator_led.kicad_sch",
+  "components": {
+    "C1": {
+      "symbol": "Device:C",
+      "ref": "C1",
+      "value": "100nF",
+      "footprint": "Capacitor_SMD:C_0805_2012Metric",
+      "datasheet": "~",
+      "description": "Unpolarized capacitor",
+      "properties": {
+        "ki_fp_filters": "C_*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "C_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 3.81,
+          "length": 2.794,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -3.81,
+          "length": 2.794,
+          "orientation": 90.0
+        }
+      ]
+    },
+    "U1": {
+      "symbol": "Regulator_Linear:LM7805_TO220",
+      "ref": "U1",
+      "value": "LM7805",
+      "footprint": "Package_TO_SOT_THT:TO-220-3_Vertical",
+      "datasheet": "https://www.onsemi.cn/PowerSolutions/document/MC7800-D.PDF",
+      "description": "Positive 1A 35V Linear Regulator, Fixed Output 5V, TO-220",
+      "properties": {
+        "ki_fp_filters": "TO?220*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "TO?220*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "VI",
+          "func": "power_in",
+          "unit": 1,
+          "x": -7.62,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "2",
+          "name": "GND",
+          "func": "power_in",
+          "unit": 1,
+          "x": 0.0,
+          "y": -7.62,
+          "length": 2.54,
+          "orientation": 90.0
+        },
+        {
+          "pin_id": "3",
+          "name": "VO",
+          "func": "power_out",
+          "unit": 1,
+          "x": 7.62,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 180.0
+        }
+      ]
+    },
+    "C2": {
+      "symbol": "Device:C",
+      "ref": "C2",
+      "value": "100nF",
+      "footprint": "Capacitor_SMD:C_0805_2012Metric",
+      "datasheet": "~",
+      "description": "Unpolarized capacitor",
+      "properties": {
+        "ki_fp_filters": "C_*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "C_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 3.81,
+          "length": 2.794,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -3.81,
+          "length": 2.794,
+          "orientation": 90.0
+        }
+      ]
+    },
+    "R1": {
+      "symbol": "Device:R",
+      "ref": "R1",
+      "value": "1k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "~",
+      "description": "Resistor",
+      "properties": {
+        "ki_fp_filters": "R_*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "R_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 3.81,
+          "length": 1.27,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -3.81,
+          "length": 1.27,
+          "orientation": 90.0
+        }
+      ]
+    },
+    "D1": {
+      "symbol": "Device:LED",
+      "ref": "D1",
+      "value": "LED",
+      "footprint": "LED_SMD:LED_0805_2012Metric",
+      "datasheet": "~",
+      "description": "Light emitting diode",
+      "properties": {
+        "ki_fp_filters": "LED* LED_SMD:* LED_THT:*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "LED* LED_SMD:* LED_THT:*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "K",
+          "func": "passive",
+          "unit": 1,
+          "x": -3.81,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "2",
+          "name": "A",
+          "func": "passive",
+          "unit": 1,
+          "x": 3.81,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 180.0
+        }
+      ]
+    }
+  },
+  "nets": {
+    "VIN": [
+      {
+        "component": "C1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "1",
+          "name": "VI",
+          "type": "power_in"
+        }
+      }
+    ],
+    "GND": [
+      {
+        "component": "C1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "U1",
+        "pin": {
+          "number": "2",
+          "name": "GND",
+          "type": "power_in"
+        }
+      },
+      {
+        "component": "C2",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "D1",
+        "pin": {
+          "number": "2",
+          "name": "A",
+          "type": "passive"
+        }
+      }
+    ],
+    "VOUT": [
+      {
+        "component": "U1",
+        "pin": {
+          "number": "3",
+          "name": "VO",
+          "type": "power_out"
+        }
+      },
+      {
+        "component": "C2",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "R1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "LED": [
+      {
+        "component": "R1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      },
+      {
+        "component": "D1",
+        "pin": {
+          "number": "1",
+          "name": "K",
+          "type": "passive"
+        }
+      }
+    ]
+  },
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Voltage regulator circuit with LED indicator\n\n    Initial circuit: LM7805 voltage regulator with input/output capacitors\n    Then add: LED with current-limiting resistor\n\n    Tests that added LED+resistor don't overlap with existing regulator circuit.",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "9ff38211-8262-4d03-a9a7-ddb8def504d1"
+    }
+  ]
+}

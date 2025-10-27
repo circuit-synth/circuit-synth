@@ -21,10 +21,12 @@ When adding new components to an existing circuit with positioned components, th
 
 ## Manual Test Instructions
 
+### Phase 1: Initial Circuit (Small Components)
+
 ```bash
 cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/22_complex_no_overlap
 
-# Step 1: Generate full circuit (regulator + LED)
+# Step 1: Generate initial circuit (regulator + LED only)
 uv run voltage_regulator_led.py
 
 # Step 2: Open in KiCad
@@ -38,25 +40,79 @@ open voltage_regulator_led/voltage_regulator_led.kicad_pro
 #   - R1 (LED resistor) should have clear space around it
 #   - D1 (LED) should have clear space around it
 #
-#   Components may be close but should not:
-#   - Have overlapping symbols
-#   - Have overlapping text (reference designators, values)
-#   - Share the exact same position
+#   Total: 5 components (C1, U1, C2, R1, D1)
+```
 
-# Step 4: Check component spacing
-#   - Zoom in on each component
-#   - Verify readable spacing between components
-#   - All reference designators should be visible (not hidden under symbols)
+### Phase 2: Add Large Components (Test Overlap Avoidance)
+
+```bash
+# Step 4: Edit voltage_regulator_led.py
+# Uncomment the line: # add_large_components()
+# (Around line 168)
+
+# Step 5: Regenerate with additional large components
+uv run voltage_regulator_led.py
+
+# Step 6: Open updated KiCad project
+open voltage_regulator_led/voltage_regulator_led.kicad_pro
+
+# Step 7: Visual inspection - now with 13 total components
+#   Original components (should be in same positions):
+#   - C1, U1, C2, R1, D1
+#
+#   New large components (should NOT overlap originals):
+#   - C3, C4 (large electrolytic caps - 10mm and 8mm diameter)
+#   - J1, J2 (screw terminal connectors - large footprints)
+#   - U2 (comparator IC)
+#   - L1 (inductor)
+#   - R2, R3 (voltage divider resistors)
+#
+#   Critical checks:
+#   - NO overlapping symbols
+#   - Large components placed in available space
+#   - Original component positions preserved
+#   - All 13 reference designators visible
+```
+
+### Phase 3: Advanced Testing (Optional)
+
+```bash
+# Step 8: Manually move some components in KiCad
+#   - Open schematic editor
+#   - Move C1 to a specific position
+#   - Move U1 to center of page
+#   - Save schematic
+
+# Step 9: Regenerate (tests position preservation + overlap avoidance)
+uv run voltage_regulator_led.py
+
+# Step 10: Verify in KiCad
+#   - Manually moved components (C1, U1) stay in their positions
+#   - Other components avoid the manually positioned ones
+#   - No overlaps anywhere
 ```
 
 ## Expected Result
 
+### Phase 1 (Initial Circuit):
 - ✅ All 5 components present: C1, U1, C2, R1, D1
 - ✅ No overlapping component symbols
 - ✅ No overlapping text labels
-- ✅ Reasonable spacing between components (at least 5.1mm default spacing)
+- ✅ Reasonable spacing between components
 - ✅ All reference designators visible
-- ✅ Circuit is readable and professional-looking
+
+### Phase 2 (With Large Components):
+- ✅ All 13 components present (original 5 + 8 new large ones)
+- ✅ Original component positions preserved
+- ✅ Large components (C3, C4, J1, J2) placed in available space
+- ✅ NO overlaps between any components
+- ✅ Large footprints don't obscure small components
+- ✅ Circuit remains readable despite complexity
+
+### Phase 3 (Manual Positioning):
+- ✅ Manually moved components stay in their positions
+- ✅ Auto-placed components avoid manually positioned ones
+- ✅ No overlaps after regeneration
 
 ## Why This Is Critical
 
