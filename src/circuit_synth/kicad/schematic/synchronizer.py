@@ -23,6 +23,7 @@ from .net_matcher import NetMatcher
 from .search_engine import SearchEngine, SearchQueryBuilder
 from .sync_strategies import (
     ConnectionMatchStrategy,
+    PositionRenameStrategy,
     ReferenceMatchStrategy,
     SyncStrategy,
     ValueFootprintStrategy,
@@ -40,6 +41,7 @@ class SyncReport:
     modified: List[str] = field(default_factory=list)
     removed: List[str] = field(default_factory=list)
     preserved: List[str] = field(default_factory=list)
+    renamed: List[Tuple[str, str]] = field(default_factory=list)  # (old_ref, new_ref)
     errors: List[str] = field(default_factory=list)
 
     # Net/label tracking
@@ -97,10 +99,12 @@ class APISynchronizer:
         self.net_matcher = NetMatcher(self.connection_tracer)
 
         # Initialize matching strategies
+        # Order matters: strategies are tried in sequence, first match wins
         self.strategies = [
-            ReferenceMatchStrategy(self.search_engine),
-            ConnectionMatchStrategy(self.net_matcher),
-            ValueFootprintStrategy(self.search_engine),
+            ReferenceMatchStrategy(self.search_engine),  # Exact reference match
+            ConnectionMatchStrategy(self.net_matcher),    # Match by net topology
+            PositionRenameStrategy(self.search_engine),   # Detect renames by position
+            ValueFootprintStrategy(self.search_engine),   # Match by value+footprint (fallback)
         ]
 
         logger.info(f"APISynchronizer initialized for: {schematic_path}")
@@ -309,6 +313,12 @@ class APISynchronizer:
             added_refs = sorted(report.added)
             for ref in added_refs:
                 print(f"   ➕ Add: {ref} (new in Python)")
+
+        # Components that were renamed
+        if report.renamed:
+            renamed_pairs = sorted(report.renamed)
+            for old_ref, new_ref in renamed_pairs:
+                print(f"   🔄 Rename: {old_ref} → {new_ref}")
 
         # Components that were modified
         if report.modified:
@@ -785,15 +795,39 @@ class APISynchronizer:
         matches: Dict[str, str],
         report: SyncReport,
     ):
-        """Process matched components for updates."""
+        """Process matched components for updates and renames."""
         for circuit_id, kicad_ref in matches.items():
             circuit_comp = circuit_components[circuit_id]
             kicad_comp = kicad_components[kicad_ref]
+            circuit_ref = circuit_comp["reference"]
 
-            # Check if update needed
+            # Check if this is a rename (different reference but matched)
+            if circuit_ref != kicad_ref:
+                # This is a RENAME
+                logger.info(f"Detected rename: {kicad_ref} → {circuit_ref}")
+                success = self.component_manager.rename_component(
+                    old_ref=kicad_ref,
+                    new_ref=circuit_ref
+                )
+                if success:
+                    report.renamed.append((kicad_ref, circuit_ref))
+                    # Update kicad_components dict key for subsequent operations
+                    kicad_components[circuit_ref] = kicad_components.pop(kicad_ref)
+                    # Update matches dict so subsequent code uses new reference
+                    matches[circuit_id] = circuit_ref
+                    # NOTE: Don't set kicad_comp.reference directly!
+                    # rename_component() already updated it, and setting it again
+                    # will trigger kicad-sch-api validation error "Reference already exists"
+                    # Update kicad_ref to use new reference for remaining operations
+                    kicad_ref = circuit_ref
+                else:
+                    report.errors.append(f"Failed to rename {kicad_ref} → {circuit_ref}")
+                    continue
+
+            # Check if update needed (value, footprint, etc.)
             if self._needs_update(circuit_comp, kicad_comp):
                 success = self.component_manager.update_component(
-                    kicad_ref,
+                    kicad_ref,  # Use current reference (after rename if applicable)
                     value=circuit_comp["value"],
                     footprint=circuit_comp.get("footprint"),
                 )
