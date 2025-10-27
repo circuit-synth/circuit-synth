@@ -1173,21 +1173,10 @@ class SchematicWriter:
                         f"at component {actual_ref}.{pin_identifier}"
                     )
 
-                    # Calculate offset: move power symbol very close to pin (just 2.54mm / 100 mils)
-                    # Use the pin angle (not label angle) - pin angle points FROM component toward wire
-                    # We need to account for component rotation as well
-                    offset_distance = 2.54  # 100 mils in mm (standard KiCad grid spacing)
-
-                    # Calculate the global pin angle (pin angle + component rotation)
-                    global_pin_angle = (pin_angle + comp.rotation) % 360
-
-                    # Convert to radians and calculate offset in the pin direction
-                    angle_rad = math.radians(global_pin_angle)
-                    offset_x = offset_distance * math.cos(angle_rad)
-                    offset_y = offset_distance * math.sin(angle_rad)
-
-                    power_x = global_x + offset_x
-                    power_y = global_y + offset_y
+                    # Place power symbol directly at pin location
+                    # The power symbol's connection point should be exactly at the pin
+                    power_x = global_x
+                    power_y = global_y
 
                     # Determine rotation: negative power symbols should point down (180°)
                     # Check if this is a negative power supply by looking at the net name
