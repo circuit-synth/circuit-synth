@@ -569,17 +569,17 @@ class APISynchronizer:
         label_angle = (pin_angle + 180) % 360
         global_angle = (label_angle + kicad_component.rotation) % 360
 
-        # Use kicad-sch-api's official add_label() method
-        # This correctly adds to collection and syncs to _data
+        # Use kicad-sch-api's add_hierarchical_label() method
+        # Hierarchical labels create electrical connections (regular labels don't)
         try:
-            logger.debug(f"Adding label using schematic.add_label() API")
+            logger.debug(f"Adding hierarchical label using schematic.add_hierarchical_label() API")
 
-            # Use schematic.add_label() with proper signature
-            label_uuid = self.schematic.add_label(
+            # Use schematic.add_hierarchical_label() with proper signature
+            # Note: hierarchical_label uses 'shape' instead of 'rotation' and 'size'
+            label_uuid = self.schematic.add_hierarchical_label(
                 text=net_name,
                 position=(pin_pos.x, pin_pos.y),  # Tuple or Point both work
-                rotation=float(global_angle),
-                size=1.27  # Default KiCad label size
+                shape="bidirectional"  # Default to bidirectional for nets
             )
 
             logger.debug(f"Label added: '{net_name}' at ({pin_pos.x:.2f}, {pin_pos.y:.2f}), UUID={label_uuid}")
