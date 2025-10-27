@@ -2,24 +2,24 @@
 
 ## What This Tests
 
-**Core Question**: When you have unconnected components in a KiCad schematic and add a net connection in Python code, does the wire appear when regenerating?
+**Core Question**: When you have unconnected components in a KiCad schematic and add a net connection in Python code, do the hierarchical labels appear when regenerating?
 
-This tests **bidirectional sync for net creation** - adding electrical connections to existing components.
+This tests **bidirectional sync for net creation** - adding electrical connections (via hierarchical labels) to existing components.
 
 ## When This Situation Happens
 
 - Developer generates circuit with unconnected components (R1, R2)
 - Later decides components should be electrically connected
 - Adds `Net("NET1")` in Python code connecting the pins
-- Regenerates KiCad expecting wire to appear
+- Regenerates KiCad expecting hierarchical labels to appear
 
 ## What Should Work
 
-1. Generate initial KiCad with R1 and R2 (no connection)
-2. Manually verify components are unconnected in KiCad
+1. Generate initial KiCad with R1 and R2 (no connection, no labels)
+2. Manually verify components are unconnected in KiCad (no labels visible)
 3. Edit Python to add Net connecting R1[1] to R2[1]
 4. Regenerate KiCad project
-5. Wire appears connecting the components with net label
+5. Hierarchical labels "NET1" appear on both component pins, establishing electrical connection
 
 ## Manual Test Instructions
 
@@ -29,7 +29,7 @@ cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/11_add_net_to_c
 # Step 1: Generate initial KiCad project (no connection)
 uv run two_resistors.py
 open two_resistors/two_resistors.kicad_pro
-# Verify: R1 and R2 visible but NO wire between them
+# Verify: R1 and R2 visible but NO hierarchical labels (completely unconnected)
 
 # Step 2: Edit two_resistors.py to add net connection
 # Change import line to:
@@ -70,10 +70,10 @@ open two_resistors/two_resistors.kicad_pro
 **Iterative circuit development workflow:**
 1. Generate initial circuit structure (components only)
 2. Review component placement in KiCad
-3. Add electrical connections in Python
-4. Regenerate - connections appear without losing layout
+3. Add electrical connections in Python (Net objects)
+4. Regenerate - hierarchical labels appear, establishing connections without losing layout
 
-If this doesn't work, users must define all nets upfront or manually wire in KiCad (defeating the purpose of code-based design).
+If this doesn't work, users must define all nets upfront or manually add labels in KiCad (defeating the purpose of code-based design).
 
 ## Success Criteria
 
