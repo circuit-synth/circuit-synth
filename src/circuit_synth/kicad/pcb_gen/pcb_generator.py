@@ -186,22 +186,34 @@ class PCBGenerator:
         Returns:
             True if successful, False otherwise
         """
-        # Validate placement algorithm and use default if invalid
-        VALID_ALGORITHMS = {
-            "hierarchical",
-            "force_directed",
-            "advanced",
-            "connectivity_driven",
-            "connection_centric",
-            "external",
+        # Validate and map placement algorithms to kicad-pcb-api supported values
+        # kicad-pcb-api only supports: hierarchical, spiral
+        SUPPORTED_ALGORITHMS = {"hierarchical", "spiral"}
+
+        # Map legacy algorithm names to supported ones
+        ALGORITHM_MAPPING = {
+            "connection_centric": "hierarchical",
+            "force_directed": "hierarchical",
+            "connectivity_driven": "hierarchical",
+            "advanced": "hierarchical",
+            "external": "hierarchical",
         }
         DEFAULT_ALGORITHM = "hierarchical"
 
-        if placement_algorithm not in VALID_ALGORITHMS:
+        # Map legacy algorithms
+        if placement_algorithm in ALGORITHM_MAPPING:
+            original_algorithm = placement_algorithm
+            placement_algorithm = ALGORITHM_MAPPING[placement_algorithm]
+            logger.info(
+                f"ℹ️  Placement algorithm '{original_algorithm}' is no longer supported.\n"
+                f"   Automatically mapping to '{placement_algorithm}' (kicad-pcb-api compatible).\n"
+                f"   Supported algorithms: {', '.join(sorted(SUPPORTED_ALGORITHMS))}"
+            )
+        elif placement_algorithm not in SUPPORTED_ALGORITHMS:
             logger.warning(
                 f"⚠️  INVALID PLACEMENT ALGORITHM: '{placement_algorithm}'\n"
-                f"Valid algorithms are: {', '.join(sorted(VALID_ALGORITHMS))}\n"
-                f"Using default algorithm '{DEFAULT_ALGORITHM}' instead"
+                f"   Supported algorithms: {', '.join(sorted(SUPPORTED_ALGORITHMS))}\n"
+                f"   Using default algorithm '{DEFAULT_ALGORITHM}' instead"
             )
             placement_algorithm = DEFAULT_ALGORITHM
 
@@ -333,12 +345,7 @@ class PCBGenerator:
                             group_spacing=group_spacing,
                             board_width=current_width,
                             board_height=current_height,
-                            connections=(
-                                connections
-                                if placement_algorithm
-                                in ["force_directed", "connection_centric", "external"]
-                                else None
-                            ),
+                            connections=None,  # kicad-pcb-api handles connections internally
                         )
 
                     # If we get here, placement was successful
