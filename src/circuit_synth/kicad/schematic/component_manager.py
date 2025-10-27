@@ -170,19 +170,13 @@ class ComponentManager:
 
         component = self._component_index[reference]
 
-        # BUG WORKAROUND: kicad-sch-api ComponentCollection.remove() doesn't work!
-        # We must remove directly from the internal _components list
-        if hasattr(self.schematic.components, '_components'):
-            # Remove from ComponentCollection's internal list
-            self.schematic.components._components = [
-                c for c in self.schematic.components._components
-                if c.uuid != component.uuid
-            ]
-            logger.info(f"Removed {reference} from ComponentCollection._components")
-        else:
-            # Fallback if internal structure changes
-            logger.warning(f"ComponentCollection._components not found, trying remove() method")
-            self.schematic.components.remove(component)
+        # Use proper kicad-sch-api remove() method by reference
+        # (Fixed in kicad-sch-api 0.4.1+: https://github.com/circuit-synth/kicad-sch-api/pull/55)
+        result = self.schematic.components.remove(reference)
+
+        if not result:
+            logger.warning(f"Failed to remove component {reference} from ComponentCollection")
+            return False
 
         del self._component_index[reference]
 
