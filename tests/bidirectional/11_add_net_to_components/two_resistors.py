@@ -5,7 +5,7 @@ Fixture: Two unconnected resistors.
 Starting point for testing adding a net connection to existing components.
 """
 
-from circuit_synth import circuit, Component
+from circuit_synth import *
 
 
 @circuit(name="two_resistors")
@@ -23,10 +23,11 @@ def two_resistors():
         value="4.7k",
         footprint="Resistor_SMD:R_0603_1608Metric",
     )
-    # Note: No Net() defined - components are unconnected
-    net1 = Net(ref="N1")
-    r1[1] += net1
-    r2[1] += net1
+
+    # Note: uncomment to connect the resistors
+    # net1 = Net("net1")
+    # r1[1] += net1
+    # r2[1] += net1
 
 
 if __name__ == "__main__":
