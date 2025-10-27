@@ -46,10 +46,12 @@ open power_rails/power_rails.kicad_pro
 - ✅ Multiple components sharing power rail connections
 - ✅ KiCad project generated with hierarchical labels for power
 - ✅ All components exist in schematic with correct connections
+- ✅ Six hierarchical labels total: GND×3 and VCC×3 (one pair per component)
+- ✅ NO physical wires between components
+- ✅ Electrical connections established by matching label names
 - ✅ Power rail connections properly represented in nets
-- ✅ GND and VCC hierarchical labels visible in schematic
 
-**Note**: Uses `hierarchical_label` format for power rails (same as other net tests)
+**Note**: Uses `hierarchical_label` format for power rails - matching label names create power distribution without wires
 
 ## Why This Is Important
 

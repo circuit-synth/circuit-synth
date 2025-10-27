@@ -45,22 +45,25 @@ uv run two_resistors.py
 # Step 4: Open regenerated KiCad project
 open two_resistors/two_resistors.kicad_pro
 # Verify:
-#   - Wire now connects R1[1] to R2[1]
-#   - Hierarchical label "NET1" visible (square flag shape)
+#   - Hierarchical labels "NET1" now appear on R1[1] and R2[1]
+#   - NO physical wire between components
+#   - Electrical connection established by matching label names
 #   - R1 and R2 positions preserved (didn't move)
 #   - Components still no overlap
 ```
 
 ## Expected Result
 
-- ✅ Initial generation: R1 and R2 unconnected
-- ✅ After adding Net in Python: wire appears in KiCad
-- ✅ Hierarchical label "NET1" visible on connection
+- ✅ Initial generation: R1 and R2 unconnected (no labels)
+- ✅ After adding Net in Python: hierarchical labels "NET1" appear
+- ✅ Labels on both R1[1] and R2[1] pins (square flag shapes)
+- ✅ NO physical wire between components
+- ✅ Electrical connection established by matching label names
 - ✅ Component positions preserved during regeneration
 - ✅ No duplicate components
 - ✅ Connection is electrically valid (no ERC errors)
 
-**Note**: Uses `hierarchical_label` format (same as test 10)
+**Note**: Uses `hierarchical_label` format - labels create electrical connection without wires
 
 ## Why This Is Important
 
@@ -75,8 +78,9 @@ If this doesn't work, users must define all nets upfront or manually wire in KiC
 ## Success Criteria
 
 This test PASSES when:
-- Unconnected components generate correctly initially
-- Adding Net() in Python creates wire in KiCad
-- Hierarchical label appears and is readable
+- Unconnected components generate correctly initially (no labels)
+- Adding Net() in Python creates hierarchical labels in KiCad
+- Labels appear on both component pins with matching names
+- NO physical wires drawn
 - Component positions preserved across regeneration
 - No electrical rule errors in KiCad

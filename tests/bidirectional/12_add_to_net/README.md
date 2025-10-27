@@ -47,13 +47,17 @@ open two_resistors_on_net/two_resistors_on_net.kicad_pro
 
 ## Expected Result
 
-- ✅ Initial KiCad project has R1 and R2 connected via NET1
-- ✅ After adding R3 and regenerating, all three resistors on NET1
-- ✅ NET1 connections properly maintained across all components
+- ✅ Initial KiCad project has R1 and R2 with "NET1" hierarchical labels
+- ✅ After adding R3 and regenerating, all three resistors have "NET1" labels
+- ✅ Three hierarchical labels "NET1" visible (one on each component pin)
+- ✅ NO physical wires between components
+- ✅ Electrical connection established by matching label names
 - ✅ R1 and R2 positions preserved (not moved)
 - ✅ R3 placed in available space
 - ✅ No duplicate nets or connection issues
-- ✅ KiCad schematic shows clear NET1 connections to all three components
+- ✅ KiCad schematic shows clear NET1 labels on all three components
+
+**Note**: Hierarchical labels with matching names create multi-point electrical connection
 
 ## Why This Is Important
 
