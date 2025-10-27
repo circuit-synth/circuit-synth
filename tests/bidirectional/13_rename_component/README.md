@@ -37,7 +37,7 @@ open single_resistor/single_resistor.kicad_pro
 #   - Save schematic
 
 # Step 3: Import modified KiCad back to Python
-uv run kicad-to-python single_resistor -o imported.py
+uv run kicad-to-python single_resistor imported.py
 
 # Step 4: Verify imported.py contains R_PULLUP
 # Open imported.py - should show component with ref="R_PULLUP"

@@ -34,7 +34,7 @@ open single_resistor/single_resistor.kicad_pro
 # Note: Record R1's new position coordinates
 
 # Step 3: Import the manually-edited KiCad back to Python
-uv run kicad-to-python single_resistor -o imported_with_moved_r1.py
+uv run kicad-to-python single_resistor imported_with_moved_r1.py
 
 # Step 4: Verify imported Python captured the manual position
 # Open imported_with_moved_r1.py

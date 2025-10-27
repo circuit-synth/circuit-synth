@@ -26,7 +26,7 @@ open positioned_resistor/positioned_resistor.kicad_pro
 # Verify: R1 at (100.0, 100.0, 0°), R2 at (150.0, 100.0, 90°)
 
 # Step 2: Import to Python
-uv run kicad-to-python positioned_resistor -o imported.py
+uv run kicad-to-python positioned_resistor imported.py
 
 # Step 3: Modify R1 position in imported.py
 # Change R1's at=(100.0, 100.0, 0) to at=(200.0, 150.0, 45)

@@ -68,7 +68,7 @@ open resistor_circuit/resistor_circuit.kicad_pro
 # Verify: schematic now shows R1 with value 20k
 
 # Step 6: Test round-trip - import back to Python
-uv run kicad-to-python resistor_circuit -o imported_circuit.py
+uv run kicad-to-python resistor_circuit imported_circuit.py
 
 # Step 7: Verify imported code has R1=20k
 # Open imported_circuit.py - should show R1 with value="20k"

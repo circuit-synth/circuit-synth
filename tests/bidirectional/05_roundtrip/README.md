@@ -29,7 +29,7 @@ uv run single_resistor.py
 # Creates: single_resistor/single_resistor.kicad_pro with R1
 
 # Step 2: Import KiCad back to Python
-uv run kicad-to-python single_resistor -o imported.py
+uv run kicad-to-python single_resistor imported.py
 
 # Step 3: Verify imported.py contains R1 component
 # Open imported.py - should show R1 component definition

@@ -61,7 +61,7 @@ open growing_circuit/growing_circuit.kicad_pro
 # Verify: schematic has R1 and R2 only
 
 # Step 3: Import to Python and add capacitor (Round-trip 1)
-uv run kicad-to-python growing_circuit -o stage1.py
+uv run kicad-to-python growing_circuit stage1.py
 # Manually edit stage1.py to add capacitor C1
 
 # Step 4: Regenerate and verify
@@ -71,7 +71,7 @@ uv run stage1.py
 # Check: R1 and R2 positions preserved
 
 # Step 5: Import again and add resistor (Round-trip 2)
-uv run kicad-to-python growing_circuit -o stage2.py
+uv run kicad-to-python growing_circuit stage2.py
 # Manually edit stage2.py to add R3
 
 # Step 6: Regenerate and verify
@@ -80,7 +80,7 @@ uv run stage2.py
 # Check: All previous component positions preserved
 
 # Step 7: Import and modify value (Round-trip 3)
-uv run kicad-to-python growing_circuit -o stage3.py
+uv run kicad-to-python growing_circuit stage3.py
 # Manually edit stage3.py to change R1 value to "100k"
 
 # Step 8: Final regeneration and verification

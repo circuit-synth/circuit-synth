@@ -42,7 +42,7 @@ open main/main.kicad_pro
 #   - Close KiCad
 
 # Step 5: Import KiCad back to Python to sync changes
-uv run kicad-to-python main -o main.py
+uv run kicad-to-python main main.py
 
 # Step 6: Check Python now has both resistors
 cat main.py

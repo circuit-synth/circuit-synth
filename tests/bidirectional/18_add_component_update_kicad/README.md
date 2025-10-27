@@ -23,7 +23,7 @@ Adding a component in Python code and regenerating to update existing KiCad proj
 cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/18_add_component_update_kicad
 
 # Step 1: Import existing KiCad with R1
-uv run kicad-to-python existing_kicad/single_resistor.kicad_pro -o circuit.py
+uv run kicad-to-python existing_kicad/single_resistor.kicad_pro circuit.py
 
 # Step 2: Edit circuit.py to add R2
 # Add this after R1:

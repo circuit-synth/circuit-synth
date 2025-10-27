@@ -30,7 +30,7 @@ open starting_circuit/starting_circuit.kicad_pro
 # In KiCad: Add R2 (20k) resistor manually, save
 
 # Step 3: Re-import to Python
-uv run kicad-to-python starting_circuit/starting_circuit.kicad_pro -o updated_circuit.py
+uv run kicad-to-python starting_circuit/starting_circuit.kicad_pro updated_circuit.py
 
 # Step 4: Check Python has both components
 cat updated_circuit.py
