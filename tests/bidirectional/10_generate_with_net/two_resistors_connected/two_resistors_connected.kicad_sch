@@ -2,7 +2,11 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "0.8.36")
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 	(uuid "27c31603-b2e8-4b1a-86a9-80123b61e163")
+========
+	(uuid "d558df75-3fa0-487f-992e-3a8e062ea928")
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 	(paper "A4")
 	(title_block
 		(title "two_resistors_connected")
@@ -142,7 +146,11 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 		(uuid "a9406ca3-60b8-4455-8c26-db5c913807df")
+========
+		(uuid "c43d087b-35f0-4869-bb74-be3596fd2c44")
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 		(property "Reference" "R1"
 			(at 33.02 34.2899 0)
 			(effects
@@ -170,7 +178,11 @@
 				(hide yes)
 			)
 		)
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 		(property "hierarchy_path" "/27c31603-b2e8-4b1a-86a9-80123b61e163"
+========
+		(property "hierarchy_path" "/d558df75-3fa0-487f-992e-3a8e062ea928"
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 			(at 33.02 40.6399 0)
 			(effects
 				(font
@@ -179,6 +191,7 @@
 				(hide yes)
 			)
 		)
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 		(property "project_name" "two_resistors_connected"
 			(at 33.02 40.6399 0)
 			(effects
@@ -189,6 +202,9 @@
 			)
 		)
 		(property "root_uuid" "27c31603-b2e8-4b1a-86a9-80123b61e163"
+========
+		(property "project_name" "two_resistors"
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 			(at 33.02 40.6399 0)
 			(effects
 				(font
@@ -197,6 +213,7 @@
 				(hide yes)
 			)
 		)
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 		(pin "1"
 			(uuid "c1045c00-190c-4a7d-b46c-931869ab6c69")
 		)
@@ -206,6 +223,20 @@
 		(instances
 			(project "two_resistors_connected"
 				(path "/27c31603-b2e8-4b1a-86a9-80123b61e163"
+========
+		(property "root_uuid" "d558df75-3fa0-487f-992e-3a8e062ea928"
+			(at 33.02 40.6399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "two_resistors"
+				(path "/d558df75-3fa0-487f-992e-3a8e062ea928"
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 					(reference "R1")
 					(unit 1)
 				)
@@ -221,7 +252,11 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 		(uuid "8fa46d56-033a-479d-8ef9-c760a0777621")
+========
+		(uuid "8f1ad5b0-055d-4965-a3e4-052bb8c78c0d")
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 		(property "Reference" "R2"
 			(at 58.42 34.2899 0)
 			(effects
@@ -249,7 +284,11 @@
 				(hide yes)
 			)
 		)
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 		(property "hierarchy_path" "/27c31603-b2e8-4b1a-86a9-80123b61e163"
+========
+		(property "hierarchy_path" "/d558df75-3fa0-487f-992e-3a8e062ea928"
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 			(at 58.42 40.6399 0)
 			(effects
 				(font
@@ -258,6 +297,7 @@
 				(hide yes)
 			)
 		)
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 		(property "project_name" "two_resistors_connected"
 			(at 58.42 40.6399 0)
 			(effects
@@ -268,6 +308,9 @@
 			)
 		)
 		(property "root_uuid" "27c31603-b2e8-4b1a-86a9-80123b61e163"
+========
+		(property "project_name" "two_resistors"
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 			(at 58.42 40.6399 0)
 			(effects
 				(font
@@ -276,6 +319,7 @@
 				(hide yes)
 			)
 		)
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 		(pin "1"
 			(uuid "70741568-0408-4ca2-96d0-7ed6d8a37a30")
 		)
@@ -285,32 +329,61 @@
 		(instances
 			(project "two_resistors_connected"
 				(path "/27c31603-b2e8-4b1a-86a9-80123b61e163"
+========
+		(property "root_uuid" "d558df75-3fa0-487f-992e-3a8e062ea928"
+			(at 58.42 40.6399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "two_resistors"
+				(path "/d558df75-3fa0-487f-992e-3a8e062ea928"
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 					(reference "R2")
 					(unit 1)
 				)
 			)
 		)
 	)
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 	(hierarchical_label "NET1"
 		(shape input)
 		(at 30.48 31.75 90)
+========
+	(hierarchical_label "net1"
+		(shape input)
+		(at 30.48 35.56 0.0000)
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 		(uuid "4b8369c9-b4db-44dd-92f3-09831f52a90f")
 	)
 	(hierarchical_label "NET1"
 		(shape input)
 		(at 55.88 31.75 90)
+========
+		(uuid "1f634c40-2788-405a-9d0a-084ab0aa53f5")
+	)
+	(hierarchical_label "net1"
+		(shape input)
+		(at 55.88 35.56 0.0000)
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 		(uuid "a72f3b46-8bda-4d90-9353-9b476ec12ef3")
 	)
 	(text_box "Circuit with two resistors connected via NET1."
@@ -320,6 +393,17 @@
 		(margins 1 1 1 1)
 		(stroke
 			(width 0)
+========
+		(uuid "2da0ec34-b3ee-47b5-ac8f-0da8787dfa6e")
+	)
+	(text_box "Circuit with two resistors - NO connection between them."
+		(exclude_from_sim no)
+		(at 184 110 0.0000)
+		(size 80 30)
+		(margins 1 1 1 1)
+		(stroke
+			(width 0.0000)
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 			(type solid)
 		)
 		(fill
@@ -331,7 +415,11 @@
 			)
 			(justify left top)
 		)
+<<<<<<<< HEAD:tests/bidirectional/10_generate_with_net/two_resistors_connected/two_resistors_connected.kicad_sch
 		(uuid "bc152ec8-d098-43b7-898b-85e455d3fc90")
+========
+		(uuid "08b1ca69-4ff1-478b-9f5a-e0f4fafca48a")
+>>>>>>>> origin/main:tests/bidirectional/11_add_net_to_components/two_resistors/two_resistors.kicad_sch
 	)
 	(sheet_instances
 		(path "/"
