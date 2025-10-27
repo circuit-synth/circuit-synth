@@ -613,7 +613,7 @@ class Circuit:
         draw_bounding_boxes: bool = False,
         generate_ratsnest: bool = True,
         update_source_refs: Optional[bool] = None,
-        preserve_user_components: bool = True,
+        preserve_user_components: bool = False,
     ) -> Dict[str, Any]:
         """
         Generate a complete KiCad project (schematic + PCB) from this circuit.
@@ -633,6 +633,9 @@ class Circuit:
                                None (default): Auto-update unless force_regenerate=True
                                True: Always update source file
                                False: Never update source file
+            preserve_user_components: Keep components in KiCad that don't exist in Python (default: False)
+                                     False: Python is source of truth - delete components not in Python
+                                     True: Preserve all components in KiCad, even if not in Python
 
         Returns:
             dict: Result dictionary containing:
