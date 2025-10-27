@@ -4,7 +4,7 @@
 
 Created comprehensive automated test suite for bidirectional Python ↔ KiCad synchronization using programmatic manipulation via `kicad-sch-api`.
 
-**Status**: Implementation complete, needs API fixes to run
+**Status**: Implementation complete, import API added, needs test updates
 
 ## Files Created
 
@@ -47,18 +47,19 @@ output_path = temp_project_dir / "my_circuit"
 circuit.generate_kicad_project(project_name=str(output_path))
 ```
 
-### 2. Missing `import_kicad_project()` Function
+### 2. ~~Missing `import_kicad_project()` Function~~ ✅ RESOLVED
 
-**Issue**: Tests import from `circuit_synth.kicad.importer` which doesn't exist.
+**Status**: ✅ Implemented in `src/circuit_synth/kicad/importer.py`
 
-**Current**: CLI tool `kicad-to-python` exists but no Python API.
+**API**:
+```python
+from circuit_synth.kicad.importer import import_kicad_project
 
-**Options**:
-1. Create Python API wrapper around CLI
-2. Use CLI via subprocess in tests
-3. Focus tests on what can be verified with kicad-sch-api directly
+circuit = import_kicad_project("path/to/project.kicad_pro")
+# Also supports .json netlist or directory
+```
 
-**Recommended**: Option 3 for now - verify generation works, import testing can come later.
+**Tests**: 12/12 unit tests passing in `tests/unit/test_kicad_importer.py`
 
 ## Quick Fixes Needed
 
