@@ -1,0 +1,43 @@
+{
+  "name": "main",
+  "description": "",
+  "tstamps": "",
+  "source_file": "main.kicad_sch",
+  "components": {
+    "R1": {
+      "symbol": "Device:R",
+      "ref": "R1",
+      "value": "20k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "",
+      "description": "",
+      "properties": {},
+      "tstamps": "",
+      "pins": []
+    }
+  },
+  "nets": {
+    "unconnected-(R1-Pad1)": [
+      {
+        "component": "R1",
+        "pin": {
+          "number": "1",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ],
+    "unconnected-(R1-Pad2)": [
+      {
+        "component": "R1",
+        "pin": {
+          "number": "2",
+          "name": "~",
+          "type": "passive"
+        }
+      }
+    ]
+  },
+  "subcircuits": [],
+  "annotations": []
+}
