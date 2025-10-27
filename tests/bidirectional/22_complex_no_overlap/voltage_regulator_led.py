@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Test that new components don't overlap existing positioned components"""
-from circuit_synth import circuit, C, IC, R, LED, Net, Power, Ground
+from circuit_synth import circuit, Component, Net
 
 
 @circuit(name="voltage_regulator_led")
@@ -12,28 +12,60 @@ def voltage_regulator_led():
 
     Tests that added LED+resistor don't overlap with existing regulator circuit.
     """
-    # Power input
-    vin = Power("VIN", voltage="12V")
-    gnd = Ground("GND")
-
     # Voltage regulator circuit (will be positioned first)
-    c_in = C("C1", value="100n", footprint="C_0805_2012Metric")
-    reg = IC("U1", value="LM7805", footprint="Package_TO_SOT_THT:TO-220-3_Vertical")
-    c_out = C("C2", value="100n", footprint="C_0805_2012Metric")
-
-    # Connect regulator
-    Net("VIN", vin, c_in.p1, reg.pin(1))  # Input
-    Net("GND", gnd, c_in.p2, reg.pin(2), c_out.p2)  # Ground
-    vout = Net("VOUT", reg.pin(3), c_out.p1)  # Output
+    c_in = Component(
+        symbol="Device:C",
+        ref="C1",
+        value="100nF",
+        footprint="Capacitor_SMD:C_0805_2012Metric",
+    )
+    reg = Component(
+        symbol="Regulator_Linear:LM7805_TO220",
+        ref="U1",
+        value="LM7805",
+        footprint="Package_TO_SOT_THT:TO-220-3_Vertical",
+    )
+    c_out = Component(
+        symbol="Device:C",
+        ref="C2",
+        value="100nF",
+        footprint="Capacitor_SMD:C_0805_2012Metric",
+    )
 
     # LED indicator circuit (will be added and should not overlap)
-    r_led = R("R1", value="1k", footprint="R_0603_1608Metric")
-    led = LED("D1", footprint="LED_0805_2012Metric")
+    r_led = Component(
+        symbol="Device:R",
+        ref="R1",
+        value="1k",
+        footprint="Resistor_SMD:R_0603_1608Metric",
+    )
+    led = Component(
+        symbol="Device:LED",
+        ref="D1",
+        value="LED",
+        footprint="LED_SMD:LED_0805_2012Metric",
+    )
 
-    # Connect LED to output
-    Net("LED+", vout, r_led.p1)
-    Net("LED-", r_led.p2, led.anode)
-    Net("GND", led.cathode, gnd)
+    # Connect regulator
+    vin = Net(name="VIN")
+    vin += c_in[1]
+    vin += reg[1]  # Input pin
+
+    gnd = Net(name="GND")
+    gnd += c_in[2]
+    gnd += reg[2]  # Ground pin
+    gnd += c_out[2]
+    gnd += led[2]  # LED cathode
+
+    vout = Net(name="VOUT")
+    vout += reg[3]  # Output pin
+    vout += c_out[1]
+    vout += r_led[1]
+
+    # LED connection
+    led_net = Net(name="LED")
+    led_net += r_led[2]
+    led_net += led[1]  # LED anode
 
 
 if __name__ == "__main__":
