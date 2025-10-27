@@ -186,34 +186,15 @@ class PCBGenerator:
         Returns:
             True if successful, False otherwise
         """
-        # Validate and map placement algorithms to kicad-pcb-api supported values
-        # kicad-pcb-api only supports: hierarchical, spiral
+        # Validate placement algorithm (kicad-pcb-api only supports: hierarchical, spiral)
         SUPPORTED_ALGORITHMS = {"hierarchical", "spiral"}
-
-        # Map legacy algorithm names to supported ones
-        ALGORITHM_MAPPING = {
-            "connection_centric": "hierarchical",
-            "force_directed": "hierarchical",
-            "connectivity_driven": "hierarchical",
-            "advanced": "hierarchical",
-            "external": "hierarchical",
-        }
         DEFAULT_ALGORITHM = "hierarchical"
 
-        # Map legacy algorithms
-        if placement_algorithm in ALGORITHM_MAPPING:
-            original_algorithm = placement_algorithm
-            placement_algorithm = ALGORITHM_MAPPING[placement_algorithm]
-            logger.info(
-                f"ℹ️  Placement algorithm '{original_algorithm}' is no longer supported.\n"
-                f"   Automatically mapping to '{placement_algorithm}' (kicad-pcb-api compatible).\n"
-                f"   Supported algorithms: {', '.join(sorted(SUPPORTED_ALGORITHMS))}"
-            )
-        elif placement_algorithm not in SUPPORTED_ALGORITHMS:
+        if placement_algorithm not in SUPPORTED_ALGORITHMS:
             logger.warning(
-                f"⚠️  INVALID PLACEMENT ALGORITHM: '{placement_algorithm}'\n"
+                f"⚠️  Unknown placement algorithm '{placement_algorithm}'.\n"
                 f"   Supported algorithms: {', '.join(sorted(SUPPORTED_ALGORITHMS))}\n"
-                f"   Using default algorithm '{DEFAULT_ALGORITHM}' instead"
+                f"   Using default: '{DEFAULT_ALGORITHM}'"
             )
             placement_algorithm = DEFAULT_ALGORITHM
 
