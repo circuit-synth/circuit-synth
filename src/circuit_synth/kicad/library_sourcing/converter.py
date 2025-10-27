@@ -14,8 +14,8 @@ class DigiKeyLibraryConverter:
     """Converts DigiKey legacy .lib files to modern .kicad_sym format"""
 
     def __init__(self, digikey_path: Optional[Path] = None):
-        self.digikey_path = digikey_path or Path.cwd() / "libraries" / "digikey-kicad"
-        self.converted_path = Path.cwd() / "libraries" / "digikey-kicad-converted"
+        self.digikey_path = digikey_path or Path.cwd() / "submodules" / "digikey-kicad"
+        self.converted_path = Path.cwd() / "submodules" / "digikey-kicad-converted"
         self.symbols_input = self.digikey_path / "digikey-symbols"
         self.symbols_output = self.converted_path / "symbols"
 

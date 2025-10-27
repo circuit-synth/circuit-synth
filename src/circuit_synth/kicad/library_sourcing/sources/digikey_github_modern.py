@@ -269,7 +269,7 @@ class DigiKeyGitHubModernSource(BaseLibrarySource):
             import subprocess
 
             result = subprocess.run(
-                ["git", "submodule", "update", "--remote", "libraries/digikey-kicad"],
+                ["git", "submodule", "update", "--remote", "submodules/digikey-kicad"],
                 capture_output=True,
                 text=True,
                 timeout=60,
