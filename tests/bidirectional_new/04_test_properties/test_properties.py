@@ -48,7 +48,7 @@ def test_properties():
     clean_output_dir(output_dir)
 
     # Get fixture
-    fixture = Path(__file__).parent.parent / "fixtures" / "single_resistor.py"
+    fixture = Path(__file__).parent / "single_resistor.py"
     circuit_file = copy_to_output(fixture, output_dir, "original_circuit.py")
 
     # Step 1: Generate KiCad from Python

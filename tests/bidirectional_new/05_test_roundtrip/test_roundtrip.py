@@ -50,7 +50,7 @@ def test_roundtrip():
     clean_output_dir(output_dir)
 
     # Get fixture
-    fixture = Path(__file__).parent.parent / "fixtures" / "single_resistor.py"
+    fixture = Path(__file__).parent / "single_resistor.py"
     original_py = copy_to_output(fixture, output_dir, "step1_original.py")
 
     # Step 1: Generate original KiCad

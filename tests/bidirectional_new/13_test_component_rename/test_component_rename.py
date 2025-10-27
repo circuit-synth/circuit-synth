@@ -59,7 +59,7 @@ def test_component_rename():
 
     # Step 1: Generate initial circuit
     print("Step 1: Generating initial circuit with R1...")
-    fixture = Path(__file__).parent.parent / "fixtures" / "single_resistor.py"
+    fixture = Path(__file__).parent / "single_resistor.py"
     circuit_file = copy_to_output(fixture, output_dir, "step1_initial.py")
 
     exit_code, stdout, stderr = run_python_circuit(circuit_file)

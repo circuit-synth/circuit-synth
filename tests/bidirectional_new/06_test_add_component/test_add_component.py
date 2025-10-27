@@ -49,7 +49,7 @@ def test_add_component():
     clean_output_dir(output_dir)
 
     # Get fixture and copy to output
-    fixture = Path(__file__).parent.parent / "fixtures" / "single_resistor.py"
+    fixture = Path(__file__).parent / "single_resistor.py"
     circuit_file = copy_to_output(fixture, output_dir, "circuit_with_add.py")
 
     # Step 1: Modify circuit to add R2

@@ -49,7 +49,7 @@ def test_move_component():
     clean_output_dir(output_dir)
 
     # Get fixture and copy
-    fixture = Path(__file__).parent.parent / "fixtures" / "positioned_resistor.py"
+    fixture = Path(__file__).parent / "positioned_resistor.py"
     circuit_file = copy_to_output(fixture, output_dir, "circuit_moved.py")
 
     # Step 1: Modify position

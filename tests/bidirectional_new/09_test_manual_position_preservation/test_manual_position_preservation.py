@@ -62,7 +62,7 @@ def test_manual_position_preservation():
 
     # Step 1: Generate initial KiCad from Python
     print("Step 1: Generating initial KiCad circuit...")
-    fixture = Path(__file__).parent.parent / "fixtures" / "single_resistor.py"
+    fixture = Path(__file__).parent / "single_resistor.py"
     circuit_file = copy_to_output(fixture, output_dir, "step1_initial.py")
 
     exit_code, stdout, stderr = run_python_circuit(circuit_file)

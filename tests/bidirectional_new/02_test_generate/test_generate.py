@@ -47,8 +47,8 @@ def test_generate():
     output_dir = get_test_output_dir(test_file, "02_generate")
     clean_output_dir(output_dir)
 
-    # Get fixture
-    fixture = Path(__file__).parent.parent / "fixtures" / "single_resistor.py"
+    # Get fixture from same directory
+    fixture = Path(__file__).parent / "single_resistor.py"
     circuit_file = copy_to_output(fixture, output_dir)
 
     # Step 1: Run Python circuit to generate KiCad

@@ -47,7 +47,7 @@ def test_set_position():
     clean_output_dir(output_dir)
 
     # Get positioned fixture
-    fixture = Path(__file__).parent.parent / "fixtures" / "positioned_resistor.py"
+    fixture = Path(__file__).parent / "positioned_resistor.py"
     circuit_file = copy_to_output(fixture, output_dir)
 
     # Step 1: Generate KiCad

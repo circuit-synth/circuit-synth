@@ -51,7 +51,7 @@ def test_modify_value():
     clean_output_dir(output_dir)
 
     # Get fixture and copy
-    fixture = Path(__file__).parent.parent / "fixtures" / "single_resistor.py"
+    fixture = Path(__file__).parent / "single_resistor.py"
     circuit_file = copy_to_output(fixture, output_dir, "circuit_modified.py")
 
     # Step 1: Modify value from 10k to 20k
