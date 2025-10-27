@@ -23,6 +23,7 @@ from .net_matcher import NetMatcher
 from .search_engine import SearchEngine, SearchQueryBuilder
 from .sync_strategies import (
     ConnectionMatchStrategy,
+    PositionRenameStrategy,
     ReferenceMatchStrategy,
     SyncStrategy,
     ValueFootprintStrategy,
@@ -40,6 +41,7 @@ class SyncReport:
     modified: List[str] = field(default_factory=list)
     removed: List[str] = field(default_factory=list)
     preserved: List[str] = field(default_factory=list)
+    renamed: List[Tuple[str, str]] = field(default_factory=list)  # (old_ref, new_ref)
     errors: List[str] = field(default_factory=list)
 
     # Net/label tracking
@@ -97,10 +99,12 @@ class APISynchronizer:
         self.net_matcher = NetMatcher(self.connection_tracer)
 
         # Initialize matching strategies
+        # Order matters: strategies are tried in sequence, first match wins
         self.strategies = [
-            ReferenceMatchStrategy(self.search_engine),
-            ConnectionMatchStrategy(self.net_matcher),
-            ValueFootprintStrategy(self.search_engine),
+            ReferenceMatchStrategy(self.search_engine),  # Exact reference match
+            ConnectionMatchStrategy(self.net_matcher),    # Match by net topology
+            PositionRenameStrategy(self.search_engine),   # Detect renames by position
+            ValueFootprintStrategy(self.search_engine),   # Match by value+footprint (fallback)
         ]
 
         logger.info(f"APISynchronizer initialized for: {schematic_path}")
@@ -310,6 +314,12 @@ class APISynchronizer:
             for ref in added_refs:
                 print(f"   ➕ Add: {ref} (new in Python)")
 
+        # Components that were renamed
+        if report.renamed:
+            renamed_pairs = sorted(report.renamed)
+            for old_ref, new_ref in renamed_pairs:
+                print(f"   🔄 Rename: {old_ref} → {new_ref}")
+
         # Components that were modified
         if report.modified:
             modified_refs = sorted(report.modified)
@@ -474,53 +484,34 @@ class APISynchronizer:
             return pin_labels
 
         # For each pin, check if there's a label at that position
+        from .geometry_utils import GeometryUtils
+
         for pin in symbol_def.pins:
-            pin_pos = self._calculate_pin_position(kicad_component, pin)
-            if pin_pos:
-                # Find labels near this pin position (within 0.5mm tolerance)
-                for label in self.schematic.labels:
-                    distance = math.sqrt(
-                        (label.position.x - pin_pos.x) ** 2 +
-                        (label.position.y - pin_pos.y) ** 2
-                    )
-                    if distance < 0.5:  # 0.5mm tolerance
-                        pin_labels[str(pin.number)] = label
-                        break
+            # Use canonical pin position calculation
+            # SchematicPin uses 'position' (Point) and 'rotation' instead of x/y/orientation
+            pin_position = pin.position if hasattr(pin, 'position') else Point(0, 0)
+            pin_dict = {
+                "x": float(pin_position.x),
+                "y": float(pin_position.y),
+                "orientation": float(pin.rotation if hasattr(pin, 'rotation') else 0.0),
+            }
+            pin_pos, _ = GeometryUtils.calculate_pin_label_position_from_dict(
+                pin_dict=pin_dict,
+                component_position=kicad_component.position,
+                component_rotation=kicad_component.rotation,
+            )
+
+            # Find labels near this pin position (within 0.5mm tolerance)
+            for label in self.schematic.labels:
+                distance = math.sqrt(
+                    (label.position.x - pin_pos.x) ** 2 +
+                    (label.position.y - pin_pos.y) ** 2
+                )
+                if distance < 0.5:  # 0.5mm tolerance
+                    pin_labels[str(pin.number)] = label
+                    break
 
         return pin_labels
-
-    def _calculate_pin_position(self, component: SchematicSymbol, pin) -> Optional[Point]:
-        """
-        Calculate the absolute position of a pin on a component.
-
-        Args:
-            component: The schematic component
-            pin: The pin definition from symbol library
-
-        Returns:
-            Point with absolute pin position, or None if cannot calculate
-        """
-        try:
-            # Get pin position from library data
-            anchor_x = float(pin.x if hasattr(pin, 'x') else 0.0)
-            anchor_y = float(pin.y if hasattr(pin, 'y') else 0.0)
-
-            # Rotate by component rotation
-            r = math.radians(component.rotation)
-            local_x = anchor_x
-            local_y = -anchor_y  # KiCad Y axis is inverted
-            rx = (local_x * math.cos(r)) - (local_y * math.sin(r))
-            ry = (local_x * math.sin(r)) + (local_y * math.cos(r))
-
-            # Add component position
-            global_x = component.position.x + rx
-            global_y = component.position.y + ry
-
-            return Point(global_x, global_y)
-
-        except (AttributeError, TypeError) as e:
-            logger.warning(f"Could not calculate pin position: {e}")
-            return None
 
     def _add_pin_label(
         self,
@@ -559,15 +550,23 @@ class APISynchronizer:
             logger.warning(f"Pin {pin_number} not found on {kicad_component.reference}")
             return False
 
-        # Calculate pin position
-        pin_pos = self._calculate_pin_position(kicad_component, pin)
-        if not pin_pos:
-            return False
+        # Calculate pin position and label angle using CANONICAL shared implementation
+        # This ensures labels are positioned identically to fresh generation
+        from .geometry_utils import GeometryUtils
 
-        # Calculate label angle (opposite to pin direction)
-        pin_angle = float(pin.angle if hasattr(pin, 'angle') else 0.0)
-        label_angle = (pin_angle + 180) % 360
-        global_angle = (label_angle + kicad_component.rotation) % 360
+        # SchematicPin uses 'position' (Point) and 'rotation' instead of x/y/orientation
+        pin_position = pin.position if hasattr(pin, 'position') else Point(0, 0)
+        pin_dict = {
+            "x": float(pin_position.x),
+            "y": float(pin_position.y),
+            "orientation": float(pin.rotation if hasattr(pin, 'rotation') else 0.0),
+        }
+
+        label_pos, label_angle = GeometryUtils.calculate_pin_label_position_from_dict(
+            pin_dict=pin_dict,
+            component_position=kicad_component.position,
+            component_rotation=kicad_component.rotation,
+        )
 
         # Use kicad-sch-api's add_hierarchical_label() method
         # Hierarchical labels create electrical connections (regular labels don't)
@@ -575,14 +574,14 @@ class APISynchronizer:
             logger.debug(f"Adding hierarchical label using schematic.add_hierarchical_label() API")
 
             # Use schematic.add_hierarchical_label() with proper signature
-            # Note: hierarchical_label uses 'shape' instead of 'rotation' and 'size'
             label_uuid = self.schematic.add_hierarchical_label(
                 text=net_name,
-                position=(pin_pos.x, pin_pos.y),  # Tuple or Point both work
-                shape="bidirectional"  # Default to bidirectional for nets
+                position=(label_pos.x, label_pos.y),
+                shape="bidirectional",  # Default to bidirectional for nets
+                rotation=label_angle,  # CRITICAL: Must pass rotation for correct orientation!
             )
 
-            logger.debug(f"Label added: '{net_name}' at ({pin_pos.x:.2f}, {pin_pos.y:.2f}), UUID={label_uuid}")
+            logger.debug(f"Label added: '{net_name}' at ({label_pos.x:.2f}, {label_pos.y:.2f}), angle={label_angle:.0f}, UUID={label_uuid}")
             logger.info(f"Added label '{net_name}' at {kicad_component.reference} pin {pin_number}")
             report.labels_added.append((kicad_component.reference, pin_number, net_name))
             return True
@@ -796,15 +795,39 @@ class APISynchronizer:
         matches: Dict[str, str],
         report: SyncReport,
     ):
-        """Process matched components for updates."""
+        """Process matched components for updates and renames."""
         for circuit_id, kicad_ref in matches.items():
             circuit_comp = circuit_components[circuit_id]
             kicad_comp = kicad_components[kicad_ref]
+            circuit_ref = circuit_comp["reference"]
 
-            # Check if update needed
+            # Check if this is a rename (different reference but matched)
+            if circuit_ref != kicad_ref:
+                # This is a RENAME
+                logger.info(f"Detected rename: {kicad_ref} → {circuit_ref}")
+                success = self.component_manager.rename_component(
+                    old_ref=kicad_ref,
+                    new_ref=circuit_ref
+                )
+                if success:
+                    report.renamed.append((kicad_ref, circuit_ref))
+                    # Update kicad_components dict key for subsequent operations
+                    kicad_components[circuit_ref] = kicad_components.pop(kicad_ref)
+                    # Update matches dict so subsequent code uses new reference
+                    matches[circuit_id] = circuit_ref
+                    # NOTE: Don't set kicad_comp.reference directly!
+                    # rename_component() already updated it, and setting it again
+                    # will trigger kicad-sch-api validation error "Reference already exists"
+                    # Update kicad_ref to use new reference for remaining operations
+                    kicad_ref = circuit_ref
+                else:
+                    report.errors.append(f"Failed to rename {kicad_ref} → {circuit_ref}")
+                    continue
+
+            # Check if update needed (value, footprint, etc.)
             if self._needs_update(circuit_comp, kicad_comp):
                 success = self.component_manager.update_component(
-                    kicad_ref,
+                    kicad_ref,  # Use current reference (after rename if applicable)
                     value=circuit_comp["value"],
                     footprint=circuit_comp.get("footprint"),
                 )

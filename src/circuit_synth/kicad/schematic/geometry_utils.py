@@ -281,6 +281,50 @@ class GeometryUtils:
         )
 
     @staticmethod
+    def calculate_pin_label_position_from_dict(
+        pin_dict: Dict,
+        component_position: Point,
+        component_rotation: float,
+    ) -> Tuple[Point, float]:
+        """
+        Calculate hierarchical label position and angle for a pin.
+
+        This is the CANONICAL implementation used by both fresh generation and synchronization.
+        DO NOT duplicate this logic - always call this function.
+
+        Args:
+            pin_dict: Pin dictionary from symbol library with keys: x, y, orientation
+            component_position: Component position in world coordinates
+            component_rotation: Component rotation in degrees
+
+        Returns:
+            Tuple of (label_position, label_angle) where:
+                - label_position is the Point where the label should be placed (at pin anchor)
+                - label_angle is the rotation for the label in degrees
+        """
+        # Get pin position from library data
+        anchor_x = float(pin_dict.get("x", 0.0))
+        anchor_y = float(pin_dict.get("y", 0.0))
+        pin_angle = float(pin_dict.get("orientation", 0.0))
+
+        # Rotate coords by component rotation
+        r = math.radians(component_rotation)
+        local_x = anchor_x
+        local_y = -anchor_y  # KiCad Y axis is inverted
+        rx = (local_x * math.cos(r)) - (local_y * math.sin(r))
+        ry = (local_x * math.sin(r)) + (local_y * math.cos(r))
+
+        # Calculate global position (pin anchor point)
+        global_x = component_position.x + rx
+        global_y = component_position.y + ry
+
+        # Calculate label angle (opposite to pin direction)
+        label_angle = (pin_angle + 180) % 360
+        global_angle = (label_angle + component_rotation) % 360
+
+        return (Point(global_x, global_y), global_angle)
+
+    @staticmethod
     def get_pins_at_position(
         symbol: SchematicSymbol, tolerance: float = 0.01
     ) -> Dict[Tuple[float, float], List[SchematicPin]]:

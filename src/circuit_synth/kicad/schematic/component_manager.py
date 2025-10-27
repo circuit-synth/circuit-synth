@@ -204,6 +204,44 @@ class ComponentManager:
         logger.info(f"Removed component {reference}")
         return True
 
+    def rename_component(self, old_ref: str, new_ref: str) -> bool:
+        """
+        Rename a component's reference designator.
+
+        This method updates the component's reference and maintains the internal
+        index consistency. It's used during bidirectional sync when a component
+        reference has changed in the Python code.
+
+        Args:
+            old_ref: Current reference (e.g., "R1")
+            new_ref: New reference (e.g., "R2")
+
+        Returns:
+            True if renamed successfully, False otherwise
+        """
+        # Check if old component exists
+        if old_ref not in self._component_index:
+            logger.error(f"Cannot rename: component {old_ref} not found")
+            return False
+
+        # Check if new reference already exists
+        if new_ref in self._component_index:
+            logger.error(f"Cannot rename to {new_ref}: reference already exists")
+            return False
+
+        # Get the component
+        component = self._component_index[old_ref]
+
+        # Update the reference in the component object
+        component.reference = new_ref
+
+        # Update the internal index
+        self._component_index[new_ref] = component
+        del self._component_index[old_ref]
+
+        logger.info(f"Renamed component {old_ref} → {new_ref}")
+        return True
+
     def update_component(
         self,
         reference: str,

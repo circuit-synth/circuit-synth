@@ -24,10 +24,10 @@ def two_resistors():
         footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
-    # Connect the resistors with net1
-    net1 = Net(name="net1")
-    net1 += r1[1]
-    net1 += r2[1]
+    # Note: uncomment to connect the resistors
+    # net1 = Net("net1")
+    # r1[1] += net1
+    # r2[1] += net1
 
 
 if __name__ == "__main__":
