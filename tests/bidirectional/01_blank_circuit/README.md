@@ -37,4 +37,4 @@ uv run pytest test_blank.py -v -s
 ✅ Blank circuit works
 ```
 
-All KiCad files created in `generated/01_blank/blank/` with correct naming.
+All KiCad files created in `blank/` with correct naming.

@@ -18,7 +18,7 @@ def positioned_resistor():
         ref="R1",
         value="10k",
         footprint="Resistor_SMD:R_0603_1608Metric",
-        at=(100.0, 100.0, 0)  # X=100mm, Y=100mm, rotation=0°
+        at=(100.0, 100.0, 0),  # X=100mm, Y=100mm, rotation=0°
     )
 
     # Second resistor at different position
@@ -27,7 +27,7 @@ def positioned_resistor():
         ref="R2",
         value="20k",
         footprint="Resistor_SMD:R_0603_1608Metric",
-        at=(150.0, 100.0, 90)  # X=150mm, Y=100mm, rotation=90°
+        at=(150.0, 100.0, 90),  # X=150mm, Y=100mm, rotation=90°
     )
 
 
