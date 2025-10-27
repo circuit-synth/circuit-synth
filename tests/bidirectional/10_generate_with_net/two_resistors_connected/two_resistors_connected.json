@@ -1,7 +1,7 @@
 {
   "name": "two_resistors_connected",
   "description": "Circuit with two resistors connected via NET1.",
-  "tstamps": "/two_resistors_connected-4368390176/",
+  "tstamps": "/two_resistors_connected-4346287296/",
   "source_file": "two_resistors_connected.kicad_sch",
   "components": {
     "R1": {
@@ -127,7 +127,7 @@
       "border_color": "black",
       "justify": "center center",
       "rotation": 0,
-      "uuid": "3b3fcba6-286e-49de-ae27-125f0d3e1308"
+      "uuid": "33f93dcb-3e6d-4f6b-b3ce-d82aefd546e6"
     }
   ]
 }

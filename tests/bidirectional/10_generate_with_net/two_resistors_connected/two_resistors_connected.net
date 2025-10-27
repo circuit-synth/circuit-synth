@@ -1,9 +1,9 @@
 (export (version "E")
     (design
       (source "two_resistors_connected.kicad_sch")
-      (date "2025-10-26T22:43:53-0700")
+      (date "2025-10-26T22:51:02-0700")
       (tool "Circuit-Synth Exporter v0.1.0")
-      (sheet (number "1") (name "root") (tstamps "/7858e3cf-e630-41b0-91ae-4b1cdd2b37ea/")
+      (sheet (number "1") (name "root") (tstamps "/f7dfeed1-75e1-45f5-9069-4e403921f2ed/")
       (title_block
         (title )
         (company )
@@ -33,7 +33,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "1f55bd79-5e8b-463b-a98b-ce784339e0a6"))
+      (tstamps "ccd075fd-6700-489d-bc26-1a6fa200a6dc"))
     (comp (ref "R2")
       (value "4.7k")
       (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -47,7 +47,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "8a4e5cf7-4166-4b0e-9948-858bfcf73f14")))
+      (tstamps "8b92f373-bb4a-4460-bba2-eac77dbf0198")))
     (libparts
     (libpart (lib "Device") (part "R")
       (description "Resistor")

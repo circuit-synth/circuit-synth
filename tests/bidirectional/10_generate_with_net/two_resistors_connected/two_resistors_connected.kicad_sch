@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "0.8.36")
-	(uuid "c2956866-50a0-4e52-8385-61296f5ada12")
+	(uuid "27c31603-b2e8-4b1a-86a9-80123b61e163")
 	(paper "A4")
 	(title_block
 		(title "two_resistors_connected")
@@ -142,7 +142,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "0330332f-1f9c-41ef-9e19-274b88709e8b")
+		(uuid "a9406ca3-60b8-4455-8c26-db5c913807df")
 		(property "Reference" "R1"
 			(at 33.02 34.2899 0)
 			(effects
@@ -170,7 +170,7 @@
 				(hide yes)
 			)
 		)
-		(property "hierarchy_path" "/c2956866-50a0-4e52-8385-61296f5ada12"
+		(property "hierarchy_path" "/27c31603-b2e8-4b1a-86a9-80123b61e163"
 			(at 33.02 40.6399 0)
 			(effects
 				(font
@@ -188,7 +188,7 @@
 				(hide yes)
 			)
 		)
-		(property "root_uuid" "c2956866-50a0-4e52-8385-61296f5ada12"
+		(property "root_uuid" "27c31603-b2e8-4b1a-86a9-80123b61e163"
 			(at 33.02 40.6399 0)
 			(effects
 				(font
@@ -198,14 +198,14 @@
 			)
 		)
 		(pin "1"
-			(uuid "3138ba9b-9d3a-4281-bf58-10be1eeda1c3")
+			(uuid "c1045c00-190c-4a7d-b46c-931869ab6c69")
 		)
 		(pin "2"
-			(uuid "417c0baf-2e49-483e-90e9-72ff04d93a4d")
+			(uuid "ae487d8a-8a8f-4f38-9384-f568d489b17e")
 		)
 		(instances
 			(project "two_resistors_connected"
-				(path "/c2956866-50a0-4e52-8385-61296f5ada12"
+				(path "/27c31603-b2e8-4b1a-86a9-80123b61e163"
 					(reference "R1")
 					(unit 1)
 				)
@@ -221,7 +221,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "88f99d53-3924-49b2-8bf1-70f8b9c96dca")
+		(uuid "8fa46d56-033a-479d-8ef9-c760a0777621")
 		(property "Reference" "R2"
 			(at 58.42 34.2899 0)
 			(effects
@@ -249,7 +249,7 @@
 				(hide yes)
 			)
 		)
-		(property "hierarchy_path" "/c2956866-50a0-4e52-8385-61296f5ada12"
+		(property "hierarchy_path" "/27c31603-b2e8-4b1a-86a9-80123b61e163"
 			(at 58.42 40.6399 0)
 			(effects
 				(font
@@ -267,7 +267,7 @@
 				(hide yes)
 			)
 		)
-		(property "root_uuid" "c2956866-50a0-4e52-8385-61296f5ada12"
+		(property "root_uuid" "27c31603-b2e8-4b1a-86a9-80123b61e163"
 			(at 58.42 40.6399 0)
 			(effects
 				(font
@@ -277,14 +277,14 @@
 			)
 		)
 		(pin "1"
-			(uuid "c161bde4-774f-45e7-907d-0db05286d5e5")
+			(uuid "70741568-0408-4ca2-96d0-7ed6d8a37a30")
 		)
 		(pin "2"
-			(uuid "0163c900-5126-4d88-9204-35bc18e9e3ef")
+			(uuid "3241d6f3-2dfd-4e36-8d18-575de16ab225")
 		)
 		(instances
 			(project "two_resistors_connected"
-				(path "/c2956866-50a0-4e52-8385-61296f5ada12"
+				(path "/27c31603-b2e8-4b1a-86a9-80123b61e163"
 					(reference "R2")
 					(unit 1)
 				)
@@ -300,7 +300,7 @@
 			)
 			(justify left)
 		)
-		(uuid "4504fe92-2cc0-46e6-b1ce-8b1da3d3db09")
+		(uuid "4b8369c9-b4db-44dd-92f3-09831f52a90f")
 	)
 	(hierarchical_label "NET1"
 		(shape input)
@@ -311,7 +311,7 @@
 			)
 			(justify left)
 		)
-		(uuid "f38f18b1-defb-43a8-934a-44266026be48")
+		(uuid "a72f3b46-8bda-4d90-9353-9b476ec12ef3")
 	)
 	(text_box "Circuit with two resistors connected via NET1."
 		(exclude_from_sim no)
@@ -331,7 +331,7 @@
 			)
 			(justify left top)
 		)
-		(uuid "23e53600-7a0b-4a2c-a56e-54b5e507217a")
+		(uuid "bc152ec8-d098-43b7-898b-85e455d3fc90")
 	)
 	(sheet_instances
 		(path "/"

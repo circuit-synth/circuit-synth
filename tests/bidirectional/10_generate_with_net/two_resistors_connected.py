@@ -16,13 +16,13 @@ def two_resistors_connected():
         symbol="Device:R",
         ref="R1",
         value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric"
+        footprint="Resistor_SMD:R_0603_1608Metric",
     )
     r2 = Component(
         symbol="Device:R",
         ref="R2",
         value="4.7k",
-        footprint="Resistor_SMD:R_0603_1608Metric"
+        footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
     # Connect R1 pin 1 to R2 pin 1 via NET1
@@ -33,10 +33,6 @@ def two_resistors_connected():
 
 if __name__ == "__main__":
     circuit_obj = two_resistors_connected()
-    circuit_obj.generate_kicad_project(
-        project_name="two_resistors_connected",
-        placement_algorithm="simple",
-        generate_pcb=True
-    )
+    circuit_obj.generate_kicad_project(project_name="two_resistors_connected")
     print("✅ Two resistors with NET1 connection generated!")
     print("📁 Open in KiCad: two_resistors_connected/two_resistors_connected.kicad_pro")

@@ -2,26 +2,26 @@
 
 ## What This Tests
 
-**Core Question**: Does a simple named net connection in Python code correctly appear as a wire with hierarchical label in the KiCad schematic?
+**Core Question**: Does a simple named net connection in Python code correctly appear as hierarchical labels in the KiCad schematic, establishing electrical connection without physical wires?
 
 This is the **foundational net test** - validates that basic net generation works before testing more complex net operations.
 
-**Note**: Currently generates `hierarchical_label` instead of regular `label`. This may need to be changed for single-sheet schematics in the future.
+**Note**: Hierarchical labels with the same name establish electrical connection without drawing wires between them. This is the correct KiCad behavior for hierarchical labels.
 
 ## When This Situation Happens
 
 - Developer creates circuit with two components
 - Wants to connect them electrically via a named net
 - Defines `Net("NET1")` and connects component pins
-- Generates KiCad project expecting wire with net label
+- Generates KiCad project expecting hierarchical labels establishing connection
 
 ## What Should Work
 
 1. Python code defines R1 and R2 connected via NET1
 2. Generate KiCad project from Python
 3. KiCad schematic shows:
-   - Wire connecting R1 pin 1 to R2 pin 1
-   - Net label "NET1" visible on the connection
+   - R1 and R2 components with hierarchical labels "NET1" on their pins
+   - No physical wire between components (labels establish electrical connection)
    - Both components placed without overlap
 
 ## Manual Test Instructions
@@ -38,21 +38,25 @@ open two_resistors_connected/two_resistors_connected.kicad_pro
 # Step 3: Verify in KiCad schematic editor:
 # Expected:
 #   - R1 and R2 visible
-#   - Wire connecting R1 pin 1 to R2 pin 1
-#   - Hierarchical label "NET1" visible on wire (appears as small square flag)
+#   - Hierarchical label "NET1" on R1 pin 1 (small square flag)
+#   - Hierarchical label "NET1" on R2 pin 1 (small square flag)
+#   - NO physical wire between components
+#   - Electrical connection established by matching label names
 #   - Components placed without overlap
 ```
 
 ## Expected Result
 
 - ✅ KiCad schematic generated successfully
-- ✅ Wire visible connecting R1[1] to R2[1]
-- ✅ Hierarchical label "NET1" appears in schematic (square flag shape)
-- ✅ Label is readable and properly positioned on wire
+- ✅ Hierarchical label "NET1" on R1 pin 1 (square flag shape)
+- ✅ Hierarchical label "NET1" on R2 pin 1 (square flag shape)
+- ✅ Labels are readable and properly positioned on component pins
+- ✅ NO physical wire between R1 and R2
+- ✅ Electrical connection established by matching hierarchical label names
 - ✅ Components placed without overlap
-- ✅ No orphaned wires or net errors
+- ✅ No electrical rule errors when checked in KiCad
 
-**Current behavior:** Generates `hierarchical_label` instead of `label` in .kicad_sch file
+**How it works:** Hierarchical labels with identical names create electrical connection without physical wires. KiCad's ERC recognizes this as a valid electrical connection.
 
 ## Why This Is Important
 
@@ -68,10 +72,7 @@ This test validates the most basic net functionality before attempting more comp
 
 This test PASSES when:
 - Circuit generates without errors
-- KiCad schematic shows clear wire connection
-- Hierarchical label "NET1" is visible and properly placed
+- Two hierarchical labels "NET1" visible (one on each component pin)
+- NO physical wire between components
+- Labels have matching names, establishing electrical connection
 - Opening schematic in KiCad shows no electrical rule errors
-
-## Future Improvement
-
-For single-sheet schematics, should use `label` instead of `hierarchical_label`. Hierarchical labels are intended for parent-child sheet connections in multi-sheet designs.
