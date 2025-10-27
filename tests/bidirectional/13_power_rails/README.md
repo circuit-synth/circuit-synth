@@ -1,4 +1,4 @@
-# Test 11: Power Rail Connections (GND, VCC)
+# Test 13: Power Rail Connections (GND, VCC)
 
 ## What This Tests
 
@@ -22,7 +22,7 @@ Validates power rail distribution, the most fundamental and common circuit patte
 ## Manual Test Instructions
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/11_power_rails
+cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/13_power_rails
 
 # Step 1: Generate KiCad project from Python (3 resistors with GND/VCC)
 uv run power_rails.py

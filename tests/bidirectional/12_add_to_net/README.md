@@ -1,4 +1,4 @@
-# Test 10: Add Component to Existing Net
+# Test 12: Add Component to Existing Net
 
 ## What This Tests
 Validates that adding a third component to an existing connection between two components works correctly in KiCad.
@@ -18,7 +18,7 @@ Validates that adding a third component to an existing connection between two co
 ## Manual Test Instructions
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/10_add_to_net
+cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/12_add_to_net
 
 # Step 1: Generate initial KiCad project (R1 and R2 on NET1)
 uv run two_resistors_on_net.py

@@ -16,7 +16,7 @@ def single_resistor():
         symbol="Device:R",
         ref="R1",
         value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric"
+        footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
 
