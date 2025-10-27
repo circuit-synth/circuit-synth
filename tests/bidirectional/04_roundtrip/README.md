@@ -1,4 +1,4 @@
-# Test 05: Simple Round-Trip Cycle
+# Test 04: Simple Round-Trip Cycle
 
 ## What This Tests
 
@@ -22,7 +22,7 @@ Validates that a complete round-trip cycle (Python → KiCad → Python → KiCa
 ## Manual Test Instructions
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/05_roundtrip
+cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/04_roundtrip
 
 # Step 1: Generate KiCad from original Python
 uv run single_resistor.py

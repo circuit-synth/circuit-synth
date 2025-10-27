@@ -12,11 +12,13 @@ from circuit_synth import circuit, Component
 @circuit(name="single_resistor")
 def single_resistor():
     """Circuit with a single 10kΩ resistor."""
+
+    # Create components
     r1 = Component(
         symbol="Device:R",
         ref="R1",
         value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric"
+        footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
 

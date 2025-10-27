@@ -1,4 +1,4 @@
-# Test 04: Add Resistor in KiCad → Update Python
+# Test 05: Add Resistor in KiCad → Update Python
 
 ## What This Tests
 
@@ -22,7 +22,7 @@ Generating KiCad from Python, manually adding a component in KiCad, then importi
 ## Manual Test Instructions
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/04_add_resistor_kicad_to_python
+cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/05_add_resistor_kicad_to_python
 
 # Step 1: Check initial Python code (starts with R1 only)
 cat main.py
