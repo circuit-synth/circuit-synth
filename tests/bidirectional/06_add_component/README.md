@@ -16,18 +16,35 @@ Validates that adding a new component in Python code correctly appears in the re
 - Both components are properly represented in the schematic
 
 ## Manual Test Instructions
-```bash
-cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional_new/06_test_add_component
 
-# Run automated test
-uv run pytest test_add_component.py -v -s
+```bash
+cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/06_add_component
+
+# Step 1: Generate initial KiCad project with R1
+uv run single_resistor.py
+open single_resistor/single_resistor.kicad_pro
+# Verify: schematic has R1 only
+
+# Step 2: Edit single_resistor.py to add R2
+# Add after R1 definition:
+#   r2 = Component(symbol="Device:R", ref="R2", value="4.7k",
+#                  footprint="Resistor_SMD:R_0603_1608Metric")
+
+# Step 3: Regenerate KiCad project
+uv run single_resistor.py
+
+# Step 4: Open regenerated KiCad project
+open single_resistor/single_resistor.kicad_pro
+
+# Step 5: Verify schematic has both components
+#   - R1 (10k) - original component, position preserved
+#   - R2 (4.7k) - new component, placed without overlapping R1
 ```
 
 ## Expected Result
-```
-✅ Test 06: Add Component PASSED
-   - Circuit modified to add R2
-   - KiCad project regenerated
-   - Component R1 exists in schematic
-   - Component R2 exists in schematic
-```
+
+- ✅ Initial KiCad project has R1 only
+- ✅ After editing Python and regenerating, KiCad has both R1 and R2
+- ✅ R1 position preserved (not moved)
+- ✅ R2 placed in available space (no overlap)
+- ✅ Both components have correct values
