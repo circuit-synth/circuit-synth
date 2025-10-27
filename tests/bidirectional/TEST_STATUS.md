@@ -297,6 +297,18 @@ kicad-to-python successful: imported.py created
 - Every real circuit has power nets
 **Must fix before:** 1.0 release
 
+### #349: KiCad Schematic Corruption - Multiline Strings Not Escaped (CRITICAL)
+**Blocks:** Test 22, all circuits with multiline docstrings
+**Impact:** Corrupts generated KiCad schematics, makes files unreadable
+**Severity:** CRITICAL - Data corruption, 100% reproduction rate
+**Root Cause:** Docstrings written as text_box with literal newlines instead of `\n` escapes
+**Symptoms:**
+- "Un-terminated delimited string" error when opening in KiCad
+- Regeneration corrupts previously working schematics
+- All components marked as "changed" even when Python code unchanged
+**Solution:** Escape newlines, quotes, backslashes in KiCad S-expression strings
+**Must fix:** Before any release - corrupts user data
+
 ### #347: LLM-friendly API Syntax Guide Needed
 **Blocks:** None (documentation issue)
 **Impact:** LLMs make frequent API errors (wrong classes, methods, patterns)
