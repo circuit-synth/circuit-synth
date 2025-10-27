@@ -29,8 +29,8 @@ uv run power_rails.py
 open power_rails/power_rails.kicad_pro
 # Verify in KiCad schematic:
 #   - All three resistors (R1, R2, R3) present
-#   - GND power symbol visible and connected to all components
-#   - VCC power symbol visible and connected to all components
+#   - GND hierarchical labels visible and connected to all components
+#   - VCC hierarchical labels visible and connected to all components
 #   - Net names show GND and VCC rails properly
 
 # Step 2: Verify netlist shows power connections
@@ -44,10 +44,12 @@ open power_rails/power_rails.kicad_pro
 
 - ✅ Circuit created with GND and VCC power rails
 - ✅ Multiple components sharing power rail connections
-- ✅ KiCad project generated with power symbols
+- ✅ KiCad project generated with hierarchical labels for power
 - ✅ All components exist in schematic with correct connections
 - ✅ Power rail connections properly represented in nets
-- ✅ GND and VCC nets visible in schematic
+- ✅ GND and VCC hierarchical labels visible in schematic
+
+**Note**: Uses `hierarchical_label` format for power rails (same as other net tests)
 
 ## Why This Is Important
 

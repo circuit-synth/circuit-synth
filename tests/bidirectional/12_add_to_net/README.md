@@ -24,7 +24,7 @@ cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/12_add_to_net
 uv run two_resistors_on_net.py
 open two_resistors_on_net/two_resistors_on_net.kicad_pro
 # Verify: schematic shows R1 and R2 connected via NET1
-# Check: NET1 label appears on the connection between components
+# Check: NET1 hierarchical labels appear on the connections
 
 # Step 2: Edit two_resistors_on_net.py to add R3
 # Add after R2 definition:
@@ -39,7 +39,7 @@ open two_resistors_on_net/two_resistors_on_net.kicad_pro
 # Verify in KiCad schematic:
 #   - R1, R2, R3 all present
 #   - All three connected to NET1
-#   - NET1 label appears on connections
+#   - NET1 hierarchical labels appear on connections
 #   - No orphaned nets or connections
 #   - R1 and R2 positions preserved (not moved)
 #   - R3 placed without overlapping existing components

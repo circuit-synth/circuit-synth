@@ -2,9 +2,11 @@
 
 ## What This Tests
 
-**Core Question**: Does a simple named net connection in Python code correctly appear as a labeled wire in the KiCad schematic?
+**Core Question**: Does a simple named net connection in Python code correctly appear as a wire with hierarchical label in the KiCad schematic?
 
 This is the **foundational net test** - validates that basic net generation works before testing more complex net operations.
+
+**Note**: Currently generates `hierarchical_label` instead of regular `label`. This may need to be changed for single-sheet schematics in the future.
 
 ## When This Situation Happens
 
@@ -37,7 +39,7 @@ open two_resistors_connected/two_resistors_connected.kicad_pro
 # Expected:
 #   - R1 and R2 visible
 #   - Wire connecting R1 pin 1 to R2 pin 1
-#   - Net label "NET1" visible on wire
+#   - Hierarchical label "NET1" visible on wire (appears as small square flag)
 #   - Components placed without overlap
 ```
 
@@ -45,10 +47,12 @@ open two_resistors_connected/two_resistors_connected.kicad_pro
 
 - ✅ KiCad schematic generated successfully
 - ✅ Wire visible connecting R1[1] to R2[1]
-- ✅ Net label "NET1" appears in schematic
-- ✅ Net label is readable and properly positioned
+- ✅ Hierarchical label "NET1" appears in schematic (square flag shape)
+- ✅ Label is readable and properly positioned on wire
 - ✅ Components placed without overlap
 - ✅ No orphaned wires or net errors
+
+**Current behavior:** Generates `hierarchical_label` instead of `label` in .kicad_sch file
 
 ## Why This Is Important
 
@@ -65,5 +69,9 @@ This test validates the most basic net functionality before attempting more comp
 This test PASSES when:
 - Circuit generates without errors
 - KiCad schematic shows clear wire connection
-- Net label "NET1" is visible and properly placed
+- Hierarchical label "NET1" is visible and properly placed
 - Opening schematic in KiCad shows no electrical rule errors
+
+## Future Improvement
+
+For single-sheet schematics, should use `label` instead of `hierarchical_label`. Hierarchical labels are intended for parent-child sheet connections in multi-sheet designs.
