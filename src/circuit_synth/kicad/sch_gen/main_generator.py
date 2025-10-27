@@ -1015,6 +1015,7 @@ class SchematicGenerator:
                         "board_height",
                         "component_spacing",
                         "group_spacing",
+                        "preserve_user_components",  # Schematic-only parameter
                     ]
                 },
             )
