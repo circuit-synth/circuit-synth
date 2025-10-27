@@ -426,7 +426,7 @@ class SchematicGenerator:
         return False
 
     def _update_existing_project(
-        self, json_file: str, draw_bounding_boxes: bool = False
+        self, json_file: str, draw_bounding_boxes: bool = False, preserve_user_components: bool = False
     ):
         """Update existing project using synchronizer to preserve manual work"""
         logger.info("🔄 Updating existing project while preserving your work...")
@@ -465,13 +465,18 @@ class SchematicGenerator:
             f"Project has {len(sub_dict)} circuits: {'hierarchical' if has_subcircuits else 'flat'}"
         )
 
+        # Use the preserve_user_components parameter
+        preserve_components = preserve_user_components
+        if preserve_components:
+            logger.info("⚠️  preserve_user_components=True: Components in KiCad but not in Python will be kept")
+
         if has_subcircuits:
             # Use hierarchical synchronizer for projects with subcircuits
             logger.info(
                 f"Detected hierarchical project with {len(sub_dict)} subcircuits"
             )
             synchronizer = HierarchicalSynchronizer(
-                project_path=str(project_path), preserve_user_components=True
+                project_path=str(project_path), preserve_user_components=preserve_components
             )
             # Show hierarchy info
             logger.info(synchronizer.get_hierarchy_info())
@@ -479,7 +484,7 @@ class SchematicGenerator:
             # Use regular synchronizer for flat projects
             logger.debug(f"Creating synchronizer for flat project")
             synchronizer = SyncAdapter(
-                project_path=str(project_path), preserve_user_components=True
+                project_path=str(project_path), preserve_user_components=preserve_components
             )
 
         # Perform synchronization
@@ -671,7 +676,10 @@ class SchematicGenerator:
             )
 
             try:
-                result = self._update_existing_project(json_file, draw_bounding_boxes)
+                preserve_components = pcb_kwargs.get('preserve_user_components', False)
+                if preserve_components:
+                    logger.info("⚠️  preserve_user_components=True: Components in KiCad but not in Python will be kept")
+                result = self._update_existing_project(json_file, draw_bounding_boxes, preserve_components)
                 return result
             except Exception as e:
                 print(f"🔥 Exception type: {type(e).__name__}")
@@ -1010,6 +1018,7 @@ class SchematicGenerator:
                         "board_height",
                         "component_spacing",
                         "group_spacing",
+                        "preserve_user_components",  # Schematic-only parameter
                     ]
                 },
             )

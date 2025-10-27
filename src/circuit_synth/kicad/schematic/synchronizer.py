@@ -63,13 +63,13 @@ class APISynchronizer:
     and manipulation of schematic elements.
     """
 
-    def __init__(self, schematic_path: str, preserve_user_components: bool = True):
+    def __init__(self, schematic_path: str, preserve_user_components: bool = False):
         """
         Initialize the API synchronizer.
 
         Args:
             schematic_path: Path to the KiCad schematic file
-            preserve_user_components: Whether to keep components not in circuit
+            preserve_user_components: Whether to keep components not in circuit (default: False)
         """
         self.schematic_path = Path(schematic_path)
         self.preserve_user_components = preserve_user_components
@@ -314,11 +314,20 @@ class APISynchronizer:
             for ref in removed_refs:
                 print(f"   ⚠️  Remove: {ref} (not in Python code)")
 
+        # Components that were preserved (exist in KiCad but not Python)
+        if report.preserved:
+            preserved_refs = sorted(report.preserved)
+            print(f"\n   ⚠️  PRESERVED (preserve_user_components=True):")
+            for ref in preserved_refs:
+                print(f"      {ref} (exists in KiCad but not in Python)")
+            print(f"   💡 Tip: Set preserve_user_components=False to remove these")
+
         if (
             not report.matched
             and not report.added
             and not report.modified
             and not removed_refs
+            and not report.preserved
         ):
             print("   (no changes)")
 
