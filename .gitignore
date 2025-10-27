@@ -38,6 +38,7 @@ htmlcov/
 *.kicad_pro-bak
 *-backups/
 fp-info-cache
+*.kicad_sch.lck
 
 # User credentials (never commit)
 .env
