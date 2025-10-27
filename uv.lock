@@ -332,6 +332,7 @@ dependencies = [
     { name = "beautifulsoup4" },
     { name = "cachetools" },
     { name = "click" },
+    { name = "kicad-pcb-api" },
     { name = "kicad-sch-api" },
     { name = "loguru" },
     { name = "lxml" },
@@ -412,6 +413,7 @@ requires-dist = [
     { name = "google-adk", marker = "extra == 'fast-generation'", specifier = ">=0.1.0" },
     { name = "hypothesis", marker = "extra == 'test'", specifier = ">=6.0.0" },
     { name = "isort", marker = "extra == 'dev'", specifier = ">=5.10.0" },
+    { name = "kicad-pcb-api", specifier = ">=0.1.0" },
     { name = "kicad-sch-api", specifier = ">=0.4.0" },
     { name = "loguru", specifier = ">=0.5.0" },
     { name = "lxml", specifier = ">=6.0.0" },
@@ -1633,6 +1635,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/70/09/d904a6e96f76ff214be59e7aa6ef7190008f52a0ab6689760a98de0bf37d/keyring-25.6.0.tar.gz", hash = "sha256:0b39998aa941431eb3d9b0d4b2460bc773b9df6fed7621c2dfb291a7e0187a66", size = 62750, upload-time = "2024-12-25T15:26:45.782Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d3/32/da7f44bcb1105d3e88a0b74ebdca50c59121d2ddf71c9e34ba47df7f3a56/keyring-25.6.0-py3-none-any.whl", hash = "sha256:552a3f7af126ece7ed5c89753650eec89c7eaae8617d0aa4d9ad2b75111266bd", size = 39085, upload-time = "2024-12-25T15:26:44.377Z" },
+]
+
+[[package]]
+name = "kicad-pcb-api"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "loguru" },
+    { name = "sexpdata" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a6/ab/d084d3bbb7363c0fdd866e4d0a4522452a10aa1c75ae23b7fbdc264875b7/kicad_pcb_api-0.1.0.tar.gz", hash = "sha256:a159fcf8cc355ff7c7fa69e9585d1056558a4c3108215bcd8261e1a0249850a9", size = 155050, upload-time = "2025-10-26T23:29:31.388Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ad/88/7969b65a2343032d18b38aba8ad38c49d438cd473075b6036f68f0abf3b4/kicad_pcb_api-0.1.0-py3-none-any.whl", hash = "sha256:afef94bd967b09f1713ad47bb8da6be7f175089943e75b1f1c55cd3a8679b6f3", size = 132749, upload-time = "2025-10-26T23:29:30.023Z" },
 ]
 
 [[package]]

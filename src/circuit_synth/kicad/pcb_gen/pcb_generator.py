@@ -15,11 +15,13 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import kicad_sch_api as ksa
+from kicad_pcb_api import PCBBoard
+from kicad_pcb_api.core.types import Net
 
 from circuit_synth.core.circuit import Circuit
-from circuit_synth.pcb import PCBBoard
 
-# Removed duplicate PCB API imports - using single implementation
+# Removed duplicate PCB API imports - using kicad-pcb-api
+# TODO: Port simple_ratsnest to kicad-pcb-api or keep as circuit-synth extension
 from circuit_synth.pcb.simple_ratsnest import add_ratsnest_to_pcb
 
 logger = logging.getLogger(__name__)
