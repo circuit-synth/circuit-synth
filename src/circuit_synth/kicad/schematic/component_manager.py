@@ -154,16 +154,37 @@ class ComponentManager:
         logger.debug(f"Added component {reference} ({library_id}) at {position}")
         return component
 
-    def remove_component(self, reference: str) -> bool:
+    def remove_component(self, reference: str, uuid: Optional[str] = None) -> bool:
         """
-        Remove a component from the schematic.
+        Remove a component from the schematic by reference or UUID.
 
         Args:
             reference: Component reference to remove
+            uuid: Component UUID (optional, used if reference is ambiguous)
 
         Returns:
             True if component was removed, False if not found
+
+        Note:
+            Prefer UUID over reference when removing, as references are not guaranteed
+            to be unique in all scenarios. The reference parameter is retained for
+            backwards compatibility.
         """
+        # Try UUID first if provided (more reliable)
+        if uuid:
+            if hasattr(self.schematic.components, 'remove_by_uuid'):
+                # Use new API if available (kicad-sch-api 0.4.1+)
+                result = self.schematic.components.remove_by_uuid(uuid)
+                if result:
+                    # Also remove from our index
+                    if reference in self._component_index:
+                        del self._component_index[reference]
+                    logger.info(f"Removed component {reference} by UUID {uuid}")
+                    return True
+            else:
+                logger.warning(f"remove_by_uuid not available, falling back to reference")
+
+        # Fall back to reference-based removal
         if reference not in self._component_index:
             logger.warning(f"Component {reference} not found")
             return False
