@@ -15,10 +15,10 @@
 
 ## Test Results Summary
 
-**Total Tests:** 33
+**Total Tests:** 32
 **Passing:** 4 ✅
 **Failing:** 2 ❌
-**Untested:** 27 ⏳
+**Untested:** 26 ⏳
 
 ---
 
@@ -143,10 +143,9 @@ kicad-to-python successful: imported.py created
 **Last Tested:** Never
 **Notes:** Complex scenario
 
-### ⏳ Test 15: Move Component
-**Status:** UNTESTED
-**Last Tested:** Never
-**Notes:** Position change during sync
+### ❌ Test 15: Move Component (REMOVED)
+**Status:** N/A
+**Notes:** Test removed - positions shouldn't be specified in Python fixtures
 
 ---
 
