@@ -16,9 +16,9 @@
 [submodule "submodules/atopile"]
 	path = submodules/atopile
 	url = https://github.com/atopile/atopile
-[submodule "libraries/digikey-kicad"]
-	path = libraries/digikey-kicad
+[submodule "submodules/digikey-kicad"]
+	path = submodules/digikey-kicad
 	url = https://github.com/Digi-Key/digikey-kicad-library.git
-[submodule "external/kicad-pcb-api"]
-	path = external/kicad-pcb-api
+[submodule "submodules/kicad-pcb-api"]
+	path = submodules/kicad-pcb-api
 	url = https://github.com/circuit-synth/kicad-pcb-api.git
