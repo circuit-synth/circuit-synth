@@ -1857,11 +1857,11 @@ class SchematicWriter:
         # Use add_text_box() method from kicad-sch-api
         import uuid as uuid_module
 
-        # Escape the text for safe inclusion in KiCad S-expression format
-        escaped_text = self._escape_kicad_string(text)
+        # Don't escape here - kicad-sch-api should handle escaping during save
+        # Passing raw text so it can be properly escaped when writing S-expressions
 
         textbox_uuid = self.schematic.add_text_box(
-            text=escaped_text,
+            text=text,
             position=Point(position[0], position[1]),
             size=Point(size[0], size[1]),
             rotation=rotation,
