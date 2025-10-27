@@ -24,43 +24,35 @@ cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/09_position_pre
 # Step 1: Generate initial KiCad project with R1
 uv run single_resistor.py
 open single_resistor/single_resistor.kicad_pro
-# Verify: schematic has R1 at default position
-# Note: Record R1's position coordinates (shown in KiCad properties)
+# Note R1's default auto-placed position in KiCad
 
 # Step 2: Manually move R1 in KiCad schematic editor
-# Open single_resistor/single_resistor.kicad_sch in KiCad
-# Select R1 and move it to a new position (e.g., drag 50mm to the right)
-# Save the schematic in KiCad
-# Note: Record R1's new position coordinates
+# In KiCad: Select R1 and drag to new position (e.g., center of page)
+# Save schematic (Cmd+S), close KiCad
 
-# Step 3: Import the manually-edited KiCad back to Python
-uv run kicad-to-python single_resistor imported_with_moved_r1.py
-
-# Step 4: Verify imported Python captured the manual position
-# Open imported_with_moved_r1.py and verify R1 has position coordinates
-
-# Step 5: Edit imported_with_moved_r1.py to add R2
+# Step 3: Edit single_resistor.py to add R2
 # Add after R1 definition:
 #   r2 = Component(symbol="Device:R", ref="R2", value="4.7k",
 #                  footprint="Resistor_SMD:R_0603_1608Metric")
 
-# Step 6: Regenerate KiCad from modified Python
-uv run imported_with_moved_r1.py
-open imported_with_moved_r1/imported_with_moved_r1.kicad_pro
+# Step 4: Regenerate KiCad from modified Python
+uv run single_resistor.py
+
+# Step 5: Open regenerated KiCad and verify position preservation
+open single_resistor/single_resistor.kicad_pro
 # Verify:
-#   - R1 is still at the manually-positioned location (not default)
-#   - R2 appears at a new auto-generated position
-#   - R1's manual position was preserved through the cycle
+#   - R1 is still at manually-moved position (NOT at default)
+#   - R2 appears at new auto-placed position
+#   - Manual layout work preserved
 ```
 
 ## Expected Result
 
 - ✅ Original KiCad generated with R1 at default position
 - ✅ R1 manually moved in KiCad schematic editor
-- ✅ Manual position captured when importing to Python
 - ✅ R2 added in Python code
 - ✅ Regenerated KiCad preserves R1's manual position
-- ✅ R2 placed at new position without overlapping R1
+- ✅ R2 auto-placed without overlapping R1
 - ✅ Manual layout work is NOT lost during regeneration
 
 ## Why This Is Critical
