@@ -19,24 +19,25 @@ Adding a component in Python code and regenerating to update existing KiCad proj
 ```bash
 cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/18_add_component_update_kicad
 
-# Step 1: Import existing KiCad with R1
-uv run kicad-to-python existing_kicad/single_resistor.kicad_pro circuit.py
+# Step 1: Generate initial KiCad project with R1
+uv run single_resistor.py
+open single_resistor/single_resistor.kicad_pro
+# Verify: schematic has R1 only
 
-# Step 2: Edit circuit.py to add R2
-# Add after r1 component:
+# Step 2: Edit single_resistor.py to add R2
+# Add after r1 definition:
 #   r2 = Component(
 #       symbol="Device:R",
 #       ref="R2",
 #       value="20k",
-#       footprint="Resistor_SMD:R_0603_1608Metric"
+#       footprint="Resistor_SMD:R_0603_1608Metric",
 #   )
-# Add r2 to circuit.add_components() call
 
-# Step 3: Regenerate KiCad
-uv run circuit.py
+# Step 3: Regenerate KiCad project
+uv run single_resistor.py
 
 # Step 4: Open and verify both components exist
-open circuit/circuit.kicad_pro
+open single_resistor/single_resistor.kicad_pro
 # Verify: both R1 (10k) and R2 (20k) present in schematic
 ```
 

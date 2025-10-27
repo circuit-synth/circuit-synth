@@ -15,10 +15,10 @@
 
 ## Test Results Summary
 
-**Total Tests:** 32
-**Passing:** 2 ✅
+**Total Tests:** 33
+**Passing:** 4 ✅
 **Failing:** 2 ❌
-**Untested:** 28 ⏳
+**Untested:** 27 ⏳
 
 ---
 
@@ -128,11 +128,15 @@ R3 has NO NET1 label on pin
 ```
 **Notes:** Component added but label missing
 
-### ⏳ Test 13: Power Rails (GND, VCC)
-**Status:** UNTESTED (likely fails)
-**Last Tested:** Never
-**Predicted:** Will fail - same net sync issue as #344/#345
-**Notes:** Multi-drop nets, likely broken
+### ✅ Test 13: Component Rename Consistency
+**Status:** PASS
+**Last Tested:** 2025-10-26 23:29
+**Logs:**
+```
+✅ Single resistor circuit generated successfully!
+kicad-to-python successful: imported.py created
+```
+**Notes:** Basic generation and import works
 
 ### ⏳ Test 14: Incremental Growth
 **Status:** UNTESTED
@@ -226,6 +230,19 @@ R3 has NO NET1 label on pin
 **Predicted:** FAIL - combined operation
 **Notes:** Complex scenario
 
+### 🚧 Test 33: Power Symbol Replacement (CRITICAL)
+**Status:** UNTESTED (CRITICAL architectural issue)
+**Created:** 2025-10-26
+**Issue:** #346 - Power symbol vs hierarchical label semantics
+**Predicted:** Power symbols not preserved, new components get labels
+**Notes:**
+- Tests manual power symbol replacement in KiCad
+- Circuit-synth generates hierarchical labels for power (GND, VCC)
+- KiCad best practice is power symbols (global connection)
+- Hierarchical labels DON'T connect across sheets (broken for multi-sheet)
+- **This affects EVERY circuit with power nets**
+- Critical architectural decision needed
+
 ---
 
 ## Known Issues Blocking Tests
@@ -251,6 +268,18 @@ R3 has NO NET1 label on pin
 **Impact:** Adding components to existing nets doesn't create labels
 **Severity:** CRITICAL - breaks net expansion
 **Root Cause:** Same as #344 - net sync broken
+
+### #346: Power Symbol vs Hierarchical Label Semantics (CRITICAL ARCHITECTURAL)
+**Blocks:** Test 33, all multi-sheet designs
+**Impact:** Circuit-synth generates hierarchical labels for power nets (GND, VCC)
+**Severity:** CRITICAL - affects correctness of ALL circuits with power
+**Root Cause:** Architectural decision - no power symbol support
+**Key Issues:**
+- Hierarchical labels don't connect across sheets (multi-sheet broken)
+- KiCad best practice is power symbols for power distribution
+- User-added power symbols likely lost on regeneration
+- Every real circuit has power nets
+**Must fix before:** 1.0 release
 
 ### #331, #334, #335: PCB Generation Issues
 **Blocks:** All PCB-related functionality
