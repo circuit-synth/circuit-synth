@@ -50,3 +50,4 @@ bidirectional_test/main_generated/
 blank/
 tests/bidirectional_new/*/generated_*
 tests/bidirectional_new/*/test_artifacts/
+example_output/

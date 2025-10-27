@@ -70,7 +70,8 @@ class PCBGenerator:
         max_height = 0.0
         component_count = 0
 
-        for fp in pcb.footprints.values():
+        # kicad-pcb-api: FootprintCollection supports iteration directly
+        for fp in pcb.footprints:
             # Combine library and name for full footprint identifier
             fp_full_name = f"{fp.library}:{fp.name}"
 
@@ -296,7 +297,8 @@ class PCBGenerator:
 
                     # Reset component positions before retry
                     if retry_count > 0:
-                        for fp in pcb.footprints.values():
+                        # kicad-pcb-api: FootprintCollection supports iteration directly
+                        for fp in pcb.footprints:
                             fp.position = Point(50, 50)
 
                     # Debug: List components before placement
@@ -355,7 +357,8 @@ class PCBGenerator:
                         max_y = max(fp.position.y for fp in footprints) + margin
                         return min_x, min_y, max_x, max_y
 
-                    footprints = list(pcb.footprints.values())
+                    # kicad-pcb-api: FootprintCollection supports iteration directly
+                    footprints = list(pcb.footprints)
                     min_x, min_y, max_x, max_y = calculate_placement_bbox(
                         footprints, margin=10.0
                     )
