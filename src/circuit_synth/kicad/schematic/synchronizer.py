@@ -6,15 +6,19 @@ components for improved accuracy and performance.
 """
 
 import logging
+import math
+import uuid as uuid_module
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import kicad_sch_api as ksa
-from kicad_sch_api.core.types import Schematic, SchematicSymbol
+from kicad_sch_api.core.types import Label, LabelType, Point, Schematic, SchematicSymbol
 
+from ..core.symbol_cache import get_symbol_cache
 from .component_manager import ComponentManager
 from .connection_tracer import ConnectionTracer
+from .label_manager import LabelManager
 from .net_matcher import NetMatcher
 from .search_engine import SearchEngine, SearchQueryBuilder
 from .sync_strategies import (
@@ -37,6 +41,11 @@ class SyncReport:
     removed: List[str] = field(default_factory=list)
     preserved: List[str] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)
+
+    # Net/label tracking
+    labels_added: List[Tuple[str, str, str]] = field(default_factory=list)  # (component, pin, net)
+    labels_removed: List[Tuple[str, str, str]] = field(default_factory=list)  # (component, pin, net)
+    labels_updated: List[Tuple[str, str, str, str]] = field(default_factory=list)  # (component, pin, old_net, new_net)
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for compatibility."""
@@ -63,13 +72,13 @@ class APISynchronizer:
     and manipulation of schematic elements.
     """
 
-    def __init__(self, schematic_path: str, preserve_user_components: bool = True):
+    def __init__(self, schematic_path: str, preserve_user_components: bool = False):
         """
         Initialize the API synchronizer.
 
         Args:
             schematic_path: Path to the KiCad schematic file
-            preserve_user_components: Whether to keep components not in circuit
+            preserve_user_components: Whether to keep components not in circuit (default: False)
         """
         self.schematic_path = Path(schematic_path)
         self.preserve_user_components = preserve_user_components
@@ -82,6 +91,7 @@ class APISynchronizer:
 
         # Initialize API components
         self.component_manager = ComponentManager(self.schematic)
+        self.label_manager = LabelManager(self.schematic)
         self.search_engine = SearchEngine(self.schematic)
         self.connection_tracer = ConnectionTracer(self.schematic)
         self.net_matcher = NetMatcher(self.connection_tracer)
@@ -235,6 +245,11 @@ class APISynchronizer:
                 circuit_components, kicad_components, matches, report
             )
 
+            # Reconcile pin connections and labels
+            self._reconcile_pin_connections(
+                circuit_components, kicad_components, matches, report
+            )
+
             # Save changes
             self._save_schematic()
 
@@ -314,13 +329,41 @@ class APISynchronizer:
             for ref in removed_refs:
                 print(f"   ⚠️  Remove: {ref} (not in Python code)")
 
+        # Components that were preserved (exist in KiCad but not Python)
+        if report.preserved:
+            preserved_refs = sorted(report.preserved)
+            print(f"\n   ⚠️  PRESERVED (preserve_user_components=True):")
+            for ref in preserved_refs:
+                print(f"      {ref} (exists in KiCad but not in Python)")
+            print(f"   💡 Tip: Set preserve_user_components=False to remove these")
+
         if (
             not report.matched
             and not report.added
             and not report.modified
             and not removed_refs
+            and not report.preserved
         ):
             print("   (no changes)")
+
+        # Net/Label operations
+        if report.labels_added or report.labels_removed or report.labels_updated:
+            print("\nNet Labels:")
+
+            if report.labels_added:
+                print(f"   ➕ Added {len(report.labels_added)} label(s):")
+                for comp_ref, pin, net in sorted(report.labels_added):
+                    print(f"      {comp_ref} pin {pin} → {net}")
+
+            if report.labels_removed:
+                print(f"   ➖ Removed {len(report.labels_removed)} label(s):")
+                for comp_ref, pin, net in sorted(report.labels_removed):
+                    print(f"      {comp_ref} pin {pin} (was {net})")
+
+            if report.labels_updated:
+                print(f"   🔧 Updated {len(report.labels_updated)} label(s):")
+                for comp_ref, pin, old_net, new_net in sorted(report.labels_updated):
+                    print(f"      {comp_ref} pin {pin}: '{old_net}' → '{new_net}'")
 
         print("=" * 70 + "\n")
 
@@ -378,6 +421,31 @@ class APISynchronizer:
                 "original": comp,
             }
 
+        # IMPORTANT: Also extract pin connections from nets
+        # The component._pins may not be available after KiCad processing,
+        # but the circuit.nets still contain the original connection information
+        logger.debug(f"🔍 Circuit has nets attribute: {hasattr(circuit, 'nets')}")
+        if hasattr(circuit, "nets"):
+            nets_dict = circuit.nets if isinstance(circuit.nets, dict) else {n.name: n for n in circuit.nets}
+            logger.debug(f"Extracting pin info from {len(nets_dict)} nets")
+            for net_name, net in nets_dict.items():
+                if hasattr(net, "connections"):
+                    logger.debug(f"  Net '{net_name}' has {len(net.connections)} connections")
+                    for comp_ref, pin_num in net.connections:
+                        # Find the component in result
+                        comp_data = None
+                        for cid, cdata in result.items():
+                            if cdata["reference"] == comp_ref:
+                                comp_data = cdata
+                                break
+
+                        if comp_data:
+                            # Add pin connection
+                            if not comp_data["pins"]:
+                                comp_data["pins"] = {}
+                            comp_data["pins"][str(pin_num)] = net_name
+                            logger.debug(f"    Added: {comp_ref} pin {pin_num} -> {net_name}")
+
         return result
 
     def _extract_pin_info(self, component) -> Dict[str, str]:
@@ -388,6 +456,292 @@ class APISynchronizer:
                 if pin.net:
                     pins[pin_num] = pin.net.name
         return pins
+
+    def _get_pin_labels(self, kicad_component: SchematicSymbol) -> Dict[str, Label]:
+        """
+        Get existing labels at component pins.
+
+        Returns:
+            Dict mapping pin_number -> Label object for labels at this component's pins
+        """
+        pin_labels = {}
+
+        # Get symbol data to know pin positions
+        symbol_cache = get_symbol_cache()
+        symbol_def = symbol_cache.get_symbol(kicad_component.lib_id)
+        if not symbol_def or not hasattr(symbol_def, 'pins'):
+            logger.warning(f"No pin data for {kicad_component.reference} ({kicad_component.lib_id})")
+            return pin_labels
+
+        # For each pin, check if there's a label at that position
+        for pin in symbol_def.pins:
+            pin_pos = self._calculate_pin_position(kicad_component, pin)
+            if pin_pos:
+                # Find labels near this pin position (within 0.5mm tolerance)
+                for label in self.schematic.labels:
+                    distance = math.sqrt(
+                        (label.position.x - pin_pos.x) ** 2 +
+                        (label.position.y - pin_pos.y) ** 2
+                    )
+                    if distance < 0.5:  # 0.5mm tolerance
+                        pin_labels[str(pin.number)] = label
+                        break
+
+        return pin_labels
+
+    def _calculate_pin_position(self, component: SchematicSymbol, pin) -> Optional[Point]:
+        """
+        Calculate the absolute position of a pin on a component.
+
+        Args:
+            component: The schematic component
+            pin: The pin definition from symbol library
+
+        Returns:
+            Point with absolute pin position, or None if cannot calculate
+        """
+        try:
+            # Get pin position from library data
+            anchor_x = float(pin.x if hasattr(pin, 'x') else 0.0)
+            anchor_y = float(pin.y if hasattr(pin, 'y') else 0.0)
+
+            # Rotate by component rotation
+            r = math.radians(component.rotation)
+            local_x = anchor_x
+            local_y = -anchor_y  # KiCad Y axis is inverted
+            rx = (local_x * math.cos(r)) - (local_y * math.sin(r))
+            ry = (local_x * math.sin(r)) + (local_y * math.cos(r))
+
+            # Add component position
+            global_x = component.position.x + rx
+            global_y = component.position.y + ry
+
+            return Point(global_x, global_y)
+
+        except (AttributeError, TypeError) as e:
+            logger.warning(f"Could not calculate pin position: {e}")
+            return None
+
+    def _add_pin_label(
+        self,
+        kicad_component: SchematicSymbol,
+        pin_number: str,
+        net_name: str,
+        report: SyncReport
+    ) -> bool:
+        """
+        Add a label at a component pin.
+
+        Args:
+            kicad_component: The KiCad component
+            pin_number: Pin number to add label at
+            net_name: Net name for the label
+            report: Sync report to track the addition
+
+        Returns:
+            True if label added successfully
+        """
+        # Get symbol data
+        symbol_cache = get_symbol_cache()
+        symbol_def = symbol_cache.get_symbol(kicad_component.lib_id)
+        if not symbol_def or not hasattr(symbol_def, 'pins'):
+            logger.error(f"No pin data for {kicad_component.reference}")
+            return False
+
+        # Find the pin
+        pin = None
+        for p in symbol_def.pins:
+            if str(p.number) == str(pin_number):
+                pin = p
+                break
+
+        if not pin:
+            logger.warning(f"Pin {pin_number} not found on {kicad_component.reference}")
+            return False
+
+        # Calculate pin position
+        pin_pos = self._calculate_pin_position(kicad_component, pin)
+        if not pin_pos:
+            return False
+
+        # Calculate label angle (opposite to pin direction)
+        pin_angle = float(pin.angle if hasattr(pin, 'angle') else 0.0)
+        label_angle = (pin_angle + 180) % 360
+        global_angle = (label_angle + kicad_component.rotation) % 360
+
+        # Use kicad-sch-api's official add_label() method
+        # This correctly adds to collection and syncs to _data
+        try:
+            logger.debug(f"Adding label using schematic.add_label() API")
+
+            # Use schematic.add_label() with proper signature
+            label_uuid = self.schematic.add_label(
+                text=net_name,
+                position=(pin_pos.x, pin_pos.y),  # Tuple or Point both work
+                rotation=float(global_angle),
+                size=1.27  # Default KiCad label size
+            )
+
+            logger.debug(f"Label added: '{net_name}' at ({pin_pos.x:.2f}, {pin_pos.y:.2f}), UUID={label_uuid}")
+            logger.info(f"Added label '{net_name}' at {kicad_component.reference} pin {pin_number}")
+            report.labels_added.append((kicad_component.reference, pin_number, net_name))
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to add label: {e}", exc_info=True)
+            return False
+
+    def _remove_pin_label(
+        self,
+        label: Label,
+        component_ref: str,
+        pin_number: str,
+        report: SyncReport
+    ) -> bool:
+        """
+        Remove a label from the schematic.
+
+        Args:
+            label: Label to remove
+            component_ref: Component reference for tracking
+            pin_number: Pin number for tracking
+            report: Sync report to track the removal
+
+        Returns:
+            True if label removed successfully
+        """
+        try:
+            # Use schematic.remove_label() API which handles both collection and _data
+            removed = self.schematic.remove_label(label.uuid)
+
+            if removed:
+                logger.info(f"Removed label '{label.text}' from {component_ref} pin {pin_number}")
+                report.labels_removed.append((component_ref, pin_number, label.text))
+                return True
+            else:
+                logger.warning(f"Label {label.uuid} not found for removal")
+                return False
+
+        except Exception as e:
+            logger.error(f"Failed to remove label: {e}", exc_info=True)
+            return False
+
+    def _update_pin_label(
+        self,
+        label: Label,
+        new_net_name: str,
+        component_ref: str,
+        pin_number: str,
+        report: SyncReport
+    ) -> bool:
+        """
+        Update a label's net name.
+
+        Args:
+            label: Label to update
+            new_net_name: New net name
+            component_ref: Component reference for tracking
+            pin_number: Pin number for tracking
+            report: Sync report to track the update
+
+        Returns:
+            True if label updated successfully
+        """
+        old_name = label.text
+
+        try:
+            # Update label text directly - the collection wrapper handles sync
+            label.text = new_net_name
+
+            # Manually sync to _data since label property setter might not trigger it
+            self.schematic._sync_labels_to_data()
+            self.schematic._modified = True
+
+            logger.info(f"Updated label at {component_ref} pin {pin_number}: '{old_name}' -> '{new_net_name}'")
+            report.labels_updated.append((component_ref, pin_number, old_name, new_net_name))
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to update label: {e}", exc_info=True)
+            return False
+
+    def _reconcile_pin_connections(
+        self,
+        circuit_components: Dict,
+        kicad_components: Dict,
+        matches: Dict[str, str],
+        report: SyncReport,
+    ):
+        """
+        Reconcile pin connections for all matched components.
+
+        For each matched component:
+        1. Get Python pin→net mapping
+        2. Get KiCad pin→label mapping
+        3. Add missing labels (Python has net, KiCad doesn't)
+        4. Remove stale labels (KiCad has label, Python doesn't)
+        5. Update changed labels (net name changed)
+
+        Args:
+            circuit_components: Components from Python circuit
+            kicad_components: Components from KiCad schematic
+            matches: Matched circuit_id -> kicad_ref
+            report: Sync report to track changes
+        """
+        logger.info("🔌 Reconciling pin connections and labels")
+
+        for circuit_id, kicad_ref in matches.items():
+            circuit_comp = circuit_components[circuit_id]
+            kicad_comp = kicad_components[kicad_ref]
+
+            # Python says: these pins should connect to these nets
+            python_pins = circuit_comp.get("pins", {})  # {pin_num: net_name}
+
+            # KiCad says: these pins have these labels
+            kicad_labels = self._get_pin_labels(kicad_comp)  # {pin_num: Label}
+
+            logger.debug(f"  Component {kicad_ref}:")
+            logger.debug(f"    Python pins: {python_pins}")
+            logger.debug(f"    KiCad labels: {list(kicad_labels.keys())}")
+
+            # Reconcile each pin
+            all_pins = set(python_pins.keys()) | set(kicad_labels.keys())
+
+            for pin_num in all_pins:
+                python_net = python_pins.get(pin_num)
+                kicad_label = kicad_labels.get(pin_num)
+
+                if python_net and not kicad_label:
+                    # ADD label - Python has net but KiCad doesn't have label
+                    logger.debug(f"    ➕ ADD label: pin {pin_num} -> {python_net}")
+                    self._add_pin_label(kicad_comp, pin_num, python_net, report)
+
+                elif not python_net and kicad_label:
+                    # REMOVE label - KiCad has label but Python doesn't have net
+                    logger.debug(f"    ➖ REMOVE label: pin {pin_num} (was {kicad_label.text})")
+                    self._remove_pin_label(kicad_label, kicad_ref, pin_num, report)
+
+                elif python_net and kicad_label and python_net != kicad_label.text:
+                    # UPDATE label - Net name changed
+                    logger.debug(f"    🔧 UPDATE label: pin {pin_num} '{kicad_label.text}' -> '{python_net}'")
+                    self._update_pin_label(kicad_label, python_net, kicad_ref, pin_num, report)
+
+                else:
+                    # No change needed
+                    logger.debug(f"    ✅ KEEP label: pin {pin_num} -> {python_net}")
+
+        logger.info(f"✅ Pin reconciliation complete: "
+                   f"{len(report.labels_added)} added, "
+                   f"{len(report.labels_removed)} removed, "
+                   f"{len(report.labels_updated)} updated")
+
+        # INVESTIGATION: Check if labels survived
+        logger.info(f"🔍 POST-RECONCILIATION CHECK:")
+        logger.info(f"   - Labels in collection: {len(list(self.schematic.labels))}")
+        logger.info(f"   - Labels in _data: {len(self.schematic._data.get('labels', []))}")
+        if hasattr(self.schematic, 'labels'):
+            for i, label in enumerate(list(self.schematic.labels)[:3]):
+                logger.info(f"   - Label {i}: {label.text}")
 
     def _match_components(
         self, circuit_components: Dict, kicad_components: Dict
@@ -563,16 +917,50 @@ class APISynchronizer:
 
     def _save_schematic(self):
         """Save the modified schematic using kicad-sch-api's native save."""
-        logger.debug("Saving schematic")
+        logger.info("=" * 70)
+        logger.info("🔍 SAVE INVESTIGATION: Starting schematic save")
+        logger.info("=" * 70)
+
+        # Investigate what's in the schematic before save
+        logger.info(f"📊 Schematic state before save:")
+        logger.info(f"   - Schematic path: {self.schematic_path}")
+        logger.info(f"   - Has _data: {hasattr(self.schematic, '_data')}")
+
+        if hasattr(self.schematic, '_data'):
+            logger.info(f"   - Keys in _data: {list(self.schematic._data.keys())}")
+            logger.info(f"   - Labels in _data: {len(self.schematic._data.get('labels', []))}")
+            logger.info(f"   - Hierarchical labels in _data: {len(self.schematic._data.get('hierarchical_labels', []))}")
+
+            # Log actual label content
+            for i, label in enumerate(self.schematic._data.get('labels', [])[:5]):  # First 5
+                logger.info(f"   - Label {i}: {label}")
+
+        logger.info(f"   - Has labels collection: {hasattr(self.schematic, 'labels')}")
+        if hasattr(self.schematic, 'labels'):
+            try:
+                labels_list = list(self.schematic.labels)
+                logger.info(f"   - Labels in collection: {len(labels_list)}")
+                for i, label in enumerate(labels_list[:5]):  # First 5
+                    logger.info(f"   - Collection label {i}: text={label.text}, type={label.label_type}, pos={label.position}")
+            except Exception as e:
+                logger.error(f"   - Error accessing labels collection: {e}")
 
         # WORKAROUND: kicad-sch-api bug where WireCollection doesn't sync to _data["wires"]
         # Manually sync wires from collection to _data before saving
         self._sync_wires_to_data()
 
-        # Use kicad-sch-api's built-in save method which handles all S-expression formatting
-        # and lib_symbols automatically. This preserves format and includes wires/labels.
-        self.schematic.save(str(self.schematic_path), preserve_format=True)
-        logger.info(f"✅ Schematic saved successfully")
+        # Labels are now synced automatically via schematic.add_label() API
+        # which calls _sync_labels_to_data() internally, so no manual sync needed
+
+        logger.info(f"💾 Calling schematic.save(preserve_format=False)")
+        logger.info(f"   - Save path: {self.schematic_path}")
+        logger.info(f"   - Using preserve_format=False to force full rewrite from _data")
+
+        # Using preserve_format=False forces full rewrite from _data dictionary
+        self.schematic.save(str(self.schematic_path), preserve_format=False)
+
+        logger.info(f"✅ Save completed")
+        logger.info("=" * 70)
 
     def _sync_wires_to_data(self):
         """
