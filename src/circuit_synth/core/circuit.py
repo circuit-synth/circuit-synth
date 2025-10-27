@@ -613,6 +613,7 @@ class Circuit:
         draw_bounding_boxes: bool = False,
         generate_ratsnest: bool = True,
         update_source_refs: Optional[bool] = None,
+        preserve_user_components: bool = True,
     ) -> Dict[str, Any]:
         """
         Generate a complete KiCad project (schematic + PCB) from this circuit.
@@ -720,6 +721,7 @@ class Circuit:
                 force_regenerate=force_regenerate,
                 draw_bounding_boxes=draw_bounding_boxes,
                 generate_ratsnest=generate_ratsnest,
+                preserve_user_components=preserve_user_components,
             )
 
             if result.get("success", True):  # Default to success if not specified
