@@ -105,16 +105,20 @@ NO physical wires (labels establish connection)
 **Notes:** Fresh generation with nets works!
 
 ### ❌ Test 11: Add Net to Existing Unconnected Components
-**Status:** FAIL (CRITICAL)
-**Last Tested:** 2025-10-26 22:53
-**Issue:** #344 - Bidirectional sync doesn't add hierarchical labels
+**Status:** FAIL (CRITICAL) - Partially Fixed
+**Last Tested:** 2025-10-26 23:54 (after main merge)
+**Issue:** #344 - Bidirectional sync doesn't add hierarchical labels (REOPENED)
 **Logs:**
 ```
-Sync summary: Update: R1, R2 (changed in Python)
-NO mention of nets or labels
-Opening KiCad: NO hierarchical labels appear
+Sync summary:
+   Net Labels: ➕ Added 2 label(s): R1 pin 1 → net1, R2 pin 1 → net1
+   Error: 'LabelElement' object has no attribute 'label_type'
+
+Result: NO hierarchical labels appear in KiCad
 ```
-**Notes:** Sync doesn't track net changes
+**Root Cause:** Sync creates regular labels instead of hierarchical labels on pins
+**Fix Needed:** Reuse existing hierarchical label placement code from fresh generation
+**Progress:** Detection works ✅, Execution broken ❌
 
 ### ❌ Test 12: Add Component to Existing Net
 **Status:** FAIL (CRITICAL)
@@ -273,11 +277,17 @@ kicad-to-python successful: imported.py created
 **Impact:** Need canonical circuit analysis
 **Severity:** High
 
-### #344: Bidirectional Sync Doesn't Add Hierarchical Labels (CRITICAL)
+### #344: Bidirectional Sync Doesn't Add Hierarchical Labels (CRITICAL) - REOPENED
 **Blocks:** Tests 11, 13, 24-32
-**Impact:** Adding nets to existing components doesn't create labels
+**Impact:** Adding nets to existing components doesn't create hierarchical labels
 **Severity:** CRITICAL - breaks iterative workflow
-**Root Cause:** Sync doesn't track net changes
+**Status:** Partially fixed - detection works, execution broken
+**Root Cause:** Sync creates regular labels instead of hierarchical labels on pins
+**Error:** `'LabelElement' object has no attribute 'label_type'`
+**Fix:** Reuse existing hierarchical label placement code from fresh generation
+**Progress:**
+- ✅ Detection: Now identifies label additions correctly
+- ❌ Execution: Labels not written to schematic (wrong type/placement)
 
 ### #345: New Component on Existing Net Doesn't Get Labels (CRITICAL)
 **Blocks:** Tests 12, 13, 24-32
