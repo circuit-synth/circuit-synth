@@ -297,6 +297,16 @@ kicad-to-python successful: imported.py created
 - Every real circuit has power nets
 **Must fix before:** 1.0 release
 
+### #347: LLM-friendly API Syntax Guide Needed
+**Blocks:** None (documentation issue)
+**Impact:** LLMs make frequent API errors (wrong classes, methods, patterns)
+**Severity:** Medium - Quality of life for AI-assisted workflows
+**Examples Found During Testing:**
+- Non-existent shorthand classes (C, IC, R, LED, Power, Ground)
+- Non-existent methods (net.connect(), circuit.add_components())
+- Position specification confusion (when to use `at=` parameter)
+**Solution:** Create `/llm.txt` on circuit-synth website with syntax reference
+
 ### #331, #334, #335: PCB Generation Issues
 **Blocks:** All PCB-related functionality
 **Impact:** PCB sync completely broken
