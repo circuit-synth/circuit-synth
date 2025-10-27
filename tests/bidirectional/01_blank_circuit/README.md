@@ -1,4 +1,4 @@
-# Test 01: Blank Circuit
+# Test 01: Blank Python → Blank KiCad
 
 ## What This Tests
 
@@ -13,28 +13,27 @@ Generation of a blank circuit (no components, no nets) from Python to KiCad.
 ## What Should Work
 
 1. Python circuit with no components generates KiCad project
-2. All required KiCad files are created (.kicad_pro, .kicad_sch, .kicad_pcb, .net, .json)
-3. JSON metadata has correct circuit name (not hardcoded "main")
+2. All required KiCad files are created (.kicad_pro, .kicad_sch, .kicad_pcb)
+3. Schematic is empty (no components)
 
 ## Manual Test Instructions
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional_new/01_test_blank
+cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/01_blank_circuit
 
-# Run automated test
-uv run pytest test_blank.py -v -s
+# Generate KiCad from blank Python
+uv run blank.py
 
-# The test will:
-# 1. Create a blank.py circuit file
-# 2. Generate KiCad project
-# 3. Verify all files exist
-# 4. Check JSON has correct name
+# Check files created
+ls -la blank/
+
+# Open in KiCad - should be empty schematic
+open blank/blank.kicad_pro
 ```
 
 ## Expected Result
 
-```
-✅ Blank circuit works
-```
-
-All KiCad files created in `blank/` with correct naming.
+- ✅ KiCad project generated
+- ✅ Schematic opens successfully  
+- ✅ Schematic is empty (no components)
+- ✅ No errors during generation

@@ -1,46 +1,47 @@
-# Test 02: Generate KiCad from Python
+# Test 03: Add Resistor in Python → Update KiCad
 
 ## What This Tests
 
-Python → KiCad generation with a single component (resistor).
-
-Tests ONLY generation direction, not import or round-trip.
+Adding a resistor to Python code and regenerating to update existing KiCad project.
 
 ## When This Situation Happens
 
-- User writes Python circuit and generates KiCad project for the first time
-- Adding first component to a new design
-- Basic component generation workflow
+- User has existing KiCad project (maybe blank or with other components)
+- Adds new component (R1) in Python code
+- Regenerates KiCad to add new component to schematic
 
 ## What Should Work
 
-1. Python circuit with single resistor generates KiCad project
-2. Component appears in schematic with correct reference (R1)
-3. Component has correct value (10k)
-4. All KiCad files created with valid syntax
+1. Start with blank or existing circuit in Python
+2. Add R1 resistor to Python code
+3. Generate/regenerate KiCad
+4. R1 appears in KiCad schematic
+5. Other components preserved (if any)
 
 ## Manual Test Instructions
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional_new/02_test_generate
+cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/03_python_to_kicad
 
-# Run fixture manually to see generation
-uv run python ../fixtures/single_resistor.py
+# Step 1: Look at Python code - has R1 defined
+cat single_resistor.py
 
-# Check generated files
-ls -la single_resistor/
-cat single_resistor/single_resistor.json
+# Step 2: Generate KiCad (or regenerate if exists)
+uv run single_resistor.py
 
-# Run automated test
-uv run pytest test_generate.py -v -s
+# Step 3: Open in KiCad
+open single_resistor/single_resistor.kicad_pro
+
+# Verify:
+# - R1 resistor visible on schematic
+# - Value is 10k
+# - Footprint is 0603
 ```
 
 ## Expected Result
 
-```
-✅ Generation completed (exit code: 0)
-✅ KiCad project found
-✅ Component R1 found in schematic
-```
-
-KiCad project in `generated/02_generate/single_resistor/` with R1 component visible.
+- ✅ KiCad project generated/updated
+- ✅ R1 component added to schematic
+- ✅ Value: 10k
+- ✅ Footprint: R_0603_1608Metric
+- ✅ Existing components preserved (if any)

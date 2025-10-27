@@ -1,8 +1,8 @@
 (kicad_sch
 	(version 20250114)
-	(generator "eeschema")
-	(generator_version "9.0")
-	(uuid "8d885ec1-ef84-45a1-8fc7-71941dc0464b")
+	(generator "circuit_synth")
+	(generator_version "0.8.36")
+	(uuid "9980990e-9d60-4586-8e99-cd1ffc9652d5")
 	(paper "A4")
 	(lib_symbols
 		(symbol "Device:R"
@@ -132,16 +132,16 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 26.67 30.48 0)
+		(at 30.48 35.56 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "5d60a583-97f4-44f0-8377-e5daac146c7d")
+		(uuid "4b33fb45-d719-4a2f-808d-eee4b9ee0342")
 		(property "Reference" "R1"
-			(at 29.21 29.2099 0)
+			(at 33.02 34.2899 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -150,7 +150,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 29.21 31.7499 0)
+			(at 33.02 36.8299 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -159,7 +159,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 24.892 30.48 90)
+			(at 28.702 35.56 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -167,8 +167,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
-			(at 26.67 30.48 0)
+		(property "hierarchy_path" "/9980990e-9d60-4586-8e99-cd1ffc9652d5"
+			(at 33.02 40.6399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -176,8 +176,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Resistor"
-			(at 26.67 30.48 0)
+		(property "project_name" "single_resistor"
+			(at 33.02 40.6399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -185,20 +185,43 @@
 				(hide yes)
 			)
 		)
-		(pin "1"
-			(uuid "90ecc37d-fbde-49bc-86f4-cf2a5a9436bd")
-		)
-		(pin "2"
-			(uuid "2dbfa160-5d71-43ce-9b27-2022dcea603f")
+		(property "root_uuid" "9980990e-9d60-4586-8e99-cd1ffc9652d5"
+			(at 33.02 40.6399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
 		)
 		(instances
-			(project "02_kicad_ref"
-				(path "/8d885ec1-ef84-45a1-8fc7-71941dc0464b"
+			(project "single_resistor"
+				(path "/9980990e-9d60-4586-8e99-cd1ffc9652d5"
 					(reference "R1")
 					(unit 1)
 				)
 			)
 		)
+	)
+	(text_box "Circuit with a single 10kΩ resistor."
+		(exclude_from_sim no)
+		(at 184 110 0.0000)
+		(size 80 30)
+		(margins 1 1 1 1)
+		(stroke
+			(width 0.0000)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+			)
+			(justify left top)
+		)
+		(uuid "27010573-930e-468b-947e-bdfd58388f34")
 	)
 	(sheet_instances
 		(path "/"

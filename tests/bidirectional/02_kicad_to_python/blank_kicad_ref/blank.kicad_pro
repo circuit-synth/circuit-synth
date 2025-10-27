@@ -1,0 +1,20 @@
+{
+  "board": {
+    "design_settings": {
+      "defaults": {}
+    }
+  },
+  "boards": [],
+  "cvpcb": {},
+  "erc": {},
+  "libraries": {
+    "pinned_footprint_libs": [],
+    "pinned_symbol_libs": []
+  },
+  "meta": {
+    "filename": "blank.kicad_pro",
+    "version": 1
+  },
+  "schematic": {},
+  "sheets": []
+}
