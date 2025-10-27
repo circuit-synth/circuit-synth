@@ -16,19 +16,44 @@ Validates that changing a component's position in Python code correctly updates 
 - Rotation angle updated correctly to 45 degrees
 
 ## Manual Test Instructions
-```bash
-cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional_new/15_test_move_component
 
-# Run automated test
-uv run pytest test_move_component.py -v -s
+```bash
+cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/15_move_component
+
+# Step 1: Generate initial circuit with positioned resistors
+uv run positioned_resistor.py
+open positioned_resistor/positioned_resistor.kicad_pro
+# Verify: R1 at (100.0, 100.0, 0°), R2 at (150.0, 100.0, 90°)
+
+# Step 2: Import to Python
+uv run kicad-to-python positioned_resistor -o imported.py
+
+# Step 3: Modify R1 position in imported.py
+# Change R1's at=(100.0, 100.0, 0) to at=(200.0, 150.0, 45)
+# Edit the file to update the position
+
+# Step 4: Regenerate KiCad from modified Python
+uv run imported.py
+
+# Step 5: Open regenerated KiCad project
+open positioned_resistor/positioned_resistor.kicad_pro
+
+# Step 6: Verify changes
+#   - R1 now at (200.0, 150.0, 45°) - NEW position
+#   - R2 still at (150.0, 100.0, 90°) - UNCHANGED
+#   - Both components have correct values and footprints
 ```
 
 ## Expected Result
-```
-✅ Test 15: Move Component PASSED
-   - Original position: (100.0, 100.0, 0°)
-   - Position modified to: (200.0, 150.0, 45°)
-   - KiCad project regenerated
-   - Component appears at new position
-   - Component has correct rotation angle
-```
+
+- ✅ Initial KiCad project has R1 at (100.0, 100.0, 0°)
+- ✅ Python import successful (imported.py created)
+- ✅ Modified position in Python: R1 at=(200.0, 150.0, 45)
+- ✅ Regenerated KiCad shows R1 at new position (200.0, 150.0, 45°)
+- ✅ R1 rotation angle correctly updated to 45 degrees
+- ✅ R2 position unchanged (150.0, 100.0, 90°)
+- ✅ Component properties (value, footprint) preserved
+
+## Why This Is Important
+
+Developers need to programmatically control component placement. Modifying position coordinates in Python should reliably update the KiCad schematic layout without affecting other component properties.
