@@ -160,7 +160,7 @@ class KiCadParser:
 
         try:
             # Step 1: Generate real KiCad netlist
-            logger.info("🔍 HIERARCHICAL DEBUG: Step 1 - Generating KiCad netlist")
+            logger.debug("🔍 HIERARCHICAL DEBUG: Step 1 - Generating KiCad netlist")
             netlist_path = self.generate_netlist()
             if not netlist_path:
                 logger.warning(
@@ -202,7 +202,7 @@ class KiCadParser:
                 logger.info("  - No hierarchical structure detected")
 
             # Step 3.5: Build hierarchical tree for import relationships
-            logger.info("🔍 HIERARCHICAL DEBUG: Step 3.5 - Building hierarchical tree")
+            logger.debug("🔍 HIERARCHICAL DEBUG: Step 3.5 - Building hierarchical tree")
             hierarchical_tree = self._build_hierarchical_tree(hierarchical_info)
 
             logger.info(f"🔍 HIERARCHICAL DEBUG: Hierarchical tree results:")
@@ -216,7 +216,7 @@ class KiCadParser:
             circuits = {}
 
             if hierarchical_info:
-                logger.info("🔍 HIERARCHICAL DEBUG: Using hierarchical approach")
+                logger.debug("🔍 HIERARCHICAL DEBUG: Using hierarchical approach")
                 # Distribute components across hierarchical sheets based on schematic analysis
                 for sheet_name, sheet_components in hierarchical_info.items():
                     logger.info(
@@ -265,7 +265,7 @@ class KiCadParser:
                         f"🔍 HIERARCHICAL DEBUG: Created {sheet_name}: {len(sheet_actual_components)} components, {len(sheet_nets)} nets"
                     )
             else:
-                logger.info("🔍 HIERARCHICAL DEBUG: Using flat circuit approach")
+                logger.debug("🔍 HIERARCHICAL DEBUG: Using flat circuit approach")
                 # Single flat circuit - use project name instead of hardcoded "main"
                 circuit = Circuit(
                     name=self.kicad_project.stem,
@@ -299,7 +299,7 @@ class KiCadParser:
 
     def _analyze_hierarchical_structure(self) -> Dict[str, List[Component]]:
         """Analyze schematic files to understand hierarchical structure"""
-        logger.info("🔍 HIERARCHICAL DEBUG: Starting _analyze_hierarchical_structure")
+        logger.debug("🔍 HIERARCHICAL DEBUG: Starting _analyze_hierarchical_structure")
         hierarchical_info = {}
 
         # Find all schematic files
@@ -358,7 +358,7 @@ class KiCadParser:
         self, hierarchical_info: Dict[str, List[Component]]
     ) -> Dict[str, List[str]]:
         """Build a tree structure showing parent-child relationships between sheets"""
-        logger.info("🔍 HIERARCHICAL DEBUG: Building hierarchical tree")
+        logger.debug("🔍 HIERARCHICAL DEBUG: Building hierarchical tree")
         hierarchical_tree = {}
 
         # Find all schematic files and their sheet instances
