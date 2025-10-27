@@ -124,3 +124,120 @@ class ConnectionMatchStrategy(SyncStrategy):
                     break
 
         return matches
+
+
+class PositionRenameStrategy(SyncStrategy):
+    """
+    Match components by position to detect renames.
+
+    This strategy identifies when a component has been renamed by matching on
+    position + properties but different reference. It runs before ValueFootprintStrategy
+    to prevent incorrectly matching renamed components by value/footprint alone.
+
+    Logic: If a KiCad component matches a Python component on:
+    - Position (within tolerance)
+    - Symbol (lib_id)
+    - Value
+    - Footprint
+    But has DIFFERENT reference → This is a RENAME
+    """
+
+    def __init__(self, search_engine: SearchEngine):
+        self.search_engine = search_engine
+        self.position_tolerance = 2.54  # mm (one KiCad grid unit)
+
+    def match_components(
+        self, circuit_components: Dict[str, Dict], kicad_components: Dict[str, Any]
+    ) -> Dict[str, str]:
+        """
+        Match components by position to detect renames.
+
+        Args:
+            circuit_components: Dict mapping circuit_id -> component dict with keys:
+                - reference: component reference (e.g., "R2")
+                - position: Point with x, y coordinates
+                - symbol: lib_id (e.g., "Device:R")
+                - value: component value (e.g., "10k")
+                - footprint: footprint string (e.g., "R_0603_1608Metric")
+            kicad_components: Dict mapping reference -> SchematicSymbol
+
+        Returns:
+            Dict mapping circuit_id -> kicad_reference for matched components
+        """
+        matches = {}
+        used_refs = set()
+
+        for circuit_id, circuit_comp in circuit_components.items():
+            circuit_ref = circuit_comp["reference"]
+
+            # Skip if already matched by reference
+            # (ReferenceMatchStrategy already handled exact matches)
+            if circuit_ref in kicad_components:
+                continue
+
+            # Get position from circuit component
+            circuit_pos = circuit_comp.get("position")
+            if not circuit_pos:
+                continue
+
+            # Search for KiCad components at same position with matching properties
+            for kicad_ref, kicad_comp in kicad_components.items():
+                if kicad_ref in used_refs:
+                    continue
+
+                # Check position match (within tolerance)
+                if not self._positions_match(circuit_pos, kicad_comp.position):
+                    continue
+
+                # Check properties match (symbol, value, footprint)
+                if not self._properties_match(circuit_comp, kicad_comp):
+                    continue
+
+                # Found match at same position with same properties but different reference
+                # This is a RENAME!
+                matches[circuit_id] = kicad_ref
+                used_refs.add(kicad_ref)
+                break
+
+        return matches
+
+    def _positions_match(self, pos1: Any, pos2: Any) -> bool:
+        """
+        Check if positions match within tolerance.
+
+        Args:
+            pos1: Position from circuit component (Point object)
+            pos2: Position from KiCad component (Point object)
+
+        Returns:
+            True if positions are within tolerance, False otherwise
+        """
+        dx = abs(pos1.x - pos2.x)
+        dy = abs(pos1.y - pos2.y)
+        return dx < self.position_tolerance and dy < self.position_tolerance
+
+    def _properties_match(self, circuit_comp: Dict, kicad_comp: Any) -> bool:
+        """
+        Check if electrical properties match.
+
+        Args:
+            circuit_comp: Circuit component dict
+            kicad_comp: KiCad SchematicSymbol
+
+        Returns:
+            True if properties match, False otherwise
+        """
+        # Compare symbol (lib_id)
+        if circuit_comp.get("symbol") != kicad_comp.lib_id:
+            return False
+
+        # Compare value
+        if circuit_comp.get("value") != kicad_comp.value:
+            return False
+
+        # Compare footprint (if present)
+        circuit_footprint = circuit_comp.get("footprint")
+        if circuit_footprint and circuit_footprint != kicad_comp.footprint:
+            return False
+
+        return True
