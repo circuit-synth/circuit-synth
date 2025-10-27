@@ -478,10 +478,12 @@ class APISynchronizer:
 
         for pin in symbol_def.pins:
             # Use canonical pin position calculation
+            # SchematicPin uses 'position' (Point) and 'rotation' instead of x/y/orientation
+            pin_position = pin.position if hasattr(pin, 'position') else Point(0, 0)
             pin_dict = {
-                "x": float(pin.x if hasattr(pin, 'x') else 0.0),
-                "y": float(pin.y if hasattr(pin, 'y') else 0.0),
-                "orientation": float(pin.orientation if hasattr(pin, 'orientation') else 0.0),
+                "x": float(pin_position.x),
+                "y": float(pin_position.y),
+                "orientation": float(pin.rotation if hasattr(pin, 'rotation') else 0.0),
             }
             pin_pos, _ = GeometryUtils.calculate_pin_label_position_from_dict(
                 pin_dict=pin_dict,
@@ -542,10 +544,12 @@ class APISynchronizer:
         # This ensures labels are positioned identically to fresh generation
         from .geometry_utils import GeometryUtils
 
+        # SchematicPin uses 'position' (Point) and 'rotation' instead of x/y/orientation
+        pin_position = pin.position if hasattr(pin, 'position') else Point(0, 0)
         pin_dict = {
-            "x": float(pin.x if hasattr(pin, 'x') else 0.0),
-            "y": float(pin.y if hasattr(pin, 'y') else 0.0),
-            "orientation": float(pin.orientation if hasattr(pin, 'orientation') else 0.0),
+            "x": float(pin_position.x),
+            "y": float(pin_position.y),
+            "orientation": float(pin.rotation if hasattr(pin, 'rotation') else 0.0),
         }
 
         label_pos, label_angle = GeometryUtils.calculate_pin_label_position_from_dict(
@@ -560,11 +564,11 @@ class APISynchronizer:
             logger.debug(f"Adding hierarchical label using schematic.add_hierarchical_label() API")
 
             # Use schematic.add_hierarchical_label() with proper signature
-            # Note: hierarchical_label uses 'shape' instead of 'rotation' and 'size'
             label_uuid = self.schematic.add_hierarchical_label(
                 text=net_name,
-                position=(label_pos.x, label_pos.y),  # Tuple or Point both work
-                shape="bidirectional"  # Default to bidirectional for nets
+                position=(label_pos.x, label_pos.y),
+                shape="bidirectional",  # Default to bidirectional for nets
+                rotation=label_angle,  # CRITICAL: Must pass rotation for correct orientation!
             )
 
             logger.debug(f"Label added: '{net_name}' at ({label_pos.x:.2f}, {label_pos.y:.2f}), angle={label_angle:.0f}, UUID={label_uuid}")
