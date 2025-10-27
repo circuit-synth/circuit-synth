@@ -35,14 +35,14 @@ def power_rails():
     vcc = Net(name="VCC")
 
     # Connect all components to GND
-    gnd.connect(r1[2])
-    gnd.connect(r2[2])
-    gnd.connect(r3[2])
+    gnd += r1[2]
+    gnd += r2[2]
+    gnd += r3[2]
 
     # Connect all components to VCC
-    vcc.connect(r1[1])
-    vcc.connect(r2[1])
-    vcc.connect(r3[1])
+    vcc += r1[1]
+    vcc += r2[1]
+    vcc += r3[1]
 
 
 if __name__ == "__main__":

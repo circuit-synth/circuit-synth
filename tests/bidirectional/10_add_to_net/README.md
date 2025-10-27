@@ -30,8 +30,8 @@ open two_resistors_on_net/two_resistors_on_net.kicad_pro
 # Add after R2 definition:
 #   r3 = Component(symbol="Device:R", ref="R3", value="2.2k",
 #                  footprint="Resistor_SMD:R_0603_1608Metric")
-# Add after net1.connect(r2[1]):
-#   net1.connect(r3[1])
+# Add after net1 += r2[1]:
+#   net1 += r3[1]
 
 # Step 3: Regenerate KiCad with R3 added to NET1
 uv run two_resistors_on_net.py

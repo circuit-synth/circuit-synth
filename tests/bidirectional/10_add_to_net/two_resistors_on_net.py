@@ -26,8 +26,8 @@ def two_resistors_on_net():
 
     # Connect R1 and R2 via NET1
     net1 = Net(name="NET1")
-    net1.connect(r1[1])
-    net1.connect(r2[1])
+    net1 += r1[1]
+    net1 += r2[1]
 
 
 if __name__ == "__main__":
