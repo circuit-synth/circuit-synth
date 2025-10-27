@@ -28,17 +28,15 @@ open positioned_resistor/positioned_resistor.kicad_pro
 # Step 2: Import to Python
 uv run kicad-to-python positioned_resistor imported.py
 
-# Step 3: Modify R1 position in imported.py
-# Change R1's at=(100.0, 100.0, 0) to at=(200.0, 150.0, 45)
-# Edit the file to update the position
+# Step 3: Edit imported.py to modify R1 position
+# Change: at=(100.0, 100.0, 0) → at=(200.0, 150.0, 45)
 
 # Step 4: Regenerate KiCad from modified Python
 uv run imported.py
 
 # Step 5: Open regenerated KiCad project
 open positioned_resistor/positioned_resistor.kicad_pro
-
-# Step 6: Verify changes
+# Verify:
 #   - R1 now at (200.0, 150.0, 45°) - NEW position
 #   - R2 still at (150.0, 100.0, 90°) - UNCHANGED
 #   - Both components have correct values and footprints

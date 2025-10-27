@@ -24,27 +24,17 @@ Validates power rail distribution, the most fundamental and common circuit patte
 ```bash
 cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/11_power_rails
 
-# Step 1: Create Python circuit with power rails
-# Create power_rails.py with multiple components sharing GND and VCC
-# Example circuit should have:
-#   - 3 resistors (R1, R2, R3)
-#   - All connected to common GND rail
-#   - All connected to common VCC rail
-
-# Step 2: Generate KiCad project from Python
+# Step 1: Generate KiCad project from Python (3 resistors with GND/VCC)
 uv run power_rails.py
-
-# Step 3: Open generated KiCad project
 open power_rails/power_rails.kicad_pro
-
-# Step 4: Verify power rail connections in schematic
+# Verify in KiCad schematic:
 #   - All three resistors (R1, R2, R3) present
 #   - GND power symbol visible and connected to all components
 #   - VCC power symbol visible and connected to all components
 #   - Net names show GND and VCC rails properly
 
-# Step 5: Verify netlist shows power connections
-# Check that netlist file contains:
+# Step 2: Verify netlist shows power connections
+# Check netlist file contains:
 #   - GND net with multiple component pins
 #   - VCC net with multiple component pins
 #   - All expected connections present

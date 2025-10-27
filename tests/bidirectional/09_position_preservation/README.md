@@ -37,19 +37,16 @@ open single_resistor/single_resistor.kicad_pro
 uv run kicad-to-python single_resistor imported_with_moved_r1.py
 
 # Step 4: Verify imported Python captured the manual position
-# Open imported_with_moved_r1.py
-# Check that R1 has position coordinates matching the manual edit
+# Open imported_with_moved_r1.py and verify R1 has position coordinates
 
-# Step 5: Add R2 component to the imported Python
-# Edit imported_with_moved_r1.py to add:
+# Step 5: Edit imported_with_moved_r1.py to add R2
+# Add after R1 definition:
 #   r2 = Component(symbol="Device:R", ref="R2", value="4.7k",
 #                  footprint="Resistor_SMD:R_0603_1608Metric")
 
 # Step 6: Regenerate KiCad from modified Python
 uv run imported_with_moved_r1.py
-
-# Step 7: Open regenerated KiCad project
-# Open the KiCad project generated from imported_with_moved_r1.py
+open imported_with_moved_r1/imported_with_moved_r1.kicad_pro
 # Verify:
 #   - R1 is still at the manually-positioned location (not default)
 #   - R2 appears at a new auto-generated position

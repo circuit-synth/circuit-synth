@@ -24,68 +24,38 @@ Validates circuit stability through realistic development workflow - multiple cy
 ```bash
 cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/14_incremental_growth
 
-# Step 1: Create initial circuit with two resistors
-cat > base_circuit.py << 'EOF'
-#!/usr/bin/env python3
-from circuit_synth import circuit, Component
-
-@circuit(name="growing_circuit")
-def growing_circuit():
-    """Initial circuit with two resistors."""
-    r1 = Component(
-        symbol="Device:R",
-        ref="R1",
-        value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric"
-    )
-    r2 = Component(
-        symbol="Device:R",
-        ref="R2",
-        value="4.7k",
-        footprint="Resistor_SMD:R_0603_1608Metric"
-    )
-
-if __name__ == "__main__":
-    circuit_obj = growing_circuit()
-    circuit_obj.generate_kicad_project(
-        project_name="growing_circuit",
-        placement_algorithm="simple",
-        generate_pcb=True,
-    )
-    print("✅ Circuit generated successfully!")
-EOF
-
-# Step 2: Generate initial KiCad project
+# Step 1: Generate initial KiCad project (R1, R2)
 uv run base_circuit.py
 open growing_circuit/growing_circuit.kicad_pro
 # Verify: schematic has R1 and R2 only
 
-# Step 3: Import to Python and add capacitor (Round-trip 1)
+# Step 2: Round-trip 1 - Import to Python and add capacitor
 uv run kicad-to-python growing_circuit stage1.py
-# Manually edit stage1.py to add capacitor C1
+# Edit stage1.py to add capacitor C1
 
-# Step 4: Regenerate and verify
+# Step 3: Regenerate and verify capacitor added
 uv run stage1.py
-# Open growing_circuit/growing_circuit.kicad_pro
+open growing_circuit/growing_circuit.kicad_pro
 # Verify: schematic has R1, R2, and C1
 # Check: R1 and R2 positions preserved
 
-# Step 5: Import again and add resistor (Round-trip 2)
+# Step 4: Round-trip 2 - Import again and add resistor
 uv run kicad-to-python growing_circuit stage2.py
-# Manually edit stage2.py to add R3
+# Edit stage2.py to add R3
 
-# Step 6: Regenerate and verify
+# Step 5: Regenerate and verify resistor added
 uv run stage2.py
+open growing_circuit/growing_circuit.kicad_pro
 # Verify: schematic has R1, R2, C1, and R3
 # Check: All previous component positions preserved
 
-# Step 7: Import and modify value (Round-trip 3)
+# Step 6: Round-trip 3 - Import and modify value
 uv run kicad-to-python growing_circuit stage3.py
-# Manually edit stage3.py to change R1 value to "100k"
+# Edit stage3.py to change R1 value="10k" → value="100k"
 
-# Step 8: Final regeneration and verification
+# Step 7: Final regeneration and verification
 uv run stage3.py
-# Open growing_circuit/growing_circuit.kicad_pro
+open growing_circuit/growing_circuit.kicad_pro
 # Verify: All 4 components present
 # Check: R1 value = "100k", positions preserved
 ```

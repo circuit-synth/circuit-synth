@@ -27,36 +27,30 @@ cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/13_rename_compo
 
 # Step 1: Generate initial KiCad project with R1
 uv run single_resistor.py
-# Creates: single_resistor/single_resistor.kicad_pro with R1
-
-# Step 2: Open KiCad and rename R1 to R_PULLUP
 open single_resistor/single_resistor.kicad_pro
-# In KiCad schematic editor:
-#   - Select R1 component
-#   - Edit properties, change reference from "R1" to "R_PULLUP"
-#   - Save schematic
+# Verify: schematic shows R1
+
+# Step 2: In KiCad, rename R1 to R_PULLUP
+# - Select R1 component
+# - Edit properties, change reference from "R1" to "R_PULLUP"
+# - Save schematic
 
 # Step 3: Import modified KiCad back to Python
 uv run kicad-to-python single_resistor imported.py
+# Verify: imported.py contains ref="R_PULLUP"
 
-# Step 4: Verify imported.py contains R_PULLUP
-# Open imported.py - should show component with ref="R_PULLUP"
+# Step 4: Edit imported.py to add R2 component
+# Add a second resistor and connect to R_PULLUP
 
-# Step 5: Add connections using renamed reference
-# Edit imported.py to add another component and connection:
-#   - Add R2 component
-#   - Connect R_PULLUP to R2
-# The code should reference R_PULLUP (not R1)
-
-# Step 6: Regenerate KiCad from modified Python
+# Step 5: Regenerate KiCad from modified Python
 uv run imported.py
 
-# Step 7: Open regenerated KiCad project
+# Step 6: Open regenerated KiCad project
+open single_resistor/single_resistor.kicad_pro
 # Verify:
 #   - Component still named R_PULLUP (not reverted to R1)
 #   - New component R2 present
 #   - Connection between R_PULLUP and R2 exists
-#   - Naming consistency maintained through cycle
 ```
 
 ## Expected Result

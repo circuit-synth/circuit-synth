@@ -20,72 +20,23 @@ Validates that adding a third component to an existing connection between two co
 ```bash
 cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/10_add_to_net
 
-# Step 1: Create initial circuit with R1 and R2 connected via NET1
-cat > two_resistors_on_net.py << 'EOF'
-from circuit_synth import circuit, Component, Net
-
-@circuit(name="two_resistors_on_net")
-def two_resistors_on_net():
-    r1 = Component(symbol="Device:R", ref="R1", value="10k",
-                   footprint="Resistor_SMD:R_0603_1608Metric")
-    r2 = Component(symbol="Device:R", ref="R2", value="4.7k",
-                   footprint="Resistor_SMD:R_0603_1608Metric")
-
-    # Connect R1 and R2 via NET1
-    net1 = Net(name="NET1")
-    net1.connect(r1[1])
-    net1.connect(r2[1])
-
-if __name__ == "__main__":
-    circuit_obj = two_resistors_on_net()
-    circuit_obj.generate_kicad_project(project_name="two_resistors_on_net",
-                                      placement_algorithm="simple",
-                                      generate_pcb=True)
-    print("✅ Two resistors on NET1 generated!")
-EOF
-
-# Step 2: Generate initial KiCad project
+# Step 1: Generate initial KiCad project (R1 and R2 on NET1)
 uv run two_resistors_on_net.py
 open two_resistors_on_net/two_resistors_on_net.kicad_pro
 # Verify: schematic shows R1 and R2 connected via NET1
 # Check: NET1 label appears on the connection between components
 
-# Step 3: Add R3 to the existing NET1
-# Edit two_resistors_on_net.py to add R3:
-cat > two_resistors_on_net.py << 'EOF'
-from circuit_synth import circuit, Component, Net
+# Step 2: Edit two_resistors_on_net.py to add R3
+# Add after R2 definition:
+#   r3 = Component(symbol="Device:R", ref="R3", value="2.2k",
+#                  footprint="Resistor_SMD:R_0603_1608Metric")
+# Add after net1.connect(r2[1]):
+#   net1.connect(r3[1])
 
-@circuit(name="two_resistors_on_net")
-def two_resistors_on_net():
-    r1 = Component(symbol="Device:R", ref="R1", value="10k",
-                   footprint="Resistor_SMD:R_0603_1608Metric")
-    r2 = Component(symbol="Device:R", ref="R2", value="4.7k",
-                   footprint="Resistor_SMD:R_0603_1608Metric")
-    r3 = Component(symbol="Device:R", ref="R3", value="2.2k",
-                   footprint="Resistor_SMD:R_0603_1608Metric")
-
-    # Connect R1, R2, and R3 via NET1
-    net1 = Net(name="NET1")
-    net1.connect(r1[1])
-    net1.connect(r2[1])
-    net1.connect(r3[1])  # Added R3 to existing NET1
-
-if __name__ == "__main__":
-    circuit_obj = two_resistors_on_net()
-    circuit_obj.generate_kicad_project(project_name="two_resistors_on_net",
-                                      placement_algorithm="simple",
-                                      generate_pcb=True)
-    print("✅ Three resistors on NET1 generated!")
-EOF
-
-# Step 4: Regenerate KiCad with R3 added to NET1
+# Step 3: Regenerate KiCad with R3 added to NET1
 uv run two_resistors_on_net.py
-
-# Step 5: Open regenerated KiCad project
 open two_resistors_on_net/two_resistors_on_net.kicad_pro
-
-# Step 6: Verify all three components on same net
-# Check in KiCad schematic:
+# Verify in KiCad schematic:
 #   - R1, R2, R3 all present
 #   - All three connected to NET1
 #   - NET1 label appears on connections
