@@ -128,9 +128,41 @@ from .simple_ratsnest import add_ratsnest_to_pcb
 3. **Clear separation** - circuit-synth focuses on synthesis, kicad-pcb-api on manipulation
 4. **Better quality** - Dedicated library with focused testing
 
+## Important Notes
+
+### Footprint Requirement
+
+Components **must have footprints assigned** for PCB generation to work:
+
+```python
+# ✅ CORRECT - Footprint assigned
+r1 = Component("Device:R", ref="R1", value="10k",
+               footprint="Resistor_SMD:R_0603_1608Metric")
+
+# ❌ INCORRECT - Missing footprint (will be skipped in PCB)
+r1 = Component("Device:R", ref="R1", value="10k")
+```
+
+### Placement Algorithm Changes
+
+kicad-pcb-api supports different placement algorithms than the old internal code:
+
+- ✅ **Supported:** `hierarchical`, `spiral`
+- ❌ **Removed:** `connection_centric`, `force_directed`, `connectivity_driven`
+
+Update your code if using unsupported algorithms:
+
+```python
+# Before
+circuit.generate_kicad_project("myproject", placement_algorithm="connection_centric")
+
+# After
+circuit.generate_kicad_project("myproject", placement_algorithm="hierarchical")
+```
+
 ## Breaking Changes
 
-**None!** This migration is 100% backward compatible.
+**None!** This migration is 100% backward compatible for code using default settings.
 
 ## Deprecation Timeline
 
@@ -142,13 +174,12 @@ from .simple_ratsnest import add_ratsnest_to_pcb
 
 - **kicad-pcb-api Repository:** https://github.com/circuit-synth/kicad-pcb-api
 - **kicad-pcb-api PyPI:** https://pypi.org/project/kicad-pcb-api/
-- **Migration PRD:** `docs/prd/kicad-pcb-api-migration.md`
-- **Deep Analysis:** `docs/prd/kicad-pcb-api-deep-analysis.md`
 - **GitHub Issue:** [#325](https://github.com/circuit-synth/circuit-synth/issues/325)
+- **Example:** See `example_three_resistors.py` for a working example
 
 ## Questions?
 
-Open an issue on GitHub or check the [migration PRD documents](docs/prd/).
+Open an issue on GitHub at https://github.com/circuit-synth/circuit-synth/issues.
 
 ---
 
