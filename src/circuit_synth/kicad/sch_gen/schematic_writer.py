@@ -1011,6 +1011,7 @@ class SchematicWriter:
         reference: str,
         value: str,
         position: Tuple[float, float],
+        rotation: float = 0.0,
     ) -> Optional[str]:
         """
         Add a KiCad power symbol component.
@@ -1020,14 +1021,15 @@ class SchematicWriter:
             reference: Power symbol reference (e.g., "#PWR01")
             value: Net name (e.g., "GND")
             position: (x, y) position to place symbol
+            rotation: Rotation angle in degrees (default: 0.0)
 
         Returns:
             UUID of the created power symbol, or None if failed
 
         Example:
-            >>> self._add_power_symbol("power:GND", "#PWR01", "GND", (100, 100))
+            >>> self._add_power_symbol("power:GND", "#PWR01", "GND", (100, 100), rotation=180)
         """
-        logger.debug(f"Adding power symbol {lib_id} at {position} with value '{value}'")
+        logger.debug(f"Adding power symbol {lib_id} at {position} with value '{value}' rotation={rotation}")
 
         try:
             # Add power symbol as a component
@@ -1041,12 +1043,15 @@ class SchematicWriter:
             )
 
             if power_comp:
+                # Set rotation after creation
+                power_comp.rotation = rotation
+
                 # Power symbols are always in BOM but not on board
                 power_comp.in_bom = True
                 power_comp.on_board = True
                 power_comp.dnp = False
 
-                logger.debug(f"Created power symbol {reference} (UUID: {power_comp.uuid})")
+                logger.debug(f"Created power symbol {reference} (UUID: {power_comp.uuid}) rotation={rotation}")
                 return power_comp.uuid
             else:
                 logger.warning(f"Failed to create power symbol {reference}")
@@ -1168,12 +1173,34 @@ class SchematicWriter:
                         f"at component {actual_ref}.{pin_identifier}"
                     )
 
-                    # Add power symbol at pin location
+                    # Calculate offset: move power symbol very close to pin (just 2.54mm / 100 mils)
+                    # Use the pin angle (not label angle) - pin angle points FROM component toward wire
+                    # We need to account for component rotation as well
+                    offset_distance = 2.54  # 100 mils in mm (standard KiCad grid spacing)
+
+                    # Calculate the global pin angle (pin angle + component rotation)
+                    global_pin_angle = (pin_angle + comp.rotation) % 360
+
+                    # Convert to radians and calculate offset in the pin direction
+                    angle_rad = math.radians(global_pin_angle)
+                    offset_x = offset_distance * math.cos(angle_rad)
+                    offset_y = offset_distance * math.sin(angle_rad)
+
+                    power_x = global_x + offset_x
+                    power_y = global_y + offset_y
+
+                    # Determine rotation: negative power symbols should point down (180°)
+                    # Check if this is a negative power supply by looking at the net name
+                    is_negative = net_name.startswith('-') or net_name.startswith('V-')
+                    power_rotation = 180.0 if is_negative else 0.0
+
+                    # Add power symbol at offset position
                     self._add_power_symbol(
                         lib_id=net.power_symbol,
                         reference=power_ref,
                         value=net_name,
-                        position=(global_x, global_y),
+                        position=(power_x, power_y),
+                        rotation=power_rotation,
                     )
 
                     # Power symbols don't create labels - skip the rest

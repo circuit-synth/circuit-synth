@@ -260,9 +260,7 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             }
             net_obj = Net.from_dict(net_dict)
 
-        # Add net to circuit
-        circuit.nets.append(net_obj)
-
+        # Parse connections and add them to the net
         for conn in connections:
             comp_ref = conn["component"]
             pin_data = conn["pin"]
