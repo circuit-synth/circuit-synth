@@ -15,10 +15,10 @@
 
 ## Test Results Summary
 
-**Total Tests:** 32
+**Total Tests:** 28
 **Passing:** 4 ✅
 **Failing:** 2 ❌
-**Untested:** 26 ⏳
+**Untested:** 22 ⏳
 
 ---
 
@@ -160,7 +160,24 @@ kicad-to-python successful: imported.py created
 **Last Tested:** Never
 **Notes:** Was moved content, needs validation
 
-### ⏳ Test 18-22: Various
+### ⏳ Test 18: Add Component in Python, Update Existing KiCad
+**Status:** UNTESTED
+**Last Tested:** Never
+**Notes:** Fixture ready for testing
+
+### ❌ Test 19: Add Component Update Python (REMOVED)
+**Status:** N/A
+**Notes:** Duplicate of Test 05 - both test adding component in KiCad → Python
+
+### ❌ Test 20: Delete Net (REMOVED)
+**Status:** N/A
+**Notes:** Duplicate of Test 26 - both test deleting a net
+
+### ❌ Test 21: Position Preservation Move (REMOVED)
+**Status:** N/A
+**Notes:** Duplicate of Test 09 - both test position preservation after manual move
+
+### ⏳ Test 22: Various
 **Status:** UNTESTED
 **Last Tested:** Never
 **Notes:** Not yet documented/validated
