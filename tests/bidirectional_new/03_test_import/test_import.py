@@ -46,8 +46,8 @@ def test_import():
     output_dir = get_test_output_dir(test_file, "03_import")
     clean_output_dir(output_dir)
 
-    # Get reference KiCad project (from legacy test directory)
-    kicad_ref = Path(__file__).parent.parent / "02_single_component" / "02_kicad_ref" / "02_kicad_ref.kicad_pro"
+    # Get reference KiCad project (from same directory)
+    kicad_ref = Path(__file__).parent / "kicad_ref" / "02_kicad_ref.kicad_pro"
 
     if not kicad_ref.exists():
         print(f"❌ Reference KiCad project not found: {kicad_ref}")
