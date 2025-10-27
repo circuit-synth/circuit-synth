@@ -20,58 +20,25 @@ Validates that removing a component from Python code correctly removes it from t
 ```bash
 cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/07_delete_component
 
-# Step 1: Create a circuit with two resistors
-# Create a file called two_resistors.py with:
-cat > two_resistors.py << 'EOF'
-from circuit_synth import circuit, Component
-
-@circuit(name="two_resistors")
-def two_resistors():
-    r1 = Component(symbol="Device:R", ref="R1", value="10k",
-                   footprint="Resistor_SMD:R_0603_1608Metric")
-    r2 = Component(symbol="Device:R", ref="R2", value="4.7k",
-                   footprint="Resistor_SMD:R_0603_1608Metric")
-
-if __name__ == "__main__":
-    circuit_obj = two_resistors()
-    circuit_obj.generate_kicad_project(project_name="two_resistors",
-                                      placement_algorithm="simple",
-                                      generate_pcb=True)
-    print("✅ Two resistor circuit generated!")
-EOF
-
-# Step 2: Generate KiCad with both components
+# Step 1: Generate initial KiCad project with both R1 and R2
 uv run two_resistors.py
+
+# Step 2: Open KiCad and verify both resistors present
 open two_resistors/two_resistors.kicad_pro
-# Verify: schematic has both R1 and R2
+# Verify: schematic has both R1 (10k) and R2 (4.7k)
 
-# Step 3: Edit the Python file to remove R2
-# Comment out or delete the R2 line:
-cat > two_resistors.py << 'EOF'
-from circuit_synth import circuit, Component
+# Step 3: Edit two_resistors.py to remove R2
+# Delete or comment out the R2 component definition:
+#   r2 = Component(...)
 
-@circuit(name="two_resistors")
-def two_resistors():
-    r1 = Component(symbol="Device:R", ref="R1", value="10k",
-                   footprint="Resistor_SMD:R_0603_1608Metric")
-    # r2 removed - component deleted from circuit
-
-if __name__ == "__main__":
-    circuit_obj = two_resistors()
-    circuit_obj.generate_kicad_project(project_name="two_resistors",
-                                      placement_algorithm="simple",
-                                      generate_pcb=True)
-    print("✅ Two resistor circuit generated!")
-EOF
-
-# Step 4: Regenerate KiCad
+# Step 4: Regenerate KiCad project (without R2)
 uv run two_resistors.py
 
 # Step 5: Open regenerated KiCad project
 open two_resistors/two_resistors.kicad_pro
 
-# Step 6: Verify schematic now has only R1
-#   - R1 (10k) - still present
+# Step 6: Verify R2 is removed from schematic
+#   - R1 (10k) - still present, position preserved
 #   - R2 - completely removed from schematic
 ```
 
