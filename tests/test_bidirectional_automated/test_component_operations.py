@@ -43,8 +43,7 @@ class TestComponentOperations:
         # Start with R1
         circuit = single_resistor()
         circuit.generate_kicad_project(
-            project_name="add_component_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Add R2
@@ -93,8 +92,7 @@ class TestComponentOperations:
         # Start with R1, R2
         circuit = two_resistors()
         circuit.generate_kicad_project(
-            project_name="delete_component_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Delete R2
@@ -139,8 +137,7 @@ class TestComponentOperations:
         # Start with R1 = 10k
         circuit = single_resistor()
         circuit.generate_kicad_project(
-            project_name="modify_value_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Change to 22k
@@ -186,8 +183,7 @@ class TestComponentOperations:
         # Start with R1
         circuit = single_resistor()
         circuit.generate_kicad_project(
-            project_name="rename_component_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Rename R1 → R192713402134
@@ -232,8 +228,7 @@ class TestComponentOperations:
         # Generate circuit
         circuit = single_resistor()
         circuit.generate_kicad_project(
-            project_name="modify_footprint_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Change footprint
@@ -279,8 +274,7 @@ class TestComponentOperations:
         # Start with R1, R2
         circuit = two_resistors()
         circuit.generate_kicad_project(
-            project_name="bulk_operations_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         sch_path = output_dir / "bulk_operations_test.kicad_sch"

@@ -75,7 +75,7 @@ class TestESP32C6HierarchicalWorkflow(unittest.TestCase):
         self.python_output_dir.mkdir(parents=True, exist_ok=True)
 
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -122,7 +122,7 @@ class TestESP32C6HierarchicalWorkflow(unittest.TestCase):
         self.python_output_dir.mkdir(parents=True, exist_ok=True)
 
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -159,7 +159,7 @@ class TestESP32C6HierarchicalWorkflow(unittest.TestCase):
         self.python_output_dir.mkdir(parents=True, exist_ok=True)
 
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -195,7 +195,7 @@ class TestESP32C6HierarchicalWorkflow(unittest.TestCase):
 
         # Step 1: Generate Python from KiCad
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -269,7 +269,7 @@ class TestESP32C6HierarchicalWorkflow(unittest.TestCase):
 
         # Generate and execute Python code
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -321,7 +321,7 @@ class TestESP32C6HierarchicalWorkflow(unittest.TestCase):
 
         # Generate and execute
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -373,7 +373,7 @@ class TestESP32C6HierarchicalWorkflow(unittest.TestCase):
         first_python.mkdir(parents=True, exist_ok=True)
 
         syncer1 = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(first_python),
             preview_only=False,
             create_backup=False,
@@ -420,7 +420,7 @@ class TestESP32C6HierarchicalWorkflow(unittest.TestCase):
         second_python.mkdir(parents=True, exist_ok=True)
 
         syncer2 = KiCadToPythonSyncer(
-            kicad_project=str(generated_project_files[0]),
+            kicad_project_or_json=str(generated_project_files[0]),
             python_file=str(second_python),
             preview_only=False,
             create_backup=False,
@@ -460,7 +460,7 @@ class TestESP32C6HierarchicalWorkflow(unittest.TestCase):
 
         # Generate new Python code
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,

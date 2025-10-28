@@ -47,8 +47,7 @@ class TestPositionPreservation:
         # Step 1: Generate initial circuit with R1
         circuit = single_resistor()
         circuit.generate_kicad_project(
-            project_name="position_preservation_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Get R1's original auto-placed position
@@ -121,8 +120,7 @@ class TestPositionPreservation:
         # Generate initial circuit
         circuit = single_resistor()
         circuit.generate_kicad_project(
-            project_name="regen_position_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Manually adjust position
@@ -135,8 +133,7 @@ class TestPositionPreservation:
         # Regenerate same circuit
         circuit2 = single_resistor()
         circuit2.generate_kicad_project(
-            project_name="regen_position_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Verify position preserved
@@ -171,8 +168,7 @@ class TestPositionPreservation:
         from fixtures.circuits import two_resistors
         circuit = two_resistors()
         circuit.generate_kicad_project(
-            project_name="delete_position_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Manually position both
@@ -219,8 +215,7 @@ class TestPositionPreservation:
         # Generate circuit
         circuit = single_resistor()
         circuit.generate_kicad_project(
-            project_name="grid_snap_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Set position to non-grid value

@@ -67,7 +67,7 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
         self.python_output_dir.mkdir(parents=True, exist_ok=True)
 
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -125,7 +125,7 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
         self.python_output_dir.mkdir(parents=True, exist_ok=True)
 
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -172,7 +172,7 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
         self.python_output_dir.mkdir(parents=True, exist_ok=True)
 
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -216,7 +216,7 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
         self.python_output_dir.mkdir(parents=True, exist_ok=True)
 
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -265,7 +265,7 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
 
         # Step 1: Convert KiCad to Python
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -333,7 +333,7 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
         self.python_output_dir.mkdir(parents=True, exist_ok=True)
 
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -396,7 +396,7 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
         first_python_dir.mkdir(parents=True, exist_ok=True)
 
         syncer1 = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(first_python_dir),
             preview_only=False,
             create_backup=False,
@@ -432,7 +432,7 @@ class Test02DualHierarchyWorkflow(unittest.TestCase):
         second_python_dir.mkdir(parents=True, exist_ok=True)
 
         syncer2 = KiCadToPythonSyncer(
-            kicad_project=str(first_generated_kicad),
+            kicad_project_or_json=str(first_generated_kicad),
             python_file=str(second_python_dir),
             preview_only=False,
             create_backup=False,

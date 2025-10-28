@@ -44,8 +44,7 @@ class TestRoundTripConsistency:
         # Step 2: Generate KiCad
         output_dir = temp_project_dir / "roundtrip_test"
         original_circuit.generate_kicad_project(
-            project_name="roundtrip_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Step 3: Import back to Python
@@ -72,8 +71,7 @@ class TestRoundTripConsistency:
         # Generate KiCad
         output_dir = temp_project_dir / "two_resistors_roundtrip"
         original_circuit.generate_kicad_project(
-            project_name="two_resistors_roundtrip",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Import back
@@ -106,8 +104,7 @@ class TestRoundTripConsistency:
         # Generate KiCad
         output_dir = temp_project_dir / "nets_roundtrip"
         original_circuit.generate_kicad_project(
-            project_name="nets_roundtrip",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Import back
@@ -145,8 +142,7 @@ class TestRoundTripConsistency:
         # Iteration 1: Start with R1
         circuit1 = single_resistor()
         circuit1.generate_kicad_project(
-            project_name="incremental_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Iteration 2: Add R2 in KiCad
@@ -216,8 +212,7 @@ class TestRoundTripConsistency:
 
         # Cycle 1
         original_circuit.generate_kicad_project(
-            project_name="multi_roundtrip",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
         project_file = output_dir / "multi_roundtrip.kicad_pro"
         cycle1 = import_kicad_project(str(project_file))
@@ -226,8 +221,7 @@ class TestRoundTripConsistency:
 
         # Cycle 2: Re-generate from imported circuit
         cycle1.generate_kicad_project(
-            project_name="multi_roundtrip",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
         cycle2 = import_kicad_project(str(project_file))
 
@@ -236,8 +230,7 @@ class TestRoundTripConsistency:
 
         # Cycle 3: One more time
         cycle2.generate_kicad_project(
-            project_name="multi_roundtrip",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
         cycle3 = import_kicad_project(str(project_file))
 
