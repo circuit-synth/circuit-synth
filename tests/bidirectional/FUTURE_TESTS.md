@@ -3,8 +3,9 @@
 This document outlines comprehensive bidirectional test scenarios for circuit-synth.
 Tests are organized by category and prioritized by practical importance.
 
-## Current Status (Tests 01-08 Complete)
+## Current Status (Tests 01-13 Complete)
 
+### ✅ Completed Tests (Root Sheet)
 - ✅ 01: Blank circuit
 - ✅ 02: KiCad → Python (basic import)
 - ✅ 03: Python → KiCad (incremental addition)
@@ -14,6 +15,15 @@ Tests are organized by category and prioritized by practical importance.
 - ✅ 07: Delete component Python → KiCad
 - ✅ 07_b: Delete component KiCad → Python
 - ✅ 08: Modify component attributes + position preservation
+- ✅ 09: Position preservation (THE KILLER FEATURE)
+- ✅ 10: Generate with net (netlist comparison - XFAIL #373)
+- ✅ 11: Add net to existing components (iterative workflow)
+- ✅ 13: Rename component (UUID matching - Issue #369 FIX)
+
+**Total: 13 passing tests, 1 xfailing (waiting for #373 fix)**
+
+**⚠️ IMPORTANT NOTE:** All current tests operate on the **root/parent sheet only**.
+Hierarchical sheet testing is documented below as a critical gap to fill.
 
 ## High Priority Tests (Next Batch)
 
@@ -86,35 +96,162 @@ Tests are organized by category and prioritized by practical importance.
   - KiCad → Python: Place multi-unit component, use different units
   - Validates: Multi-unit handling, unit assignment
 
-## Medium Priority Tests
+## 🚨 CRITICAL GAP: Hierarchical Sheet Testing
 
-### Hierarchical/Subcircuit Tests
-**Why important:** Real projects use hierarchy for organization.
+**⚠️ ALL CURRENT TESTS (01-13) ONLY TEST ROOT SHEET OPERATIONS**
 
-- **21: Add subcircuit sheet**
-  - Python → KiCad: Create hierarchical sheet from Python
-  - KiCad → Python: Add sheet in KiCad, import to Python
-  - Validates: Hierarchical sheet creation
+### Why This is Critical
 
-- **22: Remove subcircuit sheet**
-  - Python → KiCad: Remove sheet from hierarchy
+**Current coverage:** Component add/remove/modify, net operations, position preservation
+**Current limitation:** Only on root/parent sheet
+**Missing coverage:** All the same operations on hierarchical sheets
+
+**Real-world impact:**
+- Most real circuits use hierarchical design
+- Components can be on any sheet in the hierarchy
+- Nets can cross sheet boundaries (via hierarchical labels/ports)
+- Sync must work correctly at ALL hierarchy levels
+
+### Required: Mirror All Tests for Hierarchical Sheets
+
+**Strategy:** Every test we've completed (01-13) should be duplicated for hierarchical scenarios.
+
+#### Hierarchical Test Categories
+
+### Category A: Same Operations, Different Sheet Context
+
+**Tests 01H-13H: Hierarchical Versions of Root Tests**
+
+Each test should be re-implemented with components on child sheets:
+
+- **01H: Blank circuit (on child sheet)**
+  - Create empty hierarchical sheet
+  - Validate sheet structure, no components
+
+- **02H: KiCad → Python (child sheet component)**
+  - Component on child sheet imported to Python
+  - Validates: Hierarchical path preservation
+
+- **03H: Python → KiCad (add to child sheet)**
+  - Add component to existing child sheet
+  - Validates: Sheet-scoped component placement
+
+- **06H: Add component (to child sheet)**
+  - Add R2 to existing child sheet with R1
+  - Validates: Position preservation within child sheet
+
+- **07H: Delete component (from child sheet)**
+  - Remove component from child sheet
+  - Validates: Sheet-scoped deletion
+
+- **08H: Modify component (on child sheet)**
+  - Change value/footprint of component on child sheet
+  - Validates: UUID matching across hierarchy
+
+- **09H: Position preservation (child sheet)**
+  - Move component on child sheet, add R2 to same sheet
+  - Validates: Position preservation within sheet scope
+
+- **10H: Generate with net (on child sheet)**
+  - Create net connecting components on child sheet
+  - Validates: Sheet-local net generation
+
+- **11H: Add net to components (child sheet)**
+  - Add connection to existing unconnected components on child sheet
+  - Validates: Iterative workflow on child sheets
+
+- **13H: Rename component (child sheet)**
+  - Change reference of component on child sheet
+  - Validates: UUID matching with hierarchical context
+
+### Category B: Cross-Sheet Operations (NEW TEST TYPES)
+
+**Critical operations that span sheet boundaries:**
+
+- **50: Add hierarchical sheet**
+  - Python → KiCad: Create new child sheet with components
+  - KiCad → Python: Add sheet in KiCad, sync to Python
+  - Validates: Sheet creation, hierarchical structure
+
+- **51: Remove hierarchical sheet**
+  - Python → KiCad: Remove child sheet
   - KiCad → Python: Delete sheet in KiCad
-  - Validates: Sheet deletion, connection cleanup
+  - Validates: Sheet deletion, orphaned connections cleanup
 
-- **23: Component changes subcircuits**
-  - Python → KiCad: Move component from root to subcircuit
-  - KiCad → Python: Cut/paste component between sheets
-  - Validates: Cross-sheet component movement
+- **52: Add hierarchical port/label**
+  - Python → KiCad: Create port on sheet boundary
+  - KiCad → Python: Add hierarchical label
+  - Validates: Cross-sheet connection points
 
-- **24: Rename subcircuit**
-  - Python → KiCad: Rename sheet
+- **53: Connect across sheets (hierarchical labels)**
+  - Python → KiCad: Net spans from root → child via hierarchical labels
+  - KiCad → Python: Draw cross-sheet connection
+  - Validates: Hierarchical label matching, net continuity
+
+- **54: Move component between sheets**
+  - Python → KiCad: Change component from root → child sheet
+  - KiCad → Python: Cut/paste between sheets
+  - Validates: Component re-parenting, connection updates
+
+- **55: Rename hierarchical sheet**
+  - Python → KiCad: Change sheet name
   - KiCad → Python: Edit sheet name in KiCad
   - Validates: Sheet name synchronization
 
-- **25: Nested subcircuits**
-  - Python → KiCad: Create 3-level hierarchy
-  - KiCad → Python: Add nested sheets
+- **56: Nested hierarchy (3 levels)**
+  - Python → KiCad: Root → Child → Grandchild
+  - KiCad → Python: Create nested sheets
   - Validates: Deep hierarchy handling
+
+- **57: Multiple instances of same sheet**
+  - Python → KiCad: Instantiate sheet multiple times
+  - KiCad → Python: Copy/duplicate sheet instance
+  - Validates: Instance handling, unique paths
+
+- **58: Cross-sheet net with multiple hierarchical labels**
+  - Net connects: Root R1 → Child1 R2 → Child2 R3
+  - Validates: Complex hierarchical net topology
+
+- **59: Modify component on multi-instance sheet**
+  - Change value of component on sheet with 3 instances
+  - Validates: Instance-specific vs. shared modifications
+
+- **60: Position preservation across sheet boundary changes**
+  - Move component from root → child, verify position maintained
+  - Validates: Coordinate system transformation
+
+### Category C: Hierarchical Edge Cases
+
+**Complex scenarios that test boundary conditions:**
+
+- **61: Empty hierarchical sheet**
+  - Create child sheet with no components
+  - Validates: Empty sheet handling in hierarchy
+
+- **62: Sheet with only connections (no local components)**
+  - Child sheet is pure "routing" - only labels/ports
+  - Validates: Pass-through sheet handling
+
+- **63: Circular hierarchy detection**
+  - Attempt to create Sheet A → Sheet B → Sheet A
+  - Validates: Circular reference prevention
+
+- **64: Deep nesting (5+ levels)**
+  - Root → C1 → C2 → C3 → C4 → C5
+  - Validates: Deep hierarchy performance, path handling
+
+- **65: Component reference conflicts across sheets**
+  - Root has R1, Child has R1 (different components)
+  - Validates: Hierarchical reference scoping
+
+- **66: Global net across all hierarchy levels**
+  - Power net VCC connects components on all sheets
+  - Validates: Global net propagation through hierarchy
+
+## Medium Priority Tests (Root Sheet Remaining)
+
+### Hierarchical/Subcircuit Tests (PARTIALLY COVERED ABOVE)
+**Note:** Basic hierarchical operations covered in Category B tests above.
 
 ### Label/Annotation Tests
 **Why important:** Labels enable cross-sheet connections and net naming.
