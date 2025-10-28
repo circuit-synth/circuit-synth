@@ -34,8 +34,8 @@ class TestCircuit:
         circuit.finalize_references()
 
         assert len(circuit.components) == 1
-        # Components is a list, not a dict
-        comp = circuit.components[0]
+        # Components is a dict keyed by reference
+        comp = circuit.components["R1"]
         assert comp.ref == "R1"
         assert comp.symbol == "Device:R"
         assert comp.value == "10k"

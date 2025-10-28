@@ -73,8 +73,8 @@ class TestJsonToModelsCircuit:
 
         assert circuit.name == "simple"
         assert len(circuit.components) == 1
-        assert circuit.components[0].reference == "R1"
-        assert circuit.components[0].value == "10k"
+        assert circuit.components["R1"].reference == "R1"
+        assert circuit.components["R1"].value == "10k"
 
     def test_convert_circuit_with_nets(self):
         """Test converting circuit with net connections."""
@@ -132,10 +132,10 @@ class TestConvertModelsCircuitToApiCircuit:
         # Verify
         assert circuit.name == "test"
         assert len(circuit.components) == 1
-        # components is a list, so access by index
-        assert circuit.components[0].ref == "R1"
-        assert circuit.components[0].value == "10k"
-        assert circuit.components[0].symbol == "Device:R"
+        # components is a dict, so access by reference
+        assert circuit.components["R1"].ref == "R1"
+        assert circuit.components["R1"].value == "10k"
+        assert circuit.components["R1"].symbol == "Device:R"
 
     def test_convert_circuit_with_nets(self):
         """Test converting circuit with net connections."""

@@ -1270,18 +1270,6 @@ class Circuit:
         """
         return self.simulate()
 
-    @property
-    def components(self):
-        """
-        Return a list of all components in this circuit.
-
-        This property provides access to components as a list, which is expected
-        by many parts of the codebase that iterate over circuit.components.
-
-        Returns:
-            List[Component]: List of all components in this circuit
-        """
-        return list(self._components.values())
 
     @property
     def nets(self):
