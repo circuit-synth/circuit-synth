@@ -3,6 +3,18 @@
 Automated test for 01_blank_circuit bidirectional test.
 
 Tests that a blank circuit generates valid KiCad project with no components.
+
+TODO: Enhance validation to check for more than just components:
+- labels (should be none in blank circuit)
+- images (should be none in blank circuit)
+- text objects (function comments are allowed)
+- wires (should be none in blank circuit)
+- junctions (should be none in blank circuit)
+- hierarchical labels (should be none in blank circuit)
+- sheets (should be none in blank circuit)
+
+This comprehensive validation exercises kicad-sch-api logic and ensures
+blank truly means blank. Critical for the most important feature of circuit-synth.
 """
 import shutil
 import subprocess
