@@ -122,7 +122,6 @@ def test_45_import_power_symbols(request):
 
     # Setup paths
     test_dir = Path(__file__).parent
-    input_project = test_dir / "circuit_with_power.kicad_pro"
     input_schematic = test_dir / "circuit_with_power.kicad_sch"
     output_dir = test_dir / "output"
     output_schematic = output_dir / "circuit_with_power_modified.kicad_sch"
@@ -149,21 +148,18 @@ def test_45_import_power_symbols(request):
         # STEP 1: Import KiCad schematic with power symbols
         # =====================================================================
         print("\n" + "="*70)
-        print("STEP 1: Import KiCad project with power symbols")
+        print("STEP 1: Import KiCad .kicad_sch with power symbols")
         print("="*70)
 
-        assert input_project.exists(), (
-            f"Input project not found: {input_project}"
-        )
         assert input_schematic.exists(), (
             f"Input schematic not found: {input_schematic}"
         )
 
-        print(f"📁 Importing: {input_project}")
+        print(f"📁 Importing: {input_schematic}")
 
         # This is the CRITICAL operation - import KiCad to Python
         try:
-            circuit = import_kicad_project(str(input_project))
+            circuit = import_kicad_project(str(input_schematic))
         except Exception as e:
             pytest.fail(
                 f"CRITICAL: import_kicad_project() failed!\n"
@@ -204,12 +200,12 @@ def test_45_import_power_symbols(request):
         r1_initial_position = getattr(r1, 'position', None)
         print(f"   - R1 position: {r1_initial_position}")
 
-        # Get all nets (nets is a dictionary keyed by net name)
-        net_names = list(circuit.nets.keys())
+        # Get all nets
+        net_names = [net.name for net in circuit.nets]
         print(f"   Nets found: {net_names}")
 
         # Check for VCC net
-        vcc_nets = [circuit.nets[name] for name in net_names if 'VCC' in name.upper()]
+        vcc_nets = [n for n in circuit.nets if 'VCC' in str(n.name).upper()]
         if not vcc_nets:
             pytest.xfail(
                 "VCC net not found after import. "
@@ -223,7 +219,7 @@ def test_45_import_power_symbols(request):
         print(f"   - VCC net: {vcc_net.name}")
 
         # Check for GND net
-        gnd_nets = [circuit.nets[name] for name in net_names if 'GND' in name.upper()]
+        gnd_nets = [n for n in circuit.nets if 'GND' in str(n.name).upper()]
         if not gnd_nets:
             pytest.xfail(
                 "GND net not found after import. "
@@ -237,17 +233,25 @@ def test_45_import_power_symbols(request):
         print(f"   - GND net: {gnd_net.name}")
 
         # Validate R1 connections to power
-        # Check if R1 pins are in VCC/GND nets
+        # This is tricky - need to check if R1 pins are in VCC/GND nets
         vcc_connections = []
         gnd_connections = []
 
-        for pin in vcc_net.pins:
-            if hasattr(pin, 'component') and pin.component.ref == 'R1':
-                vcc_connections.append(pin.num)
+        for comp_pin in vcc_net.pins:
+            if hasattr(comp_pin, 'component'):
+                if comp_pin.component.ref == 'R1':
+                    vcc_connections.append(comp_pin.pin)
+            elif hasattr(comp_pin, 'ref'):  # Alternative structure
+                if comp_pin.ref == 'R1':
+                    vcc_connections.append(comp_pin.pin)
 
-        for pin in gnd_net.pins:
-            if hasattr(pin, 'component') and pin.component.ref == 'R1':
-                gnd_connections.append(pin.num)
+        for comp_pin in gnd_net.pins:
+            if hasattr(comp_pin, 'component'):
+                if comp_pin.component.ref == 'R1':
+                    gnd_connections.append(comp_pin.pin)
+            elif hasattr(comp_pin, 'ref'):
+                if comp_pin.ref == 'R1':
+                    gnd_connections.append(comp_pin.pin)
 
         print(f"   - R1 connections to VCC: {vcc_connections}")
         print(f"   - R1 connections to GND: {gnd_connections}")

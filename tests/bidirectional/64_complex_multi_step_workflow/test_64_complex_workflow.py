@@ -351,38 +351,21 @@ def test_64_complex_multi_step_workflow(request):
         with open(python_file, "r") as f:
             current_code = f.read()
 
-        # Uncomment D2 and R1 - replace entire commented blocks
-        d2_r1_commented = '''    # STEP 5: LED indicator and resistor (uncommented by test)
-    # d2 = Component(
-    #     symbol="Device:LED",
-    #     ref="D2",
-    #     value="RED",
-    #     footprint="LED_SMD:LED_0603_1608Metric",
-    # )
-    #
-    # r1 = Component(
-    #     symbol="Device:R",
-    #     ref="R1",
-    #     value="1k",
-    #     footprint="Resistor_SMD:R_0603_1608Metric",
-    # )'''
+        # Uncomment D2 component
+        modified_code = current_code.replace('    # d2 = Component(', '    d2 = Component(')
+        modified_code = modified_code.replace('    #     symbol="Device:LED",', '        symbol="Device:LED",')
+        modified_code = modified_code.replace('    #     ref="D2",', '        ref="D2",')
+        modified_code = modified_code.replace('    #     value="RED",', '        value="RED",')
+        modified_code = modified_code.replace('    #     footprint="LED_SMD:LED_0603_1608Metric",', '        footprint="LED_SMD:LED_0603_1608Metric",')
+        modified_code = modified_code.replace('    # )', '    )')
 
-        d2_r1_uncommented = '''    # STEP 5: LED indicator and resistor (uncommented by test)
-    d2 = Component(
-        symbol="Device:LED",
-        ref="D2",
-        value="RED",
-        footprint="LED_SMD:LED_0603_1608Metric",
-    )
-
-    r1 = Component(
-        symbol="Device:R",
-        ref="R1",
-        value="1k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )'''
-
-        modified_code = current_code.replace(d2_r1_commented, d2_r1_uncommented)
+        # Uncomment R1 component
+        modified_code = modified_code.replace('    # r1 = Component(', '    r1 = Component(')
+        modified_code = modified_code.replace('    #     symbol="Device:R",', '        symbol="Device:R",')
+        modified_code = modified_code.replace('    #     ref="R1",', '        ref="R1",')
+        modified_code = modified_code.replace('    #     value="1k",', '        value="1k",')
+        modified_code = modified_code.replace('    #     footprint="Resistor_SMD:R_0603_1608Metric",', '        footprint="Resistor_SMD:R_0603_1608Metric",')
+        modified_code = modified_code.replace('    # )', '    )')
 
         with open(python_file, "w") as f:
             f.write(modified_code)
