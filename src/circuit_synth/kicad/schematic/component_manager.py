@@ -67,6 +67,7 @@ class ComponentManager:
         position: Optional[Tuple[float, float]] = None,
         placement_strategy: PlacementStrategy = PlacementStrategy.AUTO,
         footprint: Optional[str] = None,
+        snap_to_grid: bool = True,
         **properties,
     ) -> Optional[SchematicSymbol]:
         """
@@ -78,6 +79,8 @@ class ComponentManager:
             value: Component value (e.g., "10k")
             position: (x, y) position in mm. Auto-placed if None.
             placement_strategy: Strategy for automatic placement
+            footprint: Component footprint
+            snap_to_grid: If True, snap position to grid. If False, use exact position.
             **properties: Additional component properties
 
         Returns:
@@ -121,8 +124,9 @@ class ComponentManager:
                 component=component,  # Pass component for dynamic sizing
             )
         else:
-            # Ensure grid alignment
-            position = self._snap_to_grid(position)
+            # Ensure grid alignment (unless snap_to_grid is False, e.g., for power symbols)
+            if snap_to_grid:
+                position = self._snap_to_grid(position)
 
         # Update component position
         component.position = Point(position[0], position[1])

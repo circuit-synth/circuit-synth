@@ -1033,6 +1033,7 @@ class SchematicWriter:
 
         try:
             # Add power symbol as a component
+            # Power symbols must be placed exactly at pin positions, not snapped to grid
             power_comp = self.component_manager.add_component(
                 library_id=lib_id,
                 reference=reference,
@@ -1040,6 +1041,7 @@ class SchematicWriter:
                 position=position,
                 placement_strategy=PlacementStrategy.AUTO,
                 footprint="",  # Power symbols have no footprint
+                snap_to_grid=False,  # Power symbols need exact positioning at pin locations
             )
 
             if power_comp:
@@ -1050,6 +1052,28 @@ class SchematicWriter:
                 power_comp.in_bom = True
                 power_comp.on_board = True
                 power_comp.dnp = False
+
+                # Fix Value property position - kicad-sch-api places it incorrectly
+                # The Value should be positioned based on symbol rotation:
+                # - 0° (up): Value above symbol
+                # - 90° (left): Value to the left
+                # - 180° (down): Value below symbol
+                # - 270° (right): Value to the right
+                # Standard offset is ~5.08mm from symbol center
+                if hasattr(power_comp, 'properties') and 'Value' in power_comp.properties:
+                    value_prop = power_comp.properties['Value']
+                    if hasattr(value_prop, 'position'):
+                        # Calculate correct position based on rotation
+                        offset = 5.08  # Standard KiCad offset for power symbol value text
+
+                        if rotation == 0:  # Pointing up
+                            value_prop.position = Point(position[0], position[1] - offset)
+                        elif rotation == 90:  # Pointing left
+                            value_prop.position = Point(position[0] - offset, position[1])
+                        elif rotation == 180:  # Pointing down
+                            value_prop.position = Point(position[0], position[1] + offset)
+                        elif rotation == 270:  # Pointing right
+                            value_prop.position = Point(position[0] + offset, position[1])
 
                 logger.debug(f"Created power symbol {reference} (UUID: {power_comp.uuid}) rotation={rotation}")
                 return power_comp.uuid
@@ -1158,6 +1182,11 @@ class SchematicWriter:
                 global_x = comp.position.x + rx
                 global_y = comp.position.y + ry
 
+                # DEBUG: Log pin position calculation (uncomment for debugging)
+                # logger.debug(f"PIN CALC: {actual_ref}.{pin_identifier} - anchor=({anchor_x}, {anchor_y}), "
+                #             f"comp.pos=({comp.position.x}, {comp.position.y}), "
+                #             f"global=({global_x}, {global_y})")
+
                 # Calculate label angle
                 label_angle = (pin_angle + 180) % 360
                 global_angle = (label_angle + comp.rotation) % 360
@@ -1178,10 +1207,37 @@ class SchematicWriter:
                     power_x = global_x
                     power_y = global_y
 
-                    # Determine rotation: negative power symbols should point down (180°)
-                    # Check if this is a negative power supply by looking at the net name
+                    # DEBUG: Log power symbol placement (uncomment for debugging)
+                    # logger.debug(f"POWER SYMBOL: {power_ref} for {net_name} - "
+                    #             f"placing at ({power_x}, {power_y}) from pin {actual_ref}.{pin_identifier}")
+
+                    # Determine rotation based on pin orientation and net type
+                    # Power symbols should point AWAY from the component
+                    # Pin angles: 0°=right, 90°=down, 180°=left, 270°=up
+                    # Power symbol at 0° points up, so we need to rotate based on pin direction
+
+                    # Get the global pin angle (accounting for component rotation)
+                    global_pin_angle = (pin_angle + comp.rotation) % 360
+
+                    # Map pin direction to power symbol rotation
+                    # Pin points INTO component, power symbol should point AWAY (opposite direction)
+                    if global_pin_angle == 0:    # Pin points right -> symbol points right (270°)
+                        power_rotation = 270.0
+                    elif global_pin_angle == 90:  # Pin points down -> symbol points down (180°)
+                        power_rotation = 180.0
+                    elif global_pin_angle == 180: # Pin points left -> symbol points left (90°)
+                        power_rotation = 90.0
+                    elif global_pin_angle == 270: # Pin points up -> symbol points up (0°)
+                        power_rotation = 0.0
+                    else:
+                        # Default for non-cardinal angles
+                        logger.warning(f"Non-cardinal pin angle {global_pin_angle}° for power pin, defaulting to 0°")
+                        power_rotation = 0.0
+
+                    # Override for negative supplies: always point down regardless of pin direction
                     is_negative = net_name.startswith('-') or net_name.startswith('V-')
-                    power_rotation = 180.0 if is_negative else 0.0
+                    if is_negative:
+                        power_rotation = 180.0
 
                     # Add power symbol at offset position
                     self._add_power_symbol(
