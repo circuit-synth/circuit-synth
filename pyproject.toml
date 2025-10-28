@@ -214,12 +214,13 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 asyncio_mode = "auto"
 markers = [
+    "unit: marks tests as unit tests (fast, pure Python, no I/O)",
+    "integration: marks tests as integration tests (file I/O allowed, no external tools)",
+    "e2e: marks tests as end-to-end tests (external tools like kicad-cli allowed)",
     "slow: marks tests as slow running tests",
     "asyncio: marks tests as async/await tests",
-    "integration: marks tests as integration tests",
     "functional: marks tests as functional tests",
     "cache: marks tests as cache-related tests",
-    "asyncio: marks tests as async tests",
 ]
 env = [
     "KICAD_SYMBOL_DIR=tests/test_data/kicad_symbols",
