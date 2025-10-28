@@ -894,7 +894,7 @@ class PCBGenerator:
                             # Create new net
                             net_num = len(pcb.pcb_data["nets"])
                             # Simplified - create basic net structure
-                            from circuit_synth.pcb.types import Net
+                            # Net is already imported at top of file from kicad_pcb_api.core.types
 
                             new_net = Net(number=net_num, name=unconnected_net_name)
                             pcb.pcb_data["nets"].append(new_net)
