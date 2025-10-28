@@ -1033,7 +1033,6 @@ def generate_nets_section(circuit_data: Dict[str, Any]) -> List[Any]:
     nets_section = ["nets"]
     net_code = 1
 
-    # Add debug logging
     logger.debug("=== Analyzing net connectivity patterns ===")
 
     # Initialize collections for net analysis
