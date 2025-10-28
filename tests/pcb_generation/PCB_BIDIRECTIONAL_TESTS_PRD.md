@@ -4,12 +4,12 @@
 
 This PRD defines a focused bidirectional test suite for PCB-level **component placement operations** in circuit-synth, mirroring the successful pattern established for schematic testing in `tests/bidirectional/`. The PCB test suite will validate Python ↔ KiCad PCB synchronization for component placement, footprint management, and basic board setup.
 
-**Scope**: Component placement, footprint assignment, board outline, basic manufacturing output
-**Out of Scope**: Manual trace routing preservation (future), autorouting, complex layer management
+**Scope**: Component placement, vias, footprint assignment, board outline, manufacturing output
+**Out of Scope**: Complex trace routing, autorouting, trace preservation (future)
 **Status**: Planning Phase
-**Target**: Comprehensive component placement bidirectional validation
+**Target**: Component placement + via management + manufacturing workflow validation
 **Foundation**: Mirrors `tests/bidirectional/` schematic test architecture
-**Timeline**: Focused implementation (~15 tests covering placement operations)
+**Timeline**: Focused implementation (~21 tests covering placement + vias + manufacturing)
 
 ---
 
@@ -93,12 +93,14 @@ Circuit-synth focuses on **intelligent component placement** and lets users rout
 ### 2.2 Success Criteria
 
 **Test Suite Completeness**:
-- ✅ **15 focused PCB placement tests** (not 25-35, we're not testing routing)
+- ✅ **21 focused PCB tests** (placement + vias + manufacturing)
 - ✅ Every test has comprehensive README.md
 - ✅ All tests use kicad-pcb-api for validation (Level 2)
 - ✅ **Position preservation validated** for all component operations
+- ✅ **Via placement validated** for all via types (through-hole, blind, buried)
 - ✅ Footprint changes validated
 - ✅ Component add/delete/modify operations proven
+- ✅ Manufacturing output validated
 
 **Test Quality**:
 - ✅ Independent execution (each test self-contained)
@@ -112,13 +114,15 @@ Circuit-synth focuses on **intelligent component placement** and lets users rout
 - ✅ Iterative development (add components without losing placement)
 - ✅ Footprint changes (swap SOIC → QFN, preserve other placements)
 - ✅ Component operations (add decoupling caps, remove test points)
-- ✅ Board outline management
+- ✅ **Via placement** (power/ground connections, layer transitions)
+- ✅ Multi-layer board support (via blind/buried vias)
+- ✅ Board outline and mechanical features
 - ✅ Manufacturing output (Gerbers, pick-and-place, BOM)
 
 **Accepted Limitations (Not Failures)**:
-- ⚠️ Manual routing lost when components move (expected - users route in KiCad)
-- ⚠️ No trace preservation tests (future feature, low priority)
-- ⚠️ 2-layer boards primarily (4-layer future enhancement)
+- ⚠️ Manual trace routing not automated (users route in KiCad)
+- ⚠️ No trace preservation tests (future feature)
+- ⚠️ Simple orthogonal traces only (complex routing in KiCad)
 
 ---
 
@@ -533,53 +537,108 @@ def test_XX_feature_name(request):
 - **Validation**: Properties transferred to PCB footprints
 - **Scope**: Metadata sync, not placement
 
-### 4.3 Phase 3: Manufacturing Output (Tests 13-15)
+### 4.3 Phase 3: Via Management (Tests 13-15)
 
-**Status**: MEDIUM PRIORITY - Production integration
+**Status**: HIGH PRIORITY - Essential for multi-layer boards
 
-**13: Text on Silkscreen**
+**13: Through-Hole Vias**
+- **What**: Add through-hole vias in Python (connects all layers)
+- **Why**: Most common via type, essential for layer transitions
+- **Validation**: Via position, drill size, pad size, connects all layers
+- **Scope**: Via placement and properties, not routing (yet)
+- **Use Case**: Power/ground connections, signal layer transitions
+
+**14: Blind Vias**
+- **What**: Add blind vias in Python (outer layer to inner layer)
+- **Why**: Advanced PCB designs, space-constrained layouts
+- **Validation**: Via position, start/end layers, drill size
+- **Scope**: Via placement, layer span validation
+- **Use Case**: High-density interconnect (HDI) boards
+
+**15: Buried Vias**
+- **What**: Add buried vias in Python (inner layer to inner layer)
+- **Why**: Advanced multi-layer boards (4+ layers)
+- **Validation**: Via position, start/end layers (not touching outer layers)
+- **Scope**: Via placement, layer-to-layer connections
+- **Use Case**: Complex 6-8 layer boards with internal routing
+
+### 4.4 Phase 4: Board Features (Tests 16-18)
+
+**Status**: MEDIUM PRIORITY - Professional board features
+
+**16: Text on Silkscreen**
 - **What**: Add text annotations to silkscreen in Python
 - **Why**: Assembly instructions, part numbers, version info
 - **Validation**: Text content, position, layer (F.Silkscreen/B.Silkscreen)
-- **Scope**: Annotation data, not routing
+- **Scope**: Annotation data
 
-**14: Fiducial Markers**
+**17: Fiducial Markers**
 - **What**: Add fiducials for pick-and-place in Python
 - **Why**: Assembly automation registration points
 - **Validation**: Fiducial positions, sizes, copper clearance
 - **Scope**: Assembly features, treated as special components
 
-**15: Gerber & Manufacturing Export**
-- **What**: Export Gerbers, drill files, pick-and-place from Python
-- **Why**: Manufacturing handoff - verify output is valid
-- **Validation**: Files generated, valid format, positions match
-- **Scope**: Export validation, not DRC or routing checks
+**18: Silkscreen Graphics**
+- **What**: Add logos, outlines, annotations to silkscreen
+- **Why**: Branding, assembly instructions, polarity marks
+- **Validation**: Graphic elements on correct layers
+- **Scope**: Silkscreen artwork, not copper
 
-### 4.4 Future Enhancements (Not Current Scope)
+### 4.5 Phase 5: Manufacturing Output (Tests 19-21)
+
+**Status**: MEDIUM PRIORITY - Production integration
+
+**19: Gerber & Drill Export**
+- **What**: Export Gerbers, drill files from Python
+- **Why**: Manufacturing handoff - verify output is valid
+- **Validation**: Files generated, valid format, all layers present
+- **Scope**: Export validation, not DRC
+
+**20: Pick-and-Place Export**
+- **What**: Export pick-and-place (PnP) file from Python
+- **Why**: Assembly automation requires component positions
+- **Validation**: All components listed, positions accurate, rotation correct
+- **Scope**: Assembly data export
+
+**21: BOM with Positions Export**
+- **What**: Export Bill of Materials with XY positions
+- **Why**: Manufacturing needs BOM + placement data
+- **Validation**: All components, properties (MPN, DNP), positions
+- **Scope**: Complete manufacturing data package
+
+### 4.6 Future Enhancements (Not Current Scope)
 
 **Status**: FUTURE - Not in initial test suite
 
-These features may be added in future iterations, but are not priority for component placement validation:
+These features may be added in future iterations:
 
 **Routing Features** (Future):
-- Trace preservation when adding components
-- Via placement and management
+- **Trace drawing in Python** - Simple point-to-point traces
+- **Trace preservation** when adding components
+- **Orthogonal routing** - 90° angle traces
 - Differential pair routing support
 - Autorouting integration
 
+**Advanced Via Features** (Future):
+- **Micro-vias** (laser-drilled, HDI)
+- **Via-in-pad** configurations
+- **Stacked vias** (multiple blind vias)
+- Via stitching for planes
+
 **Advanced Layer Management** (Future):
-- Multi-layer stackup (4, 6, 8 layer)
-- Power/ground planes
-- Copper pours and zones
-- Complex layer rules
+- Power/ground plane zones
+- Copper pours with thermal relief
+- Complex layer stackup rules
+- Impedance control layers
 
 **Advanced Manufacturing** (Future):
 - Panel layout generation
 - IPC-2581/ODB++ export
 - 3D model assignment
 - Assembly drawing generation
+- Test point reports
 
-**Current Focus**: Component placement, footprint management, basic 2-layer boards
+**Current Focus**: Component placement, vias, basic board features, manufacturing output
 
 ---
 
@@ -876,43 +935,89 @@ for ref, (pos_before, rot_before) in positions_before.items():
 - ✅ Footprint library changes sync
 - ✅ Component metadata preserved
 
-### 7.4 Phase 4: Manufacturing Output (Weeks 7-8)
+### 7.4 Phase 4: Via Management (Weeks 7-8)
+
+**Milestone**: Multi-layer board support via vias
+
+**Tests to Implement:**
+- Test 13: Through-Hole Vias
+- Test 14: Blind Vias
+- Test 15: Buried Vias
+
+**Deliverables:**
+- 3 via tests implemented (15 tests total)
+- Through-hole via placement validated
+- Blind via layer transitions verified
+- Buried via internal connections proven
+- Multi-layer board capability demonstrated
+
+**Success Criteria:**
+- ✅ Through-hole vias connect all layers
+- ✅ Blind vias start/end on correct layers
+- ✅ Buried vias stay internal (not on outer layers)
+- ✅ Via positions preserved when components added
+- ✅ **Multi-layer board workflow validated**
+
+### 7.5 Phase 5: Board Features (Weeks 9-10)
+
+**Milestone**: Professional board finishing
+
+**Tests to Implement:**
+- Test 16: Text on Silkscreen
+- Test 17: Fiducial Markers
+- Test 18: Silkscreen Graphics
+
+**Deliverables:**
+- 3 board feature tests (18 tests total)
+- Silkscreen text placement validated
+- Fiducial positioning verified
+- Graphic element support proven
+
+**Success Criteria:**
+- ✅ Silkscreen text positioned correctly
+- ✅ Fiducials placed for assembly automation
+- ✅ Graphics (logos, polarity marks) on correct layers
+- ✅ All board features preserved during regeneration
+
+### 7.6 Phase 6: Manufacturing Output (Weeks 11-12)
 
 **Milestone**: Production-ready manufacturing data
 
 **Tests to Implement:**
-- Test 13: Text on Silkscreen
-- Test 14: Fiducial Markers
-- Test 15: Gerber & Manufacturing Export
+- Test 19: Gerber & Drill Export
+- Test 20: Pick-and-Place Export
+- Test 21: BOM with Positions Export
 
 **Deliverables:**
-- 3 manufacturing tests implemented (**15 tests total**)
-- Gerber generation validated
-- Pick-and-place export verified
-- BOM data accuracy proven
-- **Complete PCB placement test suite**
+- 3 manufacturing tests (**21 tests total**)
+- Gerber/drill file generation validated
+- Pick-and-place data accuracy verified
+- BOM export with positions proven
+- **Complete PCB workflow production-ready**
 
 **Success Criteria:**
-- ✅ Silkscreen text positioned correctly
-- ✅ Fiducials placed for assembly
-- ✅ Gerber/drill files generate correctly
-- ✅ Pick-and-place file has accurate positions
-- ✅ BOM matches component properties
-- ✅ **Full placement workflow production-ready**
+- ✅ Gerber files for all layers generated correctly
+- ✅ Drill files include all vias and holes
+- ✅ Pick-and-place file has accurate positions/rotations
+- ✅ BOM includes all components with properties
+- ✅ **Full manufacturing data package validated**
 
-### 7.5 Future Phases (TBD - Not Current Scope)
+### 7.7 Future Phases (TBD - Not Current Scope)
 
 **Milestone**: Advanced features when needed
 
 **Potential Future Tests:**
-- Routing preservation tests (if/when implemented)
-- Multi-layer stackup tests (4/6/8 layer)
+- **Basic trace drawing** (simple Python-defined point-to-point traces)
+- **Orthogonal routing** (90° angle auto-routing from via to pad)
+- Trace preservation when adding components
 - Copper pour/zone tests
-- Advanced DRC rule sync
+- Advanced DRC rule synchronization
 - Panel layout generation
 - 3D model assignment
+- Via-in-pad configurations
+- Micro-via support
 
-**Scope Decision**: These are not priority for initial placement-focused test suite. Add as features are implemented in circuit-synth.
+**Scope Decision**: These are not priority for initial test suite. Add as features are implemented in circuit-synth.
 
 **Timeline**: No estimate - driven by feature development, not test development
 
@@ -1053,12 +1158,17 @@ addopts = -v --tb=short
 
 ### 10.1 Quantitative Metrics
 
-- ✅ **15 focused PCB placement tests** implemented and passing
-- ✅ **>85% test coverage** for PCB placement/generation code
-- ✅ **<3 minutes** full test suite execution time
+- ✅ **21 comprehensive PCB tests** implemented and passing
+  - 12 placement/component tests (01-12)
+  - 3 via tests (13-15)
+  - 3 board feature tests (16-18)
+  - 3 manufacturing tests (19-21)
+- ✅ **>85% test coverage** for PCB generation code
+- ✅ **<5 minutes** full test suite execution time
 - ✅ **100% README.md coverage** (every test documented)
 - ✅ **0 text-matching tests** (all use kicad-pcb-api)
 - ✅ **Test 03 (placement preservation) passing** - THE critical milestone
+- ✅ **Via tests passing** - Essential for multi-layer boards
 
 ### 10.2 Qualitative Metrics
 
@@ -1066,15 +1176,19 @@ addopts = -v --tb=short
 - ✅ **Manual placement work provably preserved** (THE key metric)
 - ✅ Component operations (add/delete/modify) validated
 - ✅ Footprint changes preserve positions
-- ✅ Manufacturing output validated
-- ✅ **Iterative placement workflow is practical**
-- ⚠️ Users accept re-routing when components change (documented expectation)
+- ✅ **Via placement works for multi-layer boards** (through-hole, blind, buried)
+- ✅ Board features (silkscreen, fiducials) properly positioned
+- ✅ Manufacturing output validated and accurate
+- ✅ **Iterative PCB workflow is practical**
+- ⚠️ Basic trace drawing capability (future: simple Python-defined traces)
+- ⚠️ Users do complex routing in KiCad (documented expectation)
 
 ### 10.3 User Validation
 
 **Before PCB Tests:**
 - ❌ "I don't trust circuit-synth for PCB - might lose my placement work"
 - ❌ "How do I know my component positions are preserved?"
+- ❌ "What about multi-layer boards with vias?"
 - ❌ "What if I need to add components later?"
 - ❌ "Can't use this for real boards"
 
@@ -1082,8 +1196,10 @@ addopts = -v --tb=short
 - ✅ "Test 03 proves placement preservation works"
 - ✅ "Test 04 shows I can add components without losing placements"
 - ✅ "Test 06 shows footprint changes preserve positions"
-- ✅ "I can use this for production boards (I'll route in KiCad)"
-- ✅ "Clear expectations: placement preserved, routing is my job"
+- ✅ "Tests 13-15 show vias work for multi-layer boards"
+- ✅ "Test 19-21 show manufacturing data is accurate"
+- ✅ "I can use this for production boards"
+- ✅ "Clear expectations: circuit-synth for placement/vias, KiCad for complex routing"
 
 ---
 

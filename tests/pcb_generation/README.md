@@ -6,9 +6,9 @@ Focused test suite for validating bidirectional synchronization of **component p
 
 **Phase**: Planning
 **Status**: PRD Complete, Implementation Pending
-**Target**: 15 focused PCB placement tests (not 25-35, routing is out of scope)
-**Scope**: Component placement, footprint management, board setup
-**Out of Scope**: Manual routing preservation (users route in KiCad)
+**Target**: 21 comprehensive PCB tests (placement + vias + manufacturing)
+**Scope**: Component placement, via management, footprint management, board setup, manufacturing
+**Out of Scope**: Complex trace routing preservation (users route in KiCad)
 
 ## Overview
 
@@ -16,17 +16,23 @@ This test suite mirrors the architecture and philosophy of `tests/bidirectional/
 
 **✅ IN SCOPE (What We Test):**
 - **Component Placement**: Position preservation, auto-placement, manual adjustments
+- **Via Management**: Through-hole vias, blind vias, buried vias (essential for multi-layer)
 - **Footprint Management**: Footprint changes, library sync, assignment
 - **Component Operations**: Add, delete, modify, rotate components
 - **Board Setup**: Board outline, mounting holes, mechanical features
-- **Manufacturing**: Gerber generation, pick-and-place, BOM with positions
+- **Board Features**: Silkscreen text, fiducials, graphics
+- **Manufacturing**: Gerber/drill generation, pick-and-place, BOM with positions
 
 **❌ OUT OF SCOPE (What We Don't Test):**
-- **Routing**: Trace preservation, via management, autorouting (users route in KiCad)
-- **Advanced Layers**: Complex stackups, power planes, copper pours (future)
-- **Routing Algorithms**: Differential pairs, length matching (not circuit-synth's focus)
+- **Complex Routing**: Trace preservation, differential pairs, autorouting (users route in KiCad)
+- **Advanced Layers**: Power/ground plane zones, copper pours (future)
+- **Routing Algorithms**: Length matching, impedance control (not circuit-synth's focus)
 
-**Why This Scope?** Circuit-synth focuses on intelligent component placement. Users route manually in KiCad (the right tool for routing), and accept re-routing when components change. **The killer feature is placement preservation**, not routing preservation.
+**Future Scope (Nice-to-Have):**
+- **Simple Trace Drawing**: Basic Python-defined point-to-point traces
+- **Orthogonal Routing**: 90° angle traces from vias to pads
+
+**Why This Scope?** Circuit-synth focuses on intelligent component placement and essential board elements (vias). Users do complex routing in KiCad (the right tool for manual routing). **The killer features are placement preservation + via management**.
 
 ## Philosophy
 
@@ -46,7 +52,7 @@ Without placement preservation, the tool is unusable for real PCB design. With t
   - Validation strategies
   - Real-world workflows
 
-## Test Categories (15 Focused Tests)
+## Test Categories (21 Comprehensive Tests)
 
 ### Phase 1: Core Placement Operations (Tests 01-08)
 - Blank PCB generation
@@ -61,27 +67,40 @@ Without placement preservation, the tool is unusable for real PCB design. With t
 - Footprint library synchronization
 - Component properties (DNP, MPN, custom fields)
 
-### Phase 3: Manufacturing Output (Tests 13-15)
+### Phase 3: Via Management (Tests 13-15) ⭐ NEW
+- **Through-hole vias** (connects all layers)
+- **Blind vias** (outer to inner layer)
+- **Buried vias** (inner to inner layer)
+- Essential for multi-layer boards (4+ layers)
+
+### Phase 4: Board Features (Tests 16-18)
 - Silkscreen text placement
 - Fiducial markers for assembly
-- Gerber/drill/pick-and-place export
+- Silkscreen graphics (logos, polarity marks)
 
-### Future (Out of Scope for Initial Suite)
-- Routing preservation (when/if implemented)
-- Multi-layer advanced stackups
-- Copper pour algorithms
-- Autorouting integration
+### Phase 5: Manufacturing Output (Tests 19-21)
+- Gerber & drill file export
+- Pick-and-place export
+- BOM with positions export
+
+### Future (Not Current Scope)
+- Simple trace drawing (point-to-point in Python)
+- Orthogonal routing (90° angle auto-routing)
+- Trace preservation when adding components
+- Copper pour/zone tests
+- Advanced DRC synchronization
 
 ## Comparison to Schematic Tests
 
 | Feature | Schematic Tests | PCB Tests |
 |---------|----------------|-----------|
-| **Test Count** | 33+ | 15 (focused scope) |
+| **Test Count** | 33+ | 21 (placement + vias + mfg) |
 | **Killer Feature** | Position preservation (Test 09) | Placement preservation (Test 03) |
-| **Primary Focus** | Connectivity/netlist | Component placement |
+| **Secondary Focus** | Netlist validation | Via management (Tests 13-15) |
+| **Primary Focus** | Connectivity/netlist | Component placement + vias |
 | **Validation API** | kicad-sch-api | kicad-pcb-api |
 | **File Format** | .kicad_sch | .kicad_pcb |
-| **Out of Scope** | N/A | Routing (users do in KiCad) |
+| **Out of Scope** | N/A | Complex routing (users do in KiCad) |
 | **Status** | ✅ Complete | 📋 Planning |
 
 ## Why PCB Tests Are Critical
@@ -92,22 +111,24 @@ Without placement preservation, the tool is unusable for real PCB design. With t
 - ❌ No verification of footprint change workflows
 - ❌ Engineers won't trust tool for real boards
 
-**With Focused PCB Tests:**
+**With Comprehensive PCB Tests:**
 - ✅ Validates placement preservation (hours of placement work)
 - ✅ Proves component add/delete/modify operations work correctly
 - ✅ Verifies footprint changes preserve positions
-- ✅ Enables iterative PCB placement workflow
-- ✅ **Clear expectations**: placement preserved, routing is user's responsibility
-- ✅ Engineers can trust tool for production placement (route in KiCad)
+- ✅ **Validates via placement** (through-hole, blind, buried) for multi-layer boards
+- ✅ Verifies manufacturing output accuracy (Gerbers, PnP, BOM)
+- ✅ Enables iterative PCB workflow (placement + vias)
+- ✅ **Clear expectations**: circuit-synth for placement/vias, KiCad for complex routing
+- ✅ Engineers can trust tool for production boards
 
 ## Real-World Workflows Validated
 
 ### Iterative PCB Development (Realistic)
-1. Generate PCB from Python (smart auto-placement)
+1. Generate PCB from Python (smart auto-placement, auto-via power/ground)
 2. **Manually adjust component positions** in KiCad for optimal layout
 3. **Route traces in KiCad** (manual routing - not automated)
-4. Add decoupling caps in Python
-5. Regenerate → **component positions preserved** ✅, **accept re-routing** (expected)
+4. Add decoupling caps + power vias in Python
+5. Regenerate → **component positions preserved** ✅, **vias added** ✅, **accept re-routing** (expected)
 
 ### Footprint Optimization (Realistic)
 1. Design with 0805 passives, place and route in KiCad
@@ -115,23 +136,27 @@ Without placement preservation, the tool is unusable for real PCB design. With t
 3. Change footprints to 0603 in Python
 4. Regenerate → **placement positions preserved** ✅, re-route traces (expected)
 
-### Component Addition Workflow (Common)
-1. Generate initial PCB, place and route in KiCad
-2. Realize need for test points
-3. Add test points in Python
-4. Regenerate → **all placements preserved** ✅, test points auto-placed
-5. **Adjust test point positions** in KiCad (fine-tune to accessible locations)
-6. **Route test point connections** in KiCad (minimal effort)
+### Multi-Layer Board Workflow (4-Layer Example)
+1. Generate 4-layer PCB from Python (F.Cu, In1.Cu, In2.Cu, B.Cu)
+2. Place components in KiCad for optimal layout
+3. Add through-hole vias for power/ground in Python
+4. Add blind vias (F.Cu → In1.Cu) for dense routing in Python
+5. Regenerate → **all positions preserved** ✅, **vias added** ✅
+6. **Route signal traces in KiCad** (use vias for layer transitions)
+7. **Verify connectivity** with DRC in KiCad
 
-## Implementation Timeline (Focused Scope)
+## Implementation Timeline
 
 - **Weeks 1-2**: Phase 1 (Tests 01-05: Core placement operations)
   - **Test 03 is highest priority** - THE KILLER FEATURE
 - **Weeks 3-4**: Phase 2 (Tests 06-08: Component manipulation)
 - **Weeks 5-6**: Phase 3 (Tests 09-12: Board & mechanical)
-- **Weeks 7-8**: Phase 4 (Tests 13-15: Manufacturing output)
+- **Weeks 7-8**: Phase 4 (Tests 13-15: Via management) ⭐ NEW
+  - Essential for multi-layer boards
+- **Weeks 9-10**: Phase 5 (Tests 16-18: Board features)
+- **Weeks 11-12**: Phase 6 (Tests 19-21: Manufacturing output)
 
-**Total**: 15 focused tests over 8 weeks (not 10 weeks for 35 tests)
+**Total**: 21 comprehensive tests over 12 weeks
 
 ## Getting Started
 
@@ -154,14 +179,15 @@ Without placement preservation, the tool is unusable for real PCB design. With t
 
 This test suite succeeds when:
 
-✅ **Engineers trust circuit-synth for production PCB placement**
+✅ **Engineers trust circuit-synth for production PCB development**
 ✅ **Manual placement work is provably preserved** (THE key metric)
 ✅ Component operations (add/delete/modify) validated
 ✅ Footprint changes preserve positions
+✅ **Via placement works** (through-hole, blind, buried) for multi-layer boards
 ✅ Board setup and mechanical features work
 ✅ Manufacturing output is accurate
-✅ **15 focused placement tests all passing**
-✅ **Clear expectations set: placement preserved, routing done in KiCad**
+✅ **21 comprehensive tests all passing**
+✅ **Clear expectations set: circuit-synth for placement/vias, KiCad for complex routing**
 
 ---
 
