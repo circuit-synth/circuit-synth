@@ -63,7 +63,7 @@ class Test01SimpleResistorWorkflow(unittest.TestCase):
 
         kicad_pro = self.reference_project / "01_simple_resistor_reference.kicad_pro"
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(kicad_pro),
+            kicad_project_or_json=str(kicad_pro),
             python_file=str(temp_output),
             preview_only=True,
             create_backup=False,
@@ -91,7 +91,7 @@ class Test01SimpleResistorWorkflow(unittest.TestCase):
 
         # Run the conversion
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -145,7 +145,7 @@ class Test01SimpleResistorWorkflow(unittest.TestCase):
 
         # Step 1: Run KiCad-to-Python logic on reference project
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -228,7 +228,7 @@ class Test01SimpleResistorWorkflow(unittest.TestCase):
 
         # Run conversion
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -258,7 +258,7 @@ class Test01SimpleResistorWorkflow(unittest.TestCase):
 
         # Step 1: KiCad -> Python
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(self.python_output_dir),
             preview_only=False,
             create_backup=False,
@@ -318,7 +318,7 @@ class Test01SimpleResistorWorkflow(unittest.TestCase):
         )
 
         syncer_slash = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(test_dir_with_slash),
             preview_only=False,
             create_backup=False,
@@ -345,7 +345,7 @@ class Test01SimpleResistorWorkflow(unittest.TestCase):
         )
 
         syncer_no_ext = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(test_dir_no_ext),
             preview_only=False,
             create_backup=False,
@@ -368,7 +368,7 @@ class Test01SimpleResistorWorkflow(unittest.TestCase):
         self.assertFalse(test_file_py.exists(), "Test file should not exist initially")
 
         syncer_file = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(test_file_py),
             preview_only=False,
             create_backup=False,
@@ -395,7 +395,7 @@ class Test01SimpleResistorWorkflow(unittest.TestCase):
         )
 
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(test_preview_dir),
             preview_only=True,  # Important: preview mode
             create_backup=False,
@@ -420,7 +420,7 @@ class Test01SimpleResistorWorkflow(unittest.TestCase):
         first_python_dir.mkdir(parents=True, exist_ok=True)
 
         syncer1 = KiCadToPythonSyncer(
-            kicad_project=str(self.reference_project),
+            kicad_project_or_json=str(self.reference_project),
             python_file=str(first_python_dir),
             preview_only=False,
             create_backup=False,
@@ -469,7 +469,7 @@ class Test01SimpleResistorWorkflow(unittest.TestCase):
         second_python_dir.mkdir(parents=True, exist_ok=True)
 
         syncer2 = KiCadToPythonSyncer(
-            kicad_project=str(
+            kicad_project_or_json=str(
                 first_generated_kicad
             ),  # Use the generated KiCad as input
             python_file=str(second_python_dir),

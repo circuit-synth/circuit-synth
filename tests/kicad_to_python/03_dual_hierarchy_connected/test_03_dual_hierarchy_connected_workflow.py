@@ -41,7 +41,7 @@ class TestConnectedHierarchicalWorkflow:
 
         # Parse the connected hierarchical project
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(PROJECT_DIR),
+            kicad_project_or_json=str(PROJECT_DIR),
             python_file=str(test_output_dir),
             preview_only=False,
             create_backup=False,
@@ -88,7 +88,7 @@ class TestConnectedHierarchicalWorkflow:
 
         # Generate Python code
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(PROJECT_DIR),
+            kicad_project_or_json=str(PROJECT_DIR),
             python_file=str(test_output_dir),
             preview_only=False,
             create_backup=False,
@@ -140,7 +140,7 @@ class TestConnectedHierarchicalWorkflow:
 
         # Generate Python code
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(PROJECT_DIR),
+            kicad_project_or_json=str(PROJECT_DIR),
             python_file=str(test_output_dir),
             preview_only=False,
             create_backup=False,
@@ -212,7 +212,7 @@ class TestConnectedHierarchicalWorkflow:
 
         # First conversion: KiCad → Python
         syncer1 = KiCadToPythonSyncer(
-            kicad_project=str(PROJECT_DIR),
+            kicad_project_or_json=str(PROJECT_DIR),
             python_file=str(test_output_dir_1),
             preview_only=False,
             create_backup=False,
@@ -240,7 +240,7 @@ class TestConnectedHierarchicalWorkflow:
         test_output_dir_2.mkdir(parents=True, exist_ok=True)
 
         syncer2 = KiCadToPythonSyncer(
-            kicad_project=str(generated_project),
+            kicad_project_or_json=str(generated_project),
             python_file=str(test_output_dir_2),
             preview_only=False,
             create_backup=False,
@@ -281,7 +281,7 @@ class TestConnectedHierarchicalWorkflow:
         test_output_dir.mkdir(parents=True, exist_ok=True)
 
         syncer = KiCadToPythonSyncer(
-            kicad_project=str(PROJECT_DIR),
+            kicad_project_or_json=str(PROJECT_DIR),
             python_file=str(test_output_dir),
             preview_only=False,
             create_backup=False,

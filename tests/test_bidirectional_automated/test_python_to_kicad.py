@@ -48,8 +48,7 @@ class TestPythonToKiCadGeneration:
         circuit_obj = blank()
         output_dir = temp_project_dir / "blank"
         circuit_obj.generate_kicad_project(
-            project_name="blank",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Verify schematic file exists
@@ -81,8 +80,7 @@ class TestPythonToKiCadGeneration:
         circuit_obj = single_resistor()
         output_dir = temp_project_dir / "single_resistor"
         circuit_obj.generate_kicad_project(
-            project_name="single_resistor",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Parse schematic
@@ -115,8 +113,7 @@ class TestPythonToKiCadGeneration:
         circuit_obj = two_resistors()
         output_dir = temp_project_dir / "two_resistors"
         circuit_obj.generate_kicad_project(
-            project_name="two_resistors",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Parse schematic
@@ -155,8 +152,7 @@ class TestPythonToKiCadGeneration:
         circuit_obj = two_resistors_connected()
         output_dir = temp_project_dir / "two_resistors_connected"
         circuit_obj.generate_kicad_project(
-            project_name="two_resistors_connected",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Parse schematic
@@ -189,8 +185,7 @@ class TestPythonToKiCadGeneration:
         circuit_obj = voltage_regulator_led()
         output_dir = temp_project_dir / "voltage_regulator_led"
         circuit_obj.generate_kicad_project(
-            project_name="voltage_regulator_led",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Parse schematic
@@ -229,8 +224,7 @@ class TestPythonToKiCadGeneration:
         circuit_obj = single_resistor()
         output_dir = temp_project_dir / "project_test"
         circuit_obj.generate_kicad_project(
-            project_name="project_test",
-            output_dir=str(output_dir),
+            project_name=str(output_dir),
             generate_pcb=True
         )
 
@@ -261,8 +255,7 @@ class TestPythonToKiCadGeneration:
         circuit_obj = single_resistor()
         output_dir = temp_project_dir / "parse_test"
         circuit_obj.generate_kicad_project(
-            project_name="parse_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Parse schematic - should not raise exception
@@ -292,8 +285,7 @@ class TestPythonToKiCadGeneration:
         circuit_obj = single_resistor()
         output_dir = temp_project_dir / "properties_test"
         circuit_obj.generate_kicad_project(
-            project_name="properties_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Parse and verify
@@ -329,8 +321,7 @@ class TestPythonToKiCadGeneration:
         # First generation
         circuit_obj1 = single_resistor()
         circuit_obj1.generate_kicad_project(
-            project_name="regen_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         sch_path = output_dir / "regen_test.kicad_sch"
@@ -340,8 +331,7 @@ class TestPythonToKiCadGeneration:
         # Second generation (same circuit)
         circuit_obj2 = single_resistor()
         circuit_obj2.generate_kicad_project(
-            project_name="regen_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         sch2 = parse_schematic(sch_path)
