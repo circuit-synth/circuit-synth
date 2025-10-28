@@ -258,7 +258,7 @@ def test_44_subcircuit_hierarchical_ports(request):
         print("STEP 6: Add new signal (SIGNAL) to Python code")
         print("=" * 70)
 
-        # Inject SIGNAL net creation between the markers
+        # Inject SIGNAL net creation between the markers (in parent circuit)
         injection_lines = [
             "signal_net = Net(\"SIGNAL\")",
         ]
@@ -277,11 +277,33 @@ def test_44_subcircuit_hierarchical_ports(request):
 
         modified_code = original_code.replace(marker_section, replacement_section)
 
-        # Also modify the add_subcircuit call to include SIGNAL connection
-        # Find: root.add_subcircuit(led_driver, connections={"VCC": vcc, "GND": gnd})
-        # Replace: root.add_subcircuit(led_driver, connections={"VCC": vcc, "GND": gnd, "SIGNAL": signal_net})
-        old_add_subcircuit = 'root.add_subcircuit(led_driver, connections={"VCC": vcc, "GND": gnd})'
-        new_add_subcircuit = 'root.add_subcircuit(led_driver, connections={"VCC": vcc, "GND": gnd, "SIGNAL": signal_net})'
+        # Also add SIGNAL net in subcircuit and add a second resistor to use it
+        # This creates a real hierarchical connection that should appear as label and pin
+        old_add_subcircuit = '    # Add subcircuit to root circuit\n    # This creates:\n    # 1. Hierarchical labels (VCC, GND) in LED_Driver.kicad_sch\n    # 2. Sheet symbol in parent with hierarchical pins (VCC, GND)\n    # 3. Connections between parent nets and sheet pins\n    root.add_subcircuit(led_driver)'
+
+        new_add_subcircuit = '''    # Add second resistor for SIGNAL connection
+    resistor2 = Component(
+        symbol="Device:R",
+        ref="R2",
+        value="1k",
+        footprint="Resistor_SMD:R_0603_1608Metric",
+    )
+    led_driver.add_component(resistor2)
+
+    # Create matching SIGNAL net in subcircuit
+    signal_net_child = Net("SIGNAL")
+
+    # Connect second resistor to SIGNAL net
+    resistor2[1] += signal_net_child  # R2 pin 1 to SIGNAL (hierarchical label)
+    resistor2[2] += gnd_child  # R2 pin 2 to GND
+
+    # Add subcircuit to root circuit
+    # This creates:
+    # 1. Hierarchical labels (VCC, GND, SIGNAL) in LED_Driver.kicad_sch
+    # 2. Sheet symbol in parent with hierarchical pins (VCC, GND, SIGNAL)
+    # 3. Connections between parent nets and sheet pins
+    root.add_subcircuit(led_driver)'''
+
         modified_code = modified_code.replace(old_add_subcircuit, new_add_subcircuit)
 
         assert modified_code != original_code, (

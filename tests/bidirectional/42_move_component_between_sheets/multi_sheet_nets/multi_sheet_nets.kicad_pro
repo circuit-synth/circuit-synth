@@ -5,7 +5,7 @@
     }
   },
   "boards": [
-    "usb_differential_pair.kicad_pcb"
+    "multi_sheet_nets.kicad_pcb"
   ],
   "cvpcb": {},
   "erc": {},
@@ -14,7 +14,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "usb_differential_pair.kicad_pro",
+    "filename": "multi_sheet_nets.kicad_pro",
     "version": 1
   },
   "net_settings": {},
@@ -59,8 +59,12 @@
   },
   "sheets": [
     [
-      "a3d4eddd-b6fe-4600-a9e8-246fa4b5fc48",
+      "8510d4a4-03ab-467c-be07-be142496a2c9",
       ""
+    ],
+    [
+      "95ba6b08-2600-4406-b40c-b9c6c6a4683c",
+      "SubCircuit"
     ]
   ],
   "text_variables": {}

@@ -10,14 +10,17 @@ Demonstrates hierarchical pin connections:
 This fixture is modified by the test to add/remove hierarchical ports dynamically.
 """
 
-from circuit_synth import Circuit, Component, Net
+from circuit_synth import circuit, Component, Net, Circuit
 
 
-def main():
-    # Create root (parent) circuit
-    root = Circuit("led_subcircuit")
+@circuit(name="led_subcircuit")
+def led_subcircuit():
+    """Create LED subcircuit with hierarchical ports."""
+    from circuit_synth.core.decorators import get_current_circuit
 
-    # Create power nets in parent
+    root = get_current_circuit()
+
+    # Create power nets in parent circuit context
     vcc = Net("VCC")
     gnd = Net("GND")
 
@@ -46,23 +49,34 @@ def main():
     led_driver.add_component(led)
     led_driver.add_component(resistor)
 
+    # Create matching nets in subcircuit for hierarchical connection
+    # Nets with same name in parent and child create hierarchical labels/pins
+    vcc_child = Net("VCC")
+    gnd_child = Net("GND")
+
     # Connect LED and resistor inside subcircuit to hierarchical port nets
     # These connections will create hierarchical labels in the subcircuit
-    led[1] += vcc  # LED anode to VCC (hierarchical label)
+    led[1] += vcc_child  # LED anode to VCC (hierarchical label)
     led[2] += resistor[1]  # LED cathode to resistor
-    resistor[2] += gnd  # Resistor to GND (hierarchical label)
+    resistor[2] += gnd_child  # Resistor to GND (hierarchical label)
 
     # Add subcircuit to root circuit
     # This creates:
     # 1. Hierarchical labels (VCC, GND) in LED_Driver.kicad_sch
     # 2. Sheet symbol in parent with hierarchical pins (VCC, GND)
     # 3. Connections between parent nets and sheet pins
-    root.add_subcircuit(led_driver, connections={"VCC": vcc, "GND": gnd})
+    root.add_subcircuit(led_driver)
+
+
+def main():
+    """Generate KiCad project from circuit."""
+    # Create the circuit
+    root = led_subcircuit()
 
     # Generate KiCad project
     print(f"Generating KiCad project: led_subcircuit")
     print(f"  Parent circuit: {root.name}")
-    print(f"  Subcircuit: {led_driver.name}")
+    print(f"  Subcircuit: LED_Driver")
     print(f"  Hierarchical ports: VCC, GND")
     print(f"  Components in subcircuit: D1 (LED), R1 (resistor)")
 
