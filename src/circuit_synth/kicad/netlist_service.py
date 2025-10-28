@@ -88,9 +88,10 @@ class CircuitDataLoader:
                 if net_name not in flattened_nets:
                     flattened_nets[net_name] = []
 
-                # Handle both formats: list of connections OR dict with connections key
+                # Handle both formats: list of connections OR dict with nodes key
                 if isinstance(net_data, dict):
-                    net_connections = net_data.get("connections", [])
+                    # Changed from "connections" to "nodes" for KiCad compatibility
+                    net_connections = net_data.get("nodes", net_data.get("connections", []))  # Fall back to "connections" for backward compatibility
                 else:
                     net_connections = net_data  # Old format: just a list
 
@@ -200,11 +201,11 @@ class CircuitReconstructor:
             for net_name, net_info in nets_data.items():
                 # Handle both old format (list) and new format (dict with metadata)
                 if isinstance(net_info, list):
-                    # Old format: just connections
+                    # Old format: just nodes as direct list
                     connections = net_info
                 else:
-                    # New format: dict with connections and metadata
-                    connections = net_info.get("connections", [])
+                    # New format: dict with nodes and metadata (changed from "connections" to "nodes" for KiCad compatibility)
+                    connections = net_info.get("nodes", net_info.get("connections", []))  # Fall back to "connections" for backward compatibility
 
                 # Creating net with connections (verbose logging available if needed)
                 net = Net(net_name)

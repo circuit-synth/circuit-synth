@@ -258,14 +258,14 @@ class NetlistExporter:
                 }
                 net_to_pins[net_name].append(pin_connection)
 
-        # Store them in data["nets"] - include both connections and Net properties
+        # Store them in data["nets"] - include both nodes and Net properties
         for net_name, pin_list in net_to_pins.items():
             # Find the Net object to include its metadata
             net_obj = self.circuit._nets.get(net_name)
             if net_obj:
-                # Include Net properties along with connections
+                # Include Net properties along with nodes
                 data["nets"][net_name] = {
-                    "connections": pin_list,
+                    "nodes": pin_list,  # Changed from "connections" to "nodes" for KiCad compatibility
                     "is_power": net_obj.is_power,
                     "power_symbol": net_obj.power_symbol,
                     "trace_current": net_obj.trace_current,
@@ -273,7 +273,7 @@ class NetlistExporter:
                     "properties": net_obj.properties,
                 }
             else:
-                # Fallback: just connections (for backward compatibility)
+                # Fallback: just nodes as direct list (for backward compatibility)
                 data["nets"][net_name] = pin_list
 
         # 3) Recursively gather subcircuits
