@@ -19,12 +19,12 @@ def single_resistor():
         footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
-    r2 = Component(
-        symbol="Device:R",
-        ref="R2",
-        value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
+    # r2 = Component(
+    #     symbol="Device:R",
+    #     ref="R2",
+    #     value="10k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
 
 
 if __name__ == "__main__":

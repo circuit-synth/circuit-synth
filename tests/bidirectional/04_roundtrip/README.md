@@ -24,37 +24,36 @@ Validates that a complete round-trip cycle (Python → KiCad → Python → KiCa
 ```bash
 cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/04_roundtrip
 
-# Step 1: Generate KiCad from original Python
+# Step 1: Generate KiCad from Python (first generation)
 uv run single_resistor.py
 # Creates: single_resistor/single_resistor.kicad_pro with R1
 
-# Step 2: Import KiCad back to Python
-uv run kicad-to-python single_resistor imported.py
+# Step 2: Import KiCad back to Python (overwrites single_resistor.py)
+uv run kicad-to-python single_resistor single_resistor.py
 
-# Step 3: Verify imported.py contains R1 component
-# Open imported.py - should show R1 component definition
+# Step 3: Verify single_resistor.py still contains R1 component
+# Component properties should be preserved from import
 
-# Step 4: Generate KiCad from imported Python (round-trip)
-uv run imported.py
+# Step 4: Generate KiCad again from imported Python (completes round-trip)
+uv run single_resistor.py
 
-# Step 5: Open both KiCad projects and compare
-open single_resistor/single_resistor.kicad_pro
-# Then open the project generated from imported.py
-
-# Step 6: Verify both schematics have R1 with same properties
+# Step 5: Verify schematic still has R1 with same properties
 #   - ref="R1"
 #   - value="10k"
 #   - footprint="R_0603_1608Metric"
+
+# The same single_resistor.py file is used throughout:
+#   Python → KiCad → Python (overwrites same file) → KiCad
 ```
 
 ## Expected Result
 
 - ✅ Original KiCad project created with R1
-- ✅ KiCad imported to Python successfully (imported.py)
-- ✅ imported.py contains R1 component definition
-- ✅ Round-trip KiCad project created from imported.py
-- ✅ Both KiCad projects have identical R1 component
-- ✅ No data loss through the round-trip cycle
+- ✅ KiCad imported back to Python successfully (overwrites single_resistor.py)
+- ✅ single_resistor.py contains R1 component definition after import
+- ✅ Round-trip KiCad project created from same single_resistor.py
+- ✅ Schematic has identical R1 component after round-trip
+- ✅ No data loss through the round-trip cycle using single Python file
 
 ## Why This Is Important
 
