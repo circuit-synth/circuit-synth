@@ -93,7 +93,7 @@ class TestNetOperations:
 
         # Add net connection using kicad-sch-api
         sch_path = output_dir / "add_net_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
 
         # Get component pin positions
         r1 = sch.components.get("R1")
@@ -110,7 +110,7 @@ class TestNetOperations:
         sch.save()
 
         # Verify
-        sch_verify = ksa.Schematic(str(sch_path))
+        sch_verify = ksa.Schematic.load(str(sch_path))
         assert_net_exists(sch_verify, "NET1")
 
     def test_18_rename_net(self, temp_project_dir, parse_schematic):
@@ -139,7 +139,7 @@ class TestNetOperations:
 
         # Rename NET1 → VCC
         sch_path = output_dir / "rename_net_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
 
         # Find and rename all NET1 labels
         for label in list(sch.labels):
@@ -149,7 +149,7 @@ class TestNetOperations:
         sch.save()
 
         # Verify
-        sch_verify = ksa.Schematic(str(sch_path))
+        sch_verify = ksa.Schematic.load(str(sch_path))
         assert_net_exists(sch_verify, "VCC")
 
         # Verify NET1 gone
@@ -192,7 +192,7 @@ class TestNetOperations:
 
         # Delete NET1 (remove labels and wires)
         sch_path = output_dir / "delete_net_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
 
         # Remove labels
         for label in list(sch.labels):
@@ -206,7 +206,7 @@ class TestNetOperations:
         sch.save()
 
         # Verify net gone
-        sch_verify = ksa.Schematic(str(sch_path))
+        sch_verify = ksa.Schematic.load(str(sch_path))
         net1_labels = [l for l in sch_verify.labels if l.text == "NET1"]
         assert len(net1_labels) == 0, "NET1 labels still exist"
 
@@ -238,7 +238,7 @@ class TestNetOperations:
 
         # Merge NET2 into NET1
         sch_path = output_dir / "merge_nets_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
 
         # Rename all NET2 labels to NET1
         for label in list(sch.labels):
@@ -248,7 +248,7 @@ class TestNetOperations:
         sch.save()
 
         # Verify
-        sch_verify = ksa.Schematic(str(sch_path))
+        sch_verify = ksa.Schematic.load(str(sch_path))
 
         # NET1 exists
         net1_labels = [l for l in sch_verify.labels if l.text == "NET1"]
@@ -287,7 +287,7 @@ class TestNetOperations:
 
         # Split: change one label from NET1 to NET2
         sch_path = output_dir / "split_net_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
 
         # Find first NET1 label and rename to NET2
         net1_labels = [l for l in sch.labels if l.text == "NET1"]
@@ -297,7 +297,7 @@ class TestNetOperations:
         sch.save()
 
         # Verify both nets exist
-        sch_verify = ksa.Schematic(str(sch_path))
+        sch_verify = ksa.Schematic.load(str(sch_path))
         assert_net_exists(sch_verify, "NET1")
         assert_net_exists(sch_verify, "NET2")
 
@@ -386,7 +386,7 @@ class TestNetOperations:
 
         # Add R3 and connect to NET1
         sch_path = output_dir / "add_comp_net_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
 
         # Add R3
         sch.components.add(
@@ -404,7 +404,7 @@ class TestNetOperations:
         sch.save()
 
         # Verify
-        sch_verify = ksa.Schematic(str(sch_path))
+        sch_verify = ksa.Schematic.load(str(sch_path))
         assert_schematic_component_count(sch_verify, 3)
         assert_net_exists(sch_verify, "NET1")
 

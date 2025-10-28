@@ -48,7 +48,7 @@ class TestComponentOperations:
 
         # Add R2
         sch_path = output_dir / "add_component_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
         sch.components.add(
             lib_id="Device:R",
             reference="R2",
@@ -59,7 +59,7 @@ class TestComponentOperations:
         sch.save()
 
         # Verify
-        sch_verify = ksa.Schematic(str(sch_path))
+        sch_verify = ksa.Schematic.load(str(sch_path))
         assert_schematic_component_count(sch_verify, 2)
         assert_schematic_has_component(sch_verify, "R1", value="10k")
         assert_schematic_has_component(sch_verify, "R2", value="1k")
@@ -97,12 +97,12 @@ class TestComponentOperations:
 
         # Delete R2
         sch_path = output_dir / "delete_component_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
         sch.components.remove("R2")
         sch.save()
 
         # Verify
-        sch_verify = ksa.Schematic(str(sch_path))
+        sch_verify = ksa.Schematic.load(str(sch_path))
         assert_schematic_component_count(sch_verify, 1)
         assert_schematic_has_component(sch_verify, "R1", value="10k")
 
@@ -142,13 +142,13 @@ class TestComponentOperations:
 
         # Change to 22k
         sch_path = output_dir / "modify_value_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
         r1 = sch.components.get("R1")
         r1.value = "22k"
         sch.save()
 
         # Verify
-        sch_verify = ksa.Schematic(str(sch_path))
+        sch_verify = ksa.Schematic.load(str(sch_path))
         assert_schematic_has_component(sch_verify, "R1", value="22k")
 
         # Import and verify
@@ -188,13 +188,13 @@ class TestComponentOperations:
 
         # Rename R1 → R192713402134
         sch_path = output_dir / "rename_component_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
         r1 = sch.components.get("R1")
         r1.reference = "R192713402134"
         sch.save()
 
         # Verify in schematic
-        sch_verify = ksa.Schematic(str(sch_path))
+        sch_verify = ksa.Schematic.load(str(sch_path))
         assert sch_verify.components.get("R1") is None, \
             "Old reference R1 should not exist"
         assert_schematic_has_component(
@@ -233,14 +233,14 @@ class TestComponentOperations:
 
         # Change footprint
         sch_path = output_dir / "modify_footprint_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
         r1 = sch.components.get("R1")
         new_footprint = "Resistor_SMD:R_0805_2012Metric"  # Larger package
         r1.footprint = new_footprint
         sch.save()
 
         # Verify
-        sch_verify = ksa.Schematic(str(sch_path))
+        sch_verify = ksa.Schematic.load(str(sch_path))
         assert_schematic_has_component(
             sch_verify, "R1",
             footprint=new_footprint
@@ -278,7 +278,7 @@ class TestComponentOperations:
         )
 
         sch_path = output_dir / "bulk_operations_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
 
         # Add R3
         sch.components.add(
@@ -298,7 +298,7 @@ class TestComponentOperations:
         sch.save()
 
         # Verify final state
-        sch_verify = ksa.Schematic(str(sch_path))
+        sch_verify = ksa.Schematic.load(str(sch_path))
         assert_schematic_component_count(sch_verify, 2)  # R1, R3 (R2 deleted)
         assert_schematic_has_component(sch_verify, "R1", value="47k")
         assert sch_verify.components.get("R2") is None

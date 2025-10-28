@@ -52,7 +52,7 @@ class TestPositionPreservation:
 
         # Get R1's original auto-placed position
         sch_path = output_dir / "position_preservation_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
         r1_original_pos = sch.components.get("R1").position
 
         # Step 2: Manually move R1 to center of page (simulate user action)
@@ -61,7 +61,7 @@ class TestPositionPreservation:
         sch.save()
 
         # Verify move worked
-        sch_moved = ksa.Schematic(str(sch_path))
+        sch_moved = ksa.Schematic.load(str(sch_path))
         r1_moved_pos = sch_moved.components.get("R1").position
         assert_position_near(r1_moved_pos, center_pos, tolerance=0.5)
         assert r1_moved_pos != r1_original_pos, "Position didn't change"
@@ -77,7 +77,7 @@ class TestPositionPreservation:
         sch_moved.save()
 
         # Step 4: Verify R1 STILL at manually-moved position
-        sch_final = ksa.Schematic(str(sch_path))
+        sch_final = ksa.Schematic.load(str(sch_path))
         r1_final_pos = sch_final.components.get("R1").position
 
         # Critical assertion: R1 didn't move back to original position
@@ -125,7 +125,7 @@ class TestPositionPreservation:
 
         # Manually adjust position
         sch_path = output_dir / "regen_position_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
         custom_pos = (100, 150)
         sch.components.get("R1").position = custom_pos
         sch.save()
@@ -137,7 +137,7 @@ class TestPositionPreservation:
         )
 
         # Verify position preserved
-        sch_regen = ksa.Schematic(str(sch_path))
+        sch_regen = ksa.Schematic.load(str(sch_path))
         r1_regen_pos = sch_regen.components.get("R1").position
 
         # Position should be close to custom position
@@ -173,7 +173,7 @@ class TestPositionPreservation:
 
         # Manually position both
         sch_path = output_dir / "delete_position_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
         r1_custom_pos = (100, 100)
         r2_custom_pos = (200, 100)
         sch.components.get("R1").position = r1_custom_pos
@@ -181,12 +181,12 @@ class TestPositionPreservation:
         sch.save()
 
         # Delete R2
-        sch_delete = ksa.Schematic(str(sch_path))
+        sch_delete = ksa.Schematic.load(str(sch_path))
         sch_delete.components.remove("R2")
         sch_delete.save()
 
         # Verify R1 position unchanged
-        sch_final = ksa.Schematic(str(sch_path))
+        sch_final = ksa.Schematic.load(str(sch_path))
         r1_final_pos = sch_final.components.get("R1").position
 
         assert_position_near(r1_final_pos, r1_custom_pos, tolerance=0.5), \
@@ -220,13 +220,13 @@ class TestPositionPreservation:
 
         # Set position to non-grid value
         sch_path = output_dir / "grid_snap_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
         non_grid_pos = (100.123, 100.456)  # Sub-millimeter precision
         sch.components.get("R1").position = non_grid_pos
         sch.save()
 
         # Reload (KiCad may snap to grid)
-        sch_reload = ksa.Schematic(str(sch_path))
+        sch_reload = ksa.Schematic.load(str(sch_path))
         reloaded_pos = sch_reload.components.get("R1").position
 
         # Should be close (within 1mm grid snap tolerance)

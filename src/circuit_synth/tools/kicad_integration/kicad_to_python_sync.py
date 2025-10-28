@@ -168,8 +168,22 @@ class KiCadToPythonSyncer:
 
         # Check for existing JSON
         json_path = project_dir / f"{project_name}.json"
+        kicad_sch = project_dir / f"{project_name}.kicad_sch"
 
+        # Check if JSON exists and is up-to-date
         if json_path.exists():
+            # If .kicad_sch exists, check if it's newer than JSON
+            if kicad_sch.exists():
+                json_mtime = json_path.stat().st_mtime
+                sch_mtime = kicad_sch.stat().st_mtime
+
+                if sch_mtime > json_mtime:
+                    logger.info(
+                        f"JSON is stale (.kicad_sch modified after JSON), "
+                        f"regenerating from schematic..."
+                    )
+                    return self._export_kicad_to_json(kicad_project)
+
             logger.info(f"Found existing JSON: {json_path}")
             return json_path
 
