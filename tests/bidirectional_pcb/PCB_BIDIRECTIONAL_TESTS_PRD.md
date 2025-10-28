@@ -2,12 +2,14 @@
 
 ## Executive Summary
 
-This PRD defines a comprehensive bidirectional test suite for PCB-level operations in circuit-synth, mirroring the successful pattern established for schematic testing in `tests/bidirectional/`. The PCB test suite will validate Python ↔ KiCad PCB synchronization across component placement, routing, layers, design rules, and manufacturing constraints.
+This PRD defines a focused bidirectional test suite for PCB-level **component placement operations** in circuit-synth, mirroring the successful pattern established for schematic testing in `tests/bidirectional/`. The PCB test suite will validate Python ↔ KiCad PCB synchronization for component placement, footprint management, and basic board setup.
 
+**Scope**: Component placement, footprint assignment, board outline, basic manufacturing output
+**Out of Scope**: Manual trace routing preservation (future), autorouting, complex layer management
 **Status**: Planning Phase
-**Target**: Full PCB-level bidirectional synchronization validation
+**Target**: Comprehensive component placement bidirectional validation
 **Foundation**: Mirrors `tests/bidirectional/` schematic test architecture
-**Timeline**: Phased implementation starting with core placement tests
+**Timeline**: Focused implementation (~15 tests covering placement operations)
 
 ---
 
@@ -29,31 +31,45 @@ This PRD defines a comprehensive bidirectional test suite for PCB-level operatio
 - ✅ PCB Generator API (`src/circuit_synth/kicad/pcb_gen/pcb_generator.py`)
 - ⚠️ **NO bidirectional tests** (Python ↔ KiCad PCB sync)
 - ⚠️ **NO placement preservation tests**
-- ⚠️ **NO routing/trace tests**
-- ⚠️ **NO layer management tests**
+- ⚠️ **NO component add/delete/modify tests**
+
+**Explicit Non-Goals (Current Scope)**:
+- ❌ Manual trace routing preservation (future feature)
+- ❌ Autorouting algorithms
+- ❌ Complex impedance-controlled routing
+- ❌ Length-matched differential pairs (routing level)
+
+Circuit-synth focuses on **intelligent component placement** and lets users route in KiCad.
 
 ### 1.2 Why PCB Bidirectional Tests Are Critical
 
-**The PCB Problem**: PCB layout is where 80% of design time is spent. Engineers:
+**The PCB Problem**: Component placement is the first critical step in PCB design. Engineers:
 1. Generate initial PCB from schematic
 2. **Manually place components** (critical for signal integrity, thermal, mechanical)
-3. **Route traces** (controlled impedance, differential pairs, power planes)
+3. **Route traces in KiCad** (manual routing, not automated by circuit-synth)
 4. Need to **modify circuit** (add decoupling caps, change footprints)
-5. **MUST preserve** manual layout work when regenerating
+5. **MUST preserve** manual component placement when regenerating
+6. **Accept re-routing** after component changes (routing is manual anyway)
+
+**Circuit-Synth's Focus**: Intelligent component placement, not routing
+- ✅ Generate PCB with components in smart initial positions
+- ✅ Preserve manual placement adjustments when circuit changes
+- ✅ Handle component add/delete/modify operations
+- ✅ Let users route traces in KiCad (the right tool for manual routing)
+- ❌ NOT trying to preserve manual routing (future feature, low priority)
 
 **Without Bidirectional PCB Tests**:
 - ❌ No confidence that manual placement survives Python changes
-- ❌ No validation that routing is preserved
-- ❌ No verification of layer stack synchronization
-- ❌ Risk of destroying hours of PCB layout work
-- ❌ Users won't trust tool for real PCB design
+- ❌ Risk of destroying hours of component placement work
+- ❌ No validation of footprint changes
+- ❌ Users won't trust tool for iterative PCB development
 
-**With Comprehensive PCB Tests**:
+**With Focused PCB Tests**:
 - ✅ Validates placement preservation (like schematic test 09)
-- ✅ Proves routing can survive component additions
-- ✅ Verifies design rules transfer between Python and KiCad
+- ✅ Proves component operations work bidirectionally
 - ✅ Enables iterative PCB development workflow
-- ✅ Production-ready PCB generation confidence
+- ✅ Users route in KiCad, regenerate when circuit changes
+- ✅ Clear scope: placement, not routing
 
 ---
 
@@ -63,36 +79,46 @@ This PRD defines a comprehensive bidirectional test suite for PCB-level operatio
 
 1. **Mirror schematic test architecture**: Follow proven patterns from `tests/bidirectional/`
 2. **Validate placement preservation**: THE killer feature for PCB (like schematic test 09)
-3. **Prove routing preservation**: Traces survive component additions/changes
-4. **Test component operations**: Add, delete, modify components on PCB
-5. **Validate layer management**: Layer stack, zones, copper pours
-6. **Verify design rules**: DRC rules, clearances, track widths
-7. **Test manufacturing workflow**: Gerber generation, drill files, assembly data
+3. **Test component operations**: Add, delete, modify components on PCB
+4. **Verify footprint management**: Footprint changes, assignment, library sync
+5. **Validate board setup**: Board outline, mounting holes, basic mechanical
+6. **Test manufacturing workflow**: Gerber generation, pick-and-place, BOM
+
+**Explicit Non-Goals (Current Scope)**:
+- ❌ Routing preservation (users route in KiCad, accept re-routing)
+- ❌ Trace/via operations (future feature)
+- ❌ Complex layer management (focus on 2-layer for now)
+- ❌ Autorouting algorithms (not circuit-synth's focus)
 
 ### 2.2 Success Criteria
 
 **Test Suite Completeness**:
-- ✅ 25+ PCB-specific bidirectional tests
+- ✅ **15 focused PCB placement tests** (not 25-35, we're not testing routing)
 - ✅ Every test has comprehensive README.md
 - ✅ All tests use kicad-pcb-api for validation (Level 2)
-- ✅ Position preservation validated for all component operations
-- ✅ Routing preservation validated where applicable
-- ✅ Design rule synchronization verified
+- ✅ **Position preservation validated** for all component operations
+- ✅ Footprint changes validated
+- ✅ Component add/delete/modify operations proven
 
 **Test Quality**:
 - ✅ Independent execution (each test self-contained)
 - ✅ Fixture-based (reproducible starting states)
 - ✅ Clear step-by-step workflows with printed output
-- ✅ Multi-level validation (structural + electrical)
+- ✅ Structural validation (kicad-pcb-api)
 - ✅ Cleanup in finally blocks
 - ✅ `--keep-output` flag support
 
 **Real-World Workflows**:
-- ✅ Iterative development (add components without losing layout)
-- ✅ Footprint changes (swap SOIC → QFN, preserve routing)
-- ✅ Layer management (add/remove layers, update stack)
-- ✅ Design rule updates (sync DRC rules from Python)
-- ✅ Manufacturing output (Gerbers, drill files, BOM)
+- ✅ Iterative development (add components without losing placement)
+- ✅ Footprint changes (swap SOIC → QFN, preserve other placements)
+- ✅ Component operations (add decoupling caps, remove test points)
+- ✅ Board outline management
+- ✅ Manufacturing output (Gerbers, pick-and-place, BOM)
+
+**Accepted Limitations (Not Failures)**:
+- ⚠️ Manual routing lost when components move (expected - users route in KiCad)
+- ⚠️ No trace preservation tests (future feature, low priority)
+- ⚠️ 2-layer boards primarily (4-layer future enhancement)
 
 ---
 
@@ -426,7 +452,7 @@ def test_XX_feature_name(request):
 
 ## 4. Test Categories & Priority
 
-### 4.1 Phase 1: Core PCB Operations (Tests 01-11)
+### 4.1 Phase 1: Core Placement Operations (Tests 01-08)
 
 **Status**: CRITICAL - Must have for basic PCB workflow
 
@@ -434,150 +460,126 @@ def test_XX_feature_name(request):
 - **What**: Generate empty PCB with board outline
 - **Why**: Foundation test - proves basic PCB creation works
 - **Validation**: PCB file exists, has valid structure
+- **Scope**: No components, just board outline
 
 **02: Generate PCB from Schematic**
 - **What**: Python → KiCad PCB with components
 - **Why**: Basic Python → PCB workflow
 - **Validation**: Components exist on PCB with footprints
+- **Scope**: Auto-placement algorithm generates initial positions
 
 **03: Placement Preservation** ⭐ **THE KILLER FEATURE**
 - **What**: Manual component placement survives Python changes
 - **Why**: Without this, tool is unusable for real PCB design
 - **Validation**: Moved component stays at manual position after regeneration
 - **Critical**: This is to PCB what test 09 is to schematics
+- **Scope**: Only placement, NOT routing (routing expected to be redone)
 
 **04: Add Component to PCB**
 - **What**: Add component in Python, appears on existing PCB
-- **Why**: Iterative PCB development workflow
-- **Validation**: New component exists, old components unchanged
+- **Why**: Iterative PCB development workflow (e.g., add decoupling caps)
+- **Validation**: New component exists, old placements preserved
+- **Scope**: Placement only, users will route new connections in KiCad
 
 **05: Delete Component from PCB**
 - **What**: Remove component from Python, disappears from PCB
-- **Why**: Component removal workflow
+- **Why**: Component removal workflow (e.g., remove test points)
 - **Validation**: Component removed, others preserved
+- **Scope**: Placement only, connected traces become unconnected (expected)
 
 **06: Modify Footprint**
-- **What**: Change component footprint (e.g., 0603 → 0805)
+- **What**: Change component footprint (e.g., 0603 → 0805, SOIC → QFN)
 - **Why**: Footprint changes during design iteration
 - **Validation**: New footprint on PCB, position preserved
+- **Scope**: Placement preserved, routing lost (expected - users re-route)
 
 **07: Component Rotation**
-- **What**: Rotate component 90°/180°/270°
-- **Why**: Orientation affects routing and assembly
+- **What**: Rotate component 90°/180°/270° in Python
+- **Why**: Orientation affects placement density and assembly
 - **Validation**: Component at correct angle, position preserved
+- **Scope**: Rotation + placement, routing not tested
 
-**08: Trace Routing Preservation** ⭐
-- **What**: Manual traces survive component additions
-- **Why**: Routing takes hours - must be preserved
-- **Validation**: Existing traces unchanged after regeneration
+**08: Round-Trip Placement**
+- **What**: Full cycle: Python → PCB → move component → regenerate
+- **Why**: Validates complete bidirectional placement sync
+- **Validation**: Manual placement changes preserved through cycle
+- **Scope**: Placement workflow only, not testing routing preservation
 
-**09: Add Trace**
-- **What**: Add connection in Python, trace appears on PCB
-- **Why**: Programmatic routing capability
-- **Validation**: New trace exists with correct coordinates
+### 4.2 Phase 2: Board & Footprint Management (Tests 09-12)
 
-**10: Delete Trace**
-- **What**: Remove connection, trace disappears
-- **Why**: Connection removal workflow
-- **Validation**: Trace removed, others preserved
+**Status**: HIGH PRIORITY - Professional PCB workflow support
 
-**11: Round-Trip PCB**
-- **What**: Full cycle: Python → PCB → modify → regenerate
-- **Why**: Validates complete bidirectional sync
-- **Validation**: All changes preserved through cycle
+**09: Board Outline Definition**
+- **What**: Define custom board shape in Python
+- **Why**: Form factor requirements (rectangular, rounded corners, custom)
+- **Validation**: Edge.Cuts layer geometry matches Python
+- **Scope**: Board mechanical outline, not placement constraints
 
-### 4.2 Phase 2: Layer & Stack Management (Tests 12-18)
-
-**Status**: HIGH PRIORITY - Professional PCB design requirement
-
-**12: Layer Management**
-- **What**: Add/remove layers in Python, sync to PCB
-- **Why**: Multi-layer boards common in professional design
-- **Validation**: Layer stack matches Python definition
-
-**13: Design Rules Sync**
-- **What**: Update DRC rules in Python, sync to PCB
-- **Why**: Design rules critical for manufacturability
-- **Validation**: Clearances, track widths match Python
-
-**14: Via Placement**
-- **What**: Add vias in Python, appear on PCB
-- **Why**: Layer transitions essential for routing
-- **Validation**: Vias at correct positions, sizes, drill
-
-**15: Differential Pair Routing**
-- **What**: Define differential pair, enforce spacing
-- **Why**: High-speed signals (USB, HDMI, PCIe)
-- **Validation**: Pair spacing, matching enforced
-
-**16: Power Plane**
-- **What**: Create power plane on internal layer
-- **Why**: Low-impedance power distribution
-- **Validation**: Plane on correct layer, net assigned
-
-**17: Ground Plane**
-- **What**: Create ground plane (copper pour)
-- **Why**: Return path, EMI reduction
-- **Validation**: Ground plane covers area, clearances
-
-**18: Copper Pour**
-- **What**: Create arbitrary copper zone
-- **Why**: Thermal relief, shielding
-- **Validation**: Zone boundaries, fill settings
-
-### 4.3 Phase 3: Advanced Features (Tests 19-25)
-
-**Status**: MEDIUM PRIORITY - Professional polish
-
-**19: Keepout Zones**
-- **What**: Define no-copper/no-component areas
-- **Why**: Mechanical clearances, mounting
-- **Validation**: Zone boundaries, restrictions
-
-**20: Board Outline**
-- **What**: Define custom board shape
-- **Why**: Form factor requirements
-- **Validation**: Edge.Cuts layer geometry
-
-**21: Mounting Holes**
-- **What**: Add mechanical mounting holes
+**10: Mounting Holes**
+- **What**: Add mechanical mounting holes in Python
 - **Why**: PCB assembly to enclosure
-- **Validation**: Holes at correct positions, sizes
+- **Validation**: Holes at correct positions, sizes, plating
+- **Scope**: Mechanical features, not electrical
 
-**22: Text on Silkscreen**
-- **What**: Add text annotations to silkscreen
-- **Why**: Assembly instructions, part numbers
-- **Validation**: Text content, position, layer
+**11: Footprint Library Sync**
+- **What**: Change footprint library (e.g., update to newer library version)
+- **Why**: Library updates, custom footprint libraries
+- **Validation**: Components use correct library footprints
+- **Scope**: Footprint assignment, placement preserved
 
-**23: Fiducial Markers**
-- **What**: Add fiducials for pick-and-place
-- **Why**: Assembly automation registration
-- **Validation**: Fiducial positions, sizes
+**12: Component Properties**
+- **What**: Set DNP, MPN, tolerance, custom properties
+- **Why**: Manufacturing data (BOM, assembly instructions)
+- **Validation**: Properties transferred to PCB footprints
+- **Scope**: Metadata sync, not placement
 
-**24: Component Groups**
-- **What**: Group related components for placement
-- **Why**: Hierarchical placement optimization
-- **Validation**: Groups maintained, relative positions
+### 4.3 Phase 3: Manufacturing Output (Tests 13-15)
 
-**25: Gerber Generation**
-- **What**: Export Gerbers, drill files from Python
-- **Why**: Manufacturing output
-- **Validation**: Files generated, valid format
+**Status**: MEDIUM PRIORITY - Production integration
 
-### 4.4 Phase 4: Manufacturing Workflow (Tests 26-35)
+**13: Text on Silkscreen**
+- **What**: Add text annotations to silkscreen in Python
+- **Why**: Assembly instructions, part numbers, version info
+- **Validation**: Text content, position, layer (F.Silkscreen/B.Silkscreen)
+- **Scope**: Annotation data, not routing
 
-**Status**: LOWER PRIORITY - Production integration
+**14: Fiducial Markers**
+- **What**: Add fiducials for pick-and-place in Python
+- **Why**: Assembly automation registration points
+- **Validation**: Fiducial positions, sizes, copper clearance
+- **Scope**: Assembly features, treated as special components
 
-**26: Pick-and-Place Export**
-**27: Assembly Drawing Generation**
-**28: BOM with PCB Positions**
-**29: Test Point Report**
-**30: Panel Layout**
-**31: DRC Report Comparison**
-**32: Footprint Library Sync**
-**33: 3D Model Assignment**
-**34: IPC-2581 Export**
-**35: ODB++ Export**
+**15: Gerber & Manufacturing Export**
+- **What**: Export Gerbers, drill files, pick-and-place from Python
+- **Why**: Manufacturing handoff - verify output is valid
+- **Validation**: Files generated, valid format, positions match
+- **Scope**: Export validation, not DRC or routing checks
+
+### 4.4 Future Enhancements (Not Current Scope)
+
+**Status**: FUTURE - Not in initial test suite
+
+These features may be added in future iterations, but are not priority for component placement validation:
+
+**Routing Features** (Future):
+- Trace preservation when adding components
+- Via placement and management
+- Differential pair routing support
+- Autorouting integration
+
+**Advanced Layer Management** (Future):
+- Multi-layer stackup (4, 6, 8 layer)
+- Power/ground planes
+- Copper pours and zones
+- Complex layer rules
+
+**Advanced Manufacturing** (Future):
+- Panel layout generation
+- IPC-2581/ODB++ export
+- 3D model assignment
+- Assembly drawing generation
+
+**Current Focus**: Component placement, footprint management, basic 2-layer boards
 
 ---
 
@@ -585,7 +587,7 @@ def test_XX_feature_name(request):
 
 ### 5.1 Level 2: kicad-pcb-api (PRIMARY)
 
-All PCB tests use kicad-pcb-api for structural validation:
+All PCB tests use kicad-pcb-api for structural validation, **focused on placement**:
 
 ```python
 from kicad_pcb_api import PCBBoard
@@ -593,35 +595,30 @@ from kicad_pcb_api import PCBBoard
 # Load PCB
 pcb = PCBBoard.load(str(pcb_file))
 
-# Validate components
+# Validate components (CORE TEST)
 assert len(pcb.footprints) == expected_count
 r1 = next(fp for fp in pcb.footprints if fp.reference == "R1")
-assert r1.position == expected_position
+assert r1.position == expected_position  # THE KILLER FEATURE
 assert r1.rotation == expected_rotation
 assert r1.layer == "F.Cu"
 
-# Validate traces
-tracks = [t for t in pcb.tracks if t.net.name == "NET1"]
-assert len(tracks) == expected_count
-assert tracks[0].start == expected_start
-assert tracks[0].end == expected_end
-assert tracks[0].width == expected_width
+# Validate footprint assignment
+assert r1.footprint == "Resistor_SMD:R_0603_1608Metric"
 
-# Validate zones
-zones = [z for z in pcb.zones if z.net.name == "GND"]
-assert len(zones) > 0
-assert zones[0].layer == "B.Cu"
+# Validate component properties
+assert r1.properties.get("DNP") == expected_dnp
+assert r1.properties.get("MPN") == expected_mpn
 
-# Validate layers
-layers = pcb.layers
-assert "F.Cu" in layers
-assert "B.Cu" in layers
-assert "GND" in layers  # Internal plane
+# Validate board outline
+outline_segments = pcb.board_outline
+assert len(outline_segments) > 0
 
-# Validate design rules
-rules = pcb.design_rules
-assert rules.track_width_min == expected_min
-assert rules.clearance_min == expected_clearance
+# Validate mechanical features
+mounting_holes = [fp for fp in pcb.footprints if fp.is_mounting_hole]
+assert len(mounting_holes) == expected_hole_count
+
+# NOTE: We do NOT validate traces/vias/zones in placement tests
+# Users route manually in KiCad after component placement
 ```
 
 ### 5.2 Level 3: Gerber Validation (SECONDARY)
@@ -661,9 +658,9 @@ with open(gerber_dir / "project-F_Cu.gbr") as f:
     assert "G04 #@! TF.FileFunction,Copper,L1,Top*" in content
 ```
 
-### 5.3 Position Preservation Validation
+### 5.3 Position Preservation Validation (CRITICAL)
 
-Critical for all placement tests:
+**THE KILLER FEATURE** - validated in every placement test:
 
 ```python
 # BEFORE: Store original positions
@@ -672,14 +669,14 @@ positions_before = {
     for fp in pcb.footprints
 }
 
-# MODIFY: Make changes in Python
+# MODIFY: Make changes in Python (add R3, change footprint, etc.)
 
 # REGENERATE: Run Python script again
 
 # AFTER: Load regenerated PCB
 pcb_after = PCBBoard.load(str(pcb_file))
 
-# VALIDATE: Manual positions preserved
+# VALIDATE: Manual positions preserved (THE KILLER FEATURE)
 for ref, (pos_before, rot_before) in positions_before.items():
     fp_after = next(fp for fp in pcb_after.footprints if fp.reference == ref)
 
@@ -688,99 +685,123 @@ for ref, (pos_before, rot_before) in positions_before.items():
         f"{ref} position not preserved!\n"
         f"Before: {pos_before}\n"
         f"After: {fp_after.position}\n"
-        f"Manual layout work LOST!"
+        f"Manual PLACEMENT work LOST!"
     )
 
     # Rotation should be preserved
     assert fp_after.rotation == rot_before, (
         f"{ref} rotation not preserved!"
     )
+
+# NOTE: We do NOT check traces/vias
+# Users route in KiCad after placement, accept re-routing when components change
 ```
 
 ---
 
 ## 6. Real-World Workflows
 
-### 6.1 Iterative PCB Development
+### 6.1 Iterative PCB Development (Realistic Workflow)
 
 **Workflow:**
-1. Generate initial PCB from Python (components only)
-2. Open in KiCad, manually place components for optimal layout
-3. Add power connections in Python
-4. Regenerate PCB → **component positions preserved**
-5. Route traces in KiCad
-6. Add decoupling caps in Python
-7. Regenerate PCB → **positions AND traces preserved**
-8. Continue iterating
+1. Generate initial PCB from Python (components with auto-placement)
+2. Open in KiCad, **manually place components** for optimal layout
+3. **Route traces in KiCad** (manual routing - circuit-synth doesn't route)
+4. Realize need to add decoupling caps in Python
+5. Add caps in Python, regenerate PCB → **component positions preserved** ✅
+6. **Re-route new connections in KiCad** (expected - new components need routing)
+7. Change R1 footprint from 0805 to 0603 in Python
+8. Regenerate PCB → **placements preserved**, R1 has new footprint ✅
+9. **Adjust routing in KiCad** for smaller footprint (expected)
+10. Continue iterating (placement preserved, routing adjusted as needed)
+
+**Reality**: Users accept re-routing when components change. Placement preservation is critical, routing preservation is nice-to-have (future).
 
 **Tests That Validate This:**
-- Test 03: Placement Preservation
+- Test 03: Placement Preservation (THE CRITICAL ONE)
 - Test 04: Add Component to PCB
-- Test 08: Trace Routing Preservation
-- Test 11: Round-Trip PCB
+- Test 06: Modify Footprint
+- Test 08: Round-Trip Placement
 
-### 6.2 Footprint Optimization
+### 6.2 Footprint Optimization (Realistic Workflow)
 
 **Workflow:**
 1. Design with 0805 passives initially
-2. Layout and route PCB
+2. Place components and route PCB in KiCad
 3. Realize 0603 saves board space
 4. Change footprints in Python (0805 → 0603)
-5. Regenerate PCB → **positions preserved, routing preserved**
-6. Minor routing adjustments in KiCad
+5. Regenerate PCB → **positions preserved** ✅, routing lost (expected)
+6. **Re-route in KiCad** (smaller footprints, may need rework anyway)
+
+**Reality**: Footprint changes often require routing adjustments anyway. Key is preserving positions so users don't have to re-place everything.
 
 **Tests That Validate This:**
-- Test 06: Modify Footprint
+- Test 06: Modify Footprint (position preserved, new footprint correct)
 - Test 03: Placement Preservation
-- Test 08: Trace Routing Preservation
 
-### 6.3 Multi-Voltage Design
+### 6.3 Decoupling Cap Workflow (Common Pattern)
 
 **Workflow:**
-1. Define power planes in Python (VCC, 3V3, 5V, GND)
-2. Generate PCB with plane layers
-3. Place components for optimal thermal distribution
-4. Verify plane connectivity with DRC
-5. Add more components to each rail in Python
-6. Regenerate → **planes preserved, new components added**
+1. Generate initial PCB with main components (MCU, regulators)
+2. Place components in KiCad for optimal layout
+3. Route power and signal traces in KiCad
+4. Realize need more decoupling caps near MCU power pins
+5. Add 4 decoupling caps in Python (0.1uF, 1uF, etc.)
+6. Regenerate → **existing placements preserved**, new caps auto-placed near MCU ✅
+7. **Adjust cap positions** in KiCad (fine-tune near power pins)
+8. **Route cap connections** in KiCad (short, wide traces to minimize inductance)
+9. Continue development
+
+**Reality**: Adding components is common (decoupling, test points, debug headers). Placement preservation is key.
 
 **Tests That Validate This:**
-- Test 16: Power Plane
-- Test 17: Ground Plane
 - Test 04: Add Component to PCB
-- Test 12: Layer Management
+- Test 03: Placement Preservation
+- Test 12: Component Properties (DNP for test points)
 
-### 6.4 High-Speed Design
+### 6.4 Design Iteration Workflow
 
 **Workflow:**
-1. Define differential pairs in Python (USB D+/D-)
-2. Generate PCB with length matching rules
-3. Route differential pairs in KiCad
-4. Verify impedance with calculator
-5. Add termination resistors in Python
-6. Regenerate → **routing preserved, terminators added**
+1. Generate PCB with initial components
+2. Place and route in KiCad
+3. Design review reveals need for test points
+4. Add test point components in Python
+5. Regenerate → **existing placements preserved**, test points auto-placed ✅
+6. **Move test points** to accessible locations in KiCad
+7. **Route test point connections** in KiCad (minimal routing needed)
+8. Assembly review suggests moving connector
+9. **Move connector** in KiCad (manual adjustment)
+10. **Re-route affected traces** in KiCad (expected)
+11. Regenerate for new schematic change → **connector position preserved** ✅
+
+**Reality**: Design iteration involves placement adjustments and re-routing. Tool preserves manual placement work, users accept re-routing.
 
 **Tests That Validate This:**
-- Test 15: Differential Pair Routing
-- Test 04: Add Component to PCB
-- Test 08: Trace Routing Preservation
+- Test 03: Placement Preservation (manual moves preserved)
+- Test 04: Add Component to PCB (test points, debug headers)
+- Test 08: Round-Trip Placement (full cycle)
 
-### 6.5 Manufacturing Handoff
+### 6.5 Manufacturing Handoff (Realistic)
 
 **Workflow:**
-1. Finalize PCB design
+1. Finalize PCB design (placement and routing complete in KiCad)
 2. Add fiducials and mounting holes in Python
-3. Generate assembly notes on silkscreen
-4. Export Gerbers, drill files, BOM
-5. Verify pick-and-place file accuracy
-6. Submit to manufacturer
+3. Regenerate → **component placements preserved**, fiducials added ✅
+4. Add assembly notes on silkscreen in Python
+5. Regenerate → **all positions preserved**, silkscreen text added ✅
+6. Export Gerbers, drill files, pick-and-place from Python
+7. Verify pick-and-place file has correct positions
+8. Verify BOM matches actual components
+9. Submit to manufacturer
+
+**Reality**: Manufacturing data generated from finalized PCB. Placement must be correct.
 
 **Tests That Validate This:**
-- Test 23: Fiducial Markers
-- Test 21: Mounting Holes
-- Test 22: Text on Silkscreen
-- Test 25: Gerber Generation
-- Test 26: Pick-and-Place Export
+- Test 14: Fiducial Markers
+- Test 10: Mounting Holes
+- Test 13: Text on Silkscreen
+- Test 15: Gerber & Manufacturing Export
+- Test 12: Component Properties (DNP, MPN for BOM)
 
 ---
 
@@ -788,115 +809,112 @@ for ref, (pos_before, rot_before) in positions_before.items():
 
 ### 7.1 Phase 1: Foundation (Weeks 1-2)
 
-**Milestone**: Core PCB operations validated
+**Milestone**: Core placement operations validated
 
 **Tests to Implement:**
-- ✅ Test 01: Blank PCB Generation
-- ✅ Test 02: Generate PCB from Schematic
-- ⭐ Test 03: Placement Preservation (THE KILLER FEATURE)
-- ✅ Test 04: Add Component to PCB
-- ✅ Test 05: Delete Component from PCB
+- Test 01: Blank PCB Generation
+- Test 02: Generate PCB from Schematic
+- ⭐ **Test 03: Placement Preservation** (THE KILLER FEATURE - highest priority)
+- Test 04: Add Component to PCB
+- Test 05: Delete Component from PCB
 
 **Deliverables:**
-- Test directory structure created
-- First 5 tests implemented with README.md
+- Test directory structure created (`tests/bidirectional_pcb/`)
+- First 5 tests implemented with comprehensive README.md
 - conftest.py with shared fixtures
 - README.md overview document
 - All tests passing or XFAIL with issues documented
 
 **Success Criteria:**
-- Test 03 proves placement preservation works
-- All tests follow established pattern
-- kicad-pcb-api validation working
+- ✅ **Test 03 proves placement preservation works** (critical milestone)
+- ✅ All tests follow schematic test pattern
+- ✅ kicad-pcb-api validation working
+- ✅ Position comparison logic reliable
 
 ### 7.2 Phase 2: Component Operations (Weeks 3-4)
 
-**Milestone**: Component-level operations complete
+**Milestone**: Component manipulation complete
 
 **Tests to Implement:**
 - Test 06: Modify Footprint
 - Test 07: Component Rotation
-- Test 08: Trace Routing Preservation ⭐
-- Test 09: Add Trace
-- Test 10: Delete Trace
-- Test 11: Round-Trip PCB
+- Test 08: Round-Trip Placement
 
 **Deliverables:**
-- 6 more tests implemented
-- Routing preservation validated
-- Round-trip workflow proven
+- 3 more tests implemented (8 tests total)
+- Footprint changes validated
+- Component rotation verified
+- Round-trip placement workflow proven
 - All tests with comprehensive README.md
 
 **Success Criteria:**
-- Test 08 proves routing survives changes
-- Test 11 proves full bidirectional sync
-- 11 tests total passing
+- ✅ Test 06 proves footprint changes preserve position
+- ✅ Test 07 validates rotation + placement
+- ✅ Test 08 proves full bidirectional placement sync
+- ✅ 8 core placement tests passing
 
-### 7.3 Phase 3: Layers & Design Rules (Weeks 5-6)
+### 7.3 Phase 3: Board & Mechanical (Weeks 5-6)
 
-**Milestone**: Professional PCB features
-
-**Tests to Implement:**
-- Test 12: Layer Management
-- Test 13: Design Rules Sync
-- Test 14: Via Placement
-- Test 15: Differential Pair Routing
-- Test 16: Power Plane
-- Test 17: Ground Plane
-- Test 18: Copper Pour
-
-**Deliverables:**
-- 7 advanced tests implemented
-- Multi-layer PCB support validated
-- Design rule synchronization proven
-- 18 tests total
-
-**Success Criteria:**
-- Multi-layer boards work correctly
-- Design rules sync between Python and KiCad
-- Power/ground planes validated
-
-### 7.4 Phase 4: Advanced Features (Weeks 7-8)
-
-**Milestone**: Production-ready PCB workflow
+**Milestone**: Board setup and mechanical features
 
 **Tests to Implement:**
-- Test 19: Keepout Zones
-- Test 20: Board Outline
-- Test 21: Mounting Holes
-- Test 22: Text on Silkscreen
-- Test 23: Fiducial Markers
-- Test 24: Component Groups
-- Test 25: Gerber Generation
+- Test 09: Board Outline Definition
+- Test 10: Mounting Holes
+- Test 11: Footprint Library Sync
+- Test 12: Component Properties (DNP, MPN)
 
 **Deliverables:**
-- 7 polish tests implemented
-- Manufacturing output validated
-- 25 tests total
-- Full test suite documentation
+- 4 board/mechanical tests implemented (12 tests total)
+- Board outline validation working
+- Mounting hole placement verified
+- Component property sync proven
+- Comprehensive test suite documentation
 
 **Success Criteria:**
-- Gerber generation working
-- Assembly data accurate
-- Complete PCB workflow validated
+- ✅ Custom board shapes work
+- ✅ Mounting holes positioned correctly
+- ✅ Footprint library changes sync
+- ✅ Component metadata preserved
 
-### 7.5 Phase 5: Manufacturing Integration (Weeks 9-10)
+### 7.4 Phase 4: Manufacturing Output (Weeks 7-8)
 
-**Milestone**: Production manufacturing support
+**Milestone**: Production-ready manufacturing data
 
 **Tests to Implement:**
-- Test 26-35: Manufacturing workflow tests
-- Pick-and-place, BOM, test points, etc.
+- Test 13: Text on Silkscreen
+- Test 14: Fiducial Markers
+- Test 15: Gerber & Manufacturing Export
 
 **Deliverables:**
-- 10 manufacturing tests
-- 35 tests total
-- Production-ready test suite
+- 3 manufacturing tests implemented (**15 tests total**)
+- Gerber generation validated
+- Pick-and-place export verified
+- BOM data accuracy proven
+- **Complete PCB placement test suite**
 
 **Success Criteria:**
-- Manufacturing data export validated
-- Full workflow from design to fabrication
-- Test suite at production quality
+- ✅ Silkscreen text positioned correctly
+- ✅ Fiducials placed for assembly
+- ✅ Gerber/drill files generate correctly
+- ✅ Pick-and-place file has accurate positions
+- ✅ BOM matches component properties
+- ✅ **Full placement workflow production-ready**
+
+### 7.5 Future Phases (TBD - Not Current Scope)
+
+**Milestone**: Advanced features when needed
+
+**Potential Future Tests:**
+- Routing preservation tests (if/when implemented)
+- Multi-layer stackup tests (4/6/8 layer)
+- Copper pour/zone tests
+- Advanced DRC rule sync
+- Panel layout generation
+- 3D model assignment
+
+**Scope Decision**: These are not priority for initial placement-focused test suite. Add as features are implemented in circuit-synth.
+
+**Timeline**: No estimate - driven by feature development, not test development
 
 ---
 
@@ -1035,34 +1053,37 @@ addopts = -v --tb=short
 
 ### 10.1 Quantitative Metrics
 
-- ✅ **25+ PCB tests** implemented and passing
-- ✅ **>85% test coverage** for PCB generation code
-- ✅ **<5 minutes** full test suite execution time
+- ✅ **15 focused PCB placement tests** implemented and passing
+- ✅ **>85% test coverage** for PCB placement/generation code
+- ✅ **<3 minutes** full test suite execution time
 - ✅ **100% README.md coverage** (every test documented)
 - ✅ **0 text-matching tests** (all use kicad-pcb-api)
+- ✅ **Test 03 (placement preservation) passing** - THE critical milestone
 
 ### 10.2 Qualitative Metrics
 
 - ✅ Engineers trust PCB generation for real projects
-- ✅ Manual layout work provably preserved
-- ✅ Routing survives component additions
-- ✅ Design rules sync correctly
+- ✅ **Manual placement work provably preserved** (THE key metric)
+- ✅ Component operations (add/delete/modify) validated
+- ✅ Footprint changes preserve positions
 - ✅ Manufacturing output validated
-- ✅ Iterative PCB workflow is practical
+- ✅ **Iterative placement workflow is practical**
+- ⚠️ Users accept re-routing when components change (documented expectation)
 
 ### 10.3 User Validation
 
 **Before PCB Tests:**
-- ❌ "I don't trust circuit-synth for PCB - might lose my layout"
-- ❌ "How do I know routing is preserved?"
-- ❌ "What about design rules?"
+- ❌ "I don't trust circuit-synth for PCB - might lose my placement work"
+- ❌ "How do I know my component positions are preserved?"
+- ❌ "What if I need to add components later?"
 - ❌ "Can't use this for real boards"
 
 **After PCB Tests:**
 - ✅ "Test 03 proves placement preservation works"
-- ✅ "Test 08 shows routing is preserved"
-- ✅ "Test 13 validates design rules sync"
-- ✅ "I can use this for production boards"
+- ✅ "Test 04 shows I can add components without losing placements"
+- ✅ "Test 06 shows footprint changes preserve positions"
+- ✅ "I can use this for production boards (I'll route in KiCad)"
+- ✅ "Clear expectations: placement preserved, routing is my job"
 
 ---
 
@@ -1075,10 +1096,10 @@ addopts = -v --tb=short
 | **File Format** | .kicad_sch | .kicad_pcb |
 | **Validation API** | kicad-sch-api | kicad-pcb-api |
 | **Killer Feature** | Position preservation (Test 09) | Placement preservation (Test 03) |
-| **Critical Feature** | Netlist validation (Test 10, 11) | Routing preservation (Test 08) |
-| **Test Count** | 33+ tests | 25+ tests (planned) |
-| **Hierarchy** | Hierarchical sheets | Layer stackup |
-| **Connection** | Nets via labels | Traces/zones |
+| **Primary Focus** | Netlist/connectivity | Component placement |
+| **Test Count** | 33+ tests | 15 tests (focused scope) |
+| **Scope** | Components, nets, hierarchy | Placement, footprints, board setup |
+| **Out of Scope** | N/A | Routing (users do in KiCad) |
 | **Validation Levels** | Level 2 (kicad-sch-api), Level 3 (netlist) | Level 2 (kicad-pcb-api), Level 3 (Gerber) |
 
 ### 11.2 Glossary
