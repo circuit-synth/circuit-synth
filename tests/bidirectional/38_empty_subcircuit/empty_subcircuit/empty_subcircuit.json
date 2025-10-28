@@ -1,0 +1,89 @@
+{
+  "name": "empty_subcircuit",
+  "description": "Root circuit with R1 on root sheet and empty subcircuit.\n\n    The root sheet has R1. A child circuit is created but left empty initially.\n    The test will modify this to add/remove components from the subcircuit.\n    ",
+  "tstamps": "/empty_subcircuit-4376286640/",
+  "source_file": "empty_subcircuit.kicad_sch",
+  "components": {
+    "R1": {
+      "symbol": "Device:R",
+      "ref": "R1",
+      "value": "10k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "~",
+      "description": "Resistor",
+      "properties": {
+        "ki_fp_filters": "R_*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "R_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 3.81,
+          "length": 1.27,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -3.81,
+          "length": 1.27,
+          "orientation": 90.0
+        }
+      ]
+    }
+  },
+  "nets": {},
+  "subcircuits": [
+    {
+      "name": "EmptySubcircuit",
+      "description": "",
+      "tstamps": "/emptysubcircuit-4384220432/",
+      "source_file": "EmptySubcircuit.kicad_sch",
+      "components": {},
+      "nets": {},
+      "subcircuits": [],
+      "annotations": []
+    }
+  ],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Root circuit with R1 on root sheet and empty subcircuit.\n\n    The root sheet has R1. A child circuit is created but left empty initially.\n    The test will modify this to add/remove components from the subcircuit.",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "8abde4f6-f86e-43c3-8751-ad4c09877bc8"
+    }
+  ]
+}
