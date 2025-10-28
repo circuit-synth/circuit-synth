@@ -26,6 +26,7 @@ from .sync_strategies import (
     PositionRenameStrategy,
     ReferenceMatchStrategy,
     SyncStrategy,
+    UUIDMatchStrategy,
     ValueFootprintStrategy,
 )
 
@@ -101,9 +102,10 @@ class APISynchronizer:
         # Initialize matching strategies
         # Order matters: strategies are tried in sequence, first match wins
         self.strategies = [
-            ReferenceMatchStrategy(self.search_engine),  # Exact reference match
+            UUIDMatchStrategy(self.search_engine),        # UUID - most reliable (stable across changes)
+            ReferenceMatchStrategy(self.search_engine),   # Exact reference match
+            PositionRenameStrategy(self.search_engine),   # Detect renames by position+properties
             ConnectionMatchStrategy(self.net_matcher),    # Match by net topology
-            PositionRenameStrategy(self.search_engine),   # Detect renames by position
             ValueFootprintStrategy(self.search_engine),   # Match by value+footprint (fallback)
         ]
 
@@ -414,12 +416,16 @@ class APISynchronizer:
                 comp_value = getattr(comp, "value", "")
                 comp_symbol = getattr(comp, "lib_id", None)
                 comp_footprint = getattr(comp, "footprint", None)
+                comp_position = getattr(comp, "position", None)
+                comp_uuid = getattr(comp, "uuid", None)
             else:  # Circuit Synth Component
                 comp_id = comp.id if hasattr(comp, "id") else comp.ref
                 comp_ref = comp.ref
                 comp_value = comp.value
                 comp_symbol = getattr(comp, "symbol", None)
                 comp_footprint = getattr(comp, "footprint", None)
+                comp_position = getattr(comp, "position", None)
+                comp_uuid = getattr(comp, "uuid", None)
 
             result[comp_id] = {
                 "id": comp_id,
@@ -427,6 +433,8 @@ class APISynchronizer:
                 "value": comp_value,
                 "symbol": comp_symbol,  # Add symbol field
                 "footprint": comp_footprint,
+                "position": comp_position,  # Position for rename detection
+                "uuid": comp_uuid,  # UUID for stable component identity
                 "pins": self._extract_pin_info(comp),
                 "original": comp,
             }
