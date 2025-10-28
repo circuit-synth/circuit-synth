@@ -318,18 +318,14 @@ class SymbolBoundingBoxCalculator:
         # If no net name match, use minimal fallback to avoid oversized bounding boxes
         if pin_net_map and pin_number in pin_net_map:
             label_text = pin_net_map[pin_number]
-            print(
-                f"  PIN {pin_number}: ✅ USING NET '{label_text}' (len={len(label_text)}), at=({x:.2f}, {y:.2f}), angle={angle}",
-                file=sys.stderr,
-                flush=True,
+            logger.debug(
+                f"PIN {pin_number}: Using net '{label_text}' (len={len(label_text)}), at=({x:.2f}, {y:.2f}), angle={angle}"
             )
         else:
             # No net match - use minimal size (3 chars) instead of potentially long pin name
             label_text = "XXX"  # 3-character placeholder for unmatched pins
-            print(
-                f"  PIN {pin_number}: ⚠️  NO MATCH, using minimal fallback (pin name was '{pin_name}'), at=({x:.2f}, {y:.2f})",
-                file=sys.stderr,
-                flush=True,
+            logger.debug(
+                f"PIN {pin_number}: Using fallback sizing (pin name='{pin_name}'), at=({x:.2f}, {y:.2f})"
             )
 
         if label_text and label_text != "~":  # ~ means no name
