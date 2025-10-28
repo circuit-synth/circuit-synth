@@ -1,252 +1,174 @@
-# Test 33: Power Symbol Replacement (Manual KiCad Edit)
+# Test 26: Power Symbol Replacement
 
 ## What This Tests
 
-**Core Question**: When a user manually replaces circuit-synth generated hierarchical labels (GND) with KiCad power symbols in the schematic editor, what happens during regeneration?
+Validates that power symbols (GND, VCC, +3V3, +5V, -5V) are generated at correct positions and with correct rotations when connected to power nets.
 
-This tests **power symbol preservation** and **hierarchical label vs power symbol semantics**.
-
-## The Critical Difference
-
-**Hierarchical Labels** (what circuit-synth generates):
-- Text labels that say "GND"
-- Connection by matching names within hierarchical context
-- Generated from `Net(name="GND")`
-
-**Power Symbols** (what users want):
-- Actual KiCad power port symbols (⏚ ground symbol, +V arrow, etc.)
-- **GLOBAL/UNIVERSAL CONNECTION** - all GND symbols connect everywhere
-- Added manually in KiCad or from symbol library
-- Semantic meaning: this is a power net
-
-## Why This Matters (CRITICAL)
-
-**KiCad treats these VERY differently:**
-
-1. **Hierarchical labels**: Local to hierarchy, need matching names
-2. **Power symbols**: Global across entire project, universal connection
-
-**User expectation:**
-- GND should be a global power net
-- All GND connections should be universal
-- Power symbols are the "correct" KiCad way
-
-**Circuit-synth current behavior:**
-- Generates hierarchical labels for ALL nets (including power)
-- May not preserve power symbols
-- May not recognize power symbol semantics
+This test suite ensures that:
+1. Each power symbol type generates with correct KiCad library reference
+2. Power symbols are positioned correctly relative to component pins
+3. Positive supplies (VCC, +3V3, +5V) are oriented correctly (0° rotation)
+4. Ground and negative supplies (GND, -5V) are oriented correctly (180° rotation for downward-pointing symbols)
+5. Multiple power symbols in a single schematic all generate correctly
 
 ## When This Situation Happens
 
-**Real-world workflow:**
-1. User generates circuit from Python with `Net(name="GND")`
-2. Circuit-synth creates hierarchical labels "GND"
-3. User opens KiCad and thinks "this should be a power symbol"
-4. User manually deletes hierarchical labels
-5. User adds KiCad power symbols (Place → Power Port → GND)
-6. User saves schematic
-7. Later adds more components in Python connected to GND
-8. Regenerates expecting power symbols preserved
+- Multi-voltage designs with multiple power rails (e.g., 3.3V, 5V, and GND)
+- Circuits using standard KiCad power symbols instead of hierarchical labels
+- Power distribution networks requiring proper symbol representation
+- Any design following KiCad best practices (power symbols, not labels)
 
-## What Should Work (Ideal Behavior)
+## What Should Work
 
-1. Generate circuit with GND hierarchical labels
-2. User manually replaces with power symbols in KiCad
-3. Regenerate (no Python changes)
-4. **Power symbols should be preserved** (not reverted to labels)
-5. Add new component with GND in Python
-6. Regenerate
-7. **New component should get power symbol** (not hierarchical label)
-8. All GND symbols globally connected
+Each test file validates a specific power symbol type:
+
+1. **test_power_symbol_vcc.py** - VCC symbol (positive supply)
+   - Creates single resistor connected to VCC net
+   - Expects VCC power symbol at position (30.48, 31.75, 0°)
+   - Validates power symbol library reference is `power:VCC`
+
+2. **test_power_symbol_3v3.py** - +3V3 symbol (3.3V supply)
+   - Creates single resistor connected to +3V3 net
+   - Expects +3V3 power symbol at position (30.48, 31.75, 0°)
+   - Validates power symbol library reference is `power:+3V3`
+
+3. **test_power_symbol_5v.py** - +5V symbol (5V supply)
+   - Creates single resistor connected to +5V net
+   - Expects +5V power symbol at position (30.48, 31.75, 0°)
+   - Validates power symbol library reference is `power:+5V`
+
+4. **test_power_symbol_gnd.py** - GND symbol (ground/return)
+   - Creates single resistor connected to GND net
+   - Expects GND power symbol at position (30.48, 39.37, 0°)
+   - Validates power symbol library reference is `power:GND`
+   - Note: GND connects to bottom pin (pin 2) of resistor
+
+5. **test_power_symbol_neg5v.py** - -5V symbol (negative supply)
+   - Creates single resistor connected to -5V net
+   - Expects -5V power symbol at position (30.48, 39.37, 180°)
+   - Validates power symbol library reference is `power:-5V`
+   - Note: -5V connects to bottom pin (pin 2) of resistor, rotated 180° for downward orientation
+
+6. **test_power_symbol_all.py** - All power symbols combined
+   - Creates five resistors, each connected to a different power net
+   - Validates all five power symbols in a single schematic
+   - Comprehensive test ensuring no conflicts between multiple power symbols
+
+7. **test_multiple_power_nets.py** - Interactive verification
+   - Generates circuit with all five power net types
+   - Produces KiCad project for manual verification
+   - Shows how multiple power nets work in practice
 
 ## Manual Test Instructions
 
-### Phase 1: Initial Generation
+### Run Individual Power Symbol Tests
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/33_power_symbol_replacement
+cd /Users/shanemattner/Desktop/circuit-synth2/tests/bidirectional/26_power_symbol_replacement
 
-# Step 1: Generate initial circuit with GND hierarchical labels
-uv run three_resistors_gnd.py
-open three_resistors_gnd/three_resistors_gnd.kicad_pro
+# Test VCC symbol
+uv run test_power_symbol_vcc.py
 
-# Verify in KiCad:
-#   - R1[2], R2[2], R3[2] all have "GND" hierarchical labels (square flags)
-#   - NO power symbols (ground symbol ⏚)
-#   - Labels connect components
+# Test +3V3 symbol
+uv run test_power_symbol_3v3.py
+
+# Test +5V symbol
+uv run test_power_symbol_5v.py
+
+# Test GND symbol
+uv run test_power_symbol_gnd.py
+
+# Test -5V symbol
+uv run test_power_symbol_neg5v.py
+
+# Test all symbols combined
+uv run test_power_symbol_all.py
 ```
 
-### Phase 2: Manual Power Symbol Replacement
+### Run All Tests
 
 ```bash
-# Step 2: In KiCad schematic editor, manually replace labels with power symbols
-
-# For each resistor (R1, R2, R3):
-#   1. Select and delete the "GND" hierarchical label
-#   2. Place → Power Port → GND (or Add Power Symbol from toolbar)
-#   3. Connect power symbol to component pin
-#   4. Repeat for all three components
-
-# Verify:
-#   - All three resistors connected to power symbol GND (⏚)
-#   - NO hierarchical labels remaining
-#   - Power symbols show ground symbol icon
-
-# Step 3: Save schematic (Cmd+S)
-# Close KiCad
+# Run pytest to execute all tests
+pytest test_power_symbol_vcc.py test_power_symbol_3v3.py test_power_symbol_5v.py \
+       test_power_symbol_gnd.py test_power_symbol_neg5v.py test_power_symbol_all.py -v
 ```
 
-### Phase 3: Regeneration Without Changes
+### Generate and Inspect in KiCad
 
 ```bash
-# Step 4: Regenerate without Python changes (test preservation)
-uv run three_resistors_gnd.py
+# Generate a multi-power circuit for visual inspection
+uv run test_multiple_power_nets.py
 
-# Step 5: Open regenerated schematic
-open three_resistors_gnd/three_resistors_gnd.kicad_pro
-
-# Critical verification:
-#   - Are power symbols still present?
-#   - Or did they revert to hierarchical labels?
-#   - Are components still connected?
+# Open in KiCad to verify power symbols visually
+open multiple_power_nets/multiple_power_nets.kicad_pro
 ```
 
-### Phase 4: Add Component After Replacement
+## Expected Result
 
-```bash
-# Step 6: Edit three_resistors_gnd.py to add R4
-# Add after R3 definition:
-#   r4 = Component(symbol="Device:R", ref="R4", value="1k",
-#                  footprint="Resistor_SMD:R_0603_1608Metric")
-# Add after gnd += r3[2]:
-#   gnd += r4[2]
+### Individual Tests Pass When:
 
-# Step 7: Regenerate with new component
-uv run three_resistors_gnd.py
+- ✅ Power symbol library reference is correct (`power:VCC`, `power:+3V3`, etc.)
+- ✅ Power symbol position matches expected coordinates
+- ✅ Power symbol rotation matches expected value
+- ✅ Positive supplies (VCC, +3V3, +5V) have 0° rotation
+- ✅ Ground and negative supplies (GND, -5V) have appropriate rotation for orientation
+- ✅ Power symbol connects to correct component pin
 
-# Step 8: Open and verify
-open three_resistors_gnd/three_resistors_gnd.kicad_pro
+### Combined Test Passes When:
 
-# Critical verification:
-#   - Does R4 get power symbol or hierarchical label?
-#   - Are R1-R3 power symbols preserved?
-#   - Is R4 connected to same GND net?
-```
+- ✅ All five power symbols generate in single schematic
+- ✅ No conflicts or errors with multiple power net types
+- ✅ Each power symbol has correct position and rotation
+- ✅ No unexpected hierarchical labels alongside power symbols
 
-## Expected Result (Ideal)
+### Visual Verification in KiCad:
 
-**Phase 1 - Initial generation:**
-- ✅ Three hierarchical labels "GND"
+- ✅ VCC shows as upward-pointing arrow (⬆ VCC)
+- ✅ +3V3 shows as upward-pointing arrow (⬆ +3V3)
+- ✅ +5V shows as upward-pointing arrow (⬆ +5V)
+- ✅ GND shows as ground symbol (⏚ GND)
+- ✅ -5V shows as downward-pointing arrow (⬇ -5V)
+- ✅ All symbols are properly connected to component pins
 
-**Phase 2 - Manual replacement:**
-- ✅ User successfully adds power symbols
-- ✅ Power symbols connect all three resistors
+## Why This Is Critical
 
-**Phase 3 - Regeneration without changes:**
-- ✅ Power symbols preserved (NOT reverted to labels)
-- ✅ Connections maintained
-- ✅ No hierarchical labels reappear
+**Power symbols are fundamental to circuit design:**
 
-**Phase 4 - Add new component:**
-- ✅ R4 gets power symbol (matches existing style)
-- ✅ R1-R3 power symbols preserved
-- ✅ All four connected via global GND
+1. **Global Connection Semantics** - Power symbols connect globally across entire schematic. Unlike hierarchical labels, GND anywhere connects to GND everywhere. This is essential for proper electrical representation.
 
-## Likely Actual Result (Predictions)
+2. **KiCad Best Practice** - Professional KiCad designs use power symbols, not hierarchical labels for power nets. They provide visual clarity and correct electrical semantics.
 
-**Prediction 1 - Power symbols lost during regeneration:**
-- ❌ Phase 3: Power symbols revert to hierarchical labels
-- ❌ User's manual work is lost
-- ❌ Must manually re-add power symbols after every regeneration
+3. **Multi-Sheet Designs** - Power symbols maintain global connections across multiple hierarchical sheets. Hierarchical labels (the alternative) are sheet-local and don't connect across hierarchy boundaries.
 
-**Prediction 2 - Mixed symbols and labels:**
-- ❌ Phase 4: R4 gets hierarchical label
-- ❌ R1-R3 have power symbols (if preserved)
-- ❌ Inconsistent representation
-- ⚠️  May or may not be electrically connected (KiCad may treat differently)
+4. **Standard Visualization** - Power symbols provide clear visual indication of supply type:
+   - Upward arrow for positive supplies (VCC, +3V3, +5V)
+   - Downward symbols for return paths (GND, -5V)
+   - Immediate recognition of power distribution
 
-**Prediction 3 - Sync doesn't recognize power symbols:**
-- ❌ Circuit-synth reads schematic, ignores power symbols
-- ❌ Sees "missing" connections
-- ❌ Re-adds hierarchical labels alongside power symbols
-- ❌ Duplicate connection representations
+5. **Integration with Real Projects** - Any circuit with multiple voltage supplies (3.3V, 5V, GND) needs proper power symbol handling. This includes:
+   - Mixed-voltage microcontroller designs
+   - Analog/digital power separation
+   - Multi-rail power distribution
+   - Proper electrical net validation
 
-## Why This Is CRITICAL
+6. **Round-Trip Fidelity** - When users export from Python and import back to Python, power symbols should be preserved. This test validates that power symbols are generated correctly in the first place.
 
-**This affects every circuit with power nets:**
-- GND, VCC, +3.3V, +5V, etc. are in EVERY real circuit
-- Users expect power symbols (KiCad standard practice)
-- Hierarchical labels for power are incorrect semantics
+## Edge Cases Covered
 
-**If power symbols aren't preserved:**
-- Users must manually fix power connections after every regeneration
-- Defeats the purpose of bidirectional sync
-- Power nets don't have global semantics
-- Schematic doesn't follow KiCad best practices
-
-**Semantic difference matters:**
-- Hierarchical label "GND" on sheet A doesn't connect to "GND" on sheet B
-- Power symbol "GND" connects globally across ALL sheets
-- For multi-sheet designs, this is a critical difference
-
-## Success Criteria
-
-This test PASSES when:
-- User can replace hierarchical labels with power symbols
-- Power symbols are preserved during regeneration
-- New components added to power nets get power symbols (not labels)
-- Global power symbol semantics maintained
-- No manual re-work needed after regeneration
-
-## Potential Solutions to Investigate
-
-1. **Detect power nets by name pattern:**
-   - If net name is "GND", "VCC", "+5V", "+3.3V", etc. → generate power symbol
-   - Add configurable list of power net names
-
-2. **Explicit Python API:**
-   ```python
-   gnd = PowerNet(name="GND")  # or
-   gnd = Net(name="GND", type="power")
-   ```
-
-3. **Preserve user intent:**
-   - If schematic has power symbol, keep it
-   - Don't replace power symbols with hierarchical labels
-   - Match existing connection style when adding components
-
-4. **Bidirectional detection:**
-   - Read KiCad schematic, detect power symbols
-   - Import as PowerNet in Python
-   - Generate power symbols when exporting
+- Multiple power net types in single circuit
+- Both positive (upward) and negative/ground (downward) supplies
+- Correct rotation based on net name semantics
+- Position consistency for power symbols connected to different pin locations
+- Library reference accuracy for KiCad integration
 
 ## Related Tests
 
-- **Test 10-12** - Basic net operations (all use hierarchical labels)
-- **Test 34** - Add component after power symbol replacement (future)
-- **Test 35** - Generate power symbols from Python (future)
+- **Test 11** - Symbol rotation (related positioning behavior)
+- **Test 04** - Round-trip cycle (tests preservation of symbols)
+- **Test 15** - Net operations (tests net creation and connection)
 
 ## Related Issues
 
-- **#346** - Power symbol handling investigation (to be created)
-- **#344** - Net sync doesn't add labels (also affects power symbols)
-- **#345** - New component on net doesn't get labels
-
-## Notes
-
-**This test documents current behavior** - we don't know what will happen yet!
-
-The test is designed to discover:
-1. Does circuit-synth preserve user-added power symbols?
-2. Does it recognize power symbols as part of a net?
-3. What happens when mixing symbols and labels?
-4. Is this a critical blocker for real-world usage?
-
-## Edge Cases to Explore Later
-
-- Multiple power nets (GND + VCC + +3.3V)
-- Power flags vs power symbols
-- PWR_FLAG symbols
-- Hidden power pins on ICs
-- Global labels vs power symbols
-- Multi-sheet hierarchical designs
+- **#346** - Power symbol rotation algorithm
+- **#362** - Fix power symbol rotation (fixed)
+- **#363** - Correct import path for Net class in PCB generator
