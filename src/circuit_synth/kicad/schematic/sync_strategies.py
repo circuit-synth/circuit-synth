@@ -26,6 +26,47 @@ class SyncStrategy(ABC):
         pass
 
 
+class UUIDMatchStrategy(SyncStrategy):
+    """
+    Match components by UUID - most reliable identifier.
+
+    UUIDs provide stable component identity across reference changes,
+    position changes, and property modifications. This strategy should
+    be tried first as it's the most reliable matching method.
+    """
+
+    def __init__(self, search_engine: SearchEngine):
+        self.search_engine = search_engine
+
+    def match_components(
+        self, circuit_components: Dict[str, Dict], kicad_components: Dict[str, Any]
+    ) -> Dict[str, str]:
+        """
+        Match components by UUID.
+
+        Args:
+            circuit_components: Dict mapping circuit_id -> component dict with 'uuid' key
+            kicad_components: Dict mapping reference -> SchematicSymbol with uuid attribute
+
+        Returns:
+            Dict mapping circuit_id -> kicad_reference for matched components
+        """
+        matches = {}
+
+        for circuit_id, circuit_comp in circuit_components.items():
+            circuit_uuid = circuit_comp.get("uuid")
+            if not circuit_uuid:
+                continue
+
+            # Find KiCad component with matching UUID
+            for kicad_ref, kicad_comp in kicad_components.items():
+                if hasattr(kicad_comp, "uuid") and kicad_comp.uuid == circuit_uuid:
+                    matches[circuit_id] = kicad_ref
+                    break
+
+        return matches
+
+
 class ReferenceMatchStrategy(SyncStrategy):
     """Match components by reference designator."""
 
