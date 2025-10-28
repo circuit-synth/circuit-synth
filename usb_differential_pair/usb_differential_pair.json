@@ -1,0 +1,383 @@
+{
+  "name": "usb_differential_pair",
+  "description": "Circuit with USB differential pair (D+ and D-).",
+  "tstamps": "/usb_differential_pair-4313259072/",
+  "source_file": "usb_differential_pair.kicad_sch",
+  "components": {
+    "J1": {
+      "symbol": "Connector:USB_B_Micro",
+      "ref": "J1",
+      "value": "USB_B_Micro",
+      "footprint": "Connector_USB:USB_Micro-B_Amphenol_10104110-0001LF",
+      "datasheet": "~",
+      "description": "USB Micro Type B connector",
+      "properties": {
+        "ki_fp_filters": "USB*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "USB*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "VBUS",
+          "func": "power_out",
+          "unit": 1,
+          "x": 7.62,
+          "y": 5.08,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "2",
+          "name": "D-",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 7.62,
+          "y": -2.54,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "3",
+          "name": "D+",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 7.62,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "4",
+          "name": "ID",
+          "func": "passive",
+          "unit": 1,
+          "x": 7.62,
+          "y": -5.08,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "5",
+          "name": "GND",
+          "func": "power_out",
+          "unit": 1,
+          "x": 0.0,
+          "y": -10.16,
+          "length": 2.54,
+          "orientation": 90.0
+        },
+        {
+          "pin_id": "6",
+          "name": "Shield",
+          "func": "passive",
+          "unit": 1,
+          "x": -2.54,
+          "y": -10.16,
+          "length": 2.54,
+          "orientation": 90.0
+        }
+      ]
+    },
+    "U1": {
+      "symbol": "Connector:Conn_01x14_Pin",
+      "ref": "U1",
+      "value": "USB_Transceiver",
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x14_P2.54mm_Vertical",
+      "datasheet": "~",
+      "description": "Generic connector, single row, 01x14, script generated",
+      "properties": {
+        "ki_fp_filters": "Connector*:*_1x??_*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "Connector*:*_1x??_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "Pin_1",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": 15.24,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "2",
+          "name": "Pin_2",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": 12.7,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "3",
+          "name": "Pin_3",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": 10.16,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "4",
+          "name": "Pin_4",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": 7.62,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "5",
+          "name": "Pin_5",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": 5.08,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "6",
+          "name": "Pin_6",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": 2.54,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "7",
+          "name": "Pin_7",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": 0.0,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "8",
+          "name": "Pin_8",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": -2.54,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "9",
+          "name": "Pin_9",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": -5.08,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "10",
+          "name": "Pin_10",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": -7.62,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "11",
+          "name": "Pin_11",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": -10.16,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "12",
+          "name": "Pin_12",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": -12.7,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "13",
+          "name": "Pin_13",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": -15.24,
+          "length": 3.81,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "14",
+          "name": "Pin_14",
+          "func": "passive",
+          "unit": 1,
+          "x": 5.08,
+          "y": -17.78,
+          "length": 3.81,
+          "orientation": 180.0
+        }
+      ]
+    }
+  },
+  "nets": {
+    "GND": {
+      "connections": [
+        {
+          "component": "J1",
+          "pin": {
+            "number": "6",
+            "name": "Shield",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "J1",
+          "pin": {
+            "number": "4",
+            "name": "ID",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "2",
+            "name": "Pin_2",
+            "type": "passive"
+          }
+        }
+      ],
+      "is_power": true,
+      "power_symbol": "power:GND",
+      "trace_current": null,
+      "impedance": null,
+      "properties": {}
+    },
+    "VCC": {
+      "connections": [
+        {
+          "component": "J1",
+          "pin": {
+            "number": "1",
+            "name": "VBUS",
+            "type": "power_out"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "1",
+            "name": "Pin_1",
+            "type": "passive"
+          }
+        }
+      ],
+      "is_power": true,
+      "power_symbol": "power:VCC",
+      "trace_current": null,
+      "impedance": null,
+      "properties": {}
+    },
+    "USB_DP": {
+      "connections": [
+        {
+          "component": "J1",
+          "pin": {
+            "number": "3",
+            "name": "D+",
+            "type": "bidirectional"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "4",
+            "name": "Pin_4",
+            "type": "passive"
+          }
+        }
+      ],
+      "is_power": false,
+      "power_symbol": null,
+      "trace_current": null,
+      "impedance": null,
+      "properties": {}
+    },
+    "USB_DM": {
+      "connections": [
+        {
+          "component": "J1",
+          "pin": {
+            "number": "2",
+            "name": "D-",
+            "type": "bidirectional"
+          }
+        },
+        {
+          "component": "U1",
+          "pin": {
+            "number": "6",
+            "name": "Pin_6",
+            "type": "passive"
+          }
+        }
+      ],
+      "is_power": false,
+      "power_symbol": null,
+      "trace_current": null,
+      "impedance": null,
+      "properties": {}
+    }
+  },
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Circuit with USB differential pair (D+ and D-).",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "cfb8ec92-5385-4dfc-9910-f63e8ac2557c"
+    }
+  ]
+}
