@@ -55,8 +55,7 @@ class LLMPlacementManager:
 import kicad_sch_api as ksa
 from kicad_sch_api.core.types import Point
 
-# Use optimized symbol cache from core.component for better performance
-from circuit_synth.core.component import SymbolLibCache
+# Use optimized symbol cache for better performance
 from circuit_synth.kicad.canonical import CanonicalCircuit, CircuitMatcher
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
@@ -1767,8 +1766,7 @@ class SchematicGenerator:
     def get_symbol_libraries(self) -> List[str]:
         """Get list of available symbol libraries."""
         try:
-            # Use optimized symbol cache from core.component for better performance
-            from circuit_synth.core.component import SymbolLibCache
+            # Use optimized symbol cache for better performance
             from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
             cache = SymbolLibCache()

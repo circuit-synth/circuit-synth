@@ -87,9 +87,9 @@ from kicad_sch_api.core.types import (
 )
 from sexpdata import Symbol
 
-# Use optimized symbol cache from core.component for better performance,
+# Use optimized symbol cache from kicad_symbol_cache for better performance,
 # but keep Python fallback for graphics data
-from circuit_synth.core.component import SymbolLibCache
+from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
 # Import Python symbol cache specifically for graphics data
 from circuit_synth.kicad.kicad_symbol_cache import (
