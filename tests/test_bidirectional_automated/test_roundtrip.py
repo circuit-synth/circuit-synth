@@ -147,7 +147,7 @@ class TestRoundTripConsistency:
 
         # Iteration 2: Add R2 in KiCad
         sch_path = output_dir / "incremental_test.kicad_sch"
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
         sch.components.add(
             lib_id="Device:R",
             reference="R2",
@@ -166,7 +166,7 @@ class TestRoundTripConsistency:
         assert "R2" in circuit2.components
 
         # Iteration 3: Add R3 in KiCad
-        sch = ksa.Schematic(str(sch_path))
+        sch = ksa.Schematic.load(str(sch_path))
         sch.components.add(
             lib_id="Device:R",
             reference="R3",

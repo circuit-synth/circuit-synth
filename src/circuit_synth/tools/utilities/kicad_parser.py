@@ -62,7 +62,15 @@ class KiCadParser:
                 if isinstance(sheet_info, list) and len(sheet_info) >= 2:
                     schematic_file, sheet_name = sheet_info[0], sheet_info[1]
                     if sheet_name == "":  # Traditional root sheet has empty name
-                        root_sch_path = self.project_dir / schematic_file
+                        # Check if schematic_file is a UUID (KiCad stores UUIDs, not filenames)
+                        # UUIDs are 36 chars with dashes: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+                        if len(schematic_file) == 36 and schematic_file.count('-') == 4:
+                            # It's a UUID, use project name instead
+                            root_sch_path = self.project_dir / f"{self.kicad_project.stem}.kicad_sch"
+                        else:
+                            # It's a filename
+                            root_sch_path = self.project_dir / schematic_file
+
                         if root_sch_path.exists():
                             logger.info(
                                 f"Found traditional root schematic: {root_sch_path}"
