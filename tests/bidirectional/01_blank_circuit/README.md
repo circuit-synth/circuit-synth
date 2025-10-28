@@ -27,13 +27,13 @@ uv run blank.py
 # Check files created
 ls -la blank/
 
-# Open in KiCad - should be empty schematic
+# Open in KiCad - should be empty schematic and pcb file
 open blank/blank.kicad_pro
 ```
 
 ## Expected Result
 
-- ✅ KiCad project generated
-- ✅ Schematic opens successfully  
-- ✅ Schematic is empty (no components)
+- ✅ KiCad project generated (kicad_pro, kicad_sch, kicad_pcb)
+- ✅ Schematic and PCB open successfully
+- ✅ Schematic and PCB are empty (no components)
 - ✅ No errors during generation

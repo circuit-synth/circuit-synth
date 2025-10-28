@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from circuit_synth import circuit
+from circuit_synth import *
 
 
 @circuit(name="blank")

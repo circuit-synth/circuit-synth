@@ -23,7 +23,7 @@ Importing a blank KiCad project (no components) to Python.
 cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/02_kicad_to_python
 
 # Import blank KiCad to Python
-uv run kicad-to-python blank_kicad_ref/blank.kicad_pro imported_blank.py
+uv run kicad-to-python blank_kicad_ref imported_blank.py
 
 # Check Python file - should be empty circuit
 cat imported_blank.py

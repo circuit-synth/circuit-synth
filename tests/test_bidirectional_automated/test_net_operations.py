@@ -50,8 +50,7 @@ class TestNetOperations:
         # Generate circuit with NET1
         circuit = two_resistors_connected()
         circuit.generate_kicad_project(
-            project_name="net_gen_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Parse and verify
@@ -89,8 +88,7 @@ class TestNetOperations:
         from fixtures.circuits import two_resistors
         circuit = two_resistors()
         circuit.generate_kicad_project(
-            project_name="add_net_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Add net connection using kicad-sch-api
@@ -136,8 +134,7 @@ class TestNetOperations:
         # Generate with NET1
         circuit = two_resistors_connected()
         circuit.generate_kicad_project(
-            project_name="rename_net_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Rename NET1 → VCC
@@ -190,8 +187,7 @@ class TestNetOperations:
         # Generate with NET1
         circuit = two_resistors_connected()
         circuit.generate_kicad_project(
-            project_name="delete_net_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Delete NET1 (remove labels and wires)
@@ -237,8 +233,7 @@ class TestNetOperations:
         # Generate with NET1, NET2
         circuit = four_resistors_two_nets()
         circuit.generate_kicad_project(
-            project_name="merge_nets_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Merge NET2 into NET1
@@ -287,8 +282,7 @@ class TestNetOperations:
         # Use four_resistors_two_nets but manually connect all to one net first
         circuit = three_resistors_on_net()
         circuit.generate_kicad_project(
-            project_name="split_net_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Split: change one label from NET1 to NET2
@@ -323,8 +317,7 @@ class TestNetOperations:
         # Generate complex circuit with multiple nets
         circuit = four_resistors_two_nets()
         circuit.generate_kicad_project(
-            project_name="multi_net_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Verify multiple nets exist
@@ -353,8 +346,7 @@ class TestNetOperations:
         # Generate circuit (nets should auto-name if not specified)
         circuit = two_resistors_connected()
         circuit.generate_kicad_project(
-            project_name="auto_net_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Verify net has some name (either user-specified or auto-generated)
@@ -389,8 +381,7 @@ class TestNetOperations:
         # Generate with NET1
         circuit = two_resistors_connected()
         circuit.generate_kicad_project(
-            project_name="add_comp_net_test",
-            output_dir=str(output_dir)
+            project_name=str(output_dir)
         )
 
         # Add R3 and connect to NET1

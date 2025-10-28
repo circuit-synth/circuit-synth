@@ -42,7 +42,7 @@ def parse_schematic():
             assert len(sch.components) == 1
     """
     def _parse(path):
-        return ksa.Schematic(str(path))
+        return ksa.Schematic.load(str(path))
     return _parse
 
 

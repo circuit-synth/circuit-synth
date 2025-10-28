@@ -325,7 +325,7 @@ class KiCadCLI:
             List of generated Gerber file paths
         """
         pcb_path = Path(pcb_file)
-        output_path = Path(output_dir)
+        output_path = Path(output_dir).resolve()  # Make absolute to avoid cwd issues
         output_path.mkdir(parents=True, exist_ok=True)
 
         args = [
@@ -337,11 +337,13 @@ class KiCadCLI:
         ]
 
         if layers:
-            for layer in layers:
-                args.extend(["--layers", layer])
+            # KiCad expects comma-separated layer list, not multiple --layers args
+            layer_list = ",".join(layers)
+            args.extend(["--layers", layer_list])
 
-        if protel_extensions:
-            args.append("--use-protel-extensions")
+        if not protel_extensions:
+            # KiCad uses Protel extensions by default, --no-protel-ext disables them
+            args.append("--no-protel-ext")
 
         args.append(str(pcb_path))
 
@@ -375,7 +377,7 @@ class KiCadCLI:
             Tuple of (plated_holes_file, non_plated_holes_file)
         """
         pcb_path = Path(pcb_file)
-        output_path = Path(output_dir)
+        output_path = Path(output_dir).resolve()  # Make absolute to avoid cwd issues
         output_path.mkdir(parents=True, exist_ok=True)
 
         args = [
@@ -386,15 +388,26 @@ class KiCadCLI:
             str(output_path),
             "--format",
             format,
-            "--units",
-            units,
         ]
 
+        # Units argument name depends on format
+        if format == "excellon":
+            args.extend(["--excellon-units", units])
+        elif format == "gerber":
+            # Gerber drill format doesn't have units arg, uses precision instead
+            pass
+
         if mirror_y:
-            args.append("--mirror-y")
+            if format == "excellon":
+                args.append("--excellon-mirror-y")
+            else:
+                args.append("--mirror-y")
 
         if minimal_header:
-            args.append("--minimal-header")
+            if format == "excellon":
+                args.append("--excellon-min-header")
+            else:
+                args.append("--minimal-header")
 
         args.append(str(pcb_path))
 

@@ -84,9 +84,15 @@ class CircuitDataLoader:
 
             # Collect nets from this circuit level
             nets = circuit.get("nets", {})
-            for net_name, net_connections in nets.items():
+            for net_name, net_data in nets.items():
                 if net_name not in flattened_nets:
                     flattened_nets[net_name] = []
+
+                # Handle both formats: list of connections OR dict with connections key
+                if isinstance(net_data, dict):
+                    net_connections = net_data.get("connections", [])
+                else:
+                    net_connections = net_data  # Old format: just a list
 
                 # Update component references in net connections to include prefix
                 for connection in net_connections:
