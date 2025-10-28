@@ -702,8 +702,42 @@ class Circuit:
                 component="CIRCUIT",
             )
 
+            # Determine project base name for file generation
+            # Check for existing .kicad_pro files in output directory
+            existing_projects = list(output_path.glob("*.kicad_pro"))
+
+            if len(existing_projects) > 1:
+                # Multiple projects - error out
+                project_names = [p.stem for p in existing_projects]
+                raise ValueError(
+                    f"Multiple KiCad projects found in '{output_path}': {project_names}. "
+                    f"Please specify which project to update or clean the directory."
+                )
+            elif len(existing_projects) == 1:
+                # Exactly one project - use its base name for regeneration
+                project_base_name = existing_projects[0].stem
+                context_logger.info(
+                    f"Detected existing KiCad project: {project_base_name}",
+                    component="CIRCUIT",
+                )
+                # Validate folder name matches project base name
+                if output_path.name != project_base_name:
+                    context_logger.warning(
+                        f"Folder name '{output_path.name}' doesn't match project '{project_base_name}'. "
+                        f"Using folder name to maintain directory structure.",
+                        component="CIRCUIT",
+                    )
+                    project_base_name = output_path.name
+            else:
+                # No existing project - use folder name for consistency
+                project_base_name = output_path.name
+                context_logger.info(
+                    f"No existing project found, using folder name: {project_base_name}",
+                    component="CIRCUIT",
+                )
+
             # Create JSON netlist in project directory (canonical format)
-            json_path = output_path / f"{output_path.name}.json"
+            json_path = output_path / f"{project_base_name}.json"
             self.generate_json_netlist(str(json_path))
 
             context_logger.info(
@@ -713,7 +747,7 @@ class Circuit:
             )
 
             # Create schematic generator that outputs directly to the project directory
-            generator = SchematicGenerator(str(output_path.parent), output_path.name)
+            generator = SchematicGenerator(str(output_path.parent), project_base_name)
 
             # Generate the complete project using the JSON file
             # Legacy system handles placement, modern API handles file writing via write_schematic_file
