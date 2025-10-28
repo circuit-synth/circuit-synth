@@ -1,3 +1,14 @@
+"""
+Shared pytest configuration and fixtures for circuit-synth tests.
+
+Test Organization:
+- tests/unit/ - Fast unit tests (pure Python, no I/O)
+- tests/integration/ - Integration tests (file I/O, no external tools)
+- tests/e2e/ - End-to-end tests (external tools like kicad-cli allowed)
+- tests/fixtures/ - Centralized test data and fixtures
+
+This conftest.py provides shared fixtures used across all test categories.
+"""
 import os
 import shutil
 from pathlib import Path
