@@ -146,14 +146,6 @@ def extract_component_positions(schematic_file):
     return positions
 
 
-@pytest.mark.xfail(
-    reason="circuit-synth uses label-based net connections, not physical wires. "
-    "Junctions are only created when wires physically meet. This test expects "
-    "physical wires to be drawn connecting component pins, but circuit-synth "
-    "uses KiCad hierarchical labels instead, which is the correct approach for "
-    "symbolic circuit design. The net connectivity is correct, but no junctions "
-    "are created because there are no crossing/meeting wires."
-)
 def test_27_add_junction(request):
     """Test junction placement for T-connections.
 
@@ -177,11 +169,6 @@ def test_27_add_junction(request):
     - kicad-sch-api for schematic structure
     - Text search for `(junction` elements
     - netlist comparison for electrical connectivity
-
-    NOTE: This test fails because circuit-synth uses label-based net connections
-    instead of physical wires. The net connectivity is verified through the
-    generated netlist (which is correct), but junctions don't appear because
-    there are no physical wire crossings or meetings.
     """
 
     # Setup paths

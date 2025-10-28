@@ -25,37 +25,35 @@ def eight_bit_bus():
 
     # Microcontroller (simplified as a Component with 8 data pins)
     # In reality, this would be an STM32, AVR, etc.
-    # Using a 8-pin connector to represent 8 data pins
+    # Using a generic IC symbol with enough pins
     mcu = Component(
-        symbol="Connector:Conn_01x08_Pin",  # 8-pin connector - all pins usable
+        symbol="Device:R",  # Placeholder symbol - represents MCU
         ref="MCU1",
         value="ARM_MCU",
-        footprint="Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical",
+        footprint="Package_DIP:DIP-20_W7.62mm",
     )
 
     # Memory device (SRAM, Flash, etc.)
-    # Using 8-pin connector with pins 1-8
+    # Using a generic IC symbol
     mem = Component(
-        symbol="Connector:Conn_01x08_Pin",  # 8-pin connector - all pins usable
+        symbol="Device:R",  # Placeholder symbol - represents memory
         ref="MEM1",
         value="32K_SRAM",
-        footprint="Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical",
+        footprint="Package_DIP:DIP-20_W7.62mm",
     )
 
     # Optional: Buffer/driver for single-line test modification
     # This allows us to modify which component connects to a bus line
-    # Using a simpler component (2-pin resistor) for buffer testing
     buf = Component(
-        symbol="Device:R",  # Simple 2-pin component for buffer
+        symbol="Device:R",  # Placeholder symbol - represents buffer
         ref="BUF1",
         value="BUFFER",
-        footprint="Package_DIP:DIP-2_W7.62mm",
+        footprint="Package_DIP:DIP-6_W7.62mm",
     )
 
     # Create 8-bit data bus connecting MCU to MEM
     # Each net represents one data line
     # Format: D0, D1, D2, D3, D4, D5, D6, D7
-    # Using Conn_01x08_Pin which has pins 1-8, all usable for data
 
     # D0 - Data bit 0
     d0_net = Net(name="D0")
@@ -107,8 +105,7 @@ if __name__ == "__main__":
     circuit_obj.generate_kicad_project(
         project_name="eight_bit_bus",
         placement_algorithm="simple",
-        generate_pcb=True,
-        force_regenerate=True  # Always regenerate to support modification testing
+        generate_pcb=True
     )
     print("✅ 8-bit data bus circuit generated!")
     print("📁 Open in KiCad: eight_bit_bus/eight_bit_bus.kicad_pro")
