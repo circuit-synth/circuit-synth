@@ -187,7 +187,7 @@ class TestLibraryOrchestrator:
 
         assert LibrarySource.LOCAL_KICAD in status
         assert LibrarySource.SNAPEDA in status
-        assert LibrarySource.DIGIKEY in status
+        assert LibrarySource.DIGIKEY_API in status
 
         # Check status structure
         local_status = status[LibrarySource.LOCAL_KICAD]

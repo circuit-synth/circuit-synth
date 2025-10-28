@@ -163,8 +163,8 @@ def main():
 
         # Result should contain comments
         assert "# Comment" in result
-        assert "vin = Net('VIN')" in result
-        assert "gnd = Net('GND')" in result
+        assert 'vin = Net("VIN")' in result
+        assert 'gnd = Net("GND")' in result
 
     def test_multiple_comments_same_line(self, extractor):
         """Test handling multiple comments at same line offset"""
