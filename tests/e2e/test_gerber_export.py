@@ -20,10 +20,10 @@ class TestCircuitGenerateGerbers:
         """Create a simple test circuit with a few components."""
         @circuit(name="SimpleGerberTest")
         def test_circuit():
-            r1 = Component(symbol="Device:R", value="10k", ref="R1")
-            r2 = Component(symbol="Device:R", value="1k", ref="R2")
-            c1 = Component(symbol="Device:C", value="100nF", ref="C1")
-            d1 = Component(symbol="Device:LED", value="Red", ref="D1")
+            r1 = Component(symbol="Device:R", value="10k", ref="R1", footprint="Resistor_SMD:R_0603_1608Metric")
+            r2 = Component(symbol="Device:R", value="1k", ref="R2", footprint="Resistor_SMD:R_0603_1608Metric")
+            c1 = Component(symbol="Device:C", value="100nF", ref="C1", footprint="Capacitor_SMD:C_0603_1608Metric")
+            d1 = Component(symbol="Device:LED", value="Red", ref="D1", footprint="LED_SMD:LED_0603_1608Metric")
             return locals()
 
         return test_circuit()
