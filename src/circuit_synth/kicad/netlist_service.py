@@ -191,9 +191,16 @@ class CircuitReconstructor:
             # Reconstruct nets - ONLY for this circuit level (not subcircuits)
             nets_data = circuit_data.get("nets", {})
 
-            for net_name, connections in nets_data.items():
-                # Creating net with connections (verbose logging available if needed)
+            for net_name, net_info in nets_data.items():
+                # Handle both old format (list) and new format (dict with metadata)
+                if isinstance(net_info, list):
+                    # Old format: just connections
+                    connections = net_info
+                else:
+                    # New format: dict with connections and metadata
+                    connections = net_info.get("connections", [])
 
+                # Creating net with connections (verbose logging available if needed)
                 net = Net(net_name)
                 # Store net directly in internal storage since add_net may not exist
                 temp_circuit._nets[net_name] = net

@@ -1005,9 +1005,74 @@ class SchematicWriter:
         #
         # return False
 
+    def _add_power_symbol(
+        self,
+        lib_id: str,
+        reference: str,
+        value: str,
+        position: Tuple[float, float],
+        rotation: float = 0.0,
+    ) -> Optional[str]:
+        """
+        Add a KiCad power symbol component.
+
+        Args:
+            lib_id: Power symbol library ID (e.g., "power:GND")
+            reference: Power symbol reference (e.g., "#PWR01")
+            value: Net name (e.g., "GND")
+            position: (x, y) position to place symbol
+            rotation: Rotation angle in degrees (default: 0.0)
+
+        Returns:
+            UUID of the created power symbol, or None if failed
+
+        Example:
+            >>> self._add_power_symbol("power:GND", "#PWR01", "GND", (100, 100), rotation=180)
+        """
+        logger.debug(f"Adding power symbol {lib_id} at {position} with value '{value}' rotation={rotation}")
+
+        try:
+            # Add power symbol as a component
+            power_comp = self.component_manager.add_component(
+                library_id=lib_id,
+                reference=reference,
+                value=value,
+                position=position,
+                placement_strategy=PlacementStrategy.AUTO,
+                footprint="",  # Power symbols have no footprint
+            )
+
+            if power_comp:
+                # Set rotation after creation
+                power_comp.rotation = rotation
+
+                # Power symbols are always in BOM but not on board
+                power_comp.in_bom = True
+                power_comp.on_board = True
+                power_comp.dnp = False
+
+                logger.debug(f"Created power symbol {reference} (UUID: {power_comp.uuid}) rotation={rotation}")
+                return power_comp.uuid
+            else:
+                logger.warning(f"Failed to create power symbol {reference}")
+                return None
+
+        except Exception as e:
+            logger.error(f"Error creating power symbol {reference}: {e}")
+            return None
+
     def _add_pin_level_net_labels(self):
         """
-        Add local net labels at component pins for all nets.
+        Add local net labels or power symbols at component pins for all nets.
+
+        For power nets (is_power=True):
+            - Generate KiCad power symbol components
+            - Use #PWR reference prefix
+            - Creates global connection (not sheet-local)
+
+        For regular nets:
+            - Generate hierarchical labels (current behavior)
+            - Sheet-local connection
 
         Returns:
             Dict[str, List[Label]]: Mapping of component reference to list of labels created for it.
@@ -1018,8 +1083,18 @@ class SchematicWriter:
         # Track which labels belong to which component
         component_labels = {}  # Dict[str, List[Label]]
 
+        # Counter for power symbol references (#PWR01, #PWR02, etc.)
+        power_symbol_counter = 1
+
         # Get component lookup from the API
-        for net in self.circuit.nets:
+        # Handle both dict and list forms of .nets
+        circuit_nets = (
+            self.circuit.nets.values()
+            if isinstance(self.circuit.nets, dict)
+            else self.circuit.nets
+        )
+
+        for net in circuit_nets:
             net_name = net.name
             logger.debug(
                 f"Processing net '{net_name}' with {len(net.connections)} connections"
@@ -1086,6 +1161,39 @@ class SchematicWriter:
                 # Calculate label angle
                 label_angle = (pin_angle + 180) % 360
                 global_angle = (label_angle + comp.rotation) % 360
+
+                # Check if this is a power net
+                if hasattr(net, 'is_power') and net.is_power and hasattr(net, 'power_symbol'):
+                    # Generate power symbol instead of hierarchical label
+                    power_ref = f"#PWR0{power_symbol_counter:02d}"
+                    power_symbol_counter += 1
+
+                    logger.debug(
+                        f"Generating power symbol {power_ref} for net {net_name} "
+                        f"at component {actual_ref}.{pin_identifier}"
+                    )
+
+                    # Place power symbol directly at pin location
+                    # The power symbol's connection point should be exactly at the pin
+                    power_x = global_x
+                    power_y = global_y
+
+                    # Determine rotation: negative power symbols should point down (180°)
+                    # Check if this is a negative power supply by looking at the net name
+                    is_negative = net_name.startswith('-') or net_name.startswith('V-')
+                    power_rotation = 180.0 if is_negative else 0.0
+
+                    # Add power symbol at offset position
+                    self._add_power_symbol(
+                        lib_id=net.power_symbol,
+                        reference=power_ref,
+                        value=net_name,
+                        position=(power_x, power_y),
+                        rotation=power_rotation,
+                    )
+
+                    # Power symbols don't create labels - skip the rest
+                    continue
 
                 # Determine label type: hierarchical if shared with parent OR used by children
                 # Local labels are ONLY for nets that are purely internal to this sheet

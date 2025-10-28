@@ -57,9 +57,32 @@ class Net:
         self.name = name
         # Each connection is a tuple (comp_ref, pin_number).
         self.connections: List[tuple] = []
+        # Power net properties
+        self.is_power = False
+        self.power_symbol = None
+        self.trace_current = None
+        self.impedance = None
+        self.properties = {}
+
+    @staticmethod
+    def from_dict(data: Dict[str, Any]) -> "Net":
+        """Create Net from dictionary representation."""
+        net = Net(data.get("name", ""))
+        net.is_power = data.get("is_power", False)
+        net.power_symbol = data.get("power_symbol")
+        net.trace_current = data.get("trace_current")
+        net.impedance = data.get("impedance")
+        net.properties = data.get("properties", {})
+        return net
 
     def __repr__(self):
-        return f"Net(name='{self.name}', connections={self.connections})"
+        flags = []
+        if self.is_power:
+            flags.append("power")
+        if self.impedance:
+            flags.append(f"{self.impedance}Ω")
+        flag_str = f" [{', '.join(flags)}]" if flags else ""
+        return f"Net(name='{self.name}'{flag_str}, connections={self.connections})"
 
 
 class Circuit:
@@ -217,8 +240,27 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
 
     # Parse nets
     nets_data = circ_data.get("nets", {})
-    for net_name, connections in nets_data.items():
-        net_obj = Net(net_name)
+    for net_name, net_info in nets_data.items():
+        # Handle both old format (list of connections) and new format (dict with metadata)
+        if isinstance(net_info, list):
+            # Old format: just connections
+            connections = net_info
+            net_obj = Net.from_dict({"name": net_name})  # Use from_dict for consistency
+        else:
+            # New format: dict with connections and metadata
+            connections = net_info.get("connections", [])
+            # Create Net with metadata using from_dict
+            net_dict = {
+                "name": net_name,
+                "is_power": net_info.get("is_power", False),
+                "power_symbol": net_info.get("power_symbol"),
+                "trace_current": net_info.get("trace_current"),
+                "impedance": net_info.get("impedance"),
+                "properties": net_info.get("properties", {}),
+            }
+            net_obj = Net.from_dict(net_dict)
+
+        # Parse connections and add them to the net
         for conn in connections:
             comp_ref = conn["component"]
             pin_data = conn["pin"]

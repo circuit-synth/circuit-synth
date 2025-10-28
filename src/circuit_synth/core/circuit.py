@@ -70,7 +70,8 @@ class Circuit:
             from .net import Net
 
             for net_data in json_data["nets"]:
-                net = Net(net_data.get("name", "unnamed"))
+                # Use from_dict to preserve all Net attributes
+                net = Net.from_dict(net_data)
                 circuit._nets[net.name] = net
 
         # Add subcircuits recursively
