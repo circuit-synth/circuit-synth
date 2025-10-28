@@ -1,7 +1,7 @@
 {
   "name": "single_resistor",
   "description": "Circuit with a single 10k\u03a9 resistor.",
-  "tstamps": "/single_resistor-4305556480/",
+  "tstamps": "/single_resistor-4337817296/",
   "source_file": "single_resistor.kicad_sch",
   "components": {
     "R1": {
@@ -72,7 +72,7 @@
       "border_color": "black",
       "justify": "center center",
       "rotation": 0,
-      "uuid": "39fb63ac-8d62-46c7-80fd-437fd71f3de4"
+      "uuid": "153702d7-fac8-4ddc-8c66-5449757d686f"
     }
   ]
 }

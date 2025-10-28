@@ -326,11 +326,14 @@ class SymbolBoundingBoxCalculator:
         else:
             # No net match - use minimal size (3 chars) instead of potentially long pin name
             label_text = "XXX"  # 3-character placeholder for unmatched pins
-            print(
-                f"  PIN {pin_number}: ⚠️  NO MATCH, using minimal fallback (pin name was '{pin_name}'), at=({x:.2f}, {y:.2f})",
-                file=sys.stderr,
-                flush=True,
-            )
+            # Only warn if pin name is not a valid KiCad "no-name" indicator
+            # ~ means "no name to display" in KiCad and is completely normal
+            if pin_name != "~":
+                print(
+                    f"  PIN {pin_number}: ⚠️  NO MATCH, using minimal fallback (pin name was '{pin_name}'), at=({x:.2f}, {y:.2f})",
+                    file=sys.stderr,
+                    flush=True,
+                )
 
         if label_text and label_text != "~":  # ~ means no name
             # Calculate text dimensions

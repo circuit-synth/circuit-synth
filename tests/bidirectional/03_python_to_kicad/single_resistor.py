@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # Generate KiCad project when run directly
     circuit_obj = single_resistor()
 
-    circuit_obj.generate_kicad_project(project_name="single_resistor")
+    circuit_obj.generate_kicad_project(project_name="blank_kicad_ref")
 
     print("✅ Single resistor circuit generated successfully!")
     print("📁 Open in KiCad: single_resistor/single_resistor.kicad_pro")

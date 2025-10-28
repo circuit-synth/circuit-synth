@@ -30,7 +30,7 @@ cat single_resistor.py
 uv run single_resistor.py
 
 # Step 3: Open in KiCad
-open single_resistor/single_resistor.kicad_pro
+open blank_kicad_ref/blank.kicad_pro
 
 # Verify:
 # - R1 resistor visible on schematic
