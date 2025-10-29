@@ -115,9 +115,10 @@ Execution Time: ~67 seconds for full suite (tests 39-65)
 | Test Range | Manual Testing Status | Notes |
 |------------|----------------------|-------|
 | 01-11 | ✅ Manually tested | Visually inspected in KiCad GUI |
-| 12-65 | ⚠️ Automated only | Need manual GUI validation |
+| 12 | ✅ Manually tested | Label orientation issue found (#403) |
+| 13-65 | ⚠️ Automated only | Need manual GUI validation |
 
-**TODO:** Incrementally validate tests 12-65 by opening in KiCad GUI
+**Progress:** 12 of 65 tests manually validated. Issue #403 documents label orientation bug.
 
 ---
 
