@@ -223,28 +223,15 @@ def test_17_add_ground_symbol(request):
         # STEP 3: Modify Python to add ground connection: r1[2] += Net("GND")
         # =====================================================================
         print("\n" + "="*70)
-        print("STEP 3: Modify Python code: r1[2] += Net(\"GND\")")
+        print("STEP 3: Modify Python code: uncomment GND connection")
         print("="*70)
 
-        # Find the closing parenthesis of the circuit function (before __main__)
-        # We'll insert the ground connection before the circuit function ends
+        # Uncomment the GND connection lines
         modified_code = original_code.replace(
-            "    r1 = Component(\n"
-            "        symbol=\"Device:R\",\n"
-            "        ref=\"R1\",\n"
-            "        value=\"10k\",\n"
-            "        footprint=\"Resistor_SMD:R_0603_1608Metric\",\n"
-            "    )",
-            "    r1 = Component(\n"
-            "        symbol=\"Device:R\",\n"
-            "        ref=\"R1\",\n"
-            "        value=\"10k\",\n"
-            "        footprint=\"Resistor_SMD:R_0603_1608Metric\",\n"
-            "    )\n"
-            "\n"
-            "    # Connect R1 pin 2 to ground\n"
-            "    gnd = Net(\"GND\")\n"
-            "    r1[2] += gnd"
+            "    # gnd = Net(name=\"GND\")\n"
+            "    # gnd += r1[2]",
+            "    gnd = Net(name=\"GND\")\n"
+            "    gnd += r1[2]"
         )
 
         # Write modified Python file
@@ -252,8 +239,8 @@ def test_17_add_ground_symbol(request):
             f.write(modified_code)
 
         print(f"✅ Step 3: Python code modified")
-        print(f"   - Added: gnd = Net(\"GND\")")
-        print(f"   - Added: r1[2] += gnd")
+        print(f"   - Uncommented: gnd = Net(name=\"GND\")")
+        print(f"   - Uncommented: gnd += r1[2]")
 
         # =====================================================================
         # STEP 4: Regenerate KiCad with ground connection
@@ -341,19 +328,29 @@ def test_17_add_ground_symbol(request):
         print(f"   - R1 pin 2 is no longer unconnected ✓")
 
         # =====================================================================
-        # STEP 6: Validate component position preserved
+        # STEP 6: Validate component position preserved & power symbol added
         # =====================================================================
         print("\n" + "="*70)
-        print("STEP 6: Validate component position preserved")
+        print("STEP 6: Validate component position preserved & power symbol added")
         print("="*70)
 
         sch_final = Schematic.load(str(schematic_file))
         components_final = sch_final.components
 
-        assert len(components_final) == 1, f"Expected 1 component, got {len(components_final)}"
+        # Should now have R1 + GND power symbol (2 components)
+        assert len(components_final) == 2, f"Expected 2 components (R1 + GND power symbol), got {len(components_final)}"
 
-        r1_final = components_final[0]
-        assert r1_final.reference == "R1"
+        # Find R1 and GND power symbol
+        r1_final = None
+        gnd_symbol = None
+        for comp in components_final:
+            if comp.reference == "R1":
+                r1_final = comp
+            elif comp.reference.startswith("#PWR"):
+                gnd_symbol = comp
+
+        assert r1_final is not None, "R1 component not found in final schematic"
+        assert gnd_symbol is not None, "GND power symbol not found in final schematic"
 
         r1_final_pos = r1_final.position
 
@@ -364,13 +361,15 @@ def test_17_add_ground_symbol(request):
             f"Final: {r1_final_pos}"
         )
 
-        print(f"✅ Step 6: Position preserved")
+        print(f"✅ Step 6: Position preserved & power symbol added")
         print(f"   - R1 position: {r1_final_pos} ✓")
+        print(f"   - GND power symbol: {gnd_symbol.reference} ✓")
         print(f"\n🎉 Ground symbol connection workflow validated!")
         print(f"   - Initial circuit generated (no ground)")
         print(f"   - Ground connection added in Python")
         print(f"   - Netlist correctly reflects GND connection")
         print(f"   - Component position preserved")
+        print(f"   - GND power symbol automatically placed")
         print(f"   - Ground handling confirmed")
 
     finally:
