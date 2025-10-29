@@ -534,6 +534,27 @@ class APISynchronizer:
                         pin_labels[str(pin.number)] = (label, "hierarchical")
                         break
 
+            # Finally check for power symbols if no label found
+            if str(pin.number) not in pin_labels:
+                for component in self.schematic.components:
+                    # Check if this is a power symbol
+                    if component.reference.startswith("#PWR"):
+                        distance = math.sqrt(
+                            (component.position.x - pin_pos.x) ** 2 +
+                            (component.position.y - pin_pos.y) ** 2
+                        )
+                        if distance < 0.5:  # 0.5mm tolerance
+                            # Create a pseudo-label object with the power symbol's value
+                            # This allows the synchronizer to detect power net changes
+                            class PowerSymbolLabel:
+                                def __init__(self, power_comp):
+                                    self.text = power_comp.value  # Power net name (VCC, GND, etc.)
+                                    self.position = power_comp.position
+                                    self.component = power_comp  # Store reference to actual power symbol
+
+                            pin_labels[str(pin.number)] = (PowerSymbolLabel(component), "power_symbol")
+                            break
+
         return pin_labels
 
     def _get_net_object(self, net_name: str):
@@ -805,13 +826,16 @@ class APISynchronizer:
         """
         Update a label's net name.
 
+        For power symbols, this removes the old power symbol and adds a new one
+        because different power nets use different KiCad library symbols.
+
         Args:
-            label: Label to update
+            label: Label to update (or PowerSymbolLabel for power symbols)
             new_net_name: New net name
             component_ref: Component reference for tracking
             pin_number: Pin number for tracking
             report: Sync report to track the update
-            label_type: Type of label - "regular" or "hierarchical" (for logging)
+            label_type: Type of label - "regular", "hierarchical", or "power_symbol"
 
         Returns:
             True if label updated successfully
@@ -819,16 +843,45 @@ class APISynchronizer:
         old_name = label.text
 
         try:
-            # Update label text directly - the collection wrapper handles sync
-            label.text = new_net_name
+            # Special handling for power symbols - remove old and add new
+            if label_type == "power_symbol":
+                logger.info(f"Power net changed at {component_ref} pin {pin_number}: '{old_name}' -> '{new_net_name}'")
 
-            # Manually sync to _data since label property setter might not trigger it
-            self.schematic._sync_labels_to_data()
-            self.schematic._modified = True
+                # Remove the old power symbol
+                old_power_symbol = label.component
+                self.component_manager.remove_component(old_power_symbol.reference)
+                logger.debug(f"Removed old power symbol {old_power_symbol.reference} ({old_name})")
 
-            logger.info(f"Updated label at {component_ref} pin {pin_number}: '{old_name}' -> '{new_net_name}'")
-            report.labels_updated.append((component_ref, pin_number, old_name, new_net_name))
-            return True
+                # Add new power symbol for the new net
+                # Get the component to calculate pin position
+                kicad_comp = None
+                for comp in self.schematic.components:
+                    if comp.reference == component_ref:
+                        kicad_comp = comp
+                        break
+
+                if kicad_comp:
+                    # Add the new power symbol
+                    self._add_pin_label(kicad_comp, pin_number, new_net_name, report)
+                    logger.info(f"Replaced power symbol at {component_ref} pin {pin_number}: '{old_name}' -> '{new_net_name}'")
+                    report.labels_updated.append((component_ref, pin_number, old_name, new_net_name))
+                    return True
+                else:
+                    logger.error(f"Could not find component {component_ref} to update power symbol")
+                    return False
+
+            # Regular label or hierarchical label - just update the text
+            else:
+                # Update label text directly - the collection wrapper handles sync
+                label.text = new_net_name
+
+                # Manually sync to _data since label property setter might not trigger it
+                self.schematic._sync_labels_to_data()
+                self.schematic._modified = True
+
+                logger.info(f"Updated label at {component_ref} pin {pin_number}: '{old_name}' -> '{new_net_name}'")
+                report.labels_updated.append((component_ref, pin_number, old_name, new_net_name))
+                return True
 
         except Exception as e:
             logger.error(f"Failed to update label: {e}", exc_info=True)
