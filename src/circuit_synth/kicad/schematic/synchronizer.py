@@ -555,7 +555,7 @@ class APISynchronizer:
         # Get pin data from symbol library using the SAME source as initial placement
         # This ensures consistent pin orientation data between generation and synchronization
         from ..kicad_symbol_cache import SymbolLibCache
-        from ..sch_gen.symbol_geometry import find_pin_by_identifier
+        from ..sch_gen.schematic_writer import find_pin_by_identifier
         from .geometry_utils import GeometryUtils
 
         lib_data = SymbolLibCache.get_symbol_data(kicad_component.lib_id)
