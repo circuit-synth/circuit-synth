@@ -1,67 +1,109 @@
-# Test 13: Component Rename Consistency
+# Test 13: Reference Change Position Preservation (Issue #369 FIX)
 
 ## What This Tests
 
-Validates that renaming a component in KiCad maintains consistency when imported back to Python and used in further development.
+**Core Question**: When you change a component's reference in Python code (R1 → R2) and regenerate KiCad, does the component stay at its manually-positioned location, or is it treated as a Remove+Add (losing position)?
+
+This validates **UUID-based matching for reference changes** - the critical Issue #369 fix that makes component renaming work correctly without losing manual layout work.
 
 ## When This Situation Happens
 
-- Developer creates R1 in Python and generates KiCad
-- Opens in KiCad and renames R1 to R_PULLUP for better clarity
-- Imports modified KiCad back to Python
-- Adds connections using the renamed reference
-- Regenerates KiCad and expects consistency across tools
+- Developer generates KiCad with R1 from Python
+- Manually moves R1 to a specific position in KiCad (e.g., coordinates 100, 50)
+- Later decides to rename R1 to R2 in Python code (better naming)
+- Regenerates KiCad from Python
+- **Critical**: Does R1/R2 stay where it was manually placed, or does it move?
+
+Before Issue #369 fix:
+- Reference change treated as Remove R1 + Add R2
+- Component position would be lost
+- Sync would show "Remove: R1" and "Add: R2"
+
+After Issue #369 fix (UUID matching):
+- Reference change treated as Update (same component, different reference)
+- Position preserved via UUID matching
+- Component stays at manually-placed location
 
 ## What Should Work
 
-- Initial circuit with R1 generates successfully
-- KiCad component renamed from R1 to R_PULLUP (simulated)
-- Reimport to Python recognizes the new reference name
-- Python code can use R_PULLUP reference for connections
-- Regenerated KiCad maintains the renamed reference consistently
+1. Generate KiCad with R1 → R1 appears at auto-generated position
+2. Manually move R1 to (100, 50) in KiCad schematic editor
+3. Change reference in Python code: R1 → R2 → regenerate
+4. **R1/R2 stays at (100, 50)** - position preserved via UUID matching (not Remove+Add)
+5. Component reference successfully updated to R2
+6. UUID-based matching recognizes it's the same component, just renamed
 
 ## Manual Test Instructions
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth/tests/bidirectional/13_rename_component
+cd /Users/shanemattner/Desktop/circuit-synth2/tests/bidirectional/13_rename_component
 
 # Step 1: Generate initial KiCad project with R1
 uv run single_resistor.py
+# Verify: single_resistor/single_resistor.kicad_sch created with R1
+
+# Step 2: Manually move R1 to specific position in KiCad
+# Open schematic in KiCad:
 open single_resistor/single_resistor.kicad_pro
-# Verify: schematic shows R1
-
-# Step 2: In KiCad, rename R1 to R_PULLUP
 # - Select R1 component
-# - Edit properties, change reference from "R1" to "R_PULLUP"
-# - Save schematic
+# - Note its default auto-placed position
+# - Drag R1 to position (100, 50) - any visible position change
+# - Save schematic (Cmd+S), close KiCad
 
-# Step 3: Import modified KiCad back to Python
-uv run kicad-to-python single_resistor imported.py
-# Verify: imported.py contains ref="R_PULLUP"
+# Step 3: Edit single_resistor.py to change reference
+# Change: ref="R1" to ref="R2"
+# Save file
 
-# Step 4: Edit imported.py to add R2 component
-# Add a second resistor and connect to R_PULLUP
+# Step 4: Regenerate KiCad from modified Python
+uv run single_resistor.py
 
-# Step 5: Regenerate KiCad from modified Python
-uv run imported.py
-
-# Step 6: Open regenerated KiCad project
+# Step 5: Open regenerated KiCad and verify position preservation
 open single_resistor/single_resistor.kicad_pro
 # Verify:
-#   - Component still named R_PULLUP (not reverted to R1)
-#   - New component R2 present
-#   - Connection between R_PULLUP and R2 exists
+#   - Component is now named R2 (reference updated)
+#   - Component is still at (100, 50) - position NOT reset!
+#   - UUID-based matching worked (same component, renamed)
 ```
 
 ## Expected Result
 
-- ✅ Original circuit created with R1
-- ✅ Component successfully renamed to R_PULLUP in KiCad
-- ✅ Imported Python (imported.py) contains R_PULLUP reference
-- ✅ Python code can use R_PULLUP for new connections
-- ✅ Regenerated KiCad maintains R_PULLUP name (no reversion to R1)
-- ✅ Naming consistency maintained through complete cycle
+- ✅ Original KiCad generated with R1 at default position
+- ✅ R1 manually moved to (100, 50) in KiCad schematic editor
+- ✅ Reference changed R1 → R2 in Python code
+- ✅ Regenerated KiCad updates reference to R2
+- ✅ **Position preserved at (100, 50)** - NOT reset to default!
+- ✅ UUID-based matching recognized it's the same component
+- ✅ No "Remove R1 + Add R2" behavior (that would lose position)
 
-## Why This Is Important
+## Why This Is Critical
 
-Component renaming in KiCad for clarity and meaning is common practice. The bidirectional sync must preserve user-chosen names through import/export cycles, not revert to original programmatic names.
+**The Iterative Development Workflow:**
+1. Write circuit in Python → generate KiCad
+2. Arrange components nicely in KiCad (spend time on layout)
+3. Realize component naming needs improvement → rename in Python
+4. Regenerate KiCad
+
+**If positions are NOT preserved (before Issue #369 fix):**
+- All your layout work is lost (component moves back to default)
+- Reference change treated as Remove+Add instead of Update
+- Component appears to move when only reference changed
+- Users can't rename components mid-development without losing layout
+
+**If positions ARE preserved (after Issue #369 fix via UUID matching):**
+- Component stays where you manually placed it
+- Only the reference is updated
+- Layout work is preserved across reference changes
+- Users can refactor naming without re-doing layout
+- Bidirectional sync becomes truly usable for real development
+
+**This is THE fix that makes component renaming work correctly in bidirectional sync.**
+
+## Success Criteria
+
+This test PASSES when:
+- Component generates with auto-placed position
+- Manual position change in KiCad is preserved in file (100, 50)
+- Reference change in Python (R1 → R2) is accepted
+- Regenerated KiCad shows: new reference (R2) at original manual position (100, 50)
+- UUID-based matching works (not Remove+Add)
+- No position loss during reference change
