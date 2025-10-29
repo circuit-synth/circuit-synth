@@ -6,9 +6,9 @@ Focused test suite for validating bidirectional synchronization of **component p
 
 **Phase**: Planning
 **Status**: PRD Complete, Implementation Pending
-**Target**: 21 comprehensive PCB tests (placement + vias + manufacturing)
-**Scope**: Component placement, via management, footprint management, board setup, manufacturing
-**Out of Scope**: Complex trace routing preservation (users route in KiCad)
+**Target**: 18 comprehensive PCB tests (no duplication, all critical operations)
+**Scope**: Placement preservation, canonical update, collision avoidance, layer assignment, via management, manufacturing
+**Out of Scope**: Schematic→PCB generation (KiCad does this), complex routing preservation
 
 ## Overview
 
@@ -52,36 +52,36 @@ Without placement preservation, the tool is unusable for real PCB design. With t
   - Validation strategies
   - Real-world workflows
 
-## Test Categories (21 Comprehensive Tests)
+## Test Categories (18 Comprehensive Tests)
 
-### Phase 1: Core Placement Operations (Tests 01-08)
+### Phase 1: Core Placement Operations (Tests 01-07)
 - Blank PCB generation
-- Component CRUD operations (add, delete, modify)
-- ⭐ **Placement preservation** (TEST 03 - THE KILLER FEATURE)
-- Footprint changes and rotation
-- Round-trip placement synchronization
+- ⭐ **Placement preservation** (TEST 02 - THE KILLER FEATURE)
+- Component add with **collision avoidance + smart auto-placement**
+- Component delete
+- ⭐ **Canonical update** (TEST 05 - ALL component fields sync + position preserved)
+- Component rotation
+- Round-trip regeneration
 
-### Phase 2: Board & Footprint Management (Tests 09-12)
+### Phase 2: Board & Footprint Management (Tests 08-11)
+- ⭐ **Component layer assignment** (TEST 08 - F.Cu vs B.Cu - CRITICAL)
 - Board outline definition
 - Mounting holes placement
 - Footprint library synchronization
-- Component properties (DNP, MPN, custom fields)
 
-### Phase 3: Via Management (Tests 13-15) ⭐ NEW
+### Phase 3: Via Management (Tests 12-14) ⭐
 - **Through-hole vias** (connects all layers)
 - **Blind vias** (outer to inner layer)
 - **Buried vias** (inner to inner layer)
 - Essential for multi-layer boards (4+ layers)
 
-### Phase 4: Board Features (Tests 16-18)
-- Silkscreen text placement
+### Phase 4: Board Features (Tests 15-16)
+- **Silkscreen features** (text + graphics combined)
 - Fiducial markers for assembly
-- Silkscreen graphics (logos, polarity marks)
 
-### Phase 5: Manufacturing Output (Tests 19-21)
+### Phase 5: Manufacturing Output (Tests 17-18)
 - Gerber & drill file export
-- Pick-and-place export
-- BOM with positions export
+- Pick-and-place export (includes BOM data)
 
 ### Future (Not Current Scope)
 - Simple trace drawing (point-to-point in Python)
@@ -94,9 +94,10 @@ Without placement preservation, the tool is unusable for real PCB design. With t
 
 | Feature | Schematic Tests | PCB Tests |
 |---------|----------------|-----------|
-| **Test Count** | 33+ | 21 (placement + vias + mfg) |
-| **Killer Feature** | Position preservation (Test 09) | Placement preservation (Test 03) |
-| **Secondary Focus** | Netlist validation | Via management (Tests 13-15) |
+| **Test Count** | 33+ | 18 (no duplication, all critical ops) |
+| **Killer Feature** | Position preservation (Test 09) | Placement preservation (Test 02) |
+| **Secondary Focus** | Netlist validation | Canonical update (Test 05), Layer assignment (Test 08) |
+| **Tertiary Focus** | Component operations | Collision avoidance (Test 03), Via management (Tests 12-14) |
 | **Primary Focus** | Connectivity/netlist | Component placement + vias |
 | **Validation API** | kicad-sch-api | kicad-pcb-api |
 | **File Format** | .kicad_sch | .kicad_pcb |
@@ -111,14 +112,18 @@ Without placement preservation, the tool is unusable for real PCB design. With t
 - ❌ No verification of footprint change workflows
 - ❌ Engineers won't trust tool for real boards
 
-**With Comprehensive PCB Tests:**
-- ✅ Validates placement preservation (hours of placement work)
-- ✅ Proves component add/delete/modify operations work correctly
-- ✅ Verifies footprint changes preserve positions
-- ✅ **Validates via placement** (through-hole, blind, buried) for multi-layer boards
-- ✅ Verifies manufacturing output accuracy (Gerbers, PnP, BOM)
+**With Comprehensive PCB Tests (18 Tests):**
+- ✅ Validates placement preservation (hours of placement work) - TEST 02
+- ✅ Validates canonical update (ALL component fields sync) - TEST 05
+- ✅ Validates layer assignment (F.Cu vs B.Cu, double-sided boards) - TEST 08
+- ✅ Proves component add/delete/modify operations work correctly - TESTS 03-04
+- ✅ Validates collision avoidance + smart auto-placement - TEST 03
+- ✅ Verifies footprint changes preserve positions - TEST 05
+- ✅ **Validates via placement** (through-hole, blind, buried) - TESTS 12-14
+- ✅ Verifies manufacturing output accuracy (Gerbers, PnP) - TESTS 17-18
 - ✅ Enables iterative PCB workflow (placement + vias)
 - ✅ **Clear expectations**: circuit-synth for placement/vias, KiCad for complex routing
+- ✅ **No duplication** - 18 focused tests, all critical operations covered
 - ✅ Engineers can trust tool for production boards
 
 ## Real-World Workflows Validated
@@ -147,16 +152,20 @@ Without placement preservation, the tool is unusable for real PCB design. With t
 
 ## Implementation Timeline
 
-- **Weeks 1-2**: Phase 1 (Tests 01-05: Core placement operations)
-  - **Test 03 is highest priority** - THE KILLER FEATURE
-- **Weeks 3-4**: Phase 2 (Tests 06-08: Component manipulation)
-- **Weeks 5-6**: Phase 3 (Tests 09-12: Board & mechanical)
-- **Weeks 7-8**: Phase 4 (Tests 13-15: Via management) ⭐ NEW
-  - Essential for multi-layer boards
-- **Weeks 9-10**: Phase 5 (Tests 16-18: Board features)
-- **Weeks 11-12**: Phase 6 (Tests 19-21: Manufacturing output)
+- **Weeks 1-2**: Phase 1 (Tests 01-07: Core placement operations)
+  - **Test 02 is highest priority** - THE KILLER FEATURE (placement preservation)
+  - **Test 03** - Collision avoidance + smart auto-placement
+  - **Test 05 is critical** - Canonical update (ALL fields sync + position preserved)
+- **Weeks 3-4**: Phase 2 (Tests 08-11: Board & footprint management)
+  - **Test 08 is critical** - Component layer assignment (F.Cu vs B.Cu)
+- **Weeks 5-6**: Phase 3 (Tests 12-14: Via management) ⭐
+  - Essential for multi-layer boards (through-hole, blind, buried)
+- **Weeks 7-8**: Phase 4 (Tests 15-16: Board features)
+  - Test 15 combines silkscreen text + graphics (efficient)
+- **Weeks 9-10**: Phase 5 (Tests 17-18: Manufacturing output)
+  - Test 18 combines PnP + BOM (efficient)
 
-**Total**: 21 comprehensive tests over 12 weeks
+**Total**: 18 comprehensive tests over 10 weeks (no duplication, all critical operations covered)
 
 ## Getting Started
 
@@ -165,8 +174,8 @@ Without placement preservation, the tool is unusable for real PCB design. With t
 **Next Steps**:
 1. Review [PCB_BIDIRECTIONAL_TESTS_PRD.md](./PCB_BIDIRECTIONAL_TESTS_PRD.md)
 2. Validate approach with stakeholders
-3. Begin Phase 1 implementation
-4. Create test 01-05 following schematic test patterns
+3. Begin Phase 1 implementation (Tests 01-07)
+4. Focus on critical tests first: Test 02 (placement preservation), Test 05 (canonical update), Test 08 (layer assignment)
 
 ## References
 
@@ -180,16 +189,20 @@ Without placement preservation, the tool is unusable for real PCB design. With t
 This test suite succeeds when:
 
 ✅ **Engineers trust circuit-synth for production PCB development**
-✅ **Manual placement work is provably preserved** (THE key metric)
-✅ Component operations (add/delete/modify) validated
-✅ Footprint changes preserve positions
-✅ **Via placement works** (through-hole, blind, buried) for multi-layer boards
-✅ Board setup and mechanical features work
-✅ Manufacturing output is accurate
-✅ **21 comprehensive tests all passing**
-✅ **Clear expectations set: circuit-synth for placement/vias, KiCad for complex routing**
+✅ **Manual placement work is provably preserved** (TEST 02 - THE key metric)
+✅ **ALL component fields sync correctly** (TEST 05 - canonical update validation)
+✅ **Component layer assignment works** (TEST 08 - F.Cu vs B.Cu for double-sided boards)
+✅ **Collision avoidance + smart auto-placement** (TEST 03 - when adding new components)
+✅ Component operations (add/delete/modify) validated (TESTS 03-04, 06-07)
+✅ **Via placement works** (TESTS 12-14 - through-hole, blind, buried for multi-layer boards)
+✅ Board setup and mechanical features work (TESTS 09-11)
+✅ Silkscreen features work (TEST 15 - text + graphics)
+✅ Manufacturing output is accurate (TESTS 17-18 - Gerbers + PnP/BOM)
+✅ **18 comprehensive tests all passing** (no duplication, all critical operations covered)
+✅ **Clear expectations: circuit-synth regenerates PCB preserving manual work**
 
 ---
 
 **Status**: 📋 Planning Complete - Ready for Implementation
-**Next Milestone**: Phase 1 Implementation (Tests 01-05)
+**Next Milestone**: Phase 1 Implementation (Tests 01-07)
+**Focus**: Critical tests - Test 02 (placement preservation), Test 05 (canonical update), Test 08 (layer assignment)
