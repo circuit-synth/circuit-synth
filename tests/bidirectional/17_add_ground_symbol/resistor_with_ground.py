@@ -19,6 +19,9 @@ def resistor_with_ground():
         footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
+    # gnd = Net(name="GND")
+    # gnd += r1[2]
+
 
 if __name__ == "__main__":
     circuit_obj = resistor_with_ground()
