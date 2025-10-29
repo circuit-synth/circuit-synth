@@ -36,7 +36,7 @@ From Source
 
 .. code-block:: bash
 
-   git clone https://github.com/circuitsynth/circuit-synth.git
+   git clone https://github.com/circuit-synth/circuit-synth.git
    cd circuit-synth
    
    # Using uv (recommended)

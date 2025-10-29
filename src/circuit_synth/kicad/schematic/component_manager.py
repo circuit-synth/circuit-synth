@@ -253,6 +253,7 @@ class ComponentManager:
         position: Optional[Tuple[float, float]] = None,
         rotation: Optional[float] = None,
         footprint: Optional[str] = None,
+        lib_id: Optional[str] = None,
         **properties,
     ) -> bool:
         """
@@ -264,6 +265,7 @@ class ComponentManager:
             position: New position (if provided)
             rotation: New rotation in degrees (if provided)
             footprint: New footprint (if provided)
+            lib_id: New library symbol (if provided) - e.g., "Device:R" or "Device:C"
             **properties: Additional properties to update
 
         Returns:
@@ -282,6 +284,14 @@ class ComponentManager:
         # Update footprint
         if footprint is not None:
             component.footprint = footprint
+
+        # Update lib_id (symbol type) - WORKAROUND: use _data because lib_id property is read-only
+        if lib_id is not None:
+            old_lib_id = str(component.lib_id)
+            if old_lib_id != lib_id:
+                logger.info(f"Updating {reference} symbol: {old_lib_id} → {lib_id}")
+                # component.lib_id is read-only, but we can modify _data.lib_id
+                component._data.lib_id = lib_id
 
         # Update position
         if position is not None:

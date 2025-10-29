@@ -9,18 +9,12 @@ Comprehensive workflow for documenting progress, updating documentation, and com
 
 ## Process
 
-### 1. Update Memory Bank (Keep Brief)
-**IMPORTANT: Be concise - 2-3 sentences maximum**
-- Create a single, focused progress entry in memory-bank/
-- Document only the key technical change: what was done and why
-- NO lengthy explanations or detailed code analysis
-
-### 2. Update Documentation (Only if Needed)
+### 1. Update Documentation (Only if Needed)
 - IF new user-facing features: Update README.md briefly
 - IF new commands: Update CLAUDE.md
 - NO documentation changes for internal fixes or refactoring
 
-### 3. Format Code Before Committing
+### 2. Format Code Before Committing
 **IMPORTANT: Always format code before committing**
 - Run comprehensive formatting:
   ```bash
@@ -33,7 +27,7 @@ Comprehensive workflow for documenting progress, updating documentation, and com
   ```
 - This ensures consistent code style across the entire project
 
-### 4. Quality Checks Before Committing
+### 3. Quality Checks Before Committing
 **IMPORTANT: Run basic quality checks**
 - Syntax validation:
   ```bash
@@ -44,7 +38,7 @@ Comprehensive workflow for documenting progress, updating documentation, and com
   uv run pytest tests/unit/ --tb=no -q || echo "⚠️  Unit tests failing"
   ```
 
-### 5. Commit Changes (Selective and Clean)  
+### 4. Commit Changes (Selective and Clean)  
 **IMPORTANT: Keep commit message under 3 lines**
 - Check git status and review what needs to be committed
 - Add only the files that should be kept: `git add <specific-files>`
@@ -58,7 +52,7 @@ Comprehensive workflow for documenting progress, updating documentation, and com
   ```
 - NO verbose technical details in commit message
 
-### 6. File Management Strategy
+### 5. File Management Strategy
 **IMPORTANT: Be selective about what gets committed**
 
 ```bash
@@ -89,13 +83,13 @@ git status  # Should show only files you want to commit
 git commit -m "Brief description"
 ```
 
-### 7. Final Cleanup
+### 6. Final Cleanup
 - Verify working tree is clean: `git status`
 - Remove any temporary test files not in git
 - Ensure no untracked files remain that shouldn't be there
 
 ## Guidelines
-- **Be concise**: Memory bank entries and commits should be brief
+- **Be concise**: Commits should be brief
 - **Focus on impact**: What changed and why, not how
 - **Skip minor changes**: Don't document every small fix
 - **User perspective**: Document what users will notice
@@ -105,4 +99,4 @@ git commit -m "Brief description"
 /dev-update-and-commit "Add KiCad symbol search functionality"
 ```
 
-This creates a focused memory bank entry and clean commit without excessive verbosity.
+This creates a clean commit without excessive verbosity.

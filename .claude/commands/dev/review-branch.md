@@ -748,9 +748,6 @@ find /usr/share/kicad/symbols -name "*.kicad_sym" | head -5
 # Agent system validation
 ls .claude/agents/*.md | wc -l
 grep -c "^#" .claude/agents/*.md
-
-# Memory bank integrity
-find memory-bank/ -name "*.md" -exec wc -l {} \; | sort -nr
 ```
 
 ### 4. Automatic Code Formatting (Default Step)
@@ -809,7 +806,7 @@ fi
 ```bash
 # File size analysis
 find . -name "*.py" -exec wc -c {} \; | sort -nr | head -20
-du -sh memory-bank/ example_project/ src/
+du -sh example_project/ src/
 
 # Performance profiling setup
 python -m cProfile -o profile.stats example_project/circuit-synth/main.py
@@ -845,8 +842,6 @@ python -m circuit_synth.kicad.validate_libraries
 # Agent capability testing
 python -m circuit_synth.agents.test_agent_capabilities
 
-# Memory bank validation
-python -m circuit_synth.ai_integration.memory_bank.validate_structure
 ```
 
 ## Example Usage
@@ -1005,7 +1000,6 @@ quality_score = {
         core_api_compliance * 0.3 +
         kicad_integration_score * 0.3 +
         agent_system_score * 0.2 +
-        memory_bank_score * 0.2
     ) * 0.05
 }
 

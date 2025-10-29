@@ -88,10 +88,6 @@ def parse_netlist(netlist_content):
     return nets
 
 
-@pytest.mark.xfail(
-    reason="Issue #380: Synchronizer does not remove old hierarchical labels when power domains change, "
-           "resulting in extra labels"
-)
 def test_18_multiple_power_domains(request):
     """Test multi-voltage circuit with multiple independent power rails.
 
@@ -164,13 +160,19 @@ def test_18_multiple_power_domains(request):
 
         assert schematic_file.exists(), "Schematic not created"
 
-        # Validate 4 components
+        # Validate components (4 resistors + 4 power symbols)
         from kicad_sch_api import Schematic
         sch = Schematic.load(str(schematic_file))
         components = sch.components
 
-        assert len(components) == 4
-        refs = {c.reference for c in components}
+        # Filter out power symbols to get just the resistors
+        resistors = [c for c in components if not c.reference.startswith("#PWR")]
+        power_symbols = [c for c in components if c.reference.startswith("#PWR")]
+
+        assert len(resistors) == 4, f"Expected 4 resistors, found {len(resistors)}"
+        assert len(power_symbols) == 4, f"Expected 4 power symbols, found {len(power_symbols)}"
+
+        refs = {c.reference for c in resistors}
         assert "R1" in refs and "R2" in refs and "R3" in refs and "R4" in refs
 
         # Store initial positions
@@ -184,32 +186,32 @@ def test_18_multiple_power_domains(request):
         r3_initial_pos = r3_initial.position
         r4_initial_pos = r4_initial.position
 
-        # Verify hierarchical labels for power domains
+        # Verify power symbols for power domains (not hierarchical labels)
         with open(schematic_file, 'r') as f:
             sch_content = f.read()
 
-        # Count labels for each power domain
-        vcc_labels = sch_content.count('hierarchical_label "VCC"')
-        vcc_3v3_labels = sch_content.count('hierarchical_label "3V3"')
-        vcc_5v_labels = sch_content.count('hierarchical_label "5V"')
-        gnd_labels = sch_content.count('hierarchical_label "GND"')
+        # Count power symbols for each power domain
+        vcc_symbols = sch_content.count('lib_id "power:VCC"')
+        v3v3_symbols = sch_content.count('lib_id "power:+3V3"')
+        v5v_symbols = sch_content.count('lib_id "power:+5V"')
+        gnd_symbols = sch_content.count('lib_id "power:GND"')
 
         print(f"✅ Step 1: Initial multi-voltage circuit generated")
-        print(f"   - Components: {refs}")
+        print(f"   - Resistors: {refs}")
         print(f"   - R1 position: {r1_initial_pos} (VCC)")
         print(f"   - R2 position: {r2_initial_pos} (3V3)")
         print(f"   - R3 position: {r3_initial_pos} (5V)")
         print(f"   - R4 position: {r4_initial_pos} (GND)")
-        print(f"\n   Power domain labels:")
-        print(f"   - VCC: {vcc_labels} label")
-        print(f"   - 3V3: {vcc_3v3_labels} label")
-        print(f"   - 5V: {vcc_5v_labels} label")
-        print(f"   - GND: {gnd_labels} label")
+        print(f"\n   Power symbols:")
+        print(f"   - VCC: {vcc_symbols} symbol(s)")
+        print(f"   - 3V3: {v3v3_symbols} symbol(s)")
+        print(f"   - 5V: {v5v_symbols} symbol(s)")
+        print(f"   - GND: {gnd_symbols} symbol(s)")
 
-        assert vcc_labels == 1, f"Expected 1 VCC label, found {vcc_labels}"
-        assert vcc_3v3_labels == 1, f"Expected 1 3V3 label, found {vcc_3v3_labels}"
-        assert vcc_5v_labels == 1, f"Expected 1 5V label, found {vcc_5v_labels}"
-        assert gnd_labels == 1, f"Expected 1 GND label, found {gnd_labels}"
+        assert vcc_symbols == 1, f"Expected 1 VCC power symbol, found {vcc_symbols}"
+        assert v3v3_symbols == 1, f"Expected 1 3V3 power symbol, found {v3v3_symbols}"
+        assert v5v_symbols == 1, f"Expected 1 5V power symbol, found {v5v_symbols}"
+        assert gnd_symbols == 1, f"Expected 1 GND power symbol, found {gnd_symbols}"
 
         # =====================================================================
         # STEP 2: Export and validate initial netlist
@@ -345,7 +347,14 @@ def test_18_multiple_power_domains(request):
         sch_final = Schematic.load(str(schematic_file))
         components_final = sch_final.components
 
-        assert len(components_final) == 4
+        # Filter to just resistors (exclude power symbols)
+        resistors_final = [c for c in components_final if not c.reference.startswith("#PWR")]
+        power_symbols_final = [c for c in components_final if c.reference.startswith("#PWR")]
+
+        assert len(resistors_final) == 4, f"Expected 4 resistors, found {len(resistors_final)}"
+        # After moving R2 from 3V3 to 5V, we should have: VCC, 5V, 5V, GND = 4 power symbols
+        # But one 3V3 power symbol should be removed, so we might have 3 power symbols
+        assert len(power_symbols_final) >= 3, f"Expected at least 3 power symbols, found {len(power_symbols_final)}"
 
         r1_final = next(c for c in components_final if c.reference == "R1")
         r2_final = next(c for c in components_final if c.reference == "R2")
@@ -379,34 +388,40 @@ def test_18_multiple_power_domains(request):
             f"Final: {r4_final_pos}"
         )
 
-        # Validate label changes - R2 should now have 5V (not 3V3)
+        # Validate power symbol changes - R2 should now have 5V (not 3V3)
         with open(schematic_file, 'r') as f:
             sch_content_final = f.read()
 
-        # Count labels after modification
-        vcc_labels_final = sch_content_final.count('hierarchical_label "VCC"')
-        vcc_3v3_labels_final = sch_content_final.count('hierarchical_label "3V3"')
-        vcc_5v_labels_final = sch_content_final.count('hierarchical_label "5V"')
-        gnd_labels_final = sch_content_final.count('hierarchical_label "GND"')
+        # Count power symbols after modification
+        vcc_symbols_final = sch_content_final.count('lib_id "power:VCC"')
+        v3v3_symbols_final = sch_content_final.count('lib_id "power:+3V3"')
+        v5v_symbols_final = sch_content_final.count('lib_id "power:+5V"')
+        gnd_symbols_final = sch_content_final.count('lib_id "power:GND"')
 
         print(f"✅ Step 5: Positions preserved during modification")
         print(f"   - R1 position: {r1_final_pos} (unchanged)")
         print(f"   - R2 position: {r2_final_pos} (unchanged)")
         print(f"   - R3 position: {r3_final_pos} (unchanged)")
         print(f"   - R4 position: {r4_final_pos} (unchanged)")
-        print(f"\n   Power domain labels (after modification):")
-        print(f"   - VCC: {vcc_labels_final} label (unchanged)")
-        print(f"   - 3V3: {vcc_3v3_labels_final} label (removed - was 1)")
-        print(f"   - 5V: {vcc_5v_labels_final} labels (increased - was 1)")
-        print(f"   - GND: {gnd_labels_final} label (unchanged)")
+        print(f"\n   Power symbols (after modification):")
+        print(f"   - VCC: {vcc_symbols_final} symbol(s) (unchanged)")
+        print(f"   - 3V3: {v3v3_symbols_final} symbol(s) (removed - was 1)")
+        print(f"   - 5V: {v5v_symbols_final} symbol(s) (increased - was 1)")
+        print(f"   - GND: {gnd_symbols_final} symbol(s) (unchanged)")
 
-        # 3V3 label should be gone (or significantly reduced)
-        # 5V labels should increase (now has R2 and R3)
-        assert vcc_labels_final == 1, (
-            f"VCC label count changed! Expected 1, got {vcc_labels_final}"
+        # 3V3 power symbol should be gone
+        # 5V power symbols should increase (now has R2 and R3)
+        assert vcc_symbols_final == 1, (
+            f"VCC power symbol count changed! Expected 1, got {vcc_symbols_final}"
         )
-        assert gnd_labels_final == 1, (
-            f"GND label count changed! Expected 1, got {gnd_labels_final}"
+        assert v3v3_symbols_final == 0, (
+            f"3V3 power symbol should be removed! Expected 0, got {v3v3_symbols_final}"
+        )
+        assert v5v_symbols_final == 2, (
+            f"5V power symbols should be 2 (R2 + R3)! Expected 2, got {v5v_symbols_final}"
+        )
+        assert gnd_symbols_final == 1, (
+            f"GND power symbol count changed! Expected 1, got {gnd_symbols_final}"
         )
 
         # =====================================================================

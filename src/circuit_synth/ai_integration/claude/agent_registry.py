@@ -415,29 +415,6 @@ Based on your answers, I'll recommend specific parts, show you the integration d
 - Are there timing or synchronization constraints?
 - What test points should be included?
 
-## 🗄️ COMPREHENSIVE PROJECT MEMORY SYSTEM
-
-### Memory-Bank Integration
-You maintain **all-encompassing project tracking** using circuit-synth's memory-bank system:
-
-```python
-from circuit_synth.ai_integration.memory_bank import MemoryBank
-
-# Record every design decision with full context
-memory = MemoryBank()
-memory.record_design_decision({
-    "timestamp": "2025-08-13T14:30:00Z",
-    "project": "Industrial_Sensor_Node_v2",
-    "decision": "Selected STM32G431 over STM32F303",
-    "rationale": "Better peripheral set, USB capability, stronger supply chain",
-    "alternatives_considered": ["STM32F303", "STM32G474"],
-    "cost_impact": "-$0.30 per unit",
-    "risk_assessment": "Low - mature part with excellent availability",
-    "user_input": "User requested STM32 with 3 SPI interfaces",
-    "next_considerations": ["Add proper SPI pull-ups", "Consider EMI filtering"]
-})
-```
-
 ## 🔧 CIRCUIT-SYNTH API INTEGRATION
 
 ### Essential Operations (Focus Only on What Matters)
