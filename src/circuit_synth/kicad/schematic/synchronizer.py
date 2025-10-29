@@ -1062,12 +1062,13 @@ class APISynchronizer:
                     report.errors.append(f"Failed to rename {kicad_ref} → {circuit_ref}")
                     continue
 
-            # Check if update needed (value, footprint, etc.)
+            # Check if update needed (value, footprint, symbol, etc.)
             if self._needs_update(circuit_comp, kicad_comp):
                 success = self.component_manager.update_component(
                     kicad_ref,  # Use current reference (after rename if applicable)
                     value=circuit_comp["value"],
                     footprint=circuit_comp.get("footprint"),
+                    lib_id=circuit_comp.get("symbol"),
                 )
                 if success:
                     report.modified.append(kicad_ref)
@@ -1080,6 +1081,13 @@ class APISynchronizer:
             circuit_comp.get("footprint")
             and circuit_comp["footprint"] != kicad_comp.footprint
         ):
+            return True
+        # Check for symbol (lib_id) change
+        circuit_symbol = circuit_comp.get("symbol")
+        if circuit_symbol and circuit_symbol != str(kicad_comp.lib_id):
+            logger.info(
+                f"Symbol change detected for {kicad_comp.reference}: {kicad_comp.lib_id} → {circuit_symbol}"
+            )
             return True
         # Always ensure components have proper BOM and board inclusion flags
         # This fixes the "?" symbol issue caused by in_bom=no or on_board=no
