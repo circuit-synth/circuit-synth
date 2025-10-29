@@ -42,11 +42,11 @@ class TestBlankPCBGeneration:
         # Verify the result indicates success
         assert result is not False, "PCB generation should not fail for blank circuits"
 
-        # Verify .kicad_pcb file was created (named after project, not circuit)
-        pcb_file = project_dir / "blank_project.kicad_pcb"
+        # Verify .kicad_pcb file was created (named after circuit, not folder)
+        pcb_file = project_dir / "blank.kicad_pcb"
         assert (
             pcb_file.exists()
-        ), f"blank_project.kicad_pcb should be created, but file not found at {pcb_file}"
+        ), f"blank.kicad_pcb should be created, but file not found at {pcb_file}"
 
         # Verify PCB file has content (not empty)
         assert pcb_file.stat().st_size > 0, "PCB file should have content"
@@ -81,10 +81,10 @@ class TestBlankPCBGeneration:
             str(project_dir), generate_pcb=True, force_regenerate=True
         )
 
-        # Verify all three core files exist (named after project directory)
-        pro_file = project_dir / "test_project.kicad_pro"
-        sch_file = project_dir / "test_project.kicad_sch"
-        pcb_file = project_dir / "test_project.kicad_pcb"
+        # Verify all three core files exist (named after circuit, not project directory)
+        pro_file = project_dir / "test_circuit.kicad_pro"
+        sch_file = project_dir / "test_circuit.kicad_sch"
+        pcb_file = project_dir / "test_circuit.kicad_pcb"
 
         assert pro_file.exists(), ".kicad_pro file should be created"
         assert sch_file.exists(), ".kicad_sch file should be created"
@@ -106,7 +106,7 @@ class TestBlankPCBGeneration:
             str(project_dir), generate_pcb=True, force_regenerate=True
         )
 
-        pcb_file = project_dir / "blank_valid.kicad_pcb"
+        pcb_file = project_dir / "blank_circuit.kicad_pcb"
         pcb_content = pcb_file.read_text()
 
         # Verify essential KiCad PCB elements
@@ -135,7 +135,7 @@ class TestBlankPCBGeneration:
             str(project_dir), generate_pcb=True, force_regenerate=True
         )
 
-        pcb_file = project_dir / "blank_kicad.kicad_pcb"
+        pcb_file = project_dir / "blank_circuit.kicad_pcb"
 
         # Try to parse the PCB file content
         # A minimal valid PCB should at least have the opening (kicad_pcb)
