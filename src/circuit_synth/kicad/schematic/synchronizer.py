@@ -617,6 +617,9 @@ class APISynchronizer:
             if hasattr(self.schematic, "_data") and "hierarchical_labels" in self.schematic._data:
                 for label_dict in self.schematic._data["hierarchical_labels"]:
                     if label_dict.get("uuid") == label_uuid:
+                        # Ensure effects dict exists before updating justify
+                        if "effects" not in label_dict:
+                            label_dict["effects"] = {}
                         label_dict["effects"]["justify"] = justify
                         logger.debug(f"Set hierarchical label justify={justify} for rotation={rotation_normalized}°")
                         break
