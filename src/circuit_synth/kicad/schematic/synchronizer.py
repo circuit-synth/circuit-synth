@@ -599,7 +599,29 @@ class APISynchronizer:
                 rotation=label_angle,  # CRITICAL: Must pass rotation for correct orientation!
             )
 
-            logger.debug(f"Label added: '{net_name}' at ({label_pos.x:.2f}, {label_pos.y:.2f}), angle={label_angle:.0f}, UUID={label_uuid}")
+            # CRITICAL FIX: Manually set justify to match initial generation logic
+            # KiCAD hierarchical labels need correct justify based on rotation for proper text rendering
+            rotation_normalized = label_angle % 360
+            if rotation_normalized == 0:
+                justify = "left"
+            elif rotation_normalized == 90:
+                justify = "left"
+            elif rotation_normalized == 180:
+                justify = "right"
+            elif rotation_normalized == 270:
+                justify = "left"  # Fixed: was "right" in old code, should be "left"
+            else:
+                justify = "left"  # Default fallback
+
+            # Update the label's justify in the schematic data
+            if hasattr(self.schematic, "_data") and "hierarchical_labels" in self.schematic._data:
+                for label_dict in self.schematic._data["hierarchical_labels"]:
+                    if label_dict.get("uuid") == label_uuid:
+                        label_dict["effects"]["justify"] = justify
+                        logger.debug(f"Set hierarchical label justify={justify} for rotation={rotation_normalized}°")
+                        break
+
+            logger.debug(f"Label added: '{net_name}' at ({label_pos.x:.2f}, {label_pos.y:.2f}), angle={label_angle:.0f}, justify={justify}, UUID={label_uuid}")
             logger.info(f"Added label '{net_name}' at {kicad_component.reference} pin {pin_number}")
             report.labels_added.append((kicad_component.reference, pin_number, net_name))
             return True

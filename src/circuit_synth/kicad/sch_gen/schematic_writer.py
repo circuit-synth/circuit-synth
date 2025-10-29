@@ -1343,7 +1343,7 @@ class SchematicWriter:
                         elif rotation_normalized == 180:
                             justify = "right"
                         elif rotation_normalized == 270:
-                            justify = "right"
+                            justify = "left"  # Fixed: was "right", should be "left"
                         else:
                             justify = "left"  # Default fallback
 
@@ -1625,7 +1625,7 @@ class SchematicWriter:
                         elif rotation_normalized == 180:
                             justify = "right"
                         elif rotation_normalized == 270:
-                            justify = "right"
+                            justify = "left"  # Fixed: was "right", should be "left"
                         else:
                             justify = "left"  # Default fallback
 
