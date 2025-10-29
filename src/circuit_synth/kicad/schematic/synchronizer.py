@@ -966,12 +966,9 @@ class APISynchronizer:
         logger.info("=" * 70)
         logger.info("Saving schematic changes...")
 
-        # WORKAROUND: kicad-sch-api bug where WireCollection doesn't sync to _data["wires"]
-        # Manually sync wires from collection to _data before saving
-        self._sync_wires_to_data()
-
-        # Labels are now synced automatically via schematic.add_label() API
-        # which calls _sync_labels_to_data() internally, so no manual sync needed
+        # kicad-sch-api's save() method automatically syncs all collections to _data
+        # including wires, labels, components, junctions, hierarchical_labels, etc.
+        # See: kicad_sch_api/core/schematic.py:408-416 (save method calls all _sync_*_to_data methods)
 
         logger.info(f"💾 Calling schematic.save(preserve_format=False)")
         logger.info(f"   - Save path: {self.schematic_path}")
@@ -982,57 +979,3 @@ class APISynchronizer:
 
         logger.info(f"✅ Save completed")
         logger.info("=" * 70)
-
-    def _sync_wires_to_data(self):
-        """
-        Sync wires from WireCollection to _data dictionary.
-
-        WORKAROUND for kicad-sch-api bug: The WireCollection maintains wires in memory
-        but doesn't update _data["wires"], so when saving, wires are lost. This method
-        manually syncs the wire collection to _data before saving.
-        """
-        if not hasattr(self.schematic, "_data"):
-            logger.warning("Schematic has no _data attribute")
-            return
-
-        if not hasattr(self.schematic, "wires"):
-            logger.warning("Schematic has no wires attribute")
-            return
-
-        # Get all wires from the wire collection
-        try:
-            wires_list = list(self.schematic.wires)
-            logger.debug(f"Retrieved {len(wires_list)} wires from collection")
-        except (TypeError, AttributeError) as e:
-            logger.warning(f"Could not access wires collection: {e}")
-            return
-
-        if not wires_list:
-            # No wires to sync
-            logger.debug("No wires to sync (empty list)")
-            return
-
-        logger.debug(f"Syncing {len(wires_list)} wires to _data")
-
-        # Convert Wire objects to dictionaries for _data
-        wire_dicts = []
-        for wire in wires_list:
-            if not hasattr(wire, "uuid") or not hasattr(wire, "points"):
-                continue
-
-            # Build wire dictionary matching KiCad S-expression format
-            wire_dict = {"uuid": wire.uuid, "points": []}
-
-            # Add points
-            for point in wire.points:
-                wire_dict["points"].append({"x": point.x, "y": point.y})
-
-            # Add stroke info if present
-            if hasattr(wire, "stroke_width") and wire.stroke_width > 0:
-                wire_dict["stroke"] = {"width": wire.stroke_width, "type": "default"}
-
-            wire_dicts.append(wire_dict)
-
-        # Update _data["wires"]
-        self.schematic._data["wires"] = wire_dicts
-        logger.info(f"Synced {len(wire_dicts)} wires to _data")
