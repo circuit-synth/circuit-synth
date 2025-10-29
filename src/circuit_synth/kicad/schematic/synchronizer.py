@@ -210,6 +210,9 @@ class APISynchronizer:
         """
         logger.info("Starting API-based synchronization")
 
+        # Store circuit for accessing nets (needed for power symbol placement)
+        self.circuit = circuit
+
         report = SyncReport()
 
         try:
@@ -533,6 +536,129 @@ class APISynchronizer:
 
         return pin_labels
 
+    def _get_net_object(self, net_name: str):
+        """
+        Get the Net object from the circuit by name.
+
+        Args:
+            net_name: Name of the net to find
+
+        Returns:
+            Net object if found, None otherwise
+        """
+        if not hasattr(self, 'circuit') or not self.circuit:
+            return None
+
+        # Access the circuit's nets
+        if hasattr(self.circuit, 'nets'):
+            for net in self.circuit.nets:
+                if net.name == net_name:
+                    return net
+
+        return None
+
+    def _get_next_power_reference(self) -> str:
+        """
+        Generate the next available power symbol reference.
+
+        Returns:
+            Next power reference like "#PWR01", "#PWR02", etc.
+        """
+        # Find highest existing power reference
+        max_num = 0
+        for component in self.schematic.components:
+            ref = component.reference
+            if ref.startswith("#PWR"):
+                try:
+                    num = int(ref[4:])
+                    max_num = max(max_num, num)
+                except (ValueError, IndexError):
+                    continue
+
+        # Return next reference
+        next_num = max_num + 1
+        return f"#PWR0{next_num:02d}"
+
+    def _add_power_symbol(
+        self,
+        net_obj,
+        net_name: str,
+        position: Point,
+        label_angle: float,
+        component_ref: str,
+        pin_number: str,
+        report: SyncReport
+    ) -> bool:
+        """
+        Add a power symbol at the specified position.
+
+        This mirrors the logic in schematic_writer.py for consistency.
+
+        Args:
+            net_obj: The Net object containing power symbol info
+            net_name: Name of the power net
+            position: Position to place the power symbol
+            label_angle: Label angle calculated for the pin
+            component_ref: Component reference for logging
+            pin_number: Pin number for logging
+            report: Sync report to track the addition
+
+        Returns:
+            True if power symbol added successfully
+        """
+        try:
+            # Generate unique power reference
+            power_ref = self._get_next_power_reference()
+
+            # Place power symbol directly at pin location (same as schematic_writer.py)
+            power_x = position.x
+            power_y = position.y
+
+            # Calculate power symbol rotation (same logic as schematic_writer.py)
+            # Power symbols use hierarchical label rotation with -90° adjustment
+            base_rotation = (label_angle - 90) % 360
+
+            # Check if this is a GND-type symbol (inverted)
+            if "GND" in net_obj.power_symbol or "VSS" in net_obj.power_symbol:
+                # GND symbols are inverted, need 180° flip
+                power_rotation = float((base_rotation + 180) % 360)
+            else:
+                power_rotation = float(base_rotation)
+
+            logger.debug(f"Power symbol rotation: label_angle={label_angle}° → base={base_rotation}° → final={power_rotation}°")
+
+            # Add power symbol using component_manager (same as schematic_writer.py)
+            # Note: We're using the synchronizer's component_manager directly
+            power_comp = self.component_manager.add_component(
+                library_id=net_obj.power_symbol,
+                reference=power_ref,
+                value=net_name,
+                position=(power_x, power_y),
+                footprint="",  # Power symbols have no footprint
+                snap_to_grid=False,  # Power symbols need exact positioning
+            )
+
+            if not power_comp:
+                logger.error(f"Failed to add power symbol {power_ref}")
+                return False
+
+            # Set rotation after creation
+            power_comp.rotation = power_rotation
+
+            # Power symbols are always in BOM but not on board
+            power_comp.in_bom = True
+            power_comp.on_board = True
+            power_comp.dnp = False
+
+            logger.info(f"Added power symbol {power_ref} for {net_name} at {component_ref} pin {pin_number}")
+            report.labels_added.append((component_ref, pin_number, net_name))
+
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to add power symbol: {e}", exc_info=True)
+            return False
+
     def _add_pin_label(
         self,
         kicad_component: SchematicSymbol,
@@ -587,6 +713,23 @@ class APISynchronizer:
             component_position=kicad_component.position,
             component_rotation=kicad_component.rotation,
         )
+
+        # CHECK FOR POWER NETS: Place power symbol instead of hierarchical label
+        # This matches the behavior in schematic_writer.py for consistency
+        net_obj = self._get_net_object(net_name)
+
+        if net_obj and hasattr(net_obj, 'is_power') and net_obj.is_power and hasattr(net_obj, 'power_symbol'):
+            logger.info(f"Detected power net '{net_name}' -> placing power symbol instead of label")
+            success = self._add_power_symbol(
+                net_obj=net_obj,
+                net_name=net_name,
+                position=label_pos,
+                label_angle=label_angle,
+                component_ref=kicad_component.reference,
+                pin_number=pin_number,
+                report=report
+            )
+            return success
 
         # Use kicad-sch-api's add_hierarchical_label() method
         # Hierarchical labels create electrical connections (regular labels don't)
@@ -914,7 +1057,12 @@ class APISynchronizer:
             logger.info(
                 f"    UNMATCHED KiCad: {kicad_ref} (value={getattr(kicad_comp, 'value', 'N/A')})"
             )
-            if self.preserve_user_components:
+
+            # Always preserve power symbols - they're auto-generated from power nets
+            if kicad_ref.startswith("#PWR"):
+                logger.info(f"      -> PRESERVING (power symbol)")
+                report.preserved.append(kicad_ref)
+            elif self.preserve_user_components:
                 logger.info(f"      -> PRESERVING (preserve_user_components=True)")
                 report.preserved.append(kicad_ref)
             else:
