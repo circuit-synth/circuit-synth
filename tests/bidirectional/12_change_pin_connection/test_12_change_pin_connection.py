@@ -5,24 +5,11 @@ Automated test for 12_change_pin_connection bidirectional test.
 Tests changing which pin a net connects to, validating pin-level
 connection accuracy in bidirectional sync.
 
-**KNOWN LIMITATION (Issue #380):**
-When changing pin connections (e.g., R1[1] → R1[2]), the synchronizer currently
-does NOT remove old hierarchical labels. This results in both old and new pins
-being connected to the net. This test documents this behavior.
-
-Expected behavior (once fixed):
-- Old hierarchical label should be removed when pin connection changes
-- Only new pin should be connected
-
-Current behavior (Issue #380):
-- Old hierarchical label remains
-- Net connects to BOTH old and new pins
-
 This validates:
 1. Initial connection: R1[1] → NET1 ← R2[1]
 2. Change in Python: R1[2] → NET1 ← R2[1] (move NET1 from R1 pin 1 to pin 2)
 3. Regenerate KiCad
-4. Verify current behavior (both pins connected) - XFAIL
+4. Verify correct behavior (only new pin connected)
 
 Workflow:
 1. Generate with NET1 connecting R1[1] to R2[1]
@@ -30,8 +17,8 @@ Workflow:
 3. Modify Python: Move NET1 from R1[1] to R1[2]
 4. Regenerate KiCad
 5. Validate:
-   - CURRENT: NET1 connects (R1, pin 1), (R1, pin 2), and (R2, pin 1)
-   - EXPECTED: NET1 connects (R1, pin 2) and (R2, pin 1) only
+   - NET1 connects (R1, pin 2) and (R2, pin 1) only
+   - Old label on R1 pin 1 is correctly removed
    - Component positions preserved
 
 Validation uses:
@@ -90,10 +77,6 @@ def parse_netlist(netlist_content):
     return nets
 
 
-@pytest.mark.xfail(
-    reason="Issue #380: Synchronizer does not remove old hierarchical labels when pin connections change, "
-           "resulting in both old and new pins being connected to the net"
-)
 def test_12_change_pin_connection(request):
     """Test changing pin connection in Python → KiCad sync.
 

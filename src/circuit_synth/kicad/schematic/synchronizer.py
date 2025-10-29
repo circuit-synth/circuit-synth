@@ -552,35 +552,25 @@ class APISynchronizer:
         Returns:
             True if label added successfully
         """
-        # Get symbol data
-        symbol_cache = get_symbol_cache()
-        symbol_def = symbol_cache.get_symbol(kicad_component.lib_id)
-        if not symbol_def or not hasattr(symbol_def, 'pins'):
+        # Get pin data from symbol library using the SAME source as initial placement
+        # This ensures consistent pin orientation data between generation and synchronization
+        from ..kicad_symbol_cache import SymbolLibCache
+        from ..sch_gen.symbol_geometry import find_pin_by_identifier
+        from .geometry_utils import GeometryUtils
+
+        lib_data = SymbolLibCache.get_symbol_data(kicad_component.lib_id)
+        if not lib_data or "pins" not in lib_data:
             logger.error(f"No pin data for {kicad_component.reference}")
             return False
 
-        # Find the pin
-        pin = None
-        for p in symbol_def.pins:
-            if str(p.number) == str(pin_number):
-                pin = p
-                break
-
-        if not pin:
+        # Find the pin using the same helper as initial placement
+        pin_dict = find_pin_by_identifier(lib_data["pins"], pin_number)
+        if not pin_dict:
             logger.warning(f"Pin {pin_number} not found on {kicad_component.reference}")
             return False
 
-        # Calculate pin position and label angle using CANONICAL shared implementation
-        # This ensures labels are positioned identically to fresh generation
-        from .geometry_utils import GeometryUtils
-
-        # SchematicPin uses 'position' (Point) and 'rotation' instead of x/y/orientation
-        pin_position = pin.position if hasattr(pin, 'position') else Point(0, 0)
-        pin_dict = {
-            "x": float(pin_position.x),
-            "y": float(pin_position.y),
-            "orientation": float(pin.rotation if hasattr(pin, 'rotation') else 0.0),
-        }
+        # pin_dict now has correct format: {"x": ..., "y": ..., "orientation": ...}
+        # No conversion needed - this is the canonical format
 
         label_pos, label_angle = GeometryUtils.calculate_pin_label_position_from_dict(
             pin_dict=pin_dict,
