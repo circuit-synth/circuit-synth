@@ -1,4 +1,18 @@
-# Test 27: Multiple Power Domains (Multi-Voltage Circuit)
+# Test 18: Multiple Power Domains (Multi-Voltage Circuit)
+
+## Status
+
+✅ **PASSING** (as of 2025-10-28)
+
+**Fixed in PR #396:** Power symbol replacement now works correctly when component power nets change. Old power symbols are properly removed and replaced with new ones, preventing text overlap.
+
+**Test Coverage:**
+- ✅ Multiple independent power rails (VCC, 3V3, 5V, GND)
+- ✅ Power symbol generation for each domain
+- ✅ Power domain modification (R2 from 3V3 → 5V)
+- ✅ Power symbol replacement (no text overlap)
+- ✅ Position preservation during power net changes
+- ✅ Netlist validation for electrical connectivity
 
 ## What This Tests
 
@@ -36,7 +50,7 @@ This validates **multi-voltage circuit design** - a critical feature for real-wo
 ### Phase 1: Initial Multi-Voltage Circuit
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth2/tests/bidirectional/27_multiple_power_domains
+cd /Users/shanemattner/Desktop/circuit-synth2/tests/bidirectional/18_multiple_power_domains
 
 # Step 1: Generate initial circuit with multiple power domains
 uv run multi_voltage_circuit.py
