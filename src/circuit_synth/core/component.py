@@ -20,17 +20,8 @@ from .exception import (
 from .pin import Pin
 from .simple_pin_access import PinGroup, SimplifiedPinAccess
 
-# Import symbol cache
-try:
-    from ..kicad.kicad_symbol_cache import SymbolLibCache
-except ImportError:
-    # Symbol cache not available
-    context_logger.error("No symbol cache available", component="COMPONENT")
-
-    class SymbolLibCache:
-        @staticmethod
-        def get_symbol_data(symbol_id: str):
-            return {}
+# NOTE: SymbolLibCache is imported lazily in __post_init__ to avoid circular imports
+# DO NOT import it at module level
 
 
 @dataclass
@@ -124,6 +115,18 @@ class Component(SimplifiedPinAccess):
 
     def __post_init__(self):
         self._validate_symbol(self.symbol)
+
+        # Lazy import to avoid circular dependency
+        # (kicad_symbol_cache may import from core during initialization)
+        try:
+            from ..kicad.kicad_symbol_cache import SymbolLibCache
+        except ImportError as e:
+            context_logger.error(
+                f"Failed to import SymbolLibCache: {e}",
+                component="COMPONENT",
+            )
+            # Create empty component without pins
+            return
 
         # Instead of using SharedParserManager + parse_symbol,
         # we load flattened data from the SymbolLibCache

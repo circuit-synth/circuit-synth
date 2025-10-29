@@ -38,7 +38,7 @@ dependencies = [
     # Cache and performance dependencies
     "cachetools>=5.3.0",
     # KiCad API integration
-    "kicad-sch-api>=0.4.2",  # Requires 0.4.2+ for text_box escaping fix
+    "kicad-sch-api>=0.4.3",  # Requires 0.4.3+ for Symbol comparison fix
     "kicad-pcb-api>=0.1.0",
     "packaging>=21.0",
     # Additional data processing
