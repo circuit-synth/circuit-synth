@@ -510,13 +510,31 @@ class APISynchronizer:
             )
 
             # Find labels near this pin position (within 0.5mm tolerance)
-            for label in self.schematic.labels:
+            # kicad-sch-api stores hierarchical labels in _data['hierarchical_labels']
+            hierarchical_labels_data = self.schematic._data.get('hierarchical_labels', [])
+
+            for label_data in hierarchical_labels_data:
+                label_pos_data = label_data.get('position', {})
+                if not isinstance(label_pos_data, dict):
+                    continue
+
+                label_x = float(label_pos_data.get('x', 0))
+                label_y = float(label_pos_data.get('y', 0))
+
                 distance = math.sqrt(
-                    (label.position.x - pin_pos.x) ** 2 +
-                    (label.position.y - pin_pos.y) ** 2
+                    (label_x - pin_pos.x) ** 2 +
+                    (label_y - pin_pos.y) ** 2
                 )
+
                 if distance < 0.5:  # 0.5mm tolerance
-                    pin_labels[str(pin.number)] = label
+                    # Create a simple label-like object for compatibility
+                    label_obj = type('Label', (), {
+                        'uuid': label_data.get('uuid'),
+                        'text': label_data.get('text'),
+                        'position': Point(label_x, label_y)
+                    })()
+                    pin_labels[str(pin.number)] = label_obj
+                    logger.debug(f"Found label '{label_data.get('text')}' near pin {pin.number} at distance {distance:.2f}mm")
                     break
 
         return pin_labels
@@ -618,16 +636,28 @@ class APISynchronizer:
             True if label removed successfully
         """
         try:
-            # Use schematic.remove_label() API which handles both collection and _data
+            # Try to remove using the API first
             removed = self.schematic.remove_label(label.uuid)
 
             if removed:
                 logger.info(f"Removed label '{label.text}' from {component_ref} pin {pin_number}")
                 report.labels_removed.append((component_ref, pin_number, label.text))
                 return True
-            else:
-                logger.warning(f"Label {label.uuid} not found for removal")
-                return False
+
+            # If API removal didn't work, try direct removal from _data
+            # (workaround for kicad-sch-api not properly parsing hierarchical_labels)
+            if hasattr(self.schematic, '_data') and 'hierarchical_labels' in self.schematic._data:
+                hierarchical_labels = self.schematic._data.get('hierarchical_labels', [])
+                for i, label_data in enumerate(hierarchical_labels):
+                    if label_data.get('uuid') == label.uuid:
+                        # Remove this label from the list
+                        hierarchical_labels.pop(i)
+                        logger.info(f"Removed hierarchical label '{label.text}' from {component_ref} pin {pin_number} (direct _data removal)")
+                        report.labels_removed.append((component_ref, pin_number, label.text))
+                        return True
+
+            logger.warning(f"Label {label.uuid} not found for removal")
+            return False
 
         except Exception as e:
             logger.error(f"Failed to remove label: {e}", exc_info=True)
@@ -744,11 +774,15 @@ class APISynchronizer:
 
         # INVESTIGATION: Check if labels survived
         logger.info(f"🔍 POST-RECONCILIATION CHECK:")
-        logger.info(f"   - Labels in collection: {len(list(self.schematic.labels))}")
-        logger.info(f"   - Labels in _data: {len(self.schematic._data.get('labels', []))}")
         if hasattr(self.schematic, 'labels'):
+            logger.info(f"   - Labels in collection: {len(list(self.schematic.labels))}")
             for i, label in enumerate(list(self.schematic.labels)[:3]):
                 logger.info(f"   - Label {i}: {label.text}")
+        else:
+            logger.info(f"   - No labels collection available")
+
+        logger.info(f"   - Hierarchical labels in _data: {len(self.schematic._data.get('hierarchical_labels', []))}")
+        logger.info(f"   - Regular labels in _data: {len(self.schematic._data.get('labels', []))}")
 
     def _match_components(
         self, circuit_components: Dict, kicad_components: Dict

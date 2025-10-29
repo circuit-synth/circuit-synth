@@ -33,7 +33,29 @@ class LabelManager:
 
     def _build_label_index(self) -> Dict[str, Label]:
         """Build an index of labels by UUID for fast lookup."""
-        return {label.uuid: label for label in self.schematic.labels}
+        labels_dict = {}
+
+        # Handle both regular labels (if the property exists) and hierarchical labels
+        # Note: kicad-sch-api may not have a labels property, so we access _data directly
+        if hasattr(self.schematic, 'labels'):
+            try:
+                for label in self.schematic.labels:
+                    labels_dict[label.uuid] = label
+            except (AttributeError, TypeError) as e:
+                logger.debug(f"Could not access schematic.labels (may not be available): {e}")
+
+        # Also get hierarchical labels from _data
+        # Note: kicad-sch-api stores hierarchical_labels in _data but may not populate them
+        # from loaded files, so this may be empty for loaded schematics
+        if hasattr(self.schematic, '_data'):
+            hierarchical_labels = self.schematic._data.get('hierarchical_labels', [])
+            if hierarchical_labels:
+                logger.debug(f"Found {len(hierarchical_labels)} hierarchical labels in _data")
+                for label_data in hierarchical_labels:
+                    if label_data.get('uuid'):
+                        logger.debug(f"  - Hierarchical label: {label_data.get('text')}")
+
+        return labels_dict
 
     def _generate_uuid(self) -> str:
         """Generate a new UUID for a label."""
