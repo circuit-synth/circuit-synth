@@ -238,10 +238,20 @@ def test_16_add_power_symbol(request):
         sch_final = Schematic.load(str(schematic_file))
         components_final = sch_final.components
 
-        assert len(components_final) == 1
+        # Should now have R1 + VCC power symbol (2 components)
+        assert len(components_final) == 2, f"Expected 2 components (R1 + VCC power symbol), got {len(components_final)}"
 
-        r1_final = components_final[0]
-        assert r1_final.reference == "R1"
+        # Find R1 and VCC power symbol
+        r1_final = None
+        vcc_symbol = None
+        for comp in components_final:
+            if comp.reference == "R1":
+                r1_final = comp
+            elif comp.reference.startswith("#PWR"):
+                vcc_symbol = comp
+
+        assert r1_final is not None, "R1 component not found in final schematic"
+        assert vcc_symbol is not None, "VCC power symbol not found in final schematic"
 
         r1_final_pos = r1_final.position
 
@@ -252,19 +262,10 @@ def test_16_add_power_symbol(request):
             f"Final: {r1_final_pos}"
         )
 
-        # Validate hierarchical label appeared
-        with open(schematic_file, 'r') as f:
-            sch_content_final = f.read()
-
-        vcc_labels = sch_content_final.count('hierarchical_label "VCC"')
-
-        assert vcc_labels >= 1, (
-            f"Expected at least 1 VCC hierarchical label, found {vcc_labels}"
-        )
-
-        print(f"✅ Step 4: VCC label appeared")
-        print(f"   - VCC labels: {vcc_labels}")
+        print(f"✅ Step 4: VCC power symbol appeared")
+        print(f"   - VCC power symbol: {vcc_symbol.reference}")
         print(f"   - R1 position preserved: {r1_final_pos}")
+        print(f"   Note: Power symbols replace hierarchical labels")
 
         # =====================================================================
         # STEP 5: Validate electrical connectivity via netlist
