@@ -32,6 +32,23 @@ from .sync_strategies import (
 
 logger = logging.getLogger(__name__)
 
+# Constants
+POWER_SYMBOL_PREFIX = "#PWR"
+PIN_LABEL_DISTANCE_TOLERANCE = 0.5  # mm - distance threshold for associating labels/symbols with pins
+
+
+class PowerSymbolLabel:
+    """
+    Pseudo-label representing a power symbol at a pin location.
+
+    This allows the synchronizer to detect power symbols the same way it detects
+    regular and hierarchical labels, enabling unified handling of power net changes.
+    """
+    def __init__(self, power_comp):
+        self.text = power_comp.value  # Power net name (VCC, GND, 3V3, etc.)
+        self.position = power_comp.position
+        self.component = power_comp  # Store reference to actual power symbol
+
 
 @dataclass
 class SyncReport:
@@ -538,20 +555,14 @@ class APISynchronizer:
             if str(pin.number) not in pin_labels:
                 for component in self.schematic.components:
                     # Check if this is a power symbol
-                    if component.reference.startswith("#PWR"):
+                    if component.reference.startswith(POWER_SYMBOL_PREFIX):
                         distance = math.sqrt(
                             (component.position.x - pin_pos.x) ** 2 +
                             (component.position.y - pin_pos.y) ** 2
                         )
-                        if distance < 0.5:  # 0.5mm tolerance
-                            # Create a pseudo-label object with the power symbol's value
+                        if distance < PIN_LABEL_DISTANCE_TOLERANCE:
+                            # Create a pseudo-label object representing the power symbol
                             # This allows the synchronizer to detect power net changes
-                            class PowerSymbolLabel:
-                                def __init__(self, power_comp):
-                                    self.text = power_comp.value  # Power net name (VCC, GND, etc.)
-                                    self.position = power_comp.position
-                                    self.component = power_comp  # Store reference to actual power symbol
-
                             pin_labels[str(pin.number)] = (PowerSymbolLabel(component), "power_symbol")
                             break
 
@@ -843,32 +854,40 @@ class APISynchronizer:
         old_name = label.text
 
         try:
-            # Special handling for power symbols - remove old and add new
+            # Special handling for power symbols - must replace (not just update text)
+            # because different power nets use different KiCad library symbols
             if label_type == "power_symbol":
                 logger.info(f"Power net changed at {component_ref} pin {pin_number}: '{old_name}' -> '{new_net_name}'")
 
-                # Remove the old power symbol
-                old_power_symbol = label.component
-                self.component_manager.remove_component(old_power_symbol.reference)
-                logger.debug(f"Removed old power symbol {old_power_symbol.reference} ({old_name})")
-
-                # Add new power symbol for the new net
-                # Get the component to calculate pin position
+                # Get the component first (fail fast if missing)
                 kicad_comp = None
                 for comp in self.schematic.components:
                     if comp.reference == component_ref:
                         kicad_comp = comp
                         break
 
-                if kicad_comp:
-                    # Add the new power symbol
-                    self._add_pin_label(kicad_comp, pin_number, new_net_name, report)
-                    logger.info(f"Replaced power symbol at {component_ref} pin {pin_number}: '{old_name}' -> '{new_net_name}'")
-                    report.labels_updated.append((component_ref, pin_number, old_name, new_net_name))
-                    return True
-                else:
+                if not kicad_comp:
                     logger.error(f"Could not find component {component_ref} to update power symbol")
                     return False
+
+                # Add new power symbol first
+                add_success = self._add_pin_label(kicad_comp, pin_number, new_net_name, report)
+                if not add_success:
+                    logger.error(f"Failed to add new power symbol for {new_net_name} at {component_ref} pin {pin_number}")
+                    return False
+
+                # Only remove old power symbol after new one is successfully added
+                old_power_symbol = label.component
+                removed = self.component_manager.remove_component(old_power_symbol.reference)
+                if not removed:
+                    logger.warning(f"Could not remove old power symbol {old_power_symbol.reference} - new symbol added but old may remain")
+                    # Don't return False - new symbol is in place, so partial success
+                else:
+                    logger.debug(f"Removed old power symbol {old_power_symbol.reference} ({old_name})")
+
+                logger.info(f"Replaced power symbol at {component_ref} pin {pin_number}: '{old_name}' -> '{new_net_name}'")
+                report.labels_updated.append((component_ref, pin_number, old_name, new_net_name))
+                return True
 
             # Regular label or hierarchical label - just update the text
             else:
