@@ -3,10 +3,9 @@
 Circuit-Synth PCB Initialization Tool
 
 Adds circuit-synth to an existing KiCad project by:
-1. Creating circuit-synth/, memory-bank/, and .claude/ directories
+1. Creating circuit-synth/ and .claude/ directories
 2. Converting KiCad schematic to Python code (optional)
 3. Setting up PCB-specific Claude AI agent
-4. Integrating memory-bank system
 
 Usage:
     cs-init-pcb                    # Initialize in current directory
@@ -24,9 +23,6 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Confirm
 from rich.text import Text
-
-# Import circuit-synth modules
-from circuit_synth.ai_integration.memory_bank import MemoryBankManager
 
 console = Console()
 
@@ -281,107 +277,6 @@ if __name__ == "__main__":
         f.write(main_py_content)
 
 
-def create_memory_bank(project_path: Path, project_name: str) -> None:
-    """Create memory-bank system."""
-
-    memory_bank_dir = project_path / "memory-bank"
-    memory_bank_dir.mkdir(exist_ok=True)
-
-    # Cache directory
-    cache_dir = memory_bank_dir / "cache"
-    cache_dir.mkdir(exist_ok=True)
-
-    # Standard memory-bank files (same as new_pcb.py)
-    templates = {
-        "decisions.md": f"""# Design Decisions - {project_name}
-
-*This file automatically tracks design decisions and component choices*
-
-## Template Entry
-**Date**: YYYY-MM-DD  
-**Change**: Brief description of what changed  
-**Commit**: Git commit hash  
-**Rationale**: Why this change was made  
-**Alternatives Considered**: Other options evaluated  
-**Impact**: Effects on design, cost, performance  
-**Testing**: Any validation performed  
-
----
-
-""",
-        "fabrication.md": f"""# Fabrication History - {project_name}
-
-*This file tracks PCB orders, delivery, and assembly notes*
-
-## Template Order
-**Order ID**: Vendor order number  
-**Date**: YYYY-MM-DD  
-**Specs**: Board specifications (size, layers, finish, etc.)  
-**Quantity**: Number of boards ordered  
-**Cost**: Total cost including shipping  
-**Expected Delivery**: Estimated delivery date  
-**Status**: Order status and tracking information  
-**Received**: Actual delivery date and quality notes  
-**Assembly Notes**: Assembly process and any issues  
-
----
-
-""",
-        "testing.md": f"""# Testing Results - {project_name}
-
-*This file tracks test results, measurements, and performance validation*
-
-## Template Test
-**Test Name**: Brief description of test performed  
-**Date**: YYYY-MM-DD  
-**Setup**: Test equipment and conditions  
-**Results**: Measured values and outcomes  
-**Specification**: Expected values and pass/fail status  
-**Notes**: Additional observations and analysis  
-
----
-
-""",
-        "timeline.md": f"""# Project Timeline - {project_name}
-
-*This file tracks project milestones, key events, and deadlines*
-
-## Template Milestone
-**Date**: YYYY-MM-DD  
-**Milestone**: Brief description of milestone or event  
-**Status**: Completed, In Progress, Planned  
-**Details**: Additional context and notes  
-**Next Steps**: What needs to happen next  
-
----
-
-""",
-        "issues.md": f"""# Issues & Solutions - {project_name}
-
-*This file tracks problems encountered, root causes, and solutions*
-
-## Template Issue
-**Date**: YYYY-MM-DD  
-**Issue**: Brief description of the problem  
-**Severity**: Low, Medium, High, Critical  
-**Root Cause**: Technical analysis of what caused the issue  
-**Solution**: How the problem was resolved  
-**Prevention**: Steps to avoid similar issues in future  
-**Status**: Open, In Progress, Resolved  
-
----
-
-""",
-    }
-
-    for filename, content in templates.items():
-        file_path = memory_bank_dir / filename
-        with open(file_path, "w") as f:
-            f.write(content)
-
-    console.print("✅ Created memory-bank system", style="green")
-
-
 def create_claude_agent(project_path: Path, project_name: str) -> None:
     """Create PCB-specific Claude agent configuration with complete agent system."""
 
@@ -428,21 +323,11 @@ def create_claude_agent(project_path: Path, project_name: str) -> None:
 
 You are a specialized circuit design assistant working on the {project_name} PCB.
 
-## Memory-Bank Integration
-
-Automatically update memory-bank files in ./memory-bank/:
-- **decisions.md**: Component choices and design rationale
-- **fabrication.md**: PCB orders, delivery, assembly notes
-- **testing.md**: Test results, measurements, validation
-- **timeline.md**: Project milestones and key events
-- **issues.md**: Problems encountered and solutions
-
 ## Context
 
 - **PCB**: {project_name}
 - **Circuit Files**: ./circuit-synth/
 - **KiCad Files**: ./kicad/ (organized in separate directory)
-- **Memory-Bank**: ./memory-bank/
 
 ## Existing Project Integration
 
@@ -450,15 +335,6 @@ This PCB was initialized from an existing KiCad project using cs-init-pcb.
 - Help convert KiCad schematics to circuit-synth Python code
 - Maintain compatibility between KiCad files and circuit-synth
 - Provide guidance on incremental migration strategies
-
-## Automatic Documentation
-
-Update memory-bank when:
-- Git commits are made (primary trigger)
-- Component changes occur
-- Tests are performed  
-- Issues are encountered
-- Fabrication orders are placed
 
 ## Expertise
 
@@ -542,7 +418,6 @@ cd circuit-synth && uv run python main.py
 ├── kicad/             # KiCad design files
 {''.join(kicad_file_list)}
 ├── circuit-synth/     # Python circuit files
-├── memory-bank/       # Automatic documentation
 └── .claude/           # AI assistant configuration
 ```
 
@@ -565,22 +440,12 @@ This project was initialized with `cs-init-pcb` from an existing KiCad design.
 2. Gradually migrate more complex sections
 3. Eventually use circuit-synth as primary design tool
 
-## Memory-Bank System
-
-This PCB uses automatic documentation that tracks:
-- Design decisions and component choices
-- Fabrication orders and assembly notes  
-- Test results and measurements
-- Project timeline and milestones
-- Issues and solutions
-
 ## AI Assistant
 
 This PCB has a dedicated Claude AI agent configured for:
 - KiCad ↔ circuit-synth integration assistance
 - Component selection and verification
 - Design review and optimization suggestions
-- Memory-bank maintenance
 """
 
     with open(project_path / "README.md", "w") as f:
@@ -669,10 +534,6 @@ def main(project_path: str):
         # Create circuit-synth structure
         create_circuit_synth_structure(project_dir, project_name)
 
-        # Create memory-bank system
-        console.print("\n🧠 Setting up memory-bank system...", style="yellow")
-        create_memory_bank(project_dir, project_name)
-
         # Create Claude agent
         console.print("\n🤖 Setting up AI assistant...", style="yellow")
         create_claude_agent(project_dir, project_name)
@@ -694,7 +555,6 @@ def main(project_path: str):
                 + Text(f"\n   2. Run: cd circuit-synth && uv run python main.py")
                 + Text(f"\n   3. See README.md for integration strategies")
                 + Text(f"\n\n📁 KiCad files: Organized in kicad/ directory")
-                + Text(f"\n🧠 Memory-bank: Automatic documentation enabled")
                 + Text(f"\n🤖 AI Agent: PCB-specific Claude assistant configured"),
                 title="🎉 Success!",
                 style="green",
