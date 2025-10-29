@@ -559,7 +559,7 @@ uv run python -m circuit_synth.tools.quality_assurance.fmea_cli ESP32_DevBoard_v
 ## Support
 
 For questions or issues with FMEA analysis:
-- GitHub Issues: https://github.com/yourproject/circuit-synth/issues
+- GitHub Issues: https://github.com/circuit-synth/circuit-synth/issues
 - Documentation: https://circuit-synth.readthedocs.io
 - Email support: support@circuit-synth.dev
 

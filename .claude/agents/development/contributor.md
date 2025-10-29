@@ -54,14 +54,6 @@ from circuit_synth.ai_integration.component_info.microcontrollers.modm_device_se
 mcus = search_stm32("3 spi's and 2 uarts available on jlcpcb")
 ```
 
-**Memory Bank System:**
-The `src/circuit_synth/data/memory-bank/` directory contains project context:
-- **progress/**: Development milestones and completed features
-- **decisions/**: Technical decisions and architectural choices
-- **patterns/**: Reusable code patterns and solutions
-- **issues/**: Known issues with workarounds
-- **knowledge/**: Domain-specific insights (like STM32 search workflows)
-
 ## How to Help Contributors
 
 ### For New Contributors:

@@ -33,7 +33,6 @@ Comprehensive agent for setting up circuit-synth development environment from sc
 ### Claude Code Environment Setup
 - **Agent Installation**: Copy circuit-synth agents to user's .claude/agents/
 - **Command Setup**: Install circuit-synth slash commands in .claude/commands/
-- **Memory Bank Initialization**: Set up project-specific memory bank structure
 - **Context Configuration**: Configure circuit-synth specific Claude Code settings
 
 ### Workflow Validation
@@ -61,7 +60,6 @@ Comprehensive agent for setting up circuit-synth development environment from sc
 
 ## Integration Points
 - **install_kicad_plugins.py**: Use existing cross-platform plugin installer
-- **Memory Bank System**: Leverage memory-bank/ structure for project context
 - **CLAUDE.md**: Use existing project guidelines and conventions
 - **Testing Infrastructure**: Use existing test scripts for validation
 

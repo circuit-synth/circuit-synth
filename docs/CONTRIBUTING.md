@@ -76,7 +76,7 @@ Extend manufacturing integrations in `src/circuit_synth/manufacturing/`:
 
 ```bash
 # Clone and install
-git clone https://github.com/shanemattner/circuit-synth.git
+git clone https://github.com/circuit-synth/circuit-synth.git
 cd circuit-synth
 uv sync
 
