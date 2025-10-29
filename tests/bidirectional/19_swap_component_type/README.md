@@ -1,4 +1,18 @@
-# Test 27: Swap Component Type (Resistor → Capacitor)
+# Test 19: Swap Component Type (Resistor → Capacitor)
+
+## Status
+
+✅ **PASSING** (as of 2025-10-28)
+
+**Fixed in PR #397:** Component symbol type changes now work correctly. The synchronizer detects lib_id changes and updates the component symbol while preserving position, reference, and UUID.
+
+**Test Coverage:**
+- ✅ Symbol change detection (Device:R → Device:C)
+- ✅ Component symbol update in KiCad schematic
+- ✅ Position preservation during symbol change
+- ✅ Reference preservation (R1 stays R1)
+- ✅ UUID preservation (no Remove+Add)
+- ✅ Synchronizer reports "Update" (best case)
 
 ## What This Tests
 
@@ -33,7 +47,7 @@ This validates **symbol type changes during iterative design** - a common scenar
 ## Manual Test Instructions
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth2/tests/bidirectional/27_swap_component_type
+cd /Users/shanemattner/Desktop/circuit-synth2/tests/bidirectional/19_swap_component_type
 
 # Step 1: Generate initial KiCad project with R1 (resistor)
 uv run single_resistor.py
