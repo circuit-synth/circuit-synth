@@ -16,16 +16,6 @@ Or in Python:
 
 __version__ = "0.11.0"
 
-# Apply kicad-sch-api patch immediately on import
-# This fixes a bug in kicad-sch-api v0.3.0 where Symbol comparisons fail
-# See: KICAD_SCH_API_BUG_IN_BOM_PROPERTY.md
-try:
-    from .kicad.kicad_sch_api_patch import apply_kicad_sch_api_patch
-    apply_kicad_sch_api_patch()
-except Exception:
-    # Don't fail import if patch fails
-    pass
-
 
 def print_version_info():
     """Print circuit-synth version information for debugging"""
