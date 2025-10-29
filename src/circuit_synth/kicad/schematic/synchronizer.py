@@ -710,41 +710,39 @@ class APISynchronizer:
         Returns:
             True if label added successfully
         """
-        # Get symbol data
-        symbol_cache = get_symbol_cache()
-        symbol_def = symbol_cache.get_symbol(kicad_component.lib_id)
-        if not symbol_def or not hasattr(symbol_def, 'pins'):
+        # Get pin data from symbol library using the SAME source as initial placement
+        # This ensures consistent pin orientation data between generation and synchronization
+        from ..kicad_symbol_cache import SymbolLibCache
+        from ..sch_gen.schematic_writer import find_pin_by_identifier
+        from .geometry_utils import GeometryUtils
+
+        lib_data = SymbolLibCache.get_symbol_data(kicad_component.lib_id)
+        if not lib_data or "pins" not in lib_data:
             logger.error(f"No pin data for {kicad_component.reference}")
             return False
 
-        # Find the pin
-        pin = None
-        for p in symbol_def.pins:
-            if str(p.number) == str(pin_number):
-                pin = p
-                break
-
-        if not pin:
+        # Find the pin using the same helper as initial placement
+        pin_dict = find_pin_by_identifier(lib_data["pins"], pin_number)
+        if not pin_dict:
             logger.warning(f"Pin {pin_number} not found on {kicad_component.reference}")
             return False
 
-        # Calculate pin position and label angle using CANONICAL shared implementation
-        # This ensures labels are positioned identically to fresh generation
-        from .geometry_utils import GeometryUtils
+        # pin_dict now has correct format: {"x": ..., "y": ..., "orientation": ...}
+        # No conversion needed - this is the canonical format
 
-        # SchematicPin uses 'position' (Point) and 'rotation' instead of x/y/orientation
-        pin_position = pin.position if hasattr(pin, 'position') else Point(0, 0)
-        pin_dict = {
-            "x": float(pin_position.x),
-            "y": float(pin_position.y),
-            "orientation": float(pin.rotation if hasattr(pin, 'rotation') else 0.0),
-        }
+        logger.debug(f"SYNC LABEL: {kicad_component.reference} pin {pin_number}")
+        logger.debug(f"  pin_dict: {pin_dict}")
+        logger.debug(f"  component position: ({kicad_component.position.x}, {kicad_component.position.y})")
+        logger.debug(f"  component rotation: {kicad_component.rotation}°")
 
         label_pos, label_angle = GeometryUtils.calculate_pin_label_position_from_dict(
             pin_dict=pin_dict,
             component_position=kicad_component.position,
             component_rotation=kicad_component.rotation,
         )
+
+        logger.debug(f"  → label position: ({label_pos.x}, {label_pos.y})")
+        logger.debug(f"  → label angle: {label_angle}°")
 
         # CHECK FOR POWER NETS: Place power symbol instead of hierarchical label
         # This matches the behavior in schematic_writer.py for consistency
@@ -776,7 +774,32 @@ class APISynchronizer:
                 rotation=label_angle,  # CRITICAL: Must pass rotation for correct orientation!
             )
 
-            logger.debug(f"Label added: '{net_name}' at ({label_pos.x:.2f}, {label_pos.y:.2f}), angle={label_angle:.0f}, UUID={label_uuid}")
+            # CRITICAL FIX: Manually set justify to match initial generation logic
+            # KiCAD hierarchical labels need correct justify based on rotation for proper text rendering
+            rotation_normalized = label_angle % 360
+            if rotation_normalized == 0:
+                justify = "left"
+            elif rotation_normalized == 90:
+                justify = "left"
+            elif rotation_normalized == 180:
+                justify = "right"
+            elif rotation_normalized == 270:
+                justify = "left"  # Fixed: was "right" in old code, should be "left"
+            else:
+                justify = "left"  # Default fallback
+
+            # Update the label's justify in the schematic data
+            if hasattr(self.schematic, "_data") and "hierarchical_labels" in self.schematic._data:
+                for label_dict in self.schematic._data["hierarchical_labels"]:
+                    if label_dict.get("uuid") == label_uuid:
+                        # Ensure effects dict exists before updating justify
+                        if "effects" not in label_dict:
+                            label_dict["effects"] = {}
+                        label_dict["effects"]["justify"] = justify
+                        logger.debug(f"Set hierarchical label justify={justify} for rotation={rotation_normalized}°")
+                        break
+
+            logger.debug(f"Label added: '{net_name}' at ({label_pos.x:.2f}, {label_pos.y:.2f}), angle={label_angle:.0f}, justify={justify}, UUID={label_uuid}")
             logger.info(f"Added label '{net_name}' at {kicad_component.reference} pin {pin_number}")
             report.labels_added.append((kicad_component.reference, pin_number, net_name))
             return True
