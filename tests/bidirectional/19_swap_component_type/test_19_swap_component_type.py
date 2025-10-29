@@ -30,41 +30,32 @@ from pathlib import Path
 import pytest
 
 
-@pytest.mark.xfail(
-    reason=(
-        "Synchronizer does not support changing component library symbols (lib_id). "
-        "Changing Device:R to Device:C in Python does not update the schematic. "
-        "This would require removing the old component and adding a new one, which "
-        "could break position preservation and UUID matching."
-    )
-)
 def test_19_swap_component_type_resistor_to_capacitor(request):
     """Test symbol type change (Device:R → Device:C) with position preservation.
 
-    KNOWN LIMITATION - MARKED XFAIL:
-    This test documents a known limitation of the synchronizer: changing a
-    component's library symbol (lib_id) is not supported. While you can change
-    the symbol in Python code, the generated KiCad schematic will not reflect
-    this change.
+    ✅ FEATURE NOW WORKING:
+    The synchronizer now supports changing a component's library symbol (lib_id).
+    When you change the symbol in Python code, the KiCad schematic will be updated
+    to reflect this change while preserving position, reference, and UUID.
 
-    Expected behavior (not implemented):
-    - Changing Device:R → Device:C in Python should update the symbol in KiCad
-    - Position and reference should be preserved via UUID-based matching
-    - The component should be updated in-place, not removed and re-added
+    Implementation:
+    - _needs_update() now checks for symbol (lib_id) changes
+    - component_manager.update_component() accepts lib_id parameter
+    - Uses component._data.lib_id to bypass read-only lib_id property
+    - Position and reference preserved via UUID-based matching
 
-    Why this is difficult to implement:
-    - Changing a symbol requires removing the old component instance and creating
-      a new one in KiCad
-    - UUID-based matching expects the component to already exist in the schematic
-    - Simply updating the lib_id without proper removal/addition can cause issues
-    - Position preservation and UUID matching could be broken during this process
-
-    Workflow (attempted but fails):
+    Workflow:
     1. Generate with R1 (Device:R) → auto-placed position
     2. Move R1 to (100, 50)
     3. Change symbol Device:R → Device:C in Python (keep ref="R1")
-    4. Regenerate → position and reference should be preserved
-       ❌ But symbol doesn't actually change - stays as Device:R
+    4. Regenerate → position and reference preserved, symbol updated
+
+    Validation:
+    - Symbol changed: Device:R → Device:C ✓
+    - Reference preserved: R1 ✓
+    - Position preserved: (100, 50) ✓
+    - UUID preserved ✓
+    - Synchronizer reports "Update" (not Remove+Add) ✓
 
     Level 2 Semantic Validation:
     - kicad-sch-api for symbol type, reference, position, and UUID validation
