@@ -1233,6 +1233,11 @@ class SchematicWriter:
                 anchor_y = float(pin_dict.get("y", 0.0))
                 pin_angle = float(pin_dict.get("orientation", 0.0))
 
+                logger.debug(f"INITIAL LABEL: {actual_ref} pin {pin_identifier}")
+                logger.debug(f"  pin_dict: {pin_dict}")
+                logger.debug(f"  component position: ({comp.position.x}, {comp.position.y})")
+                logger.debug(f"  component rotation: {comp.rotation}°")
+
                 # Rotate coords by component rotation
                 r = math.radians(comp.rotation)
                 local_x = anchor_x
@@ -1243,14 +1248,14 @@ class SchematicWriter:
                 global_x = comp.position.x + rx
                 global_y = comp.position.y + ry
 
-                # DEBUG: Log pin position calculation (uncomment for debugging)
-                # logger.debug(f"PIN CALC: {actual_ref}.{pin_identifier} - anchor=({anchor_x}, {anchor_y}), "
-                #             f"comp.pos=({comp.position.x}, {comp.position.y}), "
-                #             f"global=({global_x}, {global_y})")
-
-                # Calculate label angle
+                # Calculate label angle (opposite to pin orientation for correct text direction)
+                # Pin orientation indicates direction pin points FROM component
+                # Label needs opposite angle to point toward connection (text reads correctly)
                 label_angle = (pin_angle + 180) % 360
                 global_angle = (label_angle + comp.rotation) % 360
+
+                logger.debug(f"  → label position: ({global_x}, {global_y})")
+                logger.debug(f"  → label angle: {global_angle}°")
 
                 # Check if this is a power net
                 if hasattr(net, 'is_power') and net.is_power and hasattr(net, 'power_symbol'):

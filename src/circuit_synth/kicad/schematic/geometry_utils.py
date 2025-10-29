@@ -307,6 +307,9 @@ class GeometryUtils:
         anchor_y = float(pin_dict.get("y", 0.0))
         pin_angle = float(pin_dict.get("orientation", 0.0))
 
+        logger.debug(f"calculate_pin_label_position_from_dict:")
+        logger.debug(f"  Input: anchor=({anchor_x}, {anchor_y}), pin_angle={pin_angle}°, comp_rot={component_rotation}°")
+
         # Rotate coords by component rotation
         r = math.radians(component_rotation)
         local_x = anchor_x
@@ -318,9 +321,16 @@ class GeometryUtils:
         global_x = component_position.x + rx
         global_y = component_position.y + ry
 
-        # Calculate label angle (opposite to pin direction)
+        logger.debug(f"  Position: local=({local_x}, {local_y}) → rotated=({rx:.2f}, {ry:.2f}) → global=({global_x:.2f}, {global_y:.2f})")
+
+        # Calculate label angle (opposite to pin orientation for correct text direction)
+        # Pin orientation indicates direction pin points FROM component
+        # Label needs opposite angle to point toward connection (text reads correctly)
         label_angle = (pin_angle + 180) % 360
         global_angle = (label_angle + component_rotation) % 360
+
+        logger.debug(f"  Angle: pin={pin_angle}° → label_local={label_angle}° → label_global={global_angle}°")
+        logger.debug(f"  Formula: label_local = {pin_angle}, then ({label_angle} + {component_rotation}) % 360 = {global_angle}")
 
         return (Point(global_x, global_y), global_angle)
 

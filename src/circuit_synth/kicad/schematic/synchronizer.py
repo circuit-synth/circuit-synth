@@ -572,11 +572,19 @@ class APISynchronizer:
         # pin_dict now has correct format: {"x": ..., "y": ..., "orientation": ...}
         # No conversion needed - this is the canonical format
 
+        logger.debug(f"SYNC LABEL: {kicad_component.reference} pin {pin_number}")
+        logger.debug(f"  pin_dict: {pin_dict}")
+        logger.debug(f"  component position: ({kicad_component.position.x}, {kicad_component.position.y})")
+        logger.debug(f"  component rotation: {kicad_component.rotation}°")
+
         label_pos, label_angle = GeometryUtils.calculate_pin_label_position_from_dict(
             pin_dict=pin_dict,
             component_position=kicad_component.position,
             component_rotation=kicad_component.rotation,
         )
+
+        logger.debug(f"  → label position: ({label_pos.x}, {label_pos.y})")
+        logger.debug(f"  → label angle: {label_angle}°")
 
         # Use kicad-sch-api's add_hierarchical_label() method
         # Hierarchical labels create electrical connections (regular labels don't)

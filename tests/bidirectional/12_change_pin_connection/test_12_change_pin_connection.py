@@ -157,11 +157,13 @@ def test_12_change_pin_connection(request):
 
         r1_initial_pos = r1_initial.position
         r2_initial_pos = r2_initial.position
+        r1_initial_uuid = r1_initial.uuid
+        r2_initial_uuid = r2_initial.uuid
 
         print(f"✅ Step 1: Initial circuit generated")
         print(f"   - Components: {refs}")
-        print(f"   - R1 position: {r1_initial_pos}")
-        print(f"   - R2 position: {r2_initial_pos}")
+        print(f"   - R1 position: {r1_initial_pos}, UUID: {r1_initial_uuid}")
+        print(f"   - R2 position: {r2_initial_pos}, UUID: {r2_initial_uuid}")
 
         # =====================================================================
         # STEP 2: Verify initial netlist: NET1 connects R1[1] to R2[1]
@@ -314,10 +316,10 @@ def test_12_change_pin_connection(request):
         print(f"   - Final:   (R1, pin 2) ← NET1 → (R2, pin 1) ✓")
 
         # =====================================================================
-        # STEP 6: Validate positions preserved
+        # STEP 6: Validate component identity and positions preserved
         # =====================================================================
         print("\n" + "="*70)
-        print("STEP 6: Validate component positions preserved")
+        print("STEP 6: Validate component identity and positions preserved")
         print("="*70)
 
         sch_final = Schematic.load(str(schematic_file))
@@ -330,6 +332,21 @@ def test_12_change_pin_connection(request):
 
         r1_final_pos = r1_final.position
         r2_final_pos = r2_final.position
+        r1_final_uuid = r1_final.uuid
+        r2_final_uuid = r2_final.uuid
+
+        # UUIDs should be preserved (proving synchronizer was used, not regeneration)
+        assert r1_final_uuid == r1_initial_uuid, (
+            f"R1 UUID changed! This indicates regeneration instead of synchronization.\n"
+            f"Initial UUID: {r1_initial_uuid}\n"
+            f"Final UUID:   {r1_final_uuid}"
+        )
+
+        assert r2_final_uuid == r2_initial_uuid, (
+            f"R2 UUID changed! This indicates regeneration instead of synchronization.\n"
+            f"Initial UUID: {r2_initial_uuid}\n"
+            f"Final UUID:   {r2_final_uuid}"
+        )
 
         # Positions should be preserved
         assert r1_final_pos == r1_initial_pos, (
@@ -344,11 +361,14 @@ def test_12_change_pin_connection(request):
             f"Final: {r2_final_pos}"
         )
 
-        print(f"✅ Step 6: Positions preserved")
-        print(f"   - R1 position: {r1_final_pos} ✓")
-        print(f"   - R2 position: {r2_final_pos} ✓")
+        print(f"✅ Step 6: Component identity and positions preserved")
+        print(f"   - R1 UUID: {r1_final_uuid} (preserved) ✓")
+        print(f"   - R2 UUID: {r2_final_uuid} (preserved) ✓")
+        print(f"   - R1 position: {r1_final_pos} (preserved) ✓")
+        print(f"   - R2 position: {r2_final_pos} (preserved) ✓")
         print(f"\n🎉 Pin connection change workflow validated!")
         print(f"   - Electrical connectivity changed correctly")
+        print(f"   - Component UUIDs preserved (synchronizer used, not regeneration)")
         print(f"   - Component positions preserved")
         print(f"   - Pin-level accuracy confirmed")
 
