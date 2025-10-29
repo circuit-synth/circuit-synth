@@ -248,7 +248,9 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             net_obj = Net.from_dict({"name": net_name})  # Use from_dict for consistency
         else:
             # New format: dict with connections and metadata
-            connections = net_info.get("connections", [])
+            # Fixed for Issue #385: Use "nodes" key instead of "connections" key
+            # The NetlistExporter uses "nodes" for KiCad compatibility
+            connections = net_info.get("nodes", net_info.get("connections", []))
             # Create Net with metadata using from_dict
             net_dict = {
                 "name": net_name,
