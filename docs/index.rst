@@ -45,6 +45,7 @@ Circuit-Synth is an open-source Python library that fits seamlessly into normal 
    :caption: Development:
 
    CONTRIBUTING
+   ai_agents
    TESTING
    SCRIPT_REFERENCE
 
