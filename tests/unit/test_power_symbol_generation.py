@@ -383,5 +383,81 @@ class TestPowerSymbolReferences:
             assert pwr_nums == list(range(1, len(pwr_nums) + 1))
 
 
+class TestProjectFolderNaming:
+    """Test that project folder name is separate from KiCad file base names (issue #358)."""
+
+    def test_separate_folder_name_from_circuit_name(self):
+        """
+        Project folder name should be independent from circuit.name.
+
+        When generate_kicad_project(project_name=<path>/different_folder") is called,
+        the circuit name (from @circuit(name="...")) should be used for KiCad files,
+        not the folder name.
+
+        Issue: https://github.com/shanemmattner/circuit-synth/issues/358
+        """
+
+        @circuit(name="my_circuit")
+        def test_circuit():
+            r1 = Component(
+                symbol="Device:R",
+                ref="R1",
+                value="10k",
+                footprint="Resistor_SMD:R_0603_1608Metric",
+            )
+            gnd = Net(name="GND")
+            gnd += r1[2]
+
+        circ = test_circuit()
+
+        with TemporaryDirectory() as tmpdir:
+            # Generate with different folder name than circuit name
+            project_path = f"{tmpdir}/different_folder"
+            result = circ.generate_kicad_project(
+                project_name=project_path,
+                placement_algorithm="simple",
+                generate_pcb=False,
+            )
+
+            assert result["success"]
+
+            # Check that folder is named "different_folder"
+            project_folder = Path(project_path)
+            assert project_folder.exists()
+
+            # Check that KiCad files use "my_circuit" (circuit.name), NOT "different_folder"
+            json_file = project_folder / "my_circuit.json"
+            kicad_pro_file = project_folder / "my_circuit.kicad_pro"
+            kicad_sch_file = project_folder / "my_circuit.kicad_sch"
+
+            assert json_file.exists(), (
+                f"Expected JSON file at {json_file}, but it doesn't exist. "
+                f"Files in {project_folder}: {list(project_folder.glob('*'))}"
+            )
+            assert kicad_pro_file.exists(), (
+                f"Expected kicad_pro file at {kicad_pro_file}, but it doesn't exist. "
+                f"Files in {project_folder}: {list(project_folder.glob('*'))}"
+            )
+            assert kicad_sch_file.exists(), (
+                f"Expected kicad_sch file at {kicad_sch_file}, but it doesn't exist. "
+                f"Files in {project_folder}: {list(project_folder.glob('*'))}"
+            )
+
+            # Verify that files with folder name DON'T exist
+            wrong_json_file = project_folder / "different_folder.json"
+            wrong_kicad_pro_file = project_folder / "different_folder.kicad_pro"
+            wrong_kicad_sch_file = project_folder / "different_folder.kicad_sch"
+
+            assert not wrong_json_file.exists(), (
+                f"File {wrong_json_file} should NOT exist (uses folder name instead of circuit name)"
+            )
+            assert not wrong_kicad_pro_file.exists(), (
+                f"File {wrong_kicad_pro_file} should NOT exist (uses folder name instead of circuit name)"
+            )
+            assert not wrong_kicad_sch_file.exists(), (
+                f"File {wrong_kicad_sch_file} should NOT exist (uses folder name instead of circuit name)"
+            )
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

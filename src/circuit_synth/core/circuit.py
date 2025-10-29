@@ -724,15 +724,16 @@ class Circuit:
                 if output_path.name != project_base_name:
                     context_logger.warning(
                         f"Folder name '{output_path.name}' doesn't match project '{project_base_name}'. "
-                        f"Using folder name to maintain directory structure.",
+                        f"Using circuit name for file generation.",
                         component="CIRCUIT",
                     )
-                    project_base_name = output_path.name
+                    # Use circuit name for file generation, not folder name
+                    project_base_name = self.name
             else:
-                # No existing project - use folder name for consistency
-                project_base_name = output_path.name
+                # No existing project - use circuit name for KiCad files
+                project_base_name = self.name
                 context_logger.info(
-                    f"No existing project found, using folder name: {project_base_name}",
+                    f"No existing project found, using circuit name: {project_base_name}",
                     component="CIRCUIT",
                 )
 
@@ -746,8 +747,13 @@ class Circuit:
                 json_path=str(json_path),
             )
 
-            # Create schematic generator that outputs directly to the project directory
-            generator = SchematicGenerator(str(output_path.parent), project_base_name)
+            # Create schematic generator
+            # Pass output_path.parent as output_dir and project_base_name as project_name
+            # But we need to change how SchematicGenerator uses project_dir
+            # For now, pass the full path and update how project_dir is computed
+            generator = SchematicGenerator(str(output_path), project_base_name)
+            # Override project_dir since output_path is already the full project directory
+            generator.project_dir = Path(str(output_path)).resolve()
 
             # Generate the complete project using the JSON file
             # Legacy system handles placement, modern API handles file writing via write_schematic_file
@@ -872,7 +878,7 @@ class Circuit:
         try:
             # Generate KiCad project if needed
             project_path = Path(project_name).resolve()
-            project_base_name = project_path.name
+            project_base_name = self.name
             sch_file = project_path / f"{project_base_name}.kicad_sch"
 
             if not sch_file.exists():
@@ -994,7 +1000,7 @@ class Circuit:
         try:
             # Generate KiCad project if needed
             project_path = Path(project_name).resolve()
-            project_base_name = project_path.name
+            project_base_name = self.name
             sch_file = project_path / f"{project_base_name}.kicad_sch"
 
             if not sch_file.exists():
@@ -1120,7 +1126,7 @@ class Circuit:
         try:
             # Generate full KiCad project (including PCB) if needed
             project_path = Path(project_name).resolve()
-            project_base_name = project_path.name
+            project_base_name = self.name
             pcb_file = project_path / f"{project_base_name}.kicad_pcb"
 
             if not pcb_file.exists():
