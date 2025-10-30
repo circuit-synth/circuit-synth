@@ -1,10 +1,12 @@
 # Bidirectional Test Suite - Comprehensive Summary
 
 **Date:** 2025-10-30
-**Branch:** fix/issue-409-custom-properties
+**Branch:** fix/issue-406-hierarchical-sheets
 **Total Tests:** 65 comprehensive bidirectional tests (01-65)
 **New Tests Added:** 26 tests (39-65)
-**Recently Completed:** Test 29 (Component Custom Properties) - Issue #409 ✅
+**Recently Completed:**
+  - Test 29 (Component Custom Properties) - Issue #409 ✅
+  - Test 22 (Hierarchical Subcircuit Sheets) - Issue #406 ✅ **MERGED & RELEASED**
 
 ## Executive Summary
 
@@ -25,7 +27,7 @@ Overall Status: ✅ ALL TESTS OPERATIONAL
 Execution Time: ~67 seconds for full suite (tests 39-65)
 ```
 
-### Key Achievement: Hierarchical Operations Gap CLOSED
+### Key Achievement: Hierarchical Operations Gap CLOSED + Issue #406 FIXED ✅
 
 **Critical Finding:** Tests 01-38 almost exclusively operated on ROOT SHEET ONLY. This left a massive gap in hierarchical circuit testing.
 
@@ -35,6 +37,42 @@ Execution Time: ~67 seconds for full suite (tests 39-65)
 - ✅ Power distribution through hierarchy (tests 44, 47, 48)
 - ✅ Cross-sheet component operations (tests 41, 42)
 - ✅ Hierarchical pin management (tests 59, 60)
+
+### Issue #406: Hierarchical Sheets - RESOLVED ✅
+
+**Problem:** Components in hierarchical child sheets displayed as "R?" instead of correct reference designators
+
+**Root Cause:** kicad-sch-api was not preserving hierarchical instance paths through save/load cycles
+
+**Solution Implemented:**
+1. **kicad-sch-api v0.4.5** (PR #78 merged, released to PyPI)
+   - Added `instances` field to SchematicSymbol dataclass
+   - Modified save logic to preserve user-set instances instead of generating defaults
+   - Proper round-trip preservation through save/load cycles
+
+2. **circuit-synth PR #417** (merged to main)
+   - Updated dependency: kicad-sch-api >= 0.4.5
+   - No code changes needed - existing instance setting logic now works correctly
+
+3. **Test 22 Validation**
+   - ✅ Generates root sheet with R1 successfully
+   - ✅ Generates child sheet with R2 successfully
+   - ✅ Components appear with correct references in KiCad
+   - ✅ Hierarchical instance paths preserved in .kicad_sch files
+   - ✅ JSON netlist reflects hierarchical structure
+
+**Validation Output:**
+```
+(instances
+  (project "hierarchical_circuit"
+    (path "/09b968bb-1c14-4c83-adb9-7742cc5dc170"
+      (reference "R1")
+      (unit 1)
+    )
+  )
+)
+```
+✅ Instance paths correctly preserved!
 
 ---
 
@@ -158,18 +196,36 @@ Conclusion: ✅ Scales well to realistic circuit sizes
 ### Achievements
 - ✅ 26 new tests created (39-65)
 - ✅ Test 29 completed: Component custom properties (DNP, MPN, Tolerance, complex types) - Issue #409
+- ✅ Test 22 completed: Hierarchical subcircuit sheets - Issue #406 ✅ **FIXED & RELEASED**
 - ✅ Hierarchical operations gap CLOSED
 - ✅ Comprehensive power symbol testing
 - ✅ Real-world workflow integration (DRC, ERC, BOM)
 - ✅ Performance validated (100+ components)
 - ✅ Ultimate integration test (test 64)
 
+### Issue #406 Resolution Details
+
+**Release Pipeline Completed:**
+1. ✅ kicad-sch-api PR #78 merged (hierarchical instance support)
+2. ✅ kicad-sch-api version bumped to 0.4.5
+3. ✅ kicad-sch-api released to PyPI (tested with `uv run`)
+4. ✅ circuit-synth PR #417 merged (dependency update)
+5. ✅ circuit-synth main branch ready for hierarchical workflows
+6. ✅ Test 22 validates end-to-end functionality
+
+**Verification Results:**
+- Hierarchical circuit generation: ✅ WORKING
+- Component references display correctly: ✅ VERIFIED
+- Instance paths preserved in KiCAD: ✅ CONFIRMED
+- JSON hierarchical structure intact: ✅ VALIDATED
+
 ### Test Suite Health
-- **Status:** ✅ HEALTHY
+- **Status:** ✅ HEALTHY + ENHANCED
 - **Coverage:** Excellent (65 tests)
 - **Documentation:** Comprehensive
 - **CI-Ready:** All tests operational
+- **Release-Ready:** Issue #406 complete and validated
 
-**Last Updated:** 2025-10-30 (Test 29 completed - Issue #409)
+**Last Updated:** 2025-10-30 (Issue #406 Fixed & Released, Test Suite Updated)
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
