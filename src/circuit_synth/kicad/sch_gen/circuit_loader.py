@@ -209,7 +209,17 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
         value = comp_dict.get("value", symbol_id.split(":")[-1])
         footprint = comp_dict.get("footprint", "")
 
-        # Create SchematicSymbol directly
+        # Extract ALL properties (system + user) using property_utils
+        from ..property_utils import extract_component_properties, extract_dnp_value
+
+        properties = extract_component_properties(comp_dict, default_hierarchy_path="/"  if not hasattr(circuit, 'hierarchical_path') else circuit.hierarchical_path)
+
+        # Handle DNP special case: KiCad has built-in dnp attribute
+        dnp_value = extract_dnp_value(comp_dict)
+
+        # Create SchematicSymbol with properties
+        # NOTE: kicad-sch-api SchematicSymbol doesn't support dnp parameter yet
+        # DNP is written as a property for now. in_bom/on_board flags can be set based on DNP.
         comp = SchematicSymbol(
             reference=ref,
             value=value,
@@ -217,9 +227,11 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             position=Point(0.0, 0.0),  # Will be set during placement
             rotation=0.0,
             footprint=footprint,
-            properties={"hierarchy_path": "/"},  # default top-level
+            properties=properties,  # FIXED: Use extracted properties instead of hardcoded
             pins=[],
             uuid=str(uuid_module.uuid4()),
+            in_bom=not dnp_value,  # If DNP, exclude from BOM
+            on_board=not dnp_value,  # If DNP, exclude from board
         )
 
         # Parse pins and convert to SchematicPin
