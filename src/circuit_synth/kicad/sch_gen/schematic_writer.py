@@ -573,7 +573,7 @@ class SchematicWriter:
             # Use 'units' attribute which contains the number of units
             unit_count = getattr(symbol_def, "units", 1) if symbol_def else 1
 
-            logger.debug(f"      Component has {unit_count} unit(s)")
+            logger.debug(f"      Component {comp.lib_id} has {unit_count} unit(s)")
 
             # Add component using the API - for multi-unit, add each unit separately
             # Time the component manager operation
@@ -586,7 +586,7 @@ class SchematicWriter:
                         f"      Adding multi-unit component with {unit_count} units"
                     )
                     # Add each unit with a vertical offset
-                    unit_spacing = 50.8  # 2 inches vertical spacing between units
+                    unit_spacing = 12.7  # 0.5 inch (12.7mm) vertical spacing between units
                     for unit_num in range(1, unit_count + 1):
                         unit_position = (
                             comp.position.x,
@@ -814,26 +814,20 @@ class SchematicWriter:
             # (same method used to draw the bbox rectangles)
             component_bboxes = []
 
-            # Group multi-unit components by reference (base name without unit suffix)
-            # Key: reference, Value: list of components with that reference
-            component_groups = {}
+            # Add components individually (multi-unit components will be placed side-by-side)
+            # Create unique placement keys for multi-unit components
+            placement_key_map = {}  # Maps unique placement key -> component
             for comp in components_needing_placement:
-                # Extract base reference (e.g., "U1" from "U1A" or just "U1")
-                base_ref = comp.reference
-                if base_ref not in component_groups:
-                    component_groups[base_ref] = []
-                component_groups[base_ref].append(comp)
-
-            # Add components (grouped for multi-unit)
-            for base_ref, comps in component_groups.items():
-                # Use first component to get symbol data (all units have same symbol)
-                first_comp = comps[0]
+                # Create unique key for placement (reference + unit number)
+                unit_num = getattr(comp, "unit", 1)
+                placement_key = f"{comp.reference}_U{unit_num}"
+                placement_key_map[placement_key] = comp
 
                 # Get symbol library data
-                lib_data = SymbolLibCache.get_symbol_data(first_comp.lib_id)
+                lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
                 if not lib_data:
                     logger.warning(
-                        f"No symbol data found for {first_comp.lib_id}, using fallback size"
+                        f"No symbol data found for {comp.lib_id}, using fallback size"
                     )
                     # Fallback to reasonable defaults
                     width, height = 10.0, 10.0
@@ -842,7 +836,7 @@ class SchematicWriter:
                     import sys
 
                     print(
-                        f"\n🔍 PLACEMENT: About to calculate bbox for {base_ref} ({first_comp.lib_id})",
+                        f"\n🔍 PLACEMENT: About to calculate bbox for {placement_key} ({comp.lib_id})",
                         file=sys.stderr,
                         flush=True,
                     )
@@ -853,28 +847,14 @@ class SchematicWriter:
                     )
                     width = max_x - min_x
                     height = max_y - min_y
-
-                # If multi-unit component, calculate combined height
-                unit_count = len(comps)
-                if unit_count > 1:
-                    unit_spacing = 50.8  # 2 inches vertical spacing between units
-                    total_height = (height * unit_count) + (unit_spacing * (unit_count - 1))
                     print(
-                        f"🔍 PLACEMENT: Multi-unit component {base_ref}: {unit_count} units, "
-                        f"single={width:.2f}x{height:.2f}mm, total={width:.2f}x{total_height:.2f}mm",
-                        file=sys.stderr,
-                        flush=True,
-                    )
-                    height = total_height
-                else:
-                    print(
-                        f"🔍 PLACEMENT: Calculated bbox for {base_ref}: {width:.2f} x {height:.2f} mm",
+                        f"🔍 PLACEMENT: Calculated bbox for {placement_key}: {width:.2f} x {height:.2f} mm",
                         file=sys.stderr,
                         flush=True,
                     )
 
-                component_bboxes.append((base_ref, width, height))
-                logger.debug(f"  {base_ref}: bbox {width:.1f}x{height:.1f}mm (units: {unit_count})")
+                component_bboxes.append((placement_key, width, height))
+                logger.debug(f"  {placement_key}: bbox {width:.1f}x{height:.1f}mm")
 
             # Add sheets (if any)
             if (
@@ -957,41 +937,12 @@ class SchematicWriter:
             # Apply placements to components and sheets
             placement_map = {ref: (x, y) for ref, x, y in placements}
 
-            # Apply to components (with multi-unit spacing)
-            for base_ref, comps in component_groups.items():
-                if base_ref in placement_map:
-                    base_x, base_y = placement_map[base_ref]
-
-                    # For multi-unit components, space them vertically
-                    if len(comps) > 1:
-                        unit_spacing = 50.8  # 2 inches vertical spacing
-                        # Calculate single unit height
-                        lib_data = SymbolLibCache.get_symbol_data(comps[0].lib_id)
-                        if lib_data:
-                            min_x, min_y, max_x, max_y = (
-                                SymbolBoundingBoxCalculator.calculate_bounding_box(
-                                    lib_data, include_properties=True
-                                )
-                            )
-                            single_height = max_y - min_y
-                        else:
-                            single_height = 10.0
-
-                        # Sort components by unit number to ensure correct ordering
-                        sorted_comps = sorted(comps, key=lambda c: getattr(c, "unit", 1))
-
-                        # Place each unit with vertical spacing
-                        for i, comp in enumerate(sorted_comps):
-                            offset_y = i * (single_height + unit_spacing)
-                            comp.position = Point(base_x, base_y + offset_y)
-                            print(
-                                f"  Placed {comp.reference} unit {getattr(comp, 'unit', 1)} at ({base_x:.1f}, {base_y + offset_y:.1f})",
-                                file=sys.stderr,
-                                flush=True,
-                            )
-                    else:
-                        # Single-unit component
-                        comps[0].position = Point(base_x, base_y)
+            # Apply to components (each unit placed independently using unique keys)
+            for placement_key, comp in placement_key_map.items():
+                if placement_key in placement_map:
+                    x, y = placement_map[placement_key]
+                    comp.position = Point(x, y)
+                    logger.debug(f"      Applied position to {comp.reference} unit {getattr(comp, 'unit', 1)}: ({x}, {y})")
 
             # Apply to sheets
             if (
