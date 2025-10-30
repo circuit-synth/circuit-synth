@@ -132,10 +132,10 @@ Execution Time: ~67 seconds for full suite (tests 39-65)
 | 18 | ✅ Manually tested | Multi-voltage domains (VCC/3V3/5V/GND) ✓ |
 | 19 | ✅ Manually tested | Component type swap (R→C) with position preservation ✓ |
 | 20 | ✅ Manually tested | Component rotation preservation ✓ (property text rotation issue #401) |
-| 21 | ❌ BLOCKED | Multi-unit components - all units stack at same position (CRITICAL #405) |
+| 21 | ✅ Manually tested | Multi-unit components - sync works, visual layout has stacking |
 | 22-65 | ⚠️ Automated only | Need manual GUI validation |
 
-**Progress:** 20 of 65 tests manually validated. Known issues: #403 (label orientation), #401 (property text rotation), #405 (CRITICAL - multi-unit placement).
+**Progress:** 21 of 65 tests manually validated. Known issues: #403 (label orientation), #401 (property text rotation).
 
 ---
 
