@@ -113,6 +113,18 @@ class ComponentManager:
             )
             return None
 
+        # Log properties being added
+        logger.debug(f"Adding component with {len(properties)} properties")
+        if properties:
+            logger.debug(f"Property keys: {list(properties.keys())}")
+
+        # Check for DNP in properties to set in_bom/on_board flags
+        dnp_value = False
+        if "DNP" in properties:
+            dnp_str = properties["DNP"]
+            dnp_value = dnp_str.lower() in ("true", "yes", "1") if isinstance(dnp_str, str) else bool(dnp_str)
+            logger.debug(f"DNP flag detected: {dnp_value}")
+
         # Create component first (needed for dynamic sizing)
         component = SchematicSymbol(
             uuid=self._generate_uuid(),
@@ -124,9 +136,11 @@ class ComponentManager:
             unit=unit,  # Set the unit number
             properties=properties,
             pins=symbol_def.pins.copy() if symbol_def.pins else [],
-            in_bom=True,  # Ensure component is included in BOM
-            on_board=True,  # Ensure component is included on board
+            in_bom=not dnp_value,  # If DNP, exclude from BOM
+            on_board=not dnp_value,  # If DNP, exclude from board
         )
+
+        logger.debug(f"Created SchematicSymbol with {len(component.properties)} properties")
 
         # Determine position (now with component for dynamic sizing)
         if position is None:
