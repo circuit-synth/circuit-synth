@@ -133,9 +133,11 @@ Execution Time: ~67 seconds for full suite (tests 39-65)
 | 19 | ✅ Manually tested | Component type swap (R→C) with position preservation ✓ |
 | 20 | ✅ Manually tested | Component rotation preservation ✓ (property text rotation issue #401) |
 | 21 | ✅ Manually tested | Multi-unit components - sync works, visual layout has stacking |
-| 22-65 | ⚠️ Automated only | Need manual GUI validation |
+| 22-24 | ⚠️ Automated only | Need manual GUI validation (hierarchical, blocked by #406) |
+| 25 | ✅ Manually tested | Local label creation (DATA_LINE) - sync adds labels correctly ✓ |
+| 26-65 | ⚠️ Automated only | Need manual GUI validation |
 
-**Progress:** 21 of 65 tests manually validated. Known issues: #403 (label orientation), #401 (property text rotation).
+**Progress:** 22 of 67 tests manually validated. Known issues: #403 (label orientation), #401 (property text rotation).
 
 ---
 
