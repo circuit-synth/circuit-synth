@@ -131,9 +131,10 @@ Execution Time: ~67 seconds for full suite (tests 39-65)
 | 17 | ✅ Manually tested | Add ground symbol (GND) to resistor ✓ |
 | 18 | ✅ Manually tested | Multi-voltage domains (VCC/3V3/5V/GND) ✓ |
 | 19 | ✅ Manually tested | Component type swap (R→C) with position preservation ✓ |
-| 20-65 | ⚠️ Automated only | Need manual GUI validation |
+| 20 | ✅ Manually tested | Component rotation preservation ✓ (property text rotation issue #401) |
+| 21-65 | ⚠️ Automated only | Need manual GUI validation |
 
-**Progress:** 19 of 65 tests manually validated. Issue #403 documents label orientation bug.
+**Progress:** 20 of 65 tests manually validated. Known issues: #403 (label orientation), #401 (property text rotation).
 
 ---
 
