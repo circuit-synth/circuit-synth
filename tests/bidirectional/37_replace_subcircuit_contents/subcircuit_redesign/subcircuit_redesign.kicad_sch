@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "0.8.36")
-	(uuid "e3d1383c-0168-49f1-9828-030748e2ecf2")
+	(uuid "ec8ca999-376f-408a-b1e2-c06b980c8b82")
 	(paper "A4")
 	(title_block
 		(title "subcircuit_redesign")
@@ -142,7 +142,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "6badf9bb-9d54-4789-a3fb-358e8dcc02dd")
+		(uuid "35fb435c-6a62-4a92-a436-ed71b42b98d2")
 		(property "Reference" "R_main1"
 			(at 99.06 34.2899 0)
 			(effects
@@ -170,7 +170,7 @@
 				(hide yes)
 			)
 		)
-		(property "hierarchy_path" "/e3d1383c-0168-49f1-9828-030748e2ecf2"
+		(property "hierarchy_path" "/ec8ca999-376f-408a-b1e2-c06b980c8b82"
 			(at 99.06 40.6399 0)
 			(effects
 				(font
@@ -188,7 +188,7 @@
 				(hide yes)
 			)
 		)
-		(property "root_uuid" "e3d1383c-0168-49f1-9828-030748e2ecf2"
+		(property "root_uuid" "ec8ca999-376f-408a-b1e2-c06b980c8b82"
 			(at 99.06 40.6399 0)
 			(effects
 				(font
@@ -198,14 +198,14 @@
 			)
 		)
 		(pin "1"
-			(uuid "ac4b3de5-d788-4975-9bc1-c0529b939939")
+			(uuid "c77b97d5-7254-463b-a123-f9905978b0c6")
 		)
 		(pin "2"
-			(uuid "ce0711ff-898a-45ea-8b7f-d1a06e229fe0")
+			(uuid "5504dafc-d8b7-4a43-a998-de847f226bec")
 		)
 		(instances
 			(project "subcircuit_redesign"
-				(path "/e3d1383c-0168-49f1-9828-030748e2ecf2"
+				(path "/ec8ca999-376f-408a-b1e2-c06b980c8b82"
 					(reference "R_main1")
 					(unit 1)
 				)
@@ -230,7 +230,7 @@
 			)
 			(justify left top)
 		)
-		(uuid "4a798918-e4b1-40aa-81fb-79a3b368d653")
+		(uuid "c55d374c-7cca-4be0-92e7-d4160b81275a")
 	)
 	(sheet
 		(at 29.21 12.7)
@@ -247,7 +247,7 @@
 		(fill
 			(color 0 0 0 0.0000)
 		)
-		(uuid "1ff6acad-f5bb-45c3-bc70-6f6eccaa8b57")
+		(uuid "42775e0d-2c1f-4a23-8cb6-fecf96b0cb0c")
 		(property "Sheetname" "amplifier_subcircuit_1"
 			(at 29.21 11.9884 0)
 			(effects
@@ -268,7 +268,7 @@
 		)
 		(instances
 			(project "subcircuit_redesign"
-				(path "/e3d1383c-0168-49f1-9828-030748e2ecf2"
+				(path "/ec8ca999-376f-408a-b1e2-c06b980c8b82"
 					(page "2")
 				)
 			)

@@ -2,7 +2,7 @@
 	(version 20250114)
 	(generator "circuit_synth")
 	(generator_version "0.8.36")
-	(uuid "21c44fc6-68b3-470b-b6cd-931d5644a718")
+	(uuid "79f6b226-2d3a-4a0c-b115-9260518ef094")
 	(paper "A4")
 	(title_block
 		(title "subcircuit_redesign")
@@ -281,7 +281,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "96fab54d-f2fc-4ff2-87e2-899b9c55bdc9")
+		(uuid "62dcf9da-e7fd-4460-84d9-67780d2c7feb")
 		(property "Reference" "R1"
 			(at 33.02 34.2899 0)
 			(effects
@@ -309,7 +309,7 @@
 				(hide yes)
 			)
 		)
-		(property "hierarchy_path" "/e3d1383c-0168-49f1-9828-030748e2ecf2/1ff6acad-f5bb-45c3-bc70-6f6eccaa8b57"
+		(property "hierarchy_path" "/ec8ca999-376f-408a-b1e2-c06b980c8b82/42775e0d-2c1f-4a23-8cb6-fecf96b0cb0c"
 			(at 33.02 40.6399 0)
 			(effects
 				(font
@@ -327,7 +327,7 @@
 				(hide yes)
 			)
 		)
-		(property "root_uuid" "e3d1383c-0168-49f1-9828-030748e2ecf2"
+		(property "root_uuid" "ec8ca999-376f-408a-b1e2-c06b980c8b82"
 			(at 33.02 40.6399 0)
 			(effects
 				(font
@@ -337,14 +337,14 @@
 			)
 		)
 		(pin "1"
-			(uuid "3a60fa0e-0d0c-49a8-8fb9-049ce65e21f0")
+			(uuid "5b83c44f-d4d2-4fba-b00a-30f1292d750b")
 		)
 		(pin "2"
-			(uuid "5848ed21-036f-4230-acc9-da185d38a804")
+			(uuid "e53fbb0b-4dcc-4c65-aa9c-2c840ed322e7")
 		)
 		(instances
 			(project "subcircuit_redesign"
-				(path "/e3d1383c-0168-49f1-9828-030748e2ecf2/1ff6acad-f5bb-45c3-bc70-6f6eccaa8b57"
+				(path "/ec8ca999-376f-408a-b1e2-c06b980c8b82/42775e0d-2c1f-4a23-8cb6-fecf96b0cb0c"
 					(reference "R1")
 					(unit 1)
 				)
@@ -360,7 +360,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "e0878532-168d-4f99-8996-742c639a83f3")
+		(uuid "15e8732a-ba9d-4feb-90ac-a0a9a95a0dc3")
 		(property "Reference" "C1"
 			(at 58.42 31.7499 0)
 			(effects
@@ -388,7 +388,7 @@
 				(hide yes)
 			)
 		)
-		(property "hierarchy_path" "/e3d1383c-0168-49f1-9828-030748e2ecf2/1ff6acad-f5bb-45c3-bc70-6f6eccaa8b57"
+		(property "hierarchy_path" "/ec8ca999-376f-408a-b1e2-c06b980c8b82/42775e0d-2c1f-4a23-8cb6-fecf96b0cb0c"
 			(at 58.42 38.0999 0)
 			(effects
 				(font
@@ -406,7 +406,7 @@
 				(hide yes)
 			)
 		)
-		(property "root_uuid" "e3d1383c-0168-49f1-9828-030748e2ecf2"
+		(property "root_uuid" "ec8ca999-376f-408a-b1e2-c06b980c8b82"
 			(at 58.42 38.0999 0)
 			(effects
 				(font
@@ -416,14 +416,14 @@
 			)
 		)
 		(pin "1"
-			(uuid "13d93dbd-c0fa-4165-93d2-a2d4bba3b955")
+			(uuid "3ad91840-668e-475b-8f64-186654615c4b")
 		)
 		(pin "2"
-			(uuid "abe5db30-33b1-49bb-8637-ea95602551f3")
+			(uuid "4263df4d-be15-419a-965e-8923a57d484e")
 		)
 		(instances
 			(project "subcircuit_redesign"
-				(path "/e3d1383c-0168-49f1-9828-030748e2ecf2/1ff6acad-f5bb-45c3-bc70-6f6eccaa8b57"
+				(path "/ec8ca999-376f-408a-b1e2-c06b980c8b82/42775e0d-2c1f-4a23-8cb6-fecf96b0cb0c"
 					(reference "C1")
 					(unit 1)
 				)
@@ -448,7 +448,7 @@
 			)
 			(justify left top)
 		)
-		(uuid "73a81d33-31fa-449e-a071-6a209d4f5313")
+		(uuid "9ac40e98-0ed6-4ca1-bcf4-770a6406ee64")
 	)
 	(sheet_instances
 		(path "/"

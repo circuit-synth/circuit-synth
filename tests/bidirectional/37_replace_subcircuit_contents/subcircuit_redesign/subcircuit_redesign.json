@@ -1,7 +1,7 @@
 {
   "name": "subcircuit_redesign",
   "description": "Root circuit with Amplifier subcircuit.\n\n    Root: Main resistor (R_main)\n    Subcircuit: Amplifier (R1, C1 \u2192 R2, R3, C2)\n    ",
-  "tstamps": "/subcircuit_redesign-4312313216/",
+  "tstamps": "/subcircuit_redesign-4350721344/",
   "source_file": "subcircuit_redesign.kicad_sch",
   "components": {
     "R_main1": {
@@ -46,7 +46,7 @@
     {
       "name": "amplifier_subcircuit_1",
       "description": "Amplifier subcircuit that can be redesigned.\n\n    Initial implementation: Simple RC filter (R1, C1)\n    Modified implementation: Multi-stage filter (R2, R3, C2)\n    ",
-      "tstamps": "/amplifier_subcircuit_1-4313952192/",
+      "tstamps": "/amplifier_subcircuit_1-4350718032/",
       "source_file": "amplifier_subcircuit_1.kicad_sch",
       "components": {
         "R1": {
@@ -153,7 +153,7 @@
           "border_color": "black",
           "justify": "center center",
           "rotation": 0,
-          "uuid": "e6cc671d-8171-4a08-adb7-5fdd8368c165"
+          "uuid": "f542f9e0-86e3-427a-994a-3c05e06f03bf"
         }
       ]
     }
@@ -187,7 +187,7 @@
       "border_color": "black",
       "justify": "center center",
       "rotation": 0,
-      "uuid": "307cd64b-25b3-43a5-bcdd-63d5ea529c62"
+      "uuid": "e3a4bdde-47b9-4bd1-bef9-d943c4cb9a71"
     }
   ]
 }

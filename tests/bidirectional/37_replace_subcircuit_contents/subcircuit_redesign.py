@@ -10,7 +10,7 @@ Demonstrates subcircuit content replacement:
 Used to test replacing entire subcircuit implementation while preserving hierarchy.
 """
 
-from circuit_synth import *
+from circuit_synth import circuit, Component, Net
 
 
 @circuit
@@ -80,11 +80,7 @@ if __name__ == "__main__":
     # Generate KiCad project when run directly
     circuit_obj = subcircuit_redesign()
 
-    circuit_obj.generate_kicad_project(
-        project_name="subcircuit_redesign",
-        placement_algorithm="simple",
-        generate_pcb=True,
-    )
+    circuit_obj.generate_kicad_project(project_name="subcircuit_redesign")
 
     print("✅ Subcircuit redesign circuit generated successfully!")
     print("📁 Open in KiCad: subcircuit_redesign/subcircuit_redesign.kicad_pro")

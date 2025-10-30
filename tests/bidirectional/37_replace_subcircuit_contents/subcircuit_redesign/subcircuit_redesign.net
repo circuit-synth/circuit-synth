@@ -1,9 +1,9 @@
 (export (version "E")
     (design
       (source "subcircuit_redesign.kicad_sch")
-      (date "2025-10-30T02:19:48-0700")
+      (date "2025-10-30T02:28:31-0700")
       (tool "Circuit-Synth Exporter v0.1.0")
-      (sheet (number "1") (name "root") (tstamps "/75a35b9f-8cfc-4925-b7fc-26ee92ff4d9a/")
+      (sheet (number "1") (name "root") (tstamps "/09066af1-2d22-4d45-8eba-38b3aba066f5/")
       (title_block
         (title )
         (company )
@@ -33,7 +33,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "44f1e631-b056-4127-b889-94deee65db4c"))
+      (tstamps "f8303d76-3592-49e8-a9c1-e236164bb3f8"))
     (comp (ref "R1")
       (value "10k")
       (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -47,7 +47,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "R_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "5b0b2ff4-9c12-4244-804b-72dbc86a70e2"))
+      (tstamps "e313d3f8-c308-4989-974a-b338cda385c6"))
     (comp (ref "C1")
       (value "1µF")
       (footprint "Capacitor_SMD:C_0603_1608Metric")
@@ -61,7 +61,7 @@
       (property (name "Sheetfile") (value "circuit.kicad_sch"))
       (property (name "ki_fp_filters") (value "C_*"))
       (sheetpath (names "/") (tstamps "/"))
-      (tstamps "68b2c70b-9338-40b2-b0b8-3c24ec848083")))
+      (tstamps "b24ac217-cf3b-4a15-b992-1771d2909254")))
     (libparts
     (libpart (lib "Device") (part "R")
       (description "Resistor")

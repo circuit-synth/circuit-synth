@@ -8,7 +8,7 @@
 **Recently Fixed:** Test 29 (Component Custom Properties) - Issue #409 ✅
 
 ### 🎯 Manual Validation Campaign Progress
-**Status:** Tests 01-21, 25, 26, 31, 33, 34, 35, 36 manually validated (28 of 68 tests)
+**Status:** Tests 01-21, 25, 26, 31, 33, 34, 35, 36, 37 manually validated (29 of 68 tests)
 **Findings:**
 - Test 15 (Net split) is XPASS - now working despite expected failure on Issue #373
 - Test 22 BLOCKED by Issue #406 (subcircuit generation broken)
@@ -24,6 +24,9 @@
 - Test 36 PARTIALLY WORKING - Auto-incrementing subcircuit naming feature implemented (Issue #422) ✅
   - Single instance works perfectly (hierarchical sheet + child circuit)
   - Multiple instances blocked by Issue #419 (reference collision bug)
+- Test 37 PASSES - Hierarchical subcircuit redesign (R1,C1 → R2,R3,C2) ✓
+  - Root circuit (R_main) preserved, child subcircuit components replaced
+  - Synchronization falls back to regeneration (acceptable for now)
 - Test 68 NEW - Dynamic sheet sizing (XFAIL - Issue #413)
 
 ## Executive Summary
@@ -50,7 +53,7 @@ Total: 68 tests across 46 test directories (test 27 removed)
     └── Test 68: Automatic sheet resize (XFAIL - Issue #413)
 
 Overall Status: ✅ ALL TESTS OPERATIONAL
-Manual Validation: 28 of 68 tests (41%)
+Manual Validation: 29 of 68 tests (43%)
 ```
 
 ### Key Achievement: Hierarchical Operations Gap CLOSED
@@ -222,10 +225,12 @@ Manual Validation: 28 of 68 tests (41%)
 | 35 | ✅ Manually tested | Bulk component remove - Python loop (10→5 resistors) ✓ |
 | 36 | ✅ Manually tested | Hierarchical subcircuit duplication - auto-increment naming works ✓ (Issue #422) |
 |    |                  | Single instance perfect, multiple blocked by Issue #419 |
-| 37-67 | ⚠️ Automated only | Need manual GUI validation |
+| 37 | ✅ Manually tested | Hierarchical subcircuit redesign - R1,C1 → R2,R3,C2 ✓ |
+|    |                  | Root preserved, child components replaced successfully |
+| 38-67 | ⚠️ Automated only | Need manual GUI validation |
 | 68 | 🆕 NEW TEST | Dynamic sheet sizing (XFAIL - Issue #413) |
 
-**Progress:** 28 of 68 tests manually validated (41%)
+**Progress:** 29 of 68 tests manually validated (43%)
 
 **Known issues:**
 - #401: Property text rotation
