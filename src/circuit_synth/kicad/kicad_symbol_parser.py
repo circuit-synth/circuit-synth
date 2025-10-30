@@ -415,7 +415,9 @@ def _flatten_symbol(
             parts = sub_name.rsplit("_", 2)  # Split from right to get last two numbers
             if len(parts) == 3:
                 try:
-                    unit_num = int(parts[1])  # The unit number is the second-to-last part
+                    unit_num = int(
+                        parts[1]
+                    )  # The unit number is the second-to-last part
                     unique_units.add(unit_num)
                 except ValueError:
                     pass  # Not a valid unit number, skip

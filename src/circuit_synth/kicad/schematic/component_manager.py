@@ -170,7 +170,9 @@ class ComponentManager:
         # Store in index with unique key for multi-unit support
         self._component_index[component_key] = component
 
-        logger.debug(f"Added component {reference} unit {unit} ({library_id}) at {position}")
+        logger.debug(
+            f"Added component {reference} unit {unit} ({library_id}) at {position}"
+        )
         return component
 
     def remove_component(self, reference: str, uuid: Optional[str] = None) -> bool:
@@ -191,7 +193,7 @@ class ComponentManager:
         """
         # Try UUID first if provided (more reliable)
         if uuid:
-            if hasattr(self.schematic.components, 'remove_by_uuid'):
+            if hasattr(self.schematic.components, "remove_by_uuid"):
                 # Use new API if available (kicad-sch-api 0.4.1+)
                 result = self.schematic.components.remove_by_uuid(uuid)
                 if result:
@@ -201,7 +203,9 @@ class ComponentManager:
                     logger.info(f"Removed component {reference} by UUID {uuid}")
                     return True
             else:
-                logger.warning(f"remove_by_uuid not available, falling back to reference")
+                logger.warning(
+                    f"remove_by_uuid not available, falling back to reference"
+                )
 
         # Fall back to reference-based removal
         if reference not in self._component_index:
@@ -215,7 +219,9 @@ class ComponentManager:
         result = self.schematic.components.remove(reference)
 
         if not result:
-            logger.warning(f"Failed to remove component {reference} from ComponentCollection")
+            logger.warning(
+                f"Failed to remove component {reference} from ComponentCollection"
+            )
             return False
 
         del self._component_index[reference]

@@ -586,7 +586,9 @@ class SchematicWriter:
                         f"      Adding multi-unit component with {unit_count} units"
                     )
                     # Add each unit with a vertical offset
-                    unit_spacing = 12.7  # 0.5 inch (12.7mm) vertical spacing between units
+                    unit_spacing = (
+                        12.7  # 0.5 inch (12.7mm) vertical spacing between units
+                    )
                     for unit_num in range(1, unit_count + 1):
                         unit_position = (
                             comp.position.x,
@@ -942,7 +944,9 @@ class SchematicWriter:
                 if placement_key in placement_map:
                     x, y = placement_map[placement_key]
                     comp.position = Point(x, y)
-                    logger.debug(f"      Applied position to {comp.reference} unit {getattr(comp, 'unit', 1)}: ({x}, {y})")
+                    logger.debug(
+                        f"      Applied position to {comp.reference} unit {getattr(comp, 'unit', 1)}: ({x}, {y})"
+                    )
 
             # Apply to sheets
             if (
@@ -1081,7 +1085,9 @@ class SchematicWriter:
         Example:
             >>> self._add_power_symbol("power:GND", "#PWR01", "GND", (100, 100), rotation=180)
         """
-        logger.debug(f"Adding power symbol {lib_id} at {position} with value '{value}' rotation={rotation}")
+        logger.debug(
+            f"Adding power symbol {lib_id} at {position} with value '{value}' rotation={rotation}"
+        )
 
         try:
             # Add power symbol as a component
@@ -1112,32 +1118,49 @@ class SchematicWriter:
                 # - 180° (down): Value below symbol
                 # - 270° (right): Value to the right
                 # Standard offset is ~5.08mm from symbol center
-                if hasattr(power_comp, 'properties') and 'Value' in power_comp.properties:
-                    value_prop = power_comp.properties['Value']
-                    if hasattr(value_prop, 'position'):
+                if (
+                    hasattr(power_comp, "properties")
+                    and "Value" in power_comp.properties
+                ):
+                    value_prop = power_comp.properties["Value"]
+                    if hasattr(value_prop, "position"):
                         # Calculate correct position based on rotation
-                        offset = 5.08  # Standard KiCad offset for power symbol value text
+                        offset = (
+                            5.08  # Standard KiCad offset for power symbol value text
+                        )
 
                         if rotation == 0:  # Pointing up
-                            value_prop.position = Point(position[0], position[1] - offset)
+                            value_prop.position = Point(
+                                position[0], position[1] - offset
+                            )
                         elif rotation == 90:  # Pointing left
-                            value_prop.position = Point(position[0] - offset, position[1])
+                            value_prop.position = Point(
+                                position[0] - offset, position[1]
+                            )
                         elif rotation == 180:  # Pointing down
-                            value_prop.position = Point(position[0], position[1] + offset)
+                            value_prop.position = Point(
+                                position[0], position[1] + offset
+                            )
                         elif rotation == 270:  # Pointing right
-                            value_prop.position = Point(position[0] + offset, position[1])
+                            value_prop.position = Point(
+                                position[0] + offset, position[1]
+                            )
 
-                logger.debug(f"Created power symbol {reference} (UUID: {power_comp.uuid}) rotation={rotation}")
+                logger.debug(
+                    f"Created power symbol {reference} (UUID: {power_comp.uuid}) rotation={rotation}"
+                )
 
                 # Track power symbol for post-processing text positions
-                if not hasattr(self, '_power_symbols_to_fix'):
+                if not hasattr(self, "_power_symbols_to_fix"):
                     self._power_symbols_to_fix = []
-                self._power_symbols_to_fix.append({
-                    'uuid': power_comp.uuid,
-                    'position': position,
-                    'rotation': rotation,
-                    'value': value
-                })
+                self._power_symbols_to_fix.append(
+                    {
+                        "uuid": power_comp.uuid,
+                        "position": position,
+                        "rotation": rotation,
+                        "value": value,
+                    }
+                )
 
                 return power_comp.uuid
             else:
@@ -1153,20 +1176,23 @@ class SchematicWriter:
         Post-process schematic file to fix power symbol Value property positions.
         kicad-sch-api doesn't expose property positioning API, so we fix it in the file.
         """
-        if not hasattr(self, '_power_symbols_to_fix') or not self._power_symbols_to_fix:
+        if not hasattr(self, "_power_symbols_to_fix") or not self._power_symbols_to_fix:
             return
 
-        logger.debug(f"Fixing Value positions for {len(self._power_symbols_to_fix)} power symbols...")
+        logger.debug(
+            f"Fixing Value positions for {len(self._power_symbols_to_fix)} power symbols..."
+        )
 
         import re
-        with open(sch_file_path, 'r') as f:
+
+        with open(sch_file_path, "r") as f:
             content = f.read()
 
         for symbol_info in self._power_symbols_to_fix:
-            uuid = symbol_info['uuid']
-            pos = symbol_info['position']
-            rotation = symbol_info['rotation']
-            value = symbol_info['value']
+            uuid = symbol_info["uuid"]
+            pos = symbol_info["position"]
+            rotation = symbol_info["rotation"]
+            value = symbol_info["value"]
 
             # Calculate correct Value position based on rotation
             offset = 5.08  # Standard KiCad offset
@@ -1187,12 +1213,14 @@ class SchematicWriter:
             symbol_pattern = rf'(\(symbol.*?uuid "{uuid}".*?property "Value" "{re.escape(value)}".*?\(at )[\d.]+\s+[\d.]+(\s+[\d.]+\))'
 
             def replace_value_position(match):
-                return f'{match.group(1)}{value_x} {value_y}{match.group(2)}'
+                return f"{match.group(1)}{value_x} {value_y}{match.group(2)}"
 
-            content = re.sub(symbol_pattern, replace_value_position, content, flags=re.DOTALL)
+            content = re.sub(
+                symbol_pattern, replace_value_position, content, flags=re.DOTALL
+            )
 
         # Write back
-        with open(sch_file_path, 'w') as f:
+        with open(sch_file_path, "w") as f:
             f.write(content)
 
         logger.debug(f"Fixed Value positions in {sch_file_path}")
@@ -1287,7 +1315,9 @@ class SchematicWriter:
 
                 logger.debug(f"INITIAL LABEL: {actual_ref} pin {pin_identifier}")
                 logger.debug(f"  pin_dict: {pin_dict}")
-                logger.debug(f"  component position: ({comp.position.x}, {comp.position.y})")
+                logger.debug(
+                    f"  component position: ({comp.position.x}, {comp.position.y})"
+                )
                 logger.debug(f"  component rotation: {comp.rotation}°")
 
                 # Rotate coords by component rotation
@@ -1310,7 +1340,11 @@ class SchematicWriter:
                 logger.debug(f"  → label angle: {global_angle}°")
 
                 # Check if this is a power net
-                if hasattr(net, 'is_power') and net.is_power and hasattr(net, 'power_symbol'):
+                if (
+                    hasattr(net, "is_power")
+                    and net.is_power
+                    and hasattr(net, "power_symbol")
+                ):
                     # Generate power symbol instead of hierarchical label
                     power_ref = f"#PWR0{power_symbol_counter:02d}"
                     power_symbol_counter += 1
