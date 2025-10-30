@@ -10,26 +10,32 @@ Requirements
 Installation Methods
 --------------------
 
-PyPI Installation (Recommended)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using uv (Recommended)
+~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: bash
-
-   pip install circuit-synth
-
-Using uv (Recommended for Development)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Fast package installer with better dependency resolution:
 
 .. code-block:: bash
 
    # Install uv if you haven't already
    curl -LsSf https://astral.sh/uv/install.sh | sh
-   
+
    # Install circuit-synth
-   uv pip install circuit-synth
-   
+   uv add circuit-synth
+
    # For development
-   uv pip install -e ".[dev]"
+   git clone https://github.com/circuit-synth/circuit-synth.git
+   cd circuit-synth
+   uv sync
+
+Using pip (Alternative)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Standard Python package installer:
+
+.. code-block:: bash
+
+   pip install circuit-synth
 
 From Source
 ~~~~~~~~~~~
