@@ -1,9 +1,10 @@
 # Bidirectional Test Suite - Comprehensive Summary
 
-**Date:** 2025-10-28  
-**Branch:** feat/automate-bidirectional-tests-14-26  
-**Total Tests:** 65 comprehensive bidirectional tests (01-65)  
+**Date:** 2025-10-30
+**Branch:** fix/issue-409-custom-properties
+**Total Tests:** 65 comprehensive bidirectional tests (01-65)
 **New Tests Added:** 26 tests (39-65)
+**Recently Completed:** Test 29 (Component Custom Properties) - Issue #409 ✅
 
 ## Executive Summary
 
@@ -67,10 +68,11 @@ Execution Time: ~67 seconds for full suite (tests 39-65)
 | 60 | Remove Hierarchical Pin | ⚠️ XFAIL | Interface simplification |
 | 61 | Large Circuit Performance | ✅ PASS | 100 components, performance benchmarks |
 
-### Priority 2: Nice-to-Have (8 tests) 🟢
+### Priority 2: Nice-to-Have (9 tests) 🟢
 
 | Test | Name | Status | Key Validation |
 |------|------|--------|----------------|
+| 29 | Component Custom Properties | ✅ PASS | DNP, MPN, Tolerance, complex types (Issue #409) |
 | 52 | Unicode Component Names | ✅ PASS | Greek (Ω, π, μ), Chinese, Japanese |
 | 53 | Reference Collision Detection | ✅ PASS | Global uniqueness enforcement |
 | 54 | DRC Validation | ✅ PASS (2 tests) | kicad-cli DRC integration |
@@ -155,6 +157,7 @@ Conclusion: ✅ Scales well to realistic circuit sizes
 
 ### Achievements
 - ✅ 26 new tests created (39-65)
+- ✅ Test 29 completed: Component custom properties (DNP, MPN, Tolerance, complex types) - Issue #409
 - ✅ Hierarchical operations gap CLOSED
 - ✅ Comprehensive power symbol testing
 - ✅ Real-world workflow integration (DRC, ERC, BOM)
@@ -167,6 +170,6 @@ Conclusion: ✅ Scales well to realistic circuit sizes
 - **Documentation:** Comprehensive
 - **CI-Ready:** All tests operational
 
-**Last Updated:** 2025-10-28
+**Last Updated:** 2025-10-30 (Test 29 completed - Issue #409)
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)

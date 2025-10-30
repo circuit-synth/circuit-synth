@@ -564,6 +564,26 @@ class SchematicWriter:
             # Track the mapping
             self.reference_mapping[original_ref] = new_ref
 
+            # Extract user properties from SchematicSymbol.properties
+            # At this point, comp is a SchematicSymbol loaded from JSON
+            # Properties were already extracted by circuit_loader.py
+            from ..property_utils import filter_user_properties
+
+            user_properties = filter_user_properties(comp.properties) if hasattr(comp, 'properties') else {}
+
+            # Check if DNP flag is set via properties or flags
+            dnp_value = False
+            if "DNP" in user_properties:
+                dnp_str = user_properties["DNP"]
+                dnp_value = dnp_str.lower() in ("true", "yes", "1") if isinstance(dnp_str, str) else bool(dnp_str)
+            elif hasattr(comp, 'in_bom') and not comp.in_bom:
+                # If in_bom is False, component is DNP
+                dnp_value = True
+
+            logger.debug(f"      Component properties: {len(user_properties)} user properties")
+            if user_properties:
+                logger.debug(f"      Property keys: {list(user_properties.keys())}")
+
             # Add component using the API
             # Time the component manager operation
             with timed_operation(
@@ -576,6 +596,7 @@ class SchematicWriter:
                     position=(comp.position.x, comp.position.y),
                     placement_strategy=PlacementStrategy.AUTO,
                     footprint=comp.footprint,
+                    **user_properties,  # Pass user properties
                 )
 
             if api_component:
