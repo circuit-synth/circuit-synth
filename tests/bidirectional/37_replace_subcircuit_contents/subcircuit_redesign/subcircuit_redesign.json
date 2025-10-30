@@ -1,0 +1,193 @@
+{
+  "name": "subcircuit_redesign",
+  "description": "Root circuit with Amplifier subcircuit.\n\n    Root: Main resistor (R_main)\n    Subcircuit: Amplifier (R1, C1 \u2192 R2, R3, C2)\n    ",
+  "tstamps": "/subcircuit_redesign-4350721344/",
+  "source_file": "subcircuit_redesign.kicad_sch",
+  "components": {
+    "R_main1": {
+      "symbol": "Device:R",
+      "ref": "R_main1",
+      "value": "1k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "~",
+      "description": "Resistor",
+      "properties": {
+        "ki_fp_filters": "R_*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "R_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 3.81,
+          "length": 1.27,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -3.81,
+          "length": 1.27,
+          "orientation": 90.0
+        }
+      ]
+    }
+  },
+  "nets": {},
+  "subcircuits": [
+    {
+      "name": "amplifier_subcircuit_1",
+      "description": "Amplifier subcircuit that can be redesigned.\n\n    Initial implementation: Simple RC filter (R1, C1)\n    Modified implementation: Multi-stage filter (R2, R3, C2)\n    ",
+      "tstamps": "/amplifier_subcircuit_1-4350718032/",
+      "source_file": "amplifier_subcircuit_1.kicad_sch",
+      "components": {
+        "R1": {
+          "symbol": "Device:R",
+          "ref": "R1",
+          "value": "10k",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "datasheet": "~",
+          "description": "Resistor",
+          "properties": {
+            "ki_fp_filters": "R_*"
+          },
+          "_extra_fields": {
+            "ki_fp_filters": "R_*"
+          },
+          "pins": [
+            {
+              "pin_id": "1",
+              "name": "~",
+              "func": "passive",
+              "unit": 1,
+              "x": 0.0,
+              "y": 3.81,
+              "length": 1.27,
+              "orientation": 270.0
+            },
+            {
+              "pin_id": "2",
+              "name": "~",
+              "func": "passive",
+              "unit": 1,
+              "x": 0.0,
+              "y": -3.81,
+              "length": 1.27,
+              "orientation": 90.0
+            }
+          ]
+        },
+        "C1": {
+          "symbol": "Device:C",
+          "ref": "C1",
+          "value": "1\u00b5F",
+          "footprint": "Capacitor_SMD:C_0603_1608Metric",
+          "datasheet": "~",
+          "description": "Unpolarized capacitor",
+          "properties": {
+            "ki_fp_filters": "C_*"
+          },
+          "_extra_fields": {
+            "ki_fp_filters": "C_*"
+          },
+          "pins": [
+            {
+              "pin_id": "1",
+              "name": "~",
+              "func": "passive",
+              "unit": 1,
+              "x": 0.0,
+              "y": 3.81,
+              "length": 2.794,
+              "orientation": 270.0
+            },
+            {
+              "pin_id": "2",
+              "name": "~",
+              "func": "passive",
+              "unit": 1,
+              "x": 0.0,
+              "y": -3.81,
+              "length": 2.794,
+              "orientation": 90.0
+            }
+          ]
+        }
+      },
+      "nets": {},
+      "subcircuits": [],
+      "annotations": [
+        {
+          "type": "TextBox",
+          "text": "Amplifier subcircuit that can be redesigned.\n\n    Initial implementation: Simple RC filter (R1, C1)\n    Modified implementation: Multi-stage filter (R2, R3, C2)",
+          "position": [
+            184.0,
+            110.0
+          ],
+          "size": [
+            80.0,
+            30.0
+          ],
+          "margins": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "text_size": 1.2,
+          "bold": true,
+          "italic": false,
+          "text_color": "black",
+          "background": true,
+          "background_color": "lightyellow",
+          "border": true,
+          "border_width": 0.1,
+          "border_color": "black",
+          "justify": "center center",
+          "rotation": 0,
+          "uuid": "f542f9e0-86e3-427a-994a-3c05e06f03bf"
+        }
+      ]
+    }
+  ],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Root circuit with Amplifier subcircuit.\n\n    Root: Main resistor (R_main)\n    Subcircuit: Amplifier (R1, C1 \u2192 R2, R3, C2)",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "e3a4bdde-47b9-4bd1-bef9-d943c4cb9a71"
+    }
+  ]
+}

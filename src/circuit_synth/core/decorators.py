@@ -3,6 +3,8 @@
 from functools import wraps
 
 _CURRENT_CIRCUIT = None
+# Track how many times each function has been called to auto-increment instance names
+_CIRCUIT_CALL_COUNTERS = {}
 
 
 def get_current_circuit():
@@ -12,6 +14,12 @@ def get_current_circuit():
 def set_current_circuit(circuit):
     global _CURRENT_CIRCUIT
     _CURRENT_CIRCUIT = circuit
+
+
+def reset_circuit_call_counters():
+    """Reset the call counters for auto-incrementing circuit instance names."""
+    global _CIRCUIT_CALL_COUNTERS
+    _CIRCUIT_CALL_COUNTERS = {}
 
 
 def circuit(_func=None, *, name=None, comments=True):
@@ -41,16 +49,36 @@ def circuit(_func=None, *, name=None, comments=True):
             from .circuit import Circuit  # local import to avoid circular import
 
             global _CURRENT_CIRCUIT
+            global _CIRCUIT_CALL_COUNTERS
 
             parent_circuit = _CURRENT_CIRCUIT
+
+            # Reset call counters when starting a new top-level circuit
+            if parent_circuit is None:
+                _CIRCUIT_CALL_COUNTERS = {}
             # Capture docstring to use as circuit description
             docstring = func.__doc__ or ""  # or you could .strip() if you prefer
 
             # Check if enable_comments decorator was used
             use_comments = comments or getattr(func, "_enable_comments", False)
 
+            # Auto-increment instance name if no explicit name provided and inside parent circuit
+            circuit_name = name
+            if circuit_name is None:
+                base_name = func.__name__
+                if parent_circuit is not None:
+                    # Inside a parent circuit - auto-increment the instance name
+                    # Track calls per function name
+                    if base_name not in _CIRCUIT_CALL_COUNTERS:
+                        _CIRCUIT_CALL_COUNTERS[base_name] = 0
+                    _CIRCUIT_CALL_COUNTERS[base_name] += 1
+                    circuit_name = f"{base_name}_{_CIRCUIT_CALL_COUNTERS[base_name]}"
+                else:
+                    # Top-level circuit - use function name as-is
+                    circuit_name = base_name
+
             c = Circuit(
-                name=name or func.__name__,
+                name=circuit_name,
                 description=docstring,
                 auto_comments=use_comments,
             )

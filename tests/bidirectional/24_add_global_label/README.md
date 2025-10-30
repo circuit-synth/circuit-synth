@@ -1,135 +1,204 @@
-# Test 24: Add Global Label for Cross-Sheet Connections
+# Test 24: Cross-Sheet Hierarchical Label Connection
 
 ## What This Tests
 
-**Core Question**: When you have unconnected components in a KiCad schematic and add a net with global label scope in Python code, do the global labels appear when regenerating? Can global labels enable cross-sheet connectivity for future hierarchical designs?
+**Core Question**: Can you pass a Net from a parent circuit to a child circuit to establish electrical connectivity across hierarchical sheets via hierarchical labels and pins?
 
-This tests **bidirectional sync for global label creation** - adding electrical connections via global labels (as an alternative to hierarchical labels) to establish connections that can work across sheets.
+This validates the **critical cross-sheet connection workflow** - the foundation for hierarchical circuit development.
 
 ## When This Situation Happens
 
-- Developer generates circuit with unconnected components (R1, R2)
-- Later decides components should be electrically connected
-- Adds `Net("GLOBAL_NET")` in Python code connecting the pins
-- Marks the net for global labeling (if supported)
-- Regenerates KiCad expecting global labels to appear
-- Global labels enable same net name to connect components on different sheets (future feature)
+- Developer creates parent circuit with R1
+- Creates child circuit with R2
+- Initially unconnected (separate sheets)
+- Later decides R1 and R2 should be electrically connected
+- Passes `Net("SIGNAL")` from parent to child
+- Connects R1[1] and R2[1] to the shared net
+- Regenerates KiCad
+- **Expected**: Hierarchical infrastructure appears automatically:
+  - Hierarchical sheet symbol on parent sheet
+  - Hierarchical pin "SIGNAL" on the sheet symbol
+  - Hierarchical label "SIGNAL" on child sheet
+  - R1[1] and R2[1] electrically connected (verified in netlist)
 
 ## What Should Work
 
-1. Generate initial KiCad with R1 and R2 (no connection, no labels)
-2. Manually verify components are unconnected in KiCad (no labels visible)
-3. Edit Python to add Net connecting R1[1] to R2[1] with global scope
-4. Regenerate KiCad project
-5. Global labels "GLOBAL_NET" appear on both component pins, establishing electrical connection
-6. Component positions preserved during regeneration
+1. Generate parent + child circuits with unconnected components (R1, R2)
+   - Parent sheet shows R1 and hierarchical sheet symbol
+   - Child sheet shows R2
+   - No connection between R1 and R2
+2. Modify Python to pass Net("SIGNAL") from parent to child:
+   ```python
+   @circuit(name="child_circuit")
+   def child_circuit(signal_net):  # Accept net parameter
+       r2 = Component(...)
+       r2[1] += signal_net  # Connect to passed net
+
+   @circuit(name="parent_circuit")
+   def parent_circuit():
+       r1 = Component(...)
+       signal = Net("SIGNAL")
+       r1[1] += signal
+       child_circuit(signal_net=signal)  # Pass net to child
+   ```
+3. Regenerate KiCad project
+4. Verify hierarchical infrastructure created:
+   - Hierarchical pin "SIGNAL" appears on sheet symbol (parent sheet)
+   - Hierarchical label "SIGNAL" appears on child sheet
+   - R1[1] and R2[1] electrically connected (netlist shows same net)
+5. Component positions preserved during regeneration
 
 ## Manual Test Instructions
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth2/tests/bidirectional/24_add_global_label
+cd tests/bidirectional/24_add_global_label
 
-# Step 1: Generate initial KiCad project (no connection)
-uv run two_resistors.py
-open two_resistors/two_resistors.kicad_pro
-# Verify: R1 and R2 visible but NO global labels (completely unconnected)
-
-# Step 2: Edit two_resistors.py to add global label net
-# Change import line to:
-#   from circuit_synth import circuit, Component, Net
-# Add before the end of the function (after r2 definition):
-#   global_net = Net(name="GLOBAL_NET")
-#   global_net += r1[1]
-#   global_net += r2[1]
-
-# Step 3: Regenerate KiCad project with connection
-uv run two_resistors.py
-
-# Step 4: Open regenerated KiCad project
-open two_resistors/two_resistors.kicad_pro
+# Step 1: Generate initial hierarchical circuit (unconnected)
+uv run hierarchical_connection.py
+open hierarchical_connection/hierarchical_connection.kicad_pro
 # Verify:
-#   - Global labels "GLOBAL_NET" now appear on R1[1] and R2[1]
-#   - NO physical wire between components
-#   - Electrical connection established by matching label names
-#   - R1 and R2 positions preserved (didn't move)
-#   - Components still no overlap
+#   - Parent sheet shows R1
+#   - Hierarchical sheet symbol visible (links to child)
+#   - Child sheet shows R2
+#   - No connection between R1 and R2
+
+# Step 2: Edit hierarchical_connection.py to pass Net("SIGNAL")
+# Modify child_circuit:
+#   @circuit(name="child_circuit")
+#   def child_circuit(signal_net):
+#       r2 = Component(...)
+#       r2[1] += signal_net
+#
+# Modify parent_circuit:
+#   signal = Net("SIGNAL")
+#   r1[1] += signal
+#   child_circuit(signal_net=signal)
+
+# Step 3: Regenerate KiCad project
+uv run hierarchical_connection.py
+
+# Step 4: Verify hierarchical connection
+open hierarchical_connection/hierarchical_connection.kicad_pro
+# Verify:
+#   - Hierarchical pin "SIGNAL" on sheet symbol (parent sheet)
+#   - Hierarchical label "SIGNAL" on child sheet
+#   - R1 and R2 positions preserved
+
+# Step 5: Verify electrical connectivity via netlist
+kicad-cli sch export netlist hierarchical_connection/hierarchical_connection.kicad_sch \
+  --output hierarchical_connection.net
+# Verify: R1 pin 1 and R2 pin 1 on same net "SIGNAL"
 ```
 
 ## Expected Result
 
-- ✅ Initial generation: R1 and R2 unconnected (no labels)
-- ✅ After adding Net in Python: global labels "GLOBAL_NET" appear
-- ✅ Labels on both R1[1] and R2[1] pins (circle/globe shapes)
-- ✅ NO physical wire between components
-- ✅ Electrical connection established by matching label names
-- ✅ Component positions preserved during regeneration
-- ✅ No duplicate components
-- ✅ Connection is electrically valid (no ERC errors)
+- ✅ Initial: Parent + child sheets generated, hierarchical sheet symbol visible
+- ✅ Parent sheet: R1 + hierarchical sheet symbol
+- ✅ Child sheet: R2
+- ✅ After passing Net: Hierarchical pin "SIGNAL" on sheet symbol
+- ✅ After passing Net: Hierarchical label "SIGNAL" on child sheet
+- ✅ Netlist: R1[1] and R2[1] on same net (cross-sheet connection)
+- ✅ Component positions preserved
+- ✅ No electrical rule errors
 
-**Note**: Uses `global_label` format - labels create electrical connection without wires. Global labels enable same net name to connect on different sheets (future feature).
+## Why This Is Critical
 
-## Why This Is Important
+**Cross-sheet connectivity is fundamental to hierarchical design:**
 
-**Iterative circuit development workflow with hierarchical expansion:**
-1. Generate initial circuit structure with components on root sheet
-2. Connect components using global labels (can work same-sheet or cross-sheet)
-3. Review component placement in KiCad
-4. Add hierarchical sheets later with same global net names
-5. Cross-sheet connections automatically established by matching label names
+1. **Modularity**: Child circuits are reusable modules
+2. **Organization**: Complex circuits split across logical sheets
+3. **Explicit data flow**: Nets passed between circuits make connections visible in code
+4. **Safety**: No implicit global nets - all connections explicit
 
-If this doesn't work:
-- Users must use hierarchical labels (sheet-local) on same sheet
-- Cannot easily transition to hierarchical designs
-- Global labels are essential for future cross-sheet expansion
-- Code-based design becomes less flexible
+**If this doesn't work:**
+- Hierarchical circuits are disconnected islands
+- Cannot build complex designs
+- Tool is limited to flat single-sheet circuits
+- Major feature unusable
+
+**If this works:**
+- Hierarchical design becomes practical
+- Can build complex multi-sheet circuits
+- Code clearly shows inter-circuit connections
+- Foundation for real-world circuit development
 
 ## Success Criteria
 
 This test PASSES when:
-- Unconnected components generate correctly initially (no labels)
-- Adding Net() in Python creates global labels in KiCad
-- Labels appear on both component pins with matching names
-- NO physical wires drawn
+- Parent and child sheets generate correctly
+- Hierarchical sheet symbol appears on parent sheet
+- Passing Net from parent to child creates hierarchical pin on sheet symbol
+- Hierarchical label appears on child sheet with matching name
+- Netlist proves R1 and R2 are electrically connected
 - Component positions preserved across regeneration
-- No electrical rule errors in KiCad
-- Can validate presence of "global_label" in schematic file
+- No electrical rule errors
+
+## Current Status
+
+⚠️ **XFAIL - Blocked by Issue #406**
+
+This test is currently marked as XFAIL because:
+1. Subcircuit sheet generation is broken (Issue #406)
+2. Net passing syntax between @circuit functions needs confirmation
+3. Test documents the expected workflow but cannot execute until dependencies resolved
 
 ## Validation Level
 
-**Level 3 (Netlist Comparison)**: Validates electrical connectivity via netlist comparison
-- Uses kicad-cli to export netlist
-- Compares component connectivity
-- Verifies R1 and R2 are electrically connected via GLOBAL_NET
-- Confirms positions preserved
+**Level 3 (Netlist Comparison)**: Cross-sheet electrical connectivity
+- kicad-sch-api for schematic structure
+- Text search for hierarchical_pin and hierarchical_label in .kicad_sch files
+- Netlist comparison to prove R1 and R2 electrically connected
+- Position preservation verification
 
 ## Related Tests
 
-- **Test 11** - Add hierarchical labels to same-sheet components (local scope)
-- **Test 22** - Add subcircuit sheet (for future cross-sheet with global labels)
-- **Test 23** - Multiple nets per component (single sheet, multiple connections)
+- **Test 22** - Add subcircuit progressively (1→2→3 levels) - MUST PASS FIRST
+- **Test 10** - Add net to components (same sheet)
+- **Test 11** - Add hierarchical labels (same sheet)
 
 ## Design Notes
 
-**Global labels vs. Hierarchical labels:**
-- **Hierarchical labels**: Sheet-local, cannot connect across sheets
-- **Global labels**: Can connect same sheet or different sheets with same name
-- On single sheet: functionally identical in appearance
-- In hierarchical designs: global labels enable cross-sheet connections
-- KiCad visually distinguishes them (hierarchical = flag, global = circle)
+**Hierarchical Infrastructure in KiCad:**
 
-## Expected Schematic Differences
+When you pass a Net from parent to child, circuit-synth must generate:
 
-**Initial (no labels):**
+1. **Hierarchical Sheet Symbol** (parent sheet)
+   - Rectangle representing child circuit
+   - Contains hierarchical pins for each passed net
+
+2. **Hierarchical Pin** (on sheet symbol)
+   - Pin labeled "SIGNAL"
+   - Connects to parent net (R1[1])
+
+3. **Hierarchical Label** (child sheet)
+   - Label "SIGNAL" on child sheet
+   - Connects to child component (R2[1])
+
+4. **Electrical Connection**
+   - KiCad connects hierarchical pin to hierarchical label by matching names
+   - Creates single net spanning both sheets
+   - Netlist shows R1[1] and R2[1] on same net
+
+**Example:**
+
+Parent sheet:
 ```
-R1 ----  (unconnected)
-R2 ----  (unconnected)
+R1 --o SIGNAL
+      |
+   +--+------------+
+   | SIGNAL        |  <- Hierarchical sheet symbol
+   | child_circuit |
+   +---------------+
 ```
 
-**After adding global labels:**
+Child sheet (child_circuit.kicad_sch):
 ```
-R1 --o GLOBAL_NET
-R2 --o GLOBAL_NET
+SIGNAL o-- R2
 ```
 
-Where `o` represents global label (circle shape in KiCad).
-
+Netlist:
+```
+(net (code "1") (name "SIGNAL")
+  (node (ref "R1") (pin "1"))
+  (node (ref "R2") (pin "1")))
+```

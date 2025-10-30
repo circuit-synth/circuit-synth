@@ -27,8 +27,9 @@ def isolated_resistor():
 if __name__ == "__main__":
     circuit_obj = isolated_resistor()
     circuit_obj.generate_kicad_project(
-        project_name="isolated_resistor", placement_algorithm="simple", generate_pcb=True
+        project_name="isolated_resistor",
+        placement_algorithm="simple",
+        generate_pcb=True,
     )
     print("✅ Isolated resistor generated!")
     print("📁 Open in KiCad: isolated_resistor/isolated_resistor.kicad_pro")
-

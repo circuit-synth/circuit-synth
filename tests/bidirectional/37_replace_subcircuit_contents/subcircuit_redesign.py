@@ -10,37 +10,18 @@ Demonstrates subcircuit content replacement:
 Used to test replacing entire subcircuit implementation while preserving hierarchy.
 """
 
-from circuit_synth import circuit, Component, Circuit
+from circuit_synth import circuit, Component, Net
 
 
-@circuit(name="subcircuit_redesign")
-def subcircuit_redesign():
-    """Root circuit with Amplifier subcircuit.
+@circuit
+def amplifier_subcircuit():
+    """Amplifier subcircuit that can be redesigned.
 
-    Initial implementation:
-    - Root: Main circuit with one component (e.g., signal source)
-    - Amplifier: Subcircuit with R1 (10k), C1 (1µF) - simple RC filter
-
-    The test will modify the Amplifier subcircuit to replace with new design.
+    Initial implementation: Simple RC filter (R1, C1)
+    Modified implementation: Multi-stage filter (R2, R3, C2)
     """
-    from circuit_synth.core.decorators import get_current_circuit
-
-    root = get_current_circuit()
-
-    # Root circuit component
-    main = Component(
-        symbol="Device:R",
-        ref="R_main",
-        value="1k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
-    root.add_component(main)
-
-    # Amplifier subcircuit - INITIAL IMPLEMENTATION
-    # START_MARKER: Test will replace between these markers
-    amplifier = Circuit("Amplifier")
-
     # Initial design: Simple RC filter (R1, C1)
+    # Uncomment these lines for initial state:
     r1 = Component(
         symbol="Device:R",
         ref="R1",
@@ -54,22 +35,52 @@ def subcircuit_redesign():
         footprint="Capacitor_SMD:C_0603_1608Metric",
     )
 
-    amplifier.add_component(r1)
-    amplifier.add_component(c1)
-    # END_MARKER
+    # Modified design: New implementation (R2, R3, C2)
+    # Uncomment these lines for modified state:
+    # r2 = Component(
+    #     symbol="Device:R",
+    #     ref="R2",
+    #     value="22k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    # r3 = Component(
+    #     symbol="Device:R",
+    #     ref="R3",
+    #     value="47k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    # c2 = Component(
+    #     symbol="Device:C",
+    #     ref="C2",
+    #     value="10µF",
+    #     footprint="Capacitor_SMD:C_0603_1608Metric",
+    # )
 
-    root.add_subcircuit(amplifier)
+
+@circuit(name="subcircuit_redesign")
+def subcircuit_redesign():
+    """Root circuit with Amplifier subcircuit.
+
+    Root: Main resistor (R_main)
+    Subcircuit: Amplifier (R1, C1 → R2, R3, C2)
+    """
+    # Root circuit component
+    main = Component(
+        symbol="Device:R",
+        ref="R_main1",
+        value="1k",
+        footprint="Resistor_SMD:R_0603_1608Metric",
+    )
+
+    # Call subcircuit - creates hierarchical sheet
+    amplifier_subcircuit()
 
 
 if __name__ == "__main__":
     # Generate KiCad project when run directly
     circuit_obj = subcircuit_redesign()
 
-    circuit_obj.generate_kicad_project(
-        project_name="subcircuit_redesign",
-        placement_algorithm="simple",
-        generate_pcb=True,
-    )
+    circuit_obj.generate_kicad_project(project_name="subcircuit_redesign")
 
     print("✅ Subcircuit redesign circuit generated successfully!")
     print("📁 Open in KiCad: subcircuit_redesign/subcircuit_redesign.kicad_pro")
