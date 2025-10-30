@@ -117,9 +117,10 @@ Execution Time: ~67 seconds for full suite (tests 39-65)
 | 01-11 | ✅ Manually tested | Visually inspected in KiCad GUI |
 | 12 | ✅ Manually tested | Label orientation issue found (#403) |
 | 13 | ✅ Manually tested | Component rename with position preservation ✓ |
-| 14-65 | ⚠️ Automated only | Need manual GUI validation |
+| 14 | ✅ Manually tested | Net merge - NET2→NET1 on R3/R4 ✓ |
+| 15-65 | ⚠️ Automated only | Need manual GUI validation |
 
-**Progress:** 13 of 65 tests manually validated. Issue #403 documents label orientation bug.
+**Progress:** 14 of 65 tests manually validated. Issue #403 documents label orientation bug.
 
 ---
 
