@@ -12,6 +12,17 @@ Used to test adding subcircuits (child sheets) during iterative development.
 from circuit_synth import circuit, Component, Circuit
 
 
+@circuit(name="ChildSheet")
+def child_sheet():
+    """Child circuit with R2 on child sheet."""
+    r2 = Component(
+        symbol="Device:R",
+        ref="R2",
+        value="4.7k",
+        footprint="Resistor_SMD:R_0603_1608Metric",
+    )
+
+
 @circuit(name="hierarchical_circuit")
 def hierarchical_circuit():
     """Root circuit with R1 on root sheet.
@@ -30,6 +41,8 @@ def hierarchical_circuit():
         footprint="Resistor_SMD:R_0603_1608Metric",
     )
     # START_MARKER: Test will modify between these markers
+    # Call the child sheet circuit to add it as a subcircuit
+    child_sheet()
     # END_MARKER
 
 

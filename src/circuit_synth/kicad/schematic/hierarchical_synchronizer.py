@@ -99,85 +99,95 @@ class HierarchicalSynchronizer:
 
             logger.debug(f"Parsed schematic has {len(schematic.components)} components")
 
+            # Check kicad-sch-api version for compatibility
+            if hasattr(ksa, '__version__'):
+                version = ksa.__version__
+                logger.debug(f"Using kicad-sch-api version: {version}")
+
+                # Warn if version is very old
+                try:
+                    from packaging import version as pkg_version
+                    if pkg_version.parse(version) < pkg_version.parse('0.4.0'):
+                        logger.warning(
+                            f"kicad-sch-api {version} is older than 0.4.0. "
+                            "Hierarchical sheet detection may not work correctly. "
+                            "Consider upgrading with: pip install --upgrade kicad-sch-api"
+                        )
+                except Exception:
+                    # Ignore if packaging not available or version parsing fails
+                    pass
+
             # Create synchronizer for this sheet
             sheet.synchronizer = APISynchronizer(
                 str(sheet.file_path),
                 preserve_user_components=self.preserve_user_components,
             )
 
-            # Find hierarchical sheet instances
-            # Look for sheet elements in the schematic
-            if hasattr(schematic, "sheets") and schematic.sheets:
-                logger.debug(f"Schematic has {len(schematic.sheets)} sheets")
-                for sheet_elem in schematic.sheets:
-                    logger.debug(f"Processing sheet element: {sheet_elem}")
-                    logger.debug(f"Sheet attributes: {dir(sheet_elem)}")
+            # Find hierarchical sheet instances using sheet_manager API
+            # kicad-sch-api v0.4.3+ uses sheet_manager instead of direct sheets attribute
+            if hasattr(schematic, '_sheet_manager'):
+                logger.debug("Using sheet_manager to find hierarchical sheets")
+                try:
+                    hierarchy = schematic._sheet_manager.get_sheet_hierarchy()
 
-                    # Try different ways to get sheet info
-                    sheet_file = None
-                    sheet_name = None
+                    if 'root' in hierarchy and 'children' in hierarchy['root']:
+                        children = hierarchy['root']['children']
+                        logger.debug(f"Found {len(children)} child sheets in hierarchy")
 
-                    # Direct attributes
-                    if hasattr(sheet_elem, "filename"):
-                        sheet_file = sheet_elem.filename
-                    elif hasattr(sheet_elem, "file"):
-                        sheet_file = sheet_elem.file
-                    if hasattr(sheet_elem, "name"):
-                        sheet_name = sheet_elem.name
+                        for sheet_data in children:
+                            # sheet_data is a dict with keys: 'name', 'filename', 'uuid', etc.
+                            sheet_name = sheet_data.get('name')
+                            sheet_file = sheet_data.get('filename')
 
-                    # From at property (position)
-                    if hasattr(sheet_elem, "at"):
-                        logger.debug(f"Sheet at: {sheet_elem.at}")
+                            logger.debug(f"Processing sheet: {sheet_name} -> {sheet_file}")
 
-                    # From properties
-                    if hasattr(sheet_elem, "properties"):
-                        for prop in sheet_elem.properties:
-                            if prop.name == "Sheetfile":
-                                sheet_file = prop.value
-                            elif prop.name == "Sheetname":
-                                sheet_name = prop.value
+                            if sheet_file:
+                                logger.info(f"Found sheet: {sheet_name} -> {sheet_file}")
+                                # Resolve the file path
+                                child_path = self.project_dir / sheet_file
 
-                    logger.debug(f"Sheet file: {sheet_file}, name: {sheet_name}")
-
-                    if sheet_file:
-                        logger.info(f"Found sheet: {sheet_name} -> {sheet_file}")
-                        # Resolve the file path
-                        child_path = self.project_dir / sheet_file
-
-                        if child_path.exists():
-                            # Create child sheet and load recursively
-                            child = HierarchicalSheet(
-                                sheet_name or sheet_file, child_path, sheet
-                            )
-                            sheet.add_child(child)
-                            self._load_sheet_hierarchy(child)
-                        else:
-                            logger.warning(
-                                f"Hierarchical sheet file not found: {child_path}"
-                            )
+                                if child_path.exists():
+                                    # Create child sheet and load recursively
+                                    child = HierarchicalSheet(
+                                        sheet_name or sheet_file, child_path, sheet
+                                    )
+                                    sheet.add_child(child)
+                                    self._load_sheet_hierarchy(child)
+                                else:
+                                    logger.warning(
+                                        f"Hierarchical sheet file not found: {child_path}"
+                                    )
+                    else:
+                        logger.debug("No child sheets found in hierarchy")
+                except Exception as e:
+                    logger.warning(f"Error reading sheet hierarchy via sheet_manager: {e}")
+                    logger.debug("Will try fallback component scan")
             else:
                 logger.debug(
-                    "Schematic has no sheets attribute or sheets list is empty"
+                    "Schematic has no _sheet_manager attribute (old kicad-sch-api version?)"
                 )
 
-            # Alternative: Look in components for sheet instances
+            # Alternative: Look in components for sheet instances (fallback)
+            # This fallback is rarely needed with modern kicad-sch-api
             if len(sheet.children) == 0:
+                logger.debug("No sheets found via sheet_manager, trying component fallback")
                 for comp in schematic.components:
                     # Check if this is a sheet (has Sheetfile property)
                     sheet_file = None
                     sheet_name = None
 
-                    if hasattr(comp, "properties"):
-                        for prop in comp.properties:
-                            if prop.name == "Sheetfile":
-                                sheet_file = prop.value
-                            elif prop.name == "Sheetname":
-                                sheet_name = prop.value
+                    if hasattr(comp, "properties") and isinstance(comp.properties, dict):
+                        # Properties is a dict in kicad-sch-api v0.4.3+
+                        # Keys are property names, values are property values
+                        sheet_file = comp.properties.get("Sheetfile")
+                        sheet_name = comp.properties.get("Sheetname")
+
+                        if sheet_file:
+                            logger.debug(
+                                f"Found sheet in component properties: {sheet_name} -> {sheet_file}"
+                            )
 
                     if sheet_file:
-                        logger.debug(
-                            f"Found sheet component: {sheet_name} -> {sheet_file}"
-                        )
                         # Resolve the file path
                         child_path = self.project_dir / sheet_file
 
