@@ -37,10 +37,10 @@ def subcircuit_redesign():
     root.add_component(main)
 
     # Amplifier subcircuit - INITIAL IMPLEMENTATION
-    # START_MARKER: Test will replace between these markers
     amplifier = Circuit("Amplifier")
 
     # Initial design: Simple RC filter (R1, C1)
+    # Uncomment these lines for initial state:
     r1 = Component(
         symbol="Device:R",
         ref="R1",
@@ -54,9 +54,29 @@ def subcircuit_redesign():
         footprint="Capacitor_SMD:C_0603_1608Metric",
     )
 
-    amplifier.add_component(r1)
-    amplifier.add_component(c1)
-    # END_MARKER
+    # Modified design: New implementation (R2, R3, C2)
+    # Uncomment these lines for modified state:
+    # r2 = Component(
+    #     symbol="Device:R",
+    #     ref="R2",
+    #     value="22k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    # r3 = Component(
+    #     symbol="Device:R",
+    #     ref="R3",
+    #     value="47k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    # c2 = Component(
+    #     symbol="Device:C",
+    #     ref="C2",
+    #     value="10µF",
+    #     footprint="Capacitor_SMD:C_0603_1608Metric",
+    # )
+    # amplifier.add_component(r2)
+    # amplifier.add_component(r3)
+    # amplifier.add_component(c2)
 
     root.add_subcircuit(amplifier)
 
