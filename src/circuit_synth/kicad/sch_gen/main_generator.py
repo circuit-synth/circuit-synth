@@ -506,6 +506,29 @@ class SchematicGenerator:
         # Log results
         self._log_sync_results(sync_report)
 
+        # Synchronize PCB after schematic sync
+        logger.info("🔄 Synchronizing PCB with updated schematic...")
+        try:
+            from circuit_synth.kicad.pcb_gen.pcb_synchronizer import PCBSynchronizer
+
+            pcb_path = self.project_dir / f"{self.project_name}.kicad_pcb"
+            if pcb_path.exists():
+                logger.info("📋 PCB file exists - using synchronizer to preserve manual placement")
+                pcb_sync = PCBSynchronizer(
+                    pcb_path=str(pcb_path),
+                    project_dir=self.project_dir,
+                    project_name=self.project_name
+                )
+                pcb_sync_report = pcb_sync.sync_with_schematics()
+                logger.info("✅ PCB synchronization complete!")
+            else:
+                logger.info("ℹ️  No PCB file found - skipping PCB sync")
+        except Exception as e:
+            logger.error(f"❌ PCB synchronization failed: {e}")
+            logger.warning("   PCB may not reflect latest schematic changes")
+            import traceback
+            traceback.print_exc()
+
         return sync_report
 
     def _log_sync_results(self, sync_report):

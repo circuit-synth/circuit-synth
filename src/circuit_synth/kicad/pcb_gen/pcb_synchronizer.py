@@ -72,8 +72,7 @@ class PCBSynchronizer:
             raise FileNotFoundError(f"PCB file not found: {self.pcb_path}")
 
         logger.info(f"📄 Loading existing PCB: {self.pcb_path}")
-        self.pcb = PCBBoard()
-        self.pcb.load(str(self.pcb_path))
+        self.pcb = PCBBoard(str(self.pcb_path))
         logger.info(f"✅ PCB loaded with {len(self.pcb.footprints)} existing footprints")
 
     def sync_with_schematics(self) -> PCBSyncReport:
@@ -217,7 +216,7 @@ class PCBSynchronizer:
                 "library": fp.library,
                 "name": fp.name,
                 "position": (fp.position.x, fp.position.y),
-                "rotation": fp.position.rotation,
+                "rotation": fp.rotation,
                 "layer": fp.layer,
             }
             logger.debug(f"  • {fp.reference}: {fp.library}:{fp.name} at ({fp.position.x:.2f}, {fp.position.y:.2f})")
@@ -380,6 +379,13 @@ class PCBSynchronizer:
             if pcb_fp.value != sch_value:
                 logger.debug(f"  🔧 Updating {ref} value: {pcb_fp.value} → {sch_value}")
                 pcb_fp.value = sch_value
+
+                # Also update the Value property in properties list
+                for prop in pcb_fp.properties:
+                    if prop.name == "Value":
+                        prop.value = sch_value
+                        break
+
                 report.updated.append(ref)
             else:
                 # Position preserved, no changes needed

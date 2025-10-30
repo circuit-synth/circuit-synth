@@ -72,19 +72,72 @@ class TestComponentExtraction:
         pcb = PCBBoard()
         pcb.save(str(pcb_path))
 
-        # Create schematic with components
+        # Create schematic with components (valid KiCad format)
         sch_path = tmp_path / f"{project_name}.kicad_sch"
-        sch_content = """(kicad_sch (version 20230121) (generator eeschema)
-  (paper "A4")
-  (lib_symbols
-    (symbol "Device:R" (pin_names (offset 0)) (in_bom yes) (on_board yes))
-  )
-  (symbol (lib_id "Device:R") (at 50 50 0)
-    (property "Reference" "R1" (at 50 48 0))
-    (property "Value" "10k" (at 50 52 0))
-    (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 50 54 0))
-  )
-  (symbol_instances)
+        sch_content = """(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(uuid "12345678-1234-5678-1234-567812345678")
+	(paper "A4")
+	(title_block
+		(title "test")
+	)
+	(lib_symbols)
+	(symbol
+		(lib_id "Device:R")
+		(at 127 63.5 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+		(property "Reference" "R1"
+			(at 129.032 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 127 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 125.222 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "11111111-1111-1111-1111-111111111111")
+		)
+		(pin "2"
+			(uuid "22222222-2222-2222-2222-222222222222")
+		)
+		(instances
+			(project ""
+				(path "/12345678-1234-5678-1234-567812345678"
+					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
 )"""
         sch_path.write_text(sch_content)
 
@@ -118,17 +171,72 @@ class TestComponentMatching:
         )
         pcb.save(str(pcb_path))
 
-        # Create schematic
+        # Create schematic (valid KiCad format)
         sch_path = tmp_path / f"{project_name}.kicad_sch"
-        sch_content = """(kicad_sch (version 20230121) (generator eeschema)
-  (paper "A4")
-  (lib_symbols)
-  (symbol (lib_id "Device:R") (at 50 50 0)
-    (property "Reference" "R1" (at 50 48 0))
-    (property "Value" "10k" (at 50 52 0))
-    (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 50 54 0))
-  )
-  (symbol_instances)
+        sch_content = """(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(uuid "12345678-1234-5678-1234-567812345678")
+	(paper "A4")
+	(title_block
+		(title "test")
+	)
+	(lib_symbols)
+	(symbol
+		(lib_id "Device:R")
+		(at 127 63.5 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+		(property "Reference" "R1"
+			(at 129.032 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 127 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 125.222 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "11111111-1111-1111-1111-111111111111")
+		)
+		(pin "2"
+			(uuid "22222222-2222-2222-2222-222222222222")
+		)
+		(instances
+			(project ""
+				(path "/12345678-1234-5678-1234-567812345678"
+					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
 )"""
         sch_path.write_text(sch_content)
 
@@ -207,10 +315,21 @@ class TestRemoveDeletedFootprints:
 
         # Create empty schematic (no components)
         sch_path = tmp_path / f"{project_name}.kicad_sch"
-        sch_content = """(kicad_sch (version 20230121) (generator eeschema)
-  (paper "A4")
-  (lib_symbols)
-  (symbol_instances)
+        sch_content = """(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(uuid "12345678-1234-5678-1234-567812345678")
+	(paper "A4")
+	(title_block
+		(title "test")
+	)
+	(lib_symbols)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
 )"""
         sch_path.write_text(sch_content)
 
@@ -253,15 +372,70 @@ class TestPositionPreservation:
 
         # Create schematic with R1 (value unchanged)
         sch_path = tmp_path / f"{project_name}.kicad_sch"
-        sch_content = """(kicad_sch (version 20230121) (generator eeschema)
-  (paper "A4")
-  (lib_symbols)
-  (symbol (lib_id "Device:R") (at 50 50 0)
-    (property "Reference" "R1" (at 50 48 0))
-    (property "Value" "10k" (at 50 52 0))
-    (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 50 54 0))
-  )
-  (symbol_instances)
+        sch_content = """(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(uuid "12345678-1234-5678-1234-567812345678")
+	(paper "A4")
+	(title_block
+		(title "test")
+	)
+	(lib_symbols)
+	(symbol
+		(lib_id "Device:R")
+		(at 127 63.5 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+		(property "Reference" "R1"
+			(at 129.032 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 127 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 125.222 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "11111111-1111-1111-1111-111111111111")
+		)
+		(pin "2"
+			(uuid "22222222-2222-2222-2222-222222222222")
+		)
+		(instances
+			(project ""
+				(path "/12345678-1234-5678-1234-567812345678"
+					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
 )"""
         sch_path.write_text(sch_content)
 
@@ -273,8 +447,7 @@ class TestPositionPreservation:
         sync._update_existing_footprints(sch_components, matches, report)
 
         # Verify position preserved
-        pcb_after = PCBBoard()
-        pcb_after.load(str(pcb_path))
+        pcb_after = PCBBoard(str(pcb_path))
         r1_after = pcb_after.get_footprint("R1")
 
         assert r1_after is not None
@@ -307,15 +480,70 @@ class TestValueUpdate:
 
         # Create schematic with R1 value="22k" (changed)
         sch_path = tmp_path / f"{project_name}.kicad_sch"
-        sch_content = """(kicad_sch (version 20230121) (generator eeschema)
-  (paper "A4")
-  (lib_symbols)
-  (symbol (lib_id "Device:R") (at 50 50 0)
-    (property "Reference" "R1" (at 50 48 0))
-    (property "Value" "22k" (at 50 52 0))
-    (property "Footprint" "Resistor_SMD:R_0603_1608Metric" (at 50 54 0))
-  )
-  (symbol_instances)
+        sch_content = """(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(uuid "12345678-1234-5678-1234-567812345678")
+	(paper "A4")
+	(title_block
+		(title "test")
+	)
+	(lib_symbols)
+	(symbol
+		(lib_id "Device:R")
+		(at 127 63.5 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+		(property "Reference" "R1"
+			(at 129.032 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "22k"
+			(at 127 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 125.222 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "11111111-1111-1111-1111-111111111111")
+		)
+		(pin "2"
+			(uuid "22222222-2222-2222-2222-222222222222")
+		)
+		(instances
+			(project ""
+				(path "/12345678-1234-5678-1234-567812345678"
+					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
 )"""
         sch_path.write_text(sch_content)
 
@@ -328,8 +556,7 @@ class TestValueUpdate:
         sync.pcb.save(str(pcb_path))
 
         # Verify value updated, position preserved
-        pcb_after = PCBBoard()
-        pcb_after.load(str(pcb_path))
+        pcb_after = PCBBoard(str(pcb_path))
         r1_after = pcb_after.get_footprint("R1")
 
         assert r1_after is not None
