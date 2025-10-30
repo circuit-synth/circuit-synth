@@ -7,7 +7,7 @@
 **Tests Removed:** Test 27 (architecturally invalid - junction test incompatible with label-based design)
 
 ### 🎯 Manual Validation Campaign Progress
-**Status:** Tests 01-21, 25, 26, 31 manually validated (24 of 66 tests)
+**Status:** Tests 01-21, 25, 26, 31, 33 manually validated (25 of 66 tests)
 **Findings:**
 - Test 15 (Net split) is XPASS - now working despite expected failure on Issue #373
 - Test 22 BLOCKED by Issue #406 (subcircuit generation broken)
@@ -16,6 +16,8 @@
 - Test 29 BLOCKED by Issue #409 (custom properties not written)
 - Test 30 BLOCKED by Issue #410 (PCB synchronization broken)
 - Test 31 FIXED (initial state had NET1 uncommented) - now passes ✓
+- Test 32 SKIPPED (waiting for text annotation API improvement - Issue #411)
+- Test 33 PASSES - 8-bit bus connections (D0-D7) all correct ✓
 
 ## Executive Summary
 
@@ -39,7 +41,7 @@ Total: 66 tests across 44 test directories (test 27 removed)
     └── Test 67: Connected multi-level hierarchy (XFAIL - blocked by 22+24)
 
 Overall Status: ✅ ALL TESTS OPERATIONAL
-Manual Validation: 24 of 66 tests (36%)
+Manual Validation: 25 of 66 tests (38%)
 ```
 
 ### Key Achievement: Hierarchical Operations Gap CLOSED
@@ -204,9 +206,11 @@ Manual Validation: 24 of 66 tests (36%)
 | 29 | ❌ BLOCKED | Issue #409 (custom properties not written to KiCad) |
 | 30 | ❌ BLOCKED | Issue #410 (PCB synchronization broken - critical) |
 | 31 | ✅ Manually tested | Isolated component + netlist validation - initial state fixed, test passes ✓ |
-| 32-65 | ⚠️ Automated only | Need manual GUI validation |
+| 32 | ⏭️ SKIPPED | Waiting for text annotation API improvement (Issue #411) |
+| 33 | ✅ Manually tested | 8-bit bus connections (D0-D7) - all nets verified in netlist ✓ |
+| 34-65 | ⚠️ Automated only | Need manual GUI validation |
 
-**Progress:** 24 of 66 tests manually validated (36%)
+**Progress:** 25 of 66 tests manually validated (38%)
 
 **Known issues:**
 - #401: Property text rotation
