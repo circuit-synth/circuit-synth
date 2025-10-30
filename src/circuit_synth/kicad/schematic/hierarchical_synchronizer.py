@@ -432,6 +432,13 @@ class HierarchicalSynchronizer:
         print(f"\n📝 STEP 2: Synchronize components into child sheet")
         print(f"   Circuit has {len(circuit_obj.components)} components to sync")
 
+        # Log component references BEFORE sync
+        print(f"\n🔍 COMPONENT REFERENCES BEFORE SYNC:")
+        for i, comp in enumerate(circuit_obj.components):
+            ref = comp.reference if hasattr(comp, 'reference') else '???'
+            lib_id = comp.lib_id if hasattr(comp, 'lib_id') else '???'
+            print(f"      [{i}] {ref} ({lib_id})")
+
         try:
             # Create a synchronizer for the new child sheet
             child_synchronizer = APISynchronizer(
@@ -451,6 +458,12 @@ class HierarchicalSynchronizer:
                 added_count = 0
 
             print(f"   ✅ Synchronized {added_count} components")
+
+            # Log what was actually added
+            if hasattr(sync_report, 'added'):
+                print(f"\n🔍 COMPONENTS ADDED BY SYNC:")
+                for comp_ref in sync_report.added:
+                    print(f"      - {comp_ref}")
 
         except Exception as e:
             print(f"   ❌ ERROR synchronizing components: {e}")

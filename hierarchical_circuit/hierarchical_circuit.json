@@ -1,7 +1,7 @@
 {
   "name": "hierarchical_circuit",
   "description": "Root circuit with R1 on root sheet.\n\n    Note: This uses the root-only version by default.\n    The test will modify this to add the subcircuit section.\n    ",
-  "tstamps": "/hierarchical_circuit-4313037952/",
+  "tstamps": "/hierarchical_circuit-4387945936/",
   "source_file": "hierarchical_circuit.kicad_sch",
   "components": {
     "R1": {
@@ -46,7 +46,7 @@
     {
       "name": "ChildSheet",
       "description": "Child circuit with R2 on child sheet.",
-      "tstamps": "/childsheet-4314791232/",
+      "tstamps": "/childsheet-4382427856/",
       "source_file": "ChildSheet.kicad_sch",
       "components": {
         "R2": {
@@ -117,7 +117,7 @@
           "border_color": "black",
           "justify": "center center",
           "rotation": 0,
-          "uuid": "fbc90589-53a1-44ee-9af3-8795404588ed"
+          "uuid": "c99c3ad8-8ab9-4beb-8f82-7146c9a88013"
         }
       ]
     }
@@ -151,7 +151,7 @@
       "border_color": "black",
       "justify": "center center",
       "rotation": 0,
-      "uuid": "97a704ec-a25f-4712-af33-fb2083fa660e"
+      "uuid": "0f7e68ce-b0a1-497e-a49c-7263f37a5ac6"
     }
   ]
 }

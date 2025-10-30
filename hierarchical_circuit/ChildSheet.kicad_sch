@@ -197,12 +197,6 @@
 				(hide yes)
 			)
 		)
-		(pin "1"
-			(uuid "f0b785d2-b680-4d95-b2a4-a524eadf379d")
-		)
-		(pin "2"
-			(uuid "7144f5ff-fb34-4ac4-abdb-61af843377b7")
-		)
 		(instances
 			(project "hierarchical_circuit"
 				(path "/d29c9cda-a36a-4297-b6a9-413542b07e51/d1b3e426-65a7-4d0b-b4bf-7f02d8d00f2f"
@@ -214,11 +208,11 @@
 	)
 	(text_box "Child circuit with R2 on child sheet."
 		(exclude_from_sim no)
-		(at 184 110 0)
+		(at 184 110 0.0000)
 		(size 80 30)
 		(margins 1 1 1 1)
 		(stroke
-			(width 0)
+			(width 0.0000)
 			(type solid)
 		)
 		(fill

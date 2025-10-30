@@ -197,12 +197,6 @@
 				(hide yes)
 			)
 		)
-		(pin "1"
-			(uuid "dba3afe6-2e67-4404-97e4-3101484cc10c")
-		)
-		(pin "2"
-			(uuid "fab57f1b-061e-4452-805c-51856ecea0c3")
-		)
 		(instances
 			(project "hierarchical_circuit"
 				(path "/d29c9cda-a36a-4297-b6a9-413542b07e51"
@@ -214,11 +208,11 @@
 	)
 	(text_box "Root circuit with R1 on root sheet.\n\n    Note: This uses the root-only version by default.\n    The test will modify this to add the subcircuit section."
 		(exclude_from_sim no)
-		(at 184 110 0)
+		(at 184 110 0.0000)
 		(size 80 30)
 		(margins 1 1 1 1)
 		(stroke
-			(width 0)
+			(width 0.0000)
 			(type solid)
 		)
 		(fill

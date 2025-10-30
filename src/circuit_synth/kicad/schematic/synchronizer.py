@@ -1178,6 +1178,12 @@ class APISynchronizer:
         # Determine library ID from component type
         lib_id = self._determine_library_id(comp_data)
 
+        print(f"\n🔍 ADD_COMPONENT: Adding component to schematic")
+        print(f"   comp_data keys: {list(comp_data.keys())}")
+        print(f"   reference: {comp_data.get('reference', 'MISSING!')}")
+        print(f"   value: {comp_data.get('value')}")
+        print(f"   lib_id: {lib_id}")
+
         component = self.component_manager.add_component(
             library_id=lib_id,
             reference=comp_data["reference"],
@@ -1187,7 +1193,10 @@ class APISynchronizer:
         )
 
         if component:
+            print(f"   ✅ Component added with reference: {component.reference if hasattr(component, 'reference') else '???'}")
             report.added.append(comp_data["id"])
+        else:
+            print(f"   ❌ Component addition FAILED!")
 
     def _determine_library_id(self, comp_data: Dict) -> str:
         """Determine KiCad library ID from component data."""
