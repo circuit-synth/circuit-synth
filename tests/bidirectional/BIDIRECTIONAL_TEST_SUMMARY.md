@@ -1,32 +1,34 @@
 # Bidirectional Test Suite - Comprehensive Summary
 
-**Date:** 2025-10-29 (Updated: Manual validation campaign + test rewrites)
+**Date:** 2025-10-30 (Updated: Manual validation campaign + test rewrites + Issue #409 fix)
 **Branch:** test/bidirectional-manual-validation
-**Total Tests:** 66 comprehensive bidirectional tests (01-67, excluding 27)
-**New Tests Added:** 28 tests (39-65, plus 66-67)
+**Total Tests:** 68 comprehensive bidirectional tests (01-68, excluding 27)
+**New Tests Added:** 30 tests (39-65, plus 66-68)
 **Tests Removed:** Test 27 (architecturally invalid - junction test incompatible with label-based design)
+**Recently Fixed:** Test 29 (Component Custom Properties) - Issue #409 ✅
 
 ### 🎯 Manual Validation Campaign Progress
-**Status:** Tests 01-21, 25, 26, 31, 33 manually validated (25 of 66 tests)
+**Status:** Tests 01-21, 25, 26, 31, 33 manually validated (25 of 68 tests)
 **Findings:**
 - Test 15 (Net split) is XPASS - now working despite expected failure on Issue #373
 - Test 22 BLOCKED by Issue #406 (subcircuit generation broken)
 - Test 24 REWRITTEN for cross-sheet hierarchical connections (blocked by #406)
 - Test 28 BLOCKED by Issue #407 (LM358 rendering) and #408 (NoConnect feature)
-- Test 29 BLOCKED by Issue #409 (custom properties not written)
+- Test 29 FIXED - Issue #409 resolved (custom properties now written correctly) ✅
 - Test 30 BLOCKED by Issue #410 (PCB synchronization broken)
 - Test 31 FIXED (initial state had NET1 uncommented) - now passes ✓
 - Test 32 SKIPPED (waiting for text annotation API improvement - Issue #411)
 - Test 33 PASSES - 8-bit bus connections (D0-D7) all correct ✓
+- Test 68 NEW - Dynamic sheet sizing (XFAIL - Issue #413)
 
 ## Executive Summary
 
-This document provides a comprehensive summary of the bidirectional test suite for circuit-synth, covering all 66 tests that validate Python ↔ KiCad synchronization with position preservation (THE KILLER FEATURE).
+This document provides a comprehensive summary of the bidirectional test suite for circuit-synth, covering all 68 tests that validate Python ↔ KiCad synchronization with position preservation (THE KILLER FEATURE).
 
 ### Test Results Overview
 
 ```
-Total: 66 tests across 44 test directories (test 27 removed)
+Total: 68 tests across 46 test directories (test 27 removed)
 ├── Tests 01-38: Original suite (36 passed, 1 xfailed, 1 removed)
 │   └── Test 27 REMOVED (junction test architecturally invalid)
 ├── Tests 39-65: Hierarchical expansion (34 test functions)
@@ -34,14 +36,16 @@ Total: 66 tests across 44 test directories (test 27 removed)
 │   ├── 1 SKIPPED (documents expected behavior)
 │   ├── 12 XFAILED (known limitations documented)
 │   └── 2 XPASSED (unexpectedly working!)
-└── Tests 22, 24, 66-67: Rewritten/New (2025-10-29)
-    ├── Test 22: Progressive subcircuit addition (XFAIL - Issue #406)
-    ├── Test 24: Cross-sheet connection (XFAIL - Issue #406)
-    ├── Test 66: Duplicate net names isolation (NEW SAFETY TEST)
-    └── Test 67: Connected multi-level hierarchy (XFAIL - blocked by 22+24)
+├── Tests 22, 24, 66-67: Rewritten/New (2025-10-29)
+│   ├── Test 22: Progressive subcircuit addition (XFAIL - Issue #406)
+│   ├── Test 24: Cross-sheet connection (XFAIL - Issue #406)
+│   ├── Test 66: Duplicate net names isolation (NEW SAFETY TEST)
+│   └── Test 67: Connected multi-level hierarchy (XFAIL - blocked by 22+24)
+└── Test 68: Dynamic sheet sizing (NEW - 2025-10-30)
+    └── Test 68: Automatic sheet resize (XFAIL - Issue #413)
 
 Overall Status: ✅ ALL TESTS OPERATIONAL
-Manual Validation: 25 of 66 tests (38%)
+Manual Validation: 25 of 68 tests (37%)
 ```
 
 ### Key Achievement: Hierarchical Operations Gap CLOSED
@@ -87,10 +91,11 @@ Manual Validation: 25 of 66 tests (38%)
 | 60 | Remove Hierarchical Pin | ⚠️ XFAIL | Interface simplification |
 | 61 | Large Circuit Performance | ✅ PASS | 100 components, performance benchmarks |
 
-### Priority 2: Nice-to-Have (8 tests) 🟢
+### Priority 2: Nice-to-Have (9 tests) 🟢
 
 | Test | Name | Status | Key Validation |
 |------|------|--------|----------------|
+| 29 | Component Custom Properties | ✅ PASS | DNP, MPN, Tolerance, complex types (Issue #409) |
 | 52 | Unicode Component Names | ✅ PASS | Greek (Ω, π, μ), Chinese, Japanese |
 | 53 | Reference Collision Detection | ✅ PASS | Global uniqueness enforcement |
 | 54 | DRC Validation | ✅ PASS (2 tests) | kicad-cli DRC integration |
@@ -203,14 +208,15 @@ Manual Validation: 25 of 66 tests (38%)
 | 26 | ✅ Manually tested | Power symbols - all 5 symbols generated with correct library references ✓ |
 | 27 | ❌ REMOVED | Test architecturally invalid (junction test incompatible with label-based design) |
 | 28 | ❌ BLOCKED | Issue #407 (LM358 rendering), #408 (NoConnect feature needed) |
-| 29 | ❌ BLOCKED | Issue #409 (custom properties not written to KiCad) |
+| 29 | ✅ FIXED | Issue #409 resolved - custom properties now written correctly ✓ |
 | 30 | ❌ BLOCKED | Issue #410 (PCB synchronization broken - critical) |
 | 31 | ✅ Manually tested | Isolated component + netlist validation - initial state fixed, test passes ✓ |
 | 32 | ⏭️ SKIPPED | Waiting for text annotation API improvement (Issue #411) |
 | 33 | ✅ Manually tested | 8-bit bus connections (D0-D7) - all nets verified in netlist ✓ |
-| 34-65 | ⚠️ Automated only | Need manual GUI validation |
+| 34-67 | ⚠️ Automated only | Need manual GUI validation |
+| 68 | 🆕 NEW TEST | Dynamic sheet sizing (XFAIL - Issue #413) |
 
-**Progress:** 25 of 66 tests manually validated (38%)
+**Progress:** 25 of 68 tests manually validated (37%)
 
 **Known issues:**
 - #401: Property text rotation
@@ -218,8 +224,9 @@ Manual Validation: 25 of 66 tests (38%)
 - #406: Subcircuit generation (blocks 22, 24)
 - #407: LM358 multi-unit rendering (blocks 28)
 - #408: NoConnect feature (blocks 28)
-- #409: Custom properties not written (blocks 29)
 - #410: PCB synchronization broken (blocks 30, critical)
+- #411: Text annotation API improvement needed (blocks 32)
+- #413: Dynamic sheet sizing not implemented (test 68 documents)
 
 ---
 
@@ -257,6 +264,7 @@ Conclusion: ✅ Scales well to realistic circuit sizes
 
 ### Achievements
 - ✅ 26 new tests created (39-65)
+- ✅ Test 29 completed: Component custom properties (DNP, MPN, Tolerance, complex types) - Issue #409
 - ✅ Hierarchical operations gap CLOSED
 - ✅ Comprehensive power symbol testing
 - ✅ Real-world workflow integration (DRC, ERC, BOM)
@@ -269,6 +277,10 @@ Conclusion: ✅ Scales well to realistic circuit sizes
 - **Documentation:** Comprehensive
 - **CI-Ready:** All tests operational
 
+<<<<<<< HEAD
 **Last Updated:** 2025-10-29
+=======
+**Last Updated:** 2025-10-30 (Test 29 completed - Issue #409)
+>>>>>>> origin/main
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
