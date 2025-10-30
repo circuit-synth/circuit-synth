@@ -130,9 +130,10 @@ Execution Time: ~67 seconds for full suite (tests 39-65)
 | 16 | ✅ Manually tested | Add power symbol (VCC) to resistor ✓ |
 | 17 | ✅ Manually tested | Add ground symbol (GND) to resistor ✓ |
 | 18 | ✅ Manually tested | Multi-voltage domains (VCC/3V3/5V/GND) ✓ |
-| 19-65 | ⚠️ Automated only | Need manual GUI validation |
+| 19 | ✅ Manually tested | Component type swap (R→C) with position preservation ✓ |
+| 20-65 | ⚠️ Automated only | Need manual GUI validation |
 
-**Progress:** 18 of 65 tests manually validated. Issue #403 documents label orientation bug.
+**Progress:** 19 of 65 tests manually validated. Issue #403 documents label orientation bug.
 
 ---
 
