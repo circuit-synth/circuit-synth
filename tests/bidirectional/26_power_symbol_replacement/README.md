@@ -2,173 +2,138 @@
 
 ## What This Tests
 
-Validates that power symbols (GND, VCC, +3V3, +5V, -5V) are generated at correct positions and with correct rotations when connected to power nets.
+Validates that power symbols (GND, VCC, +3V3, +5V, -5V) are generated with correct library references, positions, and rotations.
 
-This test suite ensures that:
+This test ensures:
 1. Each power symbol type generates with correct KiCad library reference
 2. Power symbols are positioned correctly relative to component pins
-3. Positive supplies (VCC, +3V3, +5V) are oriented correctly (0° rotation)
-4. Ground and negative supplies (GND, -5V) are oriented correctly (180° rotation for downward-pointing symbols)
-5. Multiple power symbols in a single schematic all generate correctly
+3. All power symbols generate correctly in a single schematic
+4. Power domain changes work (replacing one power symbol with another)
 
 ## When This Situation Happens
 
-- Multi-voltage designs with multiple power rails (e.g., 3.3V, 5V, and GND)
-- Circuits using standard KiCad power symbols instead of hierarchical labels
+- Multi-voltage designs with multiple power rails (3.3V, 5V, 12V, GND)
+- Circuits using standard KiCad power symbols
 - Power distribution networks requiring proper symbol representation
-- Any design following KiCad best practices (power symbols, not labels)
+- Iterative development where power domains change (e.g., 3.3V → 5V)
 
 ## What Should Work
 
-Each test file validates a specific power symbol type:
+1. Generate circuit with 5 resistors connected to different power nets:
+   - R1 → VCC (positive supply)
+   - R2 → +3V3 (3.3V supply)
+   - R3 → +5V (5V supply)
+   - R4 → GND (ground)
+   - R5 → -5V (negative supply)
 
-1. **test_power_symbol_vcc.py** - VCC symbol (positive supply)
-   - Creates single resistor connected to VCC net
-   - Expects VCC power symbol at position (30.48, 31.75, 0°)
-   - Validates power symbol library reference is `power:VCC`
+2. Verify all power symbols generated with correct library references:
+   - `power:VCC`
+   - `power:+3V3`
+   - `power:+5V`
+   - `power:GND`
+   - `power:-5V`
 
-2. **test_power_symbol_3v3.py** - +3V3 symbol (3.3V supply)
-   - Creates single resistor connected to +3V3 net
-   - Expects +3V3 power symbol at position (30.48, 31.75, 0°)
-   - Validates power symbol library reference is `power:+3V3`
-
-3. **test_power_symbol_5v.py** - +5V symbol (5V supply)
-   - Creates single resistor connected to +5V net
-   - Expects +5V power symbol at position (30.48, 31.75, 0°)
-   - Validates power symbol library reference is `power:+5V`
-
-4. **test_power_symbol_gnd.py** - GND symbol (ground/return)
-   - Creates single resistor connected to GND net
-   - Expects GND power symbol at position (30.48, 39.37, 0°)
-   - Validates power symbol library reference is `power:GND`
-   - Note: GND connects to bottom pin (pin 2) of resistor
-
-5. **test_power_symbol_neg5v.py** - -5V symbol (negative supply)
-   - Creates single resistor connected to -5V net
-   - Expects -5V power symbol at position (30.48, 39.37, 180°)
-   - Validates power symbol library reference is `power:-5V`
-   - Note: -5V connects to bottom pin (pin 2) of resistor, rotated 180° for downward orientation
-
-6. **test_power_symbol_all.py** - All power symbols combined
-   - Creates five resistors, each connected to a different power net
-   - Validates all five power symbols in a single schematic
-   - Comprehensive test ensuring no conflicts between multiple power symbols
-
-7. **test_multiple_power_nets.py** - Interactive verification
-   - Generates circuit with all five power net types
-   - Produces KiCad project for manual verification
-   - Shows how multiple power nets work in practice
+3. Verify electrical connections via netlist:
+   - Each resistor connected to its power net
+   - Power symbol nodes present in netlist
 
 ## Manual Test Instructions
 
-### Run Individual Power Symbol Tests
-
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth2/tests/bidirectional/26_power_symbol_replacement
+cd tests/bidirectional/26_power_symbol_replacement
 
-# Test VCC symbol
-uv run test_power_symbol_vcc.py
+# Step 1: Generate circuit with all power symbols
+uv run power_symbols.py
+open power_symbols/power_symbols.kicad_pro
 
-# Test +3V3 symbol
-uv run test_power_symbol_3v3.py
+# Verify:
+#   - 5 resistors visible (R1-R5)
+#   - 5 power symbols visible (VCC, +3V3, +5V, GND, -5V)
+#   - Each resistor connected to its power symbol
 
-# Test +5V symbol
-uv run test_power_symbol_5v.py
+# Step 2: Export netlist to verify connections
+kicad-cli sch export netlist power_symbols/power_symbols.kicad_sch \
+  --output power_symbols.net
 
-# Test GND symbol
-uv run test_power_symbol_gnd.py
+# Verify netlist shows:
+#   - R1 connected to VCC
+#   - R2 connected to +3V3
+#   - R3 connected to +5V
+#   - R4 connected to GND
+#   - R5 connected to -5V
 
-# Test -5V symbol
-uv run test_power_symbol_neg5v.py
+# Step 3 (Optional): Test power domain replacement
+# Edit power_symbols.py to change R2 from +3V3 to +5V:
+#   v5 = Net(name="+5V")
+#   v5 += r2[1]  # Change from v3_3 to v5
+#   v5 += r3[1]
 
-# Test all symbols combined
-uv run test_power_symbol_all.py
-```
-
-### Run All Tests
-
-```bash
-# Run pytest to execute all tests
-pytest test_power_symbol_vcc.py test_power_symbol_3v3.py test_power_symbol_5v.py \
-       test_power_symbol_gnd.py test_power_symbol_neg5v.py test_power_symbol_all.py -v
-```
-
-### Generate and Inspect in KiCad
-
-```bash
-# Generate a multi-power circuit for visual inspection
-uv run test_multiple_power_nets.py
-
-# Open in KiCad to verify power symbols visually
-open multiple_power_nets/multiple_power_nets.kicad_pro
+# Regenerate and verify:
+#   - +3V3 symbol removed (or only R2 disconnected)
+#   - +5V symbol now connects both R2 and R3
+#   - No text overlap issues
 ```
 
 ## Expected Result
 
-### Individual Tests Pass When:
+- ✅ All 5 power symbols generated
+- ✅ Correct library references (power:VCC, power:+3V3, etc.)
+- ✅ Each resistor connected to correct power net
+- ✅ Netlist shows correct electrical connections
+- ✅ No visual overlaps or positioning issues
 
-- ✅ Power symbol library reference is correct (`power:VCC`, `power:+3V3`, etc.)
-- ✅ Power symbol position matches expected coordinates
-- ✅ Power symbol rotation matches expected value
-- ✅ Positive supplies (VCC, +3V3, +5V) have 0° rotation
-- ✅ Ground and negative supplies (GND, -5V) have appropriate rotation for orientation
-- ✅ Power symbol connects to correct component pin
+## Why This Is Important
 
-### Combined Test Passes When:
+**Power symbols are fundamental to KiCad schematics:**
+- Standard way to represent power distribution
+- Global net semantics (VCC connects everywhere)
+- Cleaner than drawing wires everywhere
+- Industry standard practice
 
-- ✅ All five power symbols generate in single schematic
-- ✅ No conflicts or errors with multiple power net types
-- ✅ Each power symbol has correct position and rotation
-- ✅ No unexpected hierarchical labels alongside power symbols
+**This test validates:**
+- Power symbol generation works for all common types
+- Library references are correct (KiCad compatibility)
+- Electrical connectivity is correct
+- Foundation for tests 16, 17, 18 (power symbol basics)
 
-### Visual Verification in KiCad:
+## Success Criteria
 
-- ✅ VCC shows as upward-pointing arrow (⬆ VCC)
-- ✅ +3V3 shows as upward-pointing arrow (⬆ +3V3)
-- ✅ +5V shows as upward-pointing arrow (⬆ +5V)
-- ✅ GND shows as ground symbol (⏚ GND)
-- ✅ -5V shows as downward-pointing arrow (⬇ -5V)
-- ✅ All symbols are properly connected to component pins
+This test PASSES when:
+- All 5 power symbols generate with correct library IDs
+- Each resistor electrically connected to its power net (netlist)
+- No errors or warnings during generation
+- Schematic opens cleanly in KiCad
+- Power symbols visually positioned correctly
 
-## Why This Is Critical
+## Validation Level
 
-**Power symbols are fundamental to circuit design:**
-
-1. **Global Connection Semantics** - Power symbols connect globally across entire schematic. Unlike hierarchical labels, GND anywhere connects to GND everywhere. This is essential for proper electrical representation.
-
-2. **KiCad Best Practice** - Professional KiCad designs use power symbols, not hierarchical labels for power nets. They provide visual clarity and correct electrical semantics.
-
-3. **Multi-Sheet Designs** - Power symbols maintain global connections across multiple hierarchical sheets. Hierarchical labels (the alternative) are sheet-local and don't connect across hierarchy boundaries.
-
-4. **Standard Visualization** - Power symbols provide clear visual indication of supply type:
-   - Upward arrow for positive supplies (VCC, +3V3, +5V)
-   - Downward symbols for return paths (GND, -5V)
-   - Immediate recognition of power distribution
-
-5. **Integration with Real Projects** - Any circuit with multiple voltage supplies (3.3V, 5V, GND) needs proper power symbol handling. This includes:
-   - Mixed-voltage microcontroller designs
-   - Analog/digital power separation
-   - Multi-rail power distribution
-   - Proper electrical net validation
-
-6. **Round-Trip Fidelity** - When users export from Python and import back to Python, power symbols should be preserved. This test validates that power symbols are generated correctly in the first place.
-
-## Edge Cases Covered
-
-- Multiple power net types in single circuit
-- Both positive (upward) and negative/ground (downward) supplies
-- Correct rotation based on net name semantics
-- Position consistency for power symbols connected to different pin locations
-- Library reference accuracy for KiCad integration
+**Level 2 (Semantic Validation)**: Library references + netlist
+- Text search for `power:VCC`, `power:+3V3` etc. in .kicad_sch
+- kicad-sch-api for component verification
+- Netlist comparison for electrical connectivity
 
 ## Related Tests
 
-- **Test 11** - Symbol rotation (related positioning behavior)
-- **Test 04** - Round-trip cycle (tests preservation of symbols)
-- **Test 15** - Net operations (tests net creation and connection)
+- **Test 16** - Add power symbol (VCC connection workflow)
+- **Test 17** - Add ground symbol (GND connection workflow)
+- **Test 18** - Multiple power domains (multi-voltage circuit, includes power domain replacement)
 
-## Related Issues
+## Design Notes
 
-- **#346** - Power symbol rotation algorithm
-- **#362** - Fix power symbol rotation (fixed)
-- **#363** - Correct import path for Net class in PCB generator
+**Power symbol library references:**
+```
+VCC   → power:VCC
++3V3  → power:+3V3
++5V   → power:+5V
+GND   → power:GND
+-5V   → power:-5V
+```
+
+**Pin connections:**
+- Positive supplies (+) connect to component top pin (typically pin 1)
+- Ground and negative supplies connect to component bottom pin (typically pin 2)
+
+**Why separate from test 18:**
+Test 18 focuses on multi-voltage circuit workflow and power domain **replacement**.
+Test 26 focuses on detailed power symbol **generation** validation (library IDs, all symbol types).
+Both tests complement each other - test 18 is workflow, test 26 is detailed validation.

@@ -1,31 +1,39 @@
 # Bidirectional Test Suite - Comprehensive Summary
 
-**Date:** 2025-10-29 (Updated: Manual validation campaign)
+**Date:** 2025-10-29 (Updated: Manual validation campaign + test rewrites)
 **Branch:** test/bidirectional-manual-validation
-**Total Tests:** 65 comprehensive bidirectional tests (01-65)
-**New Tests Added:** 26 tests (39-65)
+**Total Tests:** 67 comprehensive bidirectional tests (01-67)
+**New Tests Added:** 28 tests (39-65, plus 66-67)
 
 ### 🎯 Manual Validation Campaign Progress
-**Status:** Tests 01-16 manually validated and passing
-**Finding:** Test 15 (Net split) is XPASS - now working despite expected failure on Issue #373
+**Status:** Tests 01-21, 25 manually validated (22 of 67 tests)
+**Findings:**
+- Test 15 (Net split) is XPASS - now working despite expected failure on Issue #373
+- Test 22 BLOCKED by Issue #406 (subcircuit generation broken)
+- Test 24 REWRITTEN for cross-sheet hierarchical connections (blocked by #406)
 
 ## Executive Summary
 
-This document provides a comprehensive summary of the bidirectional test suite for circuit-synth, covering all 65 tests that validate Python ↔ KiCad synchronization with position preservation (THE KILLER FEATURE).
+This document provides a comprehensive summary of the bidirectional test suite for circuit-synth, covering all 67 tests that validate Python ↔ KiCad synchronization with position preservation (THE KILLER FEATURE).
 
 ### Test Results Overview
 
 ```
-Total: 65 tests across 43 test directories
-├── Tests 01-38: Previously created (37 passed, 1 xfailed)
-└── Tests 39-65: Newly created (34 test functions)
-    ├── 19 PASSED ✅
-    ├── 1 SKIPPED (documents expected behavior)
-    ├── 12 XFAILED (known limitations documented)
-    └── 2 XPASSED (unexpectedly working!)
+Total: 67 tests across 45 test directories
+├── Tests 01-38: Original suite (37 passed, 1 xfailed)
+├── Tests 39-65: Hierarchical expansion (34 test functions)
+│   ├── 19 PASSED ✅
+│   ├── 1 SKIPPED (documents expected behavior)
+│   ├── 12 XFAILED (known limitations documented)
+│   └── 2 XPASSED (unexpectedly working!)
+└── Tests 22, 24, 66-67: Rewritten/New (2025-10-29)
+    ├── Test 22: Progressive subcircuit addition (XFAIL - Issue #406)
+    ├── Test 24: Cross-sheet connection (XFAIL - Issue #406)
+    ├── Test 66: Duplicate net names isolation (NEW SAFETY TEST)
+    └── Test 67: Connected multi-level hierarchy (XFAIL - blocked by 22+24)
 
 Overall Status: ✅ ALL TESTS OPERATIONAL
-Execution Time: ~67 seconds for full suite (tests 39-65)
+Manual Validation: 22 of 67 tests (33%)
 ```
 
 ### Key Achievement: Hierarchical Operations Gap CLOSED
@@ -83,6 +91,44 @@ Execution Time: ~67 seconds for full suite (tests 39-65)
 | 62 | Wire Routing Preservation | ⚠️ XFAIL (1 PASS) | Aesthetic feature (wire paths) |
 | 63 | Component Rotation Preservation | ✅ PASS | Rotation angles preserved |
 | 65 | Conflict Resolution | ✅ PASS | Concurrent edit handling |
+
+---
+
+## Test Rewrites and New Tests (2025-10-29)
+
+### Test 22: Progressive Subcircuit Addition (REWRITTEN)
+**Old Purpose:** Single-step subcircuit addition (broken, Issue #406)
+**New Purpose:** Incremental hierarchy development (1→2→3 levels)
+**Files:** `progressive_hierarchy.py`, `test_22_progressive_subcircuit_addition.py`, `README_progressive.md`
+**Status:** XFAIL (blocked by Issue #406 - subcircuit generation)
+**Validates:** Adding subcircuits incrementally, hierarchical sheet symbols at each level
+
+### Test 24: Cross-Sheet Hierarchical Connection (REWRITTEN)
+**Old Purpose:** Same-sheet "global label" test (redundant with test 10)
+**New Purpose:** Cross-sheet hierarchical connection via net passing
+**Files:** `hierarchical_connection.py`, `test_24_cross_sheet_connection.py`, `README.md`
+**Status:** XFAIL (blocked by Issue #406)
+**Validates:** Passing Net from parent to child creates hierarchical pins/labels
+
+### Test 66: Duplicate Net Names Isolation (NEW SAFETY TEST)
+**Purpose:** Ensure Net("SIGNAL") in circuit_a ≠ Net("SIGNAL") in circuit_b
+**Files:** `isolated_circuits.py`, `test_66_duplicate_net_names_isolation.py`, `README.md`
+**Status:** Ready to test (not hierarchical)
+**Validates:** R1—R2 on one net, R3—R4 on different net, no accidental merging
+**Critical:** Prevents dangerous bug where same net names accidentally connect unrelated circuits
+
+### Test 67: Connected Multi-Level Hierarchy (NEW ULTIMATE TEST)
+**Purpose:** Combine progressive hierarchy + cross-sheet connectivity
+**Files:** `connected_hierarchy.py`, `test_67_connected_multi_level_hierarchy.py`, `README.md`
+**Status:** XFAIL (blocked by tests 22+24 dependencies)
+**Validates:** R1—R2—R3 connected across 3 hierarchy levels via net passing
+**Significance:** If this passes, hierarchical design is FULLY functional
+
+### Key Philosophy Changes
+1. **No global nets** - All connections explicit via net passing
+2. **Safety first** - Test 66 ensures duplicate names don't merge
+3. **Incremental development** - Test 22 validates step-by-step hierarchy
+4. **Complete workflow** - Test 67 combines everything into ultimate test
 
 ---
 
