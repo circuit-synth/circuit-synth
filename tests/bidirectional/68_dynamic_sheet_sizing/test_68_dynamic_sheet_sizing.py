@@ -183,16 +183,12 @@ def test_68_dynamic_sheet_sizing(request):
         print("STEP 3: Add 50 more resistors (R11-R60)")
         print("="*70)
 
-        # Uncomment R11-R60 in the Python file
+        # Change loop range from range(1, 11) to range(1, 61)
+        # This demonstrates the power of Python loops!
         modified_code = original_code.replace(
-            "# r11 = Component(symbol=\"Device:R\", ref=\"R11\",",
-            "r11 = Component(symbol=\"Device:R\", ref=\"R11\","
+            "for i in range(1, 11):  # Change to range(1, 61) to add 50 more",
+            "for i in range(1, 61):  # Changed from range(1, 11) - now 60 resistors"
         )
-        for i in range(12, 61):
-            modified_code = modified_code.replace(
-                f"# r{i} = Component(symbol=\"Device:R\", ref=\"R{i}\",",
-                f"r{i} = Component(symbol=\"Device:R\", ref=\"R{i}\","
-            )
 
         # Verify modification made
         assert modified_code != original_code, (

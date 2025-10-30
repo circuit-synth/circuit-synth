@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """
-Fixture: Ten resistors in a grid pattern.
+Fixture: Resistor array created programmatically.
 
-Tests bulk component addition - 10 resistors placed in a 2x5 grid.
-R1-R10 are standard, R11 is commented out for testing addition workflow.
+Tests bulk component addition using Python loops - the advantage of circuit-synth!
+
+Initial: 10 resistors (R1-R10)
+Modified: 20 resistors (R1-R20)
 
 Real-world use case: Pull-up/pull-down resistor banks, termination networks.
+This demonstrates the power of Python for circuit generation.
 """
 
 from circuit_synth import circuit, Component
@@ -13,150 +16,28 @@ from circuit_synth import circuit, Component
 
 @circuit(name="ten_resistors")
 def ten_resistors():
-    """Circuit with 10 resistors arranged in a 2x5 grid."""
-    # Column 1: R1, R3, R5, R7, R9
-    r1 = Component(
-        symbol="Device:R",
-        ref="R1",
-        value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
+    """Circuit with resistors created programmatically using Python loops.
 
-    r3 = Component(
-        symbol="Device:R",
-        ref="R3",
-        value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
+    This is the advantage of circuit-synth Python - no need to manually
+    write repetitive component definitions!
 
-    r5 = Component(
-        symbol="Device:R",
-        ref="R5",
-        value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
+    Initial: 10 resistors (R1-R10)
+    Modified: 20 resistors (R1-R20) - change range(1, 11) to range(1, 21)
+    """
+    # Create resistors programmatically using Python loop
+    # This is MUCH better than manually defining each one!
+    resistors = []
+    for i in range(1, 11):  # Change to range(1, 21) to add 10 more
+        r = Component(
+            symbol="Device:R",
+            ref=f"R{i}",
+            value="10k",
+            footprint="Resistor_SMD:R_0603_1608Metric",
+        )
+        resistors.append(r)
 
-    r7 = Component(
-        symbol="Device:R",
-        ref="R7",
-        value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
-
-    r9 = Component(
-        symbol="Device:R",
-        ref="R9",
-        value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
-
-    # Column 2: R2, R4, R6, R8, R10
-    r2 = Component(
-        symbol="Device:R",
-        ref="R2",
-        value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
-
-    r4 = Component(
-        symbol="Device:R",
-        ref="R4",
-        value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
-
-    r6 = Component(
-        symbol="Device:R",
-        ref="R6",
-        value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
-
-    r8 = Component(
-        symbol="Device:R",
-        ref="R8",
-        value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
-
-    r10 = Component(
-        symbol="Device:R",
-        ref="R10",
-        value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
-
-    # R11-R20 commented out - used for testing bulk component addition (10 more)
-    # Uncomment to add 10 more resistors on second run
-    # r11 = Component(
-    #     symbol="Device:R",
-    #     ref="R11",
-    #     value="10k",
-    #     footprint="Resistor_SMD:R_0603_1608Metric",
-    # )
-    #
-    # r12 = Component(
-    #     symbol="Device:R",
-    #     ref="R12",
-    #     value="10k",
-    #     footprint="Resistor_SMD:R_0603_1608Metric",
-    # )
-    #
-    # r13 = Component(
-    #     symbol="Device:R",
-    #     ref="R13",
-    #     value="10k",
-    #     footprint="Resistor_SMD:R_0603_1608Metric",
-    # )
-    #
-    # r14 = Component(
-    #     symbol="Device:R",
-    #     ref="R14",
-    #     value="10k",
-    #     footprint="Resistor_SMD:R_0603_1608Metric",
-    # )
-    #
-    # r15 = Component(
-    #     symbol="Device:R",
-    #     ref="R15",
-    #     value="10k",
-    #     footprint="Resistor_SMD:R_0603_1608Metric",
-    # )
-    #
-    # r16 = Component(
-    #     symbol="Device:R",
-    #     ref="R16",
-    #     value="10k",
-    #     footprint="Resistor_SMD:R_0603_1608Metric",
-    # )
-    #
-    # r17 = Component(
-    #     symbol="Device:R",
-    #     ref="R17",
-    #     value="10k",
-    #     footprint="Resistor_SMD:R_0603_1608Metric",
-    # )
-    #
-    # r18 = Component(
-    #     symbol="Device:R",
-    #     ref="R18",
-    #     value="10k",
-    #     footprint="Resistor_SMD:R_0603_1608Metric",
-    # )
-    #
-    # r19 = Component(
-    #     symbol="Device:R",
-    #     ref="R19",
-    #     value="10k",
-    #     footprint="Resistor_SMD:R_0603_1608Metric",
-    # )
-    #
-    # r20 = Component(
-    #     symbol="Device:R",
-    #     ref="R20",
-    #     value="10k",
-    #     footprint="Resistor_SMD:R_0603_1608Metric",
-    # )
+    # Return the list of resistors (optional - circuit decorator handles registration)
+    return resistors
 
 
 if __name__ == "__main__":
@@ -165,9 +46,14 @@ if __name__ == "__main__":
 
     circuit_obj.generate_kicad_project(
         project_name="ten_resistors",
-        placement_algorithm="simple",
+        placement_algorithm="text_flow",
         generate_pcb=True,
     )
 
-    print("✅ Ten resistors circuit generated successfully!")
-    print("📁 Open in KiCad: ten_resistors/ten_resistors.kicad_pro")
+    print("✅ Resistor array generated successfully!")
+    print(f"📁 Open in KiCad: ten_resistors/ten_resistors.kicad_pro")
+    print()
+    print("💡 Python advantage demonstrated:")
+    print("   - Created 10 resistors with 5 lines of code (loop)")
+    print("   - To add 10 more: Just change range(1, 11) to range(1, 21)")
+    print("   - No manual copy-paste of 87 lines of code!")
