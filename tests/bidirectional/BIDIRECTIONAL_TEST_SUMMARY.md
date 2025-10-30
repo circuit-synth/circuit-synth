@@ -1,9 +1,13 @@
 # Bidirectional Test Suite - Comprehensive Summary
 
-**Date:** 2025-10-28  
-**Branch:** feat/automate-bidirectional-tests-14-26  
-**Total Tests:** 65 comprehensive bidirectional tests (01-65)  
+**Date:** 2025-10-29 (Updated: Manual validation campaign)
+**Branch:** test/bidirectional-manual-validation
+**Total Tests:** 65 comprehensive bidirectional tests (01-65)
 **New Tests Added:** 26 tests (39-65)
+
+### 🎯 Manual Validation Campaign Progress
+**Status:** Tests 01-16 manually validated and passing
+**Finding:** Test 15 (Net split) is XPASS - now working despite expected failure on Issue #373
 
 ## Executive Summary
 
@@ -86,9 +90,13 @@ Execution Time: ~67 seconds for full suite (tests 39-65)
 
 ### Issue #373: Netlist Exporter Empty Nets Section
 
-**Affected Tests:** Test 36, Test 43  
-**Impact:** Cannot validate electrical connectivity via netlist  
-**Status:** Issue marked CLOSED but tests still fail - needs investigation
+**Affected Tests:** Test 36, Test 43, Test 15 (was blocking)
+**Impact:** Cannot validate electrical connectivity via netlist
+**Status:** ⚠️ **IMPORTANT UPDATE (2025-10-29):** Test 15 now XPASS!
+- Test 15 was expected to fail due to this issue
+- During manual validation, test 15 actually passes
+- This suggests the netlist functionality may be working better than expected
+- Recommend re-investigating Issue #373 status
 
 ### Issue #380: Synchronizer Doesn't Remove Old Hierarchical Labels
 
