@@ -52,8 +52,13 @@ class ComponentManager:
         self._component_index = self._build_component_index()
 
     def _build_component_index(self) -> Dict[str, SchematicSymbol]:
-        """Build an index of components by reference for fast lookup."""
-        return {comp.reference: comp for comp in self.schematic.components}
+        """Build an index of components by reference and unit for fast lookup."""
+        index = {}
+        for comp in self.schematic.components:
+            unit = getattr(comp, "unit", 1)  # Default to unit 1 if not set
+            component_key = f"{comp.reference}_unit{unit}"
+            index[component_key] = comp
+        return index
 
     def _generate_uuid(self) -> str:
         """Generate a new UUID for a component."""
@@ -68,6 +73,7 @@ class ComponentManager:
         placement_strategy: PlacementStrategy = PlacementStrategy.AUTO,
         footprint: Optional[str] = None,
         snap_to_grid: bool = True,
+        unit: int = 1,
         **properties,
     ) -> Optional[SchematicSymbol]:
         """
@@ -81,6 +87,7 @@ class ComponentManager:
             placement_strategy: Strategy for automatic placement
             footprint: Component footprint
             snap_to_grid: If True, snap position to grid. If False, use exact position.
+            unit: Unit number for multi-unit components (1-based, default 1)
             **properties: Additional component properties
 
         Returns:
@@ -97,9 +104,13 @@ class ComponentManager:
         if not reference:
             reference = self._generate_reference(symbol_def.reference_prefix)
 
-        # Check for duplicate reference
-        if reference in self._component_index:
-            logger.error(f"Component with reference {reference} already exists")
+        # Check for duplicate reference - allow same reference with different units
+        # Build a unique key combining reference and unit for multi-unit components
+        component_key = f"{reference}_unit{unit}"
+        if component_key in self._component_index:
+            logger.error(
+                f"Component with reference {reference} unit {unit} already exists"
+            )
             return None
 
         # Create component first (needed for dynamic sizing)
@@ -110,6 +121,7 @@ class ComponentManager:
             reference=reference,
             value=value or "",
             footprint=footprint,
+            unit=unit,  # Set the unit number
             properties=properties,
             pins=symbol_def.pins.copy() if symbol_def.pins else [],
             in_bom=True,  # Ensure component is included in BOM
@@ -148,14 +160,17 @@ class ComponentManager:
             # Create Component wrapper and add to collection
             comp_wrapper = Component(component, self.schematic._components)
             self.schematic._components._add_to_indexes(comp_wrapper)
-            logger.debug(f"Added component to ComponentCollection: {reference}")
+            logger.debug(
+                f"Added component to ComponentCollection: {reference} unit {unit}"
+            )
         else:
             # Fallback for older schematic types
             self.schematic.components.append(component)
 
-        self._component_index[reference] = component
+        # Store in index with unique key for multi-unit support
+        self._component_index[component_key] = component
 
-        logger.debug(f"Added component {reference} ({library_id}) at {position}")
+        logger.debug(f"Added component {reference} unit {unit} ({library_id}) at {position}")
         return component
 
     def remove_component(self, reference: str, uuid: Optional[str] = None) -> bool:

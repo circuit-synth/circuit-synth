@@ -87,6 +87,9 @@ from kicad_sch_api.core.types import (
 )
 from sexpdata import Symbol
 
+# Import symbol cache for multi-unit component support
+from ..core.symbol_cache import get_symbol_cache
+
 # Use optimized symbol cache from kicad_symbol_cache for better performance,
 # but keep Python fallback for graphics data
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
@@ -564,59 +567,99 @@ class SchematicWriter:
             # Track the mapping
             self.reference_mapping[original_ref] = new_ref
 
-            # Add component using the API
+            # Check if this is a multi-unit component
+            symbol_cache = get_symbol_cache()
+            symbol_def = symbol_cache.get_symbol(comp.lib_id)
+            # Use 'units' attribute which contains the number of units
+            unit_count = getattr(symbol_def, "units", 1) if symbol_def else 1
+
+            logger.debug(f"      Component has {unit_count} unit(s)")
+
+            # Add component using the API - for multi-unit, add each unit separately
             # Time the component manager operation
             with timed_operation(
                 f"add_component[{comp.lib_id}]", threshold_ms=20, details=comp_details
             ):
-                api_component = self.component_manager.add_component(
-                    library_id=comp.lib_id,
-                    reference=new_ref,
-                    value=comp.value,
-                    position=(comp.position.x, comp.position.y),
-                    placement_strategy=PlacementStrategy.AUTO,
-                    footprint=comp.footprint,
-                )
+                # For multi-unit components, add each unit as a separate symbol instance
+                if unit_count > 1:
+                    logger.debug(
+                        f"      Adding multi-unit component with {unit_count} units"
+                    )
+                    # Add each unit with a vertical offset
+                    unit_spacing = 25.4  # 1 inch vertical spacing between units
+                    for unit_num in range(1, unit_count + 1):
+                        unit_position = (
+                            comp.position.x,
+                            comp.position.y + (unit_num - 1) * unit_spacing,
+                        )
+                        logger.debug(
+                            f"        Adding unit {unit_num} at position {unit_position}"
+                        )
+                        api_component = self.component_manager.add_component(
+                            library_id=comp.lib_id,
+                            reference=new_ref,
+                            value=comp.value,
+                            position=unit_position,
+                            placement_strategy=PlacementStrategy.AUTO,
+                            footprint=comp.footprint,
+                            unit=unit_num,  # Specify the unit number
+                        )
 
-            if api_component:
-                # Update our mapping
-                self.component_uuid_map[new_ref] = api_component.uuid
+                        if api_component and unit_num == 1:
+                            # Store the first unit as the main component for mapping
+                            first_api_component = api_component
+                else:
+                    # Single-unit component - add as before
+                    api_component = self.component_manager.add_component(
+                        library_id=comp.lib_id,
+                        reference=new_ref,
+                        value=comp.value,
+                        position=(comp.position.x, comp.position.y),
+                        placement_strategy=PlacementStrategy.AUTO,
+                        footprint=comp.footprint,
+                        unit=1,  # Explicitly set unit 1
+                    )
+                    first_api_component = api_component
+
+            if first_api_component:
+                # Update our mapping (use the first unit for UUID mapping)
+                self.component_uuid_map[new_ref] = first_api_component.uuid
 
                 # Update the original component reference
                 comp.reference = new_ref
 
-                # Copy additional properties
-                api_component.rotation = comp.rotation
-                api_component.unit = comp.unit
-                api_component.in_bom = getattr(comp, "in_bom", True)
-                api_component.on_board = getattr(comp, "on_board", True)
+                # Copy additional properties to first unit
+                first_api_component.rotation = comp.rotation
+                # Note: unit is already set during add_component call
+                first_api_component.in_bom = getattr(comp, "in_bom", True)
+                first_api_component.on_board = getattr(comp, "on_board", True)
                 # dnp and mirror may not exist in kicad-sch-api SchematicSymbol
-                if hasattr(api_component, "dnp") and hasattr(comp, "dnp"):
-                    api_component.dnp = comp.dnp
-                if hasattr(api_component, "mirror") and hasattr(comp, "mirror"):
-                    api_component.mirror = comp.mirror
+                if hasattr(first_api_component, "dnp") and hasattr(comp, "dnp"):
+                    first_api_component.dnp = comp.dnp
+                if hasattr(first_api_component, "mirror") and hasattr(comp, "mirror"):
+                    first_api_component.mirror = comp.mirror
 
                 # Store hierarchy path and project name for instances generation
                 if self.hierarchical_path:
-                    api_component.properties["hierarchy_path"] = "/" + "/".join(
+                    first_api_component.properties["hierarchy_path"] = "/" + "/".join(
                         self.hierarchical_path
                     )
 
                 # Store project name for the instances section in new KiCad format
-                api_component.properties["project_name"] = self.project_name
+                first_api_component.properties["project_name"] = self.project_name
 
                 # CRITICAL: Store root UUID for instances path generation
                 # The parser needs this to create correct instance paths
                 if self.hierarchical_path and len(self.hierarchical_path) > 0:
                     root_uuid = self.hierarchical_path[0]
-                    api_component.properties["root_uuid"] = root_uuid
+                    first_api_component.properties["root_uuid"] = root_uuid
                     logger.debug(f"  Storing root_uuid property: {root_uuid}")
 
                 # Create instances for the new KiCad format (20250114+)
                 # The path should contain only sheet UUIDs, not component UUID
                 logger.debug(f"=== CREATING INSTANCE FOR COMPONENT {new_ref} ===")
                 logger.debug(f"  Component lib_id: {comp.lib_id}")
-                logger.debug(f"  Component UUID: {api_component.uuid}")
+                logger.debug(f"  Component UUID: {first_api_component.uuid}")
                 logger.debug(f"  Current circuit: {self.circuit.name}")
                 logger.debug(f"  Hierarchical path: {self.hierarchical_path}")
                 logger.debug(

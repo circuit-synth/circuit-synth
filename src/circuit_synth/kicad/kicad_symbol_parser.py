@@ -403,6 +403,26 @@ def _flatten_symbol(
         pins.extend(sub_s["pins"])
         graphics.extend(sub_s["graphics"])
 
+    # Calculate unit_count from sub_symbols
+    # Sub-symbols follow pattern: SymbolName_unit_subunit (e.g., "LM358_1_1", "LM358_2_1", "LM358_3_1")
+    # We need to extract unique unit numbers
+    unit_count = 1  # Default to 1 for single-unit components
+    if sym_data.get("sub_symbols"):
+        unique_units = set()
+        for sub_s in sym_data["sub_symbols"]:
+            sub_name = sub_s.get("sub_name", "")
+            # Try to extract unit number from pattern: SymbolName_unit_subunit
+            parts = sub_name.rsplit("_", 2)  # Split from right to get last two numbers
+            if len(parts) == 3:
+                try:
+                    unit_num = int(parts[1])  # The unit number is the second-to-last part
+                    unique_units.add(unit_num)
+                except ValueError:
+                    pass  # Not a valid unit number, skip
+
+        if unique_units:
+            unit_count = max(unique_units)  # Highest unit number = total unit count
+
     return {
         "name": sym_name,
         "properties": sym_data["properties"],
@@ -413,6 +433,7 @@ def _flatten_symbol(
         "pins": pins,
         "graphics": graphics,
         "is_power": sym_data["is_power"],
+        "unit_count": unit_count,
     }
 
 
