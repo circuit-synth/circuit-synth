@@ -8,7 +8,7 @@
 **Recently Fixed:** Test 29 (Component Custom Properties) - Issue #409 ✅
 
 ### 🎯 Manual Validation Campaign Progress
-**Status:** Tests 01-21, 25, 26, 31, 33, 34 manually validated (26 of 68 tests)
+**Status:** Tests 01-21, 25, 26, 31, 33, 34, 35, 36 manually validated (28 of 68 tests)
 **Findings:**
 - Test 15 (Net split) is XPASS - now working despite expected failure on Issue #373
 - Test 22 BLOCKED by Issue #406 (subcircuit generation broken)
@@ -20,6 +20,10 @@
 - Test 32 SKIPPED (waiting for text annotation API improvement - Issue #411)
 - Test 33 PASSES - 8-bit bus connections (D0-D7) all correct ✓
 - Test 34 PASSES - Bulk component add with Python loops (10→20 resistors) ✓
+- Test 35 PASSES - Bulk component remove with Python loops (10→5 resistors) ✓
+- Test 36 PARTIALLY WORKING - Auto-incrementing subcircuit naming feature implemented (Issue #422) ✅
+  - Single instance works perfectly (hierarchical sheet + child circuit)
+  - Multiple instances blocked by Issue #419 (reference collision bug)
 - Test 68 NEW - Dynamic sheet sizing (XFAIL - Issue #413)
 
 ## Executive Summary
@@ -46,7 +50,7 @@ Total: 68 tests across 46 test directories (test 27 removed)
     └── Test 68: Automatic sheet resize (XFAIL - Issue #413)
 
 Overall Status: ✅ ALL TESTS OPERATIONAL
-Manual Validation: 26 of 68 tests (38%)
+Manual Validation: 28 of 68 tests (41%)
 ```
 
 ### Key Achievement: Hierarchical Operations Gap CLOSED
@@ -215,10 +219,13 @@ Manual Validation: 26 of 68 tests (38%)
 | 32 | ⏭️ SKIPPED | Waiting for text annotation API improvement (Issue #411) |
 | 33 | ✅ Manually tested | 8-bit bus connections (D0-D7) - all nets verified in netlist ✓ |
 | 34 | ✅ Manually tested | Bulk component add - Python loop advantage (10→20 resistors) ✓ |
-| 35-67 | ⚠️ Automated only | Need manual GUI validation |
+| 35 | ✅ Manually tested | Bulk component remove - Python loop (10→5 resistors) ✓ |
+| 36 | ✅ Manually tested | Hierarchical subcircuit duplication - auto-increment naming works ✓ (Issue #422) |
+|    |                  | Single instance perfect, multiple blocked by Issue #419 |
+| 37-67 | ⚠️ Automated only | Need manual GUI validation |
 | 68 | 🆕 NEW TEST | Dynamic sheet sizing (XFAIL - Issue #413) |
 
-**Progress:** 26 of 68 tests manually validated (38%)
+**Progress:** 28 of 68 tests manually validated (41%)
 
 **Known issues:**
 - #401: Property text rotation
@@ -229,6 +236,10 @@ Manual Validation: 26 of 68 tests (38%)
 - #410: PCB synchronization broken (blocks 30, critical)
 - #411: Text annotation API improvement needed (blocks 32)
 - #413: Dynamic sheet sizing not implemented (test 68 documents)
+- #419: Reference collision in subcircuits (blocks test 36 multiple instances)
+
+**New features:**
+- #422: Auto-incrementing subcircuit naming (implemented, working for single instances)
 
 ---
 
