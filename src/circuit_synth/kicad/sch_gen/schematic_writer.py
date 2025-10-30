@@ -586,7 +586,7 @@ class SchematicWriter:
                         f"      Adding multi-unit component with {unit_count} units"
                     )
                     # Add each unit with a vertical offset
-                    unit_spacing = 25.4  # 1 inch vertical spacing between units
+                    unit_spacing = 50.8  # 2 inches vertical spacing between units
                     for unit_num in range(1, unit_count + 1):
                         unit_position = (
                             comp.position.x,
@@ -600,8 +600,9 @@ class SchematicWriter:
                             reference=new_ref,
                             value=comp.value,
                             position=unit_position,
-                            placement_strategy=PlacementStrategy.AUTO,
+                            placement_strategy=PlacementStrategy.AUTO,  # Position is explicit so it will be used
                             footprint=comp.footprint,
+                            snap_to_grid=True,  # Snap to grid for proper alignment
                             unit=unit_num,  # Specify the unit number
                         )
 
