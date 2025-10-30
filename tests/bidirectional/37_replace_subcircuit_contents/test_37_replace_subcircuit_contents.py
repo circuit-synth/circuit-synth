@@ -64,7 +64,7 @@ def test_37_replace_subcircuit_contents(request):
     python_file = test_dir / "subcircuit_redesign.py"
     output_dir = test_dir / "subcircuit_redesign"
     root_schematic_file = output_dir / "subcircuit_redesign.kicad_sch"
-    amplifier_schematic_file = output_dir / "Amplifier.kicad_sch"
+    amplifier_schematic_file = output_dir / "amplifier_subcircuit_1.kicad_sch"
 
     # Check for --keep-output flag
     cleanup = not request.config.getoption("--keep-output", default=False)
@@ -174,10 +174,18 @@ def test_37_replace_subcircuit_contents(request):
             "    # r1 = Component("
         )
         modified_code = modified_code.replace(
-            "    amplifier.add_component(r1)\n"
-            "    amplifier.add_component(c1)",
-            "    # amplifier.add_component(r1)\n"
-            "    # amplifier.add_component(c1)"
+            "    c1 = Component(\n"
+            "        symbol=\"Device:C\",\n"
+            "        ref=\"C1\",\n"
+            "        value=\"1µF\",\n"
+            "        footprint=\"Capacitor_SMD:C_0603_1608Metric\",\n"
+            "    )",
+            "    # c1 = Component(\n"
+            "    #     symbol=\"Device:C\",\n"
+            "    #     ref=\"C1\",\n"
+            "    #     value=\"1µF\",\n"
+            "    #     footprint=\"Capacitor_SMD:C_0603_1608Metric\",\n"
+            "    # )"
         )
 
         # Uncomment modified implementation (R2, R3, C2)
@@ -190,12 +198,32 @@ def test_37_replace_subcircuit_contents(request):
             "    r2 = Component("
         )
         modified_code = modified_code.replace(
-            "    # amplifier.add_component(r2)\n"
-            "    # amplifier.add_component(r3)\n"
-            "    # amplifier.add_component(c2)",
-            "    amplifier.add_component(r2)\n"
-            "    amplifier.add_component(r3)\n"
-            "    amplifier.add_component(c2)"
+            "    # r3 = Component(\n"
+            "    #     symbol=\"Device:R\",\n"
+            "    #     ref=\"R3\",\n"
+            "    #     value=\"47k\",\n"
+            "    #     footprint=\"Resistor_SMD:R_0603_1608Metric\",\n"
+            "    # )",
+            "    r3 = Component(\n"
+            "        symbol=\"Device:R\",\n"
+            "        ref=\"R3\",\n"
+            "        value=\"47k\",\n"
+            "        footprint=\"Resistor_SMD:R_0603_1608Metric\",\n"
+            "    )"
+        )
+        modified_code = modified_code.replace(
+            "    # c2 = Component(\n"
+            "    #     symbol=\"Device:C\",\n"
+            "    #     ref=\"C2\",\n"
+            "    #     value=\"10µF\",\n"
+            "    #     footprint=\"Capacitor_SMD:C_0603_1608Metric\",\n"
+            "    # )",
+            "    c2 = Component(\n"
+            "        symbol=\"Device:C\",\n"
+            "        ref=\"C2\",\n"
+            "        value=\"10µF\",\n"
+            "        footprint=\"Capacitor_SMD:C_0603_1608Metric\",\n"
+            "    )"
         )
 
         assert modified_code != original_code, (
@@ -347,12 +375,12 @@ def test_37_replace_subcircuit_contents(request):
         assert len(subcircuits) > 0, "No subcircuits in JSON netlist"
         print(f"   ✓ JSON contains {len(subcircuits)} subcircuit(s)")
 
-        # Find Amplifier in JSON
+        # Find amplifier_subcircuit_1 in JSON
         amplifier_json = next(
-            (s for s in subcircuits if s.get("name") == "Amplifier"), None
+            (s for s in subcircuits if s.get("name") == "amplifier_subcircuit_1"), None
         )
-        assert amplifier_json is not None, "Amplifier not found in JSON subcircuits"
-        print(f"   ✓ Amplifier subcircuit found in JSON")
+        assert amplifier_json is not None, "amplifier_subcircuit_1 not found in JSON subcircuits"
+        print(f"   ✓ amplifier_subcircuit_1 subcircuit found in JSON")
 
         # Verify Amplifier JSON has new components
         amplifier_components_json = amplifier_json.get("components", {})
