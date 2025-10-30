@@ -86,10 +86,74 @@ def ten_resistors():
         footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
-    # R11 commented out - used for testing bulk component addition
+    # R11-R20 commented out - used for testing bulk component addition (10 more)
+    # Uncomment to add 10 more resistors on second run
     # r11 = Component(
     #     symbol="Device:R",
     #     ref="R11",
+    #     value="10k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    #
+    # r12 = Component(
+    #     symbol="Device:R",
+    #     ref="R12",
+    #     value="10k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    #
+    # r13 = Component(
+    #     symbol="Device:R",
+    #     ref="R13",
+    #     value="10k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    #
+    # r14 = Component(
+    #     symbol="Device:R",
+    #     ref="R14",
+    #     value="10k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    #
+    # r15 = Component(
+    #     symbol="Device:R",
+    #     ref="R15",
+    #     value="10k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    #
+    # r16 = Component(
+    #     symbol="Device:R",
+    #     ref="R16",
+    #     value="10k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    #
+    # r17 = Component(
+    #     symbol="Device:R",
+    #     ref="R17",
+    #     value="10k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    #
+    # r18 = Component(
+    #     symbol="Device:R",
+    #     ref="R18",
+    #     value="10k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    #
+    # r19 = Component(
+    #     symbol="Device:R",
+    #     ref="R19",
+    #     value="10k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
+    #
+    # r20 = Component(
+    #     symbol="Device:R",
+    #     ref="R20",
     #     value="10k",
     #     footprint="Resistor_SMD:R_0603_1608Metric",
     # )
