@@ -8,7 +8,7 @@
 **Recently Fixed:** Test 29 (Component Custom Properties) - Issue #409 ✅
 
 ### 🎯 Manual Validation Campaign Progress
-**Status:** Tests 01-21, 25, 26, 31, 33 manually validated (25 of 68 tests)
+**Status:** Tests 01-21, 25, 26, 31, 33, 34 manually validated (26 of 68 tests)
 **Findings:**
 - Test 15 (Net split) is XPASS - now working despite expected failure on Issue #373
 - Test 22 BLOCKED by Issue #406 (subcircuit generation broken)
@@ -19,6 +19,7 @@
 - Test 31 FIXED (initial state had NET1 uncommented) - now passes ✓
 - Test 32 SKIPPED (waiting for text annotation API improvement - Issue #411)
 - Test 33 PASSES - 8-bit bus connections (D0-D7) all correct ✓
+- Test 34 PASSES - Bulk component add with Python loops (10→20 resistors) ✓
 - Test 68 NEW - Dynamic sheet sizing (XFAIL - Issue #413)
 
 ## Executive Summary
@@ -45,7 +46,7 @@ Total: 68 tests across 46 test directories (test 27 removed)
     └── Test 68: Automatic sheet resize (XFAIL - Issue #413)
 
 Overall Status: ✅ ALL TESTS OPERATIONAL
-Manual Validation: 25 of 68 tests (37%)
+Manual Validation: 26 of 68 tests (38%)
 ```
 
 ### Key Achievement: Hierarchical Operations Gap CLOSED
@@ -213,10 +214,11 @@ Manual Validation: 25 of 68 tests (37%)
 | 31 | ✅ Manually tested | Isolated component + netlist validation - initial state fixed, test passes ✓ |
 | 32 | ⏭️ SKIPPED | Waiting for text annotation API improvement (Issue #411) |
 | 33 | ✅ Manually tested | 8-bit bus connections (D0-D7) - all nets verified in netlist ✓ |
-| 34-67 | ⚠️ Automated only | Need manual GUI validation |
+| 34 | ✅ Manually tested | Bulk component add - Python loop advantage (10→20 resistors) ✓ |
+| 35-67 | ⚠️ Automated only | Need manual GUI validation |
 | 68 | 🆕 NEW TEST | Dynamic sheet sizing (XFAIL - Issue #413) |
 
-**Progress:** 25 of 68 tests manually validated (37%)
+**Progress:** 26 of 68 tests manually validated (38%)
 
 **Known issues:**
 - #401: Property text rotation
