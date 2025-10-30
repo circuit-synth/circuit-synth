@@ -87,6 +87,9 @@ from kicad_sch_api.core.types import (
 )
 from sexpdata import Symbol
 
+# Import symbol cache for multi-unit component support
+from ..core.symbol_cache import get_symbol_cache
+
 # Use optimized symbol cache from kicad_symbol_cache for better performance,
 # but keep Python fallback for graphics data
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
@@ -569,75 +572,129 @@ class SchematicWriter:
             # Properties were already extracted by circuit_loader.py
             from ..property_utils import filter_user_properties
 
-            user_properties = filter_user_properties(comp.properties) if hasattr(comp, 'properties') else {}
+            user_properties = (
+                filter_user_properties(comp.properties)
+                if hasattr(comp, "properties")
+                else {}
+            )
 
             # Check if DNP flag is set via properties or flags
             dnp_value = False
             if "DNP" in user_properties:
                 dnp_str = user_properties["DNP"]
-                dnp_value = dnp_str.lower() in ("true", "yes", "1") if isinstance(dnp_str, str) else bool(dnp_str)
-            elif hasattr(comp, 'in_bom') and not comp.in_bom:
+                dnp_value = (
+                    dnp_str.lower() in ("true", "yes", "1")
+                    if isinstance(dnp_str, str)
+                    else bool(dnp_str)
+                )
+            elif hasattr(comp, "in_bom") and not comp.in_bom:
                 # If in_bom is False, component is DNP
                 dnp_value = True
 
-            logger.debug(f"      Component properties: {len(user_properties)} user properties")
+            logger.debug(
+                f"      Component properties: {len(user_properties)} user properties"
+            )
             if user_properties:
                 logger.debug(f"      Property keys: {list(user_properties.keys())}")
 
-            # Add component using the API
+            # Check if this is a multi-unit component
+            symbol_cache = get_symbol_cache()
+            symbol_def = symbol_cache.get_symbol(comp.lib_id)
+            # Use 'units' attribute which contains the number of units
+            unit_count = getattr(symbol_def, "units", 1) if symbol_def else 1
+
+            logger.debug(f"      Component {comp.lib_id} has {unit_count} unit(s)")
+
+            # Add component using the API - for multi-unit, add each unit separately
             # Time the component manager operation
             with timed_operation(
                 f"add_component[{comp.lib_id}]", threshold_ms=20, details=comp_details
             ):
-                api_component = self.component_manager.add_component(
-                    library_id=comp.lib_id,
-                    reference=new_ref,
-                    value=comp.value,
-                    position=(comp.position.x, comp.position.y),
-                    placement_strategy=PlacementStrategy.AUTO,
-                    footprint=comp.footprint,
-                    **user_properties,  # Pass user properties
-                )
+                # For multi-unit components, add each unit as a separate symbol instance
+                if unit_count > 1:
+                    logger.debug(
+                        f"      Adding multi-unit component with {unit_count} units"
+                    )
+                    # Add each unit with a vertical offset
+                    unit_spacing = (
+                        12.7  # 0.5 inch (12.7mm) vertical spacing between units
+                    )
+                    for unit_num in range(1, unit_count + 1):
+                        unit_position = (
+                            comp.position.x,
+                            comp.position.y + (unit_num - 1) * unit_spacing,
+                        )
+                        logger.debug(
+                            f"        Adding unit {unit_num} at position {unit_position}"
+                        )
+                        api_component = self.component_manager.add_component(
+                            library_id=comp.lib_id,
+                            reference=new_ref,
+                            value=comp.value,
+                            position=unit_position,
+                            placement_strategy=PlacementStrategy.AUTO,  # Position is explicit so it will be used
+                            footprint=comp.footprint,
+                            snap_to_grid=True,  # Snap to grid for proper alignment
+                            unit=unit_num,  # Specify the unit number
+                            **user_properties,  # Pass user properties
+                        )
 
-            if api_component:
-                # Update our mapping
-                self.component_uuid_map[new_ref] = api_component.uuid
+                        if api_component and unit_num == 1:
+                            # Store the first unit as the main component for mapping
+                            first_api_component = api_component
+                else:
+                    # Single-unit component - add as before
+                    api_component = self.component_manager.add_component(
+                        library_id=comp.lib_id,
+                        reference=new_ref,
+                        value=comp.value,
+                        position=(comp.position.x, comp.position.y),
+                        placement_strategy=PlacementStrategy.AUTO,
+                        footprint=comp.footprint,
+                        unit=1,  # Explicitly set unit 1
+                        **user_properties,  # Pass user properties
+                    )
+                    first_api_component = api_component
+
+            if first_api_component:
+                # Update our mapping (use the first unit for UUID mapping)
+                self.component_uuid_map[new_ref] = first_api_component.uuid
 
                 # Update the original component reference
                 comp.reference = new_ref
 
-                # Copy additional properties
-                api_component.rotation = comp.rotation
-                api_component.unit = comp.unit
-                api_component.in_bom = getattr(comp, "in_bom", True)
-                api_component.on_board = getattr(comp, "on_board", True)
+                # Copy additional properties to first unit
+                first_api_component.rotation = comp.rotation
+                # Note: unit is already set during add_component call
+                first_api_component.in_bom = getattr(comp, "in_bom", True)
+                first_api_component.on_board = getattr(comp, "on_board", True)
                 # dnp and mirror may not exist in kicad-sch-api SchematicSymbol
-                if hasattr(api_component, "dnp") and hasattr(comp, "dnp"):
-                    api_component.dnp = comp.dnp
-                if hasattr(api_component, "mirror") and hasattr(comp, "mirror"):
-                    api_component.mirror = comp.mirror
+                if hasattr(first_api_component, "dnp") and hasattr(comp, "dnp"):
+                    first_api_component.dnp = comp.dnp
+                if hasattr(first_api_component, "mirror") and hasattr(comp, "mirror"):
+                    first_api_component.mirror = comp.mirror
 
                 # Store hierarchy path and project name for instances generation
                 if self.hierarchical_path:
-                    api_component.properties["hierarchy_path"] = "/" + "/".join(
+                    first_api_component.properties["hierarchy_path"] = "/" + "/".join(
                         self.hierarchical_path
                     )
 
                 # Store project name for the instances section in new KiCad format
-                api_component.properties["project_name"] = self.project_name
+                first_api_component.properties["project_name"] = self.project_name
 
                 # CRITICAL: Store root UUID for instances path generation
                 # The parser needs this to create correct instance paths
                 if self.hierarchical_path and len(self.hierarchical_path) > 0:
                     root_uuid = self.hierarchical_path[0]
-                    api_component.properties["root_uuid"] = root_uuid
+                    first_api_component.properties["root_uuid"] = root_uuid
                     logger.debug(f"  Storing root_uuid property: {root_uuid}")
 
                 # Create instances for the new KiCad format (20250114+)
                 # The path should contain only sheet UUIDs, not component UUID
                 logger.debug(f"=== CREATING INSTANCE FOR COMPONENT {new_ref} ===")
                 logger.debug(f"  Component lib_id: {comp.lib_id}")
-                logger.debug(f"  Component UUID: {api_component.uuid}")
+                logger.debug(f"  Component UUID: {first_api_component.uuid}")
                 logger.debug(f"  Current circuit: {self.circuit.name}")
                 logger.debug(f"  Hierarchical path: {self.hierarchical_path}")
                 logger.debug(
@@ -791,8 +848,15 @@ class SchematicWriter:
             # (same method used to draw the bbox rectangles)
             component_bboxes = []
 
-            # Add components
+            # Add components individually (multi-unit components will be placed side-by-side)
+            # Create unique placement keys for multi-unit components
+            placement_key_map = {}  # Maps unique placement key -> component
             for comp in components_needing_placement:
+                # Create unique key for placement (reference + unit number)
+                unit_num = getattr(comp, "unit", 1)
+                placement_key = f"{comp.reference}_U{unit_num}"
+                placement_key_map[placement_key] = comp
+
                 # Get symbol library data
                 lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
                 if not lib_data:
@@ -806,7 +870,7 @@ class SchematicWriter:
                     import sys
 
                     print(
-                        f"\n🔍 PLACEMENT: About to calculate bbox for {comp.reference} ({comp.lib_id})",
+                        f"\n🔍 PLACEMENT: About to calculate bbox for {placement_key} ({comp.lib_id})",
                         file=sys.stderr,
                         flush=True,
                     )
@@ -818,13 +882,13 @@ class SchematicWriter:
                     width = max_x - min_x
                     height = max_y - min_y
                     print(
-                        f"🔍 PLACEMENT: Calculated bbox for {comp.reference}: {width:.2f} x {height:.2f} mm",
+                        f"🔍 PLACEMENT: Calculated bbox for {placement_key}: {width:.2f} x {height:.2f} mm",
                         file=sys.stderr,
                         flush=True,
                     )
 
-                component_bboxes.append((comp.reference, width, height))
-                logger.debug(f"  {comp.reference}: bbox {width:.1f}x{height:.1f}mm")
+                component_bboxes.append((placement_key, width, height))
+                logger.debug(f"  {placement_key}: bbox {width:.1f}x{height:.1f}mm")
 
             # Add sheets (if any)
             if (
@@ -907,11 +971,14 @@ class SchematicWriter:
             # Apply placements to components and sheets
             placement_map = {ref: (x, y) for ref, x, y in placements}
 
-            # Apply to components
-            for comp in components_needing_placement:
-                if comp.reference in placement_map:
-                    x, y = placement_map[comp.reference]
+            # Apply to components (each unit placed independently using unique keys)
+            for placement_key, comp in placement_key_map.items():
+                if placement_key in placement_map:
+                    x, y = placement_map[placement_key]
                     comp.position = Point(x, y)
+                    logger.debug(
+                        f"      Applied position to {comp.reference} unit {getattr(comp, 'unit', 1)}: ({x}, {y})"
+                    )
 
             # Apply to sheets
             if (
@@ -1050,7 +1117,9 @@ class SchematicWriter:
         Example:
             >>> self._add_power_symbol("power:GND", "#PWR01", "GND", (100, 100), rotation=180)
         """
-        logger.debug(f"Adding power symbol {lib_id} at {position} with value '{value}' rotation={rotation}")
+        logger.debug(
+            f"Adding power symbol {lib_id} at {position} with value '{value}' rotation={rotation}"
+        )
 
         try:
             # Add power symbol as a component
@@ -1081,32 +1150,49 @@ class SchematicWriter:
                 # - 180° (down): Value below symbol
                 # - 270° (right): Value to the right
                 # Standard offset is ~5.08mm from symbol center
-                if hasattr(power_comp, 'properties') and 'Value' in power_comp.properties:
-                    value_prop = power_comp.properties['Value']
-                    if hasattr(value_prop, 'position'):
+                if (
+                    hasattr(power_comp, "properties")
+                    and "Value" in power_comp.properties
+                ):
+                    value_prop = power_comp.properties["Value"]
+                    if hasattr(value_prop, "position"):
                         # Calculate correct position based on rotation
-                        offset = 5.08  # Standard KiCad offset for power symbol value text
+                        offset = (
+                            5.08  # Standard KiCad offset for power symbol value text
+                        )
 
                         if rotation == 0:  # Pointing up
-                            value_prop.position = Point(position[0], position[1] - offset)
+                            value_prop.position = Point(
+                                position[0], position[1] - offset
+                            )
                         elif rotation == 90:  # Pointing left
-                            value_prop.position = Point(position[0] - offset, position[1])
+                            value_prop.position = Point(
+                                position[0] - offset, position[1]
+                            )
                         elif rotation == 180:  # Pointing down
-                            value_prop.position = Point(position[0], position[1] + offset)
+                            value_prop.position = Point(
+                                position[0], position[1] + offset
+                            )
                         elif rotation == 270:  # Pointing right
-                            value_prop.position = Point(position[0] + offset, position[1])
+                            value_prop.position = Point(
+                                position[0] + offset, position[1]
+                            )
 
-                logger.debug(f"Created power symbol {reference} (UUID: {power_comp.uuid}) rotation={rotation}")
+                logger.debug(
+                    f"Created power symbol {reference} (UUID: {power_comp.uuid}) rotation={rotation}"
+                )
 
                 # Track power symbol for post-processing text positions
-                if not hasattr(self, '_power_symbols_to_fix'):
+                if not hasattr(self, "_power_symbols_to_fix"):
                     self._power_symbols_to_fix = []
-                self._power_symbols_to_fix.append({
-                    'uuid': power_comp.uuid,
-                    'position': position,
-                    'rotation': rotation,
-                    'value': value
-                })
+                self._power_symbols_to_fix.append(
+                    {
+                        "uuid": power_comp.uuid,
+                        "position": position,
+                        "rotation": rotation,
+                        "value": value,
+                    }
+                )
 
                 return power_comp.uuid
             else:
@@ -1122,20 +1208,23 @@ class SchematicWriter:
         Post-process schematic file to fix power symbol Value property positions.
         kicad-sch-api doesn't expose property positioning API, so we fix it in the file.
         """
-        if not hasattr(self, '_power_symbols_to_fix') or not self._power_symbols_to_fix:
+        if not hasattr(self, "_power_symbols_to_fix") or not self._power_symbols_to_fix:
             return
 
-        logger.debug(f"Fixing Value positions for {len(self._power_symbols_to_fix)} power symbols...")
+        logger.debug(
+            f"Fixing Value positions for {len(self._power_symbols_to_fix)} power symbols..."
+        )
 
         import re
-        with open(sch_file_path, 'r') as f:
+
+        with open(sch_file_path, "r") as f:
             content = f.read()
 
         for symbol_info in self._power_symbols_to_fix:
-            uuid = symbol_info['uuid']
-            pos = symbol_info['position']
-            rotation = symbol_info['rotation']
-            value = symbol_info['value']
+            uuid = symbol_info["uuid"]
+            pos = symbol_info["position"]
+            rotation = symbol_info["rotation"]
+            value = symbol_info["value"]
 
             # Calculate correct Value position based on rotation
             offset = 5.08  # Standard KiCad offset
@@ -1156,12 +1245,14 @@ class SchematicWriter:
             symbol_pattern = rf'(\(symbol.*?uuid "{uuid}".*?property "Value" "{re.escape(value)}".*?\(at )[\d.]+\s+[\d.]+(\s+[\d.]+\))'
 
             def replace_value_position(match):
-                return f'{match.group(1)}{value_x} {value_y}{match.group(2)}'
+                return f"{match.group(1)}{value_x} {value_y}{match.group(2)}"
 
-            content = re.sub(symbol_pattern, replace_value_position, content, flags=re.DOTALL)
+            content = re.sub(
+                symbol_pattern, replace_value_position, content, flags=re.DOTALL
+            )
 
         # Write back
-        with open(sch_file_path, 'w') as f:
+        with open(sch_file_path, "w") as f:
             f.write(content)
 
         logger.debug(f"Fixed Value positions in {sch_file_path}")
@@ -1256,7 +1347,9 @@ class SchematicWriter:
 
                 logger.debug(f"INITIAL LABEL: {actual_ref} pin {pin_identifier}")
                 logger.debug(f"  pin_dict: {pin_dict}")
-                logger.debug(f"  component position: ({comp.position.x}, {comp.position.y})")
+                logger.debug(
+                    f"  component position: ({comp.position.x}, {comp.position.y})"
+                )
                 logger.debug(f"  component rotation: {comp.rotation}°")
 
                 # Rotate coords by component rotation
@@ -1279,7 +1372,11 @@ class SchematicWriter:
                 logger.debug(f"  → label angle: {global_angle}°")
 
                 # Check if this is a power net
-                if hasattr(net, 'is_power') and net.is_power and hasattr(net, 'power_symbol'):
+                if (
+                    hasattr(net, "is_power")
+                    and net.is_power
+                    and hasattr(net, "power_symbol")
+                ):
                     # Generate power symbol instead of hierarchical label
                     power_ref = f"#PWR0{power_symbol_counter:02d}"
                     power_symbol_counter += 1

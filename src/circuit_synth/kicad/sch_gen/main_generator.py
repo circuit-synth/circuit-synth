@@ -506,6 +506,29 @@ class SchematicGenerator:
         # Log results
         self._log_sync_results(sync_report)
 
+        # Synchronize PCB after schematic sync
+        logger.info("🔄 Synchronizing PCB with updated schematic...")
+        try:
+            from circuit_synth.kicad.pcb_gen.pcb_synchronizer import PCBSynchronizer
+
+            pcb_path = self.project_dir / f"{self.project_name}.kicad_pcb"
+            if pcb_path.exists():
+                logger.info("📋 PCB file exists - using synchronizer to preserve manual placement")
+                pcb_sync = PCBSynchronizer(
+                    pcb_path=str(pcb_path),
+                    project_dir=self.project_dir,
+                    project_name=self.project_name
+                )
+                pcb_sync_report = pcb_sync.sync_with_schematics()
+                logger.info("✅ PCB synchronization complete!")
+            else:
+                logger.info("ℹ️  No PCB file found - skipping PCB sync")
+        except Exception as e:
+            logger.error(f"❌ PCB synchronization failed: {e}")
+            logger.warning("   PCB may not reflect latest schematic changes")
+            import traceback
+            traceback.print_exc()
+
         return sync_report
 
     def _log_sync_results(self, sync_report):
@@ -641,6 +664,7 @@ class SchematicGenerator:
         json_file: str,
         force_regenerate: bool = False,
         generate_pcb: bool = True,
+        force_pcb_regenerate: bool = False,
         placement_algorithm: str = "hierarchical",
         schematic_placement: str = "connection_aware",
         draw_bounding_boxes: bool = False,
@@ -653,6 +677,7 @@ class SchematicGenerator:
             json_file: Path to circuit JSON file
             force_regenerate: If True, recreate project even if it exists (loses manual work!)
             generate_pcb: If True, generate PCB along with schematics (default: True)
+            force_pcb_regenerate: If True, regenerate PCB from scratch (loses manual placement!)
             placement_algorithm: PCB placement algorithm to use (hierarchical, spiral)
             schematic_placement: Schematic placement algorithm - "sequential" or "connection_aware" (default: "sequential")
             **pcb_kwargs: Additional keyword arguments passed to PCB generation
@@ -992,40 +1017,72 @@ class SchematicGenerator:
 
         # Generate PCB (default behavior)
         if generate_pcb:
-            logger.debug("Generating PCB with hierarchical placement...")
             # Import locally to avoid circular import
             from circuit_synth.kicad.pcb_gen import PCBGenerator
+            from circuit_synth.kicad.pcb_gen.pcb_synchronizer import PCBSynchronizer
 
-            pcb_gen = PCBGenerator(self.project_dir, self.project_name)
+            # Check if PCB already exists
+            pcb_path = self.project_dir / f"{self.project_name}.kicad_pcb"
+            pcb_exists = pcb_path.exists()
 
-            # Generate PCB with specified placement algorithm
-            success = pcb_gen.generate_pcb(
-                circuit_dict=sub_dict,
-                placement_algorithm=placement_algorithm,
-                board_width=pcb_kwargs.get(
-                    "board_width", None
-                ),  # Auto-calculate if not specified
-                board_height=pcb_kwargs.get("board_height", None),
-                component_spacing=pcb_kwargs.get("component_spacing", 5.0),
-                group_spacing=pcb_kwargs.get("group_spacing", 10.0),
-                **{
-                    k: v
-                    for k, v in pcb_kwargs.items()
-                    if k
-                    not in [
-                        "board_width",
-                        "board_height",
-                        "component_spacing",
-                        "group_spacing",
-                        "preserve_user_components",  # Schematic-only parameter
-                    ]
-                },
-            )
-
-            if success:
-                logger.info("PCB generation complete!")
+            # Decide whether to sync or regenerate
+            if pcb_exists and not force_pcb_regenerate:
+                # Synchronize existing PCB (preserves manual placement)
+                logger.info("📋 PCB exists - using synchronizer to preserve manual placement")
+                try:
+                    pcb_sync = PCBSynchronizer(
+                        pcb_path=str(pcb_path),
+                        project_dir=self.project_dir,
+                        project_name=self.project_name
+                    )
+                    sync_report = pcb_sync.sync_with_schematics()
+                    logger.info("✅ PCB synchronization complete!")
+                    success = True
+                except Exception as e:
+                    logger.error(f"❌ PCB synchronization failed: {e}")
+                    logger.info("Falling back to full PCB regeneration...")
+                    success = False
+                    pcb_exists = False  # Force regeneration below
             else:
-                logger.error("❌ PCB generation failed!")
+                success = False  # Will generate below
+
+            # Generate PCB if it doesn't exist or sync failed or force_pcb_regenerate
+            if not pcb_exists or force_pcb_regenerate or not success:
+                if force_pcb_regenerate:
+                    logger.warning("⚠️  force_pcb_regenerate=True - regenerating PCB from scratch (manual placement will be lost!)")
+                else:
+                    logger.debug("Generating new PCB with hierarchical placement...")
+
+                pcb_gen = PCBGenerator(self.project_dir, self.project_name)
+
+                # Generate PCB with specified placement algorithm
+                success = pcb_gen.generate_pcb(
+                    circuit_dict=sub_dict,
+                    placement_algorithm=placement_algorithm,
+                    board_width=pcb_kwargs.get(
+                        "board_width", None
+                    ),  # Auto-calculate if not specified
+                    board_height=pcb_kwargs.get("board_height", None),
+                    component_spacing=pcb_kwargs.get("component_spacing", 5.0),
+                    group_spacing=pcb_kwargs.get("group_spacing", 10.0),
+                    **{
+                        k: v
+                        for k, v in pcb_kwargs.items()
+                        if k
+                        not in [
+                            "board_width",
+                            "board_height",
+                            "component_spacing",
+                            "group_spacing",
+                            "preserve_user_components",  # Schematic-only parameter
+                        ]
+                    },
+                )
+
+                if success:
+                    logger.info("PCB generation complete!")
+                else:
+                    logger.error("❌ PCB generation failed!")
 
         # NOTE: Netlist generation now handled earlier in the method using modular service
         logger.debug("Netlist generation completed earlier using modular service")
