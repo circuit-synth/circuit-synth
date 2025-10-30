@@ -2,11 +2,12 @@
 
 **Date:** 2025-10-29 (Updated: Manual validation campaign + test rewrites)
 **Branch:** test/bidirectional-manual-validation
-**Total Tests:** 67 comprehensive bidirectional tests (01-67)
+**Total Tests:** 66 comprehensive bidirectional tests (01-67, excluding 27)
 **New Tests Added:** 28 tests (39-65, plus 66-67)
+**Tests Removed:** Test 27 (architecturally invalid - junction test incompatible with label-based design)
 
 ### 🎯 Manual Validation Campaign Progress
-**Status:** Tests 01-21, 25 manually validated (22 of 67 tests)
+**Status:** Tests 01-21, 25 manually validated (22 of 66 tests)
 **Findings:**
 - Test 15 (Net split) is XPASS - now working despite expected failure on Issue #373
 - Test 22 BLOCKED by Issue #406 (subcircuit generation broken)
@@ -14,13 +15,14 @@
 
 ## Executive Summary
 
-This document provides a comprehensive summary of the bidirectional test suite for circuit-synth, covering all 67 tests that validate Python ↔ KiCad synchronization with position preservation (THE KILLER FEATURE).
+This document provides a comprehensive summary of the bidirectional test suite for circuit-synth, covering all 66 tests that validate Python ↔ KiCad synchronization with position preservation (THE KILLER FEATURE).
 
 ### Test Results Overview
 
 ```
-Total: 67 tests across 45 test directories
-├── Tests 01-38: Original suite (37 passed, 1 xfailed)
+Total: 66 tests across 44 test directories (test 27 removed)
+├── Tests 01-38: Original suite (36 passed, 1 xfailed, 1 removed)
+│   └── Test 27 REMOVED (junction test architecturally invalid)
 ├── Tests 39-65: Hierarchical expansion (34 test functions)
 │   ├── 19 PASSED ✅
 │   ├── 1 SKIPPED (documents expected behavior)
@@ -33,7 +35,7 @@ Total: 67 tests across 45 test directories
     └── Test 67: Connected multi-level hierarchy (XFAIL - blocked by 22+24)
 
 Overall Status: ✅ ALL TESTS OPERATIONAL
-Manual Validation: 22 of 67 tests (33%)
+Manual Validation: 22 of 66 tests (33%)
 ```
 
 ### Key Achievement: Hierarchical Operations Gap CLOSED
@@ -124,11 +126,22 @@ Manual Validation: 22 of 67 tests (33%)
 **Validates:** R1—R2—R3 connected across 3 hierarchy levels via net passing
 **Significance:** If this passes, hierarchical design is FULLY functional
 
+### Test 27: Add Junction (REMOVED)
+**Old Purpose:** Test junction dot creation when T-connections occur
+**Removal Reason:** Architecturally invalid - circuit-synth uses hierarchical labels instead of physical wires
+**Rationale:**
+- Circuit-synth doesn't draw wires between components
+- Each component pin gets its own hierarchical label
+- Junction dots only appear when physical wires cross/meet
+- Since no wires are drawn, junctions will never be generated
+- Test assumption (T-connections create junctions) doesn't apply to label-based architecture
+
 ### Key Philosophy Changes
 1. **No global nets** - All connections explicit via net passing
 2. **Safety first** - Test 66 ensures duplicate names don't merge
 3. **Incremental development** - Test 22 validates step-by-step hierarchy
 4. **Complete workflow** - Test 67 combines everything into ultimate test
+5. **Architecture alignment** - Removed test 27 (incompatible with label-based design)
 
 ---
 
@@ -181,9 +194,11 @@ Manual Validation: 22 of 67 tests (33%)
 | 21 | ✅ Manually tested | Multi-unit components - sync works, visual layout has stacking |
 | 22-24 | ⚠️ Automated only | Need manual GUI validation (hierarchical, blocked by #406) |
 | 25 | ✅ Manually tested | Local label creation (DATA_LINE) - sync adds labels correctly ✓ |
-| 26-65 | ⚠️ Automated only | Need manual GUI validation |
+| 26 | ✅ Manually tested | Power symbols - all 5 symbols generated with correct library references ✓ |
+| 27 | ❌ REMOVED | Test architecturally invalid (junction test incompatible with label-based design) |
+| 28-65 | ⚠️ Automated only | Need manual GUI validation |
 
-**Progress:** 22 of 67 tests manually validated. Known issues: #403 (label orientation), #401 (property text rotation).
+**Progress:** 22 of 66 tests manually validated. Known issues: #403 (label orientation), #401 (property text rotation).
 
 ---
 
@@ -229,10 +244,10 @@ Conclusion: ✅ Scales well to realistic circuit sizes
 
 ### Test Suite Health
 - **Status:** ✅ HEALTHY
-- **Coverage:** Excellent (65 tests)
+- **Coverage:** Excellent (66 tests)
 - **Documentation:** Comprehensive
 - **CI-Ready:** All tests operational
 
-**Last Updated:** 2025-10-28
+**Last Updated:** 2025-10-29
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
