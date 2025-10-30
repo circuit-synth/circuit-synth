@@ -7,11 +7,15 @@
 **Tests Removed:** Test 27 (architecturally invalid - junction test incompatible with label-based design)
 
 ### 🎯 Manual Validation Campaign Progress
-**Status:** Tests 01-21, 25 manually validated (22 of 66 tests)
+**Status:** Tests 01-21, 25, 26, 31 manually validated (24 of 66 tests)
 **Findings:**
 - Test 15 (Net split) is XPASS - now working despite expected failure on Issue #373
 - Test 22 BLOCKED by Issue #406 (subcircuit generation broken)
 - Test 24 REWRITTEN for cross-sheet hierarchical connections (blocked by #406)
+- Test 28 BLOCKED by Issue #407 (LM358 rendering) and #408 (NoConnect feature)
+- Test 29 BLOCKED by Issue #409 (custom properties not written)
+- Test 30 BLOCKED by Issue #410 (PCB synchronization broken)
+- Test 31 FIXED (initial state had NET1 uncommented) - now passes ✓
 
 ## Executive Summary
 
@@ -35,7 +39,7 @@ Total: 66 tests across 44 test directories (test 27 removed)
     └── Test 67: Connected multi-level hierarchy (XFAIL - blocked by 22+24)
 
 Overall Status: ✅ ALL TESTS OPERATIONAL
-Manual Validation: 22 of 66 tests (33%)
+Manual Validation: 24 of 66 tests (36%)
 ```
 
 ### Key Achievement: Hierarchical Operations Gap CLOSED
@@ -196,9 +200,22 @@ Manual Validation: 22 of 66 tests (33%)
 | 25 | ✅ Manually tested | Local label creation (DATA_LINE) - sync adds labels correctly ✓ |
 | 26 | ✅ Manually tested | Power symbols - all 5 symbols generated with correct library references ✓ |
 | 27 | ❌ REMOVED | Test architecturally invalid (junction test incompatible with label-based design) |
-| 28-65 | ⚠️ Automated only | Need manual GUI validation |
+| 28 | ❌ BLOCKED | Issue #407 (LM358 rendering), #408 (NoConnect feature needed) |
+| 29 | ❌ BLOCKED | Issue #409 (custom properties not written to KiCad) |
+| 30 | ❌ BLOCKED | Issue #410 (PCB synchronization broken - critical) |
+| 31 | ✅ Manually tested | Isolated component + netlist validation - initial state fixed, test passes ✓ |
+| 32-65 | ⚠️ Automated only | Need manual GUI validation |
 
-**Progress:** 22 of 66 tests manually validated. Known issues: #403 (label orientation), #401 (property text rotation).
+**Progress:** 24 of 66 tests manually validated (36%)
+
+**Known issues:**
+- #401: Property text rotation
+- #403: Label orientation
+- #406: Subcircuit generation (blocks 22, 24)
+- #407: LM358 multi-unit rendering (blocks 28)
+- #408: NoConnect feature (blocks 28)
+- #409: Custom properties not written (blocks 29)
+- #410: PCB synchronization broken (blocks 30, critical)
 
 ---
 
