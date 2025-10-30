@@ -1,0 +1,79 @@
+(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(generator_version "0.8.36")
+	(uuid "574d216c-e794-44e1-9c80-a3f34419c043")
+	(paper "A4")
+	(title_block
+		(title "voltage_divider_instances")
+	)
+	(lib_symbols)
+	(text_box "Circuit demonstrating multiple hierarchical subcircuit instances.\n\n    Initial: One voltage divider subcircuit (divider_1)\n    Modified: Two voltage divider subcircuits (divider_1 + divider_2)\n\n    Each subcircuit appears as a sheet symbol in the parent, with its own subsheet.\n    Both subcircuits share common VCC and GND nets from parent."
+		(exclude_from_sim no)
+		(at 184 110 0)
+		(size 80 30)
+		(margins 1 1 1 1)
+		(stroke
+			(width 0)
+			(type solid)
+		)
+		(fill
+			(type none)
+		)
+		(effects
+			(font
+				(size 1.2 1.2)
+			)
+			(justify left top)
+		)
+		(uuid "d28a3db7-b9c0-45a4-a237-c9ebca4fa96a")
+	)
+	(sheet
+		(at 25.4 12.7)
+		(size 52 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "4aec0fde-8d20-493d-b0ce-3fbf8a02322c")
+		(property "Sheetname" "voltage_divider_subcircuit_1"
+			(at 25.4 11.9884 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "voltage_divider_subcircuit_1.kicad_sch"
+			(at 25.4 33.6046 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "voltage_divider_instances"
+				(path "/574d216c-e794-44e1-9c80-a3f34419c043"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

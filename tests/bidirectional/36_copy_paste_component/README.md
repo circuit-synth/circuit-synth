@@ -1,67 +1,116 @@
-# Test 36: Copy-Paste Component
+# Test 36: Hierarchical Subcircuit Instance Duplication
 
 ## What This Tests
-Validates that duplicating components in Python code (copy-paste pattern) preserves electrical connectivity and correctly generates in KiCad schematic. Tests the component duplication workflow with proper net management.
+Validates that you can create **reusable hierarchical subcircuit blocks** by calling a `@circuit` decorated function multiple times. Each call automatically creates an independent subcircuit instance on its own KiCad sheet with auto-incremented naming.
+
+**Key Concept:** Circuit-synth allows you to write a circuit pattern once (as a function) and instantiate it multiple times as hierarchical subcircuits - like creating classes/objects in programming.
 
 ## When This Situation Happens
-- Developer has an existing circuit with components and nets (e.g., R1-R2 resistor divider)
-- Needs to duplicate the entire component group (copy-paste pattern)
-- Creates new component instances with similar connectivity patterns
-- Regenerates KiCad project with all components and nets intact
+- You have a useful circuit block (voltage divider, LED driver, sensor input, etc.)
+- You need multiple instances of the same circuit
+- Each instance should have unique component references
+- All instances share common power/ground nets
+
+**Real-world examples:**
+- 8 sensor inputs, each with the same voltage divider circuit
+- 4 LED drivers with identical current-limiting circuits
+- Multiple power regulators with the same topology
 
 ## What Should Work
-- Initial circuit with R1-R2 divider and 3 nets (VCC, junction, GND)
-- Python code modified to add R3-R4 as copies of R1-R2
-- New nets created to mirror the R1-R2 connectivity pattern
-- Regenerated KiCad project contains all 4 resistors
-- Both divider chains have correct electrical connectivity (Level 3 netlist validation)
-- Net names and component references are unique
+- Write `@circuit` decorated `voltage_divider_subcircuit()` function
+- Call it once → one subcircuit appears on its own sheet (voltage_divider_subcircuit_1.kicad_sch)
+- Call it twice → two subcircuits appear, each on its own sheet
+- Auto-incremented naming: voltage_divider_subcircuit_1, voltage_divider_subcircuit_2, etc.
+- Both subcircuits share VCC and GND nets via hierarchical pins
+- Each subcircuit has its own VOUT hierarchical pin
+- Synchronization preserves first subcircuit when adding/removing second
+
+**Clean Syntax:**
+```python
+@circuit
+def voltage_divider_subcircuit(vcc: Net, gnd: Net):
+    # ... circuit implementation
+    return output_net
+
+@circuit(name="main")
+def main():
+    vcc = Net("VCC")
+    gnd = Net("GND")
+
+    vout_1 = voltage_divider_subcircuit(vcc, gnd)  # Auto-named: voltage_divider_subcircuit_1
+    vout_2 = voltage_divider_subcircuit(vcc, gnd)  # Auto-named: voltage_divider_subcircuit_2
+```
 
 ## Manual Test Instructions
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth2/tests/bidirectional/36_copy_paste_component
+cd tests/bidirectional/36_copy_paste_component
 
-# Step 1: Generate initial KiCad project with R1-R2 divider
+# Step 1: Generate initial KiCad project with ONE subcircuit instance
 uv run resistor_divider_for_copy.py
-open resistor_divider_for_copy/resistor_divider_for_copy.kicad_pro
-# Verify: schematic has R1 and R2 in series with nets: VCC, Net1, GND
+open voltage_divider_instances/voltage_divider_instances.kicad_pro
 
-# Step 2: Edit resistor_divider_for_copy.py to add R3-R4 as copies
-# Add after R2 definition:
-#   r3 = Component(symbol="Device:R", ref="R3", value="10k",
-#                  footprint="Resistor_SMD:R_0603_1608Metric")
-#   r4 = Component(symbol="Device:R", ref="R4", value="10k",
-#                  footprint="Resistor_SMD:R_0603_1608Metric")
-#   net4 = Net(name="VCC_copy")
-#   net4 += r3[1]
-#   net5 = Net(name="Net2")
-#   net5 += r3[2]
-#   net5 += r4[1]
-#   net6 = Net(name="GND_copy")
-#   net6 += r4[2]
+# Verify in KiCad:
+#   Parent sheet (voltage_divider_instances.kicad_sch):
+#     - One hierarchical sheet symbol labeled "voltage_divider_subcircuit_1"
+#     - Hierarchical pins: VCC, GND, VOUT
+#
+#   Child sheet (voltage_divider_subcircuit_1.kicad_sch):
+#     - 2 resistors: R1 (10k), R2 (10k)
+#     - Hierarchical labels: VCC, GND, VOUT
+#     - VCC connects to R1 pin 1
+#     - VOUT connects to R1 pin 2 and R2 pin 1
+#     - GND connects to R2 pin 2
 
-# Step 3: Regenerate KiCad project
-uv run resistor_divider_for_copy.py
+# Step 2: Edit resistor_divider_for_copy.py to ADD SECOND subcircuit instance
+# Uncomment line 81:
+#   vout_2 = voltage_divider_subcircuit(vcc, gnd)
 
-# Step 4: Open regenerated KiCad project
-open resistor_divider_for_copy/resistor_divider_for_copy.kicad_pro
+# Step 3: Regenerate KiCad project (now with TWO subcircuit instances)
+# NOTE: Currently blocked by Issue #419 - reference collision bug
+# Each subcircuit should have independent namespace, but collision detection is global
 
-# Step 5: Verify schematic has all components
-#   - R1 (10k) - original component, position preserved
-#   - R2 (10k) - original component, position preserved
-#   - R3 (10k) - new copy, placed without overlapping
-#   - R4 (10k) - new copy, placed without overlapping
-#   - All nets present: VCC, Net1, GND, VCC_copy, Net2, GND_copy
+# Expected behavior (when bug is fixed):
+#   Parent sheet:
+#     - Two hierarchical sheet symbols:
+#       * voltage_divider_subcircuit_1 (first instance - positions preserved)
+#       * voltage_divider_subcircuit_2 (second instance - newly placed)
+#     - Both share VCC and GND nets via hierarchical pins
+#
+#   Child sheets:
+#     - voltage_divider_subcircuit_1.kicad_sch: R1, R2 (first instance)
+#     - voltage_divider_subcircuit_2.kicad_sch: R1, R2 (second instance)
+#     - Each has independent namespace (no collision)
+
+# Step 4: Comment out line 81 again and regenerate
+# Verify second subcircuit disappears, first subcircuit remains
 ```
 
 ## Expected Result
 
-- ✅ Initial KiCad project has R1-R2 divider only (2 components, 3 nets)
-- ✅ After editing Python and regenerating, KiCad has 4 resistors
-- ✅ R1-R2 positions preserved (not moved)
-- ✅ R3-R4 placed in available space (no overlap)
-- ✅ All 4 components have correct values (10k)
-- ✅ All 6 nets present: VCC, Net1, GND, VCC_copy, Net2, GND_copy
-- ✅ Netlist validation shows correct electrical connectivity for both dividers
-- ✅ No unconnected pins (Level 3 netlist validation)
+**Initial state (1 subcircuit):**
+- ✅ Parent sheet has one hierarchical sheet symbol: "voltage_divider_subcircuit_1"
+- ✅ Child sheet (voltage_divider_subcircuit_1.kicad_sch) has R1 and R2
+- ✅ Auto-incremented naming works correctly
+- ✅ Hierarchical pins connect parent and child (VCC, GND, VOUT)
+- ✅ Correct electrical connectivity
+
+**After uncommenting (2 subcircuits):**
+- ⏳ BLOCKED by Issue #419 (reference collision bug)
+- ✅ (When fixed) Parent sheet has two hierarchical sheet symbols
+- ✅ (When fixed) First subcircuit positions preserved
+- ✅ (When fixed) Second subcircuit placed without overlap
+- ✅ (When fixed) Two child sheets: voltage_divider_subcircuit_1.kicad_sch, voltage_divider_subcircuit_2.kicad_sch
+- ✅ (When fixed) Each child sheet has its own R1 and R2 (independent namespaces)
+- ✅ (When fixed) Both subcircuits share VCC and GND nets via hierarchical pins
+- ✅ (When fixed) Synchronization logs show "Add: voltage_divider_subcircuit_2"
+
+**After commenting back (1 subcircuit):**
+- ✅ (When fixed) Second subcircuit removed
+- ✅ (When fixed) First subcircuit preserved
+- ✅ (When fixed) Synchronization logs show "Remove: voltage_divider_subcircuit_2"
+
+**This demonstrates:**
+- ✅ Auto-incrementing subcircuit naming feature (working!)
+- ✅ Reusable hierarchical circuit blocks - write once, instantiate multiple times
+- ⏳ Multiple instances blocked by Issue #419 (reference collision)
