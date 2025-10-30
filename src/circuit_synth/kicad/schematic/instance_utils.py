@@ -63,6 +63,7 @@ def get_project_hierarchy_path(schematic_path: str) -> tuple[str, str]:
         if path.name != f"{path.parent.name}.kicad_sch":
             # Look for main project schematic
             project_files = list(path.parent.glob("*.kicad_sch"))
+
             main_project = None
 
             for proj_file in project_files:
@@ -74,18 +75,30 @@ def get_project_hierarchy_path(schematic_path: str) -> tuple[str, str]:
                 # Parse the main project to get hierarchy info
                 main_schematic = ksa.Schematic.load(str(main_project))
 
-                # Find the sheet that corresponds to our file
-                for sheet in main_schematic.sheets:
-                    if sheet.filename == path.name:
-                        project_name = main_schematic.uuid or path.parent.name
+                # kicad-sch-api doesn't expose sheets collection, so parse the file directly
+                with open(main_project, 'r') as f:
+                    content = f.read()
+
+                # Find all sheet blocks in the file
+                # Format: (sheet ... (uuid "XXX") ... (property "Sheetfile" "YYY.kicad_sch") ...)
+                import re
+                # Match sheet blocks
+                sheet_pattern = r'\(sheet\s+.*?\(uuid\s+"([^"]+)".*?\(property\s+"Sheetfile"\s+"([^"]+)"'
+                matches = re.findall(sheet_pattern, content, re.DOTALL)
+
+                for sheet_uuid, sheet_filename in matches:
+                    if sheet_filename == path.name:
+                        project_name = path.parent.name  # Use directory name
                         # Construct hierarchical path from main project UUID and sheet UUID
-                        hierarchical_path = f"/{main_schematic.uuid}/{sheet.uuid}"
+                        hierarchical_path = f"/{main_schematic.uuid}/{sheet_uuid}"
                         return project_name, hierarchical_path
 
         # Fallback: use simple project structure
         project_name = path.parent.name
         return project_name, "/"
 
-    except Exception:
+    except Exception as e:
         # Safe fallback to original behavior
+        import traceback
+        traceback.print_exc()
         return "circuit", "/"

@@ -133,6 +133,16 @@ class APISynchronizer:
         # Load the main schematic
         main_schematic = ksa.Schematic.load(str(self.schematic_path))
 
+        # Set the project name from the directory/file name
+        # This is critical for proper component instance references in hierarchical schematics
+        # Without this, kicad-sch-api defaults to "simple_circuit" causing "R?" display
+        project_name = self.schematic_path.parent.name
+        main_schematic.name = project_name
+
+        # Also update the parser's project_name to match
+        if hasattr(main_schematic, '_parser'):
+            main_schematic._parser.project_name = project_name
+
         # Track loaded files to avoid infinite recursion
         loaded_files = set()
         loaded_files.add(str(self.schematic_path.resolve()))
@@ -403,6 +413,11 @@ class APISynchronizer:
         """Extract component information from Circuit Synth circuit."""
         result = {}
 
+        print(f"\n{'='*80}")
+        print(f"🔍 EXTRACT: _extract_circuit_components()")
+        print(f"   Circuit name: {circuit.name if hasattr(circuit, 'name') else '???'}")
+        print(f"{'='*80}")
+
         # Recursive function to get all components including from subcircuits
         def get_all_components(circ):
             components = []
@@ -422,13 +437,9 @@ class APISynchronizer:
 
         # Get all components recursively
         all_components = get_all_components(circuit)
+        print(f"   Total components found: {len(all_components)}")
 
         for comp in all_components:
-            # Debug: Check component type and attributes
-            logger.debug(
-                f"Processing component: {type(comp).__name__}, attributes: {dir(comp)}"
-            )
-
             # Handle different component types
             if hasattr(comp, "reference"):  # KiCad SchematicSymbol
                 comp_id = comp.reference
@@ -438,6 +449,10 @@ class APISynchronizer:
                 comp_footprint = getattr(comp, "footprint", None)
                 comp_position = getattr(comp, "position", None)
                 comp_uuid = getattr(comp, "uuid", None)
+                print(f"\n   📦 Component (SchematicSymbol):")
+                print(f"      reference: '{comp_ref}'")
+                print(f"      value: '{comp_value}'")
+                print(f"      lib_id: '{comp_symbol}'")
             else:  # Circuit Synth Component
                 comp_id = comp.id if hasattr(comp, "id") else comp.ref
                 comp_ref = comp.ref
@@ -446,6 +461,10 @@ class APISynchronizer:
                 comp_footprint = getattr(comp, "footprint", None)
                 comp_position = getattr(comp, "position", None)
                 comp_uuid = getattr(comp, "uuid", None)
+                print(f"\n   📦 Component (Circuit Synth):")
+                print(f"      ref: '{comp_ref}'")
+                print(f"      value: '{comp_value}'")
+                print(f"      symbol: '{comp_symbol}'")
 
             result[comp_id] = {
                 "id": comp_id,
@@ -1229,6 +1248,25 @@ class APISynchronizer:
         # kicad-sch-api's save() method automatically syncs all collections to _data
         # including wires, labels, components, junctions, hierarchical_labels, etc.
         # See: kicad_sch_api/core/schematic.py:408-416 (save method calls all _sync_*_to_data methods)
+
+        # BEFORE SAVE: Log all component instances
+        print(f"\n🔍 BEFORE SAVE: Inspecting component instances")
+        for comp_wrapper in self.schematic.components:
+            # Access the underlying symbol
+            if hasattr(comp_wrapper, '_component'):
+                symbol = comp_wrapper._component
+            elif hasattr(comp_wrapper, 'symbol'):
+                symbol = comp_wrapper.symbol
+            else:
+                print(f"   ⚠️  Cannot access symbol from wrapper: {type(comp_wrapper)}")
+                continue
+
+            print(f"   Component: {symbol.reference}")
+            print(f"      UUID: {symbol.uuid}")
+            print(f"      instances: {symbol.instances}")
+            if symbol.instances:
+                for i, inst in enumerate(symbol.instances):
+                    print(f"         [{i}] path={inst.path}, ref={inst.reference}")
 
         logger.info(f"💾 Calling schematic.save(preserve_format=False)")
         logger.info(f"   - Save path: {self.schematic_path}")

@@ -135,11 +135,13 @@ class ComponentManager:
         from .instance_utils import add_symbol_instance, get_project_hierarchy_path
 
         schematic_path = getattr(self.schematic, "file_path", "")
+
         if schematic_path:
             project_name, hierarchical_path = get_project_hierarchy_path(schematic_path)
         else:
             project_name = getattr(self.schematic, "project_name", "circuit")
             hierarchical_path = "/"
+
         add_symbol_instance(component, project_name, hierarchical_path)
 
         # Add to schematic - need to handle both old and new (kicad-sch-api) schematic types
