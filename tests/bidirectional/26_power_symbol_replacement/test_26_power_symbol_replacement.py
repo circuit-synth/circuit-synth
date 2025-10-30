@@ -138,17 +138,25 @@ def test_26_power_symbol_replacement(request):
 
         assert schematic_file.exists(), "Schematic not created"
 
-        # Validate 5 components
+        # Validate components (5 resistors + 5 power symbols = 10 total)
         from kicad_sch_api import Schematic
         sch = Schematic.load(str(schematic_file))
         components = sch.components
 
-        assert len(components) == 5, f"Expected 5 components, found {len(components)}"
-        refs = {c.reference for c in components}
-        assert refs == {"R1", "R2", "R3", "R4", "R5"}
+        # Power symbols are also components in KiCad
+        # Expected: 5 resistors (R1-R5) + 5 power symbols (VCC, +3V3, +5V, GND, -5V)
+        assert len(components) == 10, f"Expected 10 components (5 resistors + 5 power symbols), found {len(components)}"
 
-        print(f"✅ Step 1: 5 components generated")
-        print(f"   - Components: {sorted(refs)}")
+        refs = {c.reference for c in components}
+        resistor_refs = {ref for ref in refs if ref.startswith("R")}
+        power_refs = {ref for ref in refs if ref.startswith("#")}
+
+        assert resistor_refs == {"R1", "R2", "R3", "R4", "R5"}, f"Expected R1-R5, found {resistor_refs}"
+        assert len(power_refs) == 5, f"Expected 5 power symbols, found {len(power_refs)}"
+
+        print(f"✅ Step 1: 10 components generated (5 resistors + 5 power symbols)")
+        print(f"   - Resistors: {sorted(resistor_refs)}")
+        print(f"   - Power symbols: {len(power_refs)} power components")
 
         # =====================================================================
         # STEP 2: Validate power symbol library references
