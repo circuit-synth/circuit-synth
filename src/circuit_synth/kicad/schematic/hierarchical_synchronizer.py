@@ -259,8 +259,29 @@ class HierarchicalSynchronizer:
             f"Synchronizing sheet: {sheet.name} at {sheet.get_hierarchical_path()}"
         )
 
+        print(f"\n{'='*80}")
+        print(f"🔍 SYNC SHEET: '{sheet.name}' at {sheet.get_hierarchical_path()}")
+        print(f"{'='*80}")
+        print(f"📂 Existing KiCad child sheets: {len(sheet.children)}")
+        for i, child in enumerate(sheet.children):
+            print(f"   [{i}] {child.name} -> {child.file_path}")
+
+        print(f"\n🐍 Python subcircuit_dict: {len(subcircuit_dict)} total circuits")
+        for name in subcircuit_dict.keys():
+            print(f"   - {name}")
+
         # Find the corresponding circuit for this sheet
         sheet_circuit = self._find_circuit_for_sheet(sheet, circuit, subcircuit_dict)
+
+        print(f"\n🎯 Found circuit for sheet '{sheet.name}': {sheet_circuit.name if sheet_circuit else 'None'}")
+        if sheet_circuit and hasattr(sheet_circuit, 'child_instances'):
+            print(f"   Circuit has {len(sheet_circuit.child_instances)} child_instances:")
+            for i, child_inst in enumerate(sheet_circuit.child_instances):
+                print(f"      [{i}] {child_inst}")
+        elif sheet_circuit and hasattr(sheet_circuit, '_subcircuits'):
+            print(f"   Circuit has {len(sheet_circuit._subcircuits)} _subcircuits:")
+            for i, subcirc in enumerate(sheet_circuit._subcircuits):
+                print(f"      [{i}] {subcirc.name if hasattr(subcirc, 'name') else subcirc}")
 
         if sheet_circuit and sheet.synchronizer:
             # Synchronize this sheet
@@ -296,8 +317,193 @@ class HierarchicalSynchronizer:
             logger.warning(f"No circuit found for sheet: {sheet.name}")
 
         # Synchronize child sheets
+        print(f"\n🔄 Recursively syncing {len(sheet.children)} existing child sheets...")
         for child in sheet.children:
             self._sync_sheet_recursive(child, circuit, subcircuit_dict, report)
+
+        # TODO: DETECT AND CREATE MISSING SHEETS
+        # This is where we need to detect NEW subcircuits in Python that don't exist in KiCad yet
+        print(f"\n⚠️  MISSING LOGIC: Need to detect and create new sheets here!")
+        if sheet_circuit:
+            # Get expected child circuits from Python
+            expected_children = []
+            if hasattr(sheet_circuit, 'child_instances'):
+                expected_children = [child['sub_name'] for child in sheet_circuit.child_instances]
+            elif hasattr(sheet_circuit, '_subcircuits'):
+                expected_children = [subcirc.name for subcirc in sheet_circuit._subcircuits]
+
+            # Get existing child sheets from KiCad
+            existing_children = [child.name for child in sheet.children]
+
+            # Find missing sheets
+            missing_sheets = [name for name in expected_children if name not in existing_children]
+
+            print(f"\n📊 COMPARISON:")
+            print(f"   Expected children (Python): {expected_children}")
+            print(f"   Existing children (KiCad):  {existing_children}")
+            print(f"   ❌ MISSING in KiCad: {missing_sheets}")
+
+            if missing_sheets:
+                print(f"\n🚨 NEED TO CREATE {len(missing_sheets)} NEW SHEET(S):")
+                for missing_name in missing_sheets:
+                    print(f"      - {missing_name}")
+                    print(f"        → Should create sheet symbol in {sheet.file_path}")
+                    print(f"        → Should create {missing_name}.kicad_sch file")
+                    print(f"        → Should synchronize components into new sheet")
+
+                # Attempt to create missing sheets
+                print(f"\n🔧 ATTEMPTING TO CREATE MISSING SHEETS...")
+                for missing_name in missing_sheets:
+                    print(f"\n{'='*80}")
+                    print(f"🏗️  Creating sheet: {missing_name}")
+                    print(f"{'='*80}")
+
+                    # Get the circuit object for this missing sheet
+                    missing_circuit = subcircuit_dict.get(missing_name)
+                    if not missing_circuit:
+                        print(f"❌ ERROR: Circuit '{missing_name}' not found in subcircuit_dict!")
+                        continue
+
+                    print(f"✅ Found circuit object: {missing_circuit.name}")
+                    print(f"   Circuit has {len(missing_circuit.components) if hasattr(missing_circuit, 'components') else 'unknown'} components")
+
+                    # Try to create the new sheet
+                    try:
+                        self._create_missing_sheet(sheet, missing_name, missing_circuit, subcircuit_dict)
+                    except Exception as e:
+                        print(f"❌ ERROR creating sheet: {e}")
+                        import traceback
+                        traceback.print_exc()
+
+    def _create_missing_sheet(
+        self,
+        parent_sheet: HierarchicalSheet,
+        sheet_name: str,
+        circuit_obj: Any,
+        subcircuit_dict: Dict[str, Any],
+    ):
+        """Create a new hierarchical sheet that's missing in KiCad but exists in Python."""
+        print(f"\n🔨 _create_missing_sheet() called")
+        print(f"   Parent sheet: {parent_sheet.name}")
+        print(f"   New sheet name: {sheet_name}")
+        print(f"   Circuit object: {circuit_obj.name}")
+        print(f"   Project dir: {self.project_dir}")
+
+        # Step 1: Create blank child .kicad_sch file
+        child_sch_path = self.project_dir / f"{sheet_name}.kicad_sch"
+        print(f"\n📝 STEP 1: Create blank {child_sch_path}")
+
+        if child_sch_path.exists():
+            print(f"   ⚠️  File already exists, will synchronize")
+        else:
+            print(f"   Creating new minimal schematic file...")
+            try:
+                # Create a minimal blank KiCad 8 schematic manually
+                import uuid as uuid_module
+
+                sch_uuid = str(uuid_module.uuid4())
+                minimal_sch = f'''(kicad_sch
+\t(version 20231120)
+\t(generator "circuit-synth")
+\t(generator_version "0.11.1")
+\t(uuid "{sch_uuid}")
+\t(paper "A4")
+\t(lib_symbols)
+\t(sheet_instances
+\t\t(path "/"
+\t\t\t(page "1")
+\t\t)
+\t)
+)
+'''
+                # Write the minimal schematic
+                with open(child_sch_path, 'w') as f:
+                    f.write(minimal_sch)
+
+                print(f"   ✅ Created minimal schematic: {child_sch_path}")
+
+            except Exception as e:
+                print(f"   ❌ ERROR creating schematic file: {e}")
+                import traceback
+                traceback.print_exc()
+                raise
+
+        # Step 2: Synchronize components into the new child schematic
+        print(f"\n📝 STEP 2: Synchronize components into child sheet")
+        print(f"   Circuit has {len(circuit_obj.components)} components to sync")
+
+        try:
+            # Create a synchronizer for the new child sheet
+            child_synchronizer = APISynchronizer(
+                str(child_sch_path),
+                preserve_user_components=self.preserve_user_components
+            )
+
+            # Synchronize the circuit into the new sheet
+            sync_report = child_synchronizer.sync_with_circuit(circuit_obj)
+
+            # Handle both dict and SyncReport object
+            if hasattr(sync_report, 'added'):
+                added_count = len(sync_report.added)
+            elif isinstance(sync_report, dict):
+                added_count = sync_report.get('added', 0)
+            else:
+                added_count = 0
+
+            print(f"   ✅ Synchronized {added_count} components")
+
+        except Exception as e:
+            print(f"   ❌ ERROR synchronizing components: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
+
+        # Step 3: Add sheet symbol to parent schematic
+        print(f"\n📝 STEP 3: Add sheet symbol to parent schematic")
+        print(f"   Parent schematic: {parent_sheet.file_path}")
+
+        try:
+            import kicad_sch_api as ksa
+            import uuid as uuid_module
+
+            # Load the parent schematic
+            parent_sch = ksa.Schematic.load(str(parent_sheet.file_path))
+            print(f"   ✅ Loaded parent schematic")
+
+            # Create a sheet symbol
+            sheet_uuid = str(uuid_module.uuid4())
+            print(f"   Creating sheet symbol with UUID: {sheet_uuid}")
+
+            # Determine position for the new sheet (simple: place at 50, 50)
+            sheet_x = 50.0
+            sheet_y = 50.0
+            sheet_width = 50.0
+            sheet_height = 30.0
+
+            print(f"   Position: ({sheet_x}, {sheet_y}), Size: {sheet_width}x{sheet_height}")
+
+            # Create sheet using kicad-sch-api
+            # Note: kicad-sch-api uses add_sheet() method
+            new_sheet = parent_sch.add_sheet(
+                name=sheet_name,
+                filename=f"{sheet_name}.kicad_sch",
+                position=(sheet_x, sheet_y),
+                size=(sheet_width, sheet_height),
+                uuid=sheet_uuid
+            )
+
+            print(f"   ✅ Added sheet symbol to parent")
+
+            # Save the parent schematic
+            parent_sch.save(str(parent_sheet.file_path))
+            print(f"   ✅ Saved parent schematic with new sheet symbol")
+
+        except Exception as e:
+            print(f"   ❌ ERROR adding sheet symbol: {e}")
+            print(f"   Error type: {type(e).__name__}")
+            import traceback
+            traceback.print_exc()
+            print(f"   ⚠️  Continuing without sheet symbol (child file exists)")
 
     def _find_circuit_for_sheet(
         self, sheet: HierarchicalSheet, main_circuit, subcircuit_dict: Dict[str, Any]

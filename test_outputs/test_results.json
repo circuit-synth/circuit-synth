@@ -1,0 +1,132 @@
+{
+  "timestamp": "2025-10-29T22:43:30.696531",
+  "duration": 18.37156581878662,
+  "total_passed": 11,
+  "total_failed": 3,
+  "critical_failures": 2,
+  "overall_passed": false,
+  "environment": {
+    "timestamp": "2025-10-29T22:43:12.324559",
+    "python_version": "3.13.3 (main, Apr  8 2025, 13:54:08) [Clang 16.0.0 (clang-1600.0.26.6)]",
+    "platform": "darwin",
+    "cwd": "/Users/shanemattner/Desktop/circuit-synth2",
+    "project_root": "/Users/shanemattner/Desktop/circuit-synth2",
+    "python3_version": "Python 3.13.3",
+    "uv_version": "uv 0.8.9 (Homebrew 2025-08-12)",
+    "kicad_version": "9.0.0"
+  },
+  "results": [
+    {
+      "name": "Basic Imports",
+      "category": "Core",
+      "severity": "CRITICAL",
+      "passed": true,
+      "duration": 0.09222698211669922,
+      "error": null
+    },
+    {
+      "name": "Component Creation",
+      "category": "Core",
+      "severity": "CRITICAL",
+      "passed": true,
+      "duration": 0.11650896072387695,
+      "error": null
+    },
+    {
+      "name": "Net Connections",
+      "category": "Core",
+      "severity": "CRITICAL",
+      "passed": true,
+      "duration": 0.11111903190612793,
+      "error": null
+    },
+    {
+      "name": "Reference Auto-Assignment",
+      "category": "Core",
+      "severity": "HIGH",
+      "passed": true,
+      "duration": 0.12007713317871094,
+      "error": null
+    },
+    {
+      "name": "JSON Export",
+      "category": "KiCad",
+      "severity": "HIGH",
+      "passed": true,
+      "duration": 0.11143016815185547,
+      "error": null
+    },
+    {
+      "name": "Symbol Library Access",
+      "category": "KiCad",
+      "severity": "HIGH",
+      "passed": false,
+      "duration": 0.7158370018005371,
+      "error": "2025-10-29 22:43:24.520 | DEBUG    | circuit_synth.core.power_net_registry:_discover_power_symbols:55 - Discovering power symbols from KiCad library...\n2025-10-29 22:43:24.520 | DEBUG    | circuit_synth.core.power_net_registry:_find_power_library:124 - Found power library at: tests/test_data/kicad_symbols/power.kicad_sym\n2025-10-29 22:43:24.520 | DEBUG    | circuit_synth.core.power_net_registry:_discover_power_symbols:85 - Discovered 631 power symbol mappings\nFailed to convert symbol data for Device:R: SchematicPin.__init__() got an unexpected keyword argument 'type'\nFailed to convert symbol data for Device:R: SchematicPin.__init__() got an unexpected keyword argument 'type'\nTraceback (most recent call last):\n  File \"<string>\", line 7, in <module>\nAssertionError: Could not load resistor symbol\n"
+    },
+    {
+      "name": "cs-new-project Import Test",
+      "category": "CLI",
+      "severity": "CRITICAL",
+      "passed": true,
+      "duration": 0.3262040615081787,
+      "error": null
+    },
+    {
+      "name": "cs-init-pcb Import Test",
+      "category": "CLI",
+      "severity": "HIGH",
+      "passed": true,
+      "duration": 0.22499704360961914,
+      "error": null
+    },
+    {
+      "name": "register-agents Import Test",
+      "category": "CLI",
+      "severity": "MEDIUM",
+      "passed": true,
+      "duration": 0.09567403793334961,
+      "error": null
+    },
+    {
+      "name": "validate-circuit Import Test",
+      "category": "CLI",
+      "severity": "MEDIUM",
+      "passed": true,
+      "duration": 0.202409029006958,
+      "error": null
+    },
+    {
+      "name": "cs-new-project Execution Test",
+      "category": "CLI",
+      "severity": "CRITICAL",
+      "passed": false,
+      "duration": 0.08538389205932617,
+      "error": "2025-10-29 22:43:26.083 | DEBUG    | circuit_synth.core.power_net_registry:_discover_power_symbols:55 - Discovering power symbols from KiCad library...\n2025-10-29 22:43:26.083 | DEBUG    | circuit_synth.core.power_net_registry:_find_power_library:124 - Found power library at: /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/power.kicad_sym\n2025-10-29 22:43:26.084 | DEBUG    | circuit_synth.core.power_net_registry:_discover_power_symbols:85 - Discovered 631 power symbol mappings\nTraceback (most recent call last):\n  File \"/Users/shanemattner/.local/bin/cs-new-project\", line 4, in <module>\n    from circuit_synth.tools.project_management.new_project import main\n  File \"/Users/shanemattner/Desktop/circuit-synth3/src/circuit_synth/__init__.py\", line 153, in <module>\n    from .kicad.core import Junction, Label, Schematic, SchematicSymbol, Wire\n  File \"/Users/shanemattner/Desktop/circuit-synth3/src/circuit_synth/kicad/core/__init__.py\", line 10, in <module>\n    from kicad_sch_api.core.parser import SExpressionParser\nModuleNotFoundError: No module named 'kicad_sch_api'\n"
+    },
+    {
+      "name": "Example Project Generation",
+      "category": "Integration",
+      "severity": "CRITICAL",
+      "passed": false,
+      "duration": 0.0011739730834960938,
+      "error": "[Errno 2] No such file or directory: PosixPath('/Users/shanemattner/Desktop/circuit-synth2/example_project/circuit-synth')"
+    },
+    {
+      "name": "JLCPCB Integration",
+      "category": "External",
+      "severity": "LOW",
+      "passed": true,
+      "duration": 0.7397890090942383,
+      "error": null
+    },
+    {
+      "name": "STM32 Search",
+      "category": "Components",
+      "severity": "MEDIUM",
+      "passed": true,
+      "duration": 0.16539335250854492,
+      "error": null
+    }
+  ]
+}

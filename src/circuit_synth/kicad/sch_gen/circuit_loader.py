@@ -300,9 +300,8 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
     sub_list = circ_data.get("subcircuits", [])
     for sub_info in sub_list:
         child_circ = _parse_circuit(sub_info, sub_dict)
-        circuit.child_instances.append(
-            {"sub_name": child_circ.name, "instance_label": ""}  # assigned later
-        )
+        child_inst = {"sub_name": child_circ.name, "instance_label": ""}
+        circuit.child_instances.append(child_inst)
 
     # Parse annotations
     annotations_data = circ_data.get("annotations", [])

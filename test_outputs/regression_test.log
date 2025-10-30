@@ -1,0 +1,113 @@
+[22:43:12.324] [HEADER] ================================================================================
+[22:43:12.324] [HEADER] COMPREHENSIVE REGRESSION TEST SUITE
+[22:43:12.324] [HEADER] Project: /Users/shanemattner/Desktop/circuit-synth2
+[22:43:12.324] [HEADER] Time: 2025-10-29 22:43:12
+[22:43:12.324] [HEADER] ================================================================================
+[22:43:12.324] [INFO] Capturing environment information...
+[22:43:12.552] [SUCCESS] Environment info saved to /Users/shanemattner/Desktop/circuit-synth2/test_outputs/environment.json
+[22:43:12.552] [HEADER] ============================================================
+[22:43:12.552] [HEADER] CLEARING ALL CACHES
+[22:43:12.552] [HEADER] ============================================================
+[22:43:12.552] [SUCCESS]   Cleared: /Users/shanemattner/.cache/circuit_synth
+[22:43:14.250] [SUCCESS]   Cleared: /Users/shanemattner/.cache/uv
+[22:43:15.264] [SUCCESS]   Cleared: /Users/shanemattner/Desktop/circuit-synth2/.venv
+[22:43:15.266] [SUCCESS]   Cleared: /Users/shanemattner/Desktop/circuit-synth2/dist
+[22:43:15.266] [INFO] Clearing Python bytecode...
+[22:43:15.526] [SUCCESS]   Cleared 111 bytecode files/directories
+[22:43:15.526] [INFO] Clearing test artifacts...
+[22:43:15.527] [SUCCESS] Cleared 4 cache locations
+[22:43:15.527] [HEADER] ============================================================
+[22:43:15.527] [HEADER] REINSTALLING PYTHON ENVIRONMENT
+[22:43:15.527] [HEADER] ============================================================
+[22:43:15.530] [INFO] Creating fresh virtual environment...
+[22:43:15.616] [SUCCESS]   Virtual environment created
+[22:43:15.616] [INFO] Installing circuit-synth with all dependencies...
+[22:43:19.589] [SUCCESS]   Circuit-synth installed successfully
+[22:43:19.589] [INFO] Verifying Python installation...
+[22:43:23.691] [SUCCESS]   Python environment verified
+[22:43:23.692] [INFO] Registering Claude agents...
+[22:43:23.905] [SUCCESS]   Agents registered
+[22:43:23.906] [HEADER] 
+============================================================
+[22:43:23.906] [HEADER] TESTING CORE FUNCTIONALITY
+[22:43:23.906] [HEADER] ============================================================
+[22:43:23.998] [SUCCESS]   ✅ Basic Imports (0.1s)
+[22:43:24.115] [SUCCESS]   ✅ Component Creation (0.1s)
+[22:43:24.226] [SUCCESS]   ✅ Net Connections (0.1s)
+[22:43:24.347] [SUCCESS]   ✅ Reference Auto-Assignment (0.1s)
+[22:43:24.347] [HEADER] 
+============================================================
+[22:43:24.347] [HEADER] TESTING KICAD GENERATION
+[22:43:24.347] [HEADER] ============================================================
+[22:43:24.458] [SUCCESS]   ✅ JSON Export (0.1s)
+[22:43:25.175] [ERROR]   ❌ Symbol Library Access (0.7s)
+[22:43:25.175] [HEADER] 
+============================================================
+[22:43:25.175] [HEADER] TESTING CLI ENTRY POINTS
+[22:43:25.175] [HEADER] ============================================================
+[22:43:25.501] [SUCCESS]   ✅ cs-new-project imports and shows help
+[22:43:25.726] [SUCCESS]   ✅ cs-init-pcb imports and shows help
+[22:43:25.822] [SUCCESS]   ✅ register-agents imports and shows help
+[22:43:26.024] [SUCCESS]   ✅ validate-circuit imports and shows help
+[22:43:26.109] [ERROR]   ❌ cs-new-project execution failed: 2025-10-29 22:43:26.083 | DEBUG    | circuit_synth.core.power_net_registry:_discover_power_symbols:55 - Discovering power symbols from KiCad library...
+2025-10-29 22:43:26.083 | DEBUG    | circuit_syn
+[22:43:26.110] [HEADER] 
+============================================================
+[22:43:26.110] [HEADER] TESTING CS-NEW-PROJECT END-TO-END WORKFLOW
+[22:43:26.110] [HEADER] ============================================================
+[22:43:26.110] [INFO] Creating test project...
+[22:43:26.143] [INFO] Adding circuit-synth dependency...
+[22:43:28.700] [INFO] Running cs-new-project...
+[22:43:29.457] [ERROR] ❌ cs-new-project failed: 2025-10-29 22:43:28.928 | DEBUG    | circuit_synth.core.power_net_registry:_discover_power_symbols:55 - Discovering power symbols from KiCad library...
+2025-10-29 22:43:28.928 | DEBUG    | circuit_synth.core.power_net_registry:_find_power_library:124 - Found power library at: /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/power.kicad_sym
+2025-10-29 22:43:28.928 | DEBUG    | circuit_synth.core.power_net_registry:_discover_power_symbols:85 - Discovered 631 power symbol mappings
+
+Aborted!
+
+[22:43:29.788] [HEADER] 
+============================================================
+[22:43:29.788] [HEADER] TESTING EXAMPLE PROJECT
+[22:43:29.788] [HEADER] ============================================================
+[22:43:29.788] [INFO]   Running example project main.py...
+[22:43:29.789] [ERROR] Unexpected error: [Errno 2] No such file or directory: PosixPath('/Users/shanemattner/Desktop/circuit-synth2/example_project/circuit-synth')
+[22:43:29.789] [ERROR]   ❌ Example project failed: [Errno 2] No such file or directory: PosixPath('/Users/shanemattner/Desktop/circuit-synth2/example_project/circuit-synth')
+[22:43:29.790] [HEADER] 
+============================================================
+[22:43:29.790] [HEADER] ADDITIONAL TESTS
+[22:43:29.790] [HEADER] ============================================================
+[22:43:30.529] [SUCCESS]   ✅ JLCPCB Integration (0.7s)
+[22:43:30.695] [SUCCESS]   ✅ STM32 Search (0.2s)
+[22:43:30.695] [HEADER] 
+================================================================================
+[22:43:30.695] [HEADER] TEST SUMMARY
+[22:43:30.695] [HEADER] ================================================================================
+[22:43:30.695] [SUCCESS] Core: 4/4 passed ✅
+[22:43:30.696] [ERROR] KiCad: 1/2 passed ❌
+[22:43:30.696] [ERROR]     ❌ Symbol Library Access (HIGH)
+[22:43:30.696] [ERROR] CLI: 4/5 passed ❌
+[22:43:30.696] [ERROR]     ❌ cs-new-project Execution Test (CRITICAL)
+[22:43:30.696] [ERROR] Integration: 0/1 passed ❌
+[22:43:30.696] [ERROR]     ❌ Example Project Generation (CRITICAL)
+[22:43:30.696] [SUCCESS] External: 1/1 passed ✅
+[22:43:30.696] [SUCCESS] Components: 1/1 passed ✅
+[22:43:30.696] [INFO] 
+------------------------------------------------------------
+[22:43:30.696] [INFO] Total: 11/14 tests passed
+[22:43:30.696] [INFO] Duration: 18.4 seconds
+[22:43:30.696] [ERROR] 
+⛔ CRITICAL FAILURES DETECTED - DO NOT RELEASE!
+[22:43:30.696] [ERROR]   • cs-new-project Execution Test: 2025-10-29 22:43:26.083 | DEBUG    | circuit_synth.core.power_net_registry:_discover_power_symbols:55 - Discovering power symbols from KiCad library...
+2025-10-29 22:43:26.083 | DEBUG    | circuit_synth.core.power_net_registry:_find_power_library:124 - Found power library at: /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/power.kicad_sym
+2025-10-29 22:43:26.084 | DEBUG    | circuit_synth.core.power_net_registry:_discover_power_symbols:85 - Discovered 631 power symbol mappings
+Traceback (most recent call last):
+  File "/Users/shanemattner/.local/bin/cs-new-project", line 4, in <module>
+    from circuit_synth.tools.project_management.new_project import main
+  File "/Users/shanemattner/Desktop/circuit-synth3/src/circuit_synth/__init__.py", line 153, in <module>
+    from .kicad.core import Junction, Label, Schematic, SchematicSymbol, Wire
+  File "/Users/shanemattner/Desktop/circuit-synth3/src/circuit_synth/kicad/core/__init__.py", line 10, in <module>
+    from kicad_sch_api.core.parser import SExpressionParser
+ModuleNotFoundError: No module named 'kicad_sch_api'
+
+[22:43:30.696] [ERROR]   • Example Project Generation: [Errno 2] No such file or directory: PosixPath('/Users/shanemattner/Desktop/circuit-synth2/example_project/circuit-synth')
+[22:43:30.696] [INFO] 
+Results saved to: /Users/shanemattner/Desktop/circuit-synth2/test_outputs/test_results.json

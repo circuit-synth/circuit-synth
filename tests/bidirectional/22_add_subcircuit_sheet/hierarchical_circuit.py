@@ -30,9 +30,6 @@ def hierarchical_circuit():
     Note: This uses the root-only version by default.
     The test will modify this to add the subcircuit section.
     """
-    from circuit_synth.core.decorators import get_current_circuit
-
-    root = get_current_circuit()
 
     r1 = Component(
         symbol="Device:R",
