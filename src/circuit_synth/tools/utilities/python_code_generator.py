@@ -341,7 +341,9 @@ class PythonCodeGenerator:
         # Create components
         if circuit.components:
             code_parts.append("    # Create components")
-            for comp in circuit.components.values():
+            # Handle both dict and list types for components
+            components_iter = circuit.components.values() if isinstance(circuit.components, dict) else circuit.components
+            for comp in components_iter:
                 comp_code = self._generate_component_code(comp, indent="    ")
                 code_parts.extend(comp_code)
 
@@ -1274,7 +1276,9 @@ class PythonCodeGenerator:
         """Update Python file with circuit data - creates separate files for each circuit"""
         logger.info(f"🔄 CODE_UPDATE: Starting update of {python_file}")
         logger.info(f"🔄 CODE_UPDATE: Preview mode: {preview_only}")
-        logger.info(f"🔄 CODE_UPDATE: Circuits to update: {list(circuits.keys())}")
+        # Handle both dict and list types for circuits parameter
+        circuit_keys = list(circuits.keys()) if isinstance(circuits, dict) else [f"circuit_{i}" for i in range(len(circuits))]
+        logger.info(f"🔄 CODE_UPDATE: Circuits to update: {circuit_keys}")
 
         # Debug hierarchical tree
         if hierarchical_tree:
@@ -1287,11 +1291,18 @@ class PythonCodeGenerator:
             )
 
         try:
+            # Normalize circuits to always be a dict
+            if isinstance(circuits, list):
+                # If circuits is a list, convert to dict with indices as keys
+                circuits_dict = {f"circuit_{i}": c for i, c in enumerate(circuits)}
+            else:
+                circuits_dict = circuits
+
             # Check if this is a hierarchical design
-            is_hierarchical = len(circuits) > 1 or any(
+            is_hierarchical = len(circuits_dict) > 1 or any(
                 hasattr(circuit, "is_hierarchical_sheet")
                 and circuit.is_hierarchical_sheet
-                for circuit in circuits.values()
+                for circuit in circuits_dict.values()
             )
             logger.info(f"📝 CODE_UPDATE: Hierarchical design: {is_hierarchical}")
 
@@ -1300,12 +1311,12 @@ class PythonCodeGenerator:
                     "📝 CODE_UPDATE: Generating separate files for hierarchical circuits"
                 )
                 return self._generate_multiple_files(
-                    python_file, circuits, preview_only, hierarchical_tree
+                    python_file, circuits_dict, preview_only, hierarchical_tree
                 )
             else:
                 # For non-hierarchical (flat) circuits, still use the old single-file approach
                 logger.info("📝 CODE_UPDATE: Generating single file for flat circuit")
-                main_circuit = list(circuits.values())[0]
+                main_circuit = list(circuits_dict.values())[0]
                 updated_code = self._generate_flat_code(main_circuit)
 
             if updated_code:
