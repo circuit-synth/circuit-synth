@@ -1,11 +1,13 @@
 # Bidirectional Test Suite - Comprehensive Summary
 
-**Date:** 2025-10-30 (Updated: Manual validation campaign + test rewrites + Issue #409 fix)
+**Date:** 2025-10-30 (Updated: Manual validation campaign + test rewrites + Issue #409, #427 fixes)
 **Branch:** test/bidirectional-manual-validation
 **Total Tests:** 68 comprehensive bidirectional tests (01-68, excluding 27)
 **New Tests Added:** 30 tests (39-65, plus 66-68)
 **Tests Removed:** Test 27 (architecturally invalid - junction test incompatible with label-based design)
-**Recently Fixed:** Test 29 (Component Custom Properties) - Issue #409 ✅
+**Recently Fixed:**
+- Test 29 (Component Custom Properties) - Issue #409 ✅
+- Test 59 Steps 1-4 (Hierarchical Label Generation) - Issue #427 ✅
 
 ### 🎯 Manual Validation Campaign Progress
 **Status:** Tests 01-21, 25, 26, 31, 33, 34, 35, 36, 37 manually validated (29 of 68 tests)
@@ -95,7 +97,7 @@ Manual Validation: 29 of 68 tests (43%)
 | 49 | Annotate Schematic | ✅ PASS | KiCad annotation integration |
 | 50 | Component Footprint Change | ✅ PASS | SMD ↔ THT footprint swaps |
 | 51 | Sync After External Edit | ⏭️ SKIP | Collaborative workflow (documents expected) |
-| 59 | Modify Hierarchical Pin Name | ⚠️ XFAIL | Interface evolution (pin renaming) |
+| 59 | Modify Hierarchical Pin Name | ⚠️ XFAIL (4 PASS) | Interface evolution (pin renaming) - Steps 1-4 PASS (Issue #427 fixed ✅) |
 | 60 | Remove Hierarchical Pin | ⚠️ XFAIL | Interface simplification |
 | 61 | Large Circuit Performance | ✅ PASS | 100 components, performance benchmarks |
 
@@ -176,11 +178,24 @@ Manual Validation: 29 of 68 tests (43%)
 - This suggests the netlist functionality may be working better than expected
 - Recommend re-investigating Issue #373 status
 
+### Issue #427: Hierarchical Labels Not Generated ✅ FIXED
+
+**Affected Tests:** Test 59, Test 28, Test 22
+**Impact:** Hierarchical labels were not being generated for nets in subcircuits
+**Root Cause:** ComponentManager.find_component() couldn't find components with unit suffix
+**Status:** ✅ **FIXED** (PR #428)
+- Components indexed as "R1_unit1" but find_component("R1") looked for exact match
+- Fixed in component_manager.py:384 to handle unit suffix
+- Test 59 now passes Steps 1-4 (hierarchical label generation validated)
+- Test 22 (subcircuit sheet) now passes
+- Test 28 (no-connect) now passes
+
 ### Issue #380: Synchronizer Doesn't Remove Old Hierarchical Labels
 
-**Affected Tests:** Test 59, Test 60, Test 58  
-**Impact:** Old labels persist when pins removed/renamed  
+**Affected Tests:** Test 59, Test 60, Test 58
+**Impact:** Old labels persist when pins removed/renamed (separate from #427)
 **Status:** Open issue, needs synchronizer enhancement
+**Note:** Issue #427 fixed label *generation*, Issue #380 is about label *removal* during rename
 
 ### Power Symbol Handling
 
