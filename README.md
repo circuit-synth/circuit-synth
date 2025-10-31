@@ -129,7 +129,7 @@ You get the best of both worlds: code-based definition with visual refinement.
 pip install circuit-synth
 
 # 2. Create a new project with working example
-cs-new-project my_first_board
+uv run cs-new-project my_first_board
 
 # 3. Generate KiCad files from the example
 cd my_first_board
@@ -169,7 +169,7 @@ pip install circuit-synth
 
 ```bash
 # Create new project with ESP32-C6 example
-cs-new-project my_project
+uv run cs-new-project my_project
 
 # Generate KiCad files
 cd my_project
@@ -709,7 +709,7 @@ The AI agents and skills will automatically select the right tools and expertise
 
 ### Project Creation
 ```bash
-cs-new-project              # Complete project setup with ESP32-C6 example
+uv run cs-new-project              # Complete project setup with ESP32-C6 example
 ```
 
 ### Circuit Generation
