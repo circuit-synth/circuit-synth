@@ -2,22 +2,21 @@
 """
 Automated test for 38_empty_subcircuit bidirectional test.
 
-Tests empty hierarchical sheet handling: Creating a subcircuit with no components,
-then dynamically adding and removing components while regenerating.
+Tests empty hierarchical sheet handling: Generating a subcircuit with no components,
+then dynamically adding and removing components in Python and syncing to KiCad.
 
-Core Question: When you create an empty subcircuit (no components) and regenerate,
-does KiCad handle it correctly? Can you then add components to the empty subcircuit
-and regenerate again?
+Core Question: When you generate an empty subcircuit (no components), does KiCad
+handle it correctly? Can you then add components in Python and sync to KiCad?
 
-Workflow:
-1. Generate KiCad with R1 on root sheet and empty subcircuit
+Workflow (Python→KiCad sync):
+1. Generate KiCad from Python with R1 on root sheet and empty subcircuit
 2. Verify root sheet has R1, subcircuit sheet exists but is empty
 3. Add R2 to empty subcircuit in Python code
-4. Regenerate KiCad from Python
-5. Validate R2 now exists in subcircuit
+4. Sync Python→KiCad (regenerate)
+5. Validate R2 now exists in KiCad subcircuit
 6. Remove R2 from subcircuit in Python code
-7. Regenerate KiCad from Python
-8. Validate subcircuit is empty again
+7. Sync Python→KiCad again
+8. Validate subcircuit is empty again in KiCad
 
 Validation uses kicad-sch-api for Level 2 semantic validation.
 """
@@ -31,23 +30,23 @@ import pytest
 
 
 def test_38_empty_subcircuit(request):
-    """Test empty subcircuit handling and dynamic component addition.
+    """Test empty subcircuit handling and dynamic component addition/sync.
 
-    EDGE CASE TEST (Empty Hierarchical Sheets):
-    Validates that empty subcircuits can be created and populated dynamically,
-    enabling flexible hierarchical design workflows.
+    EDGE CASE TEST (Empty Hierarchical Sheets - Python→KiCad sync):
+    Validates that empty subcircuits can be generated and populated dynamically
+    in Python, with changes syncing correctly to KiCad.
 
     Workflow:
-    1. Generate with R1 on root sheet and empty subcircuit
-    2. Verify root sheet has R1, subcircuit is empty
-    3. Add R2 to subcircuit → verify it appears
-    4. Remove R2 from subcircuit → verify it's empty again
+    1. Generate KiCad from Python with R1 on root sheet and empty subcircuit
+    2. Verify root sheet has R1, subcircuit is empty in KiCad
+    3. Add R2 in Python → sync to KiCad → verify it appears
+    4. Remove R2 in Python → sync to KiCad → verify it's empty again
 
     Why important:
-    - Enables hierarchical structure before implementation details
-    - Allows dynamic population of subsystems
+    - Enables generating hierarchical structure before implementation details
+    - Allows dynamic population of subsystems in Python
     - Tests edge case of truly empty sheets
-    - Ensures robustness of empty sheet handling in KiCad
+    - Ensures robustness of empty sheet handling in KiCad during sync
 
     Level 2 Semantic Validation:
     - kicad-sch-api for sheet structure and component placement
@@ -137,23 +136,24 @@ def test_38_empty_subcircuit(request):
             (
                 s
                 for s in json_data.get("subcircuits", [])
-                if s.get("name") == "EmptySubcircuit"
+                if "placeholder_subcircuit" in s.get("name", "")
             ),
             None,
         )
-        assert empty_sub_in_json is not None, "EmptySubcircuit not found in JSON"
+        assert empty_sub_in_json is not None, "placeholder_subcircuit not found in JSON"
 
-        # Verify EmptySubcircuit has no components
+        # Verify placeholder_subcircuit has no components
         empty_sub_components = empty_sub_in_json.get("components", {})
-        print(f"       * EmptySubcircuit (components: {len(empty_sub_components)})")
+        subcircuit_name = empty_sub_in_json.get("name")
+        print(f"       * {subcircuit_name} (components: {len(empty_sub_components)})")
         assert (
             len(empty_sub_components) == 0
-        ), f"EmptySubcircuit should have no components, found {len(empty_sub_components)}"
+        ), f"{subcircuit_name} should have no components, found {len(empty_sub_components)}"
 
         print(f"\n✅ Step 1 complete: Empty subcircuit created successfully")
         print(f"   - Root circuit has R1: ✓")
-        print(f"   - EmptySubcircuit exists: ✓")
-        print(f"   - EmptySubcircuit has 0 components: ✓")
+        print(f"   - {subcircuit_name} exists: ✓")
+        print(f"   - {subcircuit_name} has 0 components: ✓")
 
         # =====================================================================
         # STEP 2: Add R2 to empty subcircuit in Python code
@@ -162,34 +162,27 @@ def test_38_empty_subcircuit(request):
         print("STEP 2: Add R2 to empty subcircuit in Python code")
         print("=" * 70)
 
-        # Inject component creation code between the markers
-        injection_lines = [
-            "r2 = Component(",
-            "    symbol=\"Device:R\",",
-            "    ref=\"R2\",",
-            "    value=\"4.7k\",",
-            "    footprint=\"Resistor_SMD:R_0603_1608Metric\",",
-            ")",
-            "empty_sub.add_component(r2)",
-        ]
-        component_injection = "\n    " + "\n    ".join(injection_lines)
-
-        # Use simple string replacement for reliability
-        marker_section = (
-            "    # START_MARKER: Test will modify between these markers to add/remove components\n"
-            "    # END_MARKER"
+        # Uncomment the R2 component between the markers
+        # The fixture has commented-out R2 component code that we'll uncomment
+        modified_code = original_code.replace(
+            "    # Uncomment to add components to subcircuit:\n"
+            "    # r2 = Component(\n"
+            "    #     symbol=\"Device:R\",\n"
+            "    #     ref=\"R2\",\n"
+            "    #     value=\"1k\",\n"
+            "    #     footprint=\"Resistor_SMD:R_0603_1608Metric\",\n"
+            "    # )",
+            "    # Uncomment to add components to subcircuit:\n"
+            "    r2 = Component(\n"
+            "        symbol=\"Device:R\",\n"
+            "        ref=\"R2\",\n"
+            "        value=\"1k\",\n"
+            "        footprint=\"Resistor_SMD:R_0603_1608Metric\",\n"
+            ")"
         )
-        replacement_section = (
-            "    # START_MARKER: Test will modify between these markers to add/remove components\n"
-            + component_injection
-            + "\n"
-            + "    # END_MARKER"
-        )
-
-        modified_code = original_code.replace(marker_section, replacement_section)
 
         assert modified_code != original_code, (
-            "Failed to modify Python code - markers not found or pattern incorrect"
+            "Failed to modify Python code - R2 component not found or pattern incorrect"
         )
 
         # Write modified Python file
@@ -197,8 +190,8 @@ def test_38_empty_subcircuit(request):
             f.write(modified_code)
 
         print(f"✅ Step 2: Component R2 added to Python code")
-        print(f"   - Component: R2 (4.7k resistor)")
-        print(f"   - Will be added to: EmptySubcircuit")
+        print(f"   - Component: R2 (1k resistor)")
+        print(f"   - Will be added to: placeholder_subcircuit")
 
         # =====================================================================
         # STEP 3: Regenerate KiCad with R2 in subcircuit
@@ -269,20 +262,21 @@ def test_38_empty_subcircuit(request):
             (
                 s
                 for s in json_data.get("subcircuits", [])
-                if s.get("name") == "EmptySubcircuit"
+                if "placeholder_subcircuit" in s.get("name", "")
             ),
             None,
         )
-        assert empty_sub_in_json is not None, "EmptySubcircuit not found in JSON"
+        assert empty_sub_in_json is not None, "placeholder_subcircuit not found in JSON"
 
         empty_sub_components = empty_sub_in_json.get("components", {})
+        subcircuit_name_with_r2 = empty_sub_in_json.get("name")
         assert (
             "R2" in empty_sub_components
-        ), f"R2 not found in EmptySubcircuit, components: {list(empty_sub_components.keys())}"
+        ), f"R2 not found in {subcircuit_name_with_r2}, components: {list(empty_sub_components.keys())}"
 
         print(f"\n✅ Step 4 complete: R2 successfully added to subcircuit")
         print(f"   - R1 still on root sheet: ✓")
-        print(f"   - R2 now in EmptySubcircuit: ✓")
+        print(f"   - R2 now in {subcircuit_name_with_r2}: ✓")
         print(f"   - R1 position preserved: ✓")
 
         # =====================================================================
@@ -292,25 +286,27 @@ def test_38_empty_subcircuit(request):
         print("STEP 5: Remove R2 from subcircuit in Python code")
         print("=" * 70)
 
-        # Remove the injection (replace with just markers again)
-        marker_section_with_r2 = (
-            "    # START_MARKER: Test will modify between these markers to add/remove components\n"
-            + component_injection
-            + "\n"
-            + "    # END_MARKER"
-        )
-        replacement_section_remove = (
-            "    # START_MARKER: Test will modify between these markers to add/remove components\n"
-            "    # END_MARKER"
-        )
-
+        # Re-comment the R2 component (reverse of step 2)
         current_code = open(python_file, "r").read()
         modified_code_remove = current_code.replace(
-            marker_section_with_r2, replacement_section_remove
+            "    # Uncomment to add components to subcircuit:\n"
+            "    r2 = Component(\n"
+            "        symbol=\"Device:R\",\n"
+            "        ref=\"R2\",\n"
+            "        value=\"1k\",\n"
+            "        footprint=\"Resistor_SMD:R_0603_1608Metric\",\n"
+            ")",
+            "    # Uncomment to add components to subcircuit:\n"
+            "    # r2 = Component(\n"
+            "    #     symbol=\"Device:R\",\n"
+            "    #     ref=\"R2\",\n"
+            "    #     value=\"1k\",\n"
+            "    #     footprint=\"Resistor_SMD:R_0603_1608Metric\",\n"
+            "    # )"
         )
 
         assert modified_code_remove != current_code, (
-            "Failed to remove R2 injection from Python code"
+            "Failed to re-comment R2 component in Python code"
         )
 
         # Write modified Python file
@@ -379,16 +375,17 @@ def test_38_empty_subcircuit(request):
             (
                 s
                 for s in json_data.get("subcircuits", [])
-                if s.get("name") == "EmptySubcircuit"
+                if "placeholder_subcircuit" in s.get("name", "")
             ),
             None,
         )
-        assert empty_sub_in_json is not None, "EmptySubcircuit not found in JSON"
+        assert empty_sub_in_json is not None, "placeholder_subcircuit not found in JSON"
 
         empty_sub_components = empty_sub_in_json.get("components", {})
+        subcircuit_name_final = empty_sub_in_json.get("name")
         assert (
             len(empty_sub_components) == 0
-        ), f"EmptySubcircuit should be empty again, found {len(empty_sub_components)} components"
+        ), f"{subcircuit_name_final} should be empty again, found {len(empty_sub_components)} components"
 
         print(f"\n🎉 EMPTY SUBCIRCUIT HANDLING WORKS!")
         print(f"   ✓ Empty subcircuits can be created without errors")
