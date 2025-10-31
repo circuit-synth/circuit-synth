@@ -227,7 +227,7 @@ result = circuit.generate_pdf_schematic(
 
 - **KiCad 7.0 or later** (for kicad-cli PDF support)
 - **kicad-cli available in PATH**: Ensure KiCad is properly installed
-- **Python 3.8+**: Circuit-synth requires Python 3.8 or later
+- **Python 3.12+**: Circuit-synth requires Python 3.12 or later
 
 ### Verify KiCad Installation
 

@@ -1054,7 +1054,7 @@ black src/ && isort src/ && flake8 src/ && mypy src/
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.12+
 - KiCad 8.0+
 
 ```bash
