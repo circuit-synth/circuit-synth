@@ -4,7 +4,7 @@ Installation
 Requirements
 ------------
 
-* Python 3.9 or higher
+* Python 3.12 or higher
 * KiCad (for project generation)
 
 Installation Methods

@@ -284,7 +284,7 @@ subprocess.run(["kicad", str(kicad_pcb)])
 
 - **KiCad 8.0 or later** (for kicad-cli gerber export support)
 - **kicad-cli available in PATH**: Ensure KiCad is properly installed
-- **Python 3.8+**: Circuit-synth requires Python 3.8 or later
+- **Python 3.12+**: Circuit-synth requires Python 3.12 or later
 - **Complete circuit design**: All components must be defined and connected
 
 ### Verify KiCad Installation

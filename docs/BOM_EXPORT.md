@@ -168,7 +168,7 @@ The default CSV format includes:
 
 - **KiCad 8.0 or later** (for kicad-cli support)
 - **kicad-cli available in PATH**: Ensure KiCad is properly installed
-- **Python 3.8+**: Circuit-synth requires Python 3.8 or later
+- **Python 3.12+**: Circuit-synth requires Python 3.12 or later
 
 ### Verify KiCad Installation
 
