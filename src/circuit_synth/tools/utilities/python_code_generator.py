@@ -341,7 +341,7 @@ class PythonCodeGenerator:
         # Create components
         if circuit.components:
             code_parts.append("    # Create components")
-            for comp in circuit.components:
+            for comp in circuit.components.values():
                 comp_code = self._generate_component_code(comp, indent="    ")
                 code_parts.extend(comp_code)
 
