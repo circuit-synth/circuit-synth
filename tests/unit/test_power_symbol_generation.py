@@ -134,7 +134,7 @@ class TestPowerSymbolGeneration:
 
             assert result["success"]
 
-            sch_file = Path(tmpdir) / "test_multi" / "test_multi.kicad_sch"
+            sch_file = Path(tmpdir) / "test_multi" / "test_multi_power.kicad_sch"
             content = sch_file.read_text()
 
             # Should have all three power symbols
@@ -231,9 +231,9 @@ class TestNetJSONSerialization:
             assert "GND" in data["nets"]
             gnd_net = data["nets"]["GND"]
 
-            # Should be a dict with connections and metadata
+            # Should be a dict with nodes and metadata
             assert isinstance(gnd_net, dict)
-            assert "connections" in gnd_net
+            assert "nodes" in gnd_net
             assert "is_power" in gnd_net
             assert "power_symbol" in gnd_net
 
@@ -366,7 +366,7 @@ class TestPowerSymbolReferences:
 
             assert result["success"]
 
-            sch_file = Path(tmpdir) / "test_refs" / "test_refs.kicad_sch"
+            sch_file = Path(tmpdir) / "test_refs" / "test_pwr_refs.kicad_sch"
             content = sch_file.read_text()
 
             # Extract all #PWR references
