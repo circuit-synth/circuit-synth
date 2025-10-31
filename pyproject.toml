@@ -223,6 +223,8 @@ markers = [
     "functional: marks tests as functional tests",
     "cache: marks tests as cache-related tests",
 ]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 env = [
     "KICAD_SYMBOL_DIR=tests/test_data/kicad_symbols",
 ]
