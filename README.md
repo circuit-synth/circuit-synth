@@ -132,8 +132,8 @@ pip install circuit-synth
 uv run cs-new-project my_first_board
 
 # 3. Generate KiCad files from the example
-cd my_first_board/circuit-synth
-uv run python example_project/circuit-synth/main.py
+cd my_first_board
+uv run python main.py
 
 # 4. Open in KiCad (generated in ESP32_C6_Dev_Board/)
 open ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.kicad_pro
@@ -149,15 +149,19 @@ open ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.kicad_pro
 - ✅ Complete KiCad project ready to edit/manufacture
 
 **Next steps:**
-- Modify `example_project/circuit-synth/main.py` to customize your circuit
-- Re-run `uv run python example_project/circuit-synth/main.py` to regenerate KiCad files
+- Modify `main.py` in your project to customize your circuit
+- Re-run `uv run python main.py` to regenerate KiCad files
 - Open KiCad to view/edit your schematic and PCB layout
 
 ## Installation
 
+Install using your preferred package manager:
+
 ```bash
+# Recommended: uv (faster, better dependency resolution)
 uv add circuit-synth
-# or
+
+# Alternative: pip
 pip install circuit-synth
 ```
 
@@ -165,10 +169,11 @@ pip install circuit-synth
 
 ```bash
 # Create new project with ESP32-C6 example
-cs-new-project
+uv run cs-new-project my_project
 
 # Generate KiCad files
-cd circuit-synth && uv run python circuit-synth/main.py
+cd my_project
+uv run python main.py
 ```
 
 ## Example Circuit
@@ -600,8 +605,11 @@ Circuit-synth includes a curated library of 7 pre-made, manufacturing-ready circ
 
 ### Using Circuit Patterns
 
+Circuit patterns are included in projects created with `cs-new-project`:
+
 ```python
 from circuit_synth import *
+# These patterns are copied to your project by cs-new-project
 from buck_converter import buck_converter
 from thermistor import thermistor_sensor
 
@@ -701,12 +709,12 @@ The AI agents and skills will automatically select the right tools and expertise
 
 ### Project Creation
 ```bash
-cs-new-project              # Complete project setup with ESP32-C6 example
+uv run cs-new-project              # Complete project setup with ESP32-C6 example
 ```
 
 ### Circuit Generation
 ```bash
-cd circuit-synth && uv run python example_project/circuit-synth/main.py    # Generate KiCad files from Python code
+cd my_project && uv run python main.py    # Generate KiCad files from Python code
 ```
 
 ### Available Commands
@@ -970,7 +978,7 @@ my_circuit_project/
 
 | Traditional EE Workflow | With Circuit-Synth |
 |-------------------------|-------------------|
-| Manual component placement | `python example_project/circuit-synth/main.py` → Complete project |
+| Manual component placement | `cs-new-project && python main.py` → Complete project |
 | Hunt through symbol libraries | Verified components with JLCPCB & DigiKey availability |
 | Visual net verification | Explicit Python connections |
 | GUI-based editing | Version-controlled Python files |

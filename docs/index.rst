@@ -60,10 +60,14 @@ Circuit-Synth is an open-source Python library that fits seamlessly into normal 
 Quick Start
 -----------
 
-Install Circuit-Synth:
+Install Circuit-Synth using your preferred package manager:
 
 .. code-block:: bash
 
+   # Recommended: uv (faster, better dependency resolution)
+   uv add circuit-synth
+
+   # Alternative: pip
    pip install circuit-synth
 
 Create your first circuit:

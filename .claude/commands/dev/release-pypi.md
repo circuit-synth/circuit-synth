@@ -170,6 +170,19 @@ fi
 git checkout "$current_branch"
 ```
 
+### Documentation Validation (CRITICAL)
+```bash
+# Validate documentation alignment (PREVENTS broken docs on PyPI)
+echo "📚 Validating documentation alignment..."
+python3 tools/documentation/validate_docs.py || {
+    echo "❌ Documentation validation failed!"
+    echo "📖 Fix errors before release. See docs/DOCUMENTATION_MAINTENANCE.md"
+    echo "💡 Run: /dev:validate-docs for details"
+    exit 1
+}
+echo "✅ Documentation validation passed"
+```
+
 ### Core Functionality Test
 ```bash
 # Test main functionality
