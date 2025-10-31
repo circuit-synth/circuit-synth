@@ -1,0 +1,10 @@
+ERROR    circuit_synth.kicad.pdf_exporter:pdf_exporter.py:104 kicad-cli PDF export failed: Failed to load schematic
+ERROR    circuit_synth.kicad.schematic.component_manager:component_manager.py:111 Component with reference R2 unit 1 already exists
+ERROR    circuit_synth.tools.kicad_integration.kicad_to_python_sync:kicad_to_python_sync.py:385 Failed to regenerate JSON from schematic: Object of type Mock is not JSON serializable
+ERROR    circuit_synth.kicad.sch_gen.schematic_writer:schematic_writer.py:1015 ❌ PLACE_COMPONENTS: TEXT-FLOW PLACEMENT FAILED after 126.22ms: Components do not fit on A3 sheet (largest supported size). Reduce component count or implement larger sheet support.
+ERROR    circuit_synth:_logger.py:53 Failed to generate KiCad project '/var/folders/rm/26jsncrd4xl3z78w3jdxplrw0000gn/T/tmpu4ihp1a1/test_matching': Error: Subcircuit name 'leaf' is used more than once with different definitions.
+ERROR    circuit_synth:_logger.py:53 Failed to generate KiCad project '/var/folders/rm/26jsncrd4xl3z78w3jdxplrw0000gn/T/tmpth2pfxrk/test_deep': Error: Subcircuit name 'level3' is used more than once with different definitions.
+ERROR    circuit_synth:_logger.py:53 Failed to generate KiCad project '/var/folders/rm/26jsncrd4xl3z78w3jdxplrw0000gn/T/tmpm2u_w7gw/test_detection': Error: Subcircuit name 'sub' is used more than once with different definitions.
+ERROR tests/integration/test_component_rename_sync.py::TestComponentRenameSync::test_rename_detected_by_uuid_match
+ERROR tests/integration/test_component_rename_sync.py::TestComponentRenameSync::test_rename_with_position_change_matched_by_uuid
+ERROR tests/integration/test_component_rename_sync.py::TestComponentRenameSync::test_no_duplicate_components_after_rename

@@ -1,0 +1,8 @@
+FAILED tests/e2e/test_gerber_export.py::TestCircuitGenerateGerbers::test_generate_gerbers_creates_project_path
+FAILED tests/e2e/test_pdf_export.py::TestPDFExporter::test_pdf_exporter_requires_kicad
+FAILED tests/e2e/test_pdf_export.py::TestCircuitGeneratePDF::test_generate_pdf_default_parameters
+FAILED tests/e2e/test_roundtrip_advanced.py::TestComponentRotation::test_component_rotation_preservation
+FAILED tests/e2e/test_roundtrip_advanced.py::TestFootprintUpdates::test_footprint_update_preserves_position
+FAILED tests/e2e/test_roundtrip_advanced.py::TestManualComponentPreservation::test_manual_component_preserved
+FAILED tests/e2e/test_roundtrip_advanced.py::TestComponentMovementWithLabels::test_component_movement_preserves_labels
+FAILED tests/e2e/test_roundtrip_preservation.py::TestRoundTripPreservation::test_value_update_with_position_preservation
