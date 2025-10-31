@@ -1,0 +1,69 @@
+{
+  "name": "spi_subcircuit",
+  "description": "",
+  "tstamps": "/spi_subcircuit-4341333984/",
+  "source_file": "spi_subcircuit.kicad_sch",
+  "components": {},
+  "nets": {},
+  "subcircuits": [
+    {
+      "name": "SPI_Driver",
+      "description": "",
+      "tstamps": "/spi_driver-4340651008/",
+      "source_file": "SPI_Driver.kicad_sch",
+      "components": {
+        "R1": {
+          "symbol": "Device:R",
+          "ref": "R1",
+          "value": "10k",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "datasheet": "~",
+          "description": "Resistor",
+          "properties": {
+            "ki_fp_filters": "R_*"
+          },
+          "_extra_fields": {
+            "ki_fp_filters": "R_*"
+          },
+          "pins": [
+            {
+              "pin_id": "1",
+              "name": "~",
+              "func": "passive",
+              "unit": 1,
+              "x": 0.0,
+              "y": 3.81,
+              "length": 1.27,
+              "orientation": 270.0
+            },
+            {
+              "pin_id": "2",
+              "name": "~",
+              "func": "passive",
+              "unit": 1,
+              "x": 0.0,
+              "y": -3.81,
+              "length": 1.27,
+              "orientation": 90.0
+            }
+          ]
+        }
+      },
+      "nets": {
+        "DATA_IN": [
+          {
+            "component": "R1",
+            "pin": {
+              "number": "1",
+              "name": "~",
+              "type": "passive"
+            }
+          }
+        ]
+      },
+      "subcircuits": [],
+      "annotations": []
+    }
+  ],
+  "annotations": []
+}

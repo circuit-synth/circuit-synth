@@ -1,0 +1,256 @@
+{
+  "name": "nested_dividers",
+  "description": "",
+  "tstamps": "/nested_dividers-4384257520/",
+  "source_file": "nested_dividers.kicad_sch",
+  "components": {},
+  "nets": {},
+  "subcircuits": [
+    {
+      "name": "Divider_Level1",
+      "description": "",
+      "tstamps": "/divider_level1-4386397440/",
+      "source_file": "Divider_Level1.kicad_sch",
+      "components": {
+        "R1": {
+          "symbol": "Device:R",
+          "ref": "R1",
+          "value": "10k",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "datasheet": "~",
+          "description": "Resistor",
+          "properties": {
+            "ki_fp_filters": "R_*"
+          },
+          "_extra_fields": {
+            "ki_fp_filters": "R_*"
+          },
+          "pins": [
+            {
+              "pin_id": "1",
+              "name": "~",
+              "func": "passive",
+              "unit": 1,
+              "x": 0.0,
+              "y": 3.81,
+              "length": 1.27,
+              "orientation": 270.0
+            },
+            {
+              "pin_id": "2",
+              "name": "~",
+              "func": "passive",
+              "unit": 1,
+              "x": 0.0,
+              "y": -3.81,
+              "length": 1.27,
+              "orientation": 90.0
+            }
+          ]
+        },
+        "R2": {
+          "symbol": "Device:R",
+          "ref": "R2",
+          "value": "10k",
+          "footprint": "Resistor_SMD:R_0603_1608Metric",
+          "datasheet": "~",
+          "description": "Resistor",
+          "properties": {
+            "ki_fp_filters": "R_*"
+          },
+          "_extra_fields": {
+            "ki_fp_filters": "R_*"
+          },
+          "pins": [
+            {
+              "pin_id": "1",
+              "name": "~",
+              "func": "passive",
+              "unit": 1,
+              "x": 0.0,
+              "y": 3.81,
+              "length": 1.27,
+              "orientation": 270.0
+            },
+            {
+              "pin_id": "2",
+              "name": "~",
+              "func": "passive",
+              "unit": 1,
+              "x": 0.0,
+              "y": -3.81,
+              "length": 1.27,
+              "orientation": 90.0
+            }
+          ]
+        }
+      },
+      "nets": {
+        "VIN": [
+          {
+            "component": "R1",
+            "pin": {
+              "number": "1",
+              "name": "~",
+              "type": "passive"
+            }
+          }
+        ],
+        "VOUT1": [
+          {
+            "component": "R1",
+            "pin": {
+              "number": "2",
+              "name": "~",
+              "type": "passive"
+            }
+          },
+          {
+            "component": "R2",
+            "pin": {
+              "number": "1",
+              "name": "~",
+              "type": "passive"
+            }
+          }
+        ],
+        "GND": [
+          {
+            "component": "R2",
+            "pin": {
+              "number": "2",
+              "name": "~",
+              "type": "passive"
+            }
+          }
+        ]
+      },
+      "subcircuits": [
+        {
+          "name": "Divider_Level2",
+          "description": "",
+          "tstamps": "/divider_level2-4375543728/",
+          "source_file": "Divider_Level2.kicad_sch",
+          "components": {
+            "R3": {
+              "symbol": "Device:R",
+              "ref": "R3",
+              "value": "5k",
+              "footprint": "Resistor_SMD:R_0603_1608Metric",
+              "datasheet": "~",
+              "description": "Resistor",
+              "properties": {
+                "ki_fp_filters": "R_*"
+              },
+              "_extra_fields": {
+                "ki_fp_filters": "R_*"
+              },
+              "pins": [
+                {
+                  "pin_id": "1",
+                  "name": "~",
+                  "func": "passive",
+                  "unit": 1,
+                  "x": 0.0,
+                  "y": 3.81,
+                  "length": 1.27,
+                  "orientation": 270.0
+                },
+                {
+                  "pin_id": "2",
+                  "name": "~",
+                  "func": "passive",
+                  "unit": 1,
+                  "x": 0.0,
+                  "y": -3.81,
+                  "length": 1.27,
+                  "orientation": 90.0
+                }
+              ]
+            },
+            "R4": {
+              "symbol": "Device:R",
+              "ref": "R4",
+              "value": "5k",
+              "footprint": "Resistor_SMD:R_0603_1608Metric",
+              "datasheet": "~",
+              "description": "Resistor",
+              "properties": {
+                "ki_fp_filters": "R_*"
+              },
+              "_extra_fields": {
+                "ki_fp_filters": "R_*"
+              },
+              "pins": [
+                {
+                  "pin_id": "1",
+                  "name": "~",
+                  "func": "passive",
+                  "unit": 1,
+                  "x": 0.0,
+                  "y": 3.81,
+                  "length": 1.27,
+                  "orientation": 270.0
+                },
+                {
+                  "pin_id": "2",
+                  "name": "~",
+                  "func": "passive",
+                  "unit": 1,
+                  "x": 0.0,
+                  "y": -3.81,
+                  "length": 1.27,
+                  "orientation": 90.0
+                }
+              ]
+            }
+          },
+          "nets": {
+            "VOUT1": [
+              {
+                "component": "R3",
+                "pin": {
+                  "number": "1",
+                  "name": "~",
+                  "type": "passive"
+                }
+              }
+            ],
+            "VOUT2": [
+              {
+                "component": "R3",
+                "pin": {
+                  "number": "2",
+                  "name": "~",
+                  "type": "passive"
+                }
+              },
+              {
+                "component": "R4",
+                "pin": {
+                  "number": "1",
+                  "name": "~",
+                  "type": "passive"
+                }
+              }
+            ],
+            "GND": [
+              {
+                "component": "R4",
+                "pin": {
+                  "number": "2",
+                  "name": "~",
+                  "type": "passive"
+                }
+              }
+            ]
+          },
+          "subcircuits": [],
+          "annotations": []
+        }
+      ],
+      "annotations": []
+    }
+  ],
+  "annotations": []
+}

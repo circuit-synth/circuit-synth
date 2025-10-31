@@ -1,0 +1,52 @@
+2025-10-30 19:25:45.723 | DEBUG    | circuit_synth.core.power_net_registry:_discover_power_symbols:55 - Discovering power symbols from KiCad library...
+2025-10-30 19:25:45.724 | DEBUG    | circuit_synth.core.power_net_registry:_find_power_library:124 - Found power library at: /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/power.kicad_sym
+2025-10-30 19:25:45.724 | DEBUG    | circuit_synth.core.power_net_registry:_discover_power_symbols:85 - Discovered 631 power symbol mappings
+Processing 1 main shapes
+Processing 2 main pins
+    label_width=4.95, label_height=7.62 (len=3)
+    Angle 270 (Down pin): max_y 3.81 -> 10.67 (offset=0.508)
+    Pin bounds: (-1.91, 0.64) to (1.91, 12.57)
+    label_width=4.95, label_height=7.62 (len=3)
+    Angle 90 (Up pin): min_y -3.81 -> -10.67 (offset=0.508)
+    Pin bounds: (-1.91, -12.57) to (1.91, -0.64)
+After geometry processing: (-1.91, -12.57) to (1.91, 12.57)
+  Width: 3.81, Height: 25.15
+FINAL BBOX: (-5.00, -20.37) to (5.00, 25.37)
+  Width: 10.00, Height: 45.73
+==================================================
+
+
+🔍 WRITER_INIT: Circuit='spi_subcircuit'
+🔍 WRITER_INIT:   Hierarchical path=['885bb411-c700-4e77-8e8d-4acb3fbcb7ad']
+🔍 WRITER_INIT:   Self UUID=885bb411-c700-4e77-8e8d-4acb3fbcb7ad
+🔍 WRITER_INIT:   Root UUID (path[0])=885bb411-c700-4e77-8e8d-4acb3fbcb7ad
+================================================================================
+🔤 TEXT-FLOW PLACEMENT _place_components() called!
+================================================================================
+⚠️  No components to place!
+2025-10-30 19:25:45,869 - WARNING - circuit_synth.kicad.sch_gen.schematic_writer - 🔍 CYCLE 1: === _add_pin_level_net_labels() for circuit 'spi_subcircuit' ===
+2025-10-30 19:25:45,869 - WARNING - circuit_synth.kicad.sch_gen.schematic_writer - 🔍 CYCLE 1:   Circuit has 0 nets
+2025-10-30 19:25:45,869 - ERROR - circuit_synth - Failed to generate KiCad project 'test1_spi_output': 'ComponentManager' object has no attribute 'get_all_components' [component=CIRCUIT project_name=test1_spi_output]
+Generating KiCad project: spi_subcircuit
+  Parent circuit: spi_subcircuit
+  Subcircuit: SPI_Driver
+  Hierarchical port: DATA_IN
+  Components in subcircuit: R1 (resistor)
+============================================================
+Circuit-Synth Version Information
+============================================================
+Version: 0.11.3
+Source: /Users/shanemattner/Desktop/circuit-synth3/src/circuit_synth
+Install Type: local/editable source
+Git Commit: f3bfa111
+Git Tag: v0.11.3
+Git Status: DIRTY (uncommitted changes)
+============================================================
+
+
+✅ Project generated successfully!
+   Expected hierarchical structure:
+   - Parent: spi_subcircuit.kicad_sch (with sheet symbol)
+   - Subcircuit: SPI_Driver.kicad_sch (with hierarchical label)
+   - Sheet symbol should have pin: DATA_IN
+   - Subcircuit should have hierarchical label: DATA_IN

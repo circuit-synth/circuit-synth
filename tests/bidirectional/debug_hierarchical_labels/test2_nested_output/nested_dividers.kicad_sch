@@ -1,0 +1,59 @@
+(kicad_sch
+	(version 20250114)
+	(generator "circuit_synth")
+	(generator_version "0.8.36")
+	(uuid "89d3af47-2880-43fd-847f-746b603cf672")
+	(paper "A4")
+	(title_block
+		(title "nested_dividers")
+	)
+	(lib_symbols)
+	(sheet
+		(at 25.4 12.7)
+		(size 41.75 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "b55f763f-74c4-47f2-9c6f-19f069147fc6")
+		(property "Sheetname" "Divider_Level1"
+			(at 25.4 11.9884 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "Divider_Level1.kicad_sch"
+			(at 25.4 33.6046 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "nested_dividers"
+				(path "/89d3af47-2880-43fd-847f-746b603cf672"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
