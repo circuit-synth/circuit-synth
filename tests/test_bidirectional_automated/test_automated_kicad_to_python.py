@@ -47,7 +47,7 @@ class TestKiCadToPythonImport:
             f"Expected 1 component, got {len(imported_circuit.components)}"
 
         # Verify component properties - convert list to dict for lookup
-        comp_map = {c.ref: c for c in imported_circuit.components}
+        comp_map = {c.ref: c for c in imported_circuit.components.values()}
         assert "R1" in comp_map, "R1 not found in imported circuit"
         r1 = comp_map["R1"]
         assert r1.value == "10k", f"Expected value '10k', got '{r1.value}'"
@@ -109,7 +109,7 @@ class TestKiCadToPythonImport:
             f"Expected 2 components, got {len(imported_circuit.components)}"
 
         # Convert list to dict for lookup
-        comp_map = {c.ref: c for c in imported_circuit.components}
+        comp_map = {c.ref: c for c in imported_circuit.components.values()}
 
         # Verify R1 (original)
         assert "R1" in comp_map, "R1 lost during import"
@@ -146,7 +146,7 @@ class TestKiCadToPythonImport:
         imported_circuit = import_kicad_project(str(project_file))
 
         # Convert list to dict for lookup
-        comp_map = {c.ref: c for c in imported_circuit.components}
+        comp_map = {c.ref: c for c in imported_circuit.components.values()}
 
         # Verify position preserved (if supported by importer)
         if hasattr(comp_map["R1"], 'position'):
