@@ -324,7 +324,7 @@ def calculate_text_bounds(
         Tuple of (min_x, min_y, max_x, max_y)
     """
     # Count lines and max line length
-    lines = text.content.split("\n")
+    lines = text.text.split("\n")
     max_line_length = max(len(line) for line in lines)
     num_lines = len(lines)
 

@@ -86,12 +86,12 @@ class TextManager:
 
         # Create text
         text = Text(
-            content=content,
-            position=text_position,
-            orientation=orientation,
-            size=size,
-            effects=effects,
             uuid=self._generate_uuid(),
+            position=text_position,
+            text=content,
+            rotation=orientation,
+            size=size,
+            exclude_from_sim=False,
         )
 
         # Add to schematic
@@ -203,10 +203,10 @@ class TextManager:
 
         for text in self.schematic.texts:
             if exact_match:
-                if text.content == pattern:
+                if text.text == pattern:
                     matching_texts.append(text)
             else:
-                if pattern.lower() in text.content.lower():
+                if pattern.lower() in text.text.lower():
                     matching_texts.append(text)
 
         return matching_texts
