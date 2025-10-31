@@ -1,10 +1,11 @@
 # Bidirectional Test Suite - Comprehensive Summary
 
-**Date:** 2025-10-30 (Updated: Manual validation campaign + test rewrites + Issue #409, #427 fixes)
+**Date:** 2025-10-30 (Updated: Version 0.11.3 + Manual validation + Issue #409, #427 fixes)
 **Branch:** test/bidirectional-manual-validation
 **Total Tests:** 68 comprehensive bidirectional tests (01-68, excluding 27)
 **New Tests Added:** 30 tests (39-65, plus 66-68)
 **Tests Removed:** Test 27 (architecturally invalid - junction test incompatible with label-based design)
+**Version:** 0.11.3
 **Recently Fixed:**
 - Test 29 (Component Custom Properties) - Issue #409 ✅
 - Test 59 Steps 1-4 (Hierarchical Label Generation) - Issue #427 ✅
@@ -196,6 +197,13 @@ Manual Validation: 29 of 68 tests (43%)
 **Impact:** Old labels persist when pins removed/renamed (separate from #427)
 **Status:** Open issue, needs synchronizer enhancement
 **Note:** Issue #427 fixed label *generation*, Issue #380 is about label *removal* during rename
+
+### Issue #426: Custom KiCad Library Support Not Exposed
+
+**Created:** 2025-10-30
+**Impact:** Users cannot use custom symbol libraries (company parts, vendor libs)
+**Status:** Feature exists internally but no user-facing API
+**Priority:** Medium-High - Important for professional use
 
 ### Power Symbol Handling
 
