@@ -2279,16 +2279,13 @@ class SchematicWriter:
                     from kicad_sch_api.core.types import Text
 
                     text_element = Text(
-                        content=str(cell_text),
+                        uuid=f"{uuid}_{row_idx}_{col_idx}",
                         position=Point(cell_x, cell_y),
+                        text=str(cell_text),
+                        rotation=0.0,
                         size=text_size,
+                        exclude_from_sim=False,
                     )
-
-                    # Make header row bold
-                    if row_idx == 0 and header_bold:
-                        text_element._text_bold = True
-
-                    text_element._text_uuid = f"{uuid}_{row_idx}_{col_idx}"
 
                     self.schematic.add_text(text_element)
 
