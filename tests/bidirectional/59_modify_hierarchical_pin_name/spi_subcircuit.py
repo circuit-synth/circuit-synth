@@ -59,7 +59,7 @@ def main():
     print(f"  Hierarchical port: DATA_IN (will be renamed to SPI_MOSI)")
     print(f"  Components in subcircuit: R1 (resistor)")
 
-    root.generate_kicad_project("spi_subcircuit", force_regenerate=True)
+    root.generate_kicad_project("spi_subcircuit")
 
     print(f"\n✅ Project generated successfully!")
     print(f"   Expected hierarchical structure:")
