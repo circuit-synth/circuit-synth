@@ -12,7 +12,8 @@ from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
-from kicad_sch_api.core.types import Point, Schematic, SchematicSymbol
+from kicad_sch_api import Schematic
+from kicad_sch_api.core.types import Point, SchematicSymbol
 
 from circuit_synth.kicad.schematic.synchronizer import APISynchronizer
 
@@ -29,16 +30,17 @@ class TestComponentRenameSync:
     @pytest.fixture
     def simple_schematic_path(self, temp_workspace):
         """Create a simple schematic with one resistor."""
-        schematic = Schematic()
+        schematic = Schematic.create()
 
         # Add a resistor R1
-        r1_uuid = schematic.add_component(
-            library_id="Device:R",
+        r1_component = schematic.components.add(
+            lib_id="Device:R",
             reference="R1",
             value="10k",
             position=(100.0, 50.0),
             footprint="Resistor_SMD:R_0603_1608Metric",
         )
+        r1_uuid = r1_component._data.uuid
 
         # Save schematic
         sch_path = temp_workspace / "test.kicad_sch"
@@ -61,7 +63,7 @@ class TestComponentRenameSync:
                 break
 
         assert r1_component is not None, "R1 should exist"
-        original_uuid = r1_component.uuid
+        original_uuid = r1_component._data.uuid
 
         # Rename to R2
         r1_component.reference = "R2"
@@ -78,6 +80,7 @@ class TestComponentRenameSync:
         mock_r1.ref = "R1"
         mock_r1.value = "10k"
         mock_r1.symbol = "Device:R"
+        mock_r1.lib_id = "Device:R"
         mock_r1.footprint = "Resistor_SMD:R_0603_1608Metric"
         mock_r1.position = Point(100.0, 50.0)
         mock_r1.uuid = original_uuid  # Same UUID as renamed component
@@ -100,11 +103,11 @@ class TestComponentRenameSync:
     def test_rename_detected_by_position_match(self, temp_workspace):
         """Test that rename is detected by position+properties when UUID not available."""
         # Create schematic without preserving UUIDs (simulate legacy workflow)
-        schematic = Schematic()
+        schematic = Schematic.create()
 
         # Add resistor at specific position
-        schematic.add_component(
-            library_id="Device:R",
+        schematic.components.add(
+            lib_id="Device:R",
             reference="R2",  # Already renamed in KiCad
             value="10k",
             position=(100.0, 50.0),
@@ -124,6 +127,7 @@ class TestComponentRenameSync:
         mock_r1.ref = "R1"
         mock_r1.value = "10k"
         mock_r1.symbol = "Device:R"
+        mock_r1.lib_id = "Device:R"
         mock_r1.footprint = "Resistor_SMD:R_0603_1608Metric"
         mock_r1.position = Point(100.0, 50.0)  # Same position
         mock_r1.uuid = None  # No UUID
@@ -157,7 +161,7 @@ class TestComponentRenameSync:
                 break
 
         assert r1 is not None
-        original_uuid = r1.uuid
+        original_uuid = r1._data.uuid
 
         # Change both reference AND position
         r1.reference = "R10"
@@ -174,6 +178,7 @@ class TestComponentRenameSync:
         mock_r1.ref = "R1"
         mock_r1.value = "10k"
         mock_r1.symbol = "Device:R"
+        mock_r1.lib_id = "Device:R"
         mock_r1.footprint = "Resistor_SMD:R_0603_1608Metric"
         mock_r1.position = Point(100.0, 50.0)  # Old position
         mock_r1.uuid = original_uuid  # Same UUID
@@ -206,7 +211,7 @@ class TestComponentRenameSync:
                 r1 = comp
                 break
 
-        original_uuid = r1.uuid
+        original_uuid = r1._data.uuid
         r1.reference = "R2"
         schematic.save(str(sch_path))
 
@@ -219,6 +224,7 @@ class TestComponentRenameSync:
         mock_r1.ref = "R1"
         mock_r1.value = "10k"
         mock_r1.symbol = "Device:R"
+        mock_r1.lib_id = "Device:R"
         mock_r1.footprint = "Resistor_SMD:R_0603_1608Metric"
         mock_r1.position = Point(100.0, 50.0)
         mock_r1.uuid = original_uuid
@@ -242,28 +248,31 @@ class TestComponentRenameSync:
     def test_multiple_renames_handled_correctly(self, temp_workspace):
         """Test handling multiple component renames in same sync."""
         # Create schematic with 3 components
-        schematic = Schematic()
+        schematic = Schematic.create()
 
-        r1_uuid = schematic.add_component(
-            library_id="Device:R",
+        r1_component = schematic.components.add(
+            lib_id="Device:R",
             reference="R1",
             value="10k",
             position=(100.0, 50.0),
         )
+        r1_uuid = r1_component._data.uuid
 
-        r2_uuid = schematic.add_component(
-            library_id="Device:R",
+        r2_component = schematic.components.add(
+            lib_id="Device:R",
             reference="R2",
             value="20k",
             position=(150.0, 50.0),
         )
+        r2_uuid = r2_component._data.uuid
 
-        c1_uuid = schematic.add_component(
-            library_id="Device:C",
+        c1_component = schematic.components.add(
+            lib_id="Device:C",
             reference="C1",
             value="100nF",
             position=(200.0, 50.0),
         )
+        c1_uuid = c1_component._data.uuid
 
         sch_path = temp_workspace / "test.kicad_sch"
         schematic.save(str(sch_path))
@@ -275,7 +284,7 @@ class TestComponentRenameSync:
         # Store original UUIDs
         uuid_map = {}
         for comp in components_list:
-            uuid_map[comp.reference] = comp.uuid
+            uuid_map[comp.reference] = comp._data.uuid
 
         # Rename: R1->R10, R2->R20, C1->C10
         for comp in components_list:
@@ -298,6 +307,7 @@ class TestComponentRenameSync:
         mock_r1.ref = "R1"
         mock_r1.value = "10k"
         mock_r1.symbol = "Device:R"
+        mock_r1.lib_id = "Device:R"
         mock_r1.position = Point(100.0, 50.0)
         mock_r1.uuid = uuid_map["R1"]
         mock_r1._pins = {}
@@ -307,6 +317,7 @@ class TestComponentRenameSync:
         mock_r2.ref = "R2"
         mock_r2.value = "20k"
         mock_r2.symbol = "Device:R"
+        mock_r2.lib_id = "Device:R"
         mock_r2.position = Point(150.0, 50.0)
         mock_r2.uuid = uuid_map["R2"]
         mock_r2._pins = {}
@@ -316,6 +327,7 @@ class TestComponentRenameSync:
         mock_c1.ref = "C1"
         mock_c1.value = "100nF"
         mock_c1.symbol = "Device:C"
+        mock_c1.lib_id = "Device:C"
         mock_c1.position = Point(200.0, 50.0)
         mock_c1.uuid = uuid_map["C1"]
         mock_c1._pins = {}

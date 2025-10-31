@@ -269,14 +269,16 @@ class TestComponentManagerRename:
     def test_rename_component_success(self, component_manager):
         """Test successful component rename."""
         # Add a component with ref R1
-        component_manager._component_index["R1"] = Mock(reference="R1")
+        # Index keys are stored as "{reference}_unit{n}" format
+        component = Mock(reference="R1", unit=1)
+        component_manager._component_index["R1_unit1"] = component
 
         result = component_manager.rename_component("R1", "R2")
 
         assert result is True
-        assert "R1" not in component_manager._component_index
-        assert "R2" in component_manager._component_index
-        assert component_manager._component_index["R2"].reference == "R2"
+        assert "R1_unit1" not in component_manager._component_index
+        assert "R2_unit1" in component_manager._component_index
+        assert component_manager._component_index["R2_unit1"].reference == "R2"
 
     def test_rename_component_old_not_found(self, component_manager):
         """Test rename fails when old reference doesn't exist."""
@@ -286,27 +288,29 @@ class TestComponentManagerRename:
 
     def test_rename_component_new_already_exists(self, component_manager):
         """Test rename fails when new reference already exists."""
-        component_manager._component_index["R1"] = Mock(reference="R1")
-        component_manager._component_index["R2"] = Mock(reference="R2")
+        # Index keys are stored as "{reference}_unit{n}" format
+        component_manager._component_index["R1_unit1"] = Mock(reference="R1", unit=1)
+        component_manager._component_index["R2_unit1"] = Mock(reference="R2", unit=1)
 
         result = component_manager.rename_component("R1", "R2")
 
         assert result is False
         # R1 should still exist
-        assert "R1" in component_manager._component_index
+        assert "R1_unit1" in component_manager._component_index
 
     def test_rename_updates_internal_index(self, component_manager):
         """Test that rename updates the internal component index correctly."""
-        component = Mock(reference="R1")
-        component_manager._component_index["R1"] = component
+        # Index keys are stored as "{reference}_unit{n}" format
+        component = Mock(reference="R1", unit=1)
+        component_manager._component_index["R1_unit1"] = component
 
         component_manager.rename_component("R1", "R100")
 
         # Old reference gone
-        assert "R1" not in component_manager._component_index
+        assert "R1_unit1" not in component_manager._component_index
         # New reference present
-        assert "R100" in component_manager._component_index
+        assert "R100_unit1" in component_manager._component_index
         # Same component object
-        assert component_manager._component_index["R100"] is component
+        assert component_manager._component_index["R100_unit1"] is component
         # Reference updated
         assert component.reference == "R100"

@@ -126,8 +126,9 @@ class TestComponentManagerDeletion:
         manager.remove_component("R2")
 
         # Verify index is updated
-        assert "R1" in manager._component_index
-        assert "R2" not in manager._component_index
+        # Index keys are stored as "{reference}_unit{n}" format
+        assert "R1_unit1" in manager._component_index
+        assert "R2_unit1" not in manager._component_index
         assert len(manager._component_index) == 1
 
     def test_remove_multiple_components_sequential(self, temp_schematic):

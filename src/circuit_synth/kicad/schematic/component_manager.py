@@ -217,9 +217,10 @@ class ComponentManager:
                 # Use new API if available (kicad-sch-api 0.4.1+)
                 result = self.schematic.components.remove_by_uuid(uuid)
                 if result:
-                    # Also remove from our index
-                    if reference in self._component_index:
-                        del self._component_index[reference]
+                    # Also remove from our index - need to find the correct key
+                    component_key = self._get_component_key(reference)
+                    if component_key:
+                        del self._component_index[component_key]
                     logger.info(f"Removed component {reference} by UUID {uuid}")
                     return True
             else:
@@ -228,11 +229,13 @@ class ComponentManager:
                 )
 
         # Fall back to reference-based removal
-        if reference not in self._component_index:
+        # Find the component using correct key format (with unit suffix)
+        component_key = self._get_component_key(reference)
+        if component_key is None:
             logger.warning(f"Component {reference} not found")
             return False
 
-        component = self._component_index[reference]
+        component = self._component_index[component_key]
 
         # Use proper kicad-sch-api remove() method by reference
         # (Fixed in kicad-sch-api 0.4.1+: https://github.com/circuit-synth/kicad-sch-api/pull/55)
@@ -244,7 +247,7 @@ class ComponentManager:
             )
             return False
 
-        del self._component_index[reference]
+        del self._component_index[component_key]
 
         logger.info(f"Removed component {reference}")
         return True
@@ -265,24 +268,28 @@ class ComponentManager:
             True if renamed successfully, False otherwise
         """
         # Check if old component exists
-        if old_ref not in self._component_index:
+        old_key = self._get_component_key(old_ref)
+        if old_key is None:
             logger.error(f"Cannot rename: component {old_ref} not found")
             return False
 
         # Check if new reference already exists
-        if new_ref in self._component_index:
+        new_key = self._get_component_key(new_ref)
+        if new_key is not None:
             logger.error(f"Cannot rename to {new_ref}: reference already exists")
             return False
 
         # Get the component
-        component = self._component_index[old_ref]
+        component = self._component_index[old_key]
 
         # Update the reference in the component object
         component.reference = new_ref
 
-        # Update the internal index
-        self._component_index[new_ref] = component
-        del self._component_index[old_ref]
+        # Update the internal index - construct new key with same unit
+        unit = getattr(component, "unit", 1)
+        new_index_key = f"{new_ref}_unit{unit}"
+        self._component_index[new_index_key] = component
+        del self._component_index[old_key]
 
         logger.info(f"Renamed component {old_ref} → {new_ref}")
         return True
@@ -312,11 +319,12 @@ class ComponentManager:
         Returns:
             True if component was updated, False if not found
         """
-        if reference not in self._component_index:
+        component_key = self._get_component_key(reference)
+        if component_key is None:
             logger.warning(f"Component {reference} not found")
             return False
 
-        component = self._component_index[reference]
+        component = self._component_index[component_key]
 
         # Update value
         if value is not None:
@@ -456,7 +464,8 @@ class ComponentManager:
         Returns:
             True if moved successfully, False otherwise
         """
-        if reference not in self._component_index:
+        component_key = self._get_component_key(reference)
+        if component_key is None:
             logger.warning(f"Component {reference} not found")
             return False
 
@@ -494,11 +503,12 @@ class ComponentManager:
         Returns:
             The cloned component, or None if cloning failed
         """
-        if reference not in self._component_index:
+        component_key = self._get_component_key(reference)
+        if component_key is None:
             logger.warning(f"Component {reference} not found")
             return None
 
-        original = self._component_index[reference]
+        original = self._component_index[component_key]
 
         # Generate new reference if not provided
         if not new_reference:
@@ -563,6 +573,33 @@ class ComponentManager:
 
         return is_valid, messages
 
+    def _get_component_key(self, reference: str) -> Optional[str]:
+        """
+        Get the internal index key for a component reference.
+
+        The index stores components with keys like "R1_unit1", "R1_unit2", etc.
+        This method handles the lookup correctly by trying unit 1 first, then
+        searching for any unit with this reference.
+
+        Args:
+            reference: Component reference (e.g., "R1")
+
+        Returns:
+            The internal key (e.g., "R1_unit1") if found, None otherwise
+        """
+        # Try unit 1 first (most common case)
+        component_key = f"{reference}_unit1"
+        if component_key in self._component_index:
+            return component_key
+
+        # If not found with unit1, search for any unit with this reference
+        for key in self._component_index:
+            if key.startswith(f"{reference}_unit"):
+                return key
+
+        # Not found
+        return None
+
     def _generate_reference(self, prefix: str) -> str:
         """
         Generate a unique reference with the given prefix.
@@ -576,9 +613,12 @@ class ComponentManager:
         # Find all existing references with this prefix
         existing_numbers = []
         for ref in self._component_index:
+            # Index keys are like "R1_unit1", extract the number part
             if ref.startswith(prefix):
                 try:
-                    num = int(ref[len(prefix) :])
+                    # Extract number before "_unit" suffix
+                    num_str = ref[len(prefix) :].split('_')[0]
+                    num = int(num_str)
                     existing_numbers.append(num)
                 except ValueError:
                     pass
@@ -600,7 +640,10 @@ class ComponentManager:
         Returns:
             Component if found, None otherwise
         """
-        return self._component_index.get(reference)
+        component_key = self._get_component_key(reference)
+        if component_key is None:
+            return None
+        return self._component_index.get(component_key)
 
     def _snap_to_grid(
         self, position: Tuple[float, float], grid_size: float = 2.54
