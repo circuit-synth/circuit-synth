@@ -115,7 +115,7 @@ def test_10_mounting_holes(request):
         try:
             from kicad_pcb_api import PCBBoard
 
-            pcb = PCBBoard.load(str(pcb_file))
+            pcb = PCBBoard(str(pcb_file))
 
             # Expected mounting hole positions
             expected_holes = [
@@ -257,7 +257,7 @@ def test_10_mounting_holes(request):
         print("STEP 6: Validate 5 holes with correct positions")
         print("="*70)
 
-        pcb_updated = PCBBoard.load(str(pcb_file))
+        pcb_updated = PCBBoard(str(pcb_file))
         assert pcb_updated is not None, "Updated PCB failed to load"
 
         # Extract holes from updated PCB file

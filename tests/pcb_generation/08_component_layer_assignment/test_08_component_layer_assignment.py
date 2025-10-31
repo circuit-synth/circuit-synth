@@ -113,7 +113,7 @@ def test_08_component_layer_assignment(request):
         try:
             from kicad_pcb_api import PCBBoard
 
-            pcb = PCBBoard.load(str(pcb_file))
+            pcb = PCBBoard(str(pcb_file))
 
             # Validate components exist
             assert len(pcb.footprints) == 2, (
@@ -192,7 +192,7 @@ def test_08_component_layer_assignment(request):
         print("STEP 5: Validate new layer assignments")
         print("="*70)
 
-        pcb_final = PCBBoard.load(str(pcb_file))
+        pcb_final = PCBBoard(str(pcb_file))
 
         assert len(pcb_final.footprints) == 2, (
             f"Expected 2 footprints after regeneration, found {len(pcb_final.footprints)}"

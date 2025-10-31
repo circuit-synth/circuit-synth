@@ -126,7 +126,7 @@ def test_03_add_component_collision_avoidance(request):
 
         from kicad_pcb_api import PCBBoard
 
-        pcb = PCBBoard.load(str(pcb_file))
+        pcb = PCBBoard(str(pcb_file))
 
         # Validate components exist
         assert len(pcb.footprints) == 2, (
@@ -200,7 +200,7 @@ def test_03_add_component_collision_avoidance(request):
         print("STEP 5: Validate preservation and auto-placement")
         print("="*70)
 
-        pcb_final = PCBBoard.load(str(pcb_file))
+        pcb_final = PCBBoard(str(pcb_file))
 
         assert len(pcb_final.footprints) == 3, (
             f"Expected 3 footprints after addition, found {len(pcb_final.footprints)}"
@@ -249,8 +249,8 @@ def test_03_add_component_collision_avoidance(request):
         # =====================================================================
         def check_no_collision(fp1, fp2, min_distance_mm=5.0):
             """Check that two footprints are spaced apart."""
-            x1, y1 = fp1.position
-            x2, y2 = fp2.position
+            x1, y1 = fp1.position.x, fp1.position.y
+            x2, y2 = fp2.position.x, fp2.position.y
             distance = ((x2 - x1)**2 + (y2 - y1)**2)**0.5
             return distance >= min_distance_mm
 

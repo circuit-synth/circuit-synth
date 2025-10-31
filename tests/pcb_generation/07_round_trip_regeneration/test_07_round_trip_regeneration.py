@@ -144,9 +144,9 @@ def test_07_round_trip_regeneration(request):
         print("ROUND 1: Manually adjust R1 position to (40, 50)")
         print("="*70)
 
-        from kicad_pcb_api import PCBBoard
+        from kicad_pcb_api import PCBBoard, Point
 
-        pcb = PCBBoard.load(str(pcb_file))
+        pcb = PCBBoard(str(pcb_file))
 
         assert len(pcb.footprints) == 2, "Should have R1, R2"
 
@@ -159,13 +159,13 @@ def test_07_round_trip_regeneration(request):
         r2_v1_pos = r2.position
 
         # Manually move R1 to (40, 50) - simulating designer adjusting in KiCad
-        r1.position = (40.0, 50.0)
+        r1.position = Point(40.0, 50.0)
         pcb.save(str(pcb_file))
 
         # Verify manual move saved
-        pcb_verify = PCBBoard.load(str(pcb_file))
+        pcb_verify = PCBBoard(str(pcb_file))
         r1_verify = next(fp for fp in pcb_verify.footprints if fp.reference == "R1")
-        assert r1_verify.position == (40.0, 50.0), "Manual position not saved!"
+        assert r1_verify.position == Point(40.0, 50.0), "Manual position not saved!"
 
         print(f"✅ Round 1: R1 manually moved to (40.0, 50.0)")
 
@@ -212,7 +212,7 @@ def test_07_round_trip_regeneration(request):
         print("ROUND 2: Validate R1 position preserved from manual change")
         print("="*70)
 
-        pcb_v2 = PCBBoard.load(str(pcb_file))
+        pcb_v2 = PCBBoard(str(pcb_file))
 
         assert len(pcb_v2.footprints) == 3, (
             f"Expected 3 footprints (R1, R2, R3), found {len(pcb_v2.footprints)}"
@@ -227,7 +227,7 @@ def test_07_round_trip_regeneration(request):
         assert r3_v2 is not None, "R3 missing in v2"
 
         # CRITICAL: R1 must be at (40, 50) - the position we manually set
-        assert r1_v2.position == (40.0, 50.0), (
+        assert r1_v2.position == Point(40.0, 50.0), (
             f"❌ R1 POSITION NOT PRESERVED!\n"
             f"   Manual adjustment in v1 was lost!\n"
             f"   Position: {r1_v2.position}, expected (40.0, 50.0)"
@@ -259,7 +259,7 @@ def test_07_round_trip_regeneration(request):
         pcb_v2.save(str(pcb_file))
 
         # Verify manual rotation saved
-        pcb_verify = PCBBoard.load(str(pcb_file))
+        pcb_verify = PCBBoard(str(pcb_file))
         r2_verify = next(fp for fp in pcb_verify.footprints if fp.reference == "R2")
         r2_rotation_saved = getattr(r2_verify, 'rotation', 0.0)
 
@@ -314,7 +314,7 @@ def test_07_round_trip_regeneration(request):
         print("ROUND 3: Validate complete round-trip workflow")
         print("="*70)
 
-        pcb_v3 = PCBBoard.load(str(pcb_file))
+        pcb_v3 = PCBBoard(str(pcb_file))
 
         assert len(pcb_v3.footprints) == 3, (
             f"Expected 3 footprints in v3, found {len(pcb_v3.footprints)}"
@@ -331,7 +331,7 @@ def test_07_round_trip_regeneration(request):
         # =====================================================================
         # CRITICAL VALIDATION 1: R1 position still at (40, 50)
         # =====================================================================
-        assert r1_v3.position == (40.0, 50.0), (
+        assert r1_v3.position == Point(40.0, 50.0), (
             f"❌ R1 POSITION LOST THROUGH ROUND-TRIP!\n"
             f"   Manual adjustment from v1 was lost!\n"
             f"   Position: {r1_v3.position}, expected (40.0, 50.0)"

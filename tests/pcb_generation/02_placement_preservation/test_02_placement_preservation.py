@@ -121,9 +121,9 @@ def test_02_placement_preservation(request):
         print("STEP 2: Validate initial PCB structure")
         print("="*70)
 
-        from kicad_pcb_api import PCBBoard
+        from kicad_pcb_api import PCBBoard, Point
 
-        pcb = PCBBoard.load(str(pcb_file))
+        pcb = PCBBoard(str(pcb_file))
 
         # Validate components exist
         assert len(pcb.footprints) == 2, (
@@ -153,14 +153,14 @@ def test_02_placement_preservation(request):
         print("="*70)
 
         # Move R1 to specific position (simulating manual layout in KiCad)
-        r1.position = (50.0, 30.0)
+        r1.position = Point(50.0, 30.0)
         pcb.save(str(pcb_file))
 
         # Verify move was saved
-        pcb_moved = PCBBoard.load(str(pcb_file))
+        pcb_moved = PCBBoard(str(pcb_file))
         r1_moved = next(fp for fp in pcb_moved.footprints if fp.reference == "R1")
 
-        assert r1_moved.position == (50.0, 30.0), (
+        assert r1_moved.position == Point(50.0, 30.0), (
             f"R1 move failed! Position is {r1_moved.position}, expected (50.0, 30.0)"
         )
 
@@ -220,7 +220,7 @@ def test_02_placement_preservation(request):
         print("STEP 6: VALIDATE PLACEMENT PRESERVATION")
         print("="*70)
 
-        pcb_final = PCBBoard.load(str(pcb_file))
+        pcb_final = PCBBoard(str(pcb_file))
 
         assert len(pcb_final.footprints) == 3, (
             f"Expected 3 footprints after regeneration, found {len(pcb_final.footprints)}"
@@ -237,7 +237,7 @@ def test_02_placement_preservation(request):
         # =====================================================================
         # CRITICAL VALIDATION: R1 position MUST be preserved
         # =====================================================================
-        assert r1_final.position == (50.0, 30.0), (
+        assert r1_final.position == Point(50.0, 30.0), (
             f"❌ POSITION NOT PRESERVED! R1 should stay at (50.0, 30.0)\n"
             f"   But R1 moved to {r1_final.position}\n"
             f"   This means manual PCB layout work is LOST!\n"
@@ -276,8 +276,8 @@ def test_02_placement_preservation(request):
         # and not overlapping existing components
         def check_collision(fp1, fp2, min_distance_mm=5.0):
             """Check if two footprints overlap with minimum spacing."""
-            x1, y1 = fp1.position
-            x2, y2 = fp2.position
+            x1, y1 = fp1.position.x, fp1.position.y
+            x2, y2 = fp2.position.x, fp2.position.y
             distance = ((x2 - x1)**2 + (y2 - y1)**2)**0.5
             return distance >= min_distance_mm
 

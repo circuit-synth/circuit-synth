@@ -121,7 +121,7 @@ def test_06_component_rotation(request):
 
         from kicad_pcb_api import PCBBoard
 
-        pcb = PCBBoard.load(str(pcb_file))
+        pcb = PCBBoard(str(pcb_file))
 
         # Validate components exist
         assert len(pcb.footprints) == 2, (
@@ -204,7 +204,7 @@ def test_06_component_rotation(request):
         print("STEP 5: Validate rotation update and position preservation")
         print("="*70)
 
-        pcb_final = PCBBoard.load(str(pcb_file))
+        pcb_final = PCBBoard(str(pcb_file))
 
         assert len(pcb_final.footprints) == 2, (
             f"Expected 2 footprints, found {len(pcb_final.footprints)}"
