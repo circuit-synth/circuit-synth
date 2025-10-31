@@ -41,10 +41,16 @@ class TestPCBSynchronization:
         """Find a footprint in PCB data by its reference designation."""
         for fp in pcb.pcb_data.get("footprints", []):
             # Handle both dict-like and Footprint objects
-            properties = fp.get("properties", []) if hasattr(fp, 'get') else fp.properties if hasattr(fp, 'properties') else []
+            # For Footprint objects from kicad_pcb_api, directly access reference attribute
+            if hasattr(fp, 'reference'):
+                if fp.reference == reference:
+                    return fp
+            # Fallback: search properties list
+            properties = fp.get("properties", []) if hasattr(fp, 'get') else (fp.properties if hasattr(fp, 'properties') else [])
             for prop in properties:
-                prop_key = prop.get("key") if hasattr(prop, 'get') else prop.key if hasattr(prop, 'key') else None
-                prop_val = prop.get("value") if hasattr(prop, 'get') else prop.value if hasattr(prop, 'value') else None
+                # Property objects have 'name' and 'value' attributes
+                prop_key = prop.get("key") if hasattr(prop, 'get') else (prop.name if hasattr(prop, 'name') else None)
+                prop_val = prop.get("value") if hasattr(prop, 'get') else (prop.value if hasattr(prop, 'value') else None)
                 if prop_key == "Reference" and prop_val == reference:
                     return fp
         return None
@@ -52,30 +58,44 @@ class TestPCBSynchronization:
     @staticmethod
     def _get_footprint_position(footprint):
         """Extract position (x, y, rotation) from a footprint object."""
-        # Handle both dict-like and Footprint objects
-        at_data = footprint.get("at", [5.0, 5.0, 0.0]) if hasattr(footprint, 'get') else footprint.at if hasattr(footprint, 'at') else [5.0, 5.0, 0.0]
+        # Handle Footprint objects from kicad_pcb_api
+        if hasattr(footprint, 'position'):
+            # Footprint object with position attribute (Point object)
+            x = float(footprint.position.x) if hasattr(footprint.position, 'x') else 5.0
+            y = float(footprint.position.y) if hasattr(footprint.position, 'y') else 5.0
+            rotation = float(footprint.rotation) if hasattr(footprint, 'rotation') else 0.0
+            return x, y, rotation
 
-        # Extract coordinates
+        # Fallback for dict-like objects
+        at_data = footprint.get("at", [5.0, 5.0, 0.0]) if hasattr(footprint, 'get') else [5.0, 5.0, 0.0]
         x = float(at_data[0]) if len(at_data) > 0 else 5.0
         y = float(at_data[1]) if len(at_data) > 1 else 5.0
         rotation = float(at_data[2]) if len(at_data) > 2 else 0.0
-
         return x, y, rotation
 
     @staticmethod
     def _set_footprint_position(footprint, x, y, rotation=0.0):
         """Set position on a footprint object."""
-        if hasattr(footprint, '__setitem__'):
-            # Dict-like object
-            footprint["at"] = [x, y, rotation]
-        elif hasattr(footprint, 'position'):
-            # Footprint object with position attribute
+        if hasattr(footprint, 'position') and hasattr(footprint.position, 'x'):
+            # Footprint object from kicad_pcb_api with Point position
             footprint.position.x = x
             footprint.position.y = y
-            footprint.position.rotation = rotation
-        else:
-            # Try direct assignment
+            if hasattr(footprint, 'rotation'):
+                footprint.rotation = rotation
+        elif hasattr(footprint, '__setitem__'):
+            # Dict-like object
             footprint["at"] = [x, y, rotation]
+        else:
+            # Fallback: try direct assignment as dict
+            try:
+                footprint["at"] = [x, y, rotation]
+            except (TypeError, KeyError):
+                # If that fails, just try to set the attributes
+                if hasattr(footprint, 'position'):
+                    footprint.position.x = x
+                    footprint.position.y = y
+                if hasattr(footprint, 'rotation'):
+                    footprint.rotation = rotation
 
     def test_initial_pcb_generation_creates_single_component(self, temp_workspace):
         """
