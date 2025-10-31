@@ -15,6 +15,18 @@ from pathlib import Path
 
 import pytest
 
+
+def pytest_ignore_collect(collection_path, config):
+    """
+    Ignore collection of Test* classes from src/ directory.
+    These are domain classes (TestEquipment, TestProcedure, etc.) not pytest tests.
+    """
+    path_str = str(collection_path)
+    # Ignore any file in src/ directory
+    if "/src/" in path_str or "\\src\\" in path_str:
+        return True
+    return False
+
 from circuit_synth.core.circuit import Circuit
 from circuit_synth.core.decorators import get_current_circuit, set_current_circuit
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
