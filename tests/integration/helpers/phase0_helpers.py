@@ -357,8 +357,8 @@ def compare_circuits_semantic(
     # Compare component properties for matching refs
     common_refs = refs1 & refs2
     for ref in common_refs:
-        comp1 = next(c for c in circuit1.components if c.ref == ref)
-        comp2 = next(c for c in circuit2.components if c.ref == ref)
+        comp1 = next(c for c in circuit1.components.values() if c.ref == ref)
+        comp2 = next(c for c in circuit2.components.values() if c.ref == ref)
 
         if comp1.value != comp2.value:
             differences.append(
