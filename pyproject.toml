@@ -207,6 +207,13 @@ testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+# Don't collect Test* classes from source code, only from tests/
+norecursedirs = [".*", "build", "dist", "*.egg", "src"]
+# Ignore collection warnings for domain classes named Test* in source code
+# These are legitimate domain classes (TestEquipment, TestProcedure, etc.)
+filterwarnings = [
+    "ignore::pytest.PytestCollectionWarning",
+]
 markers = [
     "unit: marks tests as unit tests (fast, pure Python, no I/O)",
     "integration: marks tests as integration tests (file I/O allowed, no external tools)",
