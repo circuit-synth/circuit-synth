@@ -41,6 +41,16 @@ def main():
     # Create data net in parent (will be renamed DATA_IN → SPI_MOSI)
     data_in = Net("DATA_IN")
 
+    # Add a component in parent connected to data_in net
+    # This creates the need for a sheet symbol with hierarchical pin
+    source_resistor = Component(
+        symbol="Device:R",
+        ref="R_SOURCE1",
+        value="100",
+        footprint="Resistor_SMD:R_0603_1608Metric",
+    )
+    source_resistor[1] += data_in  # Connect source to data net
+
     # START_MARKER: Test will modify pin name between these markers
     # END_MARKER
 
