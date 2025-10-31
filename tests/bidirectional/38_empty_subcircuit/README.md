@@ -2,107 +2,110 @@
 
 ## What This Tests
 
-**Core Question**: When you create a hierarchical circuit with an empty subcircuit (no components), does KiCad generation handle the empty sheet correctly? And can you add components to the empty sheet and regenerate?
+**Core Question**: When you generate a hierarchical circuit with an empty subcircuit (no components), does KiCad handle the empty sheet correctly? Can you then add components in Python and sync to KiCad?
 
-This tests **empty hierarchical sheet handling** - creating a child sheet that contains no components initially, then dynamically adding components to it.
+This tests **empty hierarchical sheet handling** - generating an empty child sheet, then syncing component additions from Python to KiCad.
 
 ## When This Situation Happens
 
-- Developer creates hierarchical circuit structure (organization) before adding components
+- Developer generates hierarchical circuit structure (organization) before adding components
 - Some subsystems are initially placeholders (empty subcircuits)
-- Components are added to subcircuits iteratively during development
-- Need to verify empty sheets don't break KiCad generation and can be populated later
+- Components are added to subcircuits iteratively in Python
+- Need to verify empty sheets don't break KiCad generation and sync correctly when populated
 
 ## What Should Work
 
-1. Generate KiCad with R1 on root sheet and empty Subcircuit
+1. **Generate** KiCad from Python with R1 on root sheet and empty subcircuit
 2. Verify root sheet contains R1
 3. Verify subcircuit sheet exists but has no components
 4. Edit Python to add R2 to empty subcircuit
-5. Regenerate KiCad project
+5. **Sync** Python→KiCad (regenerate, preserving positions)
 6. Verify R2 now exists in subcircuit
 7. Edit Python to remove R2 from subcircuit
-8. Regenerate
+8. **Sync** Python→KiCad again
 9. Verify subcircuit is empty again
 
 ## Manual Test Instructions
 
 ```bash
-cd /Users/shanemattner/Desktop/circuit-synth2/tests/bidirectional/38_empty_subcircuit
+cd tests/bidirectional/38_empty_subcircuit
 
 # Step 1: Generate initial KiCad project (R1 on root, empty subcircuit)
 uv run empty_subcircuit.py
 open empty_subcircuit/empty_subcircuit.kicad_pro
 # Verify: Root sheet has R1
-# Verify: Subcircuit sheet exists but is empty
+# Verify: Child sheet "placeholder_subcircuit_1" exists but is empty
 
-# Step 2: Edit empty_subcircuit.py to add R2 to subcircuit
-# Uncomment or add:
-#   r2 = Component(symbol="Device:R", ref="R2", value="4.7k",
-#                  footprint="Resistor_SMD:R_0603_1608Metric")
-#   subcircuit.add_component(r2)
+# Step 2: Edit Python to add R2 to subcircuit
+# In empty_subcircuit.py, in the placeholder_subcircuit() function,
+# uncomment the R2 component (lines 23-28):
+#   Change from:
+#     # r2 = Component(
+#     #     symbol="Device:R",
+#   To:
+#     r2 = Component(
+#         symbol="Device:R",
 
-# Step 3: Regenerate KiCad project
+# Step 3: Sync Python→KiCad (regenerate)
 uv run empty_subcircuit.py
 
-# Step 4: Open regenerated KiCad project
+# Step 4: Verify R2 synced to KiCad
 open empty_subcircuit/empty_subcircuit.kicad_pro
 # Verify:
-#   - Root sheet still has R1
-#   - Subcircuit sheet now contains R2
-#   - Both sheets have correct components
+#   - Root sheet still has R1 (position preserved)
+#   - Child sheet "placeholder_subcircuit_1" now contains R2
+#   - R1 position unchanged (sync preserved existing component)
 
-# Step 5: Edit empty_subcircuit.py to remove R2 from subcircuit
-# Comment out or remove:
-#   r2 = Component(...)
-#   subcircuit.add_component(r2)
+# Step 5: Edit Python to remove R2 from subcircuit
+# Re-comment the R2 component (lines 23-28)
 
-# Step 6: Regenerate KiCad project
+# Step 6: Sync Python→KiCad again
 uv run empty_subcircuit.py
 
-# Step 7: Open regenerated KiCad project
+# Step 7: Verify subcircuit is empty again
 open empty_subcircuit/empty_subcircuit.kicad_pro
 # Verify:
-#   - Root sheet still has R1
-#   - Subcircuit sheet is now empty again
+#   - Root sheet still has R1 (position preserved)
+#   - Child sheet "placeholder_subcircuit_1" is empty again
+#   - Sheet symbol remains on root sheet
 ```
 
 ## Expected Result
 
 - ✅ Initial generation: Root sheet has R1, subcircuit sheet exists but empty
-- ✅ After adding R2 to subcircuit: R2 appears in subcircuit
-- ✅ After removing R2: Subcircuit becomes empty again
-- ✅ Root sheet R1 preserved across all regenerations
-- ✅ No errors during any generation
+- ✅ After adding R2 in Python and syncing: R2 appears in KiCad subcircuit
+- ✅ After removing R2 in Python and syncing: Subcircuit becomes empty again in KiCad
+- ✅ Root sheet R1 position preserved across all syncs
+- ✅ No errors during generation or sync
 - ✅ No ERC errors in KiCad project
 - ✅ Empty sheets handled gracefully without breaking project
 
 ## Why This Is Important
 
 **Edge case handling for hierarchical design:**
-1. Developers may create hierarchical structure (empty subsystems) before populating
-2. Empty sheets should not cause errors or corruption
-3. Dynamic component addition/removal to subcircuits must work reliably
+1. Developers may generate hierarchical structure (empty subsystems) before populating
+2. Empty sheets should not cause errors or corruption during generation
+3. Dynamic component addition/removal in Python must sync reliably to KiCad
 4. Organization structure should be separable from component content
 
 If this doesn't work, users cannot:
-- Create project structure before implementation
-- Dynamically populate subsystems
+- Generate project structure before implementation
+- Dynamically populate subsystems and sync to KiCad
 - Keep empty placeholder sheets in complex projects
-- Refactor circuits without regenerating from scratch
+- Add/remove components from subcircuits iteratively
 
 ## Success Criteria
 
 This test PASSES when:
 - Root sheet is generated with R1
-- Empty subcircuit sheet is created without error
-- Subcircuit sheet has zero components
-- Adding R2 to subcircuit creates it in the sheet
-- Removing R2 makes subcircuit empty again
-- Root sheet R1 position preserved across all regenerations
-- No error messages during any generation
+- Empty subcircuit sheet is generated without error
+- Subcircuit sheet has zero components initially
+- Adding R2 in Python and syncing creates it in KiCad subcircuit
+- Removing R2 in Python and syncing makes subcircuit empty again in KiCad
+- Root sheet R1 position preserved across all syncs
+- No error messages during generation or sync
 - No ERC errors in KiCad project
-- KiCad project remains valid after each generation
+- KiCad project remains valid after each sync operation
 
 ## Validation Level
 
@@ -115,7 +118,10 @@ This test PASSES when:
 ## Notes
 
 - This tests the edge case of empty hierarchical sheets
+- Tests Python→KiCad sync workflow specifically
 - Simplified hierarchical structure (no cross-sheet connections)
-- Uses Circuit.add_subcircuit() API for organization
-- Each subcircuit becomes a separate .kicad_sch file in KiCad
-- Emphasizes dynamic component addition/removal capability
+- Uses modern @circuit decorator syntax
+- Two circuit functions: main() (parent) and placeholder_subcircuit() (child)
+- Calling placeholder_subcircuit() generates hierarchical sheet symbol on parent
+- Each subcircuit becomes a separate .kicad_sch file (placeholder_subcircuit_1.kicad_sch)
+- Emphasizes dynamic component addition/removal in Python syncing to KiCad
