@@ -11,13 +11,14 @@ This fixture is modified by the test to rename the hierarchical pin
 from generic "DATA_IN" to specific "SPI_MOSI".
 """
 
-from circuit_synth import *
+from circuit_synth import Circuit, Component, Net, circuit
 
 
-@circuit
-def spi_driver_subcircuit(data_in: Net):
-    """SPI Driver subcircuit with hierarchical DATA_IN connection."""
+@circuit(name="SPI_Driver")
+def spi_driver(data_in):
+    """Subcircuit with resistor connected to hierarchical port."""
     # Add resistor in subcircuit that connects to data input
+    # Component is auto-added to the current circuit context (SPI_Driver)
     resistor = Component(
         symbol="Device:R",
         ref="R1",
@@ -32,33 +33,51 @@ def spi_driver_subcircuit(data_in: Net):
 
 @circuit(name="spi_subcircuit")
 def main():
-    """Root circuit with SPI driver subcircuit."""
+    """Main circuit with subcircuit."""
+    from circuit_synth.core.decorators import get_current_circuit
+
+    root = get_current_circuit()
+
     # Create data net in parent (will be renamed DATA_IN → SPI_MOSI)
     data_in = Net("DATA_IN")
+
+    # Add a component in parent connected to data_in net
+    # This creates the need for a sheet symbol with hierarchical pin
+    source_resistor = Component(
+        symbol="Device:R",
+        ref="R_SOURCE1",
+        value="100",
+        footprint="Resistor_SMD:R_0603_1608Metric",
+    )
+    source_resistor[1] += data_in  # Connect source to data net
 
     # START_MARKER: Test will modify pin name between these markers
     # END_MARKER
 
-    # Call subcircuit - creates hierarchical sheet
+    # Call subcircuit function to add it to root circuit
     # This creates:
-    # 1. Hierarchical label "DATA_IN" in spi_driver_subcircuit.kicad_sch
+    # 1. Hierarchical label "DATA_IN" in SPI_Driver.kicad_sch
     # 2. Sheet symbol in parent with hierarchical pin "DATA_IN"
     # 3. Connection between parent data_in net and sheet pin
-    spi_driver_subcircuit(data_in)
+    # Note: Connections are established via net assignments (resistor[1] += data_in)
+    spi_driver(data_in)
 
+    # Generate KiCad project
     print(f"Generating KiCad project: spi_subcircuit")
+    print(f"  Parent circuit: {root.name}")
+    print(f"  Subcircuit: SPI_Driver")
     print(f"  Hierarchical port: DATA_IN (will be renamed to SPI_MOSI)")
     print(f"  Components in subcircuit: R1 (resistor)")
+
+    root.generate_kicad_project("spi_subcircuit")
+
     print(f"\n✅ Project generated successfully!")
     print(f"   Expected hierarchical structure:")
     print(f"   - Parent: spi_subcircuit.kicad_sch (with sheet symbol)")
-    print(
-        f"   - Subcircuit: spi_driver_subcircuit_1.kicad_sch (with hierarchical label)"
-    )
+    print(f"   - Subcircuit: SPI_Driver.kicad_sch (with hierarchical label)")
     print(f"   - Sheet symbol should have pin: DATA_IN")
     print(f"   - Subcircuit should have hierarchical label: DATA_IN")
 
 
 if __name__ == "__main__":
-    circuit_obj = main()
-    circuit_obj.generate_kicad_project(project_name="spi_subcircuit")
+    main()
