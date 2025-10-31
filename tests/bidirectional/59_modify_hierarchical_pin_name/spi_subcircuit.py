@@ -11,9 +11,10 @@ This fixture is modified by the test to rename the hierarchical pin
 from generic "DATA_IN" to specific "SPI_MOSI".
 """
 
-from circuit_synth import Circuit, Component, Net
+from circuit_synth import Circuit, Component, Net, circuit
 
 
+@circuit
 def main():
     # Create root (parent) circuit
     root = Circuit("spi_subcircuit")
@@ -46,7 +47,8 @@ def main():
     # 1. Hierarchical label "DATA_IN" in SPI_Driver.kicad_sch
     # 2. Sheet symbol in parent with hierarchical pin "DATA_IN"
     # 3. Connection between parent data_in net and sheet pin
-    root.add_subcircuit(spi_driver, connections={"DATA_IN": data_in})
+    # Note: Connections are established via net assignments (resistor[1] += data_in)
+    root.add_subcircuit(spi_driver)
 
     # Generate KiCad project
     print(f"Generating KiCad project: spi_subcircuit")
