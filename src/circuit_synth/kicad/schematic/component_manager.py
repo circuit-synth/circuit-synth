@@ -122,7 +122,11 @@ class ComponentManager:
         dnp_value = False
         if "DNP" in properties:
             dnp_str = properties["DNP"]
-            dnp_value = dnp_str.lower() in ("true", "yes", "1") if isinstance(dnp_str, str) else bool(dnp_str)
+            dnp_value = (
+                dnp_str.lower() in ("true", "yes", "1")
+                if isinstance(dnp_str, str)
+                else bool(dnp_str)
+            )
             logger.debug(f"DNP flag detected: {dnp_value}")
 
         # Create component first (needed for dynamic sizing)
@@ -140,7 +144,9 @@ class ComponentManager:
             on_board=not dnp_value,  # If DNP, exclude from board
         )
 
-        logger.debug(f"Created SchematicSymbol with {len(component.properties)} properties")
+        logger.debug(
+            f"Created SchematicSymbol with {len(component.properties)} properties"
+        )
 
         # Determine position (now with component for dynamic sizing)
         if position is None:
