@@ -267,7 +267,13 @@ class TestKiCadToPythonSyncerRefactored:
         mock_circuit.name = "test"
         mock_circuit.components = []  # Empty list of components
         mock_circuit.nets = []  # Empty list of nets
-        mock_circuit.generate_json_netlist = Mock()
+        mock_circuit.to_circuit_synth_json = Mock(
+            return_value={
+                "name": "test",
+                "components": {},
+                "nets": {},
+            }
+        )
 
         with patch(
             "circuit_synth.tools.kicad_integration.kicad_to_python_sync.KiCadParser"
@@ -280,8 +286,12 @@ class TestKiCadToPythonSyncerRefactored:
 
             # Verify KiCadParser was called
             mock_parser_class.assert_called_once()
-            # Verify circuit.generate_json_netlist was called with correct path
-            mock_circuit.generate_json_netlist.assert_called_once_with(str(json_file))
+            # Verify circuit.to_circuit_synth_json was called (returns dict for json.dump)
+            mock_circuit.to_circuit_synth_json.assert_called_once()
+            # Verify JSON file was written
+            assert json_file.exists()
+            written_data = json.loads(json_file.read_text())
+            assert written_data["name"] == "test"
 
     def test_sync_regenerates_json_before_importing(self, tmp_path):
         """Test 12: sync() regenerates JSON from .kicad_sch before importing"""
