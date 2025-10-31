@@ -336,7 +336,7 @@ class TestPhase0JSONCanonical:
         ), "Component count should match"
 
         # Verify component data preserved
-        original_refs = {comp.ref for comp in original_circuit.components}
+        original_refs = {comp.ref for comp in original_circuit.components.values()}
         json_refs = set(json_data["components"].keys())
         assert original_refs == json_refs, "Component references should match"
 

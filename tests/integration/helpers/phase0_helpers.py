@@ -343,8 +343,8 @@ def compare_circuits_semantic(
         )
 
     # Compare component references
-    refs1 = {comp.ref for comp in circuit1.components}
-    refs2 = {comp.ref for comp in circuit2.components}
+    refs1 = {comp.ref for comp in circuit1.components.values()}
+    refs2 = {comp.ref for comp in circuit2.components.values()}
 
     missing_refs = refs1 - refs2
     extra_refs = refs2 - refs1

@@ -118,7 +118,7 @@ def test_04_delete_component(request):
 
         from kicad_pcb_api import PCBBoard
 
-        pcb = PCBBoard.load(str(pcb_file))
+        pcb = PCBBoard(str(pcb_file))
 
         # Validate components exist
         assert len(pcb.footprints) == 3, (
@@ -197,7 +197,7 @@ def test_04_delete_component(request):
         print("STEP 5: Validate deletion and placement preservation")
         print("="*70)
 
-        pcb_final = PCBBoard.load(str(pcb_file))
+        pcb_final = PCBBoard(str(pcb_file))
 
         # Should now have only 2 components (R1 and R3)
         assert len(pcb_final.footprints) == 2, (

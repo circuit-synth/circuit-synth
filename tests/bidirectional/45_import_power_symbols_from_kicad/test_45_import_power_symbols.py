@@ -185,11 +185,11 @@ def test_45_import_power_symbols(request):
         print("="*70)
 
         # Get all components
-        component_refs = [comp.ref for comp in circuit.components]
+        component_refs = [comp.ref for comp in circuit.components.values()]
         print(f"   Components found: {component_refs}")
 
         # Check R1 exists
-        r1_components = [c for c in circuit.components if c.ref == "R1"]
+        r1_components = [c for c in circuit.components.values() if c.ref == "R1"]
         if not r1_components:
             pytest.xfail(
                 "R1 component not found after import. "

@@ -112,7 +112,7 @@ def test_09_board_outline_definition(request):
         try:
             from kicad_pcb_api import PCBBoard
 
-            pcb = PCBBoard.load(str(pcb_file))
+            pcb = PCBBoard(str(pcb_file))
 
             # Validate PCB loaded successfully
             assert pcb is not None, "PCB failed to load"
@@ -280,7 +280,7 @@ def test_09_board_outline_definition(request):
         print("="*70)
 
         # Load updated PCB and verify new outline
-        pcb_updated = PCBBoard.load(str(pcb_file))
+        pcb_updated = PCBBoard(str(pcb_file))
         assert pcb_updated is not None, "Updated PCB failed to load"
 
         # Extract new outline

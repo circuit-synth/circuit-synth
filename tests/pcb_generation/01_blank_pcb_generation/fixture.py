@@ -23,8 +23,6 @@ if __name__ == "__main__":
         project_name="blank_pcb",
         placement_algorithm="simple",
         generate_pcb=True,
-        board_width_mm=200.0,
-        board_height_mm=150.0,
     )
 
     print("✅ Blank PCB generated successfully!")

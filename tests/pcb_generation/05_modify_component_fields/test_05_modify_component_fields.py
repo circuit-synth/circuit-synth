@@ -125,7 +125,7 @@ def test_05_modify_component_fields(request):
 
         from kicad_pcb_api import PCBBoard
 
-        pcb = PCBBoard.load(str(pcb_file))
+        pcb = PCBBoard(str(pcb_file))
 
         # Validate component exists
         assert len(pcb.footprints) == 1, (
@@ -212,7 +212,7 @@ def test_05_modify_component_fields(request):
         print("STEP 5: Validate CANONICAL UPDATE (fields changed, position preserved)")
         print("="*70)
 
-        pcb_final = PCBBoard.load(str(pcb_file))
+        pcb_final = PCBBoard(str(pcb_file))
 
         assert len(pcb_final.footprints) == 1, (
             f"Expected 1 footprint after modification, found {len(pcb_final.footprints)}"

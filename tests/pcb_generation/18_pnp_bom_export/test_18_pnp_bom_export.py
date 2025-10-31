@@ -167,7 +167,7 @@ def test_18_pnp_bom_export(request):
         try:
             from kicad_pcb_api import PCBBoard
 
-            pcb = PCBBoard.load(str(pcb_file))
+            pcb = PCBBoard(str(pcb_file))
             assert pcb is not None, "PCB failed to load"
 
             # Verify components exist (R1, R2, C1, R3)

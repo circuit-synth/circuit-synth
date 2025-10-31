@@ -226,7 +226,7 @@ def test_15_silkscreen_features(request):
         try:
             from kicad_pcb_api import PCBBoard
 
-            pcb = PCBBoard.load(str(pcb_file))
+            pcb = PCBBoard(str(pcb_file))
             assert pcb is not None, "PCB failed to load"
 
             # Verify components exist

@@ -134,7 +134,7 @@ def test_14_buried_vias(request):
         try:
             from kicad_pcb_api import PCBBoard
 
-            pcb = PCBBoard.load(str(pcb_file))
+            pcb = PCBBoard(str(pcb_file))
 
             # Validate PCB is valid and readable
             assert pcb is not None, "PCB failed to load"

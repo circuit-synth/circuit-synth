@@ -116,7 +116,7 @@ def test_11_footprint_library_sync(request):
         try:
             from kicad_pcb_api import PCBBoard
 
-            pcb = PCBBoard.load(str(pcb_file))
+            pcb = PCBBoard(str(pcb_file))
 
             # Validate component exists
             assert len(pcb.footprints) == 1, (
@@ -223,7 +223,7 @@ def test_11_footprint_library_sync(request):
         print("STEP 6: Validate new footprint (0805)")
         print("="*70)
 
-        pcb_updated = PCBBoard.load(str(pcb_file))
+        pcb_updated = PCBBoard(str(pcb_file))
 
         assert len(pcb_updated.footprints) == 1, (
             f"Expected 1 footprint, found {len(pcb_updated.footprints)}"
