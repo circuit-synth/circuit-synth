@@ -73,8 +73,9 @@ class TestJsonToModelsCircuit:
 
         assert circuit.name == "simple"
         assert len(circuit.components) == 1
-        assert circuit.components["R1"].reference == "R1"
-        assert circuit.components["R1"].value == "10k"
+        # models.Circuit.components is a list, not a dict
+        assert circuit.components[0].reference == "R1"
+        assert circuit.components[0].value == "10k"
 
     def test_convert_circuit_with_nets(self):
         """Test converting circuit with net connections."""
@@ -97,6 +98,7 @@ class TestJsonToModelsCircuit:
         assert len(circuit.components) == 2
         assert len(circuit.nets) == 1
         assert circuit.nets[0].name == "NET1"
+        # models.Net uses 'connections' attribute (not 'nodes')
         assert len(circuit.nets[0].connections) == 2
         assert ("R1", "1") in circuit.nets[0].connections
         assert ("R2", "1") in circuit.nets[0].connections
@@ -175,8 +177,8 @@ class TestConvertModelsCircuitToApiCircuit:
 
         # Verify components
         assert len(circuit.components) == 2
-        # Find components by ref
-        comp_refs = [c.ref for c in circuit.components]
+        # Find components by ref - circuit.components is a dict, iterate over values
+        comp_refs = [c.ref for c in circuit.components.values()]
         assert "R1" in comp_refs
         assert "R2" in comp_refs
 
@@ -226,8 +228,8 @@ class TestImportKicadProject:
         # Verify
         assert circuit.name == "test_project"
         assert len(circuit.components) == 2
-        # Find components by ref
-        comp_map = {c.ref: c for c in circuit.components}
+        # Find components by ref - circuit.components is a dict, iterate over values
+        comp_map = {c.ref: c for c in circuit.components.values()}
         assert "R1" in comp_map
         assert "C1" in comp_map
         assert comp_map["R1"].value == "10k"
@@ -258,8 +260,8 @@ class TestImportKicadProject:
 
         circuit = import_kicad_project(json_path)
 
-        # Find L1 component
-        l1 = next(c for c in circuit.components if c.ref == "L1")
+        # Find L1 component - circuit.components is a dict, iterate over values
+        l1 = next(c for c in circuit.components.values() if c.ref == "L1")
         assert l1.ref == "L1"
         assert l1.symbol == "Device:L"
         assert l1.value == "100uH"
