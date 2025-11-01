@@ -172,10 +172,10 @@ def verify_component_properties(
         )
 
     if expected_symbol is not None:
-        assert component.symbol == expected_symbol, (
-            f"{message} - Symbol mismatch for {expected_ref}:\n"
+        assert component.lib_id == expected_symbol, (
+            f"{message} - Library ID (symbol) mismatch for {expected_ref}:\n"
             f"  Expected: {expected_symbol}\n"
-            f"  Actual:   {component.symbol}"
+            f"  Actual:   {component.lib_id}"
         )
 
 
@@ -214,10 +214,10 @@ def verify_component_unchanged(
         f"  After:  {component_after.footprint}"
     )
 
-    assert component_after.symbol == component_before.symbol, (
-        f"{message} - Symbol changed for {ref}:\n"
-        f"  Before: {component_before.symbol}\n"
-        f"  After:  {component_after.symbol}"
+    assert component_after.lib_id == component_before.lib_id, (
+        f"{message} - Library ID (symbol) changed for {ref}:\n"
+        f"  Before: {component_before.lib_id}\n"
+        f"  After:  {component_after.lib_id}"
     )
 
     assert component_after.position == component_before.position, (
