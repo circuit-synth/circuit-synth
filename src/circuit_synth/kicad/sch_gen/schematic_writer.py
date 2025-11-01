@@ -1451,19 +1451,9 @@ class SchematicWriter:
                         if "hierarchical_labels" not in self.schematic._data:
                             self.schematic._data["hierarchical_labels"] = []
 
-                        # Determine justification based on rotation for proper text alignment
-                        # Matches KiCad's hierarchical label behavior
-                        rotation_normalized = label.rotation % 360
-                        if rotation_normalized == 0:
-                            justify = "left"
-                        elif rotation_normalized == 90:
-                            justify = "left"
-                        elif rotation_normalized == 180:
-                            justify = "right"
-                        elif rotation_normalized == 270:
-                            justify = "left"  # Fixed: was "right", should be "left"
-                        else:
-                            justify = "left"  # Default fallback
+                        # Use canonical justification calculation from label_utils
+                        from ..schematic.label_utils import calculate_hierarchical_label_justify
+                        justify = calculate_hierarchical_label_justify(label.rotation)
 
                         label_dict = {
                             "uuid": label.uuid,
@@ -1733,19 +1723,9 @@ class SchematicWriter:
                         if "hierarchical_labels" not in self.schematic._data:
                             self.schematic._data["hierarchical_labels"] = []
 
-                        # Determine justification based on rotation for proper text alignment
-                        # Matches KiCad's hierarchical label behavior
-                        rotation_normalized = label.rotation % 360
-                        if rotation_normalized == 0:
-                            justify = "left"
-                        elif rotation_normalized == 90:
-                            justify = "left"
-                        elif rotation_normalized == 180:
-                            justify = "right"
-                        elif rotation_normalized == 270:
-                            justify = "left"  # Fixed: was "right", should be "left"
-                        else:
-                            justify = "left"  # Default fallback
+                        # Use canonical justification calculation from label_utils
+                        from ..schematic.label_utils import calculate_hierarchical_label_justify
+                        justify = calculate_hierarchical_label_justify(label.rotation)
 
                         label_dict = {
                             "uuid": label.uuid,
