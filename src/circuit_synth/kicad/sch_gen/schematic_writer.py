@@ -1191,6 +1191,7 @@ class SchematicWriter:
                         "position": position,
                         "rotation": rotation,
                         "value": value,
+                        "lib_id": lib_id,  # Track symbol type for text positioning
                     }
                 )
 
@@ -1225,18 +1226,42 @@ class SchematicWriter:
             pos = symbol_info["position"]
             rotation = symbol_info["rotation"]
             value = symbol_info["value"]
+            lib_id = symbol_info.get("lib_id", "")
 
-            # Calculate correct Value position based on rotation
+            # Calculate correct Value position based on rotation AND symbol type
             offset = 5.08  # Standard KiCad offset
 
-            if rotation == 0:  # Pointing up
-                value_x, value_y = pos[0], pos[1] - offset
-            elif rotation == 90:  # Pointing left
-                value_x, value_y = pos[0] - offset, pos[1]
-            elif rotation == 180:  # Pointing down
-                value_x, value_y = pos[0], pos[1] + offset
-            elif rotation == 270:  # Pointing right
-                value_x, value_y = pos[0] + offset, pos[1]
+            # GND-type symbols point DOWN by default, so invert the offset direction
+            is_gnd_type = "GND" in lib_id or "VSS" in lib_id
+
+            if rotation == 0:
+                if is_gnd_type:
+                    # GND at rotation 0 points DOWN, text goes below
+                    value_x, value_y = pos[0], pos[1] + offset
+                else:
+                    # VCC at rotation 0 points UP, text goes above
+                    value_x, value_y = pos[0], pos[1] - offset
+            elif rotation == 90:
+                if is_gnd_type:
+                    # GND at rotation 90 points LEFT, text goes right (away from symbol)
+                    value_x, value_y = pos[0] + offset, pos[1]
+                else:
+                    # VCC at rotation 90 points RIGHT, text goes left (away from symbol)
+                    value_x, value_y = pos[0] - offset, pos[1]
+            elif rotation == 180:
+                if is_gnd_type:
+                    # GND at rotation 180 points UP, text goes above
+                    value_x, value_y = pos[0], pos[1] - offset
+                else:
+                    # VCC at rotation 180 points DOWN, text goes below
+                    value_x, value_y = pos[0], pos[1] + offset
+            elif rotation == 270:
+                if is_gnd_type:
+                    # GND at rotation 270 points RIGHT, text goes left (away from symbol)
+                    value_x, value_y = pos[0] - offset, pos[1]
+                else:
+                    # VCC at rotation 270 points LEFT, text goes right (away from symbol)
+                    value_x, value_y = pos[0] + offset, pos[1]
             else:
                 continue  # Skip non-cardinal angles
 
