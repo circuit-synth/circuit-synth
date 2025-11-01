@@ -242,6 +242,10 @@ class CircuitReconstructor:
 
             # Log any connection issues for debugging
             for net_name, net_obj in temp_circuit._nets.items():
+                # Skip warning for standalone power nets (Issue #458)
+                # Power nets with 0 connections are intentionally supported
+                if len(net_obj._pins) == 0 and hasattr(net_obj, 'is_power') and net_obj.is_power:
+                    continue  # Standalone power nets are valid
                 if len(net_obj._pins) < 2:
                     self.logger.warning(
                         f"Net '{net_name}' has only {len(net_obj._pins)} connection(s) - may indicate connection issue"

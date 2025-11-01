@@ -1508,6 +1508,43 @@ class SchematicWriter:
                     f"Added hierarchical label for net {net_name} at component {actual_ref}.{pin_identifier}"
                 )
 
+        # Handle standalone power nets (Issue #458)
+        # Power nets with no connections should still generate power symbols
+        for net in circuit_nets:
+            if (
+                hasattr(net, "is_power")
+                and net.is_power
+                and hasattr(net, "power_symbol")
+                and len(net.connections) == 0
+            ):
+                # This is a standalone power net with no connections
+                logger.debug(
+                    f"Generating standalone power symbol for net '{net.name}' (no connections)"
+                )
+
+                # Generate a single power symbol at a default position
+                power_ref = f"#PWR0{power_symbol_counter:02d}"
+                power_symbol_counter += 1
+
+                # Place at a reasonable default position
+                # Use a grid to space out multiple standalone power symbols
+                standalone_x = 50.0 + (power_symbol_counter - 1) * 20.0
+                standalone_y = 50.0
+
+                logger.debug(
+                    f"Placing standalone power symbol {power_ref} ({net.power_symbol}) "
+                    f"for net '{net.name}' at ({standalone_x}, {standalone_y})"
+                )
+
+                # Add power symbol at default position
+                self._add_power_symbol(
+                    lib_id=net.power_symbol,
+                    reference=power_ref,
+                    value=net.name,
+                    position=(standalone_x, standalone_y),
+                    rotation=0.0,  # Default upward orientation
+                )
+
         return component_labels
 
     def _add_subcircuit_sheets(self):

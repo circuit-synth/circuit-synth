@@ -276,6 +276,23 @@ class NetlistExporter:
                 # Fallback: just nodes as direct list (for backward compatibility)
                 data["nets"][net_name] = pin_list
 
+        # 2.5) Export standalone power nets (Issue #458)
+        # Power nets with no connections should still be exported so they generate power symbols
+        for net_name, net_obj in self.circuit._nets.items():
+            if net_name not in data["nets"] and net_obj.is_power:
+                # This is a standalone power net (no component connections)
+                logger.debug(
+                    f"Exporting standalone power net '{net_name}' with symbol '{net_obj.power_symbol}'"
+                )
+                data["nets"][net_name] = {
+                    "nodes": [],  # Empty nodes list - no connections
+                    "is_power": net_obj.is_power,
+                    "power_symbol": net_obj.power_symbol,
+                    "trace_current": net_obj.trace_current,
+                    "impedance": net_obj.impedance,
+                    "properties": net_obj.properties,
+                }
+
         # 3) Recursively gather subcircuits
         for sc in self.circuit._subcircuits:
             exporter = NetlistExporter(sc)
