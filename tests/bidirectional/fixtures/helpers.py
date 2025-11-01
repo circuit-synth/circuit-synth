@@ -2,6 +2,11 @@
 
 These helpers use kicad-sch-api to verify EXACT schematic contents,
 ensuring that CRUD operations preserve all other elements.
+
+IMPORTANT: Requires kicad-sch-api >= 0.4.5 for:
+- hierarchical_labels property (for label verification)
+- labels property (for future regular label support)
+- Collection-based API for all schematic elements
 """
 
 from pathlib import Path
@@ -92,19 +97,26 @@ def verify_labels(
 ) -> Dict[str, any]:
     """Verify EXACTLY the expected labels exist in schematic.
 
+    Note: circuit-synth generates hierarchical_labels (not regular labels) when
+    Net() objects are created, even on root-level circuits. This is expected
+    behavior for inter-sheet connectivity.
+
+    Requires: kicad-sch-api >= 0.4.5 for hierarchical_labels property
+
     Args:
         schematic_path: Path to .kicad_sch file
         expected_labels: Set of expected label texts (e.g., {"DATA", "CLK"})
         message: Context message for assertion failures
 
     Returns:
-        Dict mapping label text to label object
+        Dict mapping label text to hierarchical label object
 
     Raises:
         AssertionError: If labels don't match expected set
     """
     sch = Schematic.load(str(schematic_path))
-    actual_labels = {l.text for l in sch.labels}
+    # Circuit-synth generates hierarchical_labels, not regular labels
+    actual_labels = {l.text for l in sch.hierarchical_labels}
 
     assert actual_labels == expected_labels, (
         f"{message} mismatch:\n"
@@ -114,8 +126,8 @@ def verify_labels(
         f"  Extra:    {sorted(actual_labels - expected_labels)}"
     )
 
-    # Return dict for easy lookup
-    return {l.text: l for l in sch.labels}
+    # Return dict for easy lookup (circuit-synth uses hierarchical_labels)
+    return {l.text: l for l in sch.hierarchical_labels}
 
 
 def verify_component_properties(
