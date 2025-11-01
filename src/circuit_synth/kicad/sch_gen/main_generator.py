@@ -825,6 +825,9 @@ class SchematicGenerator:
         out_path = self.project_dir / f"{self.project_name}.kicad_sch"
         write_schematic_file(main_sch_expr, str(out_path))
 
+        # Fix power symbol text positions (Issue #458)
+        main_writer._fix_power_symbol_text_positions(str(out_path))
+
         # Now generate other subcircuits recursively
         # Create a mapping to track which circuits have been generated
         generated_circuits = {top_name}
@@ -929,6 +932,9 @@ class SchematicGenerator:
 
                         out_path = self.project_dir / f"{c_name}.kicad_sch"
                         write_schematic_file(sch_expr, str(out_path))
+
+                        # Fix power symbol text positions (Issue #458)
+                        writer._fix_power_symbol_text_positions(str(out_path))
 
                         generated_circuits.add(c_name)
                         made_progress = True
