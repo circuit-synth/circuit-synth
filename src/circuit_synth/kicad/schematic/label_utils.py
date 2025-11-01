@@ -309,6 +309,49 @@ def suggest_label_for_component_pin(
     return (suggested_text, (label_x, label_y), orientation)
 
 
+def calculate_hierarchical_label_justify(rotation: float) -> str:
+    """
+    Calculate correct justification for hierarchical label based on rotation.
+
+    This is the CANONICAL implementation used everywhere hierarchical labels are created.
+    DO NOT duplicate this logic - always call this function.
+
+    KiCad Justification Rules (verified from test data):
+      0° (RIGHT) → justify left
+      90° (UP)   → justify left
+      180° (LEFT) → justify right
+      270° (DOWN) → justify right
+
+    Pattern: Labels pointing LEFT or DOWN use right-justify for correct text reading.
+
+    Args:
+        rotation: Label rotation in degrees (0-360)
+
+    Returns:
+        "left" or "right" justification string
+
+    Examples:
+        >>> calculate_hierarchical_label_justify(0)
+        'left'
+        >>> calculate_hierarchical_label_justify(90)
+        'left'
+        >>> calculate_hierarchical_label_justify(180)
+        'right'
+        >>> calculate_hierarchical_label_justify(270)
+        'right'
+    """
+    rotation_normalized = rotation % 360
+
+    if rotation_normalized in (0.0, 90.0):
+        return "left"
+    elif rotation_normalized in (180.0, 270.0):
+        return "right"
+    else:
+        # For non-cardinal angles, default to left
+        logger.debug(f"Non-cardinal rotation {rotation}° - defaulting to 'left' justify")
+        return "left"
+
+
 def calculate_text_bounds(
     text: Text, char_width: float = 1.0, char_height: float = 1.27
 ) -> Tuple[float, float, float, float]:
