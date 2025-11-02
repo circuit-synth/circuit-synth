@@ -1,0 +1,30 @@
+# Circuit-Synth Autonomous Coordinator Configuration
+
+[coordinator]
+max_concurrent_workers = 3
+poll_interval_seconds = 30
+worker_timeout_hours = 2
+
+[github]
+repo_owner = "circuit-synth"
+repo_name = "circuit-synth"
+issue_label = "rpi-auto"  # Only process issues with this label
+
+[llm]
+# LLM CLI configuration - interchangeable!
+provider = "claude"
+
+# Command template (use {prompt_file} and {model} placeholders)
+command_template = [
+    "claude",
+    "-p", "{prompt_file}",
+    "--model", "{model}",
+    "--output-format", "stream-json",
+    "--verbose",
+    "--dangerously-skip-permissions"
+]
+
+model_default = "claude-sonnet-4-5"
+
+[worktree]
+base_dir = "trees"

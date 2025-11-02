@@ -44,3 +44,8 @@ fp-info-cache
 .env
 .pypirc
 PRD-*.md
+
+# Autonomous coordinator (TAC-8 style)
+trees/
+logs/
+tasks.md.tmp
