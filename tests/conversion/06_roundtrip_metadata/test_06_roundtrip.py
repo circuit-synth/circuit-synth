@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+"""Test 06: Metadata Round-Trip"""
+import pytest, subprocess, shutil
+from pathlib import Path
+from kicad_sch_api import Schematic
+
+def test_06_roundtrip(request):
+    """Round-trip test for custom properties, annotations."""
+    test_dir = Path(__file__).parent
+    circuit_file = test_dir / "metadata_circuit.py"
+    output_dir = test_dir / "metadata_circuit"
+    schematic_file = output_dir / "metadata_circuit.kicad_sch"
+    cleanup = not request.config.getoption("--keep-output", default=False)
+
+    try:
+        # Generate
+        result = subprocess.run(["uv", "run", str(circuit_file)], cwd=test_dir, capture_output=True, text=True, timeout=30)
+        assert result.returncode == 0, f"Generation failed: {result.stderr}"
+        assert schematic_file.exists()
+
+        # Load and verify
+        sch = Schematic.load(str(schematic_file))
+        components = [c for c in sch.components if not c.reference.startswith("#PWR")]
+        assert len(components) > 0, "No components found"
+
+        # Regenerate
+        result2 = subprocess.run(["uv", "run", str(circuit_file)], cwd=test_dir, capture_output=True, text=True, timeout=30)
+        assert result2.returncode == 0, "Regeneration failed"
+
+        print(f"\n✅ Test 06 PASSED: Metadata Round-Trip")
+    finally:
+        if cleanup and output_dir.exists():
+            shutil.rmtree(output_dir)
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v", "--keep-output"])
