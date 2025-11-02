@@ -774,19 +774,9 @@ class APISynchronizer:
                 rotation=label_angle,  # CRITICAL: Must pass rotation for correct orientation!
             )
 
-            # CRITICAL FIX: Manually set justify to match initial generation logic
-            # KiCAD hierarchical labels need correct justify based on rotation for proper text rendering
-            rotation_normalized = label_angle % 360
-            if rotation_normalized == 0:
-                justify = "left"
-            elif rotation_normalized == 90:
-                justify = "left"
-            elif rotation_normalized == 180:
-                justify = "right"
-            elif rotation_normalized == 270:
-                justify = "left"  # Fixed: was "right" in old code, should be "left"
-            else:
-                justify = "left"  # Default fallback
+            # Use canonical justification calculation from label_utils
+            from .label_utils import calculate_hierarchical_label_justify
+            justify = calculate_hierarchical_label_justify(label_angle)
 
             # Update the label's justify in the schematic data
             if hasattr(self.schematic, "_data") and "hierarchical_labels" in self.schematic._data:
