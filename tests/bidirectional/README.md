@@ -1,113 +1,208 @@
 # Bidirectional Sync Tests
 
-Manual test suite for validating bidirectional synchronization between Python circuit definitions and KiCad schematics.
+Comprehensive test suite for validating bidirectional synchronization between Python circuit definitions and KiCad schematics.
+
+## Quick Start
+
+**Run all passing tests:**
+```bash
+pytest tests/bidirectional/component_crud_root/*/test_*.py tests/bidirectional/net_crud_root/*/test_*.py -v
+```
+
+**Manual verification checklist:**
+See [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md) for detailed manual testing instructions.
+
+## Current Status
+
+**Completed & Passing**: 8/45 tests (18%)
+- ✅ Tests 10-13: Component CRUD (Root Sheet)
+- ✅ Tests 14-17: Net CRUD (Root Sheet)
+
+**In Progress**: Tests 18-25 (Hierarchical CRUD operations)
 
 ## Philosophy
 
-**Simple, Manual, Comprehensive**
+**Simple, Automated, Comprehensive**
 
-- **One test = One scenario** - Each test demonstrates one specific behavior
-- **Manual verification** - Run the circuit, inspect output, verify functionality
-- **Self-contained** - Each test directory has everything needed to run
-- **Comprehensive coverage** - Tests cover all critical workflows
+- **One test = One scenario** - Each test demonstrates one specific CRUD operation
+- **Automated verification** - Tests use kicad-sch-api for programmatic validation
+- **Position preservation** - Tests verify component positions survive regeneration
+- **Self-contained** - Each test directory has circuit + test + README
 
-## Test Coverage
+## Test Coverage Plan (45 Tests Total)
 
-This test suite validates:
-- **Python → KiCad**: Generate KiCad schematics from Python code
-- **KiCad → Python**: Import KiCad schematics to Python code
-- **Round-Trip**: Maintain consistency through multiple sync cycles
-- **Position Preservation**: Manual component positions survive sync
-- **Property Preservation**: Component values, footprints, references preserved
+### Component CRUD - Root Sheet (Tests 10-13) ✅
+- Test 10: Add component
+- Test 11: Update component value
+- Test 12: Rename component (update ref)
+- Test 13: Delete component
+
+### Net CRUD - Root Sheet (Tests 14-17) ✅
+- Test 14: Add net
+- Test 15: Update net connection
+- Test 16: Rename net
+- Test 17: Delete net
+
+### Component CRUD - Hierarchical (Tests 18-21) 🏗️
+- Test 18: Add component in subcircuit
+- Test 19: Update component value in subcircuit
+- Test 20: Rename component in subcircuit
+- Test 21: Delete component in subcircuit
+
+### Net CRUD - Hierarchical (Tests 22-25) 🏗️
+- Test 22: Add net in subcircuit
+- Test 23: Update net in subcircuit
+- Test 24: Rename net in subcircuit
+- Test 25: Delete net in subcircuit
+
+### Sheet CRUD (Tests 26-29) 📋
+- Test 26: Add hierarchical sheet
+- Test 27: Update sheet properties
+- Test 28: Rename sheet
+- Test 29: Delete sheet
+
+### Label CRUD (Tests 30-33) 📋
+- Test 30: Add hierarchical label
+- Test 31: Update label properties
+- Test 32: Rename label
+- Test 33: Delete label
+
+### Power Symbol CRUD (Tests 34-37) 📋
+- Test 34: Add power symbol
+- Test 35: Change power symbol type
+- Test 36: Rename power net
+- Test 37: Delete power symbol
+
+### Cross-Hierarchy Operations (Tests 38-41) 📋
+- Test 38: Connect across sheets
+- Test 39: Modify cross-sheet connection
+- Test 40: Move component between sheets
+- Test 41: Propagate changes up/down hierarchy
+
+### Bulk Operations (Tests 42-45) 📋
+- Test 42: Add multiple components
+- Test 43: Update multiple components
+- Test 44: Delete multiple components
+- Test 45: Complex multi-operation workflow
 
 ## Test Structure
 
-Each test directory contains:
-- **Starting file(s)**: Python circuit or KiCad project to run
-- **README.md**: Instructions on how to test and what to verify
+Each test follows the **one-folder-per-test** pattern:
 
 ```
 tests/bidirectional/
-├── 01_test_blank/              # Empty circuit generation
-│   ├── blank.py
-│   └── README.md
-├── 02_test_generate/           # Python → KiCad generation
-│   ├── single_resistor.py
-│   └── README.md
-├── 03_test_import/             # KiCad → Python import
-│   ├── kicad_ref/
-│   └── README.md
-├── 04_test_properties/         # Property preservation
-├── 05_test_roundtrip/          # Full cycle test
-├── 06_test_add_component/      # Adding components
-├── 07_test_delete_component/   # Removing components
-├── 08_test_modify_value/       # Changing values
-├── 09_test_manual_position_preservation/  # Position handling
-├── 10_test_add_to_existing_net/  # Net operations
-├── 11_test_power_rails/        # Power/ground nets
-├── 12_test_set_position/       # Explicit positioning
-├── 13_test_component_rename/   # Reference changes
-├── 14_test_incremental_growth/ # Multiple iterations
-├── 15_test_move_component/     # Position changes
-├── 17_test_create_net/         # Creating connections
-└── 22_test_delete_net/         # Removing connections
+├── component_crud_root/
+│   ├── 10_sync_component_root_create/
+│   │   ├── comprehensive_root.py      # Circuit definition
+│   │   ├── test_add_component.py      # Automated test
+│   │   └── README.md                  # Manual instructions
+│   ├── 11_sync_component_root_update_value/
+│   ├── 12_sync_component_root_update_ref/
+│   └── 13_sync_component_root_delete/
+├── net_crud_root/
+│   ├── 14_sync_net_root_create/
+│   ├── 15_sync_net_root_update/
+│   ├── 16_sync_net_root_rename/
+│   └── 17_sync_net_root_delete/
+├── component_crud_hier/
+│   └── 18-21...
+├── net_crud_hier/
+│   └── 22-25...
+└── MANUAL_TEST_CHECKLIST.md           # Manual verification checklist
 ```
 
 ## Running Tests
 
-### General Pattern
+### Automated Tests (Recommended)
+
+Run all passing tests:
+```bash
+pytest tests/bidirectional/component_crud_root/*/test_*.py \
+       tests/bidirectional/net_crud_root/*/test_*.py -v
+```
+
+Run specific test:
+```bash
+pytest tests/bidirectional/component_crud_root/10_sync_component_root_create/test_add_component.py -v
+```
+
+Keep test outputs for inspection:
+```bash
+pytest tests/bidirectional/component_crud_root/10_sync_component_root_create/test_add_component.py -v --keep-output
+```
+
+### Manual Testing
+
+For manual verification in KiCad:
 
 1. Navigate to test directory:
    ```bash
-   cd tests/bidirectional/01_test_blank
+   cd tests/bidirectional/component_crud_root/10_sync_component_root_create
    ```
 
-2. Read the README.md for specific instructions
-
-3. Run the starting file:
+2. Generate circuit:
    ```bash
-   uv run blank.py
-   # or
-   uv run kicad-to-python kicad_ref/project.kicad_pro -o output.py
+   uv run comprehensive_root.py
    ```
 
-4. Verify output manually (open in KiCad, inspect files, etc.)
+3. Open in KiCad:
+   ```bash
+   open comprehensive_root/comprehensive_root.kicad_pro
+   ```
 
-### Example: Test 01 (Blank Circuit)
+4. Follow README.md instructions to perform the test operation
 
-```bash
-cd tests/bidirectional/01_test_blank
-uv run blank.py
-open blank/blank.kicad_pro  # Verify blank schematic opens
+## Test Verification
+
+Each test verifies:
+- ✅ Circuit generates without errors
+- ✅ Component positions preserved across regeneration
+- ✅ Component values preserved
+- ✅ Net connections preserved
+- ✅ Power symbols preserved
+- ✅ Modified elements updated correctly
+
+Tests use **kicad-sch-api 0.4.5+** for programmatic KiCad schematic verification.
+
+## Key Testing Patterns
+
+### Position Preservation Test
+
+```python
+# STEP 1: Generate initial circuit
+result = subprocess.run(["uv", "run", "comprehensive_root.py"])
+sch = Schematic.load("comprehensive_root/comprehensive_root.kicad_sch")
+
+# Store positions
+r1_pos_before = r1.position
+
+# STEP 2: Modify circuit (e.g., change R1 value)
+modify_circuit_code()
+
+# STEP 3: Regenerate
+result = subprocess.run(["uv", "run", "comprehensive_root.py"])
+sch_after = Schematic.load("comprehensive_root/comprehensive_root.kicad_sch")
+
+# STEP 4: Verify position preserved
+assert r1_after.position.x == r1_pos_before.x
+assert r1_after.position.y == r1_pos_before.y
 ```
 
-### Example: Test 02 (Generate from Python)
+## Legacy Tests
 
-```bash
-cd tests/bidirectional/02_test_generate
-uv run single_resistor.py
-open single_resistor/single_resistor.kicad_pro  # Verify R1 resistor appears
-```
+Old tests are archived in `_archive_legacy_tests/` for reference but are not actively maintained.
 
-### Example: Test 03 (Import from KiCad)
+## Contributing
 
-```bash
-cd tests/bidirectional/03_test_import
-uv run kicad-to-python kicad_ref/02_kicad_ref.kicad_pro -o imported.py
-cat imported.py  # Verify Python code generated with R1 component
-```
+When adding new tests:
+1. Follow the one-folder-per-test pattern
+2. Include comprehensive_root.py (circuit), test_*.py (automated test), README.md (manual instructions)
+3. Use kicad-sch-api for verification
+4. Test both automated pytest execution and manual KiCad verification
+5. Update MANUAL_TEST_CHECKLIST.md
 
-## Manual Verification Checklist
+## Documentation
 
-When testing, verify:
-- ✅ Files generate without errors
-- ✅ KiCad projects open in KiCad
-- ✅ Components appear with correct references (R1, C1, etc.)
-- ✅ Component values are correct (10k, 100nF, etc.)
-- ✅ Connections/nets are present (if applicable)
-- ✅ Positions are preserved (if applicable)
-- ✅ Round-trip maintains all properties
-
-## Test Status
-
-All tests are functional and ready for manual verification. See individual test README.md files for specific verification steps.
+- **MANUAL_TEST_CHECKLIST.md** - Checkbox list for manual verification of all 45 tests
+- **README.md** (this file) - Overview and quick reference
+- **_archive_docs/** - Historical status documents (archived)
