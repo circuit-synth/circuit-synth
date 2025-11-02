@@ -1,0 +1,15 @@
+# Generated KiCad projects from test circuits
+# Each test may generate a folder with the same name as the circuit
+*/*/comprehensive_root/
+*/*/single_resistor/
+*/*/test_*/
+
+# Any .kicad_pro, .kicad_sch, .kicad_pcb in test directories
+*/*.kicad_pro
+*/*.kicad_sch
+*/*.kicad_pcb
+*/*.kicad_prl
+*/*/*.kicad_pro
+*/*/*.kicad_sch
+*/*/*.kicad_pcb
+*/*/*.kicad_prl
