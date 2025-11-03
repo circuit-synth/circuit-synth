@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Circuit-Synth Coordinator - Simple TAC-8 inspired autonomous system
+Circuit-Synth Autonomous Coordinator
 
-Polls GitHub for 'rpi-auto' issues, spawns workers, manages task queue.
+TAC-8 inspired system for autonomous issue resolution.
+See adws/README.md for documentation.
 """
 
 import re
