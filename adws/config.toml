@@ -1,7 +1,7 @@
 # Circuit-Synth Autonomous Coordinator Configuration
 
 [coordinator]
-max_concurrent_workers = 3
+max_concurrent_workers = 1  # Reduced from 3 to prevent resource exhaustion
 poll_interval_seconds = 30
 worker_timeout_hours = 2
 

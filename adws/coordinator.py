@@ -13,11 +13,19 @@ import tomllib
 import os
 import shutil
 from pathlib import Path
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 from datetime import datetime
 import secrets
 import signal
+
+# Import error handling
+from adw_modules.error_handling import (
+    TaskErrorTracking,
+    FailureType,
+    categorize_error,
+    format_health_for_dashboard
+)
 
 # Configuration paths
 SCRIPT_DIR = Path(__file__).parent
@@ -47,6 +55,8 @@ class Task:
     commit_hash: Optional[str] = None
     pr_url: Optional[str] = None
     error: Optional[str] = None
+    # Error tracking for automatic retry
+    error_tracking: TaskErrorTracking = field(default_factory=TaskErrorTracking)
 
 
 class Coordinator:
@@ -178,22 +188,63 @@ class Coordinator:
             'blocked': r'^\[⏰\s+(w-[a-f0-9]+)\]\s+(\w+-\d+):\s+(.+)',
         }
 
-        for line in content.split('\n'):
-            line = line.strip()
-            if not line or line.startswith('#') or line.startswith('<!--'):
+        lines_list = content.split('\n')
+        i = 0
+        while i < len(lines_list):
+            line = lines_list[i].strip()
+            i += 1
+
+            if not line or line.startswith('#'):
                 continue
 
+            # Check for task pattern
+            matched = False
             for status, pattern in patterns.items():
                 match = re.match(pattern, line)
                 if match:
+                    matched = True
                     if status == 'pending':
                         task_id, desc, priority = match.groups()
                         priority_num = int(priority[1])
                         source, number = task_id.split('-')
-                        tasks.append(Task(
+                        task = Task(
                             id=task_id, source=source, number=number,
                             description=desc, priority=priority_num, status='pending'
-                        ))
+                        )
+
+                        # Check next line for metadata
+                        if i < len(lines_list) and lines_list[i].strip().startswith('<!-- META:'):
+                            meta_line = lines_list[i].strip()
+                            i += 1
+                            try:
+                                # Extract JSON from HTML comment
+                                json_str = meta_line.replace('<!-- META:', '').replace(' -->', '')
+                                metadata = json.loads(json_str)
+
+                                # Restore error tracking state
+                                task.error_tracking.attempt_count = metadata.get('attempts', 0)
+                                task.error_tracking.max_attempts = metadata.get('max_attempts', 3)
+
+                                if metadata.get('failed_at'):
+                                    task.error_tracking.failed_at = datetime.fromisoformat(metadata['failed_at'])
+
+                                # Restore failure history
+                                for failure_type_str in metadata.get('failure_types', []):
+                                    try:
+                                        failure_type = FailureType(failure_type_str)
+                                        task.error_tracking.failure_history.append(failure_type)
+                                    except ValueError:
+                                        pass
+
+                                if metadata.get('last_failure'):
+                                    try:
+                                        task.error_tracking.last_failure_type = FailureType(metadata['last_failure'])
+                                    except ValueError:
+                                        pass
+                            except (json.JSONDecodeError, KeyError) as e:
+                                print(f"⚠️  Failed to parse metadata for {task_id}: {e}")
+
+                        tasks.append(task)
                     elif status == 'active':
                         worker_id, tree_id, task_id, desc = match.groups()
                         source, number = task_id.split('-')
@@ -234,6 +285,24 @@ class Coordinator:
         for task in sorted(sections['pending'], key=lambda t: t.priority):
             lines.append(f"[] {task.id}: {task.description} {{p{task.priority}}}")
 
+            # Store error tracking as JSON metadata (machine-readable)
+            if task.error_tracking.attempt_count > 0:
+                metadata = {
+                    'attempts': task.error_tracking.attempt_count,
+                    'max_attempts': task.error_tracking.max_attempts,
+                    'failed_at': task.error_tracking.failed_at.isoformat() if task.error_tracking.failed_at else None,
+                    'failure_types': [f.value for f in task.error_tracking.failure_history],
+                    'last_failure': task.error_tracking.last_failure_type.value if task.error_tracking.last_failure_type else None
+                }
+                lines.append(f"<!-- META:{json.dumps(metadata)} -->")
+
+            # Add health and retry info (human-readable)
+            health_lines = format_health_for_dashboard(task.error_tracking)
+            lines.extend(health_lines)
+
+            if health_lines:  # Add blank line only if there was health info
+                lines.append("")
+
         if not sections['pending']:
             lines.append("<!-- No pending tasks -->")
 
@@ -269,12 +338,29 @@ class Coordinator:
         lines.extend(["", "---", "", "## Failed", ""])
 
         # Failed
+        from adw_modules.error_handling import TaskHealth
         for task in sections['failed']:
-            lines.append(f"[❌ {task.worker_id}] {task.id}: {task.description}")
+            health = task.error_tracking.get_health_status()
+            icon = "☠️" if health == TaskHealth.DEAD else "❌"
+
+            lines.append(f"[{icon} {task.worker_id}] {task.id}: {task.description}")
+            lines.append(f"- Attempts: {task.error_tracking.attempt_count}/{task.error_tracking.max_attempts}")
+
+            # Show failure history
+            if task.error_tracking.failure_history:
+                types = [f.value for f in task.error_tracking.failure_history]
+                lines.append(f"- Failure types: {', '.join(types)}")
+
             if task.completed:
                 lines.append(f"- Failed: {task.completed}")
             if task.error:
-                lines.append(f"- Reason: {task.error}")
+                error_display = task.error[:100] + "..." if len(task.error) > 100 else task.error
+                lines.append(f"- Reason: {error_display}")
+
+            # Show alerts
+            for alert in task.error_tracking.get_alerts():
+                lines.append(f"- {alert}")
+
             lines.append("")
 
         if not sections['failed']:
@@ -296,6 +382,193 @@ class Coordinator:
         temp_file = TASKS_FILE.with_suffix('.md.tmp')
         temp_file.write_text('\n'.join(lines))
         temp_file.replace(TASKS_FILE)
+
+    def get_dashboard_status(self, tasks: List[Task]) -> dict:
+        """Generate status data for dashboard display
+
+        This provides comprehensive status information including:
+        - Task counts by status
+        - Health metrics
+        - Active workers with health scores
+        - Pending tasks
+        - Recent completions
+        - Errors and alerts
+
+        Args:
+            tasks: List of all tasks
+
+        Returns:
+            Dashboard status dictionary
+        """
+        from adw_modules.error_handling import TaskHealth
+
+        # Categorize tasks
+        active = [t for t in tasks if t.status == 'active']
+        pending = [t for t in tasks if t.status == 'pending']
+        completed = [t for t in tasks if t.status == 'completed']
+        failed = [t for t in tasks if t.status == 'failed']
+        blocked = [t for t in tasks if t.status == 'blocked']
+
+        # Calculate overall health
+        if tasks:
+            health_scores = [self._calculate_task_health_score(t) for t in tasks]
+            avg_health = sum(health_scores) / len(health_scores)
+        else:
+            avg_health = 1.0
+
+        # Determine health status
+        if avg_health >= 0.9:
+            health_status = "excellent"
+        elif avg_health >= 0.7:
+            health_status = "good"
+        elif avg_health >= 0.5:
+            health_status = "fair"
+        elif avg_health >= 0.3:
+            health_status = "poor"
+        else:
+            health_status = "critical"
+
+        # Generate alerts
+        alerts = self._generate_alerts(tasks)
+
+        return {
+            "summary": {
+                "active": len(active),
+                "pending": len(pending),
+                "completed": len(completed),
+                "failed": len(failed),
+                "total": len(tasks)
+            },
+            "health_metrics": {
+                "overall_health": avg_health,
+                "health_status": health_status,
+                "timestamp": datetime.now().isoformat()
+            },
+            "alerts": alerts,
+            "active_workers": [
+                {
+                    "task_id": t.id,
+                    "worker_id": t.worker_id,
+                    "description": t.description,
+                    "started": t.started,
+                    "pid": t.pid,
+                    "health_score": self._calculate_task_health_score(t)
+                }
+                for t in active
+            ],
+            "pending_tasks": [
+                {
+                    "task_id": t.id,
+                    "description": t.description,
+                    "priority": t.priority
+                }
+                for t in sorted(pending, key=lambda x: x.priority)
+            ],
+            "recent_completions": [
+                {
+                    "task_id": t.id,
+                    "description": t.description,
+                    "completed": t.completed,
+                    "pr_url": t.pr_url
+                }
+                for t in completed[-5:]  # Last 5
+            ],
+            "errors": [
+                {
+                    "task_id": t.id,
+                    "description": t.description,
+                    "error": t.error,
+                    "retry_count": t.error_tracking.attempt_count,
+                    "category": t.error_tracking.last_failure_type.value if t.error_tracking.last_failure_type else "unknown"
+                }
+                for t in failed
+            ]
+        }
+
+    def _calculate_task_health_score(self, task: Task) -> float:
+        """Calculate health score for a task (0.0 to 1.0)"""
+        score = 1.0
+
+        # Active tasks
+        if task.status == 'active' and task.started:
+            try:
+                started = datetime.strptime(task.started, '%Y-%m-%d %H:%M:%S')
+                elapsed_minutes = (datetime.now() - started).total_seconds() / 60
+
+                # Deduct points for age
+                if elapsed_minutes > 120:  # 2 hours
+                    score -= 0.5
+                elif elapsed_minutes > 90:
+                    score -= 0.3
+                elif elapsed_minutes > 60:
+                    score -= 0.1
+            except ValueError:
+                pass
+
+        # Failed tasks
+        elif task.status == 'failed':
+            retry_count = task.error_tracking.attempt_count
+            score -= (0.2 * retry_count)
+
+        # Blocked tasks
+        elif task.status == 'blocked':
+            score = 0.5
+
+        # Completed tasks
+        elif task.status == 'completed':
+            score = 1.0
+
+        return max(0.0, min(1.0, score))
+
+    def _generate_alerts(self, tasks: List[Task]) -> List[dict]:
+        """Generate alerts based on task status"""
+        alerts = []
+
+        # Check for repeated failures
+        for task in tasks:
+            if task.status == 'failed' and task.error_tracking.attempt_count >= 3:
+                alerts.append({
+                    "severity": "critical",
+                    "task_id": task.id,
+                    "message": f"Task {task.id} has failed {task.error_tracking.attempt_count} times",
+                    "type": "repeated_failure"
+                })
+
+        # Check for high failure rate
+        recent_tasks = tasks[-20:]  # Last 20 tasks
+        if recent_tasks:
+            failed = [t for t in recent_tasks if t.status == 'failed']
+            failure_rate = len(failed) / len(recent_tasks)
+
+            if failure_rate > 0.5:
+                alerts.append({
+                    "severity": "critical",
+                    "message": f"High failure rate: {failure_rate:.1%} of recent tasks failed",
+                    "type": "high_failure_rate"
+                })
+
+        # Check for all workers stuck
+        active = [t for t in tasks if t.status == 'active']
+        if active:
+            stuck_count = 0
+            for t in active:
+                if t.started:
+                    try:
+                        started = datetime.strptime(t.started, '%Y-%m-%d %H:%M:%S')
+                        elapsed = (datetime.now() - started).total_seconds() / 60
+                        if elapsed > 120:  # 2 hours
+                            stuck_count += 1
+                    except ValueError:
+                        pass
+
+            if stuck_count > 0 and stuck_count == len(active):
+                alerts.append({
+                    "severity": "critical",
+                    "message": f"All {len(active)} active workers appear to be stuck",
+                    "type": "all_workers_stuck"
+                })
+
+        return alerts
 
     def _worker_is_running(self, task: Task) -> bool:
         """Check if worker process is still running"""
@@ -418,25 +691,6 @@ class Coordinator:
 
         print(f"   ✓ Worker {task.worker_id} started (PID: {proc.pid})")
 
-        # Write status.md for dashboard
-        self._write_agent_status(task)
-
-    def _write_agent_status(self, task: Task):
-        """Write status.md file for agent dashboard tracking"""
-        if not task.tree_path:
-            return
-
-        status_file = Path(task.tree_path) / "status.md"
-        status_content = f"""# Agent Status
-
-**Issue:** #{task.number}
-**Status:** running
-**Started:** {task.started}
-**Worker ID:** {task.worker_id}
-**Priority:** p{task.priority}
-"""
-        status_file.write_text(status_content)
-
     def check_completions(self, tasks: List[Task]) -> List[Task]:
         """Check if active workers have completed
 
@@ -461,6 +715,18 @@ class Coordinator:
                 continue
 
             print(f"🏁 Worker {task.worker_id} finished for {task.id}")
+
+            # Check if worker exited too quickly (likely an error)
+            instant_failure = False
+            if task.started:
+                try:
+                    started_dt = datetime.strptime(task.started, '%Y-%m-%d %H:%M:%S')
+                    elapsed_seconds = (datetime.now() - started_dt).total_seconds()
+                    if elapsed_seconds < 10:
+                        instant_failure = True
+                        print(f"   ⚠️  Worker exited in {elapsed_seconds:.1f}s (instant failure)")
+                except ValueError:
+                    pass
 
             # Check for PR creation (primary completion signal)
             try:
@@ -531,11 +797,37 @@ The PR is ready for your review."""
                         task.completed = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         print(f"   ⏰ Task {task.id} blocked - waiting for human")
                     else:
-                        # Worker failed
-                        task.status = 'failed'
-                        task.error = 'Worker exited without creating PR'
-                        task.completed = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                        print(f"   ❌ Task {task.id} failed - no PR created")
+                        # Worker failed - categorize error and decide on retry
+                        error_msg = task.error or 'Worker exited without creating PR'
+
+                        # Get exit code if available
+                        exit_code = proc.returncode if proc else None
+
+                        # Categorize the failure (instant failures are likely config/setup errors)
+                        if instant_failure:
+                            failure_type = FailureType.STARTUP_ERROR
+                            error_msg = f"Worker exited in <10s: {error_msg}"
+                        else:
+                            failure_type = categorize_error(error_msg, context={'exit_code': exit_code})
+
+                        # Record failure in error tracking
+                        task.error_tracking.record_failure(failure_type)
+                        task.error = error_msg
+
+                        # Check if can retry
+                        if task.error_tracking.can_retry():
+                            task.status = 'pending'  # Will retry after backoff
+                            backoff = task.error_tracking.calculate_backoff()
+                            print(f"   ⚠️ Failed (attempt {task.error_tracking.attempt_count}/{task.error_tracking.max_attempts}): {failure_type.value}")
+                            print(f"   🔄 Will retry in {backoff}s")
+                        else:
+                            task.status = 'failed'
+                            task.completed = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                            print(f"   ❌ Failed permanently after {task.error_tracking.attempt_count} attempts: {failure_type.value}")
+
+                            # Show alerts
+                            for alert in task.error_tracking.get_alerts():
+                                print(f"   {alert}")
 
                     # Keep worktree for debugging (don't clean up failures)
 
@@ -544,10 +836,22 @@ The PR is ready for your review."""
                         del self.active_workers[task.worker_id]
 
             except subprocess.CalledProcessError as e:
-                task.status = 'failed'
-                task.error = f'Failed to check PR status: {e}'
-                task.completed = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                print(f"   ❌ Task {task.id} failed: {task.error}")
+                # Failure in PR checking - record and potentially retry
+                error_msg = f'Failed to check PR status: {e}'
+                failure_type = categorize_error(error_msg)
+
+                task.error_tracking.record_failure(failure_type)
+                task.error = error_msg
+
+                if task.error_tracking.can_retry():
+                    task.status = 'pending'
+                    backoff = task.error_tracking.calculate_backoff()
+                    print(f"   ⚠️ Failed (attempt {task.error_tracking.attempt_count}/{task.error_tracking.max_attempts}): {failure_type.value}")
+                    print(f"   🔄 Will retry in {backoff}s")
+                else:
+                    task.status = 'failed'
+                    task.completed = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    print(f"   ❌ Task {task.id} failed permanently: {task.error}")
 
                 # Remove from active workers
                 if task.worker_id in self.active_workers:
@@ -588,11 +892,28 @@ The PR is ready for your review."""
                 pending = [t for t in current_tasks if t.status == 'pending']
                 slots = self.config['coordinator']['max_concurrent_workers'] - len(active)
 
-                if slots > 0 and pending:
-                    pending.sort(key=lambda t: t.priority)
+                # Filter pending tasks by retry readiness
+                pending_ready = [t for t in pending if t.error_tracking.is_ready_for_retry()]
+                pending_backoff = [t for t in pending if not t.error_tracking.is_ready_for_retry()]
 
-                    for task in pending[:slots]:
+                # Log tasks still in backoff
+                for task in pending_backoff:
+                    if task.error_tracking.failed_at:
+                        backoff = task.error_tracking.calculate_backoff()
+                        elapsed = (datetime.now() - task.error_tracking.failed_at).total_seconds()
+                        remaining = max(0, backoff - elapsed)
+                        if remaining > 0:
+                            print(f"⏳ Task {task.id} in backoff: {int(remaining)}s remaining")
+
+                if slots > 0 and pending_ready:
+                    pending_ready.sort(key=lambda t: t.priority)
+
+                    for task in pending_ready[:slots]:
                         try:
+                            # Log retry attempt if this is a retry
+                            if task.error_tracking.attempt_count > 0:
+                                print(f"🔄 Retry attempt {task.error_tracking.attempt_count + 1}/{task.error_tracking.max_attempts} for {task.id}")
+
                             task.worker_id = self.generate_worker_id()
                             task.branch_name = f"auto/{task.worker_id}"
 
@@ -608,8 +929,15 @@ The PR is ready for your review."""
 
                         except Exception as e:
                             print(f"❌ Failed to launch worker for {task.id}: {e}")
-                            task.status = 'failed'
+                            # Record worktree error
+                            failure_type = categorize_error(str(e))
+                            task.error_tracking.record_failure(failure_type)
                             task.error = str(e)
+
+                            if task.error_tracking.can_retry():
+                                task.status = 'pending'
+                            else:
+                                task.status = 'failed'
 
                 # 6. Update tasks.md
                 self.update_tasks_md(current_tasks)
