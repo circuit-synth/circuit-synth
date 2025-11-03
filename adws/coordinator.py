@@ -188,22 +188,63 @@ class Coordinator:
             'blocked': r'^\[⏰\s+(w-[a-f0-9]+)\]\s+(\w+-\d+):\s+(.+)',
         }
 
-        for line in content.split('\n'):
-            line = line.strip()
-            if not line or line.startswith('#') or line.startswith('<!--'):
+        lines_list = content.split('\n')
+        i = 0
+        while i < len(lines_list):
+            line = lines_list[i].strip()
+            i += 1
+
+            if not line or line.startswith('#'):
                 continue
 
+            # Check for task pattern
+            matched = False
             for status, pattern in patterns.items():
                 match = re.match(pattern, line)
                 if match:
+                    matched = True
                     if status == 'pending':
                         task_id, desc, priority = match.groups()
                         priority_num = int(priority[1])
                         source, number = task_id.split('-')
-                        tasks.append(Task(
+                        task = Task(
                             id=task_id, source=source, number=number,
                             description=desc, priority=priority_num, status='pending'
-                        ))
+                        )
+
+                        # Check next line for metadata
+                        if i < len(lines_list) and lines_list[i].strip().startswith('<!-- META:'):
+                            meta_line = lines_list[i].strip()
+                            i += 1
+                            try:
+                                # Extract JSON from HTML comment
+                                json_str = meta_line.replace('<!-- META:', '').replace(' -->', '')
+                                metadata = json.loads(json_str)
+
+                                # Restore error tracking state
+                                task.error_tracking.attempt_count = metadata.get('attempts', 0)
+                                task.error_tracking.max_attempts = metadata.get('max_attempts', 3)
+
+                                if metadata.get('failed_at'):
+                                    task.error_tracking.failed_at = datetime.fromisoformat(metadata['failed_at'])
+
+                                # Restore failure history
+                                for failure_type_str in metadata.get('failure_types', []):
+                                    try:
+                                        failure_type = FailureType(failure_type_str)
+                                        task.error_tracking.failure_history.append(failure_type)
+                                    except ValueError:
+                                        pass
+
+                                if metadata.get('last_failure'):
+                                    try:
+                                        task.error_tracking.last_failure_type = FailureType(metadata['last_failure'])
+                                    except ValueError:
+                                        pass
+                            except (json.JSONDecodeError, KeyError) as e:
+                                print(f"⚠️  Failed to parse metadata for {task_id}: {e}")
+
+                        tasks.append(task)
                     elif status == 'active':
                         worker_id, tree_id, task_id, desc = match.groups()
                         source, number = task_id.split('-')
@@ -244,7 +285,18 @@ class Coordinator:
         for task in sorted(sections['pending'], key=lambda t: t.priority):
             lines.append(f"[] {task.id}: {task.description} {{p{task.priority}}}")
 
-            # Add health and retry info
+            # Store error tracking as JSON metadata (machine-readable)
+            if task.error_tracking.attempt_count > 0:
+                metadata = {
+                    'attempts': task.error_tracking.attempt_count,
+                    'max_attempts': task.error_tracking.max_attempts,
+                    'failed_at': task.error_tracking.failed_at.isoformat() if task.error_tracking.failed_at else None,
+                    'failure_types': [f.value for f in task.error_tracking.failure_history],
+                    'last_failure': task.error_tracking.last_failure_type.value if task.error_tracking.last_failure_type else None
+                }
+                lines.append(f"<!-- META:{json.dumps(metadata)} -->")
+
+            # Add health and retry info (human-readable)
             health_lines = format_health_for_dashboard(task.error_tracking)
             lines.extend(health_lines)
 
@@ -664,6 +716,18 @@ class Coordinator:
 
             print(f"🏁 Worker {task.worker_id} finished for {task.id}")
 
+            # Check if worker exited too quickly (likely an error)
+            instant_failure = False
+            if task.started:
+                try:
+                    started_dt = datetime.strptime(task.started, '%Y-%m-%d %H:%M:%S')
+                    elapsed_seconds = (datetime.now() - started_dt).total_seconds()
+                    if elapsed_seconds < 10:
+                        instant_failure = True
+                        print(f"   ⚠️  Worker exited in {elapsed_seconds:.1f}s (instant failure)")
+                except ValueError:
+                    pass
+
             # Check for PR creation (primary completion signal)
             try:
                 pr_check = subprocess.run(
@@ -739,8 +803,12 @@ The PR is ready for your review."""
                         # Get exit code if available
                         exit_code = proc.returncode if proc else None
 
-                        # Categorize the failure
-                        failure_type = categorize_error(error_msg, context={'exit_code': exit_code})
+                        # Categorize the failure (instant failures are likely config/setup errors)
+                        if instant_failure:
+                            failure_type = FailureType.STARTUP_ERROR
+                            error_msg = f"Worker exited in <10s: {error_msg}"
+                        else:
+                            failure_type = categorize_error(error_msg, context={'exit_code': exit_code})
 
                         # Record failure in error tracking
                         task.error_tracking.record_failure(failure_type)

@@ -22,6 +22,7 @@ class FailureType(Enum):
     VALIDATION_ERROR = "validation_error"  # Output validation failed
     WORKTREE_ERROR = "worktree_error"  # Git worktree issues
     PR_CREATION_FAILED = "pr_creation_failed"  # Failed to create PR
+    STARTUP_ERROR = "startup_error"  # Agent failed to start or exited in <10s
     UNKNOWN = "unknown"  # Unclassified failure
 
 
@@ -63,7 +64,16 @@ class TaskErrorTracking:
             - Attempt 1: ~60 seconds
             - Attempt 2: ~120 seconds
             - Attempt 3: ~240 seconds
+
+        For STARTUP_ERROR failures, use longer backoff to prevent spawn loops:
+            - Attempt 1: ~300 seconds (5 min)
+            - Attempt 2: ~600 seconds (10 min)
+            - Attempt 3: ~1200 seconds (20 min)
         """
+        # Use longer backoff for startup errors to prevent spawn loops
+        if self.last_failure_type == FailureType.STARTUP_ERROR:
+            return 300 * (2 ** self.attempt_count)
+
         return 60 * (2 ** self.attempt_count)
 
     def is_ready_for_retry(self) -> bool:
