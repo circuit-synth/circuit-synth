@@ -5,8 +5,6 @@
 ---
 
 ## Pending
-
-[] gh-450: Dashboard: Add token budget monitoring and alerts {p1}
 [] gh-469: Test Issue: PM Agent End-to-End Verification {p2}
 [] gh-454: Dashboard: Enhance PM Agent chat with advanced commands and Claude integration {p2}
 [] gh-453: Dashboard: Add maintenance task status and scheduling interface {p2}
@@ -23,7 +21,7 @@
 
 ## Completed Today
 
-<!-- No completed tasks today -->
+[✅ ce870fd, w-b5662c] gh-450: Dashboard: Add token budget monitoring and alerts - PR: #481
 
 ---
 
