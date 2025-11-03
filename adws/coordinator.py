@@ -418,6 +418,25 @@ class Coordinator:
 
         print(f"   ✓ Worker {task.worker_id} started (PID: {proc.pid})")
 
+        # Write status.md for dashboard
+        self._write_agent_status(task)
+
+    def _write_agent_status(self, task: Task):
+        """Write status.md file for agent dashboard tracking"""
+        if not task.tree_path:
+            return
+
+        status_file = Path(task.tree_path) / "status.md"
+        status_content = f"""# Agent Status
+
+**Issue:** #{task.number}
+**Status:** running
+**Started:** {task.started}
+**Worker ID:** {task.worker_id}
+**Priority:** p{task.priority}
+"""
+        status_file.write_text(status_content)
+
     def check_completions(self, tasks: List[Task]) -> List[Task]:
         """Check if active workers have completed
 
