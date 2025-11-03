@@ -10,6 +10,7 @@ import time
 import json
 import subprocess
 import tomllib
+import os
 from pathlib import Path
 from dataclasses import dataclass
 from typing import List, Optional
@@ -62,6 +63,7 @@ class Coordinator:
         self.active_workers: dict[str, subprocess.Popen] = {}
 
         # Setup signal handlers
+        signal.signal(signal.SIGCHLD, self._reap_children)
         signal.signal(signal.SIGINT, self._shutdown)
         signal.signal(signal.SIGTERM, self._shutdown)
 
@@ -69,6 +71,49 @@ class Coordinator:
         """Graceful shutdown"""
         print(f"\n🛑 Shutting down (signal {signum})...")
         self.running = False
+
+    def _reap_children(self, signum, frame):
+        """Automatically reap zombie child processes
+
+        Called when SIGCHLD is received (child process exits).
+        Uses WNOHANG to avoid blocking.
+        """
+        while True:
+            try:
+                # Non-blocking wait for any child
+                pid, status = os.waitpid(-1, os.WNOHANG)
+
+                if pid == 0:
+                    # No more children to reap
+                    break
+
+                # Calculate exit code
+                if os.WIFEXITED(status):
+                    exit_code = os.WEXITSTATUS(status)
+                elif os.WIFSIGNALED(status):
+                    exit_code = -os.WTERMSIG(status)
+                else:
+                    exit_code = -1
+
+                # Find which task this was
+                task_id = None
+                for tid, proc in self.active_workers.items():
+                    if proc.pid == pid:
+                        task_id = tid
+                        break
+
+                if task_id:
+                    print(f"👶 Reaped worker {task_id} (PID {pid}, exit {exit_code})")
+                    # Don't remove from active_workers here - let check_completions do it
+                else:
+                    print(f"👶 Reaped unknown child (PID {pid}, exit {exit_code})")
+
+            except ChildProcessError:
+                # No children
+                break
+            except OSError as e:
+                print(f"⚠️  Error reaping child: {e}")
+                break
 
     @staticmethod
     def generate_worker_id() -> str:
@@ -251,18 +296,63 @@ class Coordinator:
         temp_file.write_text('\n'.join(lines))
         temp_file.replace(TASKS_FILE)
 
-    def create_worktree(self, task: Task) -> Path:
-        """Create git worktree for task"""
-        tree_path = TREES_DIR / task.id
-        branch = f"auto/{task.worker_id}"
+    def _worker_is_running(self, task: Task) -> bool:
+        """Check if worker process is still running"""
+        if not task.pid:
+            return False
 
-        print(f"🌲 Creating worktree: {tree_path}")
+        try:
+            os.kill(task.pid, 0)  # Signal 0 just checks existence
+            return True
+        except OSError:
+            return False
+
+    def ensure_worktree(self, task: Task) -> Path:
+        """Create git worktree for task (idempotent)
+
+        Handles existing worktrees by removing them if stale.
+        A worktree is considered stale if the worker is no longer running.
+        """
+        worktree_path = TREES_DIR / task.id
+
+        # Check if worktree already exists
+        if worktree_path.exists():
+            print(f"⚠️  Worktree already exists: {worktree_path}")
+
+            # Check git status
+            status_result = subprocess.run(
+                ["git", "status", "--porcelain"],
+                capture_output=True, text=True, cwd=worktree_path
+            )
+
+            # If it has uncommitted changes, it's probably active
+            if status_result.stdout.strip():
+                print(f"   Worktree has uncommitted changes")
+                # Check if worker is still running
+                if not self._worker_is_running(task):
+                    print(f"   Worker not running - removing stale worktree")
+                    subprocess.run(
+                        ["git", "worktree", "remove", str(worktree_path), "--force"],
+                        cwd=REPO_ROOT
+                    )
+                else:
+                    raise Exception(f"Worktree {worktree_path} is still active")
+            else:
+                # Clean worktree - remove and recreate
+                print(f"🔄 Removing stale worktree: {worktree_path}")
+                subprocess.run(
+                    ["git", "worktree", "remove", str(worktree_path), "--force"],
+                    cwd=REPO_ROOT
+                )
+
+        # Create fresh worktree
+        print(f"🌲 Creating worktree: {worktree_path}")
         subprocess.run(
-            ['git', 'worktree', 'add', str(tree_path), '-b', branch],
-            cwd=REPO_ROOT, check=True
+            ["git", "worktree", "add", str(worktree_path), "-b", task.branch_name],
+            check=True, cwd=REPO_ROOT
         )
 
-        return tree_path
+        return worktree_path
 
     def spawn_worker(self, task: Task):
         """Spawn LLM worker agent (non-blocking)"""
@@ -314,7 +404,15 @@ class Coordinator:
         print(f"   ✓ Worker {task.worker_id} started (PID: {proc.pid})")
 
     def check_completions(self, tasks: List[Task]) -> List[Task]:
-        """Check if active workers have completed"""
+        """Check if active workers have completed
+
+        Detects completion by:
+        1. Checking if PR was created for the branch
+        2. Checking if worker process has exited
+        3. Updating task status accordingly
+        4. Posting comments to GitHub issues
+        5. Cleaning up worktrees
+        """
         updated_tasks = []
 
         for task in tasks:
@@ -330,51 +428,96 @@ class Coordinator:
 
             print(f"🏁 Worker {task.worker_id} finished for {task.id}")
 
-            # Check if BLOCKED.md exists
-            blocked_file = Path(task.tree_path) / "BLOCKED.md"
-            if blocked_file.exists():
-                print(f"   ⏰ Task blocked, needs human input")
-                task.status = 'blocked'
-                task.completed = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                updated_tasks.append(task)
-                continue
-
-            # Check if PR was created
+            # Check for PR creation (primary completion signal)
             try:
-                result = subprocess.run(
-                    ['gh', 'pr', 'list', '--head', task.branch_name, '--json', 'url'],
-                    cwd=task.tree_path, capture_output=True, text=True, check=True
+                pr_check = subprocess.run(
+                    ["gh", "pr", "list",
+                     "--head", task.branch_name,
+                     "--json", "number,url,state,title"],
+                    capture_output=True, text=True, cwd=REPO_ROOT
                 )
-                prs = json.loads(result.stdout)
 
-                if prs:
-                    task.status = 'completed'
-                    task.completed = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    task.pr_url = prs[0]['url']
+                if pr_check.returncode == 0 and pr_check.stdout.strip() != "[]":
+                    # PR exists!
+                    pr_data = json.loads(pr_check.stdout)[0]
 
-                    # Get commit hash
-                    result = subprocess.run(
-                        ['git', 'log', '-1', '--format=%H'],
-                        cwd=task.tree_path, capture_output=True, text=True
+                    # Get commit hash from worktree
+                    commit_result = subprocess.run(
+                        ["git", "rev-parse", "--short", "HEAD"],
+                        capture_output=True, text=True, cwd=task.tree_path
                     )
-                    task.commit_hash = result.stdout.strip()
+                    commit_hash = commit_result.stdout.strip()
 
-                    print(f"   ✅ PR created: {task.pr_url}")
-                else:
-                    task.status = 'failed'
+                    # Update task
+                    task.status = 'completed'
+                    task.commit_hash = commit_hash
+                    task.pr_url = pr_data['url']
                     task.completed = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    task.error = "Worker finished but no PR created"
-                    print(f"   ❌ Failed: No PR created")
+
+                    print(f"   ✅ Task {task.id} completed - PR #{pr_data['number']}")
+
+                    # Post comment to GitHub issue
+                    comment = f"""✅ **Autonomous work completed!**
+
+PR: {pr_data['url']}
+Commit: `{commit_hash}`
+Worker: {task.worker_id}
+
+The PR is ready for your review."""
+
+                    try:
+                        subprocess.run(
+                            ["gh", "issue", "comment", task.number, "--body", comment],
+                            cwd=REPO_ROOT, check=True
+                        )
+                        print(f"   💬 Posted comment to issue #{task.number}")
+                    except subprocess.CalledProcessError as e:
+                        print(f"   ⚠️  Failed to post comment: {e}")
+
+                    # Cleanup worktree
+                    try:
+                        subprocess.run(
+                            ["git", "worktree", "remove", str(task.tree_path), "--force"],
+                            cwd=REPO_ROOT, check=True
+                        )
+                        print(f"   🧹 Cleaned up worktree: {task.tree_path}")
+                    except subprocess.CalledProcessError as e:
+                        print(f"   ⚠️  Failed to clean up worktree: {e}")
+
+                    # Remove from active workers
+                    if task.worker_id in self.active_workers:
+                        del self.active_workers[task.worker_id]
+
+                elif not self._worker_is_running(task):
+                    # Worker exited but no PR - check for BLOCKED.md
+                    blocked_file = Path(task.tree_path) / "BLOCKED.md"
+                    if blocked_file.exists():
+                        task.status = 'blocked'
+                        task.error = blocked_file.read_text()[:200]
+                        task.completed = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        print(f"   ⏰ Task {task.id} blocked - waiting for human")
+                    else:
+                        # Worker failed
+                        task.status = 'failed'
+                        task.error = 'Worker exited without creating PR'
+                        task.completed = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        print(f"   ❌ Task {task.id} failed - no PR created")
+
+                    # Keep worktree for debugging (don't clean up failures)
+
+                    # Remove from active workers
+                    if task.worker_id in self.active_workers:
+                        del self.active_workers[task.worker_id]
 
             except subprocess.CalledProcessError as e:
                 task.status = 'failed'
+                task.error = f'Failed to check PR status: {e}'
                 task.completed = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                task.error = f"Failed to check PR status: {e}"
-                print(f"   ❌ Failed: {task.error}")
+                print(f"   ❌ Task {task.id} failed: {task.error}")
 
-            # Remove from active workers
-            if task.worker_id in self.active_workers:
-                del self.active_workers[task.worker_id]
+                # Remove from active workers
+                if task.worker_id in self.active_workers:
+                    del self.active_workers[task.worker_id]
 
             updated_tasks.append(task)
 
@@ -423,8 +566,8 @@ class Coordinator:
                             task.status = 'active'
                             self.update_tasks_md(current_tasks)
 
-                            # Create worktree
-                            task.tree_path = str(self.create_worktree(task))
+                            # Create worktree (idempotent)
+                            task.tree_path = str(self.ensure_worktree(task))
 
                             # Spawn worker
                             self.spawn_worker(task)
