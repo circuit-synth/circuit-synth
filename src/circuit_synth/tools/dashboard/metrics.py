@@ -9,10 +9,25 @@ Collects and aggregates metrics from:
 """
 
 import re
+import sys
 import psutil
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime
+
+# Import budget status function from adws
+try:
+    # Add adws to path if not already there
+    repo_root = Path(__file__).parent.parent.parent.parent.parent
+    adws_path = repo_root / "adws"
+    if adws_path.exists() and str(adws_path) not in sys.path:
+        sys.path.insert(0, str(adws_path))
+
+    from adw_modules.dashboard_data import get_budget_status
+    BUDGET_AVAILABLE = True
+except ImportError:
+    get_budget_status = None
+    BUDGET_AVAILABLE = False
 
 
 class MetricsAggregator:
@@ -319,6 +334,24 @@ class MetricsAggregator:
 
         return None
 
+    def get_budget_metrics(self) -> Optional[Dict[str, Any]]:
+        """
+        Get token budget metrics
+
+        Returns:
+            Dict with budget status, or None if not available
+        """
+        if not BUDGET_AVAILABLE or get_budget_status is None:
+            return None
+
+        # API logs are typically in repo_root/logs/api
+        log_dir = Path(__file__).parent.parent.parent.parent.parent / "logs" / "api"
+
+        try:
+            return get_budget_status(log_dir)
+        except Exception:
+            return None
+
     def get_all_metrics(self) -> Dict[str, Any]:
         """
         Get complete metrics snapshot
@@ -333,5 +366,6 @@ class MetricsAggregator:
             'system': self.get_system_metrics(),
             'thermal': self.get_thermal_metrics(),
             'workers': self.get_worker_process_metrics(),
-            'coordinator': self.get_coordinator_stats()
+            'coordinator': self.get_coordinator_stats(),
+            'budget': self.get_budget_metrics()
         }

@@ -111,6 +111,32 @@ def create_app(tasks_file: Optional[Path] = None) -> FastAPI:
         metrics = aggregator.get_all_metrics()
         return metrics
 
+    @app.get("/api/budget")
+    async def get_budget():
+        """
+        Get monthly token budget status
+
+        Returns budget usage, remaining balance, and alert level
+        """
+        if not BUDGET_MONITORING_AVAILABLE or get_budget_status is None:
+            return JSONResponse(
+                status_code=503,
+                content={"detail": "Budget monitoring not available (adws module not found)"}
+            )
+
+        # API logs are typically in repo_root/logs/api
+        log_dir = repo_root / "logs" / "api"
+
+        budget_status = get_budget_status(log_dir)
+
+        if budget_status is None:
+            return JSONResponse(
+                status_code=404,
+                content={"detail": "Budget not configured (set MONTHLY_TOKEN_BUDGET_USD env var)"}
+            )
+
+        return budget_status
+
     @app.get("/api/thermal")
     async def get_thermal():
         """

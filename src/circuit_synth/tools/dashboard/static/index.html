@@ -217,6 +217,29 @@
                     <p style="color: #8b949e;">No active workers</p>
                 </div>
             </div>
+
+            <div class="card" id="budget-card" style="display: none;">
+                <h2>💰 Token Budget</h2>
+                <div class="metric">
+                    <span class="metric-label">Monthly Budget</span>
+                    <span class="metric-value" id="budget-total">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Used</span>
+                    <span class="metric-value" id="budget-used">--</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="budget-bar" style="width: 0%"></div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Remaining</span>
+                    <span class="metric-value status-good" id="budget-remaining">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Status</span>
+                    <span class="metric-value" id="budget-alert">--</span>
+                </div>
+            </div>
         </div>
 
         <!-- Pending Tasks -->
@@ -269,6 +292,11 @@
                 // Update thermal (if available)
                 if (data.thermal) {
                     updateThermal(data.thermal);
+                }
+
+                // Update budget (if available)
+                if (data.budget) {
+                    updateBudget(data.budget);
                 }
 
                 // Update timestamp
@@ -378,6 +406,55 @@
                 tempValue.className = 'metric-value status-warning';
             } else {
                 tempValue.className = 'metric-value status-good';
+            }
+        }
+
+        function updateBudget(budget) {
+            const card = document.getElementById('budget-card');
+            const budgetTotal = document.getElementById('budget-total');
+            const budgetUsed = document.getElementById('budget-used');
+            const budgetBar = document.getElementById('budget-bar');
+            const budgetRemaining = document.getElementById('budget-remaining');
+            const budgetAlert = document.getElementById('budget-alert');
+
+            // Show the budget card
+            card.style.display = 'block';
+
+            // Update values
+            budgetTotal.textContent = '$' + budget.budget_usd.toFixed(2);
+            budgetUsed.textContent = '$' + budget.used_usd.toFixed(4) + ' (' + budget.percentage_used.toFixed(1) + '%)';
+            budgetRemaining.textContent = '$' + budget.remaining_usd.toFixed(2);
+
+            // Update progress bar
+            budgetBar.style.width = Math.min(budget.percentage_used, 100) + '%';
+
+            // Color code based on alert level
+            const alertColors = {
+                'green': '#3fb950',
+                'yellow': '#d29922',
+                'orange': '#fb8500',
+                'red': '#f85149'
+            };
+
+            const alertSymbols = {
+                'green': '✓ OK',
+                'yellow': '⚠ Warning',
+                'orange': '⚠⚠ Alert',
+                'red': '🔴 Critical'
+            };
+
+            const color = alertColors[budget.alert_level] || '#8b949e';
+            budgetBar.style.background = color;
+            budgetAlert.textContent = alertSymbols[budget.alert_level] || budget.alert_level;
+            budgetAlert.style.color = color;
+
+            // Color code remaining value
+            if (budget.alert_level === 'red') {
+                budgetRemaining.className = 'metric-value status-error';
+            } else if (budget.alert_level === 'orange' || budget.alert_level === 'yellow') {
+                budgetRemaining.className = 'metric-value status-warning';
+            } else {
+                budgetRemaining.className = 'metric-value status-good';
             }
         }
 
