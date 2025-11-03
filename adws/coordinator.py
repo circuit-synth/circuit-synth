@@ -609,18 +609,47 @@ class Coordinator:
                 capture_output=True, text=True, cwd=worktree_path
             )
 
-            # If it has uncommitted changes, it's probably active
-            if status_result.stdout.strip():
-                print(f"   Worktree has uncommitted changes")
+            # Log current state for debugging
+            changes = status_result.stdout.strip()
+            worker_running = self._worker_is_running(task)
+            print(f"   🔍 Worktree status check:")
+            print(f"      - Has changes: {bool(changes)}")
+            print(f"      - Worker running: {worker_running}")
+            print(f"      - Worker PID: {task.pid}")
+
+            # If it has uncommitted changes
+            if changes:
+                print(f"   📝 Worktree has uncommitted changes ({len(changes.splitlines())} files)")
+
                 # Check if worker is still running
-                if not self._worker_is_running(task):
-                    print(f"   Worker not running - removing stale worktree")
+                if not worker_running:
+                    print(f"   ⏸️  Worker not running (PID {task.pid})")
+
+                    # Check if this is work in progress or a true crash
+                    # If worker has been running for a while and made changes, it's working!
+                    # Don't destroy its progress.
+                    if task.started:
+                        from datetime import datetime
+                        started_time = datetime.fromisoformat(task.started)
+                        runtime = (datetime.now() - started_time).total_seconds()
+                        print(f"      - Worker runtime: {runtime:.1f}s")
+
+                        if runtime > 60:  # Worker ran for more than 60 seconds
+                            print(f"   ✅ Worker completed work - preserving worktree")
+                            print(f"      Worker should commit its changes or be cleaned up later")
+                            # Don't remove! Let the worker commit its work
+                            # Return existing worktree
+                            return worktree_path
+
+                    # Worker crashed early or is truly stale
+                    print(f"   🗑️  Worker appears to have crashed early - removing stale worktree")
                     self._remove_worktree(worktree_path)
                 else:
+                    print(f"   ⚠️  Worker still running - worktree is active")
                     raise Exception(f"Worktree {worktree_path} is still active")
             else:
                 # Clean worktree - remove and recreate
-                print(f"🔄 Removing stale worktree: {worktree_path}")
+                print(f"   🔄 Worktree is clean - removing and recreating")
                 self._remove_worktree(worktree_path)
 
         # Prune any stale worktree references
