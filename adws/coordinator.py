@@ -30,6 +30,9 @@ from adw_modules.error_handling import (
 # Import API logging
 from adw_modules.api_logger import ClaudeAPILogger
 
+# Import provider management
+from adw_modules.providers import ProviderManager
+
 # Configuration paths
 SCRIPT_DIR = Path(__file__).parent
 REPO_ROOT = SCRIPT_DIR.parent
@@ -79,6 +82,9 @@ class Coordinator:
 
         self.running = True
         self.active_workers: dict[str, subprocess.Popen] = {}
+
+        # Initialize provider manager
+        self.provider_manager = ProviderManager(self.config)
 
         # Initialize API logger
         self.api_logger = ClaudeAPILogger(API_LOGS_DIR)
@@ -682,21 +688,25 @@ class Coordinator:
             settings={'source': task.source, 'priority': task.priority}
         )
 
-        # Build LLM command from config
-        cmd_template = self.config['llm']['command_template']
-        model = self.config['llm']['model_default']
+        # Get provider and build command
+        provider_name = self.config['llm']['provider']
+        provider = self.provider_manager.get_provider(provider_name)
 
-        cmd = [
-            part.replace('{prompt_file}', str(prompt_file))
-                .replace('{model}', model)
-            for part in cmd_template
-        ]
+        if not provider or not provider.is_available():
+            print(f"❌ Provider {provider_name} not available")
+            return
+
+        model = self.config['llm']['model_default']
+        log_file = LOGS_DIR / f"{task.id}.jsonl"
+
+        cmd = provider.build_command(prompt_file, model, log_file)
 
         print(f"🤖 Spawning worker for {task.id}")
+        print(f"   Provider: {provider_name}")
+        print(f"   Model: {model}")
         print(f"   Command: {' '.join(cmd)}")
 
         # Spawn worker (non-blocking)
-        log_file = LOGS_DIR / f"{task.id}.jsonl"
         with open(log_file, 'w') as f:
             proc = subprocess.Popen(
                 cmd,

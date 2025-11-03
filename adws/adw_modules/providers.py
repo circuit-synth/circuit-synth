@@ -1,0 +1,156 @@
+"""
+Provider abstraction for multiple AI model providers
+
+Supports:
+- Claude CLI (local)
+- OpenRouter (API - 200+ models)
+- OpenAI (API)
+- Custom providers via config
+"""
+
+import os
+import subprocess
+from pathlib import Path
+from typing import List, Dict, Optional
+from dataclasses import dataclass
+
+
+@dataclass
+class ProviderConfig:
+    """Configuration for an AI provider"""
+    name: str
+    enabled: bool
+    command_template: List[str]
+    api_key_env: Optional[str] = None
+    requires_api_key: bool = False
+
+
+class Provider:
+    """Abstract provider for running AI models"""
+
+    def __init__(self, name: str, config: Dict):
+        """Initialize provider
+
+        Args:
+            name: Provider name (e.g., 'claude-cli', 'openrouter')
+            config: Provider config from TOML
+        """
+        self.name = name
+        self.enabled = config.get('enabled', True)
+        self.command_template = config.get('command_template', [])
+        self.api_key_env = config.get('api_key_env')
+        self.requires_api_key = self.api_key_env is not None
+
+        # Validate API key if required
+        if self.requires_api_key and not os.getenv(self.api_key_env):
+            self.enabled = False
+            print(f"⚠️  Provider {name} disabled: {self.api_key_env} not set")
+
+    def build_command(self, prompt_file: Path, model: str, output_file: Path) -> List[str]:
+        """Build command with substitutions
+
+        Args:
+            prompt_file: Path to prompt file
+            model: Model name
+            output_file: Path to output file
+
+        Returns:
+            Command as list of strings
+        """
+        cmd = []
+        env_vars = os.environ.copy()
+
+        for part in self.command_template:
+            # Substitute placeholders
+            substituted = (
+                part.replace('{prompt_file}', str(prompt_file))
+                    .replace('{model}', model)
+                    .replace('{output_file}', str(output_file))
+            )
+
+            # Handle environment variable substitutions (e.g., ${API_KEY})
+            if '${' in substituted:
+                for key, value in env_vars.items():
+                    substituted = substituted.replace(f'${{{key}}}', value)
+
+            cmd.append(substituted)
+
+        return cmd
+
+    def is_available(self) -> bool:
+        """Check if provider is available
+
+        Returns:
+            True if provider can be used
+        """
+        if not self.enabled:
+            return False
+
+        # Check if API key is set (if required)
+        if self.requires_api_key:
+            if not os.getenv(self.api_key_env):
+                return False
+
+        # For CLI providers, check if command exists
+        if self.command_template:
+            try:
+                cmd = self.command_template[0]
+                result = subprocess.run(['which', cmd], capture_output=True)
+                return result.returncode == 0
+            except:
+                return False
+
+        return True
+
+    def __repr__(self):
+        status = "enabled" if self.enabled else "disabled"
+        return f"Provider({self.name}, {status})"
+
+
+class ProviderManager:
+    """Manages multiple AI providers"""
+
+    def __init__(self, config: Dict):
+        """Initialize with config
+
+        Args:
+            config: Full config dict with 'providers' section
+        """
+        self.providers = {}
+
+        # Load providers from config
+        providers_config = config.get('providers', {})
+        for name, provider_config in providers_config.items():
+            self.providers[name] = Provider(name, provider_config)
+
+    def get_provider(self, name: str) -> Optional[Provider]:
+        """Get provider by name
+
+        Args:
+            name: Provider name
+
+        Returns:
+            Provider instance or None
+        """
+        return self.providers.get(name)
+
+    def get_available_providers(self) -> List[Provider]:
+        """Get list of available providers
+
+        Returns:
+            List of providers that are enabled and available
+        """
+        return [p for p in self.providers.values() if p.is_available()]
+
+    def print_status(self):
+        """Print status of all providers"""
+        print("Provider Status:")
+        for name, provider in self.providers.items():
+            available = "✓" if provider.is_available() else "✗"
+            reason = ""
+            if not provider.enabled:
+                reason = "(disabled in config)"
+            elif provider.requires_api_key and not os.getenv(provider.api_key_env):
+                reason = f"({provider.api_key_env} not set)"
+
+            print(f"  {available} {name:20s} {reason}")
