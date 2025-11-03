@@ -6,6 +6,8 @@ completed tasks, and system status for dashboard display.
 """
 
 import re
+import json
+import os
 from pathlib import Path
 from typing import List, Dict, Optional
 from dataclasses import dataclass
@@ -139,3 +141,135 @@ def get_agent_by_issue(trees_dir: Path, issue_number: str) -> Optional[AgentStat
             return agent
 
     return None
+
+
+def get_budget_status(log_dir: Path) -> Optional[Dict]:
+    """
+    Calculate monthly token budget status from API logs.
+
+    Args:
+        log_dir: Path to API logs directory (e.g., logs/api)
+
+    Returns:
+        Dict with budget information:
+        - budget_usd: Monthly budget in USD
+        - used_usd: Amount used this month
+        - remaining_usd: Amount remaining
+        - percentage_used: Percentage of budget used (0-100)
+        - alert_level: 'green', 'yellow', 'orange', or 'red'
+        - month: Current month (YYYY-MM format)
+
+        Returns None if budget not configured.
+    """
+    # Get budget from environment variable
+    budget_str = os.environ.get('MONTHLY_TOKEN_BUDGET_USD')
+    if not budget_str:
+        # Return None if no budget configured
+        return None
+
+    try:
+        budget_usd = float(budget_str)
+    except ValueError:
+        return None
+
+    # Calculate current month's usage
+    current_month = datetime.now().strftime('%Y-%m')
+    used_usd = 0.0
+
+    # Sum up costs from all log files this month
+    if log_dir.exists():
+        for log_file in log_dir.glob(f"api-calls-{current_month}-*.jsonl"):
+            try:
+                with open(log_file, 'r') as f:
+                    for line in f:
+                        try:
+                            call = json.loads(line)
+                            cost = call.get('estimated_cost_usd', 0.0)
+                            if cost:
+                                used_usd += cost
+                        except json.JSONDecodeError:
+                            continue
+            except Exception as e:
+                # Log warning but continue
+                print(f"Warning: Could not read log file {log_file}: {e}")
+                continue
+
+    # Calculate metrics
+    remaining_usd = budget_usd - used_usd
+    percentage_used = (used_usd / budget_usd * 100) if budget_usd > 0 else 0
+
+    # Determine alert level based on thresholds
+    if percentage_used >= 95:
+        alert_level = 'red'
+    elif percentage_used >= 90:
+        alert_level = 'orange'
+    elif percentage_used >= 75:
+        alert_level = 'yellow'
+    else:
+        alert_level = 'green'
+
+    return {
+        'budget_usd': budget_usd,
+        'used_usd': round(used_usd, 4),
+        'remaining_usd': round(remaining_usd, 4),
+        'percentage_used': round(percentage_used, 2),
+        'alert_level': alert_level,
+        'month': current_month
+    }
+
+
+def get_budget_display(log_dir: Path) -> str:
+    """
+    Generate a formatted budget status display for dashboard.
+
+    Args:
+        log_dir: Path to API logs directory
+
+    Returns:
+        Formatted string showing budget status with color-coded alert
+    """
+    status = get_budget_status(log_dir)
+
+    if status is None:
+        return "Token Budget: Not configured (set MONTHLY_TOKEN_BUDGET_USD)"
+
+    # Color codes for terminal display
+    alert_colors = {
+        'green': '\033[92m',   # Green
+        'yellow': '\033[93m',  # Yellow
+        'orange': '\033[33m',  # Orange
+        'red': '\033[91m'      # Red
+    }
+    reset_color = '\033[0m'
+
+    alert_symbols = {
+        'green': '✓',
+        'yellow': '⚠',
+        'orange': '⚠⚠',
+        'red': '🔴'
+    }
+
+    color = alert_colors.get(status['alert_level'], '')
+    symbol = alert_symbols.get(status['alert_level'], '')
+
+    lines = []
+    lines.append("Token Budget Status")
+    lines.append("=" * 80)
+    lines.append(f"Month: {status['month']}")
+    lines.append(f"Budget: ${status['budget_usd']:.2f}")
+    lines.append(f"Used:   ${status['used_usd']:.4f} ({status['percentage_used']:.1f}%)")
+    lines.append(f"Remaining: ${status['remaining_usd']:.4f}")
+    lines.append("")
+    lines.append(f"{color}Status: {symbol} {status['alert_level'].upper()}{reset_color}")
+
+    # Add warning messages for different alert levels
+    if status['alert_level'] == 'yellow':
+        lines.append(f"{color}⚠  Warning: Approaching budget limit (75%){reset_color}")
+    elif status['alert_level'] == 'orange':
+        lines.append(f"{color}⚠⚠ Alert: Near budget limit (90%){reset_color}")
+    elif status['alert_level'] == 'red':
+        lines.append(f"{color}🔴 CRITICAL: Budget limit exceeded (95%+){reset_color}")
+
+    lines.append("=" * 80)
+
+    return "\n".join(lines)

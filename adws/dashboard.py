@@ -2,7 +2,7 @@
 """
 Circuit-Synth Agent Dashboard
 
-Displays real-time status of active autonomous agents.
+Displays real-time status of active autonomous agents and token budget.
 """
 
 import sys
@@ -12,11 +12,12 @@ from pathlib import Path
 # Add adw_modules to path
 sys.path.insert(0, str(Path(__file__).parent / "adw_modules"))
 
-from dashboard_data import get_active_agents_table
+from dashboard_data import get_active_agents_table, get_budget_display
 
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent
 TREES_DIR = REPO_ROOT / "trees"
+API_LOG_DIR = REPO_ROOT / "logs" / "api"
 
 
 def main():
@@ -32,6 +33,11 @@ def main():
             # Display header
             print("Circuit-Synth Autonomous Worker Dashboard")
             print(f"Updated: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+            print()
+
+            # Display token budget status
+            budget_display = get_budget_display(API_LOG_DIR)
+            print(budget_display)
             print()
 
             # Display active agents table
