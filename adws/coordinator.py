@@ -11,6 +11,7 @@ import json
 import subprocess
 import tomllib
 import os
+import shutil
 from pathlib import Path
 from dataclasses import dataclass
 from typing import List, Optional
@@ -331,19 +332,19 @@ class Coordinator:
                 # Check if worker is still running
                 if not self._worker_is_running(task):
                     print(f"   Worker not running - removing stale worktree")
-                    subprocess.run(
-                        ["git", "worktree", "remove", str(worktree_path), "--force"],
-                        cwd=REPO_ROOT
-                    )
+                    self._remove_worktree(worktree_path)
                 else:
                     raise Exception(f"Worktree {worktree_path} is still active")
             else:
                 # Clean worktree - remove and recreate
                 print(f"🔄 Removing stale worktree: {worktree_path}")
-                subprocess.run(
-                    ["git", "worktree", "remove", str(worktree_path), "--force"],
-                    cwd=REPO_ROOT
-                )
+                self._remove_worktree(worktree_path)
+
+        # Prune any stale worktree references
+        subprocess.run(
+            ["git", "worktree", "prune"],
+            cwd=REPO_ROOT, capture_output=True
+        )
 
         # Create fresh worktree
         print(f"🌲 Creating worktree: {worktree_path}")
@@ -353,6 +354,20 @@ class Coordinator:
         )
 
         return worktree_path
+
+    def _remove_worktree(self, worktree_path: Path):
+        """Remove worktree (handles both git and orphaned directories)"""
+        # Try git worktree remove first
+        result = subprocess.run(
+            ["git", "worktree", "remove", str(worktree_path), "--force"],
+            cwd=REPO_ROOT, capture_output=True, text=True
+        )
+
+        # If git remove failed and directory still exists, manually remove it
+        if result.returncode != 0 and worktree_path.exists():
+            print(f"   Git removal failed, manually deleting directory")
+            shutil.rmtree(worktree_path)
+            print(f"   Directory removed: {worktree_path}")
 
     def spawn_worker(self, task: Task):
         """Spawn LLM worker agent (non-blocking)"""
