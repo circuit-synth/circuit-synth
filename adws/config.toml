@@ -26,5 +26,27 @@ command_template = [
 
 model_default = "claude-sonnet-4-5"
 
+# Model definitions with pricing
+[[models]]
+name = "claude-sonnet-4-5"
+provider = "claude-cli"
+cost_per_million_input = 3.0
+cost_per_million_output = 15.0
+context_window = 200000
+
+[[models]]
+name = "claude-opus-4"
+provider = "claude-cli"
+cost_per_million_input = 15.0
+cost_per_million_output = 75.0
+context_window = 200000
+
+[[models]]
+name = "claude-haiku-4"
+provider = "claude-cli"
+cost_per_million_input = 0.25
+cost_per_million_output = 1.25
+context_window = 200000
+
 [worktree]
 base_dir = "trees"

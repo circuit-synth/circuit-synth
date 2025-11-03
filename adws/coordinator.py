@@ -80,8 +80,9 @@ class Coordinator:
         self.running = True
         self.active_workers: dict[str, subprocess.Popen] = {}
 
-        # Initialize API logger
-        self.api_logger = ClaudeAPILogger(API_LOGS_DIR)
+        # Initialize API logger with model catalog from config
+        model_catalog = self.config.get('models', [])
+        self.api_logger = ClaudeAPILogger(API_LOGS_DIR, model_catalog=model_catalog)
 
         # Setup signal handlers
         signal.signal(signal.SIGCHLD, self._reap_children)
