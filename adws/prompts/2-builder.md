@@ -3,8 +3,7 @@ name: "TAC-X Builder Agent"
 version: "1.0.0"
 stage: "building"
 purpose: "Implement the plan created by Planning Agent"
-model: "claude-sonnet-4"
-max_tokens: 100000
+model: "claude-sonnet-4-5"
 tools: ["Read", "Edit", "Write", "Bash", "Grep", "Glob"]
 tool_restrictions:
   - "NO force pushes or destructive git operations"

@@ -3,8 +3,7 @@ name: "TAC-X Planning Agent"
 version: "1.0.0"
 stage: "planning"
 purpose: "Analyze issue and create detailed implementation plan"
-model: "claude-sonnet-4"
-max_tokens: 50000
+model: "claude-sonnet-4-5"
 tools: ["Read", "Grep", "Glob", "Bash"]
 tool_restrictions:
   - "NO code changes (Read/Grep/Glob only for exploration)"

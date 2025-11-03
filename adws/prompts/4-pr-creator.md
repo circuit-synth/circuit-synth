@@ -3,8 +3,7 @@ name: "TAC-X PR Creator Agent"
 version: "1.0.0"
 stage: "pr_creation"
 purpose: "Create GitHub PR and finalize task"
-model: "claude-sonnet-4"
-max_tokens: 30000
+model: "claude-haiku-4-5"
 tools: ["Read", "Bash"]
 tool_restrictions:
   - "Read-only except for PR creation commands"

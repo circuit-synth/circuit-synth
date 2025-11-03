@@ -3,8 +3,7 @@ name: "TAC-X Reviewer Agent"
 version: "1.0.0"
 stage: "reviewing"
 purpose: "Review implementation quality and readiness for PR"
-model: "claude-sonnet-4"
-max_tokens: 50000
+model: "claude-sonnet-4-5"
 tools: ["Read", "Bash", "Grep", "Glob"]
 tool_restrictions:
   - "Read-only verification only"
