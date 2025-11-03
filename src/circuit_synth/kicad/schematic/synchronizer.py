@@ -939,6 +939,74 @@ class APISynchronizer:
             logger.error(f"Failed to update label: {e}", exc_info=True)
             return False
 
+    def _reconcile_component_pins(
+        self,
+        circuit_id: str,
+        kicad_ref: str,
+        circuit_components: Dict,
+        kicad_components: Dict,
+        report: SyncReport,
+    ):
+        """
+        Reconcile pin connections for a single component.
+
+        For the component:
+        1. Get Python pin→net mapping
+        2. Get KiCad pin→label mapping
+        3. Add missing labels (Python has net, KiCad doesn't)
+        4. Remove stale labels (KiCad has label, Python doesn't)
+        5. Update changed labels (net name changed)
+
+        Args:
+            circuit_id: Circuit component ID
+            kicad_ref: KiCad component reference
+            circuit_components: Components from Python circuit
+            kicad_components: Components from KiCad schematic
+            report: Sync report to track changes
+        """
+        circuit_comp = circuit_components[circuit_id]
+        kicad_comp = kicad_components[kicad_ref]
+
+        # Python says: these pins should connect to these nets
+        python_pins = circuit_comp.get("pins", {})  # {pin_num: net_name}
+
+        # KiCad says: these pins have these labels
+        kicad_labels = self._get_pin_labels(kicad_comp)  # {pin_num: (Label, type)}
+
+        logger.debug(f"  Component {kicad_ref}:")
+        logger.debug(f"    Python pins: {python_pins}")
+        logger.debug(f"    KiCad labels: {list(kicad_labels.keys())}")
+
+        # Reconcile each pin
+        all_pins = set(python_pins.keys()) | set(kicad_labels.keys())
+
+        for pin_num in all_pins:
+            python_net = python_pins.get(pin_num)
+            kicad_label_tuple = kicad_labels.get(pin_num)
+
+            # Unpack label and type if present
+            kicad_label = kicad_label_tuple[0] if kicad_label_tuple else None
+            label_type = kicad_label_tuple[1] if kicad_label_tuple else None
+
+            if python_net and not kicad_label:
+                # ADD label - Python has net but KiCad doesn't have label
+                logger.debug(f"    ➕ ADD label: pin {pin_num} -> {python_net}")
+                self._add_pin_label(kicad_comp, pin_num, python_net, report)
+
+            elif not python_net and kicad_label:
+                # REMOVE label - KiCad has label but Python doesn't have net
+                logger.debug(f"    ➖ REMOVE label: pin {pin_num} (was {kicad_label.text}, type={label_type})")
+                self._remove_pin_label(kicad_label, kicad_ref, pin_num, report, label_type)
+
+            elif python_net and kicad_label and python_net != kicad_label.text:
+                # UPDATE label - Net name changed
+                logger.debug(f"    🔧 UPDATE label: pin {pin_num} '{kicad_label.text}' -> '{python_net}' (type={label_type})")
+                self._update_pin_label(kicad_label, python_net, kicad_ref, pin_num, report, label_type)
+
+            else:
+                # No change needed
+                logger.debug(f"    ✅ KEEP label: pin {pin_num} -> {python_net}")
+
     def _reconcile_pin_connections(
         self,
         circuit_components: Dict,
@@ -949,13 +1017,6 @@ class APISynchronizer:
         """
         Reconcile pin connections for all matched components.
 
-        For each matched component:
-        1. Get Python pin→net mapping
-        2. Get KiCad pin→label mapping
-        3. Add missing labels (Python has net, KiCad doesn't)
-        4. Remove stale labels (KiCad has label, Python doesn't)
-        5. Update changed labels (net name changed)
-
         Args:
             circuit_components: Components from Python circuit
             kicad_components: Components from KiCad schematic
@@ -965,48 +1026,9 @@ class APISynchronizer:
         logger.info("🔌 Reconciling pin connections and labels")
 
         for circuit_id, kicad_ref in matches.items():
-            circuit_comp = circuit_components[circuit_id]
-            kicad_comp = kicad_components[kicad_ref]
-
-            # Python says: these pins should connect to these nets
-            python_pins = circuit_comp.get("pins", {})  # {pin_num: net_name}
-
-            # KiCad says: these pins have these labels
-            kicad_labels = self._get_pin_labels(kicad_comp)  # {pin_num: (Label, type)}
-
-            logger.debug(f"  Component {kicad_ref}:")
-            logger.debug(f"    Python pins: {python_pins}")
-            logger.debug(f"    KiCad labels: {list(kicad_labels.keys())}")
-
-            # Reconcile each pin
-            all_pins = set(python_pins.keys()) | set(kicad_labels.keys())
-
-            for pin_num in all_pins:
-                python_net = python_pins.get(pin_num)
-                kicad_label_tuple = kicad_labels.get(pin_num)
-
-                # Unpack label and type if present
-                kicad_label = kicad_label_tuple[0] if kicad_label_tuple else None
-                label_type = kicad_label_tuple[1] if kicad_label_tuple else None
-
-                if python_net and not kicad_label:
-                    # ADD label - Python has net but KiCad doesn't have label
-                    logger.debug(f"    ➕ ADD label: pin {pin_num} -> {python_net}")
-                    self._add_pin_label(kicad_comp, pin_num, python_net, report)
-
-                elif not python_net and kicad_label:
-                    # REMOVE label - KiCad has label but Python doesn't have net
-                    logger.debug(f"    ➖ REMOVE label: pin {pin_num} (was {kicad_label.text}, type={label_type})")
-                    self._remove_pin_label(kicad_label, kicad_ref, pin_num, report, label_type)
-
-                elif python_net and kicad_label and python_net != kicad_label.text:
-                    # UPDATE label - Net name changed
-                    logger.debug(f"    🔧 UPDATE label: pin {pin_num} '{kicad_label.text}' -> '{python_net}' (type={label_type})")
-                    self._update_pin_label(kicad_label, python_net, kicad_ref, pin_num, report, label_type)
-
-                else:
-                    # No change needed
-                    logger.debug(f"    ✅ KEEP label: pin {pin_num} -> {python_net}")
+            self._reconcile_component_pins(
+                circuit_id, kicad_ref, circuit_components, kicad_components, report
+            )
 
         logger.info(f"✅ Pin reconciliation complete: "
                    f"{len(report.labels_added)} added, "
@@ -1154,6 +1176,17 @@ class APISynchronizer:
                 f"    ADDING: {circuit_id} (ref={comp_data.get('reference')}, value={comp_data.get('value')})"
             )
             self._add_component(comp_data, report)
+
+            # Issue #489: Also reconcile pin connections for newly added components
+            # This ensures hierarchical labels and power symbols are added for the new component's pins
+            kicad_ref = comp_data["reference"]
+            if kicad_ref in self.schematic.components_dict:
+                logger.debug(f"    🔌 Reconciling pins for newly added component {kicad_ref}")
+                # Update kicad_components dict with newly added component
+                kicad_components[kicad_ref] = self.schematic.components_dict[kicad_ref]
+                self._reconcile_component_pins(
+                    circuit_id, kicad_ref, circuit_components, kicad_components, report
+                )
 
         # Find KiCad components to preserve/remove
         matched_kicad_refs = set(matches.values())
