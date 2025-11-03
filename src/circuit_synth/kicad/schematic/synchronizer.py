@@ -682,6 +682,23 @@ class APISynchronizer:
             power_comp.on_board = True
             power_comp.dnp = False
 
+            # FIX Issue #476: Adjust Value property position for power symbols
+            # Same as schematic_writer.py - must be done AFTER rotation is set
+            if hasattr(power_comp, "properties") and "Value" in power_comp.properties:
+                value_prop = power_comp.properties["Value"]
+                if hasattr(value_prop, "position"):
+                    offset = 5.08  # Standard KiCad offset
+
+                    if power_rotation == 0:  # Pointing up (VCC)
+                        value_prop.position = Point(power_x, power_y - offset)
+                    elif power_rotation == 90:  # Pointing left
+                        value_prop.position = Point(power_x - offset, power_y)
+                    elif power_rotation == 180:  # Pointing down (GND)
+                        value_prop.position = Point(power_x, power_y + offset)
+                    elif power_rotation == 270:  # Pointing right
+                        value_prop.position = Point(power_x + offset, power_y)
+
+
             logger.info(f"Added power symbol {power_ref} for {net_name} at {component_ref} pin {pin_number}")
             report.labels_added.append((component_ref, pin_number, net_name))
 
