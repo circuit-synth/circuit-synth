@@ -49,3 +49,9 @@ PRD-*.md
 trees/
 logs/
 tasks.md.tmp
+
+# Session-specific files (should not be committed)
+SESSION-*.md
+QUICK-START-*.txt
+*-deploy-test.log
+coordinator-integration-example.py
