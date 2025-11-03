@@ -26,11 +26,16 @@ command_template = [
 ]
 
 [providers.openrouter]
-enabled = false
+enabled = true
 requires_api_key = true
 api_key_env = "OPENROUTER_API_KEY"
-# OpenRouter via curl - would need custom integration
-command_template = []
+command_template = [
+    "tools/openrouter-cli.py",
+    "-p", "{prompt_file}",
+    "--model", "{model}",
+    "--output-file", "{output_file}",
+    "--output-format", "stream-json"
+]
 
 [llm]
 # Default provider and model

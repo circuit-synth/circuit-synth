@@ -95,8 +95,21 @@ class Provider:
         if self.command_template:
             try:
                 cmd = self.command_template[0]
-                result = subprocess.run(['which', cmd], capture_output=True)
-                return result.returncode == 0
+
+                # Handle relative paths (e.g., tools/openrouter-cli.py)
+                if '/' in cmd:
+                    # Relative or absolute path - check if file exists
+                    from pathlib import Path
+                    cmd_path = Path(cmd)
+                    if not cmd_path.is_absolute():
+                        # Make relative to repo root
+                        repo_root = Path(__file__).parent.parent.parent
+                        cmd_path = repo_root / cmd
+                    return cmd_path.exists() and os.access(cmd_path, os.X_OK)
+                else:
+                    # System command - use 'which'
+                    result = subprocess.run(['which', cmd], capture_output=True)
+                    return result.returncode == 0
             except:
                 return False
 
