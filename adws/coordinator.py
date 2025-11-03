@@ -626,23 +626,42 @@ class Coordinator:
                     print(f"   ⏸️  Worker not running (PID {task.pid})")
 
                     # Check if this is work in progress or a true crash
-                    # If worker has been running for a while and made changes, it's working!
-                    # Don't destroy its progress.
-                    if task.started:
-                        from datetime import datetime
-                        started_time = datetime.fromisoformat(task.started)
-                        runtime = (datetime.now() - started_time).total_seconds()
-                        print(f"      - Worker runtime: {runtime:.1f}s")
+                    # Strategy: Check file modification times to determine if work is fresh
+                    # If files were modified recently, it's likely completed work, not a crash
+                    from datetime import datetime
+                    import os
 
-                        if runtime > 60:  # Worker ran for more than 60 seconds
-                            print(f"   ✅ Worker completed work - preserving worktree")
-                            print(f"      Worker should commit its changes or be cleaned up later")
-                            # Don't remove! Let the worker commit its work
-                            # Return existing worktree
-                            return worktree_path
+                    # Find most recent file modification time in worktree
+                    most_recent_mtime = 0
+                    for root, dirs, files in os.walk(worktree_path):
+                        # Skip .git directory
+                        if '.git' in root:
+                            continue
+                        for file in files:
+                            file_path = os.path.join(root, file)
+                            try:
+                                mtime = os.path.getmtime(file_path)
+                                most_recent_mtime = max(most_recent_mtime, mtime)
+                            except OSError:
+                                pass
 
-                    # Worker crashed early or is truly stale
-                    print(f"   🗑️  Worker appears to have crashed early - removing stale worktree")
+                    # Calculate age of most recent change
+                    now = datetime.now().timestamp()
+                    age_seconds = now - most_recent_mtime
+                    age_minutes = age_seconds / 60
+
+                    print(f"      - Most recent file change: {age_minutes:.1f} minutes ago")
+
+                    # If files were modified in the last hour, treat as completed work
+                    if age_minutes < 60:  # Changed within last 60 minutes
+                        print(f"   ✅ Recent changes detected - preserving completed work")
+                        print(f"      Worktree appears to contain fresh work, not crash debris")
+                        print(f"      Worker should commit its changes or be cleaned up later")
+                        # Don't remove! Let the worker commit its work
+                        return worktree_path
+
+                    # Files are old - likely stale worktree from ancient crash
+                    print(f"   🗑️  Stale worktree detected (no recent changes) - removing")
                     self._remove_worktree(worktree_path)
                 else:
                     print(f"   ⚠️  Worker still running - worktree is active")
