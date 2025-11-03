@@ -470,15 +470,21 @@ def test_12_sync_preserves_special_project_names(request):
     # Setup paths
     test_dir = Path(__file__).parent
     python_file = test_dir / "comprehensive_root.py"
-    output_dir = test_dir / "comprehensive_root"
-    schematic_file = output_dir / "comprehensive_root.kicad_sch"
+
+    # Special project name with hyphens and underscores
+    special_name = "test-project_v1"
+    output_dir = test_dir / special_name
+    schematic_file = output_dir / f"{special_name}.kicad_sch"
 
     # Check for --keep-output flag
     cleanup = not request.config.getoption("--keep-output", default=False)
 
-    # Clean any existing output
+    # Clean any existing output (both special name and default)
     if output_dir.exists():
         shutil.rmtree(output_dir)
+    default_output = test_dir / "comprehensive_root"
+    if default_output.exists():
+        shutil.rmtree(default_output)
 
     # Read original Python file
     with open(python_file, "r") as f:
@@ -493,7 +499,6 @@ def test_12_sync_preserves_special_project_names(request):
         print("="*70)
 
         # Change project name to include special characters
-        special_name = "test-project_v1"
         modified_code = original_code.replace(
             'project_name="comprehensive_root"',
             f'project_name="{special_name}"'
@@ -619,9 +624,12 @@ def test_12_sync_preserves_special_project_names(request):
         with open(python_file, "w") as f:
             f.write(original_code)
 
-        # Cleanup generated files
-        if cleanup and output_dir.exists():
-            shutil.rmtree(output_dir)
+        # Cleanup generated files (both special name and default)
+        if cleanup:
+            if output_dir.exists():
+                shutil.rmtree(output_dir)
+            if default_output.exists():
+                shutil.rmtree(default_output)
 
 
 def test_13_sync_performance_regression(request):

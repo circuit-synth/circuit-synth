@@ -25,12 +25,12 @@ def comprehensive_root():
         footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
-    r2 = Component(
-        symbol="Device:R",
-        ref="R2",
-        value="4.7k",
-        footprint="Resistor_SMD:R_0603_1608Metric",
-    )
+    # r2 = Component(
+    #     symbol="Device:R",
+    #     ref="R2",
+    #     value="4.7k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric",
+    # )
 
     c1 = Component(
         symbol="Device:C",
@@ -49,9 +49,11 @@ def comprehensive_root():
     # Connections
     r1[1] += data
     c1[1] += data
+    # r2[1] += data
 
     r1[2] += vcc
     c1[2] += gnd
+    # r2[2] += gnd
 
 
 if __name__ == "__main__":
