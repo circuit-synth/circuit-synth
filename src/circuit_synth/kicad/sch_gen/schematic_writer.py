@@ -315,7 +315,7 @@ class SchematicWriter:
         )
 
         # Initialize KiCad API managers
-        self.component_manager = ComponentManager(self.schematic)
+        self.component_manager = ComponentManager(self.schematic, project_name=self.project_name)
         self.placement_engine = PlacementEngine(self.schematic)
 
         # Initialize S-expression parser

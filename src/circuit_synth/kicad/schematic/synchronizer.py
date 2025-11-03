@@ -109,8 +109,11 @@ class APISynchronizer:
         # NOTE: file_path is already set when the schematic is loaded from file
         # The Schematic object's file_path property is read-only, so we can't set it
 
+        # Extract project name from schematic path
+        project_name = self.schematic_path.stem  # e.g., "comprehensive_root.kicad_sch" -> "comprehensive_root"
+
         # Initialize API components
-        self.component_manager = ComponentManager(self.schematic)
+        self.component_manager = ComponentManager(self.schematic, project_name=project_name)
         self.label_manager = LabelManager(self.schematic)
         self.search_engine = SearchEngine(self.schematic)
         self.connection_tracer = ConnectionTracer(self.schematic)
@@ -1227,6 +1230,14 @@ class APISynchronizer:
         # kicad-sch-api's save() method automatically syncs all collections to _data
         # including wires, labels, components, junctions, hierarchical_labels, etc.
         # See: kicad_sch_api/core/schematic.py:408-416 (save method calls all _sync_*_to_data methods)
+
+        # Fix schematic name to match project name
+        # kicad-sch-api's save() method uses schematic.name to fix all component instance project references
+        # If the schematic was loaded with wrong name, we need to correct it before saving
+        correct_project_name = self.schematic_path.stem  # e.g., "comprehensive_root.kicad_sch" -> "comprehensive_root"
+        if self.schematic.name != correct_project_name:
+            logger.info(f"🔧 Fixing schematic.name: '{self.schematic.name}' -> '{correct_project_name}'")
+            self.schematic.name = correct_project_name
 
         logger.info(f"💾 Calling schematic.save(preserve_format=False)")
         logger.info(f"   - Save path: {self.schematic_path}")

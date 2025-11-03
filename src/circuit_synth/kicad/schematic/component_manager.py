@@ -39,15 +39,17 @@ class ComponentManager:
     Provides high-level operations for adding, removing, updating, and searching components.
     """
 
-    def __init__(self, schematic: Schematic, sheet_size: Tuple[float, float] = None):
+    def __init__(self, schematic: Schematic, sheet_size: Tuple[float, float] = None, project_name: Optional[str] = None):
         """
         Initialize component manager with a schematic.
 
         Args:
             schematic: The schematic to manage
             sheet_size: (width, height) of the sheet in mm (default A4: 210x297mm)
+            project_name: Name of the KiCad project (used for instance data if schematic not yet saved)
         """
         self.schematic = schematic
+        self.project_name = project_name
         self.placement_engine = PlacementEngine(schematic, sheet_size=sheet_size)
         self._component_index = self._build_component_index()
 
@@ -167,11 +169,14 @@ class ComponentManager:
         from .instance_utils import add_symbol_instance, get_project_hierarchy_path
 
         schematic_path = getattr(self.schematic, "file_path", "")
+
         if schematic_path:
             project_name, hierarchical_path = get_project_hierarchy_path(schematic_path)
         else:
-            project_name = getattr(self.schematic, "project_name", "circuit")
+            # Use project_name from constructor, fallback to schematic attr, final fallback to "circuit"
+            project_name = self.project_name or getattr(self.schematic, "project_name", "circuit")
             hierarchical_path = "/"
+
         add_symbol_instance(component, project_name, hierarchical_path)
 
         # Add to schematic - need to handle both old and new (kicad-sch-api) schematic types

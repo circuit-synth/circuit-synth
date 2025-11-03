@@ -216,7 +216,7 @@ class ProjectGenerator:
         sheet_size = paper_sizes.get("A4", (210.0, 297.0))
 
         # Initialize managers with sheet size
-        component_manager = ComponentManager(schematic, sheet_size=sheet_size)
+        component_manager = ComponentManager(schematic, sheet_size=sheet_size, project_name=self.project_name)
         sheet_manager = SheetManager(schematic)
         placement_engine = PlacementEngine(schematic, sheet_size=sheet_size)
 
@@ -474,7 +474,7 @@ class ProjectGenerator:
         sheet_size = paper_sizes.get("A4", (210.0, 297.0))
 
         # Create managers
-        component_manager = ComponentManager(schematic, sheet_size=sheet_size)
+        component_manager = ComponentManager(schematic, sheet_size=sheet_size, project_name=self.project_name)
         wire_manager = WireManager(schematic)
         connection_updater = ConnectionUpdater(schematic)
 

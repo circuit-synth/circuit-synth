@@ -82,9 +82,12 @@ def get_project_hierarchy_path(schematic_path: str) -> tuple[str, str]:
                         hierarchical_path = f"/{main_schematic.uuid}/{sheet.uuid}"
                         return project_name, hierarchical_path
 
-        # Fallback: use simple project structure
+        # Fallback: use simple project structure (root schematic)
+        # Load the schematic to get its UUID for the hierarchical path
+        schematic = ksa.Schematic.load(str(path))
         project_name = path.parent.name
-        return project_name, "/"
+        hierarchical_path = f"/{schematic.uuid}" if schematic.uuid else "/"
+        return project_name, hierarchical_path
 
     except Exception:
         # Safe fallback to original behavior
