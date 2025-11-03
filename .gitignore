@@ -49,6 +49,10 @@ PRD-*.md
 trees/
 logs/
 tasks.md.tmp
+coordinator.log
+coordinator.log.*
+pricing-cache.json
+logs.txt
 
 # Session-specific files (should not be committed)
 SESSION-*.md
