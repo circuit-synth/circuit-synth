@@ -65,7 +65,12 @@ circuit-synth is a Python library that generates KiCad schematics programmatical
    - Create PR: `gh pr create --fill`
    - Reference the issue: `Fixes #{issue_number}`
 
-7. **Update tasks.md**
+7. **Remove the rpi-auto label**
+   - Run: `gh issue edit {issue_number} --remove-label rpi-auto`
+   - This signals the coordinator that the task is complete
+   - Prevents duplicate workers from being spawned
+
+8. **Update tasks.md**
    - Mark task as complete with commit hash and PR link
 
 ---
@@ -79,6 +84,7 @@ circuit-synth is a Python library that generates KiCad schematics programmatical
 - ✅ Make focused, minimal changes
 - ✅ Commit early and often with clear messages
 - ✅ Create the PR when done
+- ✅ Remove the rpi-auto label after PR creation
 
 **DON'T:**
 - ❌ Make changes without understanding the codebase first
@@ -114,6 +120,7 @@ A human will review and provide guidance.
 You've succeeded when:
 - ✅ Tests pass (including your new test)
 - ✅ PR is created and linked to the issue
+- ✅ rpi-auto label is removed from the issue
 - ✅ tasks.md is updated with completion status
 - ✅ Code follows existing patterns and style
 - ✅ No regressions in existing tests
