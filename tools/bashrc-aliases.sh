@@ -15,19 +15,19 @@ alias tac='cd $TAC_DIR'
 # ================================================================================
 
 # Live monitoring dashboard (refreshes every 5 seconds)
-alias tac-monitor='cd $TAC_DIR && ./tools/monitor-live.py'
+alias tac-monitor='cd $TAC_DIR && ./tools/tac.py monitor'
 
 # Quick status summary
-alias tac-status='cd $TAC_DIR && ./tools/query-logs.py summary'
+alias tac-status='cd $TAC_DIR && ./tools/tac.py status'
 
 # View conversation for a specific task
-alias tac-view='cd $TAC_DIR && ./tools/view-conversation.py'
+alias tac-view='cd $TAC_DIR && ./tools/tac.py view'
 
 # Generate historical report
-alias tac-report='cd $TAC_DIR && ./tools/generate-report.py --all'
+alias tac-report='cd $TAC_DIR && ./tools/tac.py report'
 
 # Export task data (usage: tac-export gh-471)
-alias tac-export='cd $TAC_DIR && ./tools/export-task.py'
+alias tac-export='cd $TAC_DIR && ./tools/tac.py export'
 
 # ================================================================================
 # LOG FILE MONITORING
@@ -87,16 +87,16 @@ alias tac-pr='gh pr list --repo circuit-synth/circuit-synth --head'
 # ================================================================================
 
 # Search conversations for text (usage: tac-search "label cleanup")
-alias tac-search='cd $TAC_DIR && ./tools/query-logs.py search'
+alias tac-search='cd $TAC_DIR && ./tools/tac.py search'
 
 # Token usage for specific task (usage: tac-tokens gh-471)
-alias tac-tokens='cd $TAC_DIR && ./tools/query-logs.py tokens'
+alias tac-tokens='cd $TAC_DIR && ./tools/tac.py tokens'
 
 # Timeline of all activity
-alias tac-timeline='cd $TAC_DIR && ./tools/generate-report.py --timeline'
+alias tac-timeline='cd $TAC_DIR && ./tools/tac.py timeline'
 
 # Detailed task report (usage: tac-task gh-471)
-alias tac-task='cd $TAC_DIR && ./tools/generate-report.py --task'
+alias tac-task='cd $TAC_DIR && ./tools/tac.py task'
 
 # ================================================================================
 # WORKTREE MANAGEMENT
