@@ -14,7 +14,7 @@ import os
 import shutil
 from pathlib import Path
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Any
 from datetime import datetime
 import secrets
 import signal
@@ -27,6 +27,9 @@ from adw_modules.error_handling import (
     format_health_for_dashboard
 )
 
+# Import API logging
+from adw_modules.api_logger import ClaudeAPILogger
+
 # Configuration paths
 SCRIPT_DIR = Path(__file__).parent
 REPO_ROOT = SCRIPT_DIR.parent
@@ -35,6 +38,7 @@ TASKS_FILE = REPO_ROOT / "tasks.md"
 WORKER_TEMPLATE = REPO_ROOT / "worker_template.md"
 LOGS_DIR = REPO_ROOT / "logs"
 TREES_DIR = REPO_ROOT / "trees"
+API_LOGS_DIR = REPO_ROOT / "logs" / "api"
 
 
 @dataclass
@@ -57,6 +61,8 @@ class Task:
     error: Optional[str] = None
     # Error tracking for automatic retry
     error_tracking: TaskErrorTracking = field(default_factory=TaskErrorTracking)
+    # API usage tracking
+    api_call_metrics: Optional[Any] = None
 
 
 class Coordinator:
@@ -69,9 +75,13 @@ class Coordinator:
         # Create directories
         LOGS_DIR.mkdir(exist_ok=True)
         TREES_DIR.mkdir(exist_ok=True)
+        API_LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
         self.running = True
         self.active_workers: dict[str, subprocess.Popen] = {}
+
+        # Initialize API logger
+        self.api_logger = ClaudeAPILogger(API_LOGS_DIR)
 
         # Setup signal handlers
         signal.signal(signal.SIGCHLD, self._reap_children)
@@ -662,6 +672,16 @@ class Coordinator:
         prompt_file = LOGS_DIR / f"{task.id}-prompt.txt"
         prompt_file.write_text(prompt)
 
+        # Start API call tracking
+        task.api_call_metrics = self.api_logger.start_call(
+            task_id=task.id,
+            worker_id=task.worker_id,
+            model=self.config['llm']['model_default'],
+            prompt_file=str(prompt_file),
+            prompt_content=prompt,
+            settings={'source': task.source, 'priority': task.priority}
+        )
+
         # Build LLM command from config
         cmd_template = self.config['llm']['command_template']
         model = self.config['llm']['model_default']
@@ -728,6 +748,15 @@ class Coordinator:
                 except ValueError:
                     pass
 
+            # Parse API usage from worker log
+            log_file = LOGS_DIR / f"{task.id}.jsonl"
+            api_data = self.api_logger.parse_stream_json_output(log_file)
+            tokens_input = api_data['tokens_input']
+            tokens_output = api_data['tokens_output']
+            response_content = api_data['response_content']
+
+            print(f"   📊 Tokens: {tokens_input} in / {tokens_output} out / {tokens_input + tokens_output} total")
+
             # Check for PR creation (primary completion signal)
             try:
                 pr_check = subprocess.run(
@@ -753,6 +782,17 @@ class Coordinator:
                     task.commit_hash = commit_hash
                     task.pr_url = pr_data['url']
                     task.completed = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+                    # Log API usage for successful completion
+                    if task.api_call_metrics:
+                        self.api_logger.end_call(
+                            metrics=task.api_call_metrics,
+                            response_content=response_content[:1000],  # First 1000 chars
+                            tokens_input=tokens_input,
+                            tokens_output=tokens_output,
+                            success=True,
+                            exit_code=0
+                        )
 
                     print(f"   ✅ Task {task.id} completed - PR #{pr_data['number']}")
 
@@ -813,6 +853,18 @@ The PR is ready for your review."""
                         # Record failure in error tracking
                         task.error_tracking.record_failure(failure_type)
                         task.error = error_msg
+
+                        # Log API usage for failed completion
+                        if task.api_call_metrics:
+                            self.api_logger.end_call(
+                                metrics=task.api_call_metrics,
+                                response_content=response_content[:1000] if response_content else None,
+                                tokens_input=tokens_input if tokens_input > 0 else None,
+                                tokens_output=tokens_output if tokens_output > 0 else None,
+                                success=False,
+                                error_message=error_msg,
+                                exit_code=exit_code
+                            )
 
                         # Check if can retry
                         if task.error_tracking.can_retry():
