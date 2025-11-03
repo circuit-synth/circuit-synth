@@ -39,3 +39,62 @@ model_default = "claude-sonnet-4-5"
 
 [worktree]
 base_dir = "trees"
+
+# ============================================================================
+# ROUTING - Intelligent model/provider selection
+# ============================================================================
+
+[routing]
+enabled = false  # Set to true to enable intelligent routing
+default_provider = "claude-cli"
+default_model = "claude-sonnet-4-5"
+
+# Routing rules (checked in priority order, highest first)
+# Each rule has:
+#   - name: Description of the rule
+#   - priority: Higher number = checked first (default 50)
+#   - conditions: Dict of conditions that must match
+#   - provider: Target provider (optional, uses default if not set)
+#   - model: Target model (optional, uses default if not set)
+
+# Example rules (uncomment and modify as needed):
+
+# Critical issues always use best model
+[[routing.rules]]
+name = "critical-issues-opus"
+priority = 100
+conditions = { priority = "critical" }
+provider = "claude-cli"
+model = "claude-opus-4"
+
+# High priority or security issues use Sonnet 4.5
+[[routing.rules]]
+name = "high-priority-sonnet"
+priority = 90
+conditions = { priority = ["high", "normal"] }
+provider = "claude-cli"
+model = "claude-sonnet-4-5"
+
+# Retries use cheaper model (Haiku) - check before priority rules
+[[routing.rules]]
+name = "retry-use-haiku"
+priority = 95
+conditions = { retry_count = { gte = 1 } }
+provider = "claude-cli"
+model = "claude-haiku-4"
+
+# Off-hours (midnight-8am) use cheaper model
+[[routing.rules]]
+name = "off-hours-haiku"
+priority = 70
+conditions = { hour_range = [0, 8] }
+provider = "claude-cli"
+model = "claude-haiku-4"
+
+# Documentation tasks use Haiku
+[[routing.rules]]
+name = "docs-haiku"
+priority = 60
+conditions = { labels = ["documentation", "docs"] }
+provider = "claude-cli"
+model = "claude-haiku-4"
