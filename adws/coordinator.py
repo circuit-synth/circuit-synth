@@ -28,6 +28,17 @@ WORKER_TEMPLATE = REPO_ROOT / "worker_template.md"
 LOGS_DIR = REPO_ROOT / "logs"
 TREES_DIR = REPO_ROOT / "trees"
 
+# Import budget tracking (add SCRIPT_DIR to path for local imports)
+import sys
+sys.path.insert(0, str(SCRIPT_DIR))
+try:
+    from budget_tracker import BudgetTracker
+    from log_parser import extract_usage_from_issue_log
+    BUDGET_TRACKING_AVAILABLE = True
+except ImportError:
+    BUDGET_TRACKING_AVAILABLE = False
+    print("⚠️  Budget tracking modules not available - continuing without budget monitoring")
+
 
 @dataclass
 class Task:
@@ -62,6 +73,20 @@ class Coordinator:
 
         self.running = True
         self.active_workers: dict[str, subprocess.Popen] = {}
+
+        # Initialize budget tracker if available
+        if BUDGET_TRACKING_AVAILABLE:
+            budget_config = self.config.get('budget', {})
+            self.budget_tracker = BudgetTracker(
+                db_path=SCRIPT_DIR / "budget.db",
+                monthly_limit=budget_config.get('monthly_limit', 1000000),
+                alert_thresholds=budget_config.get('alert_thresholds', [75, 90, 95]),
+                cost_per_million=budget_config.get('currency_per_million_tokens', 3.00),
+                reset_day=budget_config.get('reset_day', 1)
+            )
+            print(f"✓ Budget tracking enabled: {budget_config.get('monthly_limit', 1000000):,} tokens/month")
+        else:
+            self.budget_tracker = None
 
         # Setup signal handlers
         signal.signal(signal.SIGCHLD, self._reap_children)
