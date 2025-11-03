@@ -363,11 +363,17 @@ class Coordinator:
             cwd=REPO_ROOT, capture_output=True, text=True
         )
 
-        # If git remove failed and directory still exists, manually remove it
-        if result.returncode != 0 and worktree_path.exists():
-            print(f"   Git removal failed, manually deleting directory")
+        print(f"   Git remove exit code: {result.returncode}")
+        if result.stderr:
+            print(f"   Git stderr: {result.stderr.strip()}")
+
+        # If directory still exists after git remove, manually delete it
+        if worktree_path.exists():
+            print(f"   Directory still exists, manually deleting")
             shutil.rmtree(worktree_path)
-            print(f"   Directory removed: {worktree_path}")
+            print(f"   ✓ Directory removed: {worktree_path}")
+        else:
+            print(f"   ✓ Directory removed by git")
 
     def spawn_worker(self, task: Task):
         """Spawn LLM worker agent (non-blocking)"""
