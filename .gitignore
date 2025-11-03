@@ -55,3 +55,6 @@ SESSION-*.md
 QUICK-START-*.txt
 *-deploy-test.log
 coordinator-integration-example.py
+
+# Pricing cache (regenerate with tools/fetch-live-pricing.py)
+pricing-cache.json
