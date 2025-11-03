@@ -30,6 +30,10 @@ from adw_modules.error_handling import (
 # Import API logging
 from adw_modules.api_logger import ClaudeAPILogger
 
+# Import provider management
+from adw_modules.providers import ProviderManager
+from adw_modules.routing import ModelRouter
+
 # Configuration paths
 SCRIPT_DIR = Path(__file__).parent
 REPO_ROOT = SCRIPT_DIR.parent
@@ -50,6 +54,7 @@ class Task:
     description: str
     priority: int
     status: str
+    labels: List[str] = field(default_factory=list)
     worker_id: Optional[str] = None
     tree_path: Optional[str] = None
     branch_name: Optional[str] = None
@@ -79,6 +84,12 @@ class Coordinator:
 
         self.running = True
         self.active_workers: dict[str, subprocess.Popen] = {}
+
+        # Initialize provider manager
+        self.provider_manager = ProviderManager(self.config)
+
+        # Initialize model router
+        self.model_router = ModelRouter(self.config)
 
         # Initialize API logger
         self.api_logger = ClaudeAPILogger(API_LOGS_DIR)
@@ -165,12 +176,16 @@ class Coordinator:
                     elif label_name == 'priority:P1':
                         priority = 1
 
+                # Extract label names
+                labels = [label_obj.get('name', '') for label_obj in issue.get('labels', [])]
+
                 task = Task(
                     id=f"gh-{issue['number']}",
                     source='gh',
                     number=str(issue['number']),
                     description=issue['title'],
                     priority=priority,
+                    labels=labels,
                     status='pending'
                 )
                 tasks.append(task)
@@ -652,6 +667,30 @@ class Coordinator:
             shutil.rmtree(worktree_path)
             print(f"   ✓ Worktree removed")
 
+    def _get_task_routing_attrs(self, task: Task) -> dict:
+        """Extract task attributes for routing decisions
+
+        Args:
+            task: Task to extract attributes from
+
+        Returns:
+            Dict of routing attributes
+        """
+        # Map numeric priority to string priority
+        priority_map = {
+            0: 'critical',
+            1: 'high',
+            2: 'normal',
+            3: 'low'
+        }
+
+        return {
+            'priority': priority_map.get(task.priority, 'normal'),
+            'labels': task.labels,
+            'retry_count': task.error_tracking.attempt_count
+        }
+
+
     def spawn_worker(self, task: Task):
         """Spawn LLM worker agent (non-blocking)"""
 
@@ -682,21 +721,27 @@ class Coordinator:
             settings={'source': task.source, 'priority': task.priority}
         )
 
-        # Build LLM command from config
-        cmd_template = self.config['llm']['command_template']
-        model = self.config['llm']['model_default']
+        # Route task to appropriate provider/model
+        task_attrs = self._get_task_routing_attrs(task)
+        provider_name, model = self.model_router.route(task_attrs)
 
-        cmd = [
-            part.replace('{prompt_file}', str(prompt_file))
-                .replace('{model}', model)
-            for part in cmd_template
-        ]
+        # Get provider instance
+        provider = self.provider_manager.get_provider(provider_name)
+
+        if not provider or not provider.is_available():
+            print(f"❌ Provider {provider_name} not available")
+            print(f"   Tried to route with attrs: {task_attrs}")
+            return
+        log_file = LOGS_DIR / f"{task.id}.jsonl"
+
+        cmd = provider.build_command(prompt_file, model, log_file)
 
         print(f"🤖 Spawning worker for {task.id}")
+        print(f"   Provider: {provider_name}")
+        print(f"   Model: {model}")
         print(f"   Command: {' '.join(cmd)}")
 
         # Spawn worker (non-blocking)
-        log_file = LOGS_DIR / f"{task.id}.jsonl"
         with open(log_file, 'w') as f:
             proc = subprocess.Popen(
                 cmd,
