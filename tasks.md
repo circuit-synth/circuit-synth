@@ -1,12 +1,11 @@
 # Circuit-Synth Work Queue
 
-**Last updated:** 2025-11-02 14:54:56
+**Last updated:** 2025-11-02 23:54:08
 
 ---
 
 ## Pending
 
-[] gh-450: Dashboard: Add token budget monitoring and alerts {p1}
 [] gh-469: Test Issue: PM Agent End-to-End Verification {p2}
 [] gh-454: Dashboard: Enhance PM Agent chat with advanced commands and Claude integration {p2}
 [] gh-453: Dashboard: Add maintenance task status and scheduling interface {p2}
@@ -23,7 +22,10 @@
 
 ## Completed Today
 
-<!-- No completed tasks today -->
+[✅ w-396102] gh-450: Dashboard: Add token budget monitoring and alerts {p1}
+- Commits: 609bec9, 17f295b, 235288f
+- PR: https://github.com/circuit-synth/circuit-synth/pull/494
+- Status: Ready for review
 
 ---
 
