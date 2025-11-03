@@ -609,18 +609,66 @@ class Coordinator:
                 capture_output=True, text=True, cwd=worktree_path
             )
 
-            # If it has uncommitted changes, it's probably active
-            if status_result.stdout.strip():
-                print(f"   Worktree has uncommitted changes")
+            # Log current state for debugging
+            changes = status_result.stdout.strip()
+            worker_running = self._worker_is_running(task)
+            print(f"   🔍 Worktree status check:")
+            print(f"      - Has changes: {bool(changes)}")
+            print(f"      - Worker running: {worker_running}")
+            print(f"      - Worker PID: {task.pid}")
+
+            # If it has uncommitted changes
+            if changes:
+                print(f"   📝 Worktree has uncommitted changes ({len(changes.splitlines())} files)")
+
                 # Check if worker is still running
-                if not self._worker_is_running(task):
-                    print(f"   Worker not running - removing stale worktree")
+                if not worker_running:
+                    print(f"   ⏸️  Worker not running (PID {task.pid})")
+
+                    # Check if this is work in progress or a true crash
+                    # Strategy: Check file modification times to determine if work is fresh
+                    # If files were modified recently, it's likely completed work, not a crash
+                    from datetime import datetime
+                    import os
+
+                    # Find most recent file modification time in worktree
+                    most_recent_mtime = 0
+                    for root, dirs, files in os.walk(worktree_path):
+                        # Skip .git directory
+                        if '.git' in root:
+                            continue
+                        for file in files:
+                            file_path = os.path.join(root, file)
+                            try:
+                                mtime = os.path.getmtime(file_path)
+                                most_recent_mtime = max(most_recent_mtime, mtime)
+                            except OSError:
+                                pass
+
+                    # Calculate age of most recent change
+                    now = datetime.now().timestamp()
+                    age_seconds = now - most_recent_mtime
+                    age_minutes = age_seconds / 60
+
+                    print(f"      - Most recent file change: {age_minutes:.1f} minutes ago")
+
+                    # If files were modified in the last hour, treat as completed work
+                    if age_minutes < 60:  # Changed within last 60 minutes
+                        print(f"   ✅ Recent changes detected - preserving completed work")
+                        print(f"      Worktree appears to contain fresh work, not crash debris")
+                        print(f"      Worker should commit its changes or be cleaned up later")
+                        # Don't remove! Let the worker commit its work
+                        return worktree_path
+
+                    # Files are old - likely stale worktree from ancient crash
+                    print(f"   🗑️  Stale worktree detected (no recent changes) - removing")
                     self._remove_worktree(worktree_path)
                 else:
+                    print(f"   ⚠️  Worker still running - worktree is active")
                     raise Exception(f"Worktree {worktree_path} is still active")
             else:
                 # Clean worktree - remove and recreate
-                print(f"🔄 Removing stale worktree: {worktree_path}")
+                print(f"   🔄 Worktree is clean - removing and recreating")
                 self._remove_worktree(worktree_path)
 
         # Prune any stale worktree references
