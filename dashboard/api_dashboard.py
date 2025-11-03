@@ -30,11 +30,13 @@ import pandas as pd
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from adws.adw_modules.api_logger import ClaudeAPILogger
+from dashboard.budget_monitor import BudgetMonitor
 
 # Initialize
 REPO_ROOT = Path(__file__).parent.parent
 LOG_DIR = REPO_ROOT / 'logs' / 'api'
 logger = ClaudeAPILogger(LOG_DIR)
+budget_monitor = BudgetMonitor()
 
 # Create Dash app
 app = dash.Dash(__name__, update_title='Updating...')
@@ -118,6 +120,59 @@ def create_summary_cards(df: pd.DataFrame):
             ], className="card-body", style={'textAlign': 'center'})
         ], className="card", style={'display': 'inline-block', 'width': '23%', 'margin': '1%'}),
     ])
+
+
+def create_budget_card():
+    """Create budget monitoring card with color-coded alerts"""
+    try:
+        status = budget_monitor.get_budget_status()
+    except Exception as e:
+        # If budget monitoring fails, return empty card
+        return html.Div()
+
+    # Color mapping for alert levels
+    alert_colors = {
+        'green': '#28a745',  # Success green
+        'yellow': '#ffc107',  # Warning yellow
+        'orange': '#fd7e14',  # Warning orange
+        'red': '#dc3545'     # Danger red
+    }
+
+    alert_text = {
+        'green': '✓ Within Budget',
+        'yellow': '⚠ Approaching Limit',
+        'orange': '⚠ Near Limit',
+        'red': '🚨 Budget Alert'
+    }
+
+    color = alert_colors.get(status['alert_level'], '#6c757d')
+    text = alert_text.get(status['alert_level'], 'Status Unknown')
+
+    return html.Div([
+        html.Div([
+            html.H5('Token Budget', className="card-title", style={'marginBottom': 10}),
+            html.H3(f"{status['percentage']}%", style={'color': color, 'marginBottom': 5}),
+            html.P(text, style={'color': color, 'fontWeight': 'bold', 'marginBottom': 10}),
+            html.Hr(),
+            html.P([
+                html.Strong('Used: '),
+                f"{status['tokens_used']:,} tokens"
+            ], style={'fontSize': '0.9em', 'marginBottom': 5}),
+            html.P([
+                html.Strong('Budget: '),
+                f"{status['monthly_budget']:,} tokens/mo"
+            ], style={'fontSize': '0.9em', 'marginBottom': 5}),
+            html.P([
+                html.Strong('Remaining: '),
+                f"{status['remaining']:,} tokens"
+            ], style={'fontSize': '0.9em', 'marginBottom': 0}),
+        ], className="card-body")
+    ], className="card", style={
+        'display': 'inline-block',
+        'width': '18%',
+        'margin': '1%',
+        'border': f'2px solid {color}'
+    })
 
 
 def create_tokens_timeline(df: pd.DataFrame):
@@ -318,6 +373,8 @@ app.layout = html.Div([
 
     html.Div(id='summary-cards', style={'margin': 20}),
 
+    html.Div(id='budget-card', style={'margin': 20}),
+
     html.Div([
         html.Div([
             dcc.Graph(id='tokens-timeline')
@@ -356,6 +413,7 @@ app.layout = html.Div([
 # Callbacks
 @app.callback(
     [Output('summary-cards', 'children'),
+     Output('budget-card', 'children'),
      Output('tokens-timeline', 'figure'),
      Output('cost-timeline', 'figure'),
      Output('model-breakdown', 'figure'),
@@ -371,6 +429,7 @@ def update_dashboard(n_clicks, n_intervals, days):
 
     return (
         create_summary_cards(df),
+        create_budget_card(),
         create_tokens_timeline(df),
         create_cost_timeline(df),
         create_model_breakdown(df),
