@@ -479,6 +479,100 @@ circuit-synth/
     └── commands/dev/          # Development commands
 ```
 
+### Dependency Libraries (We Maintain These!)
+
+**CRITICAL:** We maintain the lower-level KiCad libraries that circuit-synth depends on:
+
+- **kicad-sch-api** - KiCad schematic file API
+  - Repository: https://github.com/atopile/kicad-sch-api
+  - Purpose: Read/write KiCad .kicad_sch files
+  - Used by: circuit-synth for schematic generation
+
+- **kicad-pcb-api** - KiCad PCB file API
+  - Repository: https://github.com/atopile/kicad-pcb-api
+  - Purpose: Read/write KiCad .kicad_pcb files
+  - Used by: circuit-synth for PCB generation
+
+**Decision Rule:** When debugging issues in circuit-synth:
+
+1. **Root cause in circuit-synth** → Fix it here
+2. **Root cause in kicad-sch-api or kicad-pcb-api** → Fix it there
+
+**Why this matters:**
+- Don't work around upstream bugs - fix them at the source
+- Improvements benefit all users of these libraries
+- Better architectural separation
+- Easier to maintain long-term
+
+**Workflow for upstream fixes:**
+
+1. **Identify root cause** - Is the bug in circuit-synth or the API library?
+2. **If in API library:**
+   ```bash
+   # Create GitHub issue in upstream repo
+   gh issue create --repo atopile/kicad-sch-api \
+     --title "Bug: Position.to_dict() missing angle field" \
+     --body "Root cause analysis...
+
+   Minimal reproduction:
+   \`\`\`python
+   pos = Position(x=10, y=20, angle=45)
+   result = pos.to_dict()
+   # Expected: {'x': 10, 'y': 20, 'angle': 45}
+   # Actual: {'x': 10, 'y': 20}  # Missing 'angle'
+   \`\`\`
+
+   Impact: circuit-synth issue #XXX blocked
+   "
+
+   # Clone and fix in that repo
+   git clone https://github.com/atopile/kicad-sch-api.git
+   cd kicad-sch-api
+
+   # Create branch and fix with test-first approach
+   git checkout -b fix/position-angle-serialization
+   # ... write test, implement fix, verify
+
+   # Create PR in upstream repo
+   gh pr create --fill
+
+   # After merge: Release new version to PyPI
+   # (Maintainer will handle this)
+
+   # Update circuit-synth dependency
+   cd ../circuit-synth
+   # In pyproject.toml: kicad-sch-api>=1.2.3
+   poetry update kicad-sch-api
+
+   # Verify fix works in circuit-synth
+   pytest tests/test_that_was_blocked.py
+   ```
+
+3. **If in circuit-synth:**
+   - Fix it here as normal
+
+**Note:** TAC-8 autonomous infrastructure will eventually be set up in kicad-sch-api and kicad-pcb-api repos. For now, workers should create issues there when needed, but fixes will be done manually.
+
+**Example scenario:**
+
+```
+Issue: "Component positions not serializing correctly"
+
+Investigation reveals:
+- circuit-synth calls kicad-sch-api's Position.to_dict()
+- Position.to_dict() has a bug (missing 'angle' field)
+
+Correct approach:
+1. Fix Position.to_dict() in kicad-sch-api
+2. Add test in kicad-sch-api
+3. Release kicad-sch-api v1.2.3
+4. Update circuit-synth: kicad-sch-api>=1.2.3
+5. Verify fix works in circuit-synth
+
+Wrong approach:
+- Work around it in circuit-synth with custom serialization
+```
+
 ### Testing Strategy
 
 - **Unit tests** - For individual functions/classes
