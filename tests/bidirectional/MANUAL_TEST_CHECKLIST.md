@@ -21,7 +21,7 @@
 
 ### Component CRUD - Root Sheet (4 tests)
 
-- [ ] **Test 01**: Create component on root sheet - `component_crud_root/01_sync_component_root_create/`
+- [x] **Test 01**: Create component on root sheet - `component_crud_root/01_sync_component_root_create/` ✅ **Verified 2025-11-02** - R2 added with correct instance data (#479), labels, and power symbols (#489)
 - [ ] **Test 02**: Update component value on root sheet - `component_crud_root/02_sync_component_root_update_value/`
 - [ ] **Test 03**: Update component reference on root sheet - `component_crud_root/03_sync_component_root_update_ref/`
 - [ ] **Test 04**: Delete component from root sheet - `component_crud_root/04_sync_component_root_delete/`
@@ -152,10 +152,10 @@
 ## 📊 Testing Progress Summary
 
 **Total Tests:** 71
-**Tests Verified:** ___ / 71
+**Tests Verified:** 1 / 71
 
 ### Progress by Category:
-- Component CRUD Root: ___ / 4
+- Component CRUD Root: 1 / 4
 - Net CRUD Root: ___ / 4
 - Component CRUD Hier: ___ / 4
 - Net CRUD Hier: ___ / 4
