@@ -22,21 +22,21 @@ def comprehensive_root():
         symbol="Device:R",
         ref="R1",
         value="10k",
-        footprint="Resistor_SMD:R_0603_1608Metric"
+        footprint="Resistor_SMD:R_0603_1608Metric",
     )
 
-    # r2 = Component(
-    #     symbol="Device:R",
-    #     ref="R2",
-    #     value="4.7k",
-    #     footprint="Resistor_SMD:R_0603_1608Metric"
-    # )
+    r2 = Component(
+        symbol="Device:R",
+        ref="R2",
+        value="4.7k",
+        footprint="Resistor_SMD:R_0603_1608Metric",
+    )
 
     c1 = Component(
         symbol="Device:C",
         ref="C1",
         value="100nF",
-        footprint="Capacitor_SMD:C_0603_1608Metric"
+        footprint="Capacitor_SMD:C_0603_1608Metric",
     )
 
     # Power
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     circuit_obj.generate_kicad_project(
         project_name="comprehensive_root",
         placement_algorithm="simple",
-        generate_pcb=True
+        generate_pcb=True,
     )
 
     print("✅ Comprehensive root circuit generated!")

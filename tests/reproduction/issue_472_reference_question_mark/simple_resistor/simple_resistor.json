@@ -1,0 +1,165 @@
+{
+  "name": "simple_resistor",
+  "description": "Minimal circuit: single resistor R1 with 4.7k value.",
+  "tstamps": "/simple_resistor-4341119312/",
+  "source_file": "simple_resistor.kicad_sch",
+  "components": {
+    "R1": {
+      "symbol": "Device:R",
+      "ref": "R1",
+      "value": "4.7k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "~",
+      "description": "Resistor",
+      "properties": {
+        "ki_fp_filters": "R_*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "R_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 3.81,
+          "length": 1.27,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -3.81,
+          "length": 1.27,
+          "orientation": 90.0
+        }
+      ]
+    },
+    "R2": {
+      "symbol": "Device:R",
+      "ref": "R2",
+      "value": "10k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "~",
+      "description": "Resistor",
+      "properties": {
+        "ki_fp_filters": "R_*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "R_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 3.81,
+          "length": 1.27,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -3.81,
+          "length": 1.27,
+          "orientation": 90.0
+        }
+      ]
+    }
+  },
+  "nets": {
+    "VCC": {
+      "nodes": [
+        {
+          "component": "R1",
+          "pin": {
+            "number": "1",
+            "name": "~",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "R2",
+          "pin": {
+            "number": "1",
+            "name": "~",
+            "type": "passive"
+          }
+        }
+      ],
+      "is_power": true,
+      "power_symbol": "power:VCC",
+      "trace_current": null,
+      "impedance": null,
+      "properties": {}
+    },
+    "GND": {
+      "nodes": [
+        {
+          "component": "R1",
+          "pin": {
+            "number": "2",
+            "name": "~",
+            "type": "passive"
+          }
+        },
+        {
+          "component": "R2",
+          "pin": {
+            "number": "2",
+            "name": "~",
+            "type": "passive"
+          }
+        }
+      ],
+      "is_power": true,
+      "power_symbol": "power:GND",
+      "trace_current": null,
+      "impedance": null,
+      "properties": {}
+    }
+  },
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Minimal circuit: single resistor R1 with 4.7k value.",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "1aba6c9d-0d51-45b8-b5fa-b68bc1f92b8a"
+    }
+  ]
+}
