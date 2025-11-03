@@ -973,21 +973,41 @@ The PR is ready for your review."""
             try:
                 # 1. Fetch GitHub issues
                 github_tasks = self.fetch_github_issues()
+                github_ids = {t.id for t in github_tasks}
 
                 # 2. Parse current tasks.md
                 current_tasks = self.parse_tasks_md()
                 current_ids = {t.id for t in current_tasks}
 
-                # 3. Add new tasks
+                # 3. Remove pending tasks that no longer have rpi-auto label
+                # (Keep active tasks - let them finish)
+                filtered_tasks = []
+                removed_count = 0
+                for task in current_tasks:
+                    if task.status == 'pending' and task.id not in github_ids:
+                        # Task lost rpi-auto label - remove it
+                        removed_count += 1
+                        print(f"🗑️  Removing {task.id} - no longer has rpi-auto label")
+                    else:
+                        # Keep: either has label, or is active/completed
+                        filtered_tasks.append(task)
+
+                current_tasks = filtered_tasks
+                current_ids = {t.id for t in current_tasks}
+
+                if removed_count > 0:
+                    print(f"   Removed {removed_count} pending task(s) without rpi-auto label")
+
+                # 4. Add new tasks
                 new_tasks = [t for t in github_tasks if t.id not in current_ids]
                 if new_tasks:
                     print(f"📥 Found {len(new_tasks)} new tasks from GitHub")
                     current_tasks.extend(new_tasks)
 
-                # 4. Check completions
+                # 5. Check completions
                 current_tasks = self.check_completions(current_tasks)
 
-                # 5. Launch new workers
+                # 6. Launch new workers
                 active = [t for t in current_tasks if t.status == 'active']
                 pending = [t for t in current_tasks if t.status == 'pending']
                 slots = self.config['coordinator']['max_concurrent_workers'] - len(active)
