@@ -1,0 +1,21 @@
+[Unit]
+Description=Circuit-Synth TAC-8 Autonomous Coordinator
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=shane
+WorkingDirectory=/home/shane/Desktop/circuit-synth
+ExecStart=/usr/bin/python3 /home/shane/Desktop/circuit-synth/adws/coordinator.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=circuit-synth-coordinator
+
+# Environment
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+[Install]
+WantedBy=multi-user.target
