@@ -4,6 +4,7 @@ FastAPI server for TAC-8 dashboard
 Provides REST API endpoints for metrics and serves frontend dashboard.
 """
 
+import sys
 from pathlib import Path
 from typing import Optional
 from datetime import datetime
@@ -14,6 +15,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .metrics import MetricsAggregator
+
+# Import budget status function from adws
+try:
+    # Add adws to path if not already there
+    repo_root = Path(__file__).parent.parent.parent.parent.parent
+    adws_path = repo_root / "adws"
+    if adws_path.exists() and str(adws_path) not in sys.path:
+        sys.path.insert(0, str(adws_path))
+
+    from adw_modules.dashboard_data import get_budget_status
+    BUDGET_MONITORING_AVAILABLE = True
+except ImportError:
+    get_budget_status = None
+    BUDGET_MONITORING_AVAILABLE = False
 
 
 def create_app(tasks_file: Optional[Path] = None) -> FastAPI:
