@@ -13,6 +13,7 @@ import subprocess
 import tomllib
 import os
 import shutil
+import asyncio
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import List, Optional, Any
@@ -33,6 +34,11 @@ from adw_modules.api_logger import ClaudeAPILogger
 
 # Import multi-stage worker
 from adw_modules.multi_stage_worker import MultiStageWorker
+
+# Import TAC database components
+from adw_modules.tac_worker_adapter import TACWorkerAdapter
+from adw_modules.tac_database import TACDatabase
+from adw_modules.tac_models import TaskCreate
 
 # Configuration paths
 SCRIPT_DIR = Path(__file__).parent
@@ -709,57 +715,84 @@ class Coordinator:
 
         print(f"🤖 Spawning TAC-X pipeline for {task.id}")
 
-        # Create multi-stage worker
-        worker = MultiStageWorker(
-            task_id=task.id,
-            issue_number=task.number,
-            worktree_path=task.tree_path,
-            branch_name=task.branch_name,
-            llm_config=self.config['llm'],
-            api_logger=self.api_logger
-        )
-
         # Run pipeline in subprocess (non-blocking)
         # We'll use a simple wrapper script
-        wrapper_script = task.tree_path / ".tac" / "run_pipeline.py"
+        tree_path = Path(task.tree_path)  # Convert string to Path
+        wrapper_script = tree_path / ".tac" / "run_pipeline.py"
         wrapper_script.parent.mkdir(exist_ok=True, parents=True)
 
         wrapper_content = f'''#!/usr/bin/env python3
-"""TAC-X Pipeline Runner - Auto-generated"""
+"""TAC-X Pipeline Runner with Database Tracking - Auto-generated"""
 import sys
+import asyncio
 from pathlib import Path
 
 # Add adws modules to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "adws"))
+# From trees/gh-XXX/.tac/run_pipeline.py → repo_root/adws
+# __file__ = .../trees/gh-XXX/.tac/run_pipeline.py
+# parent = .../trees/gh-XXX/.tac
+# parent.parent = .../trees/gh-XXX
+# parent.parent.parent = .../trees
+# parent.parent.parent.parent = repo_root
+repo_root = Path(__file__).parent.parent.parent.parent
+sys.path.insert(0, str(repo_root / "adws"))
 
 from adw_modules.multi_stage_worker import MultiStageWorker
+from adw_modules.tac_worker_adapter import TACWorkerAdapter
+from adw_modules.tac_database import TACDatabase
+from adw_modules.tac_models import TaskCreate
 from adw_modules.api_logger import ClaudeAPILogger
 import tomllib
 
 # Load config
-config_file = Path(__file__).parent.parent.parent / "adws" / "config.toml"
+config_file = repo_root / "adws" / "config.toml"
 with open(config_file, "rb") as f:
     config = tomllib.load(f)
 
 # Create API logger
-api_logger = ClaudeAPILogger(Path(__file__).parent.parent.parent / "logs" / "api")
+api_logger = ClaudeAPILogger(repo_root / "logs" / "api")
 
-# Create and run worker
-worker = MultiStageWorker(
-    task_id="{task.id}",
-    issue_number="{task.number}",
-    worktree_path=Path("{task.tree_path}"),
-    branch_name="{task.branch_name}",
-    llm_config=config['llm'],
-    api_logger=api_logger
-)
+async def main():
+    """Run TAC pipeline with database tracking"""
+    # Initialize database
+    db = TACDatabase()
+    await db.connect()
+    print("✓ Connected to TAC database")
 
+    try:
+        # Create TAC worker adapter (registers task in database)
+        worker = await TACWorkerAdapter.create(
+            issue_number="{task.number}",
+            worktree_path=Path("{task.tree_path}"),
+            branch_name="{task.branch_name}",
+            llm_config=config['llm'],
+            api_logger=api_logger,
+            database=db
+        )
+
+        print(f"✓ Created TAC worker (task_id={{worker.task_id}})")
+
+        # Run pipeline with full tracking
+        await worker.run()
+
+        print(f"\\n✓ Pipeline completed")
+        return 0
+    except Exception as e:
+        print(f"\\n✗ Pipeline failed: {{e}}")
+        import traceback
+        traceback.print_exc()
+        return 1
+    finally:
+        # Close database connection
+        await db.close()
+        print("✓ Closed database connection")
+
+# Run async main
 try:
-    result = worker.run()
-    print(f"\\nPipeline completed with status: {{result.status}}")
-    sys.exit(0 if result.status == 'completed' else 1)
+    exit_code = asyncio.run(main())
+    sys.exit(exit_code)
 except Exception as e:
-    print(f"\\nPipeline failed: {{e}}")
+    print(f"\\nFatal error: {{e}}")
     import traceback
     traceback.print_exc()
     sys.exit(1)

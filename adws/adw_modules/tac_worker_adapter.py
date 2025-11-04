@@ -308,21 +308,13 @@ class TACWorkerAdapter:
             logger.info(f"Pipeline completed with status: {pipeline_state.status}")
 
             # Log each stage result to database
-            stage_methods = {
-                "planning": "planner",
-                "building": "builder",
-                "reviewing": "reviewer",
-                "pr_creation": "pr_creator",
-            }
-
             for stage_name in stages:
                 # Log stage start
                 stage_id = await self.log_stage_start(stage_name)
 
-                # Get the stage result from pipeline_state
-                stage_key = stage_methods.get(stage_name)
-                if stage_key and hasattr(pipeline_state, stage_key):
-                    result = getattr(pipeline_state, stage_key)
+                # Get the stage result from pipeline_state.stage_results dict
+                if stage_name in pipeline_state.stage_results:
+                    result = pipeline_state.stage_results[stage_name]
                 else:
                     # Fallback for missing results
                     result = StageResult(

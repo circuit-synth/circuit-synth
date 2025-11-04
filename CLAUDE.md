@@ -501,12 +501,12 @@ circuit-synth/
 **CRITICAL:** We maintain the lower-level KiCad libraries that circuit-synth depends on:
 
 - **kicad-sch-api** - KiCad schematic file API
-  - Repository: https://github.com/atopile/kicad-sch-api
+  - Repository: https://github.com/circuit-synth/kicad-sch-api
   - Purpose: Read/write KiCad .kicad_sch files
   - Used by: circuit-synth for schematic generation
 
 - **kicad-pcb-api** - KiCad PCB file API
-  - Repository: https://github.com/atopile/kicad-pcb-api
+  - Repository: https://github.com/circuit-synth/kicad-pcb-api
   - Purpose: Read/write KiCad .kicad_pcb files
   - Used by: circuit-synth for PCB generation
 
@@ -526,8 +526,8 @@ circuit-synth/
 1. **Identify root cause** - Is the bug in circuit-synth or the API library?
 2. **If in API library:**
    ```bash
-   # Create GitHub issue in upstream repo
-   gh issue create --repo atopile/kicad-sch-api \
+   # Create GitHub issue in library repo
+   gh issue create --repo circuit-synth/kicad-sch-api \
      --title "Bug: Position.to_dict() missing angle field" \
      --body "Root cause analysis...
 
@@ -543,7 +543,7 @@ circuit-synth/
    "
 
    # Clone and fix in that repo
-   git clone https://github.com/atopile/kicad-sch-api.git
+   git clone https://github.com/circuit-synth/kicad-sch-api.git
    cd kicad-sch-api
 
    # Create branch and fix with test-first approach

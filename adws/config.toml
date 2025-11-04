@@ -16,13 +16,10 @@ issue_label = "rpi-auto"  # Only process issues with this label
 
 [providers.claude-cli]
 enabled = true
+# Command will be: cat {prompt_file} | claude -p --model {model} --output-format stream-json --verbose --dangerously-skip-permissions | tee {output_file}
 command_template = [
-    "claude",
-    "-p", "{prompt_file}",
-    "--model", "{model}",
-    "--output-format", "stream-json",
-    "--verbose",
-    "--dangerously-skip-permissions"
+    "bash", "-c",
+    "cat '{prompt_file}' | claude -p --model '{model}' --output-format stream-json --verbose --dangerously-skip-permissions | tee '{output_file}'"
 ]
 
 [providers.openrouter]

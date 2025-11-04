@@ -47,6 +47,10 @@
                         <span class="nav-icon">🔄</span>
                         Active Tasks
                     </button>
+                    <button class="nav-item" data-view="conversations">
+                        <span class="nav-icon">💬</span>
+                        Conversations
+                    </button>
                     <button class="nav-item" data-view="templates">
                         <span class="nav-icon">🤖</span>
                         Agent Templates
@@ -79,6 +83,24 @@
                     </div>
                     <div class="task-list" id="active-task-list">
                         <div class="loading">Loading active tasks...</div>
+                    </div>
+                </div>
+
+                <!-- Conversations View -->
+                <div class="view hidden" id="view-conversations">
+                    <div class="view-header">
+                        <h2>LLM Conversations</h2>
+                        <button class="btn-refresh" onclick="loadConversations()">🔄 Refresh</button>
+                    </div>
+                    <div class="conversations-container">
+                        <div class="conversations-sidebar" id="conversations-sidebar">
+                            <div class="loading">Loading conversations...</div>
+                        </div>
+                        <div class="conversation-detail" id="conversation-detail">
+                            <div class="empty-state">
+                                <p>Select a conversation to view details</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

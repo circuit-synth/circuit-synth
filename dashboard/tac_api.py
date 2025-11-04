@@ -28,12 +28,21 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import uvicorn
+import asyncpg
+import logging
+import json
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "adws"))
 
-from adw_modules.tac_database import TACDatabase
-from adw_modules.tac_models import TaskModel, TaskSummary
+from adw_modules.tac_models import TaskModel
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Create FastAPI app
 app = FastAPI(
@@ -51,16 +60,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global database connection
-db: Optional[TACDatabase] = None
+# Global database connection pool
+db: Optional[asyncpg.Pool] = None
 
 
 @app.on_event("startup")
 async def startup():
     """Connect to database on startup"""
     global db
-    db = TACDatabase()
-    await db.connect()
+    logger.info("Connecting to PostgreSQL database...")
+    db = await asyncpg.create_pool(
+        host='localhost',
+        port=5433,
+        user='tacx',
+        password='tacx',
+        database='tacx',
+        min_size=2,
+        max_size=10
+    )
+    logger.info("✓ Connected to PostgreSQL database (pool size: 2-10)")
     print("✓ Connected to PostgreSQL database")
 
 
@@ -70,13 +88,17 @@ async def shutdown():
     global db
     if db:
         await db.close()
+        logger.info("✓ Closed database connection pool")
         print("✓ Closed database connection")
 
 
 @app.get("/api/tasks")
 async def list_tasks(limit: int = 50):
     """List all tasks (most recent first)"""
+    logger.info(f"GET /api/tasks - Fetching up to {limit} tasks")
+
     if not db:
+        logger.error("Database pool not initialized")
         raise HTTPException(status_code=500, detail="Database not connected")
 
     # Get recent tasks
@@ -86,40 +108,88 @@ async def list_tasks(limit: int = 50):
         LIMIT $1;
     """
 
-    rows = await db.pool.fetch(query, limit)
+    async with db.acquire() as conn:
+        logger.debug(f"Acquired connection from pool for task list")
+        rows = await conn.fetch(query, limit)
+        logger.info(f"Retrieved {len(rows)} tasks from database")
 
     tasks = []
     for row in rows:
         row_dict = dict(row)
-        row_dict = db._parse_jsonb_fields(row_dict)
+        # Parse workflow_config if it's a JSON string
+        if 'workflow_config' in row_dict and isinstance(row_dict['workflow_config'], str):
+            try:
+                row_dict['workflow_config'] = json.loads(row_dict['workflow_config'])
+            except (json.JSONDecodeError, TypeError):
+                row_dict['workflow_config'] = None
         tasks.append(TaskModel(**row_dict))
 
+    logger.info(f"Successfully serialized {len(tasks)} tasks")
     return {"tasks": [t.model_dump() for t in tasks], "count": len(tasks)}
 
 
 @app.get("/api/tasks/{task_id}")
 async def get_task(task_id: str):
     """Get detailed task information with stages and helpers"""
+    logger.info(f"GET /api/tasks/{task_id} - Fetching task details")
+
     if not db:
+        logger.error("Database pool not initialized")
         raise HTTPException(status_code=500, detail="Database not connected")
 
     try:
         task_uuid = UUID(task_id)
-    except ValueError:
+        logger.debug(f"Parsed task UUID: {task_uuid}")
+    except ValueError as e:
+        logger.warning(f"Invalid UUID format: {task_id} - {e}")
         raise HTTPException(status_code=400, detail="Invalid task ID format")
 
-    summary = await db.get_task_summary(task_uuid)
+    async with db.acquire() as conn:
+        logger.debug(f"Acquired database connection for task {task_uuid}")
 
-    if not summary:
-        raise HTTPException(status_code=404, detail="Task not found")
+        # Fetch task
+        logger.debug(f"Fetching task {task_uuid} from tac_tasks")
+        task_row = await conn.fetchrow("""
+            SELECT * FROM tac_tasks WHERE id = $1
+        """, task_uuid)
 
-    return {
-        "task": summary.task.model_dump(),
-        "stages": [s.model_dump() for s in summary.stages],
-        "helpers": [h.model_dump() for h in summary.helpers],
-        "event_count": summary.event_count,
-        "latest_events": [e.model_dump() for e in summary.latest_events],
+        if not task_row:
+            logger.warning(f"Task {task_uuid} not found")
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        logger.info(f"Found task: {task_row['issue_number']}")
+
+        # Fetch stages
+        logger.debug(f"Fetching stages for task {task_uuid}")
+        stage_rows = await conn.fetch("""
+            SELECT * FROM tac_stages WHERE task_id = $1 ORDER BY created_at
+        """, task_uuid)
+        logger.info(f"Found {len(stage_rows)} stages")
+
+        # Fetch helpers
+        logger.debug(f"Fetching helpers for task {task_uuid}")
+        helper_rows = await conn.fetch("""
+            SELECT * FROM tac_helper_agents WHERE task_id = $1 ORDER BY created_at
+        """, task_uuid)
+        logger.info(f"Found {len(helper_rows)} helpers")
+
+        # Fetch events
+        logger.debug(f"Fetching events for task {task_uuid}")
+        event_rows = await conn.fetch("""
+            SELECT * FROM tac_events WHERE task_id = $1 ORDER BY created_at DESC LIMIT 10
+        """, task_uuid)
+        logger.info(f"Found {len(event_rows)} events")
+
+    result = {
+        "task": dict(task_row),
+        "stages": [dict(row) for row in stage_rows],
+        "helpers": [dict(row) for row in helper_rows],
+        "event_count": len(event_rows),
+        "latest_events": [dict(row) for row in event_rows],
     }
+
+    logger.info(f"Successfully retrieved details for task {task_uuid}")
+    return result
 
 
 @app.get("/api/tasks/{task_id}/events")
@@ -167,7 +237,10 @@ async def get_active_tasks():
 @app.get("/api/stats")
 async def get_statistics():
     """Get overall system statistics"""
+    logger.info("GET /api/stats - Fetching system statistics")
+
     if not db:
+        logger.error("Database pool not initialized")
         raise HTTPException(status_code=500, detail="Database not connected")
 
     # Get aggregate statistics
@@ -183,15 +256,25 @@ async def get_statistics():
         FROM tac_tasks;
     """
 
-    stats_row = await db.pool.fetchrow(stats_query)
+    async with db.acquire() as conn:
+        logger.debug("Acquired connection from pool for statistics")
 
-    # Get helper count
-    helper_count_query = "SELECT COUNT(*)::int as helper_count FROM tac_helper_agents;"
-    helper_row = await db.pool.fetchrow(helper_count_query)
+        # Get task statistics
+        logger.debug("Fetching task statistics...")
+        stats_row = await conn.fetchrow(stats_query)
+        logger.info(f"Task stats: {stats_row['total_tasks']} total, {stats_row['running_tasks']} running")
 
-    # Get template count
-    template_count_query = "SELECT COUNT(*)::int as template_count FROM tac_agent_templates WHERE is_active = true;"
-    template_row = await db.pool.fetchrow(template_count_query)
+        # Get helper count
+        logger.debug("Fetching helper agent count...")
+        helper_count_query = "SELECT COUNT(*)::int as helper_count FROM tac_helper_agents;"
+        helper_row = await conn.fetchrow(helper_count_query)
+        logger.info(f"Helper agents: {helper_row['helper_count']}")
+
+        # Get template count
+        logger.debug("Fetching agent template count...")
+        template_count_query = "SELECT COUNT(*)::int as template_count FROM tac_agent_templates WHERE is_active = true;"
+        template_row = await conn.fetchrow(template_count_query)
+        logger.info(f"Active templates: {template_row['template_count']}")
 
     return {
         "tasks": {

@@ -516,8 +516,12 @@ Do NOT make code changes - only plan.
 
             return {'returncode': 1, 'tokens_input': 0, 'tokens_output': 0}
 
-        # Build CLI command
-        cmd = cli_provider.build_command(stage_prompt_file, stage_config.model, log_file)
+        # Build CLI command (convert to absolute paths)
+        cmd = cli_provider.build_command(
+            stage_prompt_file.resolve(),
+            stage_config.model,
+            log_file.resolve()
+        )
 
         logger.debug(f"Executing CLI command: {' '.join(cmd)}")
 

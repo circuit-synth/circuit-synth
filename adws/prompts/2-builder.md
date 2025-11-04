@@ -277,13 +277,13 @@ If the plan identifies upstream bugs:
 
 ```bash
 # 1. Create issue in upstream repo
-gh issue create --repo atopile/kicad-sch-api \
+gh issue create --repo circuit-synth/kicad-sch-api \
   --title "Bug: Position.to_dict() missing angle field" \
   --body "Root cause analysis: ..."
 
 # 2. Fix in upstream repo
 cd /tmp
-git clone https://github.com/atopile/kicad-sch-api.git
+git clone https://github.com/circuit-synth/kicad-sch-api.git
 cd kicad-sch-api
 # ... write test, implement fix, verify ...
 gh pr create --fill

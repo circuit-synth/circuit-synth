@@ -30,11 +30,11 @@ circuit-synth is a Python library that generates KiCad schematics programmatical
 - `src/circuit_synth/net.py` - Net/connection handling
 - `src/circuit_synth/subcircuit.py` - Subcircuit support
 
-**Dependencies we maintain:**
-- `kicad-sch-api` - KiCad schematic file API (we maintain this!)
-- `kicad-pcb-api` - KiCad PCB file API (we maintain this!)
+**Key Dependencies:**
+- `kicad-sch-api` - KiCad schematic file API (https://github.com/circuit-synth/kicad-sch-api)
+- `kicad-pcb-api` - KiCad PCB file API (https://github.com/circuit-synth/kicad-pcb-api)
 
-**IMPORTANT:** If you discover a bug in `kicad-sch-api` or `kicad-pcb-api`, you should fix it in that library instead of working around it in circuit-synth. These are our libraries too!
+**IMPORTANT:** If you discover a bug in `kicad-sch-api` or `kicad-pcb-api`, you should fix it in that library repository instead of working around it in circuit-synth. Don't paper over bugs!
 
 ---
 
@@ -107,13 +107,13 @@ circuit-synth is a Python library that generates KiCad schematics programmatical
 
 If you discover the root cause is in `kicad-sch-api` or `kicad-pcb-api`:
 
-1. **Create GitHub issue in the upstream repo:**
+1. **Create GitHub issue in the library repo:**
    ```bash
    # For kicad-sch-api issues:
-   gh issue create --repo atopile/kicad-sch-api --title "Bug: ..." --body "..."
+   gh issue create --repo circuit-synth/kicad-sch-api --title "Bug: ..." --body "..."
 
    # For kicad-pcb-api issues:
-   gh issue create --repo atopile/kicad-pcb-api --title "Bug: ..." --body "..."
+   gh issue create --repo circuit-synth/kicad-pcb-api --title "Bug: ..." --body "..."
    ```
 
 2. **Document in BLOCKED.md:**

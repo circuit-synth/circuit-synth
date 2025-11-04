@@ -1,10 +1,12 @@
 // TAC Dashboard Application
 
-const API_BASE = 'http://localhost:8001/api';
+const API_BASE = '/api';
 
 // State
 let currentView = 'tasks';
 let refreshInterval = null;
+let modalRefreshInterval = null;
+let currentTaskId = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -186,7 +188,7 @@ function renderTaskList(tasks, containerId) {
     }
 
     container.innerHTML = tasks.map(task => `
-        <div class="task-card" onclick="showTaskDetail('${task.task_id}')">
+        <div class="task-card" onclick="showTaskDetail('${task.id}')">
             <div class="task-header">
                 <div class="task-title">${task.issue_number}</div>
                 <div class="task-status ${task.status}">${task.status}</div>
@@ -219,19 +221,61 @@ async function showTaskDetail(taskId) {
     const modal = document.getElementById('task-modal');
     const modalBody = document.getElementById('modal-body');
 
+    // Store current task ID for refresh
+    currentTaskId = taskId;
+
+    // Clear any existing modal refresh interval
+    if (modalRefreshInterval) {
+        clearInterval(modalRefreshInterval);
+    }
+
     modal.classList.remove('hidden');
     modalBody.innerHTML = '<div class="loading">Loading task details...</div>';
 
+    // Load initial data
+    await refreshTaskDetail();
+
+    // Start auto-refresh every 3 seconds for running tasks
+    modalRefreshInterval = setInterval(async () => {
+        await refreshTaskDetail();
+    }, 3000);
+}
+
+async function refreshTaskDetail() {
+    if (!currentTaskId) return;
+
     try {
-        const data = await apiGet(`/tasks/${taskId}`);
+        const data = await apiGet(`/tasks/${currentTaskId}`);
         renderTaskDetail(data);
+
+        // If task is completed or errored, stop refreshing
+        if (data.task.status === 'completed' || data.task.status === 'errored') {
+            if (modalRefreshInterval) {
+                clearInterval(modalRefreshInterval);
+                modalRefreshInterval = null;
+            }
+        }
     } catch (error) {
+        const modalBody = document.getElementById('modal-body');
         modalBody.innerHTML = '<div class="loading">Error loading task details</div>';
+
+        // Stop refresh on error
+        if (modalRefreshInterval) {
+            clearInterval(modalRefreshInterval);
+            modalRefreshInterval = null;
+        }
     }
 }
 
 function closeTaskDetail() {
     document.getElementById('task-modal').classList.add('hidden');
+
+    // Clear modal refresh interval when closing
+    if (modalRefreshInterval) {
+        clearInterval(modalRefreshInterval);
+        modalRefreshInterval = null;
+    }
+    currentTaskId = null;
 }
 
 // Render Task Detail
@@ -241,19 +285,33 @@ function renderTaskDetail(data) {
     const modalTitle = document.getElementById('modal-title');
     const modalBody = document.getElementById('modal-body');
 
-    modalTitle.textContent = `Task: ${task.issue_number}`;
+    // Add refresh indicator for running tasks
+    const refreshIndicator = task.status === 'running'
+        ? ' <span style="font-size: 0.8em; opacity: 0.7; font-weight: normal;">(auto-updating every 3s)</span>'
+        : '';
+    modalTitle.innerHTML = `Task: ${task.issue_number}${refreshIndicator}`;
 
     modalBody.innerHTML = `
         <div class="detail-section">
             <div class="task-header">
-                <div class="task-title">${task.issue_number}</div>
+                <div class="task-title">
+                    <a href="https://github.com/circuit-synth/circuit-synth/issues/${task.issue_number.replace('gh-', '')}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                        ${task.issue_number}
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="opacity: 0.6;">
+                            <path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z"></path>
+                        </svg>
+                    </a>
+                </div>
                 <div class="task-status ${task.status}">${task.status}</div>
             </div>
 
             <div class="detail-grid">
                 <div class="meta-item">
                     <div class="meta-label">Task ID</div>
-                    <div class="meta-value">${task.task_id}</div>
+                    <div class="meta-value" style="font-size: 0.85em; word-break: break-all;">${task.id || 'N/A'}</div>
                 </div>
                 <div class="meta-item">
                     <div class="meta-label">Status</div>
@@ -423,4 +481,145 @@ function formatDateTime(dateString) {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleString();
+}
+
+// Conversations View
+let selectedConversationId = null;
+
+async function loadConversations() {
+    try {
+        // For now, we'll load conversations from helper agents and events
+        const helpers = await apiGet('/helpers');  // Will need this endpoint
+        renderConversationsList(helpers || []);
+    } catch (error) {
+        document.getElementById('conversations-sidebar').innerHTML = 
+            '<div class="loading">No conversations available yet</div>';
+    }
+}
+
+function renderConversationsList(conversations) {
+    const sidebar = document.getElementById('conversations-sidebar');
+    
+    if (conversations.length === 0) {
+        sidebar.innerHTML = `
+            <div class="empty-state">
+                <p>No conversations yet</p>
+                <p style="font-size: 0.9em; margin-top: 0.5rem;">
+                    Conversations will appear here when agents start working on tasks
+                </p>
+            </div>
+        `;
+        return;
+    }
+
+    sidebar.innerHTML = conversations.map(conv => `
+        <div class="conversation-item ${selectedConversationId === conv.id ? 'active' : ''}"
+             onclick="selectConversation('${conv.id}')">
+            <div class="conversation-header">
+                <div class="conversation-agent">${conv.agent_name}</div>
+                <div class="task-status ${conv.status}">${conv.status}</div>
+            </div>
+            <div class="conversation-meta">
+                <span>Task: ${conv.task_id}</span>
+                <span>Tokens: ${conv.input_tokens + conv.output_tokens}</span>
+                <span>Cost: $${conv.total_cost ? conv.total_cost.toFixed(6) : '0.000000'}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function selectConversation(conversationId) {
+    selectedConversationId = conversationId;
+
+    // Reload list to update active state
+    loadConversations();
+
+    // Load conversation details
+    const detailContainer = document.getElementById('conversation-detail');
+    detailContainer.innerHTML = '<div class="loading">Loading conversation...</div>';
+
+    try {
+        const conversation = await apiGet(`/conversations/${conversationId}`);
+        renderConversationDetail(conversation);
+    } catch (error) {
+        detailContainer.innerHTML = '<div class="loading">Error loading conversation</div>';
+    }
+}
+
+function renderConversationDetail(conversation) {
+    const detailContainer = document.getElementById('conversation-detail');
+
+    detailContainer.innerHTML = `
+        <div class="detail-section">
+            <h3>${conversation.agent_name}</h3>
+            <div class="detail-grid">
+                <div class="meta-item">
+                    <div class="meta-label">Status</div>
+                    <div class="meta-value">${conversation.status}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Model</div>
+                    <div class="meta-value">${conversation.model || 'N/A'}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Provider</div>
+                    <div class="meta-value">${conversation.provider || 'N/A'}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Total Cost</div>
+                    <div class="meta-value">$${conversation.total_cost ? conversation.total_cost.toFixed(6) : '0.000000'}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Input Tokens</div>
+                    <div class="meta-value">${conversation.input_tokens || 0}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Output Tokens</div>
+                    <div class="meta-value">${conversation.output_tokens || 0}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Messages (${conversation.messages ? conversation.messages.length : 0})</h3>
+            <div class="conversation-messages">
+                ${renderMessages(conversation.messages || [])}
+            </div>
+        </div>
+    `;
+}
+
+function renderMessages(messages, depth = 0) {
+    if (!messages || messages.length === 0) {
+        return '<div class="empty-state">No messages yet</div>';
+    }
+
+    return messages.map(msg => `
+        <div class="message ${msg.role}" style="margin-left: ${depth * 2}rem;">
+            <div class="message-header">
+                <span class="message-role">${msg.role}</span>
+                <span class="message-timestamp">${formatDateTime(msg.timestamp)}</span>
+            </div>
+            <div class="message-content">${escapeHtml(msg.content)}</div>
+            ${msg.input_tokens || msg.output_tokens ? `
+                <div class="message-tokens">
+                    ${msg.input_tokens ? `<span>In: ${msg.input_tokens}</span>` : ''}
+                    ${msg.output_tokens ? `<span>Out: ${msg.output_tokens}</span>` : ''}
+                    ${msg.cost ? `<span>Cost: $${msg.cost.toFixed(6)}</span>` : ''}
+                </div>
+            ` : ''}
+            ${msg.nested_conversations ? `
+                <div class="nested-conversation">
+                    <div class="nested-indicator">↳ Nested Helper Agent</div>
+                    ${renderMessages(msg.nested_conversations, depth + 1)}
+                </div>
+            ` : ''}
+        </div>
+    `).join('');
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
