@@ -22,9 +22,9 @@
 ### Component CRUD - Root Sheet (4 tests)
 
 - [x] **Test 01**: Create component on root sheet - `component_crud_root/01_sync_component_root_create/` ✅ **Verified 2025-11-02** - R2 added with correct instance data (#479), labels, and power symbols (#489)
-- [ ] **Test 02**: Update component value on root sheet - `component_crud_root/02_sync_component_root_update_value/`
+- [x] **Test 02**: Update component value on root sheet - `component_crud_root/02_sync_component_root_update_value/` ✅ **Verified 2025-11-03** - Value changes (10k→47k) preserve positions and other properties correctly
 - [x] **Test 03**: Update component reference on root sheet - `component_crud_root/03_sync_component_root_update_ref/` ✅ **Verified 2025-11-03** - Reference rename (R1→R3), position changes, and value changes all work correctly. Rotation issues tracked in #517, #518
-- [ ] **Test 04**: Delete component from root sheet - `component_crud_root/04_sync_component_root_delete/`
+- [x] **Test 04**: Delete component from root sheet - `component_crud_root/04_sync_component_root_delete/` ✅ **Verified 2025-11-03** - Component deletion with position preservation tests added
 
 ### Net CRUD - Root Sheet (4 tests)
 
@@ -152,10 +152,10 @@
 ## 📊 Testing Progress Summary
 
 **Total Tests:** 71
-**Tests Verified:** 2 / 71
+**Tests Verified:** 4 / 71
 
 ### Progress by Category:
-- Component CRUD Root: 2 / 4
+- Component CRUD Root: 4 / 4 ✅ COMPLETE!
 - Net CRUD Root: ___ / 4
 - Component CRUD Hier: ___ / 4
 - Net CRUD Hier: ___ / 4
