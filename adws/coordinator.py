@@ -31,6 +31,9 @@ from adw_modules.error_handling import (
 # Import API logging
 from adw_modules.api_logger import ClaudeAPILogger
 
+# Import multi-stage worker
+from adw_modules.multi_stage_worker import MultiStageWorker
+
 # Configuration paths
 SCRIPT_DIR = Path(__file__).parent
 REPO_ROOT = SCRIPT_DIR.parent
@@ -702,53 +705,74 @@ class Coordinator:
             print(f"   ✓ Worktree removed")
 
     def spawn_worker(self, task: Task):
-        """Spawn LLM worker agent (non-blocking)"""
+        """Spawn multi-stage TAC-X pipeline (non-blocking)"""
 
-        # Build prompt from template
-        template = WORKER_TEMPLATE.read_text()
-        prompt = template.format(
+        print(f"🤖 Spawning TAC-X pipeline for {task.id}")
+
+        # Create multi-stage worker
+        worker = MultiStageWorker(
             task_id=task.id,
-            source=task.source,
-            priority=f"p{task.priority}",
-            description=task.description,
-            worktree_path=str(task.tree_path),
+            issue_number=task.number,
+            worktree_path=task.tree_path,
             branch_name=task.branch_name,
-            worker_id=task.worker_id,
-            issue_number=task.number
+            llm_config=self.config['llm'],
+            api_logger=self.api_logger
         )
 
-        # Write prompt to file
-        prompt_file = LOGS_DIR / f"{task.id}-prompt.txt"
-        prompt_file.write_text(prompt)
+        # Run pipeline in subprocess (non-blocking)
+        # We'll use a simple wrapper script
+        wrapper_script = task.tree_path / ".tac" / "run_pipeline.py"
+        wrapper_script.parent.mkdir(exist_ok=True, parents=True)
 
-        # Start API call tracking
-        task.api_call_metrics = self.api_logger.start_call(
-            task_id=task.id,
-            worker_id=task.worker_id,
-            model=self.config['llm']['model_default'],
-            prompt_file=str(prompt_file),
-            prompt_content=prompt,
-            settings={'source': task.source, 'priority': task.priority}
-        )
+        wrapper_content = f'''#!/usr/bin/env python3
+"""TAC-X Pipeline Runner - Auto-generated"""
+import sys
+from pathlib import Path
 
-        # Build LLM command from config
-        cmd_template = self.config['llm']['command_template']
-        model = self.config['llm']['model_default']
+# Add adws modules to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "adws"))
 
-        cmd = [
-            part.replace('{prompt_file}', str(prompt_file))
-                .replace('{model}', model)
-            for part in cmd_template
-        ]
+from adw_modules.multi_stage_worker import MultiStageWorker
+from adw_modules.api_logger import ClaudeAPILogger
+import tomllib
 
-        print(f"🤖 Spawning worker for {task.id}")
-        print(f"   Command: {' '.join(cmd)}")
+# Load config
+config_file = Path(__file__).parent.parent.parent / "adws" / "config.toml"
+with open(config_file, "rb") as f:
+    config = tomllib.load(f)
 
-        # Spawn worker (non-blocking)
+# Create API logger
+api_logger = ClaudeAPILogger(Path(__file__).parent.parent.parent / "logs" / "api")
+
+# Create and run worker
+worker = MultiStageWorker(
+    task_id="{task.id}",
+    issue_number="{task.number}",
+    worktree_path=Path("{task.tree_path}"),
+    branch_name="{task.branch_name}",
+    llm_config=config['llm'],
+    api_logger=api_logger
+)
+
+try:
+    result = worker.run()
+    print(f"\\nPipeline completed with status: {{result.status}}")
+    sys.exit(0 if result.status == 'completed' else 1)
+except Exception as e:
+    print(f"\\nPipeline failed: {{e}}")
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)
+'''
+
+        wrapper_script.write_text(wrapper_content)
+        wrapper_script.chmod(0o755)
+
+        # Spawn pipeline runner
         log_file = LOGS_DIR / f"{task.id}.jsonl"
         with open(log_file, 'w') as f:
             proc = subprocess.Popen(
-                cmd,
+                ["python3", str(wrapper_script)],
                 cwd=task.tree_path,
                 stdout=f,
                 stderr=subprocess.STDOUT
@@ -758,7 +782,8 @@ class Coordinator:
         task.pid = proc.pid
         task.started = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        print(f"   ✓ Worker {task.worker_id} started (PID: {proc.pid})")
+        print(f"   ✓ TAC-X Pipeline {task.worker_id} started (PID: {proc.pid})")
+        print(f"   📋 Stages: Planning → Building → Reviewing → PR Creation")
 
     def check_completions(self, tasks: List[Task]) -> List[Task]:
         """Check if active workers have completed
