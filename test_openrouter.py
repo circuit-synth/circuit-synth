@@ -29,9 +29,10 @@ def test_openrouter():
     try:
         provider = ProviderRegistry.create(
             provider="openrouter",
-            model="anthropic/claude-3.5-sonnet"
+            model="google/gemini-2.5-flash"
         )
         print(f"   ✓ Provider created: {provider.__class__.__name__}")
+        print(f"   Model: google/gemini-2.5-flash (via OpenRouter)")
     except Exception as e:
         print(f"   ❌ Failed to create provider: {e}")
         return False
@@ -61,14 +62,9 @@ def test_openrouter():
         return False
 
     # Test 3: Different model
-    print("\n3. Testing different model (Claude Haiku via OpenRouter)...")
+    print("\n3. Testing another prompt with same model...")
     try:
-        provider2 = ProviderRegistry.create(
-            provider="openrouter",
-            model="anthropic/claude-3-haiku"
-        )
-
-        response2 = provider2.invoke(
+        response2 = provider.invoke(
             prompt="What is 2+2? Answer with just the number.",
             temperature=0.0,
             max_tokens=10
@@ -95,25 +91,25 @@ def test_workflow_with_openrouter():
     print("\n🧪 Testing Workflow Configuration with OpenRouter")
     print("=" * 60)
 
-    # Create workflow with OpenRouter
+    # Create workflow with OpenRouter using Gemini 2.5 Flash
     workflow = WorkflowConfig(
-        name="OpenRouter Test Workflow",
+        name="OpenRouter Gemini Test Workflow",
         version="1.0.0",
-        description="Test workflow using OpenRouter",
+        description="Test workflow using Google Gemini 2.5 Flash via OpenRouter",
         stages=[
             StageConfig(
                 name="planning",
                 agent="planner",
                 provider="openrouter",
-                model="anthropic/claude-3.5-sonnet",
-                fallback="anthropic/claude-3-opus",
+                model="google/gemini-2.5-flash",
+                fallback="anthropic/claude-3-haiku",
                 temperature=1.0
             ),
             StageConfig(
                 name="building",
                 agent="builder",
                 provider="openrouter",
-                model="anthropic/claude-3.5-sonnet",
+                model="google/gemini-2.5-flash",
                 temperature=1.0
             ),
         ]
