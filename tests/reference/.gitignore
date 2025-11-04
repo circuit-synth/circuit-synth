@@ -1,0 +1,11 @@
+# Ignore generated KiCad projects
+*/rotation_*/
+*/comprehensive_root/
+*/*.kicad_*
+*/*.kicad_pro
+*/*.kicad_sch
+*/*.kicad_pcb
+
+# Keep the Python source files
+!*.py
+!*.md

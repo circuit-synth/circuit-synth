@@ -332,6 +332,7 @@ dependencies = [
     { name = "beautifulsoup4" },
     { name = "cachetools" },
     { name = "click" },
+    { name = "fastapi" },
     { name = "kicad-pcb-api" },
     { name = "kicad-sch-api" },
     { name = "loguru" },
@@ -351,6 +352,7 @@ dependencies = [
     { name = "scipy" },
     { name = "sexpdata" },
     { name = "twine" },
+    { name = "uvicorn" },
 ]
 
 [package.optional-dependencies]
@@ -409,6 +411,7 @@ requires-dist = [
     { name = "cachetools", specifier = ">=5.3.0" },
     { name = "claude-code-sdk", marker = "extra == 'claude'", specifier = ">=0.0.17" },
     { name = "click", specifier = ">=8.0.0" },
+    { name = "fastapi", specifier = ">=0.100.0" },
     { name = "flake8", marker = "extra == 'dev'", specifier = ">=4.0.0" },
     { name = "google-adk", marker = "extra == 'fast-generation'", specifier = ">=0.1.0" },
     { name = "hypothesis", marker = "extra == 'test'", specifier = ">=6.0.0" },
@@ -443,6 +446,7 @@ requires-dist = [
     { name = "sexpdata", specifier = ">=0.0.3" },
     { name = "twine", specifier = ">=6.1.0" },
     { name = "types-pyyaml", marker = "extra == 'dev'", specifier = ">=6.0.0" },
+    { name = "uvicorn", specifier = ">=0.20.0" },
 ]
 provides-extras = ["dev", "claude", "fast-generation", "test"]
 
