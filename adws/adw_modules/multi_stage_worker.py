@@ -8,15 +8,22 @@ Manages sequential execution of TAC-X pipeline stages:
 3. Reviewing - Quality assessment and approval
 4. PR Creation - Create GitHub PR
 
-Each stage runs as a separate Claude invocation with fresh, minimal context.
+Each stage runs as a separate LLM invocation with fresh, minimal context.
+Supports multiple LLM providers (Anthropic, OpenAI, etc.) via provider abstraction.
 """
 
 import subprocess
 import json
+import logging
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Any, Optional
 from dataclasses import dataclass, field
+
+from .llm_providers import ProviderRegistry, LLMProvider, LLMResponse
+from .workflow_config import WorkflowConfig, StageConfig, create_default_workflow
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -52,13 +59,17 @@ class MultiStageWorker:
     """Orchestrates multi-stage autonomous pipeline"""
 
     def __init__(self, task_id: str, issue_number: str, worktree_path: Path,
-                 branch_name: str, llm_config: Dict[str, Any], api_logger):
+                 branch_name: str, llm_config: Dict[str, Any], api_logger,
+                 workflow_config: Optional[WorkflowConfig] = None):
         self.task_id = task_id
         self.issue_number = issue_number
         self.worktree_path = Path(worktree_path)
         self.branch_name = branch_name
         self.llm_config = llm_config
         self.api_logger = api_logger
+
+        # Load or use default workflow configuration
+        self.workflow = workflow_config or create_default_workflow()
 
         # Create .tac directory structure
         self.tac_dir = self.worktree_path / ".tac"
@@ -68,6 +79,16 @@ class MultiStageWorker:
         self.tac_dir.mkdir(exist_ok=True)
         self.stages_dir.mkdir(exist_ok=True)
         self.outputs_dir.mkdir(exist_ok=True)
+
+        # Save workflow configuration for inspection
+        workflow_file = self.tac_dir / "workflow.yaml"
+        if not workflow_file.exists():
+            self.workflow.to_yaml(workflow_file)
+
+        # Generate and save Mermaid diagram
+        diagram_file = self.tac_dir / "workflow-diagram.md"
+        if not diagram_file.exists():
+            diagram_file.write_text(f"# Workflow Diagram\n\n```mermaid\n{self.workflow.to_mermaid()}\n```\n")
 
         # Load or init state
         self.state = self.load_or_init_state()
@@ -454,7 +475,12 @@ Do NOT make code changes - only plan.
         return context_file
 
     def invoke_agent(self, stage: str, prompt_file: Path, context_vars: Dict[str, str]) -> Dict[str, Any]:
-        """Invoke Claude for a specific stage with fresh context"""
+        """Invoke LLM for a specific stage with fresh context"""
+
+        # Get stage config from workflow
+        stage_config = self.workflow.get_stage(stage)
+        if not stage_config:
+            raise ValueError(f"Stage '{stage}' not found in workflow configuration")
 
         # Substitute variables in prompt
         prompt_content = prompt_file.read_text()
@@ -468,45 +494,128 @@ Do NOT make code changes - only plan.
         # Prepare log file
         log_file = self.stages_dir / f"{stage}.jsonl"
 
-        # Build command
-        cmd = [
-            "claude",
-            "-p", str(stage_prompt_file),
-            "--output-format", "jsonl"
-        ]
+        # Extract system prompt from frontmatter if exists
+        system_prompt = self._extract_system_prompt(prompt_content)
 
-        print(f"   Running: claude -p {stage_prompt_file.name}")
+        # Try primary provider
+        logger.info(f"Invoking {stage_config.provider}/{stage_config.model} for stage '{stage}'")
+        print(f"   Running: {stage_config.provider}/{stage_config.model}")
 
-        # Run agent
-        with open(log_file, 'w') as f:
-            proc = subprocess.run(
-                cmd,
-                cwd=self.worktree_path,
-                stdout=f,
-                stderr=subprocess.STDOUT,
-                timeout=3600  # 1 hour timeout
+        provider = None
+        response = None
+        success = False
+
+        try:
+            # Create provider
+            provider = ProviderRegistry.create(
+                provider=stage_config.provider,
+                model=stage_config.model
             )
 
-        # Parse tokens from JSONL
-        tokens_input = 0
-        tokens_output = 0
+            # Invoke LLM
+            response = provider.invoke(
+                prompt=prompt_content,
+                system_prompt=system_prompt,
+                temperature=stage_config.temperature,
+                max_tokens=stage_config.max_tokens
+            )
 
-        if log_file.exists():
-            with open(log_file) as f:
-                for line in f:
+            success = response.success
+
+            # Log response to JSONL
+            self._log_response(log_file, response, stage_config)
+
+        except Exception as e:
+            logger.error(f"Primary provider failed: {e}")
+            print(f"   ⚠️  Primary provider failed: {e}")
+
+            # Try fallback if configured
+            if stage_config.fallback:
+                fallback_parts = stage_config.get_fallback_parts()
+                if fallback_parts:
+                    fallback_provider, fallback_model = fallback_parts
+                    logger.info(f"Trying fallback: {fallback_provider}/{fallback_model}")
+                    print(f"   Trying fallback: {fallback_provider}/{fallback_model}")
+
                     try:
-                        event = json.loads(line)
-                        if event.get('type') == 'usage':
-                            tokens_input = event.get('input_tokens', 0)
-                            tokens_output = event.get('output_tokens', 0)
-                    except json.JSONDecodeError:
-                        continue
+                        provider = ProviderRegistry.create(
+                            provider=fallback_provider,
+                            model=fallback_model
+                        )
+
+                        response = provider.invoke(
+                            prompt=prompt_content,
+                            system_prompt=system_prompt,
+                            temperature=stage_config.temperature,
+                            max_tokens=stage_config.max_tokens
+                        )
+
+                        success = response.success
+                        self._log_response(log_file, response, stage_config, is_fallback=True)
+
+                    except Exception as fallback_error:
+                        logger.error(f"Fallback provider also failed: {fallback_error}")
+                        print(f"   ❌ Fallback provider also failed: {fallback_error}")
+
+        # Return result
+        if not success or not response:
+            return {
+                'returncode': 1,
+                'tokens_input': 0,
+                'tokens_output': 0
+            }
 
         return {
-            'returncode': proc.returncode,
-            'tokens_input': tokens_input,
-            'tokens_output': tokens_output
+            'returncode': 0,
+            'tokens_input': response.usage['input_tokens'],
+            'tokens_output': response.usage['output_tokens']
         }
+
+    def _extract_system_prompt(self, prompt_content: str) -> Optional[str]:
+        """Extract system prompt from YAML frontmatter if exists"""
+        # Simple extraction - look for YAML frontmatter and purpose field
+        if prompt_content.startswith("---"):
+            lines = prompt_content.split("\n")
+            in_frontmatter = True
+            for i, line in enumerate(lines[1:], 1):
+                if line.strip() == "---":
+                    # End of frontmatter
+                    break
+                if line.startswith("purpose:"):
+                    purpose = line.split(":", 1)[1].strip().strip('"')
+                    return purpose
+        return None
+
+    def _log_response(self, log_file: Path, response: LLMResponse,
+                     stage_config: StageConfig, is_fallback: bool = False):
+        """Log LLM response to JSONL file"""
+        with open(log_file, 'a') as f:
+            # Log metadata
+            metadata = {
+                'type': 'metadata',
+                'provider': response.provider,
+                'model': response.model,
+                'is_fallback': is_fallback,
+                'timestamp': datetime.now().isoformat()
+            }
+            f.write(json.dumps(metadata) + "\n")
+
+            # Log usage
+            usage = {
+                'type': 'usage',
+                'input_tokens': response.usage['input_tokens'],
+                'output_tokens': response.usage['output_tokens']
+            }
+            f.write(json.dumps(usage) + "\n")
+
+            # Log response content
+            content_log = {
+                'type': 'response',
+                'content': response.content,
+                'success': response.success,
+                'error': response.error
+            }
+            f.write(json.dumps(content_log) + "\n")
 
     def _fetch_github_issue(self) -> Dict[str, str]:
         """Fetch GitHub issue details"""
