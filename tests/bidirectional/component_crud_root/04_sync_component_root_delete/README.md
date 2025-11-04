@@ -53,17 +53,36 @@ open comprehensive_root/comprehensive_root.kicad_pro
 #   ✅ DATA label present
 ```
 
-## Automated Test
+## Automated Tests
 
 ```bash
+# Test basic deletion
+pytest test_delete_component.py::test_13_delete_component -v
+
+# Test deletion with moved components (position preservation)
+pytest test_delete_component.py::test_13b_delete_with_moved_components -v
+
+# Run all tests
 pytest test_delete_component.py -v
 ```
 
-## Expected Result
+## Expected Results
 
+### Test 13: Basic Deletion
 - ✅ Initial: R1(10k), R2(4.7k), C1(100nF)
 - ✅ After delete: R1(10k), C1(100nF)
 - ✅ R1 position unchanged
 - ✅ C1 position unchanged
 - ✅ Power symbols and labels preserved
 - ✅ Component count: 3 → 2
+
+### Test 13b: Deletion with Moved Components
+- ✅ Initial: R1, R2, C1 at default positions
+- ✅ Move R1 to (50.8, 50.8) and C1 to (100.0, 60.0)
+- ✅ Delete R2 in Python code
+- ✅ Regenerate circuit
+- ✅ **CRITICAL**: R1 and C1 remain at their MOVED positions
+- ✅ Position preservation works correctly!
+
+**Note:** Rotation preservation not tested here due to known issues (#517, #518).
+Only position (X,Y) changes are tested, which work correctly.
