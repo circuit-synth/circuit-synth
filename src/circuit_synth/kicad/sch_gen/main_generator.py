@@ -714,8 +714,10 @@ class SchematicGenerator:
                 traceback.print_exc()
                 print("=" * 80 + "\n")
                 logger.error(f"❌ Update failed: {e}")
-                logger.error("   Falling back to regeneration...")
-                # Fall through to regeneration
+                logger.error("   ABORTING to preserve existing schematic.")
+                logger.error("   Fix the error and try again, or use force_regenerate=True to start fresh.")
+                # Re-raise the exception to abort instead of falling back to regeneration
+                raise
 
         elif project_exists and force_regenerate:
             # User explicitly wants to regenerate
