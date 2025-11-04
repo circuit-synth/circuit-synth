@@ -61,25 +61,47 @@ class APICallMetrics:
 class ClaudeAPILogger:
     """Logger for Claude API calls with comprehensive metrics"""
 
-    # Cost per million tokens (approximate, as of 2025)
-    COST_PER_MILLION_TOKENS = {
-        'claude-sonnet-4-5': {'input': 3.0, 'output': 15.0},
-        'claude-opus-4': {'input': 15.0, 'output': 75.0},
-        'claude-haiku-4': {'input': 0.25, 'output': 1.25},
-    }
-
-    def __init__(self, log_dir: Path):
+    def __init__(self, log_dir: Path, model_catalog: Optional[list] = None):
         """Initialize logger
 
         Args:
             log_dir: Directory to store logs
+            model_catalog: List of model dicts from config (optional)
         """
         self.log_dir = Path(log_dir)
         self.log_dir.mkdir(exist_ok=True)
 
+        # Build cost table from catalog (or use defaults)
+        if model_catalog:
+            self.cost_table = self._build_cost_table(model_catalog)
+        else:
+            # Fallback to hardcoded costs if no catalog provided
+            self.cost_table = {
+                'claude-sonnet-4-5': {'input': 3.0, 'output': 15.0},
+                'claude-opus-4': {'input': 15.0, 'output': 75.0},
+                'claude-haiku-4': {'input': 0.25, 'output': 1.25},
+            }
+
         # Daily log file
         today = datetime.now().strftime('%Y-%m-%d')
         self.log_file = self.log_dir / f"api-calls-{today}.jsonl"
+
+    def _build_cost_table(self, catalog: list) -> dict:
+        """Build cost lookup table from model catalog
+
+        Args:
+            catalog: List of model dicts with name, cost_per_million_input, cost_per_million_output
+
+        Returns:
+            Dict mapping model name to input/output costs
+        """
+        cost_table = {}
+        for model in catalog:
+            cost_table[model['name']] = {
+                'input': model.get('cost_per_million_input', 0.0),
+                'output': model.get('cost_per_million_output', 0.0)
+            }
+        return cost_table
 
     def start_call(self, task_id: Optional[str], worker_id: Optional[str],
                    model: str, prompt_file: Optional[str],
@@ -166,10 +188,10 @@ class ClaudeAPILogger:
         Returns:
             Estimated cost in USD
         """
-        if model not in self.COST_PER_MILLION_TOKENS:
+        if model not in self.cost_table:
             return 0.0
 
-        rates = self.COST_PER_MILLION_TOKENS[model]
+        rates = self.cost_table[model]
         cost_input = (tokens_input / 1_000_000) * rates['input']
         cost_output = (tokens_output / 1_000_000) * rates['output']
 
