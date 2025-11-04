@@ -121,17 +121,29 @@ Logs are your development tool. Use them to understand behavior, not to guess.
 
 ### Strategic Logging Pattern
 
+Follow standard Python logging best practices. **No emojis in logs.**
+
 ```python
 # Temporary investigation logs (remove after understanding)
-# Mark with 🔍 emoji so they're easy to find and remove
-logger.debug(f"🔍 CYCLE {n}: Investigating {variable_name} = {value}")
+logger.debug(f"CYCLE {n}: Investigating {variable_name} = {value}")
+logger.debug(f"CYCLE {n}: Function entry with args: {args}")
+logger.debug(f"CYCLE {n}: Branch taken: {branch_info}")
 
 # Permanent operational logs (keep)
 # These provide production insight and debugging capability
 logger.info(f"Generated netlist for {circuit.name}")
 logger.debug(f"Selected footprint {footprint} for {component.reference}")
 logger.warning(f"Component {ref} missing footprint, using default")
+logger.error(f"Failed to validate {ref}: {error}")
 ```
+
+**Log Levels:**
+- **DEBUG:** Development insights, detailed state inspection
+- **INFO:** Important state transitions, user-visible operations
+- **WARNING:** Recoverable issues, deprecated API usage
+- **ERROR:** Failures, exceptions that need attention
+
+**Professional, parseable output only.**
 
 ### Context Window Management
 
@@ -152,11 +164,12 @@ logger = logging.getLogger('circuit_synth.components')
 
 ### Log Categories
 
-**Temporary Investigation Logs (🔍 - Remove After Understanding)**
-- Variable state inspection: `logger.debug(f"🔍 {var} = {value}")`
-- Control flow tracing: `logger.debug(f"🔍 → entering function X")`
-- Data structure dumps: `logger.debug(f"🔍 dict keys: {dict.keys()}")`
+**Temporary Investigation Logs (Remove After Understanding)**
+- Variable state inspection: `logger.debug(f"CYCLE {n}: {var} = {value}")`
+- Control flow tracing: `logger.debug(f"CYCLE {n}: Entering function {func_name}")`
+- Data structure dumps: `logger.debug(f"CYCLE {n}: Dict keys: {dict.keys()}")`
 - "Why is this happening?" logs
+- Hypothesis testing logs
 
 **Permanent Operational Logs (Keep)**
 - Important state transitions: `logger.info(f"Created circuit {name}")`
@@ -165,11 +178,13 @@ logger = logging.getLogger('circuit_synth.components')
 - Warnings: `logger.warning(f"Deprecated API usage: {old_api}")`
 - Performance metrics: `logger.debug(f"Netlist generation took {ms}ms")`
 
+**No emojis, symbols, or decorative characters in logs. Professional output only.**
+
 ### Claude's Behavior During Cycles
 
 When investigating or developing:
 
-1. **Add strategic logs** - 🔍 mark temporary investigation logs
+1. **Add strategic logs** - Mark with "CYCLE N:" prefix for easy cleanup
 2. **Run immediately** - Don't wait, test right away
 3. **Report observations** - Share what logs showed
 4. **Propose hypothesis** - What does this tell us?
@@ -184,6 +199,8 @@ Logs showed component.pins is empty list.
 Hypothesis: pins aren't being loaded from component library.
 Next cycle: Add logs to library loading function.
 ```
+
+**Track cycle metrics:** Time per cycle, observations, hypotheses tested.
 
 ---
 
