@@ -25,6 +25,45 @@ Having reference material enables:
 
 **This cuts development time by 10x in many cases.**
 
+## Critical Use Case: Cooperative Debugging
+
+**This command is ESSENTIAL for debugging visual/KiCad bugs.**
+
+### The Problem
+
+Visual bugs (component positioning, rotation, text placement) **cannot be reliably tested programmatically**. You might check that rotation=90°, but miss that text is sideways.
+
+### The Solution
+
+1. **Create reference** with this command
+2. **User manipulates** in KiCad (rotate, move, etc.)
+3. **Trigger bug** by syncing changes
+4. **User visually confirms** what's wrong
+5. **Compare KiCad files** before/after to find root cause
+
+### Real Example: Issue #514
+
+\`\`\`bash
+User: /dev:test-ref "we need to make a reference kicad project to test against for this issue"
+
+Agent: Creates rotation_90.py, generates circuit
+
+User: Opens in KiCad, rotates R1 to 90°, saves
+
+Agent: Changes value in code, runs sync
+
+User: "R1 and 47k are sideways" [provides screenshot]
+
+Agent: Compares schematic files, finds text positions reset
+        → Fix: Apply rotation transform to text offsets
+        → Test with user verification at 90°, 180°, 270°
+        → User: "perfect!" ✅
+\`\`\`
+
+**Without this methodology:** Would have closed issue as "working" based on programmatic checks alone.
+
+**With this methodology:** Found and fixed the real bug in 90 minutes.
+
 ## How It Works
 
 The agent helps by:

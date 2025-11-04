@@ -118,6 +118,102 @@ logging.getLogger('circuit_synth.components').setLevel(logging.DEBUG)
 logger = logging.getLogger('circuit_synth.components')
 ```
 
+## Reference Project Methodology (For Visual/KiCad Bugs)
+
+For bugs involving visual output, component positioning, rotation, or KiCad rendering:
+
+### The Cooperative Debugging Pattern
+
+**Key principle:** Don't trust programmatic checks for visual bugs. Use human verification.
+
+### Workflow
+
+1. **Generate Reference Project**
+   ```bash
+   # Create minimal test circuit
+   mkdir -p tests/reference/bug-name
+   # Generate simple circuit with circuit-synth
+   ```
+
+2. **User Manipulates in KiCad**
+   - Open in KiCad
+   - User performs manual actions (rotate, move, etc.)
+   - User saves changes
+   - **User confirms state**: "done"
+
+3. **Trigger Bug with Code Change**
+   - Modify Python circuit (change value, ref, etc.)
+   - Run sync
+   - Open in KiCad again
+
+4. **User Visual Verification**
+   - **Don't check programmatically** (might miss visual issues)
+   - User opens KiCad and reports what they see
+   - User provides screenshots if needed
+   - User confirms: "text is sideways" or "looks correct"
+
+5. **Compare States**
+   - Check KiCad schematic file before/after
+   - Use \`grep\` to compare text positions
+   - Log actual vs expected values
+   - Identify what changed incorrectly
+
+6. **Implement Fix**
+   - Make changes based on comparison
+   - Repeat steps 1-5 to verify fix
+
+### Real Example: Issue #514 (Component Text Rotation)
+
+\`\`\`bash
+# Step 1: Generate reference
+cd tests/reference/rotation-preservation
+uv run python3 rotation_90.py
+
+# Step 2: User rotates R1 to 90° in KiCad
+# User: "done"
+
+# Step 3: Check what KiCad did
+grep -A 20 'property "Reference" "R1"' rotation_90/rotation_90.kicad_sch
+# Reference at (31.75, 35.56, 0) ← KiCad's correct positioning
+
+# Step 4: Trigger sync by changing value
+# Edit rotation_90.py: value="10k" → value="47k"
+uv run python3 rotation_90.py
+
+# Step 5: User verifies
+# User opens KiCad and reports: "R1 and 47k are sideways"
+
+# Step 6: Check what we generated
+grep -A 20 'property "Reference" "R1"' rotation_90/rotation_90.kicad_sch
+# Reference at (34.29, 40.64, 0) ← WRONG! Positions reset
+
+# Step 7: Compare and identify issue
+# KiCad correct: (31.75, 35.56) - adjusted for 90° rotation
+# Our output:    (34.29, 40.64) - using 0° defaults
+# → Root cause: Not applying rotation transform to offsets
+
+# Step 8: Fix and verify
+# Implement rotation transform
+# Repeat steps 3-5 with user confirmation
+# User: "looks good" ✓
+\`\`\`
+
+### Why This Works
+
+- **Visual bugs require visual verification** - programmatic checks can be wrong
+- **KiCad is ground truth** - it knows correct positioning/rendering
+- **User confirmation** prevents false positives
+- **Iterative refinement** catches edge cases (90°, 180°, 270°)
+- **Reference files** enable before/after comparison
+
+### When to Use This
+
+- Component positioning issues
+- Rotation/orientation bugs
+- Text field placement
+- Visual rendering issues
+- Any bug where "looks wrong in KiCad" is the symptom
+
 ## kicad-sch-api / kicad-pcb-api Context
 
 **Remember:** We maintain kicad-sch-api and kicad-pcb-api.
