@@ -109,6 +109,7 @@ class TACWorkerAdapter:
         database: TACDatabase,
         workflow_config: Optional[WorkflowConfig] = None,
         task_metadata: Optional[Dict[str, Any]] = None,
+        full_config: Optional[Dict] = None,
     ) -> "TACWorkerAdapter":
         """
         Create a new TAC worker adapter with database tracking.
@@ -167,6 +168,7 @@ class TACWorkerAdapter:
             llm_config=llm_config,
             api_logger=api_logger,
             workflow_config=workflow_config,
+            full_config=full_config or {},
         )
 
         # Return adapter
@@ -295,27 +297,44 @@ class TACWorkerAdapter:
             # Get stages from workflow
             stages = ["planning", "building", "reviewing", "pr_creation"]
 
-            # Execute each stage with tracking
+            # Execute the full pipeline via MultiStageWorker
+            logger.info("Executing MultiStageWorker pipeline...")
+
+            # Run the multi-stage worker (this is synchronous)
+            import asyncio
+            loop = asyncio.get_event_loop()
+            pipeline_state = await loop.run_in_executor(None, self.worker.run)
+
+            logger.info(f"Pipeline completed with status: {pipeline_state.status}")
+
+            # Log each stage result to database
+            stage_methods = {
+                "planning": "planner",
+                "building": "builder",
+                "reviewing": "reviewer",
+                "pr_creation": "pr_creator",
+            }
+
             for stage_name in stages:
                 # Log stage start
                 stage_id = await self.log_stage_start(stage_name)
 
-                # Execute stage (placeholder - actual execution would call worker)
-                # For now, create a placeholder result
-                # TODO: Actually execute stage via MultiStageWorker
-
-                logger.info(f"Stage {stage_name} execution (placeholder)")
-
-                # Simulate stage result
-                result = StageResult(
-                    stage_name=stage_name,
-                    success=True,
-                    started_at="",
-                    completed_at="",
-                    output_file=f".tac/outputs/{stage_name}.md",
-                    tokens_input=100,
-                    tokens_output=50,
-                )
+                # Get the stage result from pipeline_state
+                stage_key = stage_methods.get(stage_name)
+                if stage_key and hasattr(pipeline_state, stage_key):
+                    result = getattr(pipeline_state, stage_key)
+                else:
+                    # Fallback for missing results
+                    result = StageResult(
+                        stage_name=stage_name,
+                        success=False,
+                        started_at="",
+                        completed_at="",
+                        output_file="",
+                        tokens_input=0,
+                        tokens_output=0,
+                        error="Stage result not found in pipeline state",
+                    )
 
                 # Log stage completion
                 await self.log_stage_completion(stage_id, result)

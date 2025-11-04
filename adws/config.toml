@@ -10,11 +10,12 @@ repo_owner = "circuit-synth"
 repo_name = "circuit-synth"
 issue_label = "rpi-auto"  # Only process issues with this label
 
-[llm]
-# LLM CLI configuration - interchangeable!
-provider = "claude"
+# ============================================================================
+# PROVIDERS - CLI-based AI provider configurations
+# ============================================================================
 
-# Command template (use {prompt_file} and {model} placeholders)
+[providers.claude-cli]
+enabled = true
 command_template = [
     "claude",
     "-p", "{prompt_file}",
@@ -24,6 +25,21 @@ command_template = [
     "--dangerously-skip-permissions"
 ]
 
+[providers.openrouter]
+enabled = true
+requires_api_key = true
+api_key_env = "OPENROUTER_API_KEY"
+command_template = [
+    "tools/openrouter-cli.py",
+    "-p", "{prompt_file}",
+    "--model", "{model}",
+    "--output-file", "{output_file}",
+    "--output-format", "stream-json"
+]
+
+[llm]
+# Default provider and model
+provider = "claude-cli"
 model_default = "claude-sonnet-4-5"
 
 [worktree]

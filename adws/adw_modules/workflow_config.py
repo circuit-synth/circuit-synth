@@ -39,11 +39,11 @@ class StageConfig:
             provider, model = self.fallback.split("/", 1)
             return provider, model
 
-        # Infer provider
+        # Infer provider - use CLI providers by default
         if "claude" in self.fallback.lower():
-            return "anthropic", self.fallback
+            return "claude-cli", self.fallback
         elif "gpt" in self.fallback.lower():
-            return "openai", self.fallback
+            return "openrouter", self.fallback  # Use OpenRouter for GPT models
         else:
             return None
 

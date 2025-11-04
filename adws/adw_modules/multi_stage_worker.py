@@ -20,8 +20,8 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 from dataclasses import dataclass, field
 
-from .llm_providers import ProviderRegistry, LLMProvider, LLMResponse
 from .workflow_config import WorkflowConfig, StageConfig, create_default_workflow
+from .cli_providers import CLIProviderManager
 
 logger = logging.getLogger(__name__)
 
@@ -60,13 +60,17 @@ class MultiStageWorker:
 
     def __init__(self, task_id: str, issue_number: str, worktree_path: Path,
                  branch_name: str, llm_config: Dict[str, Any], api_logger,
-                 workflow_config: Optional[WorkflowConfig] = None):
+                 workflow_config: Optional[WorkflowConfig] = None, full_config: Optional[Dict] = None):
         self.task_id = task_id
         self.issue_number = issue_number
         self.worktree_path = Path(worktree_path)
         self.branch_name = branch_name
         self.llm_config = llm_config
         self.api_logger = api_logger
+        self.full_config = full_config or {}
+
+        # Initialize CLI provider manager
+        self.provider_manager = CLIProviderManager(self.full_config)
 
         # Load or use default workflow configuration
         self.workflow = workflow_config or create_default_workflow()
@@ -475,7 +479,7 @@ Do NOT make code changes - only plan.
         return context_file
 
     def invoke_agent(self, stage: str, prompt_file: Path, context_vars: Dict[str, str]) -> Dict[str, Any]:
-        """Invoke LLM for a specific stage with fresh context"""
+        """Invoke LLM via CLI for a specific stage with fresh context"""
 
         # Get stage config from workflow
         stage_config = self.workflow.get_stage(stage)
@@ -494,82 +498,154 @@ Do NOT make code changes - only plan.
         # Prepare log file
         log_file = self.stages_dir / f"{stage}.jsonl"
 
-        # Extract system prompt from frontmatter if exists
-        system_prompt = self._extract_system_prompt(prompt_content)
-
         # Try primary provider
         logger.info(f"Invoking {stage_config.provider}/{stage_config.model} for stage '{stage}'")
         print(f"   Running: {stage_config.provider}/{stage_config.model}")
 
-        provider = None
-        response = None
-        success = False
+        # Get CLI provider
+        cli_provider = self.provider_manager.get_provider(stage_config.provider)
 
-        try:
-            # Create provider
-            provider = ProviderRegistry.create(
-                provider=stage_config.provider,
-                model=stage_config.model
-            )
-
-            # Invoke LLM
-            response = provider.invoke(
-                prompt=prompt_content,
-                system_prompt=system_prompt,
-                temperature=stage_config.temperature,
-                max_tokens=stage_config.max_tokens
-            )
-
-            success = response.success
-
-            # Log response to JSONL
-            self._log_response(log_file, response, stage_config)
-
-        except Exception as e:
-            logger.error(f"Primary provider failed: {e}")
-            print(f"   ⚠️  Primary provider failed: {e}")
+        if not cli_provider or not cli_provider.is_available():
+            error_msg = f"Provider {stage_config.provider} not available"
+            logger.error(f"Primary provider failed: {error_msg}")
+            print(f"   ⚠️  Primary provider failed: {error_msg}")
 
             # Try fallback if configured
             if stage_config.fallback:
-                fallback_parts = stage_config.get_fallback_parts()
-                if fallback_parts:
-                    fallback_provider, fallback_model = fallback_parts
-                    logger.info(f"Trying fallback: {fallback_provider}/{fallback_model}")
-                    print(f"   Trying fallback: {fallback_provider}/{fallback_model}")
+                return self._try_fallback(stage_config, stage_prompt_file, log_file, stage)
 
-                    try:
-                        provider = ProviderRegistry.create(
-                            provider=fallback_provider,
-                            model=fallback_model
-                        )
+            return {'returncode': 1, 'tokens_input': 0, 'tokens_output': 0}
 
-                        response = provider.invoke(
-                            prompt=prompt_content,
-                            system_prompt=system_prompt,
-                            temperature=stage_config.temperature,
-                            max_tokens=stage_config.max_tokens
-                        )
+        # Build CLI command
+        cmd = cli_provider.build_command(stage_prompt_file, stage_config.model, log_file)
 
-                        success = response.success
-                        self._log_response(log_file, response, stage_config, is_fallback=True)
+        logger.debug(f"Executing CLI command: {' '.join(cmd)}")
 
-                    except Exception as fallback_error:
-                        logger.error(f"Fallback provider also failed: {fallback_error}")
-                        print(f"   ❌ Fallback provider also failed: {fallback_error}")
+        try:
+            # Execute CLI command
+            result = subprocess.run(
+                cmd,
+                cwd=self.worktree_path,
+                capture_output=True,
+                text=True,
+                timeout=3600  # 1 hour timeout
+            )
 
-        # Return result
-        if not success or not response:
+            if result.returncode != 0:
+                logger.error(f"CLI command failed with code {result.returncode}")
+                logger.error(f"stderr: {result.stderr}")
+                print(f"   ⚠️  Primary provider failed: {result.stderr}")
+
+                # Try fallback if configured
+                if stage_config.fallback:
+                    return self._try_fallback(stage_config, stage_prompt_file, log_file, stage)
+
+                return {'returncode': 1, 'tokens_input': 0, 'tokens_output': 0}
+
+            # Parse token usage from JSONL output
+            tokens_input, tokens_output = self._parse_token_usage(log_file)
+
+            logger.info(f"CLI execution successful: {tokens_input} in / {tokens_output} out")
+
             return {
-                'returncode': 1,
-                'tokens_input': 0,
-                'tokens_output': 0
+                'returncode': 0,
+                'tokens_input': tokens_input,
+                'tokens_output': tokens_output
             }
 
-        return {
-            'returncode': 0,
-            'tokens_input': response.usage['input_tokens'],
-            'tokens_output': response.usage['output_tokens']
-        }
+        except subprocess.TimeoutExpired:
+            logger.error(f"CLI command timed out after 1 hour")
+            print(f"   ❌ Command timed out")
+            return {'returncode': 1, 'tokens_input': 0, 'tokens_output': 0}
+
+        except Exception as e:
+            logger.error(f"CLI execution failed: {e}")
+            print(f"   ❌ Primary provider failed: {e}")
+
+            # Try fallback if configured
+            if stage_config.fallback:
+                return self._try_fallback(stage_config, stage_prompt_file, log_file, stage)
+
+            return {'returncode': 1, 'tokens_input': 0, 'tokens_output': 0}
+
+    def _try_fallback(self, stage_config: StageConfig, prompt_file: Path, log_file: Path, stage: str) -> Dict[str, Any]:
+        """Try fallback provider"""
+        fallback_parts = stage_config.get_fallback_parts()
+        if not fallback_parts:
+            return {'returncode': 1, 'tokens_input': 0, 'tokens_output': 0}
+
+        fallback_provider_name, fallback_model = fallback_parts
+        logger.info(f"Trying fallback: {fallback_provider_name}/{fallback_model}")
+        print(f"   Trying fallback: {fallback_provider_name}/{fallback_model}")
+
+        cli_provider = self.provider_manager.get_provider(fallback_provider_name)
+
+        if not cli_provider or not cli_provider.is_available():
+            error_msg = f"Fallback provider {fallback_provider_name} not available"
+            logger.error(f"Fallback provider also failed: {error_msg}")
+            print(f"   ❌ Fallback provider also failed: {error_msg}")
+            return {'returncode': 1, 'tokens_input': 0, 'tokens_output': 0}
+
+        # Build CLI command for fallback
+        fallback_log_file = log_file.parent / f"{stage}-fallback.jsonl"
+        cmd = cli_provider.build_command(prompt_file, fallback_model, fallback_log_file)
+
+        try:
+            result = subprocess.run(
+                cmd,
+                cwd=self.worktree_path,
+                capture_output=True,
+                text=True,
+                timeout=3600
+            )
+
+            if result.returncode != 0:
+                logger.error(f"Fallback CLI command failed: {result.stderr}")
+                print(f"   ❌ Fallback provider also failed: {result.stderr}")
+                return {'returncode': 1, 'tokens_input': 0, 'tokens_output': 0}
+
+            # Parse token usage
+            tokens_input, tokens_output = self._parse_token_usage(fallback_log_file)
+
+            logger.info(f"Fallback successful: {tokens_input} in / {tokens_output} out")
+
+            return {
+                'returncode': 0,
+                'tokens_input': tokens_input,
+                'tokens_output': tokens_output
+            }
+
+        except Exception as e:
+            logger.error(f"Fallback execution failed: {e}")
+            print(f"   ❌ Fallback provider also failed: {e}")
+            return {'returncode': 1, 'tokens_input': 0, 'tokens_output': 0}
+
+    def _parse_token_usage(self, log_file: Path) -> tuple[int, int]:
+        """Parse token usage from JSONL log file"""
+        if not log_file.exists():
+            return 0, 0
+
+        try:
+            # Read last line of JSONL file (contains usage info)
+            with open(log_file, 'r') as f:
+                lines = f.readlines()
+                if not lines:
+                    return 0, 0
+
+                # Look for usage in any line
+                for line in reversed(lines):
+                    try:
+                        data = json.loads(line)
+                        if 'usage' in data:
+                            usage = data['usage']
+                            return usage.get('input_tokens', 0), usage.get('output_tokens', 0)
+                    except json.JSONDecodeError:
+                        continue
+
+                return 0, 0
+        except Exception as e:
+            logger.warning(f"Failed to parse token usage from {log_file}: {e}")
+            return 0, 0
 
     def _extract_system_prompt(self, prompt_content: str) -> Optional[str]:
         """Extract system prompt from YAML frontmatter if exists"""
@@ -586,36 +662,6 @@ Do NOT make code changes - only plan.
                     return purpose
         return None
 
-    def _log_response(self, log_file: Path, response: LLMResponse,
-                     stage_config: StageConfig, is_fallback: bool = False):
-        """Log LLM response to JSONL file"""
-        with open(log_file, 'a') as f:
-            # Log metadata
-            metadata = {
-                'type': 'metadata',
-                'provider': response.provider,
-                'model': response.model,
-                'is_fallback': is_fallback,
-                'timestamp': datetime.now().isoformat()
-            }
-            f.write(json.dumps(metadata) + "\n")
-
-            # Log usage
-            usage = {
-                'type': 'usage',
-                'input_tokens': response.usage['input_tokens'],
-                'output_tokens': response.usage['output_tokens']
-            }
-            f.write(json.dumps(usage) + "\n")
-
-            # Log response content
-            content_log = {
-                'type': 'response',
-                'content': response.content,
-                'success': response.success,
-                'error': response.error
-            }
-            f.write(json.dumps(content_log) + "\n")
 
     def _fetch_github_issue(self) -> Dict[str, str]:
         """Fetch GitHub issue details"""
