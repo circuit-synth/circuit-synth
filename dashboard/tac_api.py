@@ -26,6 +26,7 @@ from typing import List, Optional
 from uuid import UUID
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 # Add parent directory to path
@@ -70,22 +71,6 @@ async def shutdown():
     if db:
         await db.close()
         print("✓ Closed database connection")
-
-
-@app.get("/")
-async def root():
-    """API root endpoint"""
-    return {
-        "name": "TAC Dashboard API",
-        "version": "1.0.0",
-        "status": "running",
-        "endpoints": {
-            "docs": "/docs",
-            "tasks": "/api/tasks",
-            "active": "/api/active",
-            "stats": "/api/stats",
-        }
-    }
 
 
 @app.get("/api/tasks")
@@ -241,6 +226,11 @@ async def get_templates():
         "templates": [t.model_dump() for t in templates],
         "count": len(templates),
     }
+
+
+# Mount static files for frontend
+dashboard_dir = Path(__file__).parent
+app.mount("/", StaticFiles(directory=dashboard_dir, html=True), name="static")
 
 
 def main():
