@@ -806,7 +806,7 @@ class APISynchronizer:
                         if "effects" not in label_dict:
                             label_dict["effects"] = {}
                         label_dict["effects"]["justify"] = justify
-                        logger.debug(f"Set hierarchical label justify={justify} for rotation={rotation_normalized}°")
+                        logger.debug(f"Set hierarchical label justify={justify} for rotation={label_angle}°")
                         break
 
             logger.debug(f"Label added: '{net_name}' at ({label_pos.x:.2f}, {label_pos.y:.2f}), angle={label_angle:.0f}, justify={justify}, UUID={label_uuid}")
