@@ -73,22 +73,6 @@ async def shutdown():
         print("✓ Closed database connection")
 
 
-@app.get("/")
-async def root():
-    """API root endpoint"""
-    return {
-        "name": "TAC Dashboard API",
-        "version": "1.0.0",
-        "status": "running",
-        "endpoints": {
-            "docs": "/docs",
-            "tasks": "/api/tasks",
-            "active": "/api/active",
-            "stats": "/api/stats",
-        }
-    }
-
-
 @app.get("/api/tasks")
 async def list_tasks(limit: int = 50):
     """List all tasks (most recent first)"""
