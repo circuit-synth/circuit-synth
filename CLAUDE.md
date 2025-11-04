@@ -121,17 +121,29 @@ Logs are your development tool. Use them to understand behavior, not to guess.
 
 ### Strategic Logging Pattern
 
+Follow standard Python logging best practices. **No emojis in logs.**
+
 ```python
 # Temporary investigation logs (remove after understanding)
-# Mark with 🔍 emoji so they're easy to find and remove
-logger.debug(f"🔍 CYCLE {n}: Investigating {variable_name} = {value}")
+logger.debug(f"CYCLE {n}: Investigating {variable_name} = {value}")
+logger.debug(f"CYCLE {n}: Function entry with args: {args}")
+logger.debug(f"CYCLE {n}: Branch taken: {branch_info}")
 
 # Permanent operational logs (keep)
 # These provide production insight and debugging capability
 logger.info(f"Generated netlist for {circuit.name}")
 logger.debug(f"Selected footprint {footprint} for {component.reference}")
 logger.warning(f"Component {ref} missing footprint, using default")
+logger.error(f"Failed to validate {ref}: {error}")
 ```
+
+**Log Levels:**
+- **DEBUG:** Development insights, detailed state inspection
+- **INFO:** Important state transitions, user-visible operations
+- **WARNING:** Recoverable issues, deprecated API usage
+- **ERROR:** Failures, exceptions that need attention
+
+**Professional, parseable output only.**
 
 ### Context Window Management
 
@@ -152,11 +164,12 @@ logger = logging.getLogger('circuit_synth.components')
 
 ### Log Categories
 
-**Temporary Investigation Logs (🔍 - Remove After Understanding)**
-- Variable state inspection: `logger.debug(f"🔍 {var} = {value}")`
-- Control flow tracing: `logger.debug(f"🔍 → entering function X")`
-- Data structure dumps: `logger.debug(f"🔍 dict keys: {dict.keys()}")`
+**Temporary Investigation Logs (Remove After Understanding)**
+- Variable state inspection: `logger.debug(f"CYCLE {n}: {var} = {value}")`
+- Control flow tracing: `logger.debug(f"CYCLE {n}: Entering function {func_name}")`
+- Data structure dumps: `logger.debug(f"CYCLE {n}: Dict keys: {dict.keys()}")`
 - "Why is this happening?" logs
+- Hypothesis testing logs
 
 **Permanent Operational Logs (Keep)**
 - Important state transitions: `logger.info(f"Created circuit {name}")`
@@ -165,11 +178,13 @@ logger = logging.getLogger('circuit_synth.components')
 - Warnings: `logger.warning(f"Deprecated API usage: {old_api}")`
 - Performance metrics: `logger.debug(f"Netlist generation took {ms}ms")`
 
+**No emojis, symbols, or decorative characters in logs. Professional output only.**
+
 ### Claude's Behavior During Cycles
 
 When investigating or developing:
 
-1. **Add strategic logs** - 🔍 mark temporary investigation logs
+1. **Add strategic logs** - Mark with "CYCLE N:" prefix for easy cleanup
 2. **Run immediately** - Don't wait, test right away
 3. **Report observations** - Share what logs showed
 4. **Propose hypothesis** - What does this tell us?
@@ -184,6 +199,8 @@ Logs showed component.pins is empty list.
 Hypothesis: pins aren't being loaded from component library.
 Next cycle: Add logs to library loading function.
 ```
+
+**Track cycle metrics:** Time per cycle, observations, hypotheses tested.
 
 ---
 
@@ -423,6 +440,115 @@ The `/dev:review-branch` command provides comprehensive pre-merge review. Key fe
 1. Update README.md to mention Potentiometer
 2. Add Potentiometer example to website
 3. Ready to merge after documentation update
+```
+
+---
+
+## 🚀 Common Development Workflows (Slash Commands)
+
+circuit-synth provides specialized slash commands for common workflows. These embody the development philosophy and automate repetitive patterns.
+
+### /dev:feature - Feature Development
+
+**Purpose:** End-to-end feature development with iterative test-first workflow
+
+**Usage:**
+```bash
+/dev:feature <feature-description>
+```
+
+**What it does:**
+1. Creates PRD document in repo root
+2. Reviews with you for simplicity, debugability, observability
+3. Breaks into implementation steps
+4. Implements test-first with 10-20 iterative cycles
+5. Tracks cycle metrics
+6. Creates PR with review
+
+**When to use:** Implementing new features, adding components, extending functionality
+
+### /dev:bug - Bug Fixing
+
+**Purpose:** Systematic bug investigation using log-driven cycles
+
+**Usage:**
+```bash
+/dev:bug <bug-description-or-issue-number>
+```
+
+**What it does:**
+1. Reproduces the issue
+2. Adds strategic logging (CYCLE N: prefix)
+3. Iterates: add logs → run → observe → hypothesis
+4. Target: 8-12 investigation cycles
+5. Implements fix with regression test
+6. Creates PR
+
+**When to use:** Debugging issues, investigating unexpected behavior, fixing regressions
+
+### /dev:test-ref - Create Reference Material
+
+**Purpose:** Help create reference material for testing (KiCad projects, logs, screenshots)
+
+**Usage:**
+```bash
+/dev:test-ref <what-you-need>
+```
+
+**What it does:**
+1. Generates base files with circuit-synth
+2. Waits for you to edit in KiCad
+3. Documents what's expected
+4. Enables comparison for iterative development
+
+**Why this matters:** Cuts reference creation time from 20 minutes to 2 minutes. Reference material enables 10x faster iterative development.
+
+**Common uses:**
+- KiCad project with specific component positions
+- Expected log output patterns
+- Screenshots of correct behavior
+- Expected file structures
+
+### /dev:make-test - Wrap Manual Test
+
+**Purpose:** Convert validated manual tests to automated pytest
+
+**Usage:**
+```bash
+/dev:make-test <test-path-or-description>
+```
+
+**What it does:**
+1. Reviews manual test README
+2. Creates pytest structure
+3. Uses existing reference files
+4. Implements with kicad-sch-api validation
+5. Runs and verifies test
+
+**When to use:** After manually validating a test, wrap it in pytest for regression protection
+
+### Workflow Integration Example
+
+```bash
+# Feature development with reference
+User: /dev:feature "Add rotation preservation"
+Agent: [Creates PRD, gets approval]
+
+User: "Let's create a reference first"
+User: /dev:test-ref "KiCad project with rotated components"
+Agent: [Generates base, user edits, documents reference]
+
+User: "Now implement"
+Agent: [Iterates with cycles, comparing to reference]
+  Cycle 3: Output doesn't match reference
+  Cycle 7: Output matches reference!
+
+User: /dev:make-test "tests/rotation-preservation/"
+Agent: [Creates automated test using reference]
+
+User: "Ship it"
+Agent: /dev:review-branch
+Agent: [Creates PR after review passes]
 ```
 
 ---
