@@ -26,6 +26,7 @@ from typing import List, Optional
 from uuid import UUID
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 # Add parent directory to path
@@ -241,6 +242,11 @@ async def get_templates():
         "templates": [t.model_dump() for t in templates],
         "count": len(templates),
     }
+
+
+# Mount static files for frontend
+dashboard_dir = Path(__file__).parent
+app.mount("/", StaticFiles(directory=dashboard_dir, html=True), name="static")
 
 
 def main():
