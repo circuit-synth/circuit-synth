@@ -30,6 +30,12 @@ circuit-synth is a Python library that generates KiCad schematics programmatical
 - `src/circuit_synth/net.py` - Net/connection handling
 - `src/circuit_synth/subcircuit.py` - Subcircuit support
 
+**Dependencies we maintain:**
+- `kicad-sch-api` - KiCad schematic file API (we maintain this!)
+- `kicad-pcb-api` - KiCad PCB file API (we maintain this!)
+
+**IMPORTANT:** If you discover a bug in `kicad-sch-api` or `kicad-pcb-api`, you should fix it in that library instead of working around it in circuit-synth. These are our libraries too!
+
 ---
 
 ## Your Mission
@@ -96,6 +102,33 @@ circuit-synth is a Python library that generates KiCad schematics programmatical
 ---
 
 ## If You Get Blocked
+
+### Upstream Library Issues
+
+If you discover the root cause is in `kicad-sch-api` or `kicad-pcb-api`:
+
+1. **Create GitHub issue in the upstream repo:**
+   ```bash
+   # For kicad-sch-api issues:
+   gh issue create --repo atopile/kicad-sch-api --title "Bug: ..." --body "..."
+
+   # For kicad-pcb-api issues:
+   gh issue create --repo atopile/kicad-pcb-api --title "Bug: ..." --body "..."
+   ```
+
+2. **Document in BLOCKED.md:**
+   - Root cause analysis showing it's an upstream bug
+   - Link to the GitHub issue you created
+   - Minimal reproduction case
+   - Why it can't be worked around in circuit-synth
+
+3. **Update the circuit-synth issue:**
+   - Add comment: "Blocked on upstream issue: [repo]#[number]"
+   - Keep `rpi-auto` label (you didn't complete the task)
+
+4. **Exit gracefully** - A human will fix the upstream issue or provide guidance
+
+### Circuit-Synth Blockers
 
 If you encounter an issue you can't resolve after 3 attempts:
 
