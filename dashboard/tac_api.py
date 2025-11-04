@@ -109,7 +109,7 @@ async def list_tasks(limit: int = 50):
         row_dict = db._parse_jsonb_fields(row_dict)
         tasks.append(TaskModel(**row_dict))
 
-    return {"tasks": [t.dict() for t in tasks], "count": len(tasks)}
+    return {"tasks": [t.model_dump() for t in tasks], "count": len(tasks)}
 
 
 @app.get("/api/tasks/{task_id}")
@@ -129,11 +129,11 @@ async def get_task(task_id: str):
         raise HTTPException(status_code=404, detail="Task not found")
 
     return {
-        "task": summary.task.dict(),
-        "stages": [s.dict() for s in summary.stages],
-        "helpers": [h.dict() for h in summary.helpers],
+        "task": summary.task.model_dump(),
+        "stages": [s.model_dump() for s in summary.stages],
+        "helpers": [h.model_dump() for h in summary.helpers],
         "event_count": summary.event_count,
-        "latest_events": [e.dict() for e in summary.latest_events],
+        "latest_events": [e.model_dump() for e in summary.latest_events],
     }
 
 
@@ -160,7 +160,7 @@ async def get_task_events(
 
     return {
         "task_id": task_id,
-        "events": [e.dict() for e in events],
+        "events": [e.model_dump() for e in events],
         "count": len(events),
     }
 
@@ -174,7 +174,7 @@ async def get_active_tasks():
     active_tasks = await db.get_active_tasks()
 
     return {
-        "tasks": [t.dict() for t in active_tasks],
+        "tasks": [t.model_dump() for t in active_tasks],
         "count": len(active_tasks),
     }
 
@@ -238,7 +238,7 @@ async def get_templates():
     templates = await db.list_agent_templates(active_only=True)
 
     return {
-        "templates": [t.dict() for t in templates],
+        "templates": [t.model_dump() for t in templates],
         "count": len(templates),
     }
 

@@ -69,6 +69,10 @@ class HelperContext:
     template_config: Dict[str, Any]
     database: TACDatabase
 
+    # Overrides
+    provider_override: Optional[str] = None
+    model_override: Optional[str] = None
+
     # Execution tracking
     input_tokens: int = 0
     output_tokens: int = 0
@@ -142,21 +146,19 @@ class HelperContext:
         **kwargs
     ) -> Dict[str, Any]:
         """
-        Execute the helper agent with a prompt.
-
-        This is a placeholder for actual agent execution.
-        In a full implementation, this would:
-        1. Create an agent session using the template configuration
-        2. Execute the agent with the given prompt
-        3. Track token usage and cost
-        4. Return the result
+        Execute the helper agent with a prompt using real LLM API.
 
         Args:
             prompt: The task prompt for the helper agent
             **kwargs: Additional arguments for agent execution
 
         Returns:
-            Dictionary containing agent result
+            Dictionary containing agent result with:
+            - status: "success" or "error"
+            - content: LLM response content
+            - provider: LLM provider used
+            - model: Model identifier
+            - error: Error message (if status is "error")
         """
         await self.log_event(
             event_type="ExecutionStarted",
@@ -164,29 +166,94 @@ class HelperContext:
             content=prompt,
         )
 
-        # TODO: Implement actual agent execution
-        # For now, this is a placeholder that simulates execution
+        try:
+            # Import LLM client
+            from .llm_client import LLMClient, LLMResponse
 
-        result = {
-            "status": "placeholder",
-            "message": "Helper agent execution not yet implemented",
-            "prompt": prompt,
-            "template": self.agent_template,
-        }
+            # Extract configuration from template with overrides
+            # Priority: kwargs > context overrides > template config > defaults
+            provider = (
+                kwargs.get("provider") or
+                self.provider_override or
+                self.template_config.get("provider", "anthropic")
+            )
+            model = (
+                kwargs.get("model") or
+                self.model_override or
+                self.template_config.get("model")
+            )
+            temperature = float(kwargs.get("temperature", self.template_config.get("temperature", 0.7)))
+            max_tokens = int(kwargs.get("max_tokens", self.template_config.get("max_tokens", 4096)))
 
-        # Simulate some token usage
-        await self.update_usage(
-            input_tokens=100,
-            output_tokens=50,
-            cost=Decimal("0.001"),
-        )
+            # Get system prompt from template config
+            system_prompt = self.template_config.get("system_prompt", "")
 
-        await self.set_result(
-            summary="Placeholder execution completed",
-            data=result,
-        )
+            # Create LLM client
+            client = LLMClient(
+                provider=provider,
+                model=model or "claude-3-5-haiku-20241022",  # Default model
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
 
-        return result
+            logger.info(
+                f"Executing helper {self.agent_name} with {provider}/{client.model}"
+            )
+
+            # Execute LLM call
+            response: LLMResponse = await client.call(
+                system_prompt=system_prompt,
+                user_message=prompt,
+            )
+
+            # Update usage tracking with real tokens and cost
+            await self.update_usage(
+                input_tokens=response.input_tokens,
+                output_tokens=response.output_tokens,
+                cost=response.cost,
+            )
+
+            logger.info(
+                f"Helper {self.agent_name} completed: "
+                f"{response.input_tokens} → {response.output_tokens} tokens, "
+                f"${response.cost}"
+            )
+
+            result = {
+                "status": "success",
+                "content": response.content,
+                "provider": response.provider,
+                "model": response.model,
+            }
+
+            await self.set_result(
+                summary=f"Helper execution completed successfully ({response.model})",
+                data=result,
+            )
+
+            return result
+
+        except Exception as e:
+            logger.error(f"Helper {self.agent_name} execution failed: {e}")
+
+            await self.log_event(
+                event_type="ExecutionError",
+                summary=f"Helper execution failed: {str(e)}",
+                content=str(e),
+            )
+
+            result = {
+                "status": "error",
+                "error": str(e),
+                "prompt": prompt,
+            }
+
+            await self.set_result(
+                summary=f"Helper execution failed: {str(e)}",
+                data=result,
+            )
+
+            return result
 
 
 class HelperAgentManager:
@@ -343,6 +410,8 @@ class HelperAgentManager:
             agent_template=template_name,
             template_config=template_config,
             database=self.db,
+            provider_override=provider,
+            model_override=model_override,
         )
 
         # Log spawn event
