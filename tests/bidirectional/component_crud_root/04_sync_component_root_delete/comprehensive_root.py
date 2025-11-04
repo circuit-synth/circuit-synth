@@ -26,12 +26,12 @@ def comprehensive_root():
         footprint="Resistor_SMD:R_0603_1608Metric"
     )
 
-    r2 = Component(  # Will be deleted in test
-        symbol="Device:R",
-        ref="R2",
-        value="4.7k",
-        footprint="Resistor_SMD:R_0603_1608Metric"
-    )
+    # r2 = Component(  # Will be deleted in test
+    #     symbol="Device:R",
+    #     ref="R2",
+    #     value="4.7k",
+    #     footprint="Resistor_SMD:R_0603_1608Metric"
+    # )
 
     c1 = Component(
         symbol="Device:C",
@@ -51,8 +51,8 @@ def comprehensive_root():
     r1[1] += data
     c1[1] += data
     r1[2] += vcc
-    r2[1] += vcc  # Will be deleted with R2
-    r2[2] += gnd  # Will be deleted with R2
+    # r2[1] += vcc  # Will be deleted with R2
+    # r2[2] += gnd  # Will be deleted with R2
     c1[2] += gnd
 
 
