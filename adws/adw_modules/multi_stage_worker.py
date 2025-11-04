@@ -276,7 +276,7 @@ class MultiStageWorker:
             )
 
         print(f"   ✓ Plan created: plan.md")
-        return StageResult(
+        stage_result = StageResult(
             stage_name="planning",
             success=True,
             started_at=started_at,
@@ -285,6 +285,11 @@ class MultiStageWorker:
             tokens_input=result['tokens_input'],
             tokens_output=result['tokens_output']
         )
+
+        # Store result in pipeline state for database tracking
+        self.state.stage_results["planning"] = stage_result
+
+        return stage_result
 
     def run_builder_stage(self) -> StageResult:
         """Stage 2: Building - Implement plan with TDD"""
@@ -322,7 +327,7 @@ class MultiStageWorker:
         else:
             print(f"   ⚠️  Builder did not create implementation.md")
 
-        return StageResult(
+        stage_result = StageResult(
             stage_name="building",
             success=success,
             started_at=started_at,
@@ -332,6 +337,11 @@ class MultiStageWorker:
             tokens_input=result['tokens_input'],
             tokens_output=result['tokens_output']
         )
+
+        # Store result in pipeline state for database tracking
+        self.state.stage_results["building"] = stage_result
+
+        return stage_result
 
     def run_reviewer_stage(self) -> StageResult:
         """Stage 3: Reviewing - Quality assessment"""
@@ -386,7 +396,7 @@ class MultiStageWorker:
             print(f"   ⚠️  Review complete: NEEDS WORK or BLOCKED")
             # Don't fail the stage, but mark as needing human intervention
 
-        return StageResult(
+        stage_result = StageResult(
             stage_name="reviewing",
             success=True,  # Stage succeeded even if approval was not granted
             started_at=started_at,
@@ -395,6 +405,11 @@ class MultiStageWorker:
             tokens_input=result['tokens_input'],
             tokens_output=result['tokens_output']
         )
+
+        # Store result in pipeline state for database tracking
+        self.state.stage_results["reviewing"] = stage_result
+
+        return stage_result
 
     def run_pr_creator_stage(self) -> StageResult:
         """Stage 4: PR Creation - Create GitHub PR"""
@@ -445,7 +460,7 @@ class MultiStageWorker:
 
         print(f"   ✓ PR created successfully")
 
-        return StageResult(
+        stage_result = StageResult(
             stage_name="pr_creation",
             success=True,
             started_at=started_at,
@@ -453,6 +468,11 @@ class MultiStageWorker:
             tokens_input=result['tokens_input'],
             tokens_output=result['tokens_output']
         )
+
+        # Store result in pipeline state for database tracking
+        self.state.stage_results["pr_creation"] = stage_result
+
+        return stage_result
 
     def create_planner_context(self, issue_data: Dict[str, str]) -> Path:
         """Create minimal context file for planning stage"""
