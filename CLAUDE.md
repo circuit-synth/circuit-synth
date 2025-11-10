@@ -2,14 +2,28 @@
 
 This guide defines how Claude Code assists with developing the circuit-synth Python library.
 
-## 👤 Developer Context
+## Project Context
 
-- **Side project** with intermittent development time
-- Work in **15-30 minute focused bursts** when you have availability
 - **Test-first mentality** - never commit untested code
 - **Log-driven investigation** - observe behavior, don't assume
 - **Small batch releases** - frequent, incremental PyPI releases
-- **Continuous verification** - parallel review threads always running
+- **Professional quality** - 80%+ test coverage, type hints, CI/CD enforcement
+
+---
+
+## Professional Quality Standards
+
+All work must meet professional software engineering standards:
+
+- **Testing**: 80%+ coverage (enforced in settings), test-first development
+- **Type Safety**: Type hints required for all functions
+- **Code Quality**: black, isort, ruff (automated linting)
+- **Security**: bandit, safety (automated scanning)
+- **CI/CD**: Automated enforcement on every PR
+- **Documentation**: Complete docstrings for all public APIs
+- **Writing**: Technical claims only (no marketing language)
+
+See [PROFESSIONAL_QUALITY_STANDARDS.md](https://github.com/circuit-synth/claude-files-inventory/blob/main/PROFESSIONAL_QUALITY_STANDARDS.md) and [SHARED_WRITING_STANDARDS.md](https://github.com/circuit-synth/claude-files-inventory/blob/main/SHARED_WRITING_STANDARDS.md) for complete requirements.
 
 ---
 
@@ -21,11 +35,11 @@ All work starts with a GitHub issue:
 
 1. **Create/select issue** - Check existing issues or create new one
 2. **Break down** - Issue describes the goal; we break into small subtasks
-3. **Work on subtask** - One small task (15-30 min) at a time
+3. **Work on subtask** - One focused task at a time
 4. **Reference in commits** - `fix: Correct Text class parameters (#238)`
 5. **Close with verification** - Issue closes when task is done and tested
 
-**Why:** Keeps work visible, context survives across sessions, work fits burst schedule.
+**Why:** Keeps work visible, context survives across sessions, enables focused problem-solving.
 
 ### 2. Test-First Mentality (MANDATORY)
 
