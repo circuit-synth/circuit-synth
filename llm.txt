@@ -65,6 +65,20 @@ capacitor = Component(symbol="Device:C", ref="C", value="100nF",
                      footprint="Capacitor_SMD:C_0603_1608Metric")
 led = Component(symbol="Device:LED", ref="D",
                footprint="LED_SMD:LED_0603_1608Metric")
+
+# Custom fields - add any fields you want
+component = Component(
+    symbol="Device:R",
+    ref="R",
+    value="10k",
+    footprint="Resistor_SMD:R_0603_1608Metric",
+    # Custom fields
+    manufacturer="Yageo",
+    part_number="RC0603FR-0710KL",
+    tolerance="1%",
+    power_rating="0.1W",
+    jlcpcb_part="C98220"
+)
 ```
 
 ### Net Connections
@@ -382,11 +396,53 @@ def dual_rail_power():
     led_3v3["K"] += gnd
 ```
 
+## Project Organization
+
+Circuit-synth projects follow a simple, flat file structure:
+
+```
+my_project/
+├── main.py              # Main circuit (imports and uses subcircuits)
+├── power_supply.py      # Subcircuit: power regulation
+├── usb_interface.py     # Subcircuit: USB-C interface
+├── led_indicators.py    # Subcircuit: status LEDs
+└── sensor_array.py      # Subcircuit: sensor connections
+```
+
+**Best Practice:**
+- `main.py` - Top-level circuit that imports and uses subcircuits
+- Subcircuits in same directory - Each reusable circuit block in its own file
+- All Python files in one directory - Simple, flat structure
+
+**Example main.py:**
+```python
+from circuit_synth import circuit, Net
+from power_supply import power_supply
+from usb_interface import usb_c_interface
+from led_indicators import status_leds
+
+@circuit(name="Main_Board")
+def main_board():
+    # Define top-level nets
+    vbus = Net('VBUS')
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+
+    # Use subcircuits as building blocks
+    usb = usb_c_interface(vbus, gnd)
+    power = power_supply(vbus, vcc_3v3, gnd)
+    leds = status_leds(vcc_3v3, gnd)
+
+if __name__ == "__main__":
+    circuit = main_board()
+    circuit.generate_kicad_project("main_board")
+```
+
 ## Complete Example Workflow
 
 ```bash
-# 1. Install circuit-synth
-pip install circuit-synth
+# 1. Install circuit-synth with uv
+uv add circuit-synth
 
 # 2. Create new project with working example
 uv run cs-new-project my_first_board
@@ -400,7 +456,7 @@ uv run python main.py
 # 5. Open in KiCad
 open ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.kicad_pro
 
-# 6. Make changes to main.py, regenerate
+# 6. Make changes to main.py or subcircuits, regenerate
 uv run python main.py
 ```
 
@@ -470,6 +526,46 @@ circuit.generate_gerbers(project_name="my_board")
 - 0805 resistor/capacitor: `Resistor_SMD:R_0805_2012Metric`, `Capacitor_SMD:C_0805_2012Metric`
 - SOT-223-3: `Package_TO_SOT_SMD:SOT-223-3_TabPin2`
 - LQFP-64: `Package_QFP:LQFP-64_10x10mm_P0.5mm`
+
+## Finding KiCad Symbols and Footprints
+
+KiCad libraries are installed at different locations depending on your operating system:
+
+**macOS:**
+```
+Symbols:    /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/
+Footprints: /Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints/
+```
+
+**Linux:**
+```
+Symbols:    /usr/share/kicad/symbols/
+Footprints: /usr/share/kicad/footprints/
+```
+
+**Windows:**
+```
+Symbols:    C:\Program Files\KiCad\8.0\share\kicad\symbols\
+Footprints: C:\Program Files\KiCad\8.0\share\kicad\footprints\
+```
+
+**Search for symbols/footprints:**
+```bash
+# macOS/Linux - find symbols containing "STM32"
+find /usr/share/kicad/symbols -name "*.kicad_sym" | xargs grep -l "STM32"
+
+# macOS/Linux - find LQFP footprints
+find /usr/share/kicad/footprints -name "*LQFP*.kicad_mod"
+
+# Windows PowerShell - find symbols
+Get-ChildItem "C:\Program Files\KiCad\8.0\share\kicad\symbols" -Recurse -Filter "*.kicad_sym" | Select-String "STM32"
+```
+
+**Or use circuit-synth AI commands:**
+```bash
+/find-symbol STM32         # Search for symbols
+/find-footprint LQFP64     # Search for footprints
+```
 
 ## AI Integration
 
@@ -561,16 +657,13 @@ JSON serves as single source of truth for circuit data, enabling:
 
 - Python 3.12+
 - KiCad 8.0+
-- uv (recommended) or pip for package management
+- uv package manager
 
 ## Installation
 
 ```bash
-# Recommended: uv
+# Install circuit-synth with uv
 uv add circuit-synth
-
-# Alternative: pip
-pip install circuit-synth
 
 # Create new project
 uv run cs-new-project my_project
