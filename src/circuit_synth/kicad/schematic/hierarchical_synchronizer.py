@@ -107,9 +107,10 @@ class HierarchicalSynchronizer:
 
             # Find hierarchical sheet instances
             # Look for sheet elements in the schematic
-            if hasattr(schematic, "sheets") and schematic.sheets:
-                logger.debug(f"Schematic has {len(schematic.sheets)} sheets")
-                for sheet_elem in schematic.sheets:
+            sheets_list = schematic._data.get("sheets", []) if hasattr(schematic, "_data") else []
+            if sheets_list:
+                logger.debug(f"Processing hierarchical sheets")
+                for sheet_elem in sheets_list:
                     logger.debug(f"Processing sheet element: {sheet_elem}")
                     logger.debug(f"Sheet attributes: {dir(sheet_elem)}")
 

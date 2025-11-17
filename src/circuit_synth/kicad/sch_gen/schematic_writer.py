@@ -527,12 +527,17 @@ class SchematicWriter:
         Add all components from the circuit using the ComponentManager.
         """
         logger.debug(f"=== ADDING COMPONENTS FOR CIRCUIT: {self.circuit.name} ===")
-        logger.debug(f"  Number of components: {len(self.circuit.components)}")
+
+        # circuit.components is a list of SchematicSymbols (from circuit_loader.py Circuit class)
+        # This contains only components that belong directly to THIS circuit
+        direct_components = self.circuit.components
+
+        logger.debug(f"  Number of direct components: {len(direct_components)}")
 
         # Track reference mapping for net updates
         self.reference_mapping = {}
 
-        for idx, comp in enumerate(self.circuit.components):
+        for idx, comp in enumerate(direct_components):
             comp_start = time.perf_counter()
             comp_details = {
                 "reference": comp.reference,
