@@ -73,3 +73,8 @@ agents/
 release.log
 tests/unit/test_hierarchical_decorator.py
 tests/unit/test_issue_538_regression.py
+release.log
+HIERARCHICAL_CIRCUITS_GUIDE.md
+SETUP.md
+test_openrouter.py
+DEPLOYMENT.md
