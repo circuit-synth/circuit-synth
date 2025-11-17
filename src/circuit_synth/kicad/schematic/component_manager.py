@@ -8,11 +8,17 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
-from kicad_sch_api.core.components import Component
+import kicad_sch_api as ksa
+from kicad_sch_api.core.components import Component, ComponentCollection
 from kicad_sch_api.core.types import Point, Schematic, SchematicSymbol
 
 from ..core.symbol_cache import get_symbol_cache
 from .instance_utils import add_symbol_instance
+
+# Debug logging for kicad-sch-api version
+logger_init = logging.getLogger(__name__)
+logger_init.info(f"🔍 IMPORT CHECK - kicad-sch-api version: {ksa.__version__}")
+logger_init.info(f"🔍 IMPORT CHECK - ComponentCollection has _add_to_indexes: {hasattr(ComponentCollection, '_add_to_indexes')}")
 from .placement import PlacementEngine, PlacementStrategy
 
 logger = logging.getLogger(__name__)
@@ -180,14 +186,22 @@ class ComponentManager:
         add_symbol_instance(component, project_name, hierarchical_path)
 
         # Add to schematic - need to handle both old and new (kicad-sch-api) schematic types
-        if hasattr(self.schematic, "_components"):
-            # kicad-sch-api Schematic - add to ComponentCollection properly
-            # Create Component wrapper and add to collection
-            comp_wrapper = Component(component, self.schematic._components)
-            self.schematic._components._add_to_indexes(comp_wrapper)
-            logger.debug(
-                f"Added component to ComponentCollection: {reference} unit {unit}"
-            )
+        if hasattr(self.schematic, "_data"):
+            # kicad-sch-api Schematic - add component to both _data and ComponentCollection
+            logger.debug(f"Adding component {reference} to kicad-sch-api schematic")
+
+            # Add to underlying S-expression data
+            if 'symbol' not in self.schematic._data:
+                self.schematic._data['symbol'] = []
+            self.schematic._data['symbol'].append(component)
+
+            # Also add to ComponentCollection's internal tracking using _add_item_to_collection
+            if hasattr(self.schematic, "_components") and hasattr(self.schematic._components, "_add_item_to_collection"):
+                comp_wrapper = Component(component, self.schematic._components)
+                self.schematic._components._add_item_to_collection(comp_wrapper)
+                logger.debug(f"Component added to ComponentCollection (total: {len(self.schematic._components)} items)")
+            else:
+                logger.debug(f"Component added to _data only (ComponentCollection not available)")
         else:
             # Fallback for older schematic types
             self.schematic.components.append(component)

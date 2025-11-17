@@ -38,7 +38,7 @@ dependencies = [
     # Cache and performance dependencies
     "cachetools>=5.3.0",
     # KiCad API integration
-    "kicad-sch-api>=0.4.5",  # Requires 0.4.5+ for hierarchical symbol instance support
+    "kicad-sch-api>=0.5.4",
     "kicad-pcb-api>=0.1.0",
     "packaging>=21.0",
     # Additional data processing

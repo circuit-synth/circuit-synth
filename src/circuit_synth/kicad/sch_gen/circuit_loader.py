@@ -327,24 +327,45 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
 
 
 def _circuits_match(existing_circuit: Circuit, new_data: dict) -> bool:
-    """Check if existing_circuit matches the new subcircuit data enough to reuse the same name."""
-    existing_refs = sorted([c.reference for c in existing_circuit.components])
+    """
+    Check if existing_circuit matches the new subcircuit data enough to reuse the same name.
+
+    Compares circuit STRUCTURE (component types/values, net count) rather than
+    specific references/names, since multiple instances will have different references.
+    """
+    # Compare component structure (types and values, not specific references)
+    existing_comp_types = sorted([
+        (c.lib_id, c.value) for c in existing_circuit.components
+    ])
+
     new_comps_data = new_data.get("components", {})
     # Handle components as a dictionary
     if isinstance(new_comps_data, dict):
-        new_refs = sorted(new_comps_data.keys())
+        new_comp_types = sorted([
+            (comp['symbol'], comp.get('value', ''))
+            for ref, comp in new_comps_data.items()
+        ])
     else:
         # Fallback for list format
-        new_refs = sorted([c["ref"] for c in new_comps_data])
-    if existing_refs != new_refs:
+        new_comp_types = sorted([
+            (comp['symbol'], comp.get('value', ''))
+            for comp in new_comps_data
+        ])
+
+    if existing_comp_types != new_comp_types:
+        logger.debug(f"Component types mismatch: {existing_comp_types} vs {new_comp_types}")
         return False
 
-    existing_net_names = sorted([n.name for n in existing_circuit.nets])
+    # Compare net count only (names will differ between instances)
+    existing_net_count = len(existing_circuit.nets)
     new_nets_data = new_data.get("nets", {})
-    new_net_names = sorted(new_nets_data.keys())
-    if existing_net_names != new_net_names:
+    new_net_count = len(new_nets_data)
+
+    if existing_net_count != new_net_count:
+        logger.debug(f"Net count mismatch: {existing_net_count} vs {new_net_count}")
         return False
 
+    logger.debug(f"Circuits match! Reusing existing circuit definition.")
     return True
 
 
