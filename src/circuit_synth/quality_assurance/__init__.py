@@ -3,6 +3,7 @@ Circuit-Synth Quality Assurance Module
 Provides FMEA, DFM, and other quality analysis tools for circuit designs
 """
 
+from .erc import ERCResults, ERCViolation, KiCADERCError, run_erc
 from .fmea_analyzer import (
     ComponentType,
     FailureMode,
@@ -13,6 +14,13 @@ from .fmea_report_generator import (
     REPORTLAB_AVAILABLE,
     FMEAReportGenerator,
     analyze_circuit_for_fmea,
+)
+from .validation import (
+    ValidationIssue,
+    validate,
+    validate_manufacturing,
+    validate_naming,
+    validate_properties,
 )
 
 # Import enhanced analyzer if available
@@ -32,6 +40,7 @@ except ImportError:
     _has_comprehensive = False
 
 __all__ = [
+    # FMEA
     "FMEAReportGenerator",
     "analyze_circuit_for_fmea",
     "REPORTLAB_AVAILABLE",
@@ -39,6 +48,17 @@ __all__ = [
     "analyze_any_circuit",
     "ComponentType",
     "FailureMode",
+    # Validation
+    "ValidationIssue",
+    "validate",
+    "validate_properties",
+    "validate_manufacturing",
+    "validate_naming",
+    # ERC
+    "run_erc",
+    "ERCResults",
+    "ERCViolation",
+    "KiCADERCError",
 ]
 
 # Add conditional exports
