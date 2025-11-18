@@ -1,0 +1,800 @@
+# circuit-synth
+
+> Python-based circuit design framework with KiCad integration. Define circuits in code, generate professional PCBs. Production-ready EDA tool with AI acceleration.
+
+Circuit-synth brings software engineering practices to hardware design. Write circuits in Python instead of GUI clicking. Get version control, modularity, code review, automated testing, and AI-assisted design for electronics.
+
+## What circuit-synth does
+
+Convert Python circuit definitions to complete KiCad PCB projects:
+
+```python
+from circuit_synth import circuit, Component, Net
+
+@circuit(name="Power_Supply")
+def power_supply():
+    # Define components
+    vreg = Component(
+        symbol="Regulator_Linear:AMS1117-3.3",
+        ref="U",
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+    )
+    cap_in = Component(symbol="Device:C", ref="C", value="10uF")
+    cap_out = Component(symbol="Device:C", ref="C", value="22uF")
+
+    # Define nets
+    vbus = Net('VBUS')
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+
+    # Connect components
+    vreg["VI"] += vbus
+    vreg["VO"] += vcc_3v3
+    vreg["GND"] += gnd
+    cap_in[1] += vbus
+    cap_in[2] += gnd
+    cap_out[1] += vcc_3v3
+    cap_out[2] += gnd
+
+if __name__ == "__main__":
+    circuit = power_supply()
+    circuit.generate_kicad_project("my_power_supply")
+```
+
+Result: Complete KiCad project with schematic (.kicad_sch) and PCB (.kicad_pcb) files ready to manufacture.
+
+## Core API Patterns
+
+### Component Creation
+
+```python
+from circuit_synth import Component
+
+# Standard component with symbol and footprint
+component = Component(
+    symbol="Library:SymbolName",        # KiCad symbol path
+    ref="U",                            # Reference prefix (U, R, C, etc.)
+    footprint="Library:FootprintName",  # KiCad footprint path
+    value="10k"                         # Optional value (for passives)
+)
+
+# Common component types
+resistor = Component(symbol="Device:R", ref="R", value="10k",
+                    footprint="Resistor_SMD:R_0603_1608Metric")
+capacitor = Component(symbol="Device:C", ref="C", value="100nF",
+                     footprint="Capacitor_SMD:C_0603_1608Metric")
+led = Component(symbol="Device:LED", ref="D",
+               footprint="LED_SMD:LED_0603_1608Metric")
+
+# Custom fields - add any fields you want
+component = Component(
+    symbol="Device:R",
+    ref="R",
+    value="10k",
+    footprint="Resistor_SMD:R_0603_1608Metric",
+    # Custom fields
+    manufacturer="Yageo",
+    part_number="RC0603FR-0710KL",
+    tolerance="1%",
+    power_rating="0.1W",
+    jlcpcb_part="C98220"
+)
+```
+
+### Net Connections
+
+```python
+from circuit_synth import Net
+
+# Create named nets
+vcc = Net('VCC_3V3')
+gnd = Net('GND')
+signal = Net('DATA_OUT')
+
+# Connect components to nets
+component["pin_name"] += vcc      # Named pins
+component[1] += gnd               # Numbered pins (for simple components)
+
+# Multiple connections to same net
+resistor[1] += vcc
+led["A"] += vcc
+```
+
+### Circuit Decorator
+
+```python
+from circuit_synth import circuit
+
+@circuit(name="My_Circuit")
+def my_circuit():
+    """Circuit docstring becomes schematic annotation"""
+    # Component creation and connections
+    # ...
+
+    # Optional: explicit return
+    return locals()  # or return circuit object
+```
+
+### Hierarchical Design
+
+```python
+@circuit(name="Power_Module")
+def power_module(vin, vout, gnd):
+    """Reusable power supply subcircuit"""
+    vreg = Component(symbol="Regulator_Linear:AMS1117-3.3", ref="U")
+    vreg["VI"] += vin
+    vreg["VO"] += vout
+    vreg["GND"] += gnd
+
+@circuit(name="Main_Circuit")
+def main_circuit():
+    # Define nets
+    vbus = Net('VBUS')
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+
+    # Use subcircuit as function
+    power = power_module(vbus, vcc_3v3, gnd)
+
+    # Continue with main circuit design
+    led = Component(symbol="Device:LED", ref="D")
+    led["A"] += vcc_3v3
+    led["K"] += gnd
+```
+
+### KiCad Project Generation
+
+```python
+circuit = my_circuit()
+
+# Generate KiCad project
+result = circuit.generate_kicad_project(
+    project_name="my_board",
+    placement_algorithm="hierarchical",  # or "simple"
+    generate_pcb=True                   # Generate PCB file
+)
+
+# Generate Bill of Materials (BOM)
+bom = circuit.generate_bom(project_name="my_board")
+# Output: my_board/my_board.csv
+
+# Generate PDF schematic
+pdf = circuit.generate_pdf_schematic(project_name="my_board")
+# Output: my_board/my_board.pdf
+
+# Generate Gerber manufacturing files
+gerbers = circuit.generate_gerbers(project_name="my_board")
+# Output: my_board/gerbers/
+```
+
+## Common Patterns
+
+### Power Supply with Decoupling
+
+```python
+@circuit(name="Regulated_Power")
+def regulated_power():
+    """5V to 3.3V linear regulator with proper decoupling"""
+
+    # Components
+    vreg = Component(
+        symbol="Regulator_Linear:AMS1117-3.3",
+        ref="U",
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+    )
+    cap_in = Component(
+        symbol="Device:C",
+        ref="C",
+        value="10uF",
+        footprint="Capacitor_SMD:C_0805_2012Metric"
+    )
+    cap_out = Component(
+        symbol="Device:C",
+        ref="C",
+        value="22uF",
+        footprint="Capacitor_SMD:C_0805_2012Metric"
+    )
+
+    # Nets
+    vin_5v = Net('VIN_5V')
+    vout_3v3 = Net('VOUT_3V3')
+    gnd = Net('GND')
+
+    # Connections
+    vreg["VI"] += vin_5v
+    vreg["VO"] += vout_3v3
+    vreg["GND"] += gnd
+
+    cap_in[1] += vin_5v
+    cap_in[2] += gnd
+
+    cap_out[1] += vout_3v3
+    cap_out[2] += gnd
+```
+
+### LED Circuit with Current Limiting
+
+```python
+@circuit(name="LED_Indicator")
+def led_indicator():
+    """LED with current-limiting resistor"""
+
+    led = Component(
+        symbol="Device:LED",
+        ref="D",
+        footprint="LED_SMD:LED_0603_1608Metric"
+    )
+    resistor = Component(
+        symbol="Device:R",
+        ref="R",
+        value="330",  # 330 ohm for ~10mA at 3.3V
+        footprint="Resistor_SMD:R_0603_1608Metric"
+    )
+
+    vcc = Net('VCC_3V3')
+    gnd = Net('GND')
+    led_anode = Net('LED_ANODE')
+
+    resistor[1] += vcc
+    resistor[2] += led_anode
+    led["A"] += led_anode
+    led["K"] += gnd
+```
+
+### USB-C Interface
+
+```python
+@circuit(name="USB_C_Interface")
+def usb_c_interface():
+    """USB-C connector with CC resistors for 5V power"""
+
+    usb_conn = Component(
+        symbol="Connector:USB_C_Receptacle_USB2.0",
+        ref="J",
+        footprint="Connector_USB:USB_C_Receptacle_GCT_USB4085"
+    )
+
+    # CC resistors for 5V negotiation (5.1k to GND)
+    cc1_resistor = Component(symbol="Device:R", ref="R", value="5.1k")
+    cc2_resistor = Component(symbol="Device:R", ref="R", value="5.1k")
+
+    # Nets
+    vbus = Net('VBUS')
+    gnd = Net('GND')
+    cc1 = Net('CC1')
+    cc2 = Net('CC2')
+    usb_dp = Net('USB_DP')
+    usb_dm = Net('USB_DM')
+
+    # USB connector
+    usb_conn["VBUS"] += vbus
+    usb_conn["GND"] += gnd
+    usb_conn["CC1"] += cc1
+    usb_conn["CC2"] += cc2
+    usb_conn["D+"] += usb_dp
+    usb_conn["D-"] += usb_dm
+
+    # CC resistors
+    cc1_resistor[1] += cc1
+    cc1_resistor[2] += gnd
+    cc2_resistor[1] += cc2
+    cc2_resistor[2] += gnd
+```
+
+### ESP32 Development Board
+
+```python
+@circuit(name="ESP32_Dev_Board")
+def esp32_dev_board():
+    """Complete ESP32-C6 development board"""
+
+    # ESP32-C6-MINI-1 module
+    esp32 = Component(
+        symbol="RF_Module:ESP32-C6-MINI-1",
+        ref="U",
+        footprint="RF_Module:ESP32-C6-MINI-1"
+    )
+
+    # Decoupling capacitors
+    cap1 = Component(symbol="Device:C", ref="C", value="10uF",
+                    footprint="Capacitor_SMD:C_0805_2012Metric")
+    cap2 = Component(symbol="Device:C", ref="C", value="100nF",
+                    footprint="Capacitor_SMD:C_0603_1608Metric")
+
+    # Boot button (for programming mode)
+    boot_btn = Component(
+        symbol="Switch:SW_Push",
+        ref="SW",
+        footprint="Button_Switch_SMD:SW_SPST_CK_RS282G05A3"
+    )
+
+    # Nets
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+    gpio9 = Net('GPIO9')  # Boot pin
+
+    # ESP32 power
+    esp32["VDD"] += vcc_3v3
+    esp32["GND"] += gnd
+    esp32["IO9"] += gpio9
+
+    # Decoupling
+    cap1[1] += vcc_3v3
+    cap1[2] += gnd
+    cap2[1] += vcc_3v3
+    cap2[2] += gnd
+
+    # Boot button (pull GPIO9 to GND)
+    boot_btn[1] += gpio9
+    boot_btn[2] += gnd
+```
+
+### Dual-Rail Power Supply
+
+```python
+@circuit(name="Dual_Rail_Power")
+def dual_rail_power():
+    """Generate both 5V and 3.3V from higher voltage input"""
+
+    # Voltage regulators
+    vreg_5v = Component(
+        symbol="Regulator_Linear:AMS1117-5.0",
+        ref="U",
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+    )
+    vreg_3v3 = Component(
+        symbol="Regulator_Linear:AMS1117-3.3",
+        ref="U",
+        footprint="Package_TO_SOT_SMD:SOT-223-3_TabPin2"
+    )
+
+    # Capacitors (input and output for each regulator)
+    cap_in_5v = Component(symbol="Device:C", ref="C", value="10uF")
+    cap_out_5v = Component(symbol="Device:C", ref="C", value="22uF")
+    cap_in_3v3 = Component(symbol="Device:C", ref="C", value="10uF")
+    cap_out_3v3 = Component(symbol="Device:C", ref="C", value="22uF")
+
+    # Power indicator LEDs
+    led_5v = Component(symbol="Device:LED", ref="D")
+    led_3v3 = Component(symbol="Device:LED", ref="D")
+    r_led_5v = Component(symbol="Device:R", ref="R", value="330")
+    r_led_3v3 = Component(symbol="Device:R", ref="R", value="330")
+
+    # Nets
+    vin = Net('VIN')          # Input (6.5V-12V)
+    vout_5v = Net('VOUT_5V')
+    vout_3v3 = Net('VOUT_3V3')
+    gnd = Net('GND')
+
+    # 5V regulator
+    vreg_5v["VIN"] += vin
+    vreg_5v["VOUT"] += vout_5v
+    vreg_5v["GND"] += gnd
+    cap_in_5v[1] += vin
+    cap_in_5v[2] += gnd
+    cap_out_5v[1] += vout_5v
+    cap_out_5v[2] += gnd
+
+    # 3.3V regulator
+    vreg_3v3["VIN"] += vin
+    vreg_3v3["VOUT"] += vout_3v3
+    vreg_3v3["GND"] += gnd
+    cap_in_3v3[1] += vin
+    cap_in_3v3[2] += gnd
+    cap_out_3v3[1] += vout_3v3
+    cap_out_3v3[2] += gnd
+
+    # Power indicators
+    r_led_5v[1] += vout_5v
+    r_led_5v[2] += Net('LED_5V_A')
+    led_5v["A"] += Net('LED_5V_A')
+    led_5v["K"] += gnd
+
+    r_led_3v3[1] += vout_3v3
+    r_led_3v3[2] += Net('LED_3V3_A')
+    led_3v3["A"] += Net('LED_3V3_A')
+    led_3v3["K"] += gnd
+```
+
+## Project Organization
+
+Circuit-synth projects follow a simple, flat file structure:
+
+```
+my_project/
+├── main.py              # Main circuit (imports and uses subcircuits)
+├── power_supply.py      # Subcircuit: power regulation
+├── usb_interface.py     # Subcircuit: USB-C interface
+├── led_indicators.py    # Subcircuit: status LEDs
+└── sensor_array.py      # Subcircuit: sensor connections
+```
+
+**Best Practice:**
+- `main.py` - Top-level circuit that imports and uses subcircuits
+- Subcircuits in same directory - Each reusable circuit block in its own file
+- All Python files in one directory - Simple, flat structure
+
+**Example main.py:**
+```python
+from circuit_synth import circuit, Net
+from power_supply import power_supply
+from usb_interface import usb_c_interface
+from led_indicators import status_leds
+
+@circuit(name="Main_Board")
+def main_board():
+    # Define top-level nets
+    vbus = Net('VBUS')
+    vcc_3v3 = Net('VCC_3V3')
+    gnd = Net('GND')
+
+    # Use subcircuits as building blocks
+    usb = usb_c_interface(vbus, gnd)
+    power = power_supply(vbus, vcc_3v3, gnd)
+    leds = status_leds(vcc_3v3, gnd)
+
+if __name__ == "__main__":
+    circuit = main_board()
+    circuit.generate_kicad_project("main_board")
+```
+
+## Complete Example Workflow
+
+```bash
+# 1. Install circuit-synth with uv
+uv add circuit-synth
+
+# 2. Create new project with working example
+uv run cs-new-project my_first_board
+
+# 3. Navigate to project
+cd my_first_board
+
+# 4. Generate KiCad files from Python
+uv run python main.py
+
+# 5. Open in KiCad
+open ESP32_C6_Dev_Board/ESP32_C6_Dev_Board.kicad_pro
+
+# 6. Make changes to main.py or subcircuits, regenerate
+uv run python main.py
+```
+
+## Key Concepts
+
+**Component**: KiCad schematic symbol instance with reference designator and footprint
+```python
+Component(symbol="Device:R", ref="R", value="10k", footprint="Resistor_SMD:R_0603_1608Metric")
+```
+
+**Net**: Electrical connection between component pins
+```python
+vcc = Net('VCC_3V3')
+component["VCC"] += vcc  # Connect component pin to net
+```
+
+**Circuit**: Function decorated with @circuit that returns circuit object
+```python
+@circuit(name="My_Circuit")
+def my_circuit():
+    # Component creation and connections
+    pass
+```
+
+**Hierarchical Design**: Circuits as reusable functions, called from other circuits
+```python
+def power_supply(vin, vout, gnd):
+    # Reusable power circuit
+    pass
+
+def main_circuit():
+    power = power_supply(vbus, vcc, gnd)  # Use as building block
+```
+
+**Manufacturing Files**: Generate BOM, PDF schematics, Gerber files for production
+```python
+circuit.generate_bom(project_name="my_board")
+circuit.generate_pdf_schematic(project_name="my_board")
+circuit.generate_gerbers(project_name="my_board")
+```
+
+## Common Component Libraries
+
+**Microcontrollers:**
+- ESP32: `RF_Module:ESP32-C6-MINI-1`, `RF_Module:ESP32-S3-MINI-1`
+- STM32: `MCU_ST_STM32F4:STM32F407VETx`
+- Arduino: `MCU_Module:Arduino_UNO_R3`
+
+**Passives:**
+- Resistor: `Device:R`
+- Capacitor: `Device:C`
+- Inductor: `Device:L`
+- LED: `Device:LED`
+
+**Connectors:**
+- USB-C: `Connector:USB_C_Receptacle_USB2.0`
+- Headers: `Connector_Generic:Conn_01x08_Pin`
+- Power jack: `Connector:Barrel_Jack_Switch`
+
+**Power:**
+- Linear regulator: `Regulator_Linear:AMS1117-3.3`
+- Switching regulator: `Regulator_Switching:TPS54331`
+- Battery charger: `Battery_Management:MCP73831`
+
+**Common SMD Footprints:**
+- 0603 resistor/capacitor: `Resistor_SMD:R_0603_1608Metric`, `Capacitor_SMD:C_0603_1608Metric`
+- 0805 resistor/capacitor: `Resistor_SMD:R_0805_2012Metric`, `Capacitor_SMD:C_0805_2012Metric`
+- SOT-223-3: `Package_TO_SOT_SMD:SOT-223-3_TabPin2`
+- LQFP-64: `Package_QFP:LQFP-64_10x10mm_P0.5mm`
+
+## ⚠️ CRITICAL: Always Verify Symbols and Footprints
+
+**LLMs can hallucinate component names that don't exist in KiCad.** Always verify symbols and footprints before using them.
+
+### How to Verify Symbols Exist
+
+**Method 1: Use circuit-synth AI commands (easiest):**
+```bash
+/find-symbol USB-C           # Search for USB symbols
+/find-footprint USB_C        # Search for USB footprints
+```
+
+**Method 2: Search KiCad libraries directly:**
+
+KiCad libraries are at different locations per OS:
+
+**macOS:**
+```bash
+# Set library path
+KICAD_SYMBOLS="/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols"
+KICAD_FOOTPRINTS="/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints"
+
+# Verify symbol exists
+grep -r "symbol.*USB_C_Receptacle\"" "$KICAD_SYMBOLS"/*.kicad_sym
+
+# Find all USB-related symbols
+find "$KICAD_SYMBOLS" -name "*.kicad_sym" -exec grep -l "USB" {} \;
+
+# Verify footprint exists
+find "$KICAD_FOOTPRINTS" -name "*USB_C*.kicad_mod"
+```
+
+**Linux:**
+```bash
+# Set library path
+KICAD_SYMBOLS="/usr/share/kicad/symbols"
+KICAD_FOOTPRINTS="/usr/share/kicad/footprints"
+
+# Verify symbol exists
+grep -r "symbol.*USB_C_Receptacle\"" "$KICAD_SYMBOLS"/*.kicad_sym
+
+# Find all USB-related symbols
+find "$KICAD_SYMBOLS" -name "*.kicad_sym" -exec grep -l "USB" {} \;
+
+# Verify footprint exists
+find "$KICAD_FOOTPRINTS" -name "*USB_C*.kicad_mod"
+```
+
+**Windows PowerShell:**
+```powershell
+# Set library path
+$KICAD_SYMBOLS = "C:\Program Files\KiCad\8.0\share\kicad\symbols"
+$KICAD_FOOTPRINTS = "C:\Program Files\KiCad\8.0\share\kicad\footprints"
+
+# Verify symbol exists
+Get-ChildItem "$KICAD_SYMBOLS\*.kicad_sym" | Select-String "symbol.*USB_C_Receptacle"
+
+# Find all USB-related symbols
+Get-ChildItem "$KICAD_SYMBOLS\*.kicad_sym" | Select-String "USB"
+
+# Verify footprint exists
+Get-ChildItem "$KICAD_FOOTPRINTS\*USB_C*.kicad_mod" -Recurse
+```
+
+### Common Symbol Hallucinations (Wrong vs Right)
+
+**USB Connectors:**
+- ❌ `Connector:USB_C_Receptacle_USB2.0` (doesn't exist)
+- ✅ `Connector:USB_C_Receptacle` (correct)
+
+**Passives:**
+- ❌ `Device:Resistor` (doesn't exist)
+- ✅ `Device:R` (correct)
+- ❌ `Device:Capacitor` (doesn't exist)
+- ✅ `Device:C` (correct)
+
+**Switches:**
+- ❌ `Switch:Button_Push` (doesn't exist)
+- ✅ `Switch:SW_Push` (correct)
+
+### Verified Symbols (Guaranteed to Exist)
+
+These symbols are verified to exist in KiCad 8.0 standard libraries:
+
+**Passives:**
+- `Device:R` - Resistor
+- `Device:C` - Capacitor
+- `Device:L` - Inductor
+- `Device:LED` - LED
+
+**Connectors:**
+- `Connector:USB_C_Receptacle` - USB-C connector (full pinout)
+- `Connector_Generic:Conn_01x02` - 2-pin header
+- `Connector_Generic:Conn_01x08_Pin` - 8-pin header
+- `Connector:Barrel_Jack_Switch` - Power jack
+
+**Power Management:**
+- `Regulator_Linear:AMS1117-3.3` - 3.3V linear regulator
+- `Regulator_Linear:AMS1117-5.0` - 5.0V linear regulator
+
+**Microcontrollers:**
+- `RF_Module:ESP32-C6-MINI-1` - ESP32-C6 module
+- `MCU_Module:Arduino_UNO_R3` - Arduino Uno
+
+**Switches:**
+- `Switch:SW_Push` - Push button
+
+**Verification Workflow:**
+
+```bash
+# 1. Before using a symbol, verify it exists:
+grep -r "symbol.*AMS1117-3.3\"" /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/*.kicad_sym
+
+# 2. If found, use the exact name from the output:
+# Output: (symbol "AMS1117-3.3"
+# Use: Regulator_Linear:AMS1117-3.3
+
+# 3. If not found, search for similar:
+find /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols -name "*.kicad_sym" -exec grep -l "AMS1117" {} \;
+```
+
+**Best Practice:** Always verify unfamiliar symbols before adding them to your circuit code.
+
+## AI Integration
+
+Circuit-synth includes Claude Code integration for AI-assisted design:
+
+**Slash Commands:**
+- `/find-symbol STM32` - Search KiCad symbol libraries
+- `/find-footprint LQFP64` - Find component footprints
+- `/find-parts "0.1uF 0603"` - Check JLCPCB availability and pricing
+- `/generate-validated-circuit "ESP32 IoT sensor"` - Generate circuit from description
+
+**AI Agents:**
+- `circuit-architect` - Complete system design from requirements
+- `circuit-generation-agent` - Generate production-ready Python code
+- `simulation-expert` - SPICE analysis and optimization
+- `component-guru` - Component sourcing across suppliers
+
+**Example AI Workflow:**
+```
+User: "Design a USB-C power supply with 3.3V output and overcurrent protection"
+Claude: [Generates complete circuit-synth code with proper components, verified availability]
+```
+
+## Important Notes
+
+**Bi-directional Workflow:**
+- Python → KiCad: Generate schematics from code
+- KiCad → Python: Import existing .kicad_sch files back to Python
+- Round-trip: Make changes in either Python or KiCad, re-import/re-export
+
+**Automatic Reference Rewriting:**
+Circuit-synth automatically updates Python source files when KiCad auto-numbers components:
+```python
+# Before generation
+cap = Component(ref="C", value="10uF")  # ref="C"
+
+# After generation (source file automatically updated)
+cap = Component(ref="C1", value="10uF")  # ref="C1"
+```
+
+**KiCad Integration:**
+- Requires KiCad 8.0+ installed
+- Uses official kicad-cli for BOM/PDF/Gerber export
+- Full compatibility with KiCad GUI workflow
+
+## Troubleshooting
+
+**Generation takes 10-30 seconds with verbose debug output. This is normal.**
+
+File generation order:
+1. `.kicad_pro` (first)
+2. `.kicad_sch` files
+3. `.kicad_pcb` (last)
+
+**If only `.kicad_pro` exists:** Script was interrupted before completing. Re-run to completion.
+
+**Placement warnings are normal:**
+```
+WARNING - Reached maximum placement attempts (100)
+```
+Components placed anyway. Adjust positions manually in KiCad if needed.
+
+**Don't interrupt the script when you see warnings - let it finish.**
+
+## Architecture
+
+**JSON-Centric Design:**
+```
+Python Circuit → JSON (canonical format) → KiCad Files (.kicad_sch, .kicad_pcb)
+                     ↑                           ↓
+                     └─────────── Round-trip ────┘
+```
+
+JSON serves as single source of truth for circuit data, enabling:
+- Version control (text-based format)
+- Tool-agnostic representation
+- Extensibility and debugging
+
+**Component Intelligence:**
+- JLCPCB integration for availability and pricing
+- DigiKey API for 8M+ component search
+- Multi-source library search (local KiCad, GitHub, SnapEDA)
+- Automatic footprint verification
+
+## File Locations
+
+**Core Documentation:**
+- [README.md](README.md): Complete user guide with examples
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): System architecture and JSON schema
+- [docs/JSON_SCHEMA.md](docs/JSON_SCHEMA.md): Detailed JSON format specification
+- [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md): Contributor guidelines
+- [CLAUDE.md](CLAUDE.md): AI assistant instructions and development workflow
+
+**Specialized Topics:**
+- [docs/BOM_EXPORT.md](docs/BOM_EXPORT.md): Bill of Materials generation
+- [docs/PDF_EXPORT.md](docs/PDF_EXPORT.md): PDF schematic export
+- [docs/GERBER_EXPORT.md](docs/GERBER_EXPORT.md): Manufacturing file generation
+- [docs/FMEA_GUIDE.md](docs/FMEA_GUIDE.md): Reliability analysis
+
+**Example Circuits:**
+- [src/circuit_synth/data/templates/example_circuits/](src/circuit_synth/data/templates/example_circuits/): Complete working examples
+- ESP32 dev board: `esp32_dev_board.py`
+- Power supply: `power_supply_module.py`
+- USB-C interface: `usb_c_basic.py`
+- STM32 minimal: `stm32_minimal.py`
+
+## Requirements
+
+- Python 3.12+
+- KiCad 8.0+
+- uv package manager
+
+## Installation
+
+```bash
+# Install circuit-synth with uv
+uv add circuit-synth
+
+# Create new project
+uv run cs-new-project my_project
+cd my_project
+uv run python main.py
+```
+
+## Testing
+
+```bash
+# Run tests
+uv run pytest --cov=circuit_synth
+
+# Code quality
+black src/ && isort src/ && flake8 src/
+
+# Full regression test suite
+./tools/testing/run_full_regression_tests.py
+```
+
+## Links
+
+- [GitHub Repository](https://github.com/circuit-synth/circuit-synth)
+- [Documentation](https://docs.circuit-synth.com)
+- [PyPI Package](https://pypi.org/project/circuit-synth/)
+- [Issue Tracker](https://github.com/circuit-synth/circuit-synth/issues)
+
+---
+
+**Last Updated:** 2025-11-17
+**Version:** 0.11.5
+**License:** MIT
