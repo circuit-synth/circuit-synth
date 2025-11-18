@@ -527,45 +527,128 @@ circuit.generate_gerbers(project_name="my_board")
 - SOT-223-3: `Package_TO_SOT_SMD:SOT-223-3_TabPin2`
 - LQFP-64: `Package_QFP:LQFP-64_10x10mm_P0.5mm`
 
-## Finding KiCad Symbols and Footprints
+## ⚠️ CRITICAL: Always Verify Symbols and Footprints
 
-KiCad libraries are installed at different locations depending on your operating system:
+**LLMs can hallucinate component names that don't exist in KiCad.** Always verify symbols and footprints before using them.
+
+### How to Verify Symbols Exist
+
+**Method 1: Use circuit-synth AI commands (easiest):**
+```bash
+/find-symbol USB-C           # Search for USB symbols
+/find-footprint USB_C        # Search for USB footprints
+```
+
+**Method 2: Search KiCad libraries directly:**
+
+KiCad libraries are at different locations per OS:
 
 **macOS:**
-```
-Symbols:    /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/
-Footprints: /Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints/
+```bash
+# Set library path
+KICAD_SYMBOLS="/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols"
+KICAD_FOOTPRINTS="/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints"
+
+# Verify symbol exists
+grep -r "symbol.*USB_C_Receptacle\"" "$KICAD_SYMBOLS"/*.kicad_sym
+
+# Find all USB-related symbols
+find "$KICAD_SYMBOLS" -name "*.kicad_sym" -exec grep -l "USB" {} \;
+
+# Verify footprint exists
+find "$KICAD_FOOTPRINTS" -name "*USB_C*.kicad_mod"
 ```
 
 **Linux:**
-```
-Symbols:    /usr/share/kicad/symbols/
-Footprints: /usr/share/kicad/footprints/
-```
-
-**Windows:**
-```
-Symbols:    C:\Program Files\KiCad\8.0\share\kicad\symbols\
-Footprints: C:\Program Files\KiCad\8.0\share\kicad\footprints\
-```
-
-**Search for symbols/footprints:**
 ```bash
-# macOS/Linux - find symbols containing "STM32"
-find /usr/share/kicad/symbols -name "*.kicad_sym" | xargs grep -l "STM32"
+# Set library path
+KICAD_SYMBOLS="/usr/share/kicad/symbols"
+KICAD_FOOTPRINTS="/usr/share/kicad/footprints"
 
-# macOS/Linux - find LQFP footprints
-find /usr/share/kicad/footprints -name "*LQFP*.kicad_mod"
+# Verify symbol exists
+grep -r "symbol.*USB_C_Receptacle\"" "$KICAD_SYMBOLS"/*.kicad_sym
 
-# Windows PowerShell - find symbols
-Get-ChildItem "C:\Program Files\KiCad\8.0\share\kicad\symbols" -Recurse -Filter "*.kicad_sym" | Select-String "STM32"
+# Find all USB-related symbols
+find "$KICAD_SYMBOLS" -name "*.kicad_sym" -exec grep -l "USB" {} \;
+
+# Verify footprint exists
+find "$KICAD_FOOTPRINTS" -name "*USB_C*.kicad_mod"
 ```
 
-**Or use circuit-synth AI commands:**
+**Windows PowerShell:**
+```powershell
+# Set library path
+$KICAD_SYMBOLS = "C:\Program Files\KiCad\8.0\share\kicad\symbols"
+$KICAD_FOOTPRINTS = "C:\Program Files\KiCad\8.0\share\kicad\footprints"
+
+# Verify symbol exists
+Get-ChildItem "$KICAD_SYMBOLS\*.kicad_sym" | Select-String "symbol.*USB_C_Receptacle"
+
+# Find all USB-related symbols
+Get-ChildItem "$KICAD_SYMBOLS\*.kicad_sym" | Select-String "USB"
+
+# Verify footprint exists
+Get-ChildItem "$KICAD_FOOTPRINTS\*USB_C*.kicad_mod" -Recurse
+```
+
+### Common Symbol Hallucinations (Wrong vs Right)
+
+**USB Connectors:**
+- ❌ `Connector:USB_C_Receptacle_USB2.0` (doesn't exist)
+- ✅ `Connector:USB_C_Receptacle` (correct)
+
+**Passives:**
+- ❌ `Device:Resistor` (doesn't exist)
+- ✅ `Device:R` (correct)
+- ❌ `Device:Capacitor` (doesn't exist)
+- ✅ `Device:C` (correct)
+
+**Switches:**
+- ❌ `Switch:Button_Push` (doesn't exist)
+- ✅ `Switch:SW_Push` (correct)
+
+### Verified Symbols (Guaranteed to Exist)
+
+These symbols are verified to exist in KiCad 8.0 standard libraries:
+
+**Passives:**
+- `Device:R` - Resistor
+- `Device:C` - Capacitor
+- `Device:L` - Inductor
+- `Device:LED` - LED
+
+**Connectors:**
+- `Connector:USB_C_Receptacle` - USB-C connector (full pinout)
+- `Connector_Generic:Conn_01x02` - 2-pin header
+- `Connector_Generic:Conn_01x08_Pin` - 8-pin header
+- `Connector:Barrel_Jack_Switch` - Power jack
+
+**Power Management:**
+- `Regulator_Linear:AMS1117-3.3` - 3.3V linear regulator
+- `Regulator_Linear:AMS1117-5.0` - 5.0V linear regulator
+
+**Microcontrollers:**
+- `RF_Module:ESP32-C6-MINI-1` - ESP32-C6 module
+- `MCU_Module:Arduino_UNO_R3` - Arduino Uno
+
+**Switches:**
+- `Switch:SW_Push` - Push button
+
+**Verification Workflow:**
+
 ```bash
-/find-symbol STM32         # Search for symbols
-/find-footprint LQFP64     # Search for footprints
+# 1. Before using a symbol, verify it exists:
+grep -r "symbol.*AMS1117-3.3\"" /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/*.kicad_sym
+
+# 2. If found, use the exact name from the output:
+# Output: (symbol "AMS1117-3.3"
+# Use: Regulator_Linear:AMS1117-3.3
+
+# 3. If not found, search for similar:
+find /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols -name "*.kicad_sym" -exec grep -l "AMS1117" {} \;
 ```
+
+**Best Practice:** Always verify unfamiliar symbols before adding them to your circuit code.
 
 ## AI Integration
 
