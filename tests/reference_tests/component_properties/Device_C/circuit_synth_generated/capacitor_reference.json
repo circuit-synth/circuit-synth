@@ -1,0 +1,78 @@
+{
+  "name": "capacitor_reference",
+  "description": "Single capacitor for property positioning analysis.",
+  "tstamps": "/capacitor_reference-4379668896/",
+  "source_file": "capacitor_reference.kicad_sch",
+  "components": {
+    "C1": {
+      "symbol": "Device:C",
+      "ref": "C1",
+      "value": "100nF",
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "datasheet": "~",
+      "description": "Unpolarized capacitor",
+      "properties": {
+        "ki_fp_filters": "C_*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "C_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 3.81,
+          "length": 2.794,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -3.81,
+          "length": 2.794,
+          "orientation": 90.0
+        }
+      ]
+    }
+  },
+  "nets": {},
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Single capacitor for property positioning analysis.",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "116c7e07-adb9-4a68-957b-2cf0c132ae48"
+    }
+  ]
+}

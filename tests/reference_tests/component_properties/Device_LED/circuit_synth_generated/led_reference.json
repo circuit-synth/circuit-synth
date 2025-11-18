@@ -1,0 +1,78 @@
+{
+  "name": "led_reference",
+  "description": "Single LED for property positioning analysis at 90\u00b0 rotation.",
+  "tstamps": "/led_reference-4330959312/",
+  "source_file": "led_reference.kicad_sch",
+  "components": {
+    "D1": {
+      "symbol": "Device:LED",
+      "ref": "D1",
+      "value": "RED",
+      "footprint": "LED_SMD:LED_0603_1608Metric",
+      "datasheet": "~",
+      "description": "Light emitting diode",
+      "properties": {
+        "ki_fp_filters": "LED* LED_SMD:* LED_THT:*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "LED* LED_SMD:* LED_THT:*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "K",
+          "func": "passive",
+          "unit": 1,
+          "x": -3.81,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "2",
+          "name": "A",
+          "func": "passive",
+          "unit": 1,
+          "x": 3.81,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 180.0
+        }
+      ]
+    }
+  },
+  "nets": {},
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Single LED for property positioning analysis at 90\u00b0 rotation.",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "4e68a686-7aca-4e9a-82f6-b43447cf153e"
+    }
+  ]
+}

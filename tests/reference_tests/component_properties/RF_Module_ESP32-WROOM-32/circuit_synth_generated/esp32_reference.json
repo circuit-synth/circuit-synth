@@ -1,0 +1,448 @@
+{
+  "name": "esp32_reference",
+  "description": "Single ESP32-WROOM-32 for property positioning analysis.",
+  "tstamps": "/esp32_reference-4371984656/",
+  "source_file": "esp32_reference.kicad_sch",
+  "components": {
+    "U1": {
+      "symbol": "RF_Module:ESP32-WROOM-32",
+      "ref": "U1",
+      "value": "ESP32-WROOM-32",
+      "footprint": "RF_Module:ESP32-WROOM-32",
+      "datasheet": "https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32_datasheet_en.pdf",
+      "description": "RF Module, ESP32-D0WDQ6 SoC, Wi-Fi 802.11b/g/n, Bluetooth, BLE, 32-bit, 2.7-3.6V, onboard antenna, SMD",
+      "properties": {
+        "ki_fp_filters": "ESP32?WROOM?32*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "ESP32?WROOM?32*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "GND",
+          "func": "power_in",
+          "unit": 1,
+          "x": 0.0,
+          "y": -35.56,
+          "length": 2.54,
+          "orientation": 90.0
+        },
+        {
+          "pin_id": "2",
+          "name": "VDD",
+          "func": "power_in",
+          "unit": 1,
+          "x": 0.0,
+          "y": 35.56,
+          "length": 2.54,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "3",
+          "name": "EN",
+          "func": "input",
+          "unit": 1,
+          "x": -15.24,
+          "y": 30.48,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "4",
+          "name": "SENSOR_VP",
+          "func": "input",
+          "unit": 1,
+          "x": -15.24,
+          "y": 25.4,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "5",
+          "name": "SENSOR_VN",
+          "func": "input",
+          "unit": 1,
+          "x": -15.24,
+          "y": 22.86,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "6",
+          "name": "IO34",
+          "func": "input",
+          "unit": 1,
+          "x": 15.24,
+          "y": -25.4,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "7",
+          "name": "IO35",
+          "func": "input",
+          "unit": 1,
+          "x": 15.24,
+          "y": -27.94,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "8",
+          "name": "IO32",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": -20.32,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "9",
+          "name": "IO33",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": -22.86,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "10",
+          "name": "IO25",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": -12.7,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "11",
+          "name": "IO26",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": -15.24,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "12",
+          "name": "IO27",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": -17.78,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "13",
+          "name": "IO14",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 10.16,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "14",
+          "name": "IO12",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 15.24,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "15",
+          "name": "GND",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -35.56,
+          "length": 2.54,
+          "orientation": 90.0
+        },
+        {
+          "pin_id": "16",
+          "name": "IO13",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 12.7,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "17",
+          "name": "SHD/SD2",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": -15.24,
+          "y": -5.08,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "18",
+          "name": "SWP/SD3",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": -15.24,
+          "y": -7.62,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "19",
+          "name": "SCS/CMD",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": -15.24,
+          "y": -12.7,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "20",
+          "name": "SCK/CLK",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": -15.24,
+          "y": -10.16,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "21",
+          "name": "SDO/SD0",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": -15.24,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "22",
+          "name": "SDI/SD1",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": -15.24,
+          "y": -2.54,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "23",
+          "name": "IO15",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 7.62,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "24",
+          "name": "IO2",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 25.4,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "25",
+          "name": "IO0",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 30.48,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "26",
+          "name": "IO4",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 20.32,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "27",
+          "name": "IO16",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 5.08,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "28",
+          "name": "IO17",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 2.54,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "29",
+          "name": "IO5",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 17.78,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "30",
+          "name": "IO18",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "31",
+          "name": "IO19",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": -2.54,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "32",
+          "name": "NC",
+          "func": "no_connect",
+          "unit": 1,
+          "x": -12.7,
+          "y": -27.94,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "33",
+          "name": "IO21",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": -5.08,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "34",
+          "name": "RXD0/IO3",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 22.86,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "35",
+          "name": "TXD0/IO1",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": 27.94,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "36",
+          "name": "IO22",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": -7.62,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "37",
+          "name": "IO23",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 15.24,
+          "y": -10.16,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "38",
+          "name": "GND",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -35.56,
+          "length": 2.54,
+          "orientation": 90.0
+        },
+        {
+          "pin_id": "39",
+          "name": "GND",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -35.56,
+          "length": 2.54,
+          "orientation": 90.0
+        }
+      ]
+    }
+  },
+  "nets": {},
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Single ESP32-WROOM-32 for property positioning analysis.",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "9c5ee123-aa11-47d9-a463-2a86d292791c"
+    }
+  ]
+}

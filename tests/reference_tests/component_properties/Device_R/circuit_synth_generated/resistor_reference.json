@@ -1,0 +1,78 @@
+{
+  "name": "resistor_reference",
+  "description": "Single resistor for property positioning analysis.",
+  "tstamps": "/resistor_reference-4381291056/",
+  "source_file": "resistor_reference.kicad_sch",
+  "components": {
+    "R1": {
+      "symbol": "Device:R",
+      "ref": "R1",
+      "value": "10k",
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "datasheet": "~",
+      "description": "Resistor",
+      "properties": {
+        "ki_fp_filters": "R_*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "R_*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": 3.81,
+          "length": 1.27,
+          "orientation": 270.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~",
+          "func": "passive",
+          "unit": 1,
+          "x": 0.0,
+          "y": -3.81,
+          "length": 1.27,
+          "orientation": 90.0
+        }
+      ]
+    }
+  },
+  "nets": {},
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Single resistor for property positioning analysis.",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "6f8a43e8-8e1c-4579-96cc-df22e4c4e85c"
+    }
+  ]
+}

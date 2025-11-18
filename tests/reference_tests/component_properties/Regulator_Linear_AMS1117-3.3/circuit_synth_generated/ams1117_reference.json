@@ -1,0 +1,88 @@
+{
+  "name": "ams1117_reference",
+  "description": "Single AMS1117-3.3 for property positioning analysis.",
+  "tstamps": "/ams1117_reference-4370444464/",
+  "source_file": "ams1117_reference.kicad_sch",
+  "components": {
+    "U1": {
+      "symbol": "Regulator_Linear:AMS1117-3.3",
+      "ref": "U1",
+      "value": "AMS1117-3.3",
+      "footprint": "Package_TO_SOT_SMD:SOT-223-3_TabPin2",
+      "datasheet": "http://www.advanced-monolithic.com/pdf/ds1117.pdf",
+      "description": "1A Low Dropout regulator, positive, 3.3V fixed output, SOT-223",
+      "properties": {
+        "ki_fp_filters": "SOT?223*TabPin2*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "SOT?223*TabPin2*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "GND",
+          "func": "power_in",
+          "unit": 1,
+          "x": 0.0,
+          "y": -7.62,
+          "length": 2.54,
+          "orientation": 90.0
+        },
+        {
+          "pin_id": "2",
+          "name": "VO",
+          "func": "power_out",
+          "unit": 1,
+          "x": 7.62,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "3",
+          "name": "VI",
+          "func": "power_in",
+          "unit": 1,
+          "x": -7.62,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 0.0
+        }
+      ]
+    }
+  },
+  "nets": {},
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Single AMS1117-3.3 for property positioning analysis.",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "15eb7c2a-7c7f-475d-90df-8b5d6d852fe7"
+    }
+  ]
+}

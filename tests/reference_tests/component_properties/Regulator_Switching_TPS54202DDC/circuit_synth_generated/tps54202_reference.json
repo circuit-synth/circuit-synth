@@ -1,0 +1,118 @@
+{
+  "name": "tps54202_reference",
+  "description": "Single TPS54202DDC for property positioning analysis.",
+  "tstamps": "/tps54202_reference-4313034928/",
+  "source_file": "tps54202_reference.kicad_sch",
+  "components": {
+    "U1": {
+      "symbol": "Regulator_Switching:TPS54202DDC",
+      "ref": "U1",
+      "value": "TPS54202DDC",
+      "footprint": "Package_TO_SOT_SMD:SOT-23-6",
+      "datasheet": "http://www.ti.com/lit/ds/symlink/tps54202.pdf",
+      "description": "2A, 4.5 to 28V Input, EMI Friendly integrated switch synchronous step-down regulator, pulse-skipping, SOT-23-6",
+      "properties": {
+        "ki_fp_filters": "SOT?23*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "SOT?23*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "GND",
+          "func": "power_in",
+          "unit": 1,
+          "x": 0.0,
+          "y": -7.62,
+          "length": 2.54,
+          "orientation": 90.0
+        },
+        {
+          "pin_id": "2",
+          "name": "SW",
+          "func": "power_out",
+          "unit": 1,
+          "x": 10.16,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "3",
+          "name": "VIN",
+          "func": "power_in",
+          "unit": 1,
+          "x": -10.16,
+          "y": 2.54,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "4",
+          "name": "FB",
+          "func": "input",
+          "unit": 1,
+          "x": 10.16,
+          "y": -2.54,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "5",
+          "name": "EN",
+          "func": "input",
+          "unit": 1,
+          "x": -10.16,
+          "y": -2.54,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "6",
+          "name": "BOOT",
+          "func": "passive",
+          "unit": 1,
+          "x": 10.16,
+          "y": 2.54,
+          "length": 2.54,
+          "orientation": 180.0
+        }
+      ]
+    }
+  },
+  "nets": {},
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Single TPS54202DDC for property positioning analysis.",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "0fa89e7d-3f39-4dc3-862b-0cbba888a7b2"
+    }
+  ]
+}

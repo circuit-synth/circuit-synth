@@ -1,0 +1,258 @@
+{
+  "name": "74ls245_reference",
+  "description": "Single 74LS245 for property positioning analysis.",
+  "tstamps": "/74ls245_reference-4316344640/",
+  "source_file": "74ls245_reference.kicad_sch",
+  "components": {
+    "U1": {
+      "symbol": "74xx:74LS245",
+      "ref": "U1",
+      "value": "74HCT245",
+      "footprint": "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm",
+      "datasheet": "http://www.ti.com/lit/gpn/sn74LS245",
+      "description": "Octal BUS Transceivers, 3-State outputs",
+      "properties": {
+        "ki_fp_filters": "DIP?20*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "DIP?20*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "A->B",
+          "func": "input",
+          "unit": 1,
+          "x": -12.7,
+          "y": -10.16,
+          "length": 5.08,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "2",
+          "name": "A0",
+          "func": "tri_state",
+          "unit": 1,
+          "x": -12.7,
+          "y": 12.7,
+          "length": 5.08,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "3",
+          "name": "A1",
+          "func": "tri_state",
+          "unit": 1,
+          "x": -12.7,
+          "y": 10.16,
+          "length": 5.08,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "4",
+          "name": "A2",
+          "func": "tri_state",
+          "unit": 1,
+          "x": -12.7,
+          "y": 7.62,
+          "length": 5.08,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "5",
+          "name": "A3",
+          "func": "tri_state",
+          "unit": 1,
+          "x": -12.7,
+          "y": 5.08,
+          "length": 5.08,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "6",
+          "name": "A4",
+          "func": "tri_state",
+          "unit": 1,
+          "x": -12.7,
+          "y": 2.54,
+          "length": 5.08,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "7",
+          "name": "A5",
+          "func": "tri_state",
+          "unit": 1,
+          "x": -12.7,
+          "y": 0.0,
+          "length": 5.08,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "8",
+          "name": "A6",
+          "func": "tri_state",
+          "unit": 1,
+          "x": -12.7,
+          "y": -2.54,
+          "length": 5.08,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "9",
+          "name": "A7",
+          "func": "tri_state",
+          "unit": 1,
+          "x": -12.7,
+          "y": -5.08,
+          "length": 5.08,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "10",
+          "name": "GND",
+          "func": "power_in",
+          "unit": 1,
+          "x": 0.0,
+          "y": -20.32,
+          "length": 5.08,
+          "orientation": 90.0
+        },
+        {
+          "pin_id": "11",
+          "name": "B7",
+          "func": "tri_state",
+          "unit": 1,
+          "x": 12.7,
+          "y": -5.08,
+          "length": 5.08,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "12",
+          "name": "B6",
+          "func": "tri_state",
+          "unit": 1,
+          "x": 12.7,
+          "y": -2.54,
+          "length": 5.08,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "13",
+          "name": "B5",
+          "func": "tri_state",
+          "unit": 1,
+          "x": 12.7,
+          "y": 0.0,
+          "length": 5.08,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "14",
+          "name": "B4",
+          "func": "tri_state",
+          "unit": 1,
+          "x": 12.7,
+          "y": 2.54,
+          "length": 5.08,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "15",
+          "name": "B3",
+          "func": "tri_state",
+          "unit": 1,
+          "x": 12.7,
+          "y": 5.08,
+          "length": 5.08,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "16",
+          "name": "B2",
+          "func": "tri_state",
+          "unit": 1,
+          "x": 12.7,
+          "y": 7.62,
+          "length": 5.08,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "17",
+          "name": "B1",
+          "func": "tri_state",
+          "unit": 1,
+          "x": 12.7,
+          "y": 10.16,
+          "length": 5.08,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "18",
+          "name": "B0",
+          "func": "tri_state",
+          "unit": 1,
+          "x": 12.7,
+          "y": 12.7,
+          "length": 5.08,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "19",
+          "name": "CE",
+          "func": "input",
+          "unit": 1,
+          "x": -12.7,
+          "y": -12.7,
+          "length": 5.08,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "20",
+          "name": "VCC",
+          "func": "power_in",
+          "unit": 1,
+          "x": 0.0,
+          "y": 20.32,
+          "length": 5.08,
+          "orientation": 270.0
+        }
+      ]
+    }
+  },
+  "nets": {},
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Single 74LS245 for property positioning analysis.",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "0f7d5707-aa11-4a68-91b8-93aef28a3ea2"
+    }
+  ]
+}

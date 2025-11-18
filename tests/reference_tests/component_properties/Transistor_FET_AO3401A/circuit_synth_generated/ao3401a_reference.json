@@ -1,0 +1,88 @@
+{
+  "name": "ao3401a_reference",
+  "description": "Single AO3401A for property positioning analysis.",
+  "tstamps": "/ao3401a_reference-4339839152/",
+  "source_file": "ao3401a_reference.kicad_sch",
+  "components": {
+    "Q1": {
+      "symbol": "Transistor_FET:AO3401A",
+      "ref": "Q1",
+      "value": "AO3401A",
+      "footprint": "Package_TO_SOT_SMD:SOT-23",
+      "datasheet": "http://www.aosmd.com/pdfs/datasheet/AO3401A.pdf",
+      "description": "-4.0A Id, -30V Vds, P-Channel MOSFET, SOT-23",
+      "properties": {
+        "ki_fp_filters": "SOT?23*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "SOT?23*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "G",
+          "func": "input",
+          "unit": 1,
+          "x": -5.08,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "2",
+          "name": "S",
+          "func": "passive",
+          "unit": 1,
+          "x": 2.54,
+          "y": -5.08,
+          "length": 2.54,
+          "orientation": 90.0
+        },
+        {
+          "pin_id": "3",
+          "name": "D",
+          "func": "passive",
+          "unit": 1,
+          "x": 2.54,
+          "y": 5.08,
+          "length": 2.54,
+          "orientation": 270.0
+        }
+      ]
+    }
+  },
+  "nets": {},
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Single AO3401A for property positioning analysis.",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "5ca60206-0f53-4344-9326-aee27172235f"
+    }
+  ]
+}

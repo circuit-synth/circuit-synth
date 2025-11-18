@@ -1,0 +1,138 @@
+{
+  "name": "max3485_reference",
+  "description": "Single MAX3485 for property positioning analysis.",
+  "tstamps": "/max3485_reference-4376605040/",
+  "source_file": "max3485_reference.kicad_sch",
+  "components": {
+    "U1": {
+      "symbol": "Interface_UART:MAX3485",
+      "ref": "U1",
+      "value": "MAX485",
+      "footprint": "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm",
+      "datasheet": "https://datasheets.maximintegrated.com/en/ds/MAX3483-MAX3491.pdf",
+      "description": "True RS-485/RS-422, 10Mbps, Slew-Rate Limited, with low-power shutdown, with receiver/driver enable, 32 receiver drive capacitity, DIP-8 and SOIC-8",
+      "properties": {
+        "ki_fp_filters": "DIP*W7.62mm* SOIC*3.9x4.9mm*P1.27mm*"
+      },
+      "_extra_fields": {
+        "ki_fp_filters": "DIP*W7.62mm* SOIC*3.9x4.9mm*P1.27mm*"
+      },
+      "pins": [
+        {
+          "pin_id": "1",
+          "name": "RO",
+          "func": "output",
+          "unit": 1,
+          "x": -10.16,
+          "y": 5.08,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "2",
+          "name": "~{RE}",
+          "func": "input",
+          "unit": 1,
+          "x": -10.16,
+          "y": 2.54,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "3",
+          "name": "DE",
+          "func": "input",
+          "unit": 1,
+          "x": -10.16,
+          "y": 0.0,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "4",
+          "name": "DI",
+          "func": "input",
+          "unit": 1,
+          "x": -10.16,
+          "y": -5.08,
+          "length": 2.54,
+          "orientation": 0.0
+        },
+        {
+          "pin_id": "5",
+          "name": "GND",
+          "func": "power_in",
+          "unit": 1,
+          "x": 0.0,
+          "y": -15.24,
+          "length": 2.54,
+          "orientation": 90.0
+        },
+        {
+          "pin_id": "6",
+          "name": "A",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 10.16,
+          "y": 7.62,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "7",
+          "name": "B",
+          "func": "bidirectional",
+          "unit": 1,
+          "x": 10.16,
+          "y": 2.54,
+          "length": 2.54,
+          "orientation": 180.0
+        },
+        {
+          "pin_id": "8",
+          "name": "VCC",
+          "func": "power_in",
+          "unit": 1,
+          "x": 0.0,
+          "y": 15.24,
+          "length": 2.54,
+          "orientation": 270.0
+        }
+      ]
+    }
+  },
+  "nets": {},
+  "subcircuits": [],
+  "annotations": [
+    {
+      "type": "TextBox",
+      "text": "Single MAX3485 for property positioning analysis.",
+      "position": [
+        184.0,
+        110.0
+      ],
+      "size": [
+        80.0,
+        30.0
+      ],
+      "margins": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "text_size": 1.2,
+      "bold": true,
+      "italic": false,
+      "text_color": "black",
+      "background": true,
+      "background_color": "lightyellow",
+      "border": true,
+      "border_width": 0.1,
+      "border_color": "black",
+      "justify": "center center",
+      "rotation": 0,
+      "uuid": "7b21b919-624f-4c96-8dfd-1490ec85c0ae"
+    }
+  ]
+}
