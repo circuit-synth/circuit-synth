@@ -2789,6 +2789,22 @@ def write_schematic_file(schematic, out_path: str):
     logger.info(f"Writing schematic to {out_path}")
 
     try:
+        # QUICK FIX: Hide all properties except Reference and Value
+        # (We'll remove these properties entirely later)
+        logger.debug("Hiding non-essential properties (all except Reference and Value)")
+        for component in schematic.components:
+            # Access the raw component data
+            if hasattr(component, '_data'):
+                comp_data = component._data
+            else:
+                comp_data = component
+
+            # Mark all properties except Reference and Value as hidden
+            if hasattr(comp_data, 'hidden_properties'):
+                for prop_name in list(component.properties.keys()):
+                    if prop_name not in ("Reference", "Value"):
+                        comp_data.hidden_properties.add(prop_name)
+
         # Sync ComponentCollection to _data before writing
         if hasattr(schematic, "_sync_components_to_data"):
             logger.debug(
