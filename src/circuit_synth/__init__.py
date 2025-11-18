@@ -131,6 +131,15 @@ from .core.netlist_exporter import NetlistExporter
 # Reference manager and netlist exporters
 from .core.reference_manager import ReferenceManager
 
+# Quality assurance and validation
+from .quality_assurance import (
+    ValidationIssue,
+    validate,
+    validate_manufacturing,
+    validate_naming,
+    validate_properties,
+)
+
 # Removed unused interface abstractions and unified integration
 
 
@@ -172,6 +181,12 @@ __all__ = [
     "ComponentError",
     "ValidationError",
     "CircuitSynthError",
+    # Quality assurance and validation
+    "ValidationIssue",
+    "validate",
+    "validate_properties",
+    "validate_manufacturing",
+    "validate_naming",
     # Dependency injection
     "DependencyContainer",
     "ServiceLocator",

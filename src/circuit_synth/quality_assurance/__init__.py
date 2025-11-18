@@ -14,6 +14,13 @@ from .fmea_report_generator import (
     FMEAReportGenerator,
     analyze_circuit_for_fmea,
 )
+from .validation import (
+    ValidationIssue,
+    validate,
+    validate_manufacturing,
+    validate_naming,
+    validate_properties,
+)
 
 # Import enhanced analyzer if available
 try:
@@ -39,6 +46,11 @@ __all__ = [
     "analyze_any_circuit",
     "ComponentType",
     "FailureMode",
+    "ValidationIssue",
+    "validate",
+    "validate_properties",
+    "validate_manufacturing",
+    "validate_naming",
 ]
 
 # Add conditional exports
