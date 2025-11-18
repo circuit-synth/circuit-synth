@@ -101,9 +101,13 @@ from .core import (
     IDependencyContainer,
     Net,
     Pin,
+    ReplacementResult,
     ServiceLocator,
     ValidationError,
     circuit,
+    find_replaceable_components,
+    replace_components,
+    replace_multiple,
 )
 
 # Annotation imports
@@ -159,6 +163,11 @@ __all__ = [
     "Net",
     "Pin",
     "circuit",
+    # Component replacement
+    "replace_components",
+    "replace_multiple",
+    "find_replaceable_components",
+    "ReplacementResult",
     # Annotations
     "TextProperty",
     "TextBox",
