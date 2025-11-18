@@ -694,6 +694,25 @@ cap = Component(ref="C1", value="10uF")  # ref="C1"
 - Uses official kicad-cli for BOM/PDF/Gerber export
 - Full compatibility with KiCad GUI workflow
 
+## Troubleshooting
+
+**Generation takes 10-30 seconds with verbose debug output. This is normal.**
+
+File generation order:
+1. `.kicad_pro` (first)
+2. `.kicad_sch` files
+3. `.kicad_pcb` (last)
+
+**If only `.kicad_pro` exists:** Script was interrupted before completing. Re-run to completion.
+
+**Placement warnings are normal:**
+```
+WARNING - Reached maximum placement attempts (100)
+```
+Components placed anyway. Adjust positions manually in KiCad if needed.
+
+**Don't interrupt the script when you see warnings - let it finish.**
+
 ## Architecture
 
 **JSON-Centric Design:**
@@ -776,6 +795,6 @@ black src/ && isort src/ && flake8 src/
 
 ---
 
-**Last Updated:** 2025-01-27
+**Last Updated:** 2025-11-17
 **Version:** 0.11.5
 **License:** MIT
