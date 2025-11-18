@@ -582,7 +582,6 @@ circuit-synth/
 3. **If in circuit-synth:**
    - Fix it here as normal
 
-**Note:** TAC-8 autonomous infrastructure will eventually be set up in kicad-sch-api and kicad-pcb-api repos. For now, workers should create issues there when needed, but fixes will be done manually.
 
 **Example scenario:**
 

@@ -130,8 +130,6 @@ cs-fast-gen-demo = "circuit_synth.fast_generation.demo:main_cli"
 # Fast JLCPCB Search CLI
 jlc-fast = "circuit_synth.tools.jlc_fast_search_cli:cli"
 
-# TAC Dashboard
-cs-dashboard = "circuit_synth.tools.dashboard.cli:main"
 
 # Test Plan Generation - DISABLED: Files don't exist yet
 # create-test-plan = "circuit_synth.tools.test_plan_commands:create_test_plan"
