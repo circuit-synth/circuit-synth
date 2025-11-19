@@ -131,6 +131,19 @@ from .core.netlist_exporter import NetlistExporter
 # Reference manager and netlist exporters
 from .core.reference_manager import ReferenceManager
 
+# Quality assurance and validation
+from .quality_assurance import (
+    ERCResults,
+    ERCViolation,
+    KiCADERCError,
+    ValidationIssue,
+    run_erc,
+    validate,
+    validate_manufacturing,
+    validate_naming,
+    validate_properties,
+)
+
 # Removed unused interface abstractions and unified integration
 
 
@@ -192,6 +205,17 @@ __all__ = [
     "require_kicad",
     "get_kicad_paths",
     "KiCadValidationError",
+    # Quality assurance and validation
+    "ValidationIssue",
+    "validate",
+    "validate_properties",
+    "validate_manufacturing",
+    "validate_naming",
+    # ERC
+    "run_erc",
+    "ERCResults",
+    "ERCViolation",
+    "KiCADERCError",
     # Claude Code integration
     "setup_claude_integration",
     # Version utilities
