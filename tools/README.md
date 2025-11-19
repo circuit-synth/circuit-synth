@@ -1,91 +1,50 @@
-# Circuit-Synth Development Tools
+# BOM Property Management
 
-This directory contains all development tools and scripts for circuit-synth. These tools are used for building, testing, analysis, and maintenance but are not part of the installed package.
+Find and fix components missing PartNumber (or any property) in your KiCad schematics.
 
-## 📁 Directory Structure
+## Quick Start
 
-### `ci-setup/`
-**Continuous Integration Setup Tools**
-- `setup-ci-symbols.sh` - Cross-platform bash script for KiCad symbol setup
-- `setup_ci_symbols.py` - Python alternative for environments without bash
-- `CI_SETUP.md` - Complete CI setup documentation
-
-### `build/`
-**Build and Compilation Tools**
-- `setup_formatting.sh` - Set up code formatting tools
-
-### `testing/`
-**Test Automation and Execution**
-- `run_regression_tests.py` - Execute regression test suite
-
-### `release/`
-**Release and Distribution**
-- `release_to_pypi.sh` - Automated PyPI release pipeline
-
-### `analysis/`
-**Code Analysis and Quality**
-- `dead-code-analysis.py` - Identify and analyze unused code
-- `dead-code-analysis.sh` - Shell wrapper for dead code analysis
-
-### `maintenance/`
-**Repository Maintenance Utilities**
-- `clear_all_caches.sh` - Clear all build and runtime caches
-- `update_examples_with_stock.py` - Update examples with current stock info
-
-## 🚀 Quick Reference
-
-### Build Operations
 ```bash
-# Build everything
+# Find components missing PartNumber
+python manage_bom_properties.py audit ~/path/to/designs --output report.csv
 
-# Format all code
-./tools/build/format_all.sh
-
-# Clean rebuild
+# Open report.csv in Excel to see what's missing
 ```
 
-### Testing
+## Bulk Update (Optional)
+
 ```bash
-# Run complete test suite
-./tools/testing/run_all_tests.sh
+# Set PartNumber for all 10k resistors (preview first)
+python manage_bom_properties.py update ~/designs \
+  --match "value=10k" \
+  --set "PartNumber=RC0805FR-0710KL" \
+  --dry-run
 
-
-# Run regression tests
-python3 tools/testing/run_regression_tests.py
+# Remove --dry-run to apply changes
 ```
 
-### Release
+## Pattern Matching
+
+Match by any field:
+- `value=10k` - exact match
+- `footprint=*0805*` - wildcard
+- `value=10k,lib_id=Device:R` - multiple criteria
+
+## Commands
+
+**Audit** - Find missing properties
 ```bash
-# Release to PyPI
-./tools/release/release_to_pypi.sh 0.5.1
+manage_bom_properties.py audit <dir> --check PartNumber --output report.csv
 ```
 
-### Analysis & Maintenance
+**Update** - Bulk property changes
 ```bash
-# Analyze dead code
-./tools/analysis/dead-code-analysis.sh
-
-# Clear all caches
-./tools/maintenance/clear_all_caches.sh
+manage_bom_properties.py update <dir> --match <criteria> --set <properties> --dry-run
 ```
 
-### CI Setup
+**Transform** - Copy properties
 ```bash
-# Cross-platform KiCad symbol setup for CI
-./tools/ci-setup/setup-ci-symbols.sh
-
-# Python alternative
-python3 tools/ci-setup/setup_ci_symbols.py
+manage_bom_properties.py transform <dir> --copy "MPN->PartNumber" --only-if-empty
 ```
 
-## 📋 Directory Purpose
-
-| Directory | Purpose | Installed with Package |
-|-----------|---------|----------------------|
-| **`tools/`** | Development, build, test, analysis tools | ❌ No |
-| **`src/circuit_synth/cli/`** | User-facing CLI utilities | ✅ Yes |
-| **`src/circuit_synth/`** | Core library code | ✅ Yes |
-| **`examples/`** | Usage examples and demos | ✅ Yes |
-| **`docs/`** | API documentation and guides | ✅ Yes |
-
-This organization provides clear separation between development tools (not installed) and user tools (part of the package).
+Always use `--dry-run` first to preview changes.
