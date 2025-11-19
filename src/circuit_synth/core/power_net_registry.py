@@ -51,17 +51,23 @@ class PowerNetRegistry:
 
         Parses power.kicad_sym to extract all power symbol names
         and build mapping of net name -> lib_id.
+
+        IMPORTANT: Always includes common power nets (VBAT, VIN, VOUT, etc.)
+        even if not in KiCad library, by merging with builtin defaults.
         """
         logger.debug("Discovering power symbols from KiCad library...")
+
+        # Start with builtin defaults to ensure common nets are always available
+        self._use_builtin_defaults()
+        initial_count = len(self._power_symbols)
 
         # Get power library path
         power_lib_path = self._find_power_library()
         if not power_lib_path:
-            logger.debug("Could not find power.kicad_sym, using built-in defaults")
-            self._use_builtin_defaults()
+            logger.debug(f"Could not find power.kicad_sym, using {initial_count} built-in defaults only")
             return
 
-        # Parse power.kicad_sym
+        # Parse power.kicad_sym and MERGE with builtin defaults
         try:
             with open(power_lib_path, 'r') as f:
                 content = f.read()
@@ -71,22 +77,29 @@ class PowerNetRegistry:
             pattern = r'\(symbol\s+"([^"]+)"'
             matches = re.findall(pattern, content)
 
+            discovered_count = 0
             for symbol_name in matches:
                 # symbol_name is like "+3V3", "GND", "VCC", etc.
                 lib_id = f"power:{symbol_name}"
 
-                # Store with exact name
+                # Store with exact name (may override builtin default)
                 self._power_symbols[symbol_name] = lib_id
+                discovered_count += 1
 
                 # Also store common variants
                 # e.g., "3V3" -> "power:+3V3", "3.3V" -> "power:+3V3"
                 self._add_common_variants(symbol_name, lib_id)
 
-            logger.debug(f"Discovered {len(self._power_symbols)} power symbol mappings")
+            logger.debug(
+                f"Discovered {discovered_count} symbols from KiCad library, "
+                f"merged with {initial_count} builtins = {len(self._power_symbols)} total mappings"
+            )
 
         except Exception as e:
-            logger.warning(f"Error parsing power library: {e}, using built-in defaults")
-            self._use_builtin_defaults()
+            logger.warning(
+                f"Error parsing power library: {e}, "
+                f"using {initial_count} built-in defaults only"
+            )
 
     def _add_common_variants(self, symbol_name: str, lib_id: str) -> None:
         """Add common variants for a power symbol."""
@@ -135,6 +148,10 @@ class PowerNetRegistry:
             "GNDD": "power:GNDD",
             "GNDPWR": "power:GNDPWR",
             "GNDREF": "power:GNDREF",
+            # Common ground variants (analog/digital/power)
+            "AGND": "power:GND",  # Analog ground → use GND symbol
+            "DGND": "power:GND",  # Digital ground → use GND symbol
+            "PGND": "power:GND",  # Power ground → use GND symbol
 
             # Positive supplies
             "VCC": "power:VCC",

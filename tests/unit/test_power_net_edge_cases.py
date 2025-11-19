@@ -64,13 +64,16 @@ class TestCaseSensitivity:
 class TestMissingCommonPowerNets:
     """Test commonly used power nets that might not be in registry."""
 
-    @pytest.mark.parametrize("net_name", ["AGND", "DGND", "PGND"])
-    def test_ground_variants(self, net_name):
+    @pytest.mark.parametrize("net_name,expected_symbol", [
+        ("AGND", "power:GND"),
+        ("DGND", "power:GND"),
+        ("PGND", "power:GND"),
+    ])
+    def test_ground_variants(self, net_name, expected_symbol):
         """
-        Common ground variants (AGND, DGND, PGND) might not be in registry.
+        Common ground variants (AGND, DGND, PGND) should auto-detect.
 
-        This is a KNOWN LIMITATION - these nets will need explicit is_power=True
-        unless we add them to the PowerNetRegistry.
+        These are now in the PowerNetRegistry builtin defaults and map to power:GND.
         """
         circuit_json = {
             "name": "test",
@@ -104,13 +107,9 @@ class TestMissingCommonPowerNets:
             net = next((n for n in circuit.nets if n.name == net_name), None)
             assert net is not None
 
-            # Known limitation: these might not be in registry
-            # Document the current behavior
-            from circuit_synth.core.power_net_registry import is_power_net
-            if is_power_net(net_name):
-                assert net.is_power is True, f"{net_name} in registry, should auto-detect"
-            else:
-                pytest.skip(f"{net_name} not in registry - known limitation")
+            # These ground variants should now auto-detect
+            assert net.is_power is True, f"{net_name} should auto-detect as power net"
+            assert net.power_symbol == expected_symbol, f"{net_name} should use {expected_symbol}"
 
         finally:
             Path(json_path).unlink()
@@ -118,9 +117,9 @@ class TestMissingCommonPowerNets:
     @pytest.mark.parametrize("net_name", ["VBAT", "VIN", "VOUT"])
     def test_voltage_rail_variants(self, net_name):
         """
-        Common voltage rails (VBAT, VIN, VOUT) might not be in registry.
+        Common voltage rails (VBAT, VIN, VOUT) should auto-detect.
 
-        KNOWN LIMITATION: These nets will need explicit is_power=True.
+        These are now in the PowerNetRegistry builtin defaults.
         """
         circuit_json = {
             "name": "test",
@@ -154,14 +153,9 @@ class TestMissingCommonPowerNets:
             net = next((n for n in circuit.nets if n.name == net_name), None)
             assert net is not None
 
-            # Check if in registry
-            from circuit_synth.core.power_net_registry import is_power_net
-            if is_power_net(net_name):
-                assert net.is_power is True, f"{net_name} in registry, should auto-detect"
-            else:
-                # Known limitation - document it
-                assert net.is_power is False, f"{net_name} not in registry"
-                pytest.skip(f"{net_name} not in registry - known limitation, need explicit is_power=True")
+            # These voltage rails should now auto-detect
+            assert net.is_power is True, f"{net_name} should auto-detect as power net"
+            assert net.power_symbol == f"power:{net_name}", f"{net_name} should use power:{net_name}"
 
         finally:
             Path(json_path).unlink()
