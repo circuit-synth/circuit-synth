@@ -567,6 +567,7 @@ Automatically exports all standard PCB layers:
 
 - **Automatic Source Reference Rewriting**: Keep Python and KiCad refs synchronized (see above)
 - **Bill of Materials Export**: Generate manufacturing-ready BOMs in CSV format (see above)
+- **BOM Property Management**: Audit, update, and transform component properties for manufacturing compliance
 - **PDF Schematic Export**: Generate professional PDF schematics with formatting options (see above)
 - **Gerber Manufacturing Files**: Generate complete PCB manufacturing files (Gerbers + drill) (see above)
 - **Professional KiCad Output**: Generate .kicad_pro, .kicad_sch, .kicad_pcb files with modern kicad-sch-api integration
