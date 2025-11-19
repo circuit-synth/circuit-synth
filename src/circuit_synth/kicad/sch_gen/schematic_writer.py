@@ -1463,6 +1463,29 @@ class SchematicWriter:
                     LabelType.HIERARCHICAL if is_hierarchical else LabelType.LOCAL
                 )
 
+                # CHECK FOR DUPLICATE LABELS: Issue #559
+                # Before creating a new label, check if one already exists at this position
+                duplicate_found = False
+                if hasattr(self.schematic, "_data"):
+                    label_list_key = "hierarchical_labels" if label_type == LabelType.HIERARCHICAL else "labels"
+                    if label_list_key in self.schematic._data:
+                        for existing_label in self.schematic._data[label_list_key]:
+                            # Calculate distance to existing label
+                            ex_pos = existing_label.get("position", {})
+                            ex_x = ex_pos.get("x", float("inf"))
+                            ex_y = ex_pos.get("y", float("inf"))
+                            distance = ((ex_x - global_x) ** 2 + (ex_y - global_y) ** 2) ** 0.5
+
+                            if distance < 0.5:  # 0.5mm tolerance (same as PIN_LABEL_DISTANCE_TOLERANCE)
+                                if existing_label.get("text") == net_name:
+                                    logger.debug(f"Label '{net_name}' already exists at ({global_x}, {global_y}), skipping duplicate")
+                                    duplicate_found = True
+                                    break
+
+                # Skip creating duplicate label
+                if duplicate_found:
+                    continue
+
                 # Create label using the API
                 label = Label(
                     uuid=str(uuid_module.uuid4()),
