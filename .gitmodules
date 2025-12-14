@@ -19,6 +19,3 @@
 [submodule "submodules/digikey-kicad"]
 	path = submodules/digikey-kicad
 	url = https://github.com/Digi-Key/digikey-kicad-library.git
-[submodule "submodules/kicad-pcb-api"]
-	path = submodules/kicad-pcb-api
-	url = https://github.com/circuit-synth/kicad-pcb-api.git

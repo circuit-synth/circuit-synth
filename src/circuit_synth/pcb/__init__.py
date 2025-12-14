@@ -1,36 +1,44 @@
 """
-KiCad PCB API for creating and manipulating PCB files.
+KiCad PCB API - PCB generation features have been removed.
 
-This module now re-exports from kicad-pcb-api for compatibility.
-NEW CODE SHOULD IMPORT DIRECTLY FROM kicad-pcb-api.
-
-Migration to kicad-pcb-api in progress (#325).
-This compatibility layer will be removed in v0.12.0.
+PCB generation functionality is no longer included in the open source version.
+Contact Circuit Synth for licensing information if you need PCB features.
 """
 
-# Re-export from kicad-pcb-api for backward compatibility
-from kicad_pcb_api import PCBBoard, PCBParser
-from kicad_pcb_api.core.types import Footprint, Layer, Pad
-from kicad_pcb_api.footprints.footprint_library import (
-    FootprintInfo,
-    FootprintLibraryCache,
-    get_footprint_cache,
-)
 
-# Keep circuit-synth specific extensions
+class PCBNotAvailableError(ImportError):
+    """Raised when PCB features are accessed but not available."""
+
+    pass
+
+
+def _raise_not_available(*args, **kwargs):
+    raise PCBNotAvailableError(
+        "PCB generation features are not included in this version. "
+        "Contact Circuit Synth for licensing information."
+    )
+
+
+# Stub classes that raise errors when used
+class PCBBoard:
+    def __init__(self, *args, **kwargs):
+        _raise_not_available()
+
+
+class PCBParser:
+    def __init__(self, *args, **kwargs):
+        _raise_not_available()
+
+
+# Keep circuit-synth specific extensions that don't depend on kicad-pcb-api
 from .kicad_cli import DRCResult, KiCadCLI, KiCadCLIError, get_kicad_cli
 
 __all__ = [
     "PCBBoard",
     "PCBParser",
-    "Footprint",
-    "Pad",
-    "Layer",
+    "PCBNotAvailableError",
     "KiCadCLI",
     "get_kicad_cli",
     "DRCResult",
     "KiCadCLIError",
-    "FootprintLibraryCache",
-    "FootprintInfo",
-    "get_footprint_cache",
 ]

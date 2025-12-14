@@ -519,15 +519,11 @@ circuit-synth/
   - Purpose: Read/write KiCad .kicad_sch files
   - Used by: circuit-synth for schematic generation
 
-- **kicad-pcb-api** - KiCad PCB file API
-  - Repository: https://github.com/circuit-synth/kicad-pcb-api
-  - Purpose: Read/write KiCad .kicad_pcb files
-  - Used by: circuit-synth for PCB generation
 
 **Decision Rule:** When debugging issues in circuit-synth:
 
 1. **Root cause in circuit-synth** → Fix it here
-2. **Root cause in kicad-sch-api or kicad-pcb-api** → Fix it there
+2. **Root cause in kicad-sch-api** → Fix it there
 
 **Why this matters:**
 - Don't work around upstream bugs - fix them at the source
