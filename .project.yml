@@ -1,0 +1,9 @@
+name: circuit-synth
+category: core-tools
+lifecycle: paused
+priority: P3
+tags:
+  - python
+  - kicad
+  - schematic
+memory_tier: none
