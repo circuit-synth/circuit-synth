@@ -764,6 +764,25 @@ class APISynchronizer:
         logger.debug(f"  → label position: ({label_pos.x}, {label_pos.y})")
         logger.debug(f"  → label angle: {label_angle}°")
 
+        # CHECK FOR DUPLICATE LABELS: Issue #559
+        # Before adding a new label, check if one already exists at this position
+        for existing_label in self.schematic.hierarchical_labels:
+            distance = math.sqrt(
+                (existing_label.position.x - label_pos.x) ** 2 +
+                (existing_label.position.y - label_pos.y) ** 2
+            )
+            if distance < PIN_LABEL_DISTANCE_TOLERANCE:  # 0.5mm tolerance
+                # Found existing label at this position
+                if existing_label.text == net_name:
+                    logger.debug(f"Label '{net_name}' already exists at pin {pin_number}, skipping duplicate")
+                    return True  # Not an error - label already exists with correct name
+                else:
+                    logger.warning(
+                        f"Conflicting label at {kicad_component.reference} pin {pin_number}: "
+                        f"existing='{existing_label.text}', new='{net_name}'"
+                    )
+                    # Continue to add the new label - this is a real conflict that needs attention
+
         # CHECK FOR POWER NETS: Place power symbol instead of hierarchical label
         # This matches the behavior in schematic_writer.py for consistency
         net_obj = self._get_net_object(net_name)
