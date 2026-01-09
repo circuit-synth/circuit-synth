@@ -24,7 +24,7 @@ from rich.prompt import Confirm
 from rich.text import Text
 
 # Import circuit-synth modules
-from circuit_synth.ai_integration.claude.agent_registry import register_circuit_agents
+from circuit_synth.ai_integration.claude import register_circuit_agents
 from circuit_synth.core.kicad_validator import validate_kicad_installation
 
 # Import new interactive CLI modules

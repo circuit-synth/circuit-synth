@@ -498,3 +498,80 @@ class TestEdgeCases:
 
                 # Should fall back to register_circuit_agents
                 assert mock_register.called, "Should call fallback agent registration"
+
+
+# ============================================================================
+# Import Regression Tests (#588)
+# ============================================================================
+
+
+class TestModuleImports:
+    """
+    Regression tests for module import issues.
+
+    These tests verify that all project management tools can be imported
+    without ModuleNotFoundError, preventing regressions like issue #588.
+    """
+
+    def test_new_project_module_imports(self):
+        """
+        REGRESSION TEST for issue #588
+
+        Verifies that new_project.py can be imported without errors.
+        The bug was importing from non-existent agent_registry submodule
+        instead of using the package root with fallback.
+        """
+        # This import should not raise ModuleNotFoundError
+        from circuit_synth.tools.project_management import new_project
+
+        # Verify key functions are accessible
+        assert hasattr(new_project, "main"), "main function should be accessible"
+        assert hasattr(
+            new_project, "create_claude_directory_from_templates"
+        ), "create_claude_directory_from_templates should be accessible"
+
+    def test_init_existing_project_module_imports(self):
+        """
+        REGRESSION TEST for issue #588
+
+        Verifies that init_existing_project.py can be imported without errors.
+        The bug was:
+        1. Importing from non-existent agent_registry submodule
+        2. Wrong import path for KiCadParser
+        """
+        # This import should not raise ModuleNotFoundError
+        from circuit_synth.tools.project_management import init_existing_project
+
+        # Verify key functions are accessible
+        assert hasattr(
+            init_existing_project, "main"
+        ), "main function should be accessible"
+
+    def test_register_circuit_agents_fallback(self):
+        """
+        REGRESSION TEST for issue #588
+
+        Verifies that register_circuit_agents can be imported from package root
+        and provides fallback behavior when agent_registry module is missing.
+        """
+        # This import should work (package root with fallback)
+        from circuit_synth.ai_integration.claude import register_circuit_agents
+
+        # Function should be callable
+        assert callable(
+            register_circuit_agents
+        ), "register_circuit_agents should be callable"
+
+    def test_kicad_parser_import_path(self):
+        """
+        REGRESSION TEST for issue #588
+
+        Verifies KiCadParser can be imported from correct path.
+        The bug was importing from circuit_synth.tools.kicad_parser
+        instead of circuit_synth.tools.utilities.kicad_parser.
+        """
+        # This import should work
+        from circuit_synth.tools.utilities.kicad_parser import KiCadParser
+
+        # Class should be importable
+        assert KiCadParser is not None, "KiCadParser class should be importable"
