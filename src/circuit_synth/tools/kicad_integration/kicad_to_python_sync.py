@@ -275,32 +275,45 @@ class KiCadToPythonSyncer:
             if not circuits:
                 raise RuntimeError("Failed to parse KiCad project")
 
-            # Get circuit by project name, fallback to first circuit
-            main_circuit = circuits.get(project_name) or list(circuits.values())[0]
+            # For hierarchical projects, merge all circuits into a flattened view
+            # This ensures all components from child sheets are included
+            all_components = {}
+            all_nets = {}
 
-            # Convert circuit to JSON format (circuit-synth schema)
-            # Transform from models.Circuit format to circuit-synth JSON format
-            json_data = {
-                "name": project_name,  # Use project name from .kicad_pro, not circuit.name
-                "components": {
-                    comp.reference: {
-                        "ref": comp.reference,
-                        "symbol": comp.lib_id,
-                        "value": comp.value,
-                        "footprint": comp.footprint,
-                    }
-                    for comp in main_circuit.components
-                },
-                "nets": {
-                    net.name: [
-                        {
+            for circuit_name, circuit in circuits.items():
+                # Collect components from all sheets
+                for comp in circuit.components:
+                    if comp.reference not in all_components:
+                        all_components[comp.reference] = {
+                            "ref": comp.reference,
+                            "symbol": comp.lib_id,
+                            "value": comp.value,
+                            "footprint": comp.footprint,
+                        }
+
+                # Collect nets from all sheets, merging connections for same net name
+                for net in circuit.nets:
+                    if net.name not in all_nets:
+                        all_nets[net.name] = []
+                    for conn in net.connections:
+                        conn_entry = {
                             "component": conn[0],
                             "pin_id": (int(conn[1]) if conn[1].isdigit() else conn[1]),
                         }
-                        for conn in net.connections
-                    ]
-                    for net in main_circuit.nets
-                },
+                        # Avoid duplicate connections
+                        if conn_entry not in all_nets[net.name]:
+                            all_nets[net.name].append(conn_entry)
+
+            logger.info(
+                f"Merged {len(circuits)} hierarchical sheets: "
+                f"{len(all_components)} components, {len(all_nets)} nets"
+            )
+
+            # Convert circuit to JSON format (circuit-synth schema)
+            json_data = {
+                "name": project_name,
+                "components": all_components,
+                "nets": all_nets,
             }
 
             # Add source_file using project name
@@ -367,18 +380,53 @@ class KiCadToPythonSyncer:
             if not circuits:
                 raise RuntimeError("Failed to parse KiCad project - no circuits found")
 
-            # Get main circuit
-            main_circuit = circuits.get("main") or list(circuits.values())[0]
+            # For hierarchical projects, merge all circuits into a flattened view
+            all_components = {}
+            all_nets = {}
 
-            # Regenerate JSON netlist from parsed circuit
+            for circuit_name, circuit in circuits.items():
+                # Collect components from all sheets
+                for comp in circuit.components:
+                    if comp.reference not in all_components:
+                        all_components[comp.reference] = {
+                            "ref": comp.reference,
+                            "symbol": comp.lib_id,
+                            "value": comp.value,
+                            "footprint": comp.footprint,
+                        }
+
+                # Collect nets from all sheets, merging connections for same net name
+                for net in circuit.nets:
+                    if net.name not in all_nets:
+                        all_nets[net.name] = []
+                    for conn in net.connections:
+                        conn_entry = {
+                            "component": conn[0],
+                            "pin_id": (int(conn[1]) if conn[1].isdigit() else conn[1]),
+                        }
+                        if conn_entry not in all_nets[net.name]:
+                            all_nets[net.name].append(conn_entry)
+
+            # Build merged JSON
+            json_data = {
+                "name": project_name,
+                "description": "",
+                "tstamps": "",
+                "source_file": f"{project_name}.kicad_sch",
+                "components": all_components,
+                "nets": all_nets,
+                "subcircuits": [],
+                "annotations": [],
+            }
+
+            # Regenerate JSON netlist from parsed circuits
             logger.info(f"Writing updated JSON to {self.json_path}")
-            json_data = main_circuit.to_circuit_synth_json()
             with open(self.json_path, "w") as f:
                 json.dump(json_data, f, indent=2)
 
             logger.info(
-                f"JSON regenerated: {len(main_circuit.components)} components, "
-                f"{len(main_circuit.nets)} nets"
+                f"JSON regenerated from {len(circuits)} sheets: "
+                f"{len(all_components)} components, {len(all_nets)} nets"
             )
 
         except Exception as e:
