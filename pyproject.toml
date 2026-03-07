@@ -53,6 +53,7 @@ dependencies = [
     "beautifulsoup4>=4.11.0",
     "lxml>=6.0.0",
     "pyspice>=1.5",
+    "reportlab>=4.4.0",
     "twine>=6.1.0",
     # Fast generation dependencies
     "openai>=1.0.0",
