@@ -1,0 +1,2890 @@
+manifest:
+  version: "0.1.3"
+  schema: https://a2as.org/cert/schema
+  subject:
+    name: circuit-synth/circuit-synth
+    source: https://github.com/circuit-synth/circuit-synth
+    branch: main
+    commit: "fb2bd306"
+    scope: [src/circuit_synth/fast_generation/adk_tools.py, src/circuit_synth/fast_generation/models.py, src/circuit_synth/fast_generation/pin_finder.py]
+  issued:
+    by: A2AS.org
+    at: '2026-02-11T16:33:38Z'
+    url: https://a2as.org/certified/agents/circuit-synth/circuit-synth
+  signatures:
+    digest: sha256:UndfEhYV_svvr5gqygoa7pJ47LZufyor52f24v2D7nU
+    key: ed25519:Zwx2K5L6ACIaLFT9o5EFQTY4gAigTLSxa13QSd4ljKQ
+    sig: ed25519:7bQM7OnhWySrQK6WWt7Nb_O159M_dzO0KnwiGrCSDfpRVCwCZldgPPgLnChZaCR_IQozQEO-gkO10NoIJSeEAg
+
+agents:
+  agent._setup_agents.0:
+    type: factory
+    models: [gemini-2.5-flash]
+    tools: [tools]
+    params:
+      name: circuit_generator
+      instruction: [You are a circuit design specialist. Generate production-ready, KiCad circuit-synth code following electrical
+          engineering best practices., 'CRITICAL: Always use these tools before generating circuits:', 1. find_symbol_tool_function()
+          - Find correct KiCad symbols, 2. find_footprint_tool_function() - Find matching footprints, 3. find_pins_tool_function()
+          - Get exact pin names, This ensures you use verified components with correct pin names.]
+      description: Primary circuit code generation
+      function: _setup_agents
+      instance: agent._setup_agents
+  agent._setup_agents.1:
+    type: factory
+    models: [gemini-2.5-flash]
+    tools: [tools]
+    params:
+      name: component_validator
+      instruction: [Validate that all components exist in KiCad libraries and, verify electrical connections are correct.
+          Use find_pins_tool_function to verify pin names.]
+      description: Component and connection validation
+      function: _setup_agents
+      instance: agent._setup_agents
+  agent._setup_agents.2:
+    type: factory
+    models: [gemini-2.5-flash]
+    params:
+      name: pattern_specialist
+      instruction: ['Specialize in common circuit patterns: MCU boards, sensor', 'integration, motor control, power management.']
+      description: Circuit pattern expertise
+      function: _setup_agents
+      instance: agent._setup_agents
+
+models:
+  gemini-2.5-flash:
+    type: literal
+    agents: [agent._setup_agents.0, agent._setup_agents.1, agent._setup_agents.2]
+
+tools:
+  tools:
+    type: function
+    agents: [agent._setup_agents.0, agent._setup_agents.1]
+    params:
+      dynamic: "True"
+
+imports:
+  _calculate_manufacturability_score: jlc_parts_lookup._calculate_manufacturability_score
+  ABC: abc.ABC
+  abstractmethod: abc.abstractmethod
+  ACAnalysis: analysis.ACAnalysis
+  add_image: core.annotations.add_image
+  add_symbol_instance: instance_utils.add_symbol_instance
+  add_table: core.annotations.add_table
+  add_text: core.annotations.add_text
+  add_text_box: core.annotations.add_text_box
+  adk_pin_finder_tool: pin_finder.adk_pin_finder_tool
+  Agent: google.adk.agents.Agent
+  AIDesignBridge: ai_integration.plugins.AIDesignBridge
+  aiohttp: aiohttp
+  Any: typing.Any
+  arc_s_expr: shape_drawer.arc_s_expr
+  argparse: argparse
+  assign_subcircuit_instance_labels: circuit_loader.assign_subcircuit_instance_labels
+  asyncio: asyncio
+  base64: base64
+  BaseLibrarySource: base.BaseLibrarySource
+  BoundingBox: core.BoundingBox
+  cached_digikey_product: cache.cached_digikey_product
+  cached_digikey_search: cache.cached_digikey_search
+  cached_jlcpcb_search: cache.cached_jlcpcb_search
+  calculate_hierarchical_label_justify: label_utils.calculate_hierarchical_label_justify
+  CanonicalCircuit: circuit_synth.kicad.canonical.CanonicalCircuit
+  CanonicalConnection: circuit_synth.kicad.canonical.CanonicalConnection
+  circle_s_expr: shape_drawer.circle_s_expr
+  Circuit: core.circuit.Circuit
+  circuit: core.circuit
+  CircuitMatcher: circuit_synth.kicad.canonical.CircuitMatcher
+  CircuitPatterns: patterns.CircuitPatterns
+  CircuitSimulator: simulator.CircuitSimulator
+  CircuitSynthError: core.CircuitSynthError
+  click: click
+  CollisionManager: collision_manager.CollisionManager
+  Component: kicad_sch_api.core.components.Component
+  ComponentCollection: kicad_sch_api.core.components.ComponentCollection
+  ComponentError: core.ComponentError
+  ComponentManager: component_manager.ComponentManager
+  ComponentRecommendation: smart_component_finder.ComponentRecommendation
+  ComponentSearchResult: models.ComponentSearchResult
+  ComponentUnit: circuit_synth.kicad.schematic.component_unit.ComponentUnit
+  configure_digikey_cli: config_manager.configure_digikey_cli
+  ConnectionAwareCollisionManager: connection_aware_collision_manager.ConnectionAwareCollisionManager
+  ConnectionMatchStrategy: sync_strategies.ConnectionMatchStrategy
+  ConnectionTracer: connection_tracer.ConnectionTracer
+  context_logger: core._logger.context_logger
+  contextmanager: contextlib.contextmanager
+  create_adk_tools: adk_tools.create_adk_tools
+  dataclass: dataclasses.dataclass
+  datetime: datetime
+  DCAnalysis: analysis.DCAnalysis
+  deepcopy: copy.deepcopy
+  DependencyContainer: core.dependency_injection.DependencyContainer
+  Dict: typing.Dict
+  DigiKeyAPIClient: api_client.DigiKeyAPIClient
+  DigiKeyCache: cache.DigiKeyCache
+  DigiKeyComponent: component_search.DigiKeyComponent
+  DigiKeyComponentSearch: component_search.DigiKeyComponentSearch
+  DigiKeyConfig: api_client.DigiKeyConfig
+  DigiKeyConfigManager: config_manager.DigiKeyConfigManager
+  DigiKeyGitHubModernSource: sources.digikey_github_modern.DigiKeyGitHubModernSource
+  DigiKeyGitHubSource: sources.DigiKeyGitHubSource
+  DigiKeyLibraryConverter: converter.DigiKeyLibraryConverter
+  DigiKeySource: sources.DigiKeySource
+  dumps: sexpdata.dumps
+  enhance_component_with_jlc_data: jlc_parts_lookup.enhance_component_with_jlc_data
+  enhance_component_with_web_data: jlc_web_scraper.enhance_component_with_web_data
+  enhance_simulation_result: visualization.enhance_simulation_result
+  EnhancedNetlistExporter: core.enhanced_netlist_exporter.EnhancedNetlistExporter
+  Enum: enum.Enum
+  ERCResults: quality_assurance.ERCResults
+  ERCViolation: quality_assurance.ERCViolation
+  fast_jlc_search: fast_search.fast_jlc_search
+  FastCircuitGenerator: core.FastCircuitGenerator
+  FastJLCSearch: fast_search.FastJLCSearch
+  FastSearchResult: fast_search.FastSearchResult
+  field: dataclasses.field
+  filter_user_properties: property_utils.filter_user_properties
+  find_cheapest_jlc: fast_search.find_cheapest_jlc
+  find_component: smart_component_finder.find_component
+  find_components: smart_component_finder.find_components
+  find_most_available_jlc: fast_search.find_most_available_jlc
+  find_pin_by_identifier: sch_gen.schematic_writer.find_pin_by_identifier
+  find_replaceable_components: core.find_replaceable_components
+  FunctionTool: google.adk.tools.FunctionTool
+  generate_testbench_for_circuit: testbench.generate_testbench_for_circuit
+  GeometryUtils: geometry_utils.GeometryUtils
+  get_ai_pin_context: pin_finder.get_ai_pin_context
+  get_component_alternatives: jlc_parts_lookup.get_component_alternatives
+  get_component_availability_web: jlc_web_scraper.get_component_availability_web
+  get_current_circuit: core.decorators.get_current_circuit
+  get_digikey_cache: cache.get_digikey_cache
+  get_fast_searcher: fast_search.get_fast_searcher
+  get_jlcpcb_cache: cache.get_jlcpcb_cache
+  get_kicad_paths: core.kicad_validator.get_kicad_paths
+  get_manufacturer_models: manufacturer_models.get_manufacturer_models
+  get_model_library: models.get_model_library
+  get_project_hierarchy_path: instance_utils.get_project_hierarchy_path
+  get_symbol_cache: core.symbol_cache.get_symbol_cache
+  google_search: google.adk.tools.google_search
+  GoogleADKModel: models.GoogleADKModel
+  Graphic: core.annotations.Graphic
+  hashlib: hashlib
+  HierarchicalSynchronizer: circuit_synth.kicad.schematic.hierarchical_synchronizer.HierarchicalSynchronizer
+  HTTPLibrarySource: sources.HTTPLibrarySource
+  IDependencyContainer: core.dependency_injection.IDependencyContainer
+  initialize_claude_integration: ai_integration.claude.initialize_claude_integration
+  IntegratedReferenceManager: integrated_reference_manager.IntegratedReferenceManager
+  JlcPartsInterface: jlc_parts_lookup.JlcPartsInterface
+  JLCPCBCache: cache.JLCPCBCache
+  JlcWebScraper: jlc_web_scraper.JlcWebScraper
+  json: json
+  Junction: kicad_sch_api.core.types.Junction
+  KiCadConfig: config.KiCadConfig
+  KiCADERCError: quality_assurance.KiCADERCError
+  KiCadNetlistService: netlist_service.KiCadNetlistService
+  KiCadToPythonSyncer: tools.kicad_integration.kicad_to_python_sync.KiCadToPythonSyncer
+  KiCadValidationError: core.kicad_validator.KiCadValidationError
+  ksa: kicad_sch_api
+  Label: kicad_sch_api.core.types.Label
+  LabelManager: label_manager.LabelManager
+  LabelType: kicad_sch_api.core.types.LabelType
+  LibraryCache: cache.LibraryCache
+  LibraryOrchestrator: orchestrator.LibraryOrchestrator
+  LibrarySource: models.LibrarySource
+  LibrarySourceConfig: circuit_synth.kicad.library_sourcing.config.LibrarySourceConfig
+  List: typing.List
+  load_circuit_from_dict: io.json_loader.load_circuit_from_dict
+  load_circuit_hierarchy: circuit_loader.load_circuit_hierarchy
+  LocalKiCadSource: sources.LocalKiCadSource
+  log_component_processing: debug_performance.log_component_processing
+  log_net_label_creation: debug_performance.log_net_label_creation
+  log_symbol_lookup: sch_gen.debug_performance.log_symbol_lookup
+  logger: loguru.logger
+  logging: logging
+  ManufacturerModels: manufacturer_models.ManufacturerModels
+  math: math
+  ModelLibrary: models.ModelLibrary
+  ModelResponse: models.ModelResponse
+  ModelsCircuit: tools.utilities.models.Circuit
+  ModelsComponent: tools.utilities.models.Component
+  ModelsNet: tools.utilities.models.Net
+  Net: core.net.Net
+  NetlistExporter: core.netlist_exporter.NetlistExporter
+  NetMatcher: net_matcher.NetMatcher
+  openai: openai
+  OpenRouterModel: models.OpenRouterModel
+  Optional: typing.Optional
+  os: os
+  parse_kicad_sym_file: kicad_symbol_parser.parse_kicad_sym_file
+  Path: pathlib.Path
+  PatternTemplate: patterns.PatternTemplate
+  PatternType: patterns.PatternType
+  PCBGenerator: circuit_synth.kicad.pcb_gen.PCBGenerator
+  PCBSynchronizer: circuit_synth.kicad.pcb_gen.pcb_synchronizer.PCBSynchronizer
+  Pin: core.Pin
+  pin_finder: pin_finder.pin_finder
+  place_with_text_flow: schematic.text_flow_placement.place_with_text_flow
+  PlacementEngine: placement.PlacementEngine
+  PlacementStrategy: placement.PlacementStrategy
+  Point: kicad_sch_api.core.types.Point
+  polyline_s_expr: shape_drawer.polyline_s_expr
+  PositionRenameStrategy: sync_strategies.PositionRenameStrategy
+  print_component_recommendation: smart_component_finder.print_component_recommendation
+  print_performance_summary: debug_performance.print_performance_summary
+  ProjectTemplateGenerator: project_templates.ProjectTemplateGenerator
+  PythonSymbolLibCache: circuit_synth.kicad.kicad_symbol_cache.SymbolLibCache
+  quick_search: api_client.quick_search
+  quick_time: core.performance_profiler.quick_time
+  quote: urllib.parse.quote
+  re: re
+  recommend_jlc_component: jlc_parts_lookup.recommend_jlc_component
+  Rectangle: kicad_sch_api.core.types.Rectangle
+  rectangle_s_expr: shape_drawer.rectangle_s_expr
+  ReferenceManager: core.reference_manager.ReferenceManager
+  ReferenceMatchStrategy: sync_strategies.ReferenceMatchStrategy
+  replace_components: core.replace_components
+  replace_multiple: core.replace_multiple
+  ReplacementResult: core.ReplacementResult
+  require_kicad: core.kicad_validator.require_kicad
+  run_erc: quality_assurance.run_erc
+  Schematic: kicad_sch_api.core.types.Schematic
+  SchematicPin: kicad_sch_api.core.types.SchematicPin
+  SchematicSymbol: kicad_sch_api.core.types.SchematicSymbol
+  SchematicSynchronizer: kicad.sch_sync.synchronizer.SchematicSynchronizer
+  SchematicUpdater: kicad.sch_sync.schematic_updater.SchematicUpdater
+  SchematicWriter: schematic_writer.SchematicWriter
+  search_digikey_components: component_search.search_digikey_components
+  search_jlc_components_web: jlc_web_scraper.search_jlc_components_web
+  SearchEngine: search_engine.SearchEngine
+  SearchQuery: models.SearchQuery
+  SearchQueryBuilder: search_engine.SearchQueryBuilder
+  ServiceLocator: core.dependency_injection.ServiceLocator
+  Set: typing.Set
+  set_current_circuit: core.decorators.set_current_circuit
+  sexpdata: sexpdata
+  SExpressionParser: kicad_sch_api.core.parser.SExpressionParser
+  Sheet: kicad_sch_api.core.types.Sheet
+  SHEET_MARGIN: collision_manager.SHEET_MARGIN
+  SheetPin: kicad_sch_api.core.types.SheetPin
+  shutil: shutil
+  SimulationResult: simulator.SimulationResult
+  SimulationVisualizer: visualization.SimulationVisualizer
+  SmartComponentFinder: smart_component_finder.SmartComponentFinder
+  SnapEDASource: sources.SnapEDASource
+  SourceConfig: models.SourceConfig
+  SourcePriority: models.SourcePriority
+  SpiceConverter: converter.SpiceConverter
+  SpiceModel: models.SpiceModel
+  subprocess: subprocess
+  Symbol: sexpdata.Symbol
+  SymbolBoundingBoxCalculator: symbol_geometry.SymbolBoundingBoxCalculator
+  SymbolInstance: kicad_sch_api.core.types.SymbolInstance
+  SymbolLibCache: circuit_synth.kicad.kicad_symbol_cache.SymbolLibCache
+  SyncAdapter: circuit_synth.kicad.schematic.sync_adapter.SyncAdapter
+  SyncIntegration: kicad.sch_api.sync_integration.SyncIntegration
+  SyncReport: kicad.sch_sync.synchronizer.SyncReport
+  SyncStrategy: sync_strategies.SyncStrategy
+  sys: sys
+  Table: core.annotations.Table
+  tempfile: tempfile
+  TestBenchGenerator: testbench.TestBenchGenerator
+  Text: kicad_sch_api.core.types.Text
+  TextBox: core.annotations.TextBox
+  TextProperty: core.annotations.TextProperty
+  time: time
+  timed_operation: sch_gen.debug_performance.timed_operation
+  timedelta: datetime.timedelta
+  traceback: traceback
+  TransientAnalysis: analysis.TransientAnalysis
+  Tuple: typing.Tuple
+  Union: typing.Union
+  util: importlib.util
+  uuid: uuid
+  uuid_module: uuid
+  UUIDMatchStrategy: sync_strategies.UUIDMatchStrategy
+  validate: quality_assurance.validate
+  validate_kicad_installation: core.kicad_validator.validate_kicad_installation
+  validate_manufacturing: quality_assurance.validate_manufacturing
+  validate_modern_api_requirements: config.validate_modern_api_requirements
+  validate_naming: quality_assurance.validate_naming
+  validate_properties: quality_assurance.validate_properties
+  ValidationError: core.ValidationError
+  ValidationIssue: validation.ValidationIssue
+  ValueFootprintStrategy: sync_strategies.ValueFootprintStrategy
+  Wire: kicad_sch_api.core.types.Wire
+  write_schematic_file: schematic_writer.write_schematic_file
+
+functions:
+  __call__:
+    type: sync
+    module: src.circuit_synth.fast_generation.pin_finder
+    args: [self, symbol_name]
+    params:
+      returns: str
+  __init__:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, schematic, sheet_size, project_name]
+  __new__:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [cls]
+  __post_init__:
+    type: sync
+    module: src.circuit_synth.tools.kicad_integration.python_to_kicad_sync
+    args: [self]
+  __repr__:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [self]
+    params:
+      returns: str
+  __str__:
+    type: sync
+    module: src.circuit_synth.quality_assurance.validation
+    args: [self]
+    params:
+      returns: str
+  _add_annotations:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self]
+  _add_bounding_boxes_to_schematic:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, circuit]
+  _add_component:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, comp_data, report]
+  _add_component_bounding_boxes:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self]
+  _add_components:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self]
+  _add_connections:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [self, nets]
+    params:
+      returns: None
+  _add_image_annotation:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, image]
+  _add_net_data:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [self, net_data]
+    params:
+      returns: None
+  _add_paper_size:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, schematic_expr]
+  _add_pin_label:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, kicad_component, pin_number, net_name, report]
+    params:
+      returns: bool
+  _add_pin_level_net_labels:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self]
+  _add_positioned_component:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [self, comp_data]
+    params:
+      returns: None
+  _add_power_symbol:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, net_obj, net_name, position, label_angle, component_ref, pin_number, report]
+    params:
+      returns: bool
+  _add_sheet_instances:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, schematic_expr]
+  _add_subcircuit_sheets:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self]
+  _add_symbol_definitions:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, schematic_expr]
+  _add_symbol_instances_table:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, schematic_expr]
+  _add_table_annotation:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, table]
+  _add_text_annotation:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, text_prop]
+  _add_textbox_annotation:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, textbox]
+  _apply_filters:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, results, min_stock, prefer_basic]
+    params:
+      returns: List[FastSearchResult]
+  _apply_sync_changes:
+    type: sync
+    module: src.circuit_synth.tools.kicad_integration.python_to_kicad_sync
+    args: [self, sync_report]
+  _build_complete_index:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [self]
+    params:
+      returns: None
+  _build_component_index:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self]
+    params:
+      returns: Dict
+  _build_context:
+    type: sync
+    module: src.circuit_synth.fast_generation.core
+    args: [self, template, requirements]
+    params:
+      returns: Dict
+  _build_generation_prompt:
+    type: sync
+    module: src.circuit_synth.fast_generation.core
+    args: [self, template, context]
+    params:
+      returns: str
+  _build_indices:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self]
+  _build_query_from_specs:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, component_type, specs]
+    params:
+      returns: str
+  _build_system_message:
+    type: sync
+    module: src.circuit_synth.fast_generation.models
+    args: [self, context]
+    params:
+      returns: str
+  _cache_filename:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [self, lib_path]
+    params:
+      returns: str
+  _calculate_connectivity_score:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [self, old_circuit, new_circuit, old_idx, new_idx]
+    params:
+      returns: float
+  _calculate_match_score:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, description, part_number, query]
+    params:
+      returns: float
+  _calculate_pin_position:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, sheet, side, index]
+    params:
+      returns: Point
+  _calculate_sheet_size:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, components]
+    params:
+      returns: Tuple
+  _calculate_symbol_bounds:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.symbol_geometry
+    args: [self, lib_id]
+    params:
+      returns: Tuple
+  _check_existing_project:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+    params:
+      returns: bool
+  _collect_all_references:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, json_file]
+    params:
+      returns: set
+  _collision_place_all_circuits:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, sub_dict, placement_algorithm]
+  _compute_file_hash:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [self, file_path]
+    params:
+      returns: str
+  _convert_models_circuit_to_api_circuit:
+    type: sync
+    module: src.circuit_synth.kicad.importer
+    args: [models_circuit]
+    params:
+      returns: Circuit
+  _convert_to_fast_result:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, raw_data, query]
+    params:
+      returns: Optional[FastSearchResult]
+  _count_project_files:
+    type: sync
+    module: src.circuit_synth.fast_generation.core
+    args: [self, project_path]
+    params:
+      returns: int
+  _create_backup:
+    type: sync
+    module: src.circuit_synth.tools.kicad_integration.python_to_kicad_sync
+    args: [self]
+  _create_component_units:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, component_labels]
+    params:
+      returns: List[ComponentUnit]
+  _create_net_wires:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [self, components, net]
+    params:
+      returns: None
+  _create_project_file:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [self, project_path]
+    params:
+      returns: None
+  _create_symbol_definition:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, lib_id, lib_data]
+  _deserialize_result:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.cache
+    args: [self, data]
+    params:
+      returns: ComponentSearchResult
+  _determine_library_id:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, comp_data]
+    params:
+      returns: str
+  _determine_paper_size:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, components, sheets]
+  _draw_component_unit_bboxes:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, units]
+    params:
+      returns: None
+  _ensure_converted:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey_github_modern
+    args: [self]
+  _escape_kicad_string:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [text]
+    params:
+      returns: str
+  _extract_circuit_components:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, circuit]
+    params:
+      returns: Dict
+  _extract_footprint_description:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey_github
+    args: [self, fp_file]
+    params:
+      returns: Optional[str]
+  _extract_net_connections:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [schematic_data]
+    params:
+      returns: Dict
+  _extract_pin_info:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, component]
+    params:
+      returns: Dict
+  _extract_price:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey
+    args: [self, pricing_data]
+    params:
+      returns: Optional[float]
+  _extract_properties:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [symbol]
+    params:
+      returns: Dict
+  _extract_specifications:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey
+    args: [self, part_data]
+    params:
+      returns: dict
+  _extract_specs_from_description:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, description]
+    params:
+      returns: Dict
+  _extract_symbol_names:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.local_kicad
+    args: [self, lib_file, query]
+    params:
+      returns: List[str]
+  _extract_symbol_names_fast:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [self, sym_file_path]
+    params:
+      returns: List[str]
+  _extract_symbol_section:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey_github
+    args: [self, content, symbol_name]
+    params:
+      returns: Optional[str]
+  _extract_symbols:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [schematic_data]
+    params:
+      returns: List[Dict]
+  _extract_wires_and_labels:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [data, wires, labels]
+    params:
+      returns: None
+  _fallback_pin_detection:
+    type: sync
+    module: src.circuit_synth.fast_generation.pin_finder
+    args: [self, symbol_name]
+    params:
+      returns: Dict
+  _find_best_footprint_match:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.local_kicad
+    args: [self, symbol_name, footprint_matches]
+    params:
+      returns: Optional[tuple]
+  _find_circular_references:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, hierarchy]
+    params:
+      returns: List[List[str]]
+  _find_footprint_paths:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.local_kicad
+    args: [self]
+    params:
+      returns: List[Path]
+  _find_kicad_symbol_dirs:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [cls]
+    params:
+      returns: List[Path]
+  _find_library_file:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [self, lib_name]
+    params:
+      returns: Optional[Path]
+  _find_matching_footprint:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey_github
+    args: [self, symbol_info, footprint_matches]
+    params:
+      returns: Optional[Dict]
+  _find_sheet_position:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self]
+    params:
+      returns: Tuple
+  _find_symbol_file_by_name:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [self, lib_name]
+    params:
+      returns: Optional[Path]
+  _find_symbol_paths:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.local_kicad
+    args: [self]
+    params:
+      returns: List[Path]
+  _fix_all_schematic_project_names:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+  _fix_power_symbol_text_positions:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, sch_file_path]
+  _flatten_hierarchical_data:
+    type: sync
+    module: src.circuit_synth.kicad.netlist_service
+    args: [self, circuit_data]
+    params:
+      returns: Dict
+  _flatten_symbol:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_parser
+    args: [sym_name, sym_data, library_dict]
+    params:
+      returns: Dict
+  _format_kicad_pins:
+    type: sync
+    module: src.circuit_synth.fast_generation.pin_finder
+    args: [self, symbol_name, pins]
+    params:
+      returns: str
+  _format_pin_info:
+    type: sync
+    module: src.circuit_synth.fast_generation.pin_finder
+    args: [self, symbol_name, pins]
+    params:
+      returns: str
+  _generate_final_report:
+    type: sync
+    module: src.circuit_synth.tools.kicad_integration.python_to_kicad_sync
+    args: [self, sync_report]
+    params:
+      returns: Dict
+  _generate_netlist:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, json_file]
+    params:
+      returns: bool
+  _generate_reference:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, prefix]
+    params:
+      returns: str
+  _generate_uuid:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self]
+    params:
+      returns: str
+  _generate_with_google_adk:
+    type: async
+    module: src.circuit_synth.fast_generation.core
+    args: [self, model, template, context]
+    params:
+      returns: ModelResponse
+  _generate_with_openrouter:
+    type: async
+    module: src.circuit_synth.fast_generation.core
+    args: [self, model, template, context]
+    params:
+      returns: ModelResponse
+  _get_cache_dir:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [cls]
+    params:
+      returns: Path
+  _get_cache_key:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.cache
+    args: [self, query]
+    params:
+      returns: str
+  _get_category_for_type:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, component_type]
+    params:
+      returns: Optional[str]
+  _get_component_field:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, component, field]
+    params:
+      returns: Optional[str]
+  _get_component_key:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, reference]
+    params:
+      returns: Optional[str]
+  _get_default_bounds:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.symbol_geometry
+    args: [self, lib_id]
+    params:
+      returns: Tuple
+  _get_kicad_library_info:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey
+    args: [self, digikey_part_number]
+    params:
+      returns: dict
+  _get_lib_id:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [self, component]
+    params:
+      returns: str
+  _get_net_object:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, net_name]
+  _get_next_power_reference:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self]
+    params:
+      returns: str
+  _get_pin_connections:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [symbol, comp_uuid, net_connections]
+    params:
+      returns: Dict
+  _get_pin_information:
+    type: sync
+    module: src.circuit_synth.fast_generation.models
+    args: [self, components]
+    params:
+      returns: str
+  _get_pin_labels:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, kicad_component]
+    params:
+      returns: Dict
+  _get_pin_orientation:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, side]
+    params:
+      returns: int
+  _get_position:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [self, component]
+    params:
+      returns: Tuple
+  _group_by_component:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [self]
+    params:
+      returns: Dict
+  _group_components_by_type:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [self, circuit]
+    params:
+      returns: Dict
+  _index_sheets:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self]
+  _initialize_sources:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.orchestrator
+    args: [self]
+  _is_cache_expired:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [cls, cache_time, ttl_hours]
+    params:
+      returns: bool
+  _is_net_hierarchical:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self, net_obj]
+  _is_power_symbol:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [symbol]
+    params:
+      returns: bool
+  _json_to_models_circuit:
+    type: sync
+    module: src.circuit_synth.kicad.importer
+    args: [json_data]
+  _key:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_parser
+    args: [obj]
+    params:
+      returns: str
+  _lazy_symbol_search:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [self, symbol_id]
+    params:
+      returns: Dict
+  _load_adi_models:
+    type: sync
+    module: src.circuit_synth.simulation.manufacturer_models
+    args: [self]
+  _load_circuit_from_execution:
+    type: sync
+    module: src.circuit_synth.tools.kicad_integration.python_to_kicad_sync
+    args: [self]
+    params:
+      returns: Optional[Circuit]
+  _load_circuit_from_module:
+    type: sync
+    module: src.circuit_synth.tools.kicad_integration.python_to_kicad_sync
+    args: [self]
+    params:
+      returns: Optional[Circuit]
+  _load_http_configs:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.http_library
+    args: [self]
+    params:
+      returns: List[Dict]
+  _load_infineon_models:
+    type: sync
+    module: src.circuit_synth.simulation.manufacturer_models
+    args: [self]
+  _load_library:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [self, lib_path]
+    params:
+      returns: Dict
+  _load_onsemi_models:
+    type: sync
+    module: src.circuit_synth.simulation.manufacturer_models
+    args: [self]
+  _load_or_create_config:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.config
+    args: [self]
+    params:
+      returns: Dict
+  _load_schematic:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self]
+    params:
+      returns: Schematic
+  _load_sheets_recursively:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, schematic, base_path, loaded_files]
+  _load_st_models:
+    type: sync
+    module: src.circuit_synth.simulation.manufacturer_models
+    args: [self]
+  _load_symbol_from_file_direct:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [self, symbol_file, symbol_id]
+    params:
+      returns: Dict
+  _load_ti_models:
+    type: sync
+    module: src.circuit_synth.simulation.manufacturer_models
+    args: [self]
+  _log_sync_results:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, sync_report]
+  _match_by_connectivity:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [self, old_circuit, new_circuit, old_indices, new_indices, matches, matched_new_components, component_type]
+    params:
+      returns: None
+  _match_components:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, circuit_components, kicad_components]
+    params:
+      returns: Dict
+  _matches_pattern:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, text, pattern, match_type, case_sensitive]
+    params:
+      returns: bool
+  _matches_query:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, component, query]
+    params:
+      returns: bool
+  _merge_parent_into_child:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_parser
+    args: [child, parent]
+    params:
+      returns: None
+  _needs_update:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, circuit_comp, kicad_comp]
+    params:
+      returns: bool
+  _parse_cached_results:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, cached_data]
+    params:
+      returns: List[FastSearchResult]
+  _parse_graphic_element:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_parser
+    args: [elem]
+    params:
+      returns: Dict
+  _parse_http_response:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.http_library
+    args: [self, data, source_name]
+    params:
+      returns: List[ComponentSearchResult]
+  _parse_httplib_config:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.http_library
+    args: [self, config_file]
+    params:
+      returns: Optional[Dict]
+  _parse_kicad_sym_file:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey_github_modern
+    args: [self, sym_file, query]
+    params:
+      returns: List[Dict]
+  _parse_kicad_symbol_dirs:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [cls]
+    params:
+      returns: List[Path]
+  _parse_label:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [label_expr]
+    params:
+      returns: Dict
+  _parse_lib_file:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey_github
+    args: [self, lib_file, query]
+    params:
+      returns: List[Dict]
+  _parse_pin:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_parser
+    args: [pin_list]
+    params:
+      returns: Optional[Dict]
+  _parse_product:
+    type: sync
+    module: src.circuit_synth.manufacturing.digikey.component_search
+    args: [self, product_data]
+    params:
+      returns: DigiKeyComponent
+  _parse_search_results:
+    type: sync
+    module: src.circuit_synth.manufacturing.digikey.component_search
+    args: [self, results, in_stock_only]
+    params:
+      returns: List[DigiKeyComponent]
+  _parse_snapeda_response:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.snapeda
+    args: [self, data]
+    params:
+      returns: List[ComponentSearchResult]
+  _parse_subsymbol:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_parser
+    args: [sub_name, body]
+    params:
+      returns: Dict
+  _parse_symbol:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [symbol_expr]
+    params:
+      returns: Dict
+  _parse_symbol_body:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_parser
+    args: [name, body]
+    params:
+      returns: Dict
+  _parse_symbol_metadata:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey_github
+    args: [self, symbol_section]
+    params:
+      returns: Dict
+  _parse_symbol_properties:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey_github_modern
+    args: [self, symbol_section]
+    params:
+      returns: Dict
+  _parse_wire:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [wire_expr]
+    params:
+      returns: Dict
+  _perform_search:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, query, category]
+    params:
+      returns: List[FastSearchResult]
+  _place_components:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self]
+  _populate_lib_symbols:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self]
+  _post_process_results:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.orchestrator
+    args: [self, results, query]
+    params:
+      returns: List[ComponentSearchResult]
+  _prepare_blank_project:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+  _print_sync_summary:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, circuit_components, kicad_components, report]
+  _process_generation_result:
+    type: async
+    module: src.circuit_synth.fast_generation.core
+    args: [self, response, template, context]
+    params:
+      returns: Dict
+  _process_matches:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, circuit_components, kicad_components, matches, report]
+  _process_subcircuit_recursive:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [cls, subcircuit, connections, component_idx_ref]
+    params:
+      returns: int
+  _process_unmatched:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, circuit_components, kicad_components, matches, report]
+  _python_grep_search:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [self, lib_name, sym_name]
+    params:
+      returns: Optional[Path]
+  _query_agent:
+    type: async
+    module: src.circuit_synth.fast_generation.models
+    args: [self, agent, prompt]
+    params:
+      returns: str
+  _recalculate_pin_positions:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, sheet]
+  _reconcile_component_pins:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, circuit_id, kicad_ref, circuit_components, kicad_components, report]
+  _reconcile_pin_connections:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, circuit_components, kicad_components, matches, report]
+  _remove_pin_label:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, label, component_ref, pin_number, report, label_type]
+    params:
+      returns: bool
+  _resolve_extends_in_library:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_parser
+    args: [library_dict]
+    params:
+      returns: None
+  _resolve_sheet_path:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, filename]
+    params:
+      returns: Path
+  _resolve_symbol_extends:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_parser
+    args: [sym_name, library_dict, visited]
+    params:
+      returns: None
+  _ripgrep_symbol_search:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [self, lib_name, sym_name]
+    params:
+      returns: Optional[Path]
+  _save_report:
+    type: sync
+    module: src.circuit_synth.tools.kicad_integration.python_to_kicad_sync
+    args: [self, report]
+  _save_schematic:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self]
+  _search_digikey_footprints:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey_github
+    args: [self, query]
+    params:
+      returns: List[Dict]
+  _search_digikey_parts:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey
+    args: [self, query]
+    params:
+      returns: List[dict]
+  _search_digikey_symbols:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey_github
+    args: [self, query]
+    params:
+      returns: List[Dict]
+  _search_footprints:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.sources.local_kicad
+    args: [self, query]
+    params:
+      returns: List[tuple]
+  _search_http_source:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.sources.http_library
+    args: [self, config, query]
+    params:
+      returns: List[ComponentSearchResult]
+  _search_local_footprints:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.command_integration
+    args: [self, search_term]
+    params:
+      returns: List[tuple]
+  _search_local_symbols:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.command_integration
+    args: [self, search_term]
+    params:
+      returns: List[tuple]
+  _search_modern_symbols:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey_github_modern
+    args: [self, query]
+    params:
+      returns: List[Dict]
+  _search_source_with_timeout:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.orchestrator
+    args: [self, source, query, source_type]
+    params:
+      returns: List[ComponentSearchResult]
+  _search_symbols:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.sources.local_kicad
+    args: [self, query]
+    params:
+      returns: List[tuple]
+  _serialize_result:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.cache
+    args: [self, result]
+    params:
+      returns: Dict
+  _set_component_properties:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [self, kicad_component, circuit_component]
+    params:
+      returns: None
+  _set_title_block:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [self, circuit]
+    params:
+      returns: None
+  _set_title_block_from_data:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [self, title_info]
+    params:
+      returns: None
+  _setup_agents:
+    type: sync
+    module: src.circuit_synth.fast_generation.models
+    args: [self]
+  _setup_models:
+    type: sync
+    module: src.circuit_synth.fast_generation.core
+    args: [self]
+  _snap_to_grid:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, position, grid_size]
+    params:
+      returns: Tuple
+  _sort_results:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, results, sort_by]
+    params:
+      returns: List[FastSearchResult]
+  _update_bounds_from_graphic_element:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.symbol_geometry
+    args: [self, graphic, min_x, min_y, max_x, max_y]
+    params:
+      returns: Tuple
+  _update_existing_project:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, json_file, draw_bounding_boxes, preserve_user_components]
+  _update_kicad_pro:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, sub_dict, top_name, root_uuid, sheet_uuids]
+  _update_pin_label:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, label, new_net_name, component_ref, pin_number, report, label_type]
+    params:
+      returns: bool
+  _update_stats:
+    type: sync
+    module: src.circuit_synth.fast_generation.core
+    args: [self, pattern_type, latency_ms, success]
+  _validate_filename:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, filename]
+    params:
+      returns: bool
+  _validate_inputs:
+    type: sync
+    module: src.circuit_synth.tools.kicad_integration.python_to_kicad_sync
+    args: [self]
+  _write_cover_sheet:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, main_circuit_name]
+    params:
+      returns: Tuple
+  add_component:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, library_id, reference, value, position, placement_strategy, footprint, snap_to_grid, unit]
+    params:
+      returns: Optional[SchematicSymbol]
+  add_criterion:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, field, pattern, match_type, case_sensitive]
+  add_sheet:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, name, filename, position, size]
+    params:
+      returns: Sheet
+  add_sheet_pin:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, sheet_uuid, name, pin_type, side]
+    params:
+      returns: Optional[SheetPin]
+  apply_transformation:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.connection_utils
+    args: [point, origin, rotation, mirror]
+    params:
+      returns: Tuple
+  as_validation_issues:
+    type: sync
+    module: src.circuit_synth.quality_assurance.erc
+    args: [self]
+    params:
+      returns: List[ValidationIssue]
+  build:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self]
+    params:
+      returns: SearchQuery
+  calculate_text_width:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.symbol_geometry
+    args: [text, font_size]
+    params:
+      returns: float
+  cleanup:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+    params:
+      returns: None
+  clear_all:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.cache
+    args: [self]
+  clear_expired:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.cache
+    args: [self]
+  clone_component:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, reference, new_reference, offset]
+    params:
+      returns: Optional[SchematicSymbol]
+  collect_from_circuit:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [circuit_data]
+  combine_with_and:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self]
+  combine_with_or:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self]
+  component_count:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [self]
+    params:
+      returns: int
+  components:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [self]
+    params:
+      returns: Dict
+  create_adk_tools:
+    type: sync
+    module: src.circuit_synth.fast_generation.adk_tools
+    params:
+      returns: List
+  create_netlist_service:
+    type: sync
+    module: src.circuit_synth.kicad.netlist_service
+    params:
+      returns: KiCadNetlistService
+  create_pcb_generator:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+  create_schematic_generator:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+    params:
+      returns: SchematicGeneratorImpl
+  create_sheet_from_components:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, components, name, filename]
+    params:
+      returns: Sheet
+  decorator:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [func]
+  dfs:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [node, path, visited]
+  distance_between_points:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.connection_utils
+    args: [p1, p2]
+    params:
+      returns: float
+  dummy:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+  extract_circuit:
+    type: sync
+    module: src.circuit_synth.tools.kicad_integration.python_to_kicad_sync
+    args: [self]
+    params:
+      returns: Circuit
+  fast_jlc_search:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [query, min_stock, max_results]
+    params:
+      returns: List[FastSearchResult]
+  find_alternatives:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, part_number, max_alternatives]
+    params:
+      returns: List[FastSearchResult]
+  find_cheapest:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, query, min_stock]
+    params:
+      returns: Optional[FastSearchResult]
+  find_cheapest_jlc:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [query, min_stock]
+    params:
+      returns: Optional[FastSearchResult]
+  find_component:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, reference]
+    params:
+      returns: Optional[SchematicSymbol]
+  find_component_pins:
+    type: sync
+    module: src.circuit_synth.fast_generation.pin_finder
+    args: [symbol_name]
+    params:
+      returns: Dict
+  find_components_by_library:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, library_pattern]
+    params:
+      returns: List[SchematicSymbol]
+  find_components_by_value:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, value_pattern]
+    params:
+      returns: List[SchematicSymbol]
+  find_components_in_area:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, area]
+    params:
+      returns: List[SchematicSymbol]
+  find_duplicate_references:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self]
+    params:
+      returns: List[Tuple]
+  find_footprint_tool_function:
+    type: sync
+    module: src.circuit_synth.fast_generation.adk_tools
+    args: [search_term]
+    params:
+      returns: str
+  find_footprints_with_fallback:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.command_integration
+    args: [self, search_term]
+    params:
+      returns: Dict
+  find_most_available:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, query]
+    params:
+      returns: Optional[FastSearchResult]
+  find_most_available_jlc:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [query]
+    params:
+      returns: Optional[FastSearchResult]
+  find_pin_by_identifier:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [pins, identifier]
+  find_pin_by_name:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.connection_utils
+    args: [component, pin_name]
+    params:
+      returns: Optional[str]
+  find_pins:
+    type: sync
+    module: src.circuit_synth.fast_generation.pin_finder
+    args: [self, symbol_name]
+    params:
+      returns: Dict
+  find_pins_tool_function:
+    type: sync
+    module: src.circuit_synth.fast_generation.adk_tools
+    args: [symbol_name]
+    params:
+      returns: str
+  find_power_nets:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self]
+    params:
+      returns: List[str]
+  find_symbol_library:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [cls, symbol_name]
+    params:
+      returns: Optional[str]
+  find_symbol_tool_function:
+    type: sync
+    module: src.circuit_synth.fast_generation.adk_tools
+    args: [search_term]
+    params:
+      returns: str
+  find_symbols_with_fallback:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.command_integration
+    args: [self, search_term]
+    params:
+      returns: Dict
+  find_unconnected_pins:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self]
+    params:
+      returns: Dict
+  format_results_for_display:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.command_integration
+    args: [self, results]
+    params:
+      returns: str
+  from_circuit:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [cls, circuit]
+    params:
+      returns: CanonicalCircuit
+  from_kicad:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [cls, schematic_data]
+    params:
+      returns: CanonicalCircuit
+  generate_circuit:
+    type: async
+    module: src.circuit_synth.fast_generation.models
+    args: [self, prompt, context, max_tokens]
+    params:
+      returns: ModelResponse
+  generate_component_sexp:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [component_data]
+  generate_demo_circuits:
+    type: async
+    module: src.circuit_synth.fast_generation.core
+    args: [self]
+    params:
+      returns: Dict
+  generate_from_circuit_data:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, circuit_data, config]
+    params:
+      returns: Dict
+  generate_from_schematic:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, schematic_path, config]
+    params:
+      returns: Dict
+  generate_hierarchical_project:
+    type: sync
+    module: src.circuit_synth.fast_generation.core
+    args: [self, project_type, output_dir, project_name]
+    params:
+      returns: Dict
+  generate_kicad_schematic:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [circuit, output_dir, project_name, use_modern]
+    params:
+      returns: str
+  generate_kicad_schematic_modern:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [circuit, output_dir, project_name]
+    params:
+      returns: str
+  generate_netlist:
+    type: sync
+    module: src.circuit_synth.kicad.netlist_service
+    args: [self, json_file_path, output_path, circuit_name]
+    params:
+      returns: NetlistGenerationResult
+  generate_pcb:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, schematic_path, output_path, config]
+    params:
+      returns: Dict
+  generate_pcb_from_schematics:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, placement_algorithm, board_width, board_height, component_spacing, group_spacing]
+    params:
+      returns: bool
+  generate_project:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, json_file, force_regenerate, generate_pcb, force_pcb_regenerate, placement_algorithm, schematic_placement,
+      draw_bounding_boxes]
+  generate_s_expr:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [self]
+    params:
+      returns: list
+  generate_schematic:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, circuit_data, output_path, config]
+    params:
+      returns: Dict
+  generate_with_agents:
+    type: async
+    module: src.circuit_synth.fast_generation.models
+    args: [self, pattern_type, requirements]
+    params:
+      returns: ModelResponse
+  get:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.cache
+    args: [self, query]
+    params:
+      returns: Optional[List[ComponentSearchResult]]
+  get_ai_pin_context:
+    type: sync
+    module: src.circuit_synth.fast_generation.pin_finder
+    args: [components]
+    params:
+      returns: str
+  get_all_components:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [circ]
+  get_all_libraries:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [cls]
+    params:
+      returns: Dict
+  get_all_symbols:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [cls]
+    params:
+      returns: Dict
+  get_bounding_box:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self]
+    params:
+      returns: Optional[Tuple]
+  get_cache_config:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.config
+    args: [self]
+    params:
+      returns: Dict
+  get_capabilities:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+    params:
+      returns: Dict
+  get_component:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, reference]
+    params:
+      returns: Optional[SchematicSymbol]
+  get_component_details:
+    type: sync
+    module: src.circuit_synth.manufacturing.digikey.component_search
+    args: [self, digikey_part_number]
+    params:
+      returns: Optional[DigiKeyComponent]
+  get_component_nets:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [self, component_index]
+    params:
+      returns: List[Tuple]
+  get_component_type:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [self, component_index]
+    params:
+      returns: Optional[str]
+  get_fast_searcher:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    params:
+      returns: FastJLCSearch
+  get_footprint_info:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, footprint_name]
+    params:
+      returns: Optional[Dict]
+  get_footprint_libraries:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+    params:
+      returns: List[str]
+  get_footprint_library:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+  get_manufacturer_models:
+    type: sync
+    module: src.circuit_synth.simulation.manufacturer_models
+    params:
+      returns: ManufacturerModels
+  get_model_source_info:
+    type: sync
+    module: src.circuit_synth.simulation.manufacturer_models
+    args: [self, model_name]
+    params:
+      returns: Dict
+  get_net_statistics:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, net_name]
+    params:
+      returns: Optional[NetStatistics]
+  get_pcb_generator:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+  get_pin_info_for_ai:
+    type: sync
+    module: src.circuit_synth.fast_generation.pin_finder
+    args: [self, symbol_name]
+    params:
+      returns: str
+  get_pin_position:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.connection_utils
+    args: [component, pin_number]
+    params:
+      returns: Optional[Tuple]
+  get_schematic_generator:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+    params:
+      returns: SchematicGeneratorImpl
+  get_sheet_by_name:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, name]
+    params:
+      returns: Optional[Sheet]
+  get_sheet_contents:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, sheet_uuid]
+    params:
+      returns: Optional[Schematic]
+  get_sheet_hierarchy:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self]
+    params:
+      returns: Dict
+  get_source_config:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.config
+    args: [self, source]
+    params:
+      returns: SourceConfig
+  get_source_info:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.base
+    args: [self]
+    params:
+      returns: dict
+  get_source_status:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.orchestrator
+    args: [self]
+    params:
+      returns: Dict
+  get_stats:
+    type: sync
+    module: src.circuit_synth.fast_generation.core
+    args: [self]
+    params:
+      returns: Dict
+  get_symbol_bounds:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.symbol_geometry
+    args: [self, lib_id]
+    params:
+      returns: Tuple
+  get_symbol_data:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [cls, symbol_id]
+    params:
+      returns: Dict
+  get_symbol_data_by_name:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_cache
+    args: [cls, symbol_name]
+    params:
+      returns: Dict
+  get_symbol_info:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, symbol_name]
+    params:
+      returns: Optional[Dict]
+  get_symbol_libraries:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+    params:
+      returns: List[str]
+  get_symbol_library:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+  get_version:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+    params:
+      returns: str
+  get_wire_segments:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.connection_utils
+    args: [points]
+    params:
+      returns: List[Tuple]
+  has_errors:
+    type: sync
+    module: src.circuit_synth.quality_assurance.erc
+    args: [self]
+    params:
+      returns: bool
+  has_warnings:
+    type: sync
+    module: src.circuit_synth.quality_assurance.erc
+    args: [self]
+    params:
+      returns: bool
+  health_check:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey
+    args: [self]
+    params:
+      returns: bool
+  import_kicad_project:
+    type: sync
+    module: src.circuit_synth.kicad.importer
+    args: [kicad_project]
+    params:
+      returns: Circuit
+  is_available:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey
+    args: [self]
+    params:
+      returns: bool
+  is_empty:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self]
+    params:
+      returns: bool
+  is_in_stock:
+    type: sync
+    module: src.circuit_synth.manufacturing.digikey.component_search
+    args: [self]
+    params:
+      returns: bool
+  is_source_configured:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.config
+    args: [self, source]
+    params:
+      returns: bool
+  list_available_patterns:
+    type: sync
+    module: src.circuit_synth.fast_generation.core
+    args: [self]
+    params:
+      returns: List[Dict]
+  list_available_project_types:
+    type: sync
+    module: src.circuit_synth.fast_generation.core
+    args: [self]
+    params:
+      returns: List[str]
+  list_components:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self]
+    params:
+      returns: List[SchematicSymbol]
+  load_circuit_data:
+    type: sync
+    module: src.circuit_synth.kicad.netlist_service
+    args: [self, json_file_path]
+    params:
+      returns: Dict
+  load_circuit_from_dict:
+    type: sync
+    module: src.circuit_synth.io.json_loader
+    args: [data, parent]
+    params:
+      returns: Circuit
+  load_circuit_from_json_file:
+    type: sync
+    module: src.circuit_synth.io.json_loader
+    args: [json_path]
+    params:
+      returns: Circuit
+  load_config:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.orchestrator
+    args: [self, config_path]
+  load_kicad_json:
+    type: sync
+    module: src.circuit_synth.kicad.importer
+    args: [kicad_project]
+    params:
+      returns: dict
+  main:
+    type: sync
+    module: src.circuit_synth.tools.kicad_integration.python_to_kicad_sync
+  manufacturability_score:
+    type: sync
+    module: src.circuit_synth.manufacturing.digikey.component_search
+    args: [self]
+    params:
+      returns: float
+  match:
+    type: sync
+    module: src.circuit_synth.kicad.canonical
+    args: [self, old_circuit, new_circuit]
+    params:
+      returns: Dict
+  move_component:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, reference, new_position, check_collision]
+    params:
+      returns: bool
+  parse_kicad_sym_file:
+    type: sync
+    module: src.circuit_synth.kicad.kicad_symbol_parser
+    args: [file_path]
+    params:
+      returns: Dict
+  parse_value:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [cls, value_str]
+    params:
+      returns: Optional[float]
+  place_components:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, components, nets, existing_placements]
+  point_on_segment:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.connection_utils
+    args: [point, seg_start, seg_end, tolerance]
+    params:
+      returns: bool
+  points_equal:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.connection_utils
+    args: [p1, p2, tolerance]
+    params:
+      returns: bool
+  print_download_instructions:
+    type: sync
+    module: src.circuit_synth.simulation.manufacturer_models
+  print_version_info:
+    type: sync
+    module: src.circuit_synth
+  quick_time:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [name]
+  reconstruct_circuit:
+    type: sync
+    module: src.circuit_synth.kicad.netlist_service
+    args: [self, circuit_data, circuit_name]
+  remove_component:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, reference, uuid]
+    params:
+      returns: bool
+  remove_sheet:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, sheet_uuid]
+    params:
+      returns: bool
+  remove_sheet_pin:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, sheet_uuid, pin_name]
+    params:
+      returns: bool
+  rename_component:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, old_ref, new_ref]
+    params:
+      returns: bool
+  replace_value_position:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [match]
+  run_erc:
+    type: sync
+    module: src.circuit_synth.quality_assurance.erc
+    args: [schematic_path, severity, units, kicad_cli_path]
+    params:
+      returns: ERCResults
+  save_config:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.config
+    args: [self, config]
+  search:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, query, category, min_stock, prefer_basic, max_results, sort_by]
+    params:
+      returns: List[FastSearchResult]
+  search_as_fallback:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.orchestrator
+    args: [self, query, local_results]
+    params:
+      returns: List[ComponentSearchResult]
+  search_by_footprint:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, footprint_pattern]
+    params:
+      returns: List[SchematicSymbol]
+  search_by_specs:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self, component_type, specs, max_results]
+    params:
+      returns: List[FastSearchResult]
+  search_by_value:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, value_pattern, tolerance]
+    params:
+      returns: List[SchematicSymbol]
+  search_component:
+    type: async
+    module: src.circuit_synth.kicad.library_sourcing.orchestrator
+    args: [self, query]
+    params:
+      returns: List[ComponentSearchResult]
+  search_components:
+    type: sync
+    module: src.circuit_synth.manufacturing.digikey.component_search
+    args: [self, keyword, filters, max_results, in_stock_only]
+    params:
+      returns: List[DigiKeyComponent]
+  search_digikey_components:
+    type: sync
+    module: src.circuit_synth.manufacturing.digikey.component_search
+    args: [keyword, max_results, in_stock_only]
+    params:
+      returns: List[Dict]
+  search_footprints:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, query]
+    params:
+      returns: List[Dict]
+  search_nets:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, pattern, use_regex]
+    params:
+      returns: List[str]
+  search_symbols:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, query]
+    params:
+      returns: List[Dict]
+  segment_intersection:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.connection_utils
+    args: [p1, p2, p3, p4]
+    params:
+      returns: Optional[Tuple]
+  set:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.cache
+    args: [self, query, results]
+  setup_claude_integration:
+    type: sync
+    module: src.circuit_synth
+  setup_digikey_api:
+    type: sync
+    module: src.circuit_synth.tools.setup.library_api_setup
+    args: [api_key, client_id]
+  setup_logging:
+    type: sync
+    module: src.circuit_synth.tools.kicad_integration.python_to_kicad_sync
+    args: [verbose]
+  setup_snapeda_api:
+    type: sync
+    module: src.circuit_synth.tools.setup.library_api_setup
+    args: [api_key]
+  setup_wizard:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.config
+    args: [self]
+    params:
+      returns: str
+  show_library_setup:
+    type: sync
+    module: src.circuit_synth.tools.setup.library_api_setup
+  simplify_points:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.connection_utils
+    args: [points, tolerance]
+    params:
+      returns: List[Point]
+  snap_to_grid:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.connection_utils
+    args: [position, grid_size]
+    params:
+      returns: Tuple
+  sync:
+    type: sync
+    module: src.circuit_synth.tools.kicad_integration.python_to_kicad_sync
+    args: [self]
+    params:
+      returns: Dict
+  sync_with_circuit:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.synchronizer
+    args: [self, circuit]
+    params:
+      returns: SyncReport
+  timed_operation:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+  to_adk_tool:
+    type: sync
+    module: src.circuit_synth.fast_generation.pin_finder
+    args: [self]
+  to_dict:
+    type: sync
+    module: src.circuit_synth.manufacturing.jlcpcb.fast_search
+    args: [self]
+    params:
+      returns: Dict
+  to_validation_issue:
+    type: sync
+    module: src.circuit_synth.quality_assurance.erc
+    args: [self]
+    params:
+      returns: ValidationIssue
+  total_count:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self]
+    params:
+      returns: int
+  trace_net:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, net_name]
+    params:
+      returns: Optional[Net]
+  update_api_credentials:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.config
+    args: [self, source]
+  update_component:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self, reference, value, position, rotation, footprint, lib_id]
+    params:
+      returns: bool
+  update_library:
+    type: sync
+    module: src.circuit_synth.kicad.library_sourcing.sources.digikey_github
+    args: [self]
+    params:
+      returns: bool
+  update_sheet:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self, sheet_uuid]
+    params:
+      returns: bool
+  validate:
+    type: sync
+    module: src.circuit_synth.quality_assurance.validation
+    args: [circuit, checks]
+    params:
+      returns: List[ValidationIssue]
+  validate_arc_geometry:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [start, mid, end]
+  validate_design:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self, project_path]
+    params:
+      returns: Dict
+  validate_hierarchy:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.sheet_manager
+    args: [self]
+    params:
+      returns: List[str]
+  validate_installation:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.main_generator
+    args: [self]
+    params:
+      returns: bool
+  validate_manufacturing:
+    type: sync
+    module: src.circuit_synth.quality_assurance.validation
+    args: [circuit]
+    params:
+      returns: List[ValidationIssue]
+  validate_naming:
+    type: sync
+    module: src.circuit_synth.quality_assurance.validation
+    args: [circuit]
+    params:
+      returns: List[ValidationIssue]
+  validate_properties:
+    type: sync
+    module: src.circuit_synth.quality_assurance.validation
+    args: [circuit, required]
+    params:
+      returns: List[ValidationIssue]
+  validate_schematic:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.component_manager
+    args: [self]
+    params:
+      returns: Tuple
+  verify_pins_exist:
+    type: sync
+    module: src.circuit_synth.fast_generation.pin_finder
+    args: [self, symbol_name, pin_names]
+    params:
+      returns: Tuple
+  with_footprint:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, pattern, match_type]
+  with_property:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, name, pattern, match_type]
+  with_reference:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, pattern, match_type]
+  with_value:
+    type: sync
+    module: src.circuit_synth.kicad.schematic.search_engine
+    args: [self, pattern, match_type]
+  write_netlist:
+    type: sync
+    module: src.circuit_synth.kicad.netlist_service
+    args: [self, circuit, output_path]
+    params:
+      returns: bool
+  write_positioned_schematic:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.modern_generator
+    args: [self, positioned_components, nets, title_info]
+    params:
+      returns: str
+  write_schematic_file:
+    type: sync
+    module: src.circuit_synth.kicad.sch_gen.schematic_writer
+    args: [schematic, out_path]
+
+variables:
+  CIRCUIT_SYNTH_CACHE_DIR:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [src.circuit_synth.kicad.kicad_symbol_cache]
+  CIRCUIT_SYNTH_LOG_LEVEL:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [src.circuit_synth.kicad.sch_gen.schematic_writer]
+  GOOGLE_CLOUD_PROJECT:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [src.circuit_synth.fast_generation.core, src.circuit_synth.fast_generation.models]
+  KICAD_SYMBOL_DIR:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [src.circuit_synth.kicad.kicad_symbol_cache]
+  OPENROUTER_API_KEY:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [src.circuit_synth.fast_generation.core, src.circuit_synth.fast_generation.models]
+
+files:
+  ./:
+    type: pattern
+    actions: [read]
+    params:
+      patterns: ['*.kicad_sym', '*{query}*.kicad_mod', '*.json', '*.lib', '*.kicad_httplib', '*.kicad_sch']
+      caller: [_search_modern_symbols, _search_footprints, clear_expired, clear_all, _search_digikey_symbols, _search_digikey_footprints,
+        _build_complete_index, _python_grep_search, _load_http_configs, _fix_all_schematic_project_names]
+  .cache:
+    type: literal
+    actions: [read]
+    params:
+      caller: [__init__, _get_cache_dir]
+      path: [Path.cwd]
+  .circuit-synth:
+    type: literal
+    actions: [read]
+    params:
+      caller: [__init__]
+      path: [Path.cwd]
+  .json:
+    type: literal
+    actions: [read, write]
+    params:
+      caller: [get, set, tempfile.NamedTemporaryFile]
+      path: [self.cache_dir]
+  .kicad:
+    type: literal
+    actions: [read]
+    params:
+      caller: [_load_http_configs]
+      path: [Path.home]
+  .kicad_pcb:
+    type: literal
+    actions: [read]
+    params:
+      caller: [validate_design, _update_existing_project, generate_project, generate_pcb_from_schematics]
+      path: [project_path]
+  .kicad_pro:
+    type: literal
+    actions: [read]
+    params:
+      caller: [write_positioned_schematic, generate_schematic, validate_design, _check_existing_project, _update_existing_project,
+        _prepare_blank_project, _update_kicad_pro]
+      path: [self.output_dir]
+  .kicad_sch:
+    type: literal
+    actions: [read]
+    params:
+      caller: [write_positioned_schematic, generate_schematic, validate_design, _check_existing_project, _add_bounding_boxes_to_schematic,
+        generate_project, _collision_place_all_circuits, _write_cover_sheet, _update_kicad_pro]
+      path: [self.output_dir]
+  .kicad_sym:
+    type: literal
+    actions: [read]
+    params:
+      caller: [_find_library_file, _find_symbol_file_by_name]
+      path: [Path.cwd]
+  .net:
+    type: literal
+    actions: [read]
+    params:
+      caller: [generate_project, _generate_netlist]
+      path: [Path]
+  /tmp/circuit_synth_debug.log:
+    type: literal
+    actions: [write, read]
+    params:
+      caller: [open, generate_s_expr]
+      alias: [f]
+  backup_dir:
+    type: variable
+    actions: [delete]
+    params:
+      caller: [shutil.rmtree]
+  cache_file:
+    type: variable
+    actions: [read, delete, write]
+    params:
+      caller: [open, json.load, cache_file.unlink]
+      alias: [f]
+  cache_path:
+    type: literal
+    actions: [read, write]
+    params:
+      caller: [Path(CIRCUIT_SYNTH_CACHE_DIR), cache_path.mkdir]
+  CIRCUIT_SYNTH_CACHE_DIR:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  config_file:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open]
+      alias: [f]
+  config_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [config_path.glob]
+  cover_path:
+    type: variable
+    actions: [write]
+    params:
+      caller: [open]
+      alias: [f]
+  dir_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  file_path:
+    type: variable
+    actions: [read, write]
+    params:
+      caller: [os.path.isfile, open, file_path.parent.mkdir]
+  first_file:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  fp_file:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open, Path]
+      alias: [f]
+  fp_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  image_file:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open]
+      alias: [f]
+  image_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  json_file:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open, json.load]
+      alias: [f]
+  json_file_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open, json.load]
+      alias: [f]
+  json_path:
+    type: literal
+    actions: [read]
+    params:
+      caller: ['Path(''{...}.json'')']
+  kicad_dir:
+    type: variable
+    actions: [read]
+    params:
+      caller: [kicad_dir.rglob]
+  kicad_pro_path:
+    type: variable
+    actions: [write, read]
+    params:
+      caller: [open, json.load]
+      alias: [f]
+  lib_file:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open, Path, json.load]
+      alias: [f]
+  lib_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  library_sources.json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [__init__]
+      path: [self.config_dir]
+  out_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  path:
+    type: literal
+    actions: [read]
+    params:
+      caller: [Path(path_str)]
+  path_obj:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path.resolve()]
+  project_dir:
+    type: variable
+    actions: [read]
+    params:
+      caller: [shutil.copytree]
+  project_path:
+    type: variable
+    actions: [write, read]
+    params:
+      caller: [open, project_path.iterdir, json.load]
+      alias: [f]
+  python_file:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  python_file_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  report_path:
+    type: literal
+    actions: [read, write]
+    params:
+      caller: [Path(self.options.output_report), open]
+  root_sch_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open]
+      alias: [f]
+  sch_file:
+    type: variable
+    actions: [read, write]
+    params:
+      caller: [sch_file.read_text, sch_file.write_text]
+  sch_file_path:
+    type: variable
+    actions: [read, write]
+    params:
+      caller: [open]
+      alias: [f]
+  sch_path:
+    type: literal
+    actions: [read]
+    params:
+      caller: [Path(schematic_path), open]
+  schematic_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  sheet_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [ksa.Schematic.load]
+  sym_file:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open]
+      alias: [f]
+  sym_file_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open]
+      alias: [f]
+  symbol_dir:
+    type: variable
+    actions: [read]
+    params:
+      caller: [symbol_dir.rglob]
+  temp_json_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open, json.load, Path]
+      alias: [f]
+
+processes:
+  git:
+    type: shell
+    actions: [exec]
+    args: [[submodule, update, --remote, submodules/digikey-kicad], [rev-parse, HEAD], [describe, --exact-match, --tags, HEAD],
+      [status, --porcelain], [pull]]
+    params:
+      caller: [subprocess.run]
+      shell: ["False", "False", "False", "False", "False"]
+  python:
+    type: shell
+    actions: [exec]
+    args: [[str(self.python_file_path)]]
+    params:
+      caller: [subprocess.run]
+      shell: ["False"]
+      ref: sys.executable
+  rg:
+    type: shell
+    actions: [exec]
+    args: [[-l, '\(symbol\s+"{sym_name}"', str(kicad_dir), --type-add, 'kicad:*.kicad_sym', --type, kicad]]
+    params:
+      caller: [subprocess.run]
+      shell: ["False"]
+
+networks:
+  openrouter.ai:
+    type: api
+    actions: [GET]
+    urls: [/api/v1]
+    protocols: [https]
+    ports: ["443"]
+    params:
+      caller: [__init__]
+      links: [base_url]
+  www.analog.com:
+    type: api
+    actions: [GET]
+    urls: [/media/en/technical-documentation/data-sheets/1117fd.pdf, /media/en/technical-documentation/data-sheets/AD8605_8606_8608.pdf]
+    protocols: [https]
+    ports: ["443"]
+    params:
+      caller: [_load_adi_models]
+      links: [datasheet_url]
+  www.infineon.com:
+    type: api
+    actions: [GET]
+    urls: [/dgdl/irfz44npbf.pdf, /dgdl/Infineon-IMZ120R045M1-DataSheet-v02_02-EN.pdf]
+    protocols: [https]
+    ports: ["443"]
+    params:
+      caller: [_load_infineon_models]
+      links: [datasheet_url]
+  www.onsemi.com:
+    type: api
+    actions: [GET]
+    urls: [/pdf/datasheet/bc846alt1-d.pdf, /pdf/datasheet/ntd4906n-d.pdf]
+    protocols: [https]
+    ports: ["443"]
+    params:
+      caller: [_load_onsemi_models]
+      links: [datasheet_url]
+  www.st.com:
+    type: api
+    actions: [GET]
+    urls: [/resource/en/datasheet/std30nf06l.pdf, /resource/en/datasheet/sct30n120.pdf]
+    protocols: [https]
+    ports: ["443"]
+    params:
+      caller: [_load_st_models]
+      links: [datasheet_url]
+  www.ti.com:
+    type: api
+    actions: [GET]
+    urls: [/lit/ds/symlink/lm358.pdf, /lit/ds/symlink/tl072.pdf, /lit/ds/symlink/tl431.pdf]
+    protocols: [https]
+    ports: ["443"]
+    params:
+      caller: [_load_ti_models]
+      links: [datasheet_url]
