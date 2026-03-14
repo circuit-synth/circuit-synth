@@ -66,10 +66,34 @@ class Net:
 
     @staticmethod
     def from_dict(data: Dict[str, Any]) -> "Net":
-        """Create Net from dictionary representation."""
+        """Create Net from dictionary representation with auto-detection support."""
+        from circuit_synth.core.power_net_registry import is_power_net, get_power_symbol
+
         net = Net(data.get("name", ""))
-        net.is_power = data.get("is_power", False)
-        net.power_symbol = data.get("power_symbol")
+        net_name = data.get("name", "")
+
+        # Get explicit values from dict
+        explicit_is_power = data.get("is_power")
+        explicit_power_symbol = data.get("power_symbol")
+
+        # Auto-detect power nets if not explicitly specified
+        # This matches the behavior of circuit_synth.core.Net
+        if explicit_is_power is None and net_name:
+            # No explicit is_power value - try auto-detection
+            if is_power_net(net_name):
+                net.is_power = True
+                net.power_symbol = explicit_power_symbol or get_power_symbol(net_name)
+                logger.debug(
+                    f"Auto-detected power net '{net_name}' -> {net.power_symbol}"
+                )
+            else:
+                net.is_power = False
+                net.power_symbol = None
+        else:
+            # Explicit value provided - use it
+            net.is_power = explicit_is_power if explicit_is_power is not None else False
+            net.power_symbol = explicit_power_symbol
+
         net.trace_current = data.get("trace_current")
         net.impedance = data.get("impedance")
         net.properties = data.get("properties", {})
@@ -266,7 +290,7 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             # Create Net with metadata using from_dict
             net_dict = {
                 "name": net_name,
-                "is_power": net_info.get("is_power", False),
+                "is_power": net_info.get("is_power"),  # Don't use False as default - let from_dict() auto-detect
                 "power_symbol": net_info.get("power_symbol"),
                 "trace_current": net_info.get("trace_current"),
                 "impedance": net_info.get("impedance"),
