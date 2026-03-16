@@ -91,22 +91,53 @@ class KiCadSchematicParser:
                     schematic_file=self.schematic_path.name,
                 )
 
-            # Return the circuit by schematic name, or first circuit if not found
-            circuit_name = self.schematic_path.stem
-            if circuit_name in circuits:
-                circuit = circuits[circuit_name]
-            elif "main" in circuits:
-                # Fallback for old behavior
-                circuit = circuits["main"]
-            else:
-                circuit = list(circuits.values())[0]
+            # For hierarchical projects, merge all circuits into a flattened view
+            # This ensures all components from child sheets are included
+            all_components = []
+            all_nets = []
+            seen_refs = set()
+            seen_net_names = {}  # net_name -> net object (to merge connections)
 
-            logger.info(
-                f"Parsed circuit '{circuit.name}': "
-                f"{len(circuit.components)} components, {len(circuit.nets)} nets"
+            for circuit_name, circuit in circuits.items():
+                # Collect components from all sheets (avoid duplicates by reference)
+                for comp in circuit.components:
+                    if comp.reference not in seen_refs:
+                        all_components.append(comp)
+                        seen_refs.add(comp.reference)
+
+                # Collect nets from all sheets, merging connections for same net name
+                for net in circuit.nets:
+                    if net.name in seen_net_names:
+                        # Merge connections into existing net
+                        existing_net = seen_net_names[net.name]
+                        existing_conns = set(existing_net.connections)
+                        for conn in net.connections:
+                            if conn not in existing_conns:
+                                existing_net.connections.append(conn)
+                    else:
+                        # Create new net entry (copy to avoid modifying original)
+                        from circuit_synth.tools.utilities.models import Net
+                        merged_net = Net(
+                            name=net.name,
+                            connections=list(net.connections)
+                        )
+                        all_nets.append(merged_net)
+                        seen_net_names[net.name] = merged_net
+
+            # Create merged circuit
+            merged_circuit = Circuit(
+                name=self.schematic_path.stem,
+                components=all_components,
+                nets=all_nets,
+                schematic_file=self.schematic_path.name,
             )
 
-            return circuit
+            logger.info(
+                f"Merged {len(circuits)} hierarchical sheets into '{merged_circuit.name}': "
+                f"{len(merged_circuit.components)} components, {len(merged_circuit.nets)} nets"
+            )
+
+            return merged_circuit
 
         except Exception as e:
             logger.error(f"Failed to parse schematic: {e}")
