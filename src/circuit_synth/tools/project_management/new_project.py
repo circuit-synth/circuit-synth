@@ -32,7 +32,15 @@ from .interactive_cli import parse_cli_flags, run_interactive_setup
 from .project_config import get_default_config
 from .template_manager import CLAUDEMDGenerator, READMEGenerator, TemplateManager
 
-console = Console()
+# Force UTF-8 output on Windows to avoid cp1252 encoding errors with emoji
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+console = Console(force_terminal=False)
 
 
 def create_claude_directory_from_templates(
@@ -963,12 +971,12 @@ def main(
 
     readme_content = readme_gen.generate(config, project_path)
     readme_path = project_path / "README.md"
-    readme_path.write_text(readme_content)
+    readme_path.write_text(readme_content, encoding="utf-8")
     console.print("✅ Created README.md", style="green")
 
     claude_md_content = claude_md_gen.generate(config)
     claude_md_path = project_path / "CLAUDE.md"
-    claude_md_path.write_text(claude_md_content)
+    claude_md_path.write_text(claude_md_content, encoding="utf-8")
     console.print("✅ Created CLAUDE.md", style="green")
 
     # Step 8: KiCad plugins note (if KiCad is installed)
