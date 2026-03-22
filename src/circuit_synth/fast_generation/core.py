@@ -57,24 +57,24 @@ class FastCircuitGenerator:
                 self.models["openrouter"] = OpenRouterModel(
                     api_key=self.openrouter_key, model="google/gemini-2.5-flash"
                 )
-                logger.info("✅ OpenRouter model initialized")
+                logger.info("OpenRouter model initialized")
             else:
-                logger.warning("⚠️ OpenRouter API key not provided")
+                logger.warning("OpenRouter API key not provided")
 
         except Exception as e:
-            logger.error(f"❌ Failed to setup OpenRouter: {e}")
+            logger.error(f"Failed to setup OpenRouter: {e}")
 
         try:
             if self.google_project:
                 self.models["google_adk"] = GoogleADKModel(
                     project_id=self.google_project
                 )
-                logger.info("✅ Google ADK model initialized")
+                logger.info("Google ADK model initialized")
             else:
-                logger.info("ℹ️ Google ADK not configured (optional)")
+                logger.info("Google ADK not configured (optional)")
 
         except Exception as e:
-            logger.error(f"❌ Failed to setup Google ADK: {e}")
+            logger.error(f"Failed to setup Google ADK: {e}")
 
     async def generate_circuit(
         self,
@@ -364,10 +364,10 @@ IMPORTANT: Only use the exact KiCad symbols and footprints specified above.
             try:
                 result = await self.generate_circuit(pattern)
                 results[pattern.value] = result
-                logger.info(f"✅ Generated demo: {pattern.value}")
+                logger.info(f"Generated demo: {pattern.value}")
 
             except Exception as e:
-                logger.error(f"❌ Demo failed for {pattern.value}: {e}")
+                logger.error(f"Demo failed for {pattern.value}: {e}")
                 results[pattern.value] = {"success": False, "error": str(e)}
 
         return results
@@ -401,21 +401,21 @@ IMPORTANT: Only use the exact KiCad symbols and footprints specified above.
                     "project_path": str(project_path),
                     "project_type": project_type,
                     "files_created": self._count_project_files(project_path),
-                    "message": f"✅ Hierarchical project '{project_name}' created successfully",
+                    "message": f"Hierarchical project '{project_name}' created successfully",
                 }
             else:
                 return {
                     "success": False,
                     "error": f"Failed to generate project type: {project_type}",
-                    "message": f"❌ Project generation failed",
+                    "message": f"Project generation failed",
                 }
 
         except Exception as e:
-            logger.error(f"❌ Hierarchical project generation failed: {e}")
+            logger.error(f"Hierarchical project generation failed: {e}")
             return {
                 "success": False,
                 "error": str(e),
-                "message": f"❌ Exception during project generation: {e}",
+                "message": f"Exception during project generation: {e}",
             }
 
     def _count_project_files(self, project_path: Path) -> int:

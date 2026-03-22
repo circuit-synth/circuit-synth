@@ -165,7 +165,7 @@ class CircuitReconstructor:
             components_data = circuit_data.get("components", {})
 
             for comp_ref, comp_data in components_data.items():
-                # self.logger.info(f"🔧 Creating component {comp_ref}:")
+                # self.logger.info(f"Creating component {comp_ref}:")
                 # self.logger.info(f"   - symbol: {comp_data.get('symbol', 'NOT SET')}")
                 # self.logger.info(f"   - ref_prefix: {comp_data.get('ref_prefix', 'NOT SET')}")
                 # self.logger.info(f"   - value: {comp_data.get('value', 'NOT SET')}")
@@ -185,15 +185,15 @@ class CircuitReconstructor:
                     )
                     # Set the specific reference from JSON
                     comp.ref = comp_ref
-                    # self.logger.info(f"✅ Created component with final ref: {comp.ref}")
+                    # self.logger.info(f"Created component with final ref: {comp.ref}")
                     # Store component directly in internal storage without calling add_component
                     temp_circuit._components[comp_ref] = comp
-                    # self.logger.info(f"📋 Stored component in circuit._components['{comp_ref}']")
+                    # self.logger.info(f"Stored component in circuit._components['{comp_ref}']")
                 finally:
                     # Restore the original circuit context
                     set_current_circuit(original_active_circuit)
 
-            # self.logger.info(f"📋 Final components in circuit: {list(temp_circuit._components.keys())}")
+            # self.logger.info(f"Final components in circuit: {list(temp_circuit._components.keys())}")
 
             # Reconstruct nets - ONLY for this circuit level (not subcircuits)
             nets_data = circuit_data.get("nets", {})
@@ -230,14 +230,14 @@ class CircuitReconstructor:
                         else:
                             available_comps = list(temp_circuit._components.keys())
                             self.logger.error(
-                                f"❌ Component '{comp_ref}' not found in circuit!"
+                                f"Component '{comp_ref}' not found in circuit!"
                             )
                             self.logger.error(
-                                f"📋 Available components: {available_comps}"
+                                f"Available components: {available_comps}"
                             )
                     else:
                         self.logger.warning(
-                            f"⚠️ Skipping connection - missing comp_ref ({comp_ref}) or pin_number ({pin_number})"
+                            f"Skipping connection - missing comp_ref ({comp_ref}) or pin_number ({pin_number})"
                         )
 
             # Log any connection issues for debugging
@@ -269,27 +269,27 @@ class NetlistFileWriter:
 
         try:
             self.logger.info(f"Writing netlist to: {output_path}")
-            # self.logger.info(f"🔍 DEBUG: Circuit components: {list(circuit._components.keys()) if hasattr(circuit, '_components') else 'NO _components'}")
-            # self.logger.info(f"🔍 DEBUG: Circuit nets: {list(circuit._nets.keys()) if hasattr(circuit, '_nets') else 'NO _nets'}")
+            # self.logger.info(f"DEBUG: Circuit components: {list(circuit._components.keys()) if hasattr(circuit, '_components') else 'NO _components'}")
+            # self.logger.info(f"DEBUG: Circuit nets: {list(circuit._nets.keys()) if hasattr(circuit, '_nets') else 'NO _nets'}")
             #
             ## Detailed inspection of circuit net connections
             # if hasattr(circuit, '_nets'):
             #     for net_name, net_obj in circuit._nets.items():
-            #         self.logger.info(f"🌐 DEBUG: Net '{net_name}' has {len(net_obj._pins)} pins connected:")
+            #         self.logger.info(f"DEBUG: Net '{net_name}' has {len(net_obj._pins)} pins connected:")
             #         for pin in net_obj._pins:
             #             component_ref = pin._component.ref if pin._component else "NO_COMPONENT"
             #             pin_num = pin._component_pin_id if hasattr(pin, '_component_pin_id') else pin.num
             #             self.logger.info(f"   - {component_ref}[{pin_num}]")
             #
             ## ADDITIONAL DEBUG: Inspect the circuit data being passed to netlist exporter
-            # self.logger.info("🔍 DEBUG: Inspecting circuit data passed to netlist exporter...")
+            # self.logger.info("DEBUG: Inspecting circuit data passed to netlist exporter...")
             # circuit_data = circuit.to_dict()
-            # self.logger.info(f"🔍 DEBUG: Circuit data components: {list(circuit_data.get('components', {}).keys())}")
-            # self.logger.info(f"🔍 DEBUG: Circuit data nets: {list(circuit_data.get('nets', {}).keys())}")
+            # self.logger.info(f"DEBUG: Circuit data components: {list(circuit_data.get('components', {}).keys())}")
+            # self.logger.info(f"DEBUG: Circuit data nets: {list(circuit_data.get('nets', {}).keys())}")
             #
             ## Check net connections in detail
             # for net_name, connections in circuit_data.get('nets', {}).items():
-            #     self.logger.info(f"🔗 DEBUG: Net '{net_name}' connections:")
+            #     self.logger.info(f"DEBUG: Net '{net_name}' connections:")
             #     for i, conn in enumerate(connections):
             #         self.logger.info(f"   Connection {i}: {conn}")
             #         component = conn.get('component')
@@ -306,12 +306,12 @@ class NetlistFileWriter:
                 return True
             else:
                 self.logger.error(
-                    f"❌ Netlist file was not created or is empty: {output_path}"
+                    f"Netlist file was not created or is empty: {output_path}"
                 )
                 return False
 
         except Exception as e:
-            self.logger.error(f"❌ Failed to write netlist file: {e}")
+            self.logger.error(f"Failed to write netlist file: {e}")
             return False
 
 
@@ -350,8 +350,8 @@ class KiCadNetlistService:
             NetlistGenerationResult with success status and details
         """
         self.logger.info(f"Starting netlist generation for '{circuit_name}'")
-        # self.logger.info(f"📖 Source: {json_file_path}")
-        # self.logger.info(f"📝 Output: {output_path}")
+        # self.logger.info(f"Source: {json_file_path}")
+        # self.logger.info(f"Output: {output_path}")
 
         try:
             # Step 1: Load circuit data
@@ -392,8 +392,8 @@ class KiCadNetlistService:
             import traceback
 
             error_msg = f"Netlist generation failed: {e}"
-            self.logger.error(f"❌ {error_msg}")
-            self.logger.error(f"❌ Full traceback: {traceback.format_exc()}")
+            self.logger.error(f"{error_msg}")
+            self.logger.error(f"Full traceback: {traceback.format_exc()}")
 
             return NetlistGenerationResult(success=False, error_message=error_msg)
 

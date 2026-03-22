@@ -243,12 +243,12 @@ def stm32_development_board():
     STM32F407 Development Board - Research Validated Design
     
     Design Validation:
-    ✅ Power supply decoupling (0.1uF + 10uF per design rules)
-    ✅ Reset circuit with 10kohm pull-up
-    ✅ BOOT0 configuration for flash boot
-    ✅ HSE crystal with proper loading capacitors
-    ✅ USB interface with 22ohm series resistors
-    ✅ All components verified JLCPCB available
+    Power supply decoupling (0.1uF + 10uF per design rules)
+    Reset circuit with 10kohm pull-up
+    BOOT0 configuration for flash boot
+    HSE crystal with proper loading capacitors
+    USB interface with 22ohm series resistors
+    All components verified JLCPCB available
     
     Performance: 168MHz ARM Cortex-M4, 1MB Flash, 192KB RAM
     Power: 3.3V +/-5%, 150mA typical, 200mA max
@@ -270,26 +270,26 @@ Include comprehensive manufacturing notes:
 
 **NEVER use these INVALID patterns:**
 ```python
-# ❌ WRONG - These will cause AttributeError
+# WRONG - These will cause AttributeError
 mcu.pins[11].connect_to(net)          # No .pins attribute
 component.pin[1] = net                # No .pin attribute  
 component.connect(pin, net)           # No .connect method
 component.pin["VDD"].connect_to(net)  # No .pin attribute
 
-# ❌ WRONG - Invalid net assignment
+# WRONG - Invalid net assignment
 net += component["VDD"]               # Backwards assignment
 net = component[1]                    # Assignment instead of connection
 ```
 
 **ALWAYS use these CORRECT patterns:**
 ```python
-# ✅ CORRECT - Pin connections with +=
+# CORRECT - Pin connections with +=
 mcu["VDD"] += VCC_3V3                 # Named pins
 mcu[11] += VCC_3V3                    # Numbered pins
 resistor[1] += VCC_3V3                # Passive components
 resistor[2] += gnd                    # Pin-to-net connections
 
-# ✅ CORRECT - Net creation and naming
+# CORRECT - Net creation and naming
 VCC_3V3 = Net('VCC_3V3')              # Descriptive net names
 gnd = Net('GND')                      # Standard ground net
 ```
@@ -1045,7 +1045,7 @@ def generate_dfm_summary(report):
 ```python
 for issue in report.issues:
     if issue.severity == IssueSeverity.CRITICAL:
-        print(f"🔴 CRITICAL: {issue.description}")
+        print(f"CRITICAL: {issue.description}")
         print(f"   Impact: {issue.impact}")
         print(f"   Fix: {issue.recommendation}")
 ```
@@ -1088,7 +1088,7 @@ dfm_report = analyzer.analyze_circuit(
 
 # Check for critical issues
 if dfm_report.critical_issues_count > 0:
-    print("⚠️ Critical DFM issues found!")
+    print("Critical DFM issues found!")
     for issue in dfm_report.issues:
         if issue.severity == IssueSeverity.CRITICAL:
             print(f"- {issue.description}")

@@ -130,61 +130,61 @@ if __name__ == "__main__":
         generate_pcb=True,
     )
 
-    print("✅ Voltage regulator circuit generated!")
-    print("📁 Open in KiCad: voltage_regulator/voltage_regulator.kicad_pro")
+    print("Voltage regulator circuit generated!")
+    print("Open in KiCad: voltage_regulator/voltage_regulator.kicad_pro")
     print()
 
     # Generate manufacturing files (BOM, PDF, Gerbers)
-    print("📦 Generating manufacturing files...")
+    print("Generating manufacturing files...")
     print()
 
     # Generate BOM for component ordering
     bom_result = circuit_obj.generate_bom(project_name="voltage_regulator")
     if bom_result["success"]:
-        print(f"✅ BOM generated: {bom_result['file']}")
+        print(f"BOM generated: {bom_result['file']}")
         print(f"   Components: {bom_result['component_count']}")
     else:
-        print(f"⚠️  BOM generation failed: {bom_result.get('error')}")
+        print(f" BOM generation failed: {bom_result.get('error')}")
     print()
 
     # Generate PDF schematic for documentation
     pdf_result = circuit_obj.generate_pdf_schematic(project_name="voltage_regulator")
     if pdf_result["success"]:
-        print(f"✅ PDF schematic generated: {pdf_result['file']}")
+        print(f"PDF schematic generated: {pdf_result['file']}")
     else:
-        print(f"⚠️  PDF generation failed: {pdf_result.get('error')}")
+        print(f" PDF generation failed: {pdf_result.get('error')}")
     print()
 
     # Generate Gerber files for manufacturing
     gerber_result = circuit_obj.generate_gerbers(project_name="voltage_regulator")
     if gerber_result["success"]:
-        print(f"✅ Gerber files generated: {gerber_result['output_dir']}")
+        print(f"Gerber files generated: {gerber_result['output_dir']}")
         print(f"   Gerber files: {len(gerber_result['gerber_files'])}")
         if gerber_result["drill_files"]:
             print(f"   Drill files: {gerber_result['drill_files']}")
     else:
-        print(f"⚠️  Gerber generation failed: {gerber_result.get('error')}")
+        print(f" Gerber generation failed: {gerber_result.get('error')}")
     print()
 
-    print("📊 Circuit Specifications:")
+    print("Circuit Specifications:")
     print("   Input voltage:     5.0V (4.5-6.5V operating range)")
     print("   Output voltage:    3.3V (±2% regulation)")
     print("   Maximum current:   1.0A continuous")
     print("   Dropout voltage:   1.2V (min Vin-Vout)")
     print("   Efficiency:        ~66% (linear regulator)")
     print()
-    print("🌡️  Thermal Analysis (at 1A load):")
+    print(" Thermal Analysis (at 1A load):")
     print("   Power dissipated:  1.7W ((5V - 3.3V) × 1A)")
     print("   Junction temp rise: ~85°C (without heatsinking)")
     print("   Recommendation:    Add heatsink or limit current for continuous use")
     print()
-    print("⚠️  Important Notes:")
+    print(" Important Notes:")
     print("   • Capacitors are REQUIRED - circuit won't work properly without them")
     print("   • Input voltage must be at least 4.5V (3.3V + 1.2V dropout)")
     print("   • For >500mA continuous, add thermal relief or heatsink")
     print("   • For switching loads (WiFi, motors), increase C_out to 47µF")
     print()
-    print("🔧 Next Steps:")
+    print("Next Steps:")
     print("   1. Open the KiCad project")
     print("   2. Note the capacitor placement near the regulator")
     print("   3. Consider adding a power LED to indicate output")

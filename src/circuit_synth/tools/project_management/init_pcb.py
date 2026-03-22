@@ -86,7 +86,7 @@ def organize_kicad_files(project_path: Path, kicad_files: dict) -> dict:
                 shutil.move(str(files), str(new_path))
             new_locations["pcb"] = new_path
 
-    console.print("✅ Organized KiCad files into kicad/ directory", style="green")
+    console.print("Organized KiCad files into kicad/ directory", style="green")
     return new_locations
 
 
@@ -107,7 +107,7 @@ def create_circuit_synth_structure(
     if not example_project_dir.exists():
         # Fallback to simple template if examples not found
         console.print(
-            "⚠️  Example project not found, creating simple template", style="yellow"
+            " Example project not found, creating simple template", style="yellow"
         )
         _create_simple_template(circuit_synth_dir, project_name, kicad_dir)
         return
@@ -215,7 +215,7 @@ if __name__ == "__main__":
         f.write(main_py_content)
 
     console.print(
-        "✅ Created circuit-synth/ directory with complete working example",
+        "Created circuit-synth/ directory with complete working example",
         style="green",
     )
 
@@ -254,12 +254,12 @@ def {project_name.lower().replace(' ', '_').replace('-', '_')}_circuit():
     #     footprint="Package_QFP:LQFP-100_14x14mm_P0.5mm"
     # )
     
-    print("🚧 Circuit structure ready for implementation")
+    print("Circuit structure ready for implementation")
     return circuit
 
 
 if __name__ == "__main__":
-    print("🚀 Generating {project_name}...")
+    print("Generating {project_name}...")
     
     # Generate the circuit
     circuit = {project_name.lower().replace(' ', '_').replace('-', '_')}_circuit()
@@ -267,10 +267,10 @@ if __name__ == "__main__":
     # Generate KiCad project (updates existing files in kicad/ directory)
     circuit.generate_kicad_project("{project_name.replace(' ', '_')}", output_dir="../{kicad_dir}")
     
-    print("✅ {project_name} circuit-synth integration complete!")
-    print("📁 Edit circuit-synth/main.py to add your components")
-    print("📁 KiCad files are organized in {kicad_dir}/ directory")
-    print("📖 See README.md for next steps")
+    print("{project_name} circuit-synth integration complete!")
+    print("Edit circuit-synth/main.py to add your components")
+    print("KiCad files are organized in {kicad_dir}/ directory")
+    print("See README.md for next steps")
 '''
 
     with open(circuit_synth_dir / "main.py", "w") as f:
@@ -370,12 +370,12 @@ Use the slash commands in ./commands/ for quick tasks:
 
     if example_claude_dir.exists():
         console.print(
-            "✅ Created complete Claude agent system with all agents and commands",
+            "Created complete Claude agent system with all agents and commands",
             style="green",
         )
     else:
         console.print(
-            "✅ Created Claude agent configuration (example agents not found)",
+            "Created Claude agent configuration (example agents not found)",
             style="green",
         )
 
@@ -451,7 +451,7 @@ This PCB has a dedicated Claude AI agent configured for:
     with open(project_path / "README.md", "w") as f:
         f.write(readme_content)
 
-    console.print("✅ Created integration README.md", style="green")
+    console.print("Created integration README.md", style="green")
 
 
 @click.command()
@@ -471,7 +471,7 @@ def main(project_path: str):
     console.print(
         Panel.fit(
             Text(
-                f"🚀 Initializing circuit-synth in: {project_dir.name}",
+                f"Initializing circuit-synth in: {project_dir.name}",
                 style="bold blue",
             ),
             style="blue",
@@ -482,27 +482,27 @@ def main(project_path: str):
     kicad_files = find_kicad_files(project_dir)
 
     if not any(kicad_files.values()):
-        console.print("❌ No KiCad files found in directory", style="red")
+        console.print("No KiCad files found in directory", style="red")
         console.print(
-            "💡 Expected files: .kicad_pro, .kicad_sch, or .kicad_pcb", style="yellow"
+            "Expected files: .kicad_pro, .kicad_sch, or .kicad_pcb", style="yellow"
         )
         sys.exit(1)
 
     # Show found files
-    console.print("📁 Found KiCad files:", style="green")
+    console.print("Found KiCad files:", style="green")
     if kicad_files["project"]:
-        console.print(f"   ✓ project: {kicad_files['project'].name}", style="green")
+        console.print(f"   project: {kicad_files['project'].name}", style="green")
     else:
         console.print(f"   - project: not found", style="dim")
 
     if kicad_files["schematic"]:
         for sch in kicad_files["schematic"]:
-            console.print(f"   ✓ schematic: {sch.name}", style="green")
+            console.print(f"   schematic: {sch.name}", style="green")
     else:
         console.print(f"   - schematic: not found", style="dim")
 
     if kicad_files["pcb"]:
-        console.print(f"   ✓ pcb: {kicad_files['pcb'].name}", style="green")
+        console.print(f"   pcb: {kicad_files['pcb'].name}", style="green")
     else:
         console.print(f"   - pcb: not found", style="dim")
 
@@ -514,55 +514,55 @@ def main(project_path: str):
     else:
         project_name = project_dir.name
 
-    console.print(f"📋 Project name: {project_name}", style="blue")
+    console.print(f"Project name: {project_name}", style="blue")
 
     # Check if circuit-synth already initialized
     if (project_dir / "circuit-synth").exists():
-        console.print("⚠️  circuit-synth directory already exists", style="yellow")
+        console.print(" circuit-synth directory already exists", style="yellow")
         if not Confirm.ask("Continue and overwrite?"):
-            console.print("❌ Initialization cancelled", style="red")
+            console.print("Initialization cancelled", style="red")
             sys.exit(1)
 
     # Create structure
-    console.print("\n🏗️  Setting up circuit-synth integration...", style="yellow")
+    console.print("\n Setting up circuit-synth integration...", style="yellow")
 
     try:
         # Organize KiCad files first
-        console.print("\n📁 Organizing KiCad files...", style="yellow")
+        console.print("\nOrganizing KiCad files...", style="yellow")
         organized_kicad_files = organize_kicad_files(project_dir, kicad_files)
 
         # Create circuit-synth structure
         create_circuit_synth_structure(project_dir, project_name)
 
         # Create Claude agent
-        console.print("\n🤖 Setting up AI assistant...", style="yellow")
+        console.print("\nSetting up AI assistant...", style="yellow")
         create_claude_agent(project_dir, project_name)
 
         # Create README
-        console.print("\n📚 Creating documentation...", style="yellow")
+        console.print("\nCreating documentation...", style="yellow")
         create_readme(project_dir, project_name, organized_kicad_files)
 
         # Success message
         console.print(
             Panel.fit(
                 Text(
-                    f"✅ Circuit-synth initialized for '{project_name}'!",
+                    f"Circuit-synth initialized for '{project_name}'!",
                     style="bold green",
                 )
-                + Text(f"\n\n📁 Location: {project_dir}")
-                + Text(f"\n🚀 Next steps:")
+                + Text(f"\n\nLocation: {project_dir}")
+                + Text(f"\nNext steps:")
                 + Text(f"\n   1. Edit circuit-synth/main.py to define your circuit")
                 + Text(f"\n   2. Run: cd circuit-synth && uv run python main.py")
                 + Text(f"\n   3. See README.md for integration strategies")
-                + Text(f"\n\n📁 KiCad files: Organized in kicad/ directory")
-                + Text(f"\n🤖 AI Agent: PCB-specific Claude assistant configured"),
-                title="🎉 Success!",
+                + Text(f"\n\nKiCad files: Organized in kicad/ directory")
+                + Text(f"\nAI Agent: PCB-specific Claude assistant configured"),
+                title="Success!",
                 style="green",
             )
         )
 
     except Exception as e:
-        console.print(f"❌ Error during initialization: {e}", style="red")
+        console.print(f"Error during initialization: {e}", style="red")
         sys.exit(1)
 
 

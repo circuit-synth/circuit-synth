@@ -187,9 +187,9 @@ class CircuitSynthParser:
             try:
                 circuit_data = self.parse_python_circuit(str(py_file))
                 circuits.append(circuit_data)
-                print(f"✓ Parsed: {py_file.name}")
+                print(f"Parsed: {py_file.name}")
             except Exception as e:
-                print(f"✗ Failed to parse {py_file.name}: {e}")
+                print(f"Failed to parse {py_file.name}: {e}")
 
         return circuits
 

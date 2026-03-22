@@ -18,7 +18,7 @@ def setup_snapeda_api(api_key: str):
     config = LibrarySourceConfig()
     config.update_api_credentials(LibrarySource.SNAPEDA, api_key=api_key, enabled=True)
 
-    click.echo(f"✅ SnapEDA API configured successfully")
+    click.echo(f"SnapEDA API configured successfully")
     click.echo(f"Config saved to: {config.config_file}")
 
 
@@ -33,7 +33,7 @@ def setup_digikey_api(api_key: str, client_id: str):
         LibrarySource.DIGIKEY_API, api_key=api_key, client_id=client_id, enabled=True
     )
 
-    click.echo(f"✅ DigiKey API configured successfully")
+    click.echo(f"DigiKey API configured successfully")
     click.echo(f"Config saved to: {config.config_file}")
 
 

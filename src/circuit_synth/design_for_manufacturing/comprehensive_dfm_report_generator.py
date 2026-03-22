@@ -293,8 +293,8 @@ class ComprehensiveDFMReportGenerator:
             story, onFirstPage=self._add_page_number, onLaterPages=self._add_page_number
         )
 
-        print(f"✅ Comprehensive DFM Report generated: {output_path}")
-        print(f"📄 Report contains detailed analysis across 17 sections")
+        print(f"Comprehensive DFM Report generated: {output_path}")
+        print(f"Report contains detailed analysis across 17 sections")
         return output_path
 
     def _create_cover_page(self, dfm_report: DFMReport) -> List:
@@ -868,26 +868,26 @@ class ComprehensiveDFMReportGenerator:
             # PCB specifications table
             spec_data = [
                 ["Parameter", "Value", "Standard Capability", "Status"],
-                ["Layer Count", str(pcb.layer_count), "2-8 layers", "✓"],
-                ["Board Size", f"{(pcb.board_size_mm2/100):.1f} cm²", "< 500 cm²", "✓"],
+                ["Layer Count", str(pcb.layer_count), "2-8 layers", ""],
+                ["Board Size", f"{(pcb.board_size_mm2/100):.1f} cm²", "< 500 cm²", ""],
                 [
                     "Min Trace Width",
                     f"{pcb.min_trace_width_mm:.3f} mm",
                     "≥ 0.127 mm",
-                    "✓",
+                    "",
                 ],
-                ["Min Via Size", f"{pcb.min_via_size_mm:.3f} mm", "≥ 0.2 mm", "✓"],
+                ["Min Via Size", f"{pcb.min_via_size_mm:.3f} mm", "≥ 0.2 mm", ""],
                 [
                     "Component Density",
                     f"{pcb.component_density:.1f} /cm²",
                     "< 10 /cm²",
-                    "✓" if pcb.component_density < 10 else "⚠",
+                    "" if pcb.component_density < 10 else "",
                 ],
                 [
                     "Panelization Efficiency",
                     f"{pcb.panelization_efficiency:.0f}%",
                     "≥ 70%",
-                    "✓" if pcb.panelization_efficiency >= 70 else "⚠",
+                    "" if pcb.panelization_efficiency >= 70 else "",
                 ],
             ]
 

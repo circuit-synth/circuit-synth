@@ -126,7 +126,7 @@ def basic_circuit():
 """
 
         # Add validation badge to code
-        validation_badge = "# ✅ VALIDATED" if is_valid else "# ⚠️ VALIDATION ISSUES"
+        validation_badge = "# VALIDATED" if is_valid else "# VALIDATION ISSUES"
 
         return f"""{header}{validation_badge}
 

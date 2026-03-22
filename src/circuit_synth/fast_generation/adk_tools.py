@@ -45,20 +45,20 @@ def find_symbol_tool_function(search_term: str) -> str:
                 break
 
         if not kicad_symbols_path:
-            return f"❌ KiCad symbol libraries not found. Checked: {', '.join(symbol_paths)}"
+            return f"KiCad symbol libraries not found. Checked: {', '.join(symbol_paths)}"
 
         # Step 1: Find library files containing the search term
         cmd = f'find "{kicad_symbols_path}" -name "*.kicad_sym" | xargs grep -l "{search_term}"'
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
 
         if result.returncode != 0 or not result.stdout.strip():
-            return f"❌ No symbols found containing '{search_term}'"
+            return f"No symbols found containing '{search_term}'"
 
         matching_libraries = result.stdout.strip().split("\n")
 
         # Step 2: Extract specific symbol names from libraries
         output = [
-            f"📍 Found {len(matching_libraries)} libraries containing '{search_term}':"
+            f"Found {len(matching_libraries)} libraries containing '{search_term}':"
         ]
         output.append("=" * 60)
 
@@ -87,7 +87,7 @@ def find_symbol_tool_function(search_term: str) -> str:
                 for symbol in symbols[:5]:  # Show up to 5 symbols per library
                     output.append(f"  - {lib_name}:{symbol}")
 
-        output.append(f"\n🔧 Circuit-synth usage:")
+        output.append(f"\nCircuit-synth usage:")
         output.append(
             f'component = Component(symbol="LibraryName:SymbolName", ref="U1")'
         )
@@ -95,7 +95,7 @@ def find_symbol_tool_function(search_term: str) -> str:
         return "\n".join(output)
 
     except Exception as e:
-        return f"❌ Error searching for symbols: {e}"
+        return f"Error searching for symbols: {e}"
 
 
 def find_footprint_tool_function(search_term: str) -> str:
@@ -124,19 +124,19 @@ def find_footprint_tool_function(search_term: str) -> str:
                 break
 
         if not kicad_footprints_path:
-            return f"❌ KiCad footprint libraries not found. Checked: {', '.join(footprint_paths)}"
+            return f"KiCad footprint libraries not found. Checked: {', '.join(footprint_paths)}"
 
         # Find footprint files containing the search term
         cmd = f'find "{kicad_footprints_path}" -name "*.pretty" -exec find {{}} -name "*{search_term}*" \\;'
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
 
         if result.returncode != 0 or not result.stdout.strip():
-            return f"❌ No footprints found containing '{search_term}'"
+            return f"No footprints found containing '{search_term}'"
 
         matching_footprints = result.stdout.strip().split("\n")
 
         output = [
-            f"📍 Found {len(matching_footprints)} footprints containing '{search_term}':"
+            f"Found {len(matching_footprints)} footprints containing '{search_term}':"
         ]
         output.append("=" * 60)
 
@@ -160,13 +160,13 @@ def find_footprint_tool_function(search_term: str) -> str:
             for fp in footprints[:5]:  # Show up to 5 footprints per library
                 output.append(f"  - {lib_name}:{fp}")
 
-        output.append(f"\n🔧 Circuit-synth usage:")
+        output.append(f"\nCircuit-synth usage:")
         output.append(f'footprint="LibraryName:FootprintName"')
 
         return "\n".join(output)
 
     except Exception as e:
-        return f"❌ Error searching for footprints: {e}"
+        return f"Error searching for footprints: {e}"
 
 
 def find_pins_tool_function(symbol_name: str) -> str:
@@ -183,7 +183,7 @@ def find_pins_tool_function(symbol_name: str) -> str:
         result = pin_finder.get_pin_info_for_ai(symbol_name)
         return result
     except Exception as e:
-        return f"❌ Error finding pins for {symbol_name}: {e}"
+        return f"Error finding pins for {symbol_name}: {e}"
 
 
 # Create Google ADK tools if available

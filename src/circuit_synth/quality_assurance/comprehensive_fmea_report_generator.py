@@ -306,8 +306,8 @@ class ComprehensiveFMEAReportGenerator:
             story, onFirstPage=self._add_page_number, onLaterPages=self._add_page_number
         )
 
-        print(f"✅ Comprehensive FMEA Report generated: {output_path}")
-        print(f"📄 Report contains detailed analysis across 19 sections")
+        print(f"Comprehensive FMEA Report generated: {output_path}")
+        print(f"Report contains detailed analysis across 19 sections")
         return output_path
 
     def _create_cover_page(self) -> List:
@@ -591,7 +591,7 @@ class ComprehensiveFMEAReportGenerator:
             )
 
             critical_warning = Paragraph(
-                f"<b>⚠️ WARNING:</b> {len(critical_modes)} critical failure modes identified "
+                f"<b>WARNING:</b> {len(critical_modes)} critical failure modes identified "
                 f"with RPN ≥ 300. These require immediate design review and mitigation.",
                 self.styles["CriticalWarning"],
             )

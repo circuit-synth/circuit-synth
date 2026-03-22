@@ -538,11 +538,11 @@ class KiCadToPythonSyncer:
             # Add debug logging for hierarchical tree
             if hierarchical_tree:
                 logger.info(
-                    f"🔧 HIERARCHICAL_TREE_DEBUG: Found hierarchical tree: {hierarchical_tree}"
+                    f"HIERARCHICAL_TREE_DEBUG: Found hierarchical tree: {hierarchical_tree}"
                 )
             else:
                 logger.warning(
-                    "🔧 HIERARCHICAL_TREE_DEBUG: No hierarchical tree found in circuits"
+                    "HIERARCHICAL_TREE_DEBUG: No hierarchical tree found in circuits"
                 )
 
             if self.is_directory_mode:
@@ -563,11 +563,11 @@ class KiCadToPythonSyncer:
                     print(updated_code)
                     logger.info("=== END PREVIEW ===")
                 else:
-                    logger.info("✅ Python file updated successfully")
+                    logger.info("Python file updated successfully")
 
                 return True
             else:
-                logger.error("❌ Failed to update Python file")
+                logger.error("Failed to update Python file")
                 return False
 
         except Exception as e:

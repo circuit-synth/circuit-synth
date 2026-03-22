@@ -48,7 +48,7 @@ def create_claude_directory_from_templates(
     dest_claude_dir.mkdir(exist_ok=True)
 
     console.print(
-        "🤖 Setting up Claude Code integration from templates...", style="blue"
+        "Setting up Claude Code integration from templates...", style="blue"
     )
 
     try:
@@ -62,7 +62,7 @@ def create_claude_directory_from_templates(
 
         if template_claude_dir.exists():
             console.print(
-                f"📋 Copying templates from {template_claude_dir}", style="blue"
+                f"Copying templates from {template_claude_dir}", style="blue"
             )
 
             # Copy the entire template .claude directory structure
@@ -114,11 +114,11 @@ def create_claude_directory_from_templates(
                 if dev_agents_dir.exists() and not any(dev_agents_dir.iterdir()):
                     dev_agents_dir.rmdir()
 
-            console.print("✅ Copied complete template structure", style="green")
+            console.print("Copied complete template structure", style="green")
 
         else:
             console.print(
-                "⚠️  Template directory not found, using basic setup", style="yellow"
+                " Template directory not found, using basic setup", style="yellow"
             )
             # Fallback: just register agents
             register_circuit_agents()
@@ -127,7 +127,7 @@ def create_claude_directory_from_templates(
         register_circuit_agents()
 
         # Hooks removed - they caused more problems than they solved
-        console.print("✅ Clean environment setup (no hooks)", style="green")
+        console.print("Clean environment setup (no hooks)", style="green")
 
         # Remove mcp_settings.json as it's not needed for user projects
         mcp_settings_file = dest_claude_dir / "mcp_settings.json"
@@ -138,19 +138,19 @@ def create_claude_directory_from_templates(
         agents_count = len(list((dest_claude_dir / "agents").rglob("*.md")))
         commands_count = len(list((dest_claude_dir / "commands").rglob("*.md")))
 
-        console.print(f"📁 Agents available: {agents_count}", style="green")
-        console.print(f"🔧 Commands available: {commands_count}", style="green")
+        console.print(f"Agents available: {agents_count}", style="green")
+        console.print(f"Commands available: {commands_count}", style="green")
 
         console.print(
-            "✅ Created Claude directory structure with templates", style="green"
+            "Created Claude directory structure with templates", style="green"
         )
         console.print(
-            f"📁 Created project-local .claude in {dest_claude_dir}", style="blue"
+            f"Created project-local .claude in {dest_claude_dir}", style="blue"
         )
 
     except Exception as e:
         console.print(
-            f"⚠️  Could not create complete Claude setup: {str(e)}", style="yellow"
+            f" Could not create complete Claude setup: {str(e)}", style="yellow"
         )
         # Fall back to basic agent registration
         register_circuit_agents()
@@ -172,7 +172,7 @@ def copy_complete_claude_setup(
 
     if not source_claude_dir.exists():
         console.print(
-            "⚠️  Source .claude directory not found - using template-based setup",
+            " Source .claude directory not found - using template-based setup",
             style="yellow",
         )
         # Use template-based approach to create complete .claude directory
@@ -182,10 +182,10 @@ def copy_complete_claude_setup(
     # Destination .claude directory in the new project
     dest_claude_dir = project_path / ".claude"
 
-    console.print(f"📋 Copying Claude setup from {source_claude_dir}", style="blue")
+    console.print(f"Copying Claude setup from {source_claude_dir}", style="blue")
     if developer_mode:
         console.print(
-            "🔧 Developer mode: Including contributor agents and dev tools",
+            "Developer mode: Including contributor agents and dev tools",
             style="cyan",
         )
 
@@ -235,19 +235,19 @@ def copy_complete_claude_setup(
                     agent_path.unlink()
 
         else:
-            console.print("✅ Keeping all developer tools and agents", style="green")
+            console.print("Keeping all developer tools and agents", style="green")
 
-        console.print("✅ Copied all agents and commands", style="green")
+        console.print("Copied all agents and commands", style="green")
 
         # Hooks removed - they caused more problems than they solved
-        console.print("✅ Clean environment setup (no hooks)", style="green")
+        console.print("Clean environment setup (no hooks)", style="green")
 
         # Count what was copied (now includes subdirectories)
         agents_count = len(list((dest_claude_dir / "agents").rglob("*.md")))
         commands_count = len(list((dest_claude_dir / "commands").rglob("*.md")))
 
-        console.print(f"📁 Agents available: {agents_count}", style="green")
-        console.print(f"🔧 Commands available: {commands_count}", style="green")
+        console.print(f"Agents available: {agents_count}", style="green")
+        console.print(f"Commands available: {commands_count}", style="green")
 
         # List key agents by category
         circuit_agents = []
@@ -268,20 +268,20 @@ def copy_complete_claude_setup(
 
         if circuit_agents:
             console.print(
-                f"🔌 Circuit agents: {', '.join(circuit_agents)}", style="cyan"
+                f"Circuit agents: {', '.join(circuit_agents)}", style="cyan"
             )
         if manufacturing_agents:
             console.print(
-                f"🏭 Manufacturing agents: {', '.join(manufacturing_agents)}",
+                f"Manufacturing agents: {', '.join(manufacturing_agents)}",
                 style="cyan",
             )
         if quality_agents:
             console.print(
-                f"✅ Quality agents: {', '.join(quality_agents)}", style="cyan"
+                f"Quality agents: {', '.join(quality_agents)}", style="cyan"
             )
         if development_agents and developer_mode:
             console.print(
-                f"🔧 Development agents: {', '.join(development_agents)}", style="cyan"
+                f"Development agents: {', '.join(development_agents)}", style="cyan"
             )
 
         # List some key commands
@@ -296,46 +296,46 @@ def copy_complete_claude_setup(
 
         if found_key_commands:
             console.print(
-                f"⚡ Key commands: /{', /'.join(found_key_commands)}", style="cyan"
+                f"Key commands: /{', /'.join(found_key_commands)}", style="cyan"
             )
 
     except Exception as e:
-        console.print(f"⚠️  Could not copy .claude directory: {e}", style="yellow")
-        console.print("🔄 Falling back to basic agent registration", style="yellow")
+        console.print(f" Could not copy .claude directory: {e}", style="yellow")
+        console.print("Falling back to basic agent registration", style="yellow")
         register_circuit_agents()
 
 
 def check_kicad_installation() -> Dict[str, Any]:
     """Check KiCad installation and return path info (cross-platform)"""
-    console.print("🔍 Checking KiCad installation...", style="yellow")
+    console.print("Checking KiCad installation...", style="yellow")
 
     try:
         result = validate_kicad_installation()
 
         # Check if KiCad CLI is available (main requirement)
         if result.get("cli_available", False):
-            console.print("✅ KiCad found!", style="green")
-            console.print(f"   🔧 CLI Path: {result.get('cli_path', 'Unknown')}")
-            console.print(f"   📦 Version: {result.get('cli_version', 'Unknown')}")
+            console.print("KiCad found!", style="green")
+            console.print(f"   CLI Path: {result.get('cli_path', 'Unknown')}")
+            console.print(f"   Version: {result.get('cli_version', 'Unknown')}")
 
             # Check libraries
             if result.get("libraries_available", False):
                 console.print(
-                    f"   📚 Symbol libraries: {result.get('symbol_path', 'Not found')}"
+                    f"   Symbol libraries: {result.get('symbol_path', 'Not found')}"
                 )
                 console.print(
-                    f"   👟 Footprint libraries: {result.get('footprint_path', 'Not found')}"
+                    f"   Footprint libraries: {result.get('footprint_path', 'Not found')}"
                 )
             else:
                 console.print(
-                    "   ⚠️  Libraries not found but CLI available", style="yellow"
+                    "    Libraries not found but CLI available", style="yellow"
                 )
 
             result["kicad_installed"] = True
             return result
         else:
-            console.print("❌ KiCad not found", style="red")
-            console.print("📥 Install options:", style="cyan")
+            console.print("KiCad not found", style="red")
+            console.print("Install options:", style="cyan")
 
             # Cross-platform installation suggestions
             if sys.platform == "darwin":  # macOS
@@ -355,7 +355,7 @@ def check_kicad_installation() -> Dict[str, Any]:
             return result
 
     except Exception as e:
-        console.print(f"⚠️  Could not verify KiCad installation: {e}", style="yellow")
+        console.print(f" Could not verify KiCad installation: {e}", style="yellow")
         return {"kicad_installed": False, "error": str(e)}
 
 
@@ -381,13 +381,13 @@ def copy_example_project_template(project_path: Path) -> bool:
 
     if not template_dir.exists():
         console.print(
-            f"⚠️  Project template not found at {template_dir}", style="yellow"
+            f" Project template not found at {template_dir}", style="yellow"
         )
-        console.print("🔄 Falling back to basic project creation", style="yellow")
+        console.print("Falling back to basic project creation", style="yellow")
         return False
 
     console.print(
-        f"📋 Copying complete project template from {template_dir}", style="blue"
+        f"Copying complete project template from {template_dir}", style="blue"
     )
 
     try:
@@ -397,30 +397,30 @@ def copy_example_project_template(project_path: Path) -> bool:
                 # Copy individual files
                 dest_file = project_path / item.name
                 shutil.copy2(item, dest_file)
-                console.print(f"   ✅ Copied {item.name}", style="green")
+                console.print(f"   Copied {item.name}", style="green")
             elif item.is_dir():
                 # Copy entire directories
                 dest_dir = project_path / item.name
                 if dest_dir.exists():
                     shutil.rmtree(dest_dir)
                 shutil.copytree(item, dest_dir)
-                console.print(f"   ✅ Copied {item.name}/ directory", style="green")
+                console.print(f"   Copied {item.name}/ directory", style="green")
 
-        console.print("✅ Complete project template copied successfully", style="green")
+        console.print("Complete project template copied successfully", style="green")
         console.print(
-            "   🎯 Ready-to-use ESP32-C6 development board example included!",
+            "   Ready-to-use ESP32-C6 development board example included!",
             style="cyan",
         )
         console.print(
-            "   🤖 Claude Code agents and commands included from template!",
+            "   Claude Code agents and commands included from template!",
             style="cyan",
         )
         return True
 
     except Exception as e:
-        console.print(f"⚠️  Could not copy project template: {e}", style="yellow")
+        console.print(f" Could not copy project template: {e}", style="yellow")
         console.print(
-            "🔄 Project setup will continue without template files", style="yellow"
+            "Project setup will continue without template files", style="yellow"
         )
         return False
 
@@ -434,14 +434,14 @@ def create_project_readme(
 
 A circuit-synth project for professional circuit design with hierarchical architecture.
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Run the ESP32-C6 development board example
 uv run python circuit-synth/main.py
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 my_kicad_project/
@@ -472,7 +472,7 @@ my_kicad_project/
 └── CLAUDE.md            # Project-specific Claude guidance
 ```
 
-## 🏗️ Circuit-Synth Basics
+## Circuit-Synth Basics
 
 ### **Hierarchical Design Philosophy**
 
@@ -532,7 +532,7 @@ circuit.generate_kicad_project(
 )
 ```
 
-## 🤖 AI-Powered Design with Claude Code
+## AI-Powered Design with Claude Code
 
 **Circuit-synth is an agent-first library** - designed to be used with and by AI agents for intelligent circuit design.
 
@@ -540,7 +540,7 @@ circuit.generate_kicad_project(
 
 This project includes specialized circuit design agents registered in `.claude/agents/`:
 
-#### **🎯 circuit-synth Agent**
+#### **circuit-synth Agent**
 - **Expertise**: Circuit-synth code generation and KiCad integration
 - **Usage**: `@Task(subagent_type="circuit-synth", description="Design power supply", prompt="Create 3.3V regulator circuit with USB-C input")`
 - **Capabilities**: 
@@ -549,7 +549,7 @@ This project includes specialized circuit design agents registered in `.claude/a
   - JLCPCB component availability checking
   - Manufacturing-ready designs with verified components
 
-#### **🔬 simulation-expert Agent**  
+#### **simulation-expert Agent**  
 - **Expertise**: SPICE simulation and circuit validation
 - **Usage**: `@Task(subagent_type="simulation-expert", description="Validate filter", prompt="Simulate and optimize this low-pass filter circuit")`
 - **Capabilities**:
@@ -563,23 +563,23 @@ This project includes specialized circuit design agents registered in `.claude/a
 **Natural Language → Working Code:** Describe what you want, get production-ready circuit-synth code.
 
 ```
-👤 "Design a motor controller with STM32, 3 half-bridges, and CAN bus"
+"Design a motor controller with STM32, 3 half-bridges, and CAN bus"
 
-🤖 Claude (using circuit-synth agent):
-   ✅ Searches components with real JLCPCB availability
-   ✅ Generates hierarchical circuit-synth code
-   ✅ Creates professional KiCad project
-   ✅ Includes manufacturing data and alternatives
+Claude (using circuit-synth agent):
+   Searches components with real JLCPCB availability
+   Generates hierarchical circuit-synth code
+   Creates professional KiCad project
+   Includes manufacturing data and alternatives
 ```
 
 ### **Component Intelligence Example**
 
 ```
-👤 "Find STM32 with 3 SPIs available on JLCPCB"
+"Find STM32 with 3 SPIs available on JLCPCB"
 
-🤖 **STM32G431CBT6** - Found matching component  
-   📊 Stock: 83,737 units | Price: $2.50@100pcs
-   ✅ 3 SPIs: SPI1, SPI2, SPI3
+**STM32G431CBT6** - Found matching component  
+   Stock: 83,737 units | Price: $2.50@100pcs
+   3 SPIs: SPI1, SPI2, SPI3
    
    # Ready-to-use circuit-synth code:
    mcu = Component(
@@ -598,16 +598,16 @@ This project includes specialized circuit design agents registered in `.claude/a
 **Examples:**
 ```
 # Design and validate workflow
-👤 "Create and simulate a buck converter for 5V→3.3V@2A"
+"Create and simulate a buck converter for 5V→3.3V@2A"
 
 # Component search workflow  
-👤 "Find a low-noise op-amp for audio applications, check JLCPCB stock"
+"Find a low-noise op-amp for audio applications, check JLCPCB stock"
 
 # Hierarchical design workflow
-👤 "Design ESP32 IoT sensor node with power management and wireless"
+"Design ESP32 IoT sensor node with power management and wireless"
 ```
 
-## 🔬 SPICE Simulation
+## SPICE Simulation
 
 Validate your designs with professional simulation:
 
@@ -624,7 +624,7 @@ print(f"Output voltage: {{result.get_voltage('VOUT'):.3f}}V")
 ac_result = sim.ac_analysis(1, 100000)  # 1Hz to 100kHz
 ```
 
-## 📚 KiCad Libraries
+## KiCad Libraries
 
 This project uses these KiCad symbol libraries:
 
@@ -640,20 +640,20 @@ This project uses these KiCad symbol libraries:
 {chr(10).join(f"- {lib}" for lib in additional_libraries)}
 ''' if additional_libraries else ""}
 
-## 🛠️ Development Workflow
+## Development Workflow
 
 1. **Design**: Create hierarchical circuits in Python
 2. **Validate**: Use SPICE simulation for critical circuits  
 3. **Generate**: Export to KiCad with proper hierarchical structure
 4. **Manufacture**: Components verified for JLCPCB availability
 
-## 📖 Documentation
+## Documentation
 
 - Circuit-Synth: https://circuit-synth.readthedocs.io
 - KiCad: https://docs.kicad.org
 - Component Search: Use Claude Code agents for intelligent component selection
 
-## 🚀 Next Steps
+## Next Steps
 
 1. Run the example circuits to familiarize yourself
 2. Use Claude Code for AI-assisted circuit design
@@ -661,13 +661,13 @@ This project uses these KiCad symbol libraries:
 4. Validate designs with SPICE simulation
 5. Generate production-ready KiCad projects
 
-**Happy circuit designing!** 🎛️
+**Happy circuit designing!** 
 """
 
     with open(project_path / "README.md", "w") as f:
         f.write(readme_content)
 
-    console.print(f"✅ Created project README.md", style="green")
+    console.print(f"Created project README.md", style="green")
 
 
 def create_claude_md(project_path: Path) -> None:
@@ -677,11 +677,11 @@ def create_claude_md(project_path: Path) -> None:
 
 Project-specific guidance for Claude Code when working with this circuit-synth project.
 
-## 🚀 Project Overview
+## Project Overview
 
 This is a **circuit-synth project** for professional circuit design with AI-powered component intelligence.
 
-## ⚡ Available Tools & Commands
+## Available Tools & Commands
 
 ### **Slash Commands**
 - `/find-symbol STM32` - Search KiCad symbol libraries
@@ -698,40 +698,40 @@ This is a **circuit-synth project** for professional circuit design with AI-powe
 - **general-purpose** - Research and codebase analysis
 - **code** - Software engineering and code quality
 
-## 🏗️ Development Workflow
+## Development Workflow
 
 ### **1. Component-First Design**
 Always start with component availability checking:
 ```
-👤 "Find STM32 with 3 SPIs available on JLCPCB"
-👤 "Search for low-power op-amps suitable for battery applications"
+"Find STM32 with 3 SPIs available on JLCPCB"
+"Search for low-power op-amps suitable for battery applications"
 ```
 
 ### **2. Circuit Generation**
 Use agents for code generation:
 ```
-👤 @Task(subagent_type="circuit-synth", description="Create power supply", 
+@Task(subagent_type="circuit-synth", description="Create power supply", 
      prompt="Design 3.3V regulator circuit with USB-C input and overcurrent protection")
 ```
 
 ### **3. Validation & Simulation**
 Validate designs before manufacturing:
 ```
-👤 @Task(subagent_type="simulation-expert", description="Validate filter", 
+@Task(subagent_type="simulation-expert", description="Validate filter", 
      prompt="Simulate this low-pass filter and optimize component values")
 ```
 
-## 🔧 Essential Commands
+## Essential Commands
 
 ```bash
 # Run the main example
 uv run python circuit-synth/main.py
 
 # Test the setup
-uv run python -c "from circuit_synth import *; print('✅ Circuit-synth ready!')"
+uv run python -c "from circuit_synth import *; print('Circuit-synth ready!')"
 ```
 
-## 🔌 KiCad Plugin Setup (Optional AI Integration)
+## KiCad Plugin Setup (Optional AI Integration)
 
 Circuit-synth includes optional KiCad plugins for AI-powered circuit analysis:
 
@@ -746,7 +746,7 @@ After installation and restarting KiCad:
 
 The plugins provide AI-powered BOM analysis and component optimization directly within KiCad!
 
-## 🎯 Best Practices
+## Best Practices
 
 ### **Component Selection Priority**
 1. **JLCPCB availability first** - Always check stock levels
@@ -764,7 +764,7 @@ The plugins provide AI-powered BOM analysis and component optimization directly 
 - **Use simulation-expert** for validation and optimization
 - **Use jlc-parts-finder** for sourcing and alternatives
 
-## 📚 Quick Reference
+## Quick Reference
 
 ### **Component Creation**
 ```python
@@ -789,7 +789,7 @@ def power_supply():
     pass
 ```
 
-## 🚀 Getting Help
+## Getting Help
 
 - Use **natural language** to describe what you want to build
 - **Be specific** about requirements (voltage, current, package, etc.)
@@ -798,21 +798,21 @@ def power_supply():
 
 **Example project requests:**
 ```
-👤 "Design ESP32 IoT sensor node with LoRaWAN, solar charging, and environmental sensors"
-👤 "Create USB-C PD trigger circuit for 20V output with safety protection" 
-👤 "Build ESP32-based IoT sensor node with WiFi, environmental sensors, and battery management"
+"Design ESP32 IoT sensor node with LoRaWAN, solar charging, and environmental sensors"
+"Create USB-C PD trigger circuit for 20V output with safety protection" 
+"Build ESP32-based IoT sensor node with WiFi, environmental sensors, and battery management"
 ```
 
 ---
 
-**This project is optimized for AI-powered circuit design with Claude Code!** 🎛️
+**This project is optimized for AI-powered circuit design with Claude Code!** 
 """
 
     claude_md_file = project_path / "CLAUDE.md"
     with open(claude_md_file, "w") as f:
         f.write(claude_md_content)
 
-    console.print(f"✅ Created project CLAUDE.md", style="green")
+    console.print(f"Created project CLAUDE.md", style="green")
 
 
 @click.command()
@@ -869,7 +869,7 @@ def main(
             if not Confirm.ask(
                 "Continue without KiCad? (You'll need it later for opening projects)"
             ):
-                console.print("❌ Aborted - Please install KiCad first", style="red")
+                console.print("Aborted - Please install KiCad first", style="red")
                 sys.exit(1)
 
     # Step 2: Determine project configuration
@@ -877,12 +877,12 @@ def main(
 
     if quick:
         # Quick mode: use defaults, no prompts
-        console.print("[bold cyan]⚡ Quick Start Mode[/bold cyan]")
+        console.print("[bold cyan]Quick Start Mode[/bold cyan]")
         config = get_default_config()
         if developer:
             config.developer_mode = True
         console.print(
-            f"✅ Creating project with: [green]{', '.join([c.display_name for c in config.circuits])}[/green]"
+            f"Creating project with: [green]{', '.join([c.display_name for c in config.circuits])}[/green]"
         )
         console.print()
 
@@ -905,7 +905,7 @@ def main(
     claude_md_gen = CLAUDEMDGenerator()
 
     # Step 4: Create circuit-synth directory and copy all selected circuits
-    console.print("\n[bold cyan]📝 Creating Project Files...[/bold cyan]")
+    console.print("\n[bold cyan]Creating Project Files...[/bold cyan]")
 
     if config.has_circuits():
         for idx, circuit in enumerate(config.circuits):
@@ -918,27 +918,27 @@ def main(
 
                 if is_first:
                     console.print(
-                        f"✅ Created circuit-synth/main.py ({circuit.display_name})",
+                        f"Created circuit-synth/main.py ({circuit.display_name})",
                         style="green",
                     )
                 else:
                     console.print(
-                        f"✅ Created circuit-synth/{circuit.value}.py ({circuit.display_name})",
+                        f"Created circuit-synth/{circuit.value}.py ({circuit.display_name})",
                         style="green",
                     )
 
             except FileNotFoundError as e:
                 console.print(
-                    f"[yellow]⚠️  Could not add {circuit.display_name}: {e}[/yellow]"
+                    f"[yellow] Could not add {circuit.display_name}: {e}[/yellow]"
                 )
     else:
         console.print(
-            "[yellow]⚠️  No circuits selected. Creating empty project.[/yellow]"
+            "[yellow] No circuits selected. Creating empty project.[/yellow]"
         )
 
     # Step 6: Setup Claude AI agents if requested
     if config.include_agents:
-        console.print("\n[cyan]🤖 Setting up Claude Code integration...[/cyan]")
+        console.print("\n[cyan]Setting up Claude Code integration...[/cyan]")
         try:
             copy_complete_claude_setup(
                 project_path, developer_mode=config.developer_mode
@@ -950,30 +950,30 @@ def main(
                 list((project_path / ".claude" / "commands").rglob("*.md"))
             )
             console.print(
-                f"✅ Claude agents setup complete ({agents_count} agents, {commands_count} commands)",
+                f"Claude agents setup complete ({agents_count} agents, {commands_count} commands)",
                 style="green",
             )
         except Exception as e:
-            console.print(f"[yellow]⚠️  Could not setup Claude agents: {e}[/yellow]")
+            console.print(f"[yellow] Could not setup Claude agents: {e}[/yellow]")
     else:
-        console.print("\n[dim]⏭️  Skipped Claude agents setup[/dim]")
+        console.print("\n[dim]⏭ Skipped Claude agents setup[/dim]")
 
     # Step 7: Generate README.md and CLAUDE.md
-    console.print("\n[cyan]📚 Generating documentation...[/cyan]")
+    console.print("\n[cyan]Generating documentation...[/cyan]")
 
     readme_content = readme_gen.generate(config, project_path)
     readme_path = project_path / "README.md"
     readme_path.write_text(readme_content)
-    console.print("✅ Created README.md", style="green")
+    console.print("Created README.md", style="green")
 
     claude_md_content = claude_md_gen.generate(config)
     claude_md_path = project_path / "CLAUDE.md"
     claude_md_path.write_text(claude_md_content)
-    console.print("✅ Created CLAUDE.md", style="green")
+    console.print("Created CLAUDE.md", style="green")
 
     # Step 8: KiCad plugins note (if KiCad is installed)
     if kicad_installed:
-        console.print("\n[cyan]🔌 KiCad plugins available separately[/cyan]")
+        console.print("\n[cyan]KiCad plugins available separately[/cyan]")
         console.print(
             "[dim]   Run 'uv run cs-setup-kicad-plugins' to install AI integration plugins[/dim]"
         )
@@ -981,23 +981,23 @@ def main(
     # Success message
     console.print()
     success_text = Text(
-        f"✅ Circuit-synth project setup complete!", style="bold green"
-    ) + Text(f"\n\n📁 Location: {project_path}")
+        f"Circuit-synth project setup complete!", style="bold green"
+    ) + Text(f"\n\nLocation: {project_path}")
 
     if config.has_circuits():
         circuits_names = ", ".join([c.display_name for c in config.circuits])
         success_text += Text(
-            f"\n🎛️  Circuits ({len(config.circuits)}): {circuits_names}"
+            f"\n Circuits ({len(config.circuits)}): {circuits_names}"
         )
 
     success_text += Text(
-        f"\n\n🚀 Get started: [cyan]uv run python circuit-synth/main.py[/cyan]"
+        f"\n\nGet started: [cyan]uv run python circuit-synth/main.py[/cyan]"
     )
-    success_text += Text(f"\n📖 Documentation: See README.md")
+    success_text += Text(f"\nDocumentation: See README.md")
 
     if config.has_circuits():
         success_text += Text(
-            f"\n📦 Manufacturing: Templates auto-generate BOM, PDF, and Gerbers"
+            f"\nManufacturing: Templates auto-generate BOM, PDF, and Gerbers"
         )
 
     if config.include_agents:
@@ -1006,10 +1006,10 @@ def main(
             list((project_path / ".claude" / "commands").rglob("*.md"))
         )
         success_text += Text(
-            f"\n🤖 AI Agents: {agents_count} agents, {commands_count} commands available"
+            f"\nAI Agents: {agents_count} agents, {commands_count} commands available"
         )
 
-    console.print(Panel.fit(success_text, title="🎉 Success!", style="green"))
+    console.print(Panel.fit(success_text, title="Success!", style="green"))
 
 
 if __name__ == "__main__":

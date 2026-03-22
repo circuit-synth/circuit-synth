@@ -3,7 +3,7 @@ Circuit-Synth: Open Source Circuit Synthesis Framework
 
 A Python framework for programmatic circuit design with KiCad integration.
 
-🤖 **Claude Code Integration Available**
+**Claude Code Integration Available**
 For AI-powered circuit design with specialized agents:
 
     pip install circuit-synth[claude]
@@ -15,6 +15,18 @@ Or in Python:
 """
 
 __version__ = "0.12.1"
+
+# Ensure UTF-8 output on Windows to prevent UnicodeEncodeError
+# when logging or printing non-ASCII characters (e.g. KiCad symbols)
+import sys as _sys
+
+if _sys.platform == "win32":
+    import io as _io
+
+    if isinstance(_sys.stdout, _io.TextIOWrapper):
+        _sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if isinstance(_sys.stderr, _io.TextIOWrapper):
+        _sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 
 def print_version_info():
@@ -159,7 +171,7 @@ def setup_claude_integration():
 
         initialize_claude_integration()
     except ImportError as e:
-        print("⚠️  Claude Code integration not available.")
+        print(" Claude Code integration not available.")
         print(
             "   For AI-powered circuit design, install with: pip install circuit-synth[claude]"
         )
