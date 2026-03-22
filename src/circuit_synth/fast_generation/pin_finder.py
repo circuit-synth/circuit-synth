@@ -89,7 +89,7 @@ class PinFinder:
 
         except Exception as e:
             result["error"] = str(e)
-            result["formatted_output"] = f"❌ Error finding pins for {symbol_name}: {e}"
+            result["formatted_output"] = f"Error finding pins for {symbol_name}: {e}"
 
         # Cache the result
         self.cache[symbol_name] = result
@@ -97,7 +97,7 @@ class PinFinder:
 
     def _format_pin_info(self, symbol_name: str, pins: Dict) -> str:
         """Format pin information for AI consumption"""
-        output = [f"📍 Pin information for {symbol_name}:"]
+        output = [f"Pin information for {symbol_name}:"]
         output.append("=" * 50)
 
         # Sort pins by number for easier reading
@@ -115,7 +115,7 @@ class PinFinder:
                 pin_list.append(pin_name)
 
         # Add circuit-synth usage example
-        output.append(f"\n🔧 Circuit-synth usage:")
+        output.append(f"\nCircuit-synth usage:")
         output.append(f'component = Component(symbol="{symbol_name}", ref="U1")')
 
         # Show first few pins as examples
@@ -132,7 +132,7 @@ class PinFinder:
 
     def _format_kicad_pins(self, symbol_name: str, pins: List) -> str:
         """Format pin information from KiCad symbol cache"""
-        output = [f"📍 Real KiCad pins for {symbol_name}:"]
+        output = [f"Real KiCad pins for {symbol_name}:"]
         output.append("=" * 60)
 
         pin_list = []
@@ -150,7 +150,7 @@ class PinFinder:
                 pin_list.append(usable_name)
 
         # Add circuit-synth usage example
-        output.append(f"\n🔧 Circuit-synth usage:")
+        output.append(f"\nCircuit-synth usage:")
         output.append(f'component = Component(symbol="{symbol_name}", ref="U1")')
 
         # Show first few pins as examples
@@ -158,7 +158,7 @@ class PinFinder:
             if pin_name not in ["Unknown", "", "NC", "~"]:
                 output.append(f'component["{pin_name}"] += some_net')
 
-        output.append(f"\n✅ Available pin names: {', '.join(pin_list[:15])}")
+        output.append(f"\nAvailable pin names: {', '.join(pin_list[:15])}")
         if len(pin_list) > 15:
             output.append(f"... and {len(pin_list) - 15} more")
 
@@ -341,10 +341,10 @@ class PinFinder:
             result["error"] = "Using fallback common pin patterns"
 
             # Create formatted output
-            output = [f"📍 Common pins for {symbol_name} (fallback):"]
+            output = [f"Common pins for {symbol_name} (fallback):"]
             output.append("=" * 50)
             output.extend(pin_names)
-            output.append(f"\n🔧 Circuit-synth usage:")
+            output.append(f"\nCircuit-synth usage:")
             output.append(f'component = Component(symbol="{symbol_name}", ref="U1")')
 
             for pin_name in pin_names[:3]:
@@ -353,7 +353,7 @@ class PinFinder:
             result["formatted_output"] = "\n".join(output)
         else:
             result["formatted_output"] = (
-                f"❌ No fallback pins available for {symbol_name}"
+                f"No fallback pins available for {symbol_name}"
             )
 
         return result

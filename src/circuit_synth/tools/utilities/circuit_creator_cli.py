@@ -23,22 +23,22 @@ from ..agents.circuit_creator_agent import (
 
 def create_circuit_interactive():
     """Interactive circuit creation workflow."""
-    print("🎯 Circuit Creator - Interactive Mode")
+    print("Circuit Creator - Interactive Mode")
     print("=" * 50)
 
     # Gather requirements
-    print("\n📋 Circuit Requirements:")
+    print("\nCircuit Requirements:")
     name = input("Circuit name: ").strip()
     if not name:
-        print("❌ Circuit name is required!")
+        print("Circuit name is required!")
         return
 
     description = input("Description: ").strip()
     if not description:
-        print("❌ Description is required!")
+        print("Description is required!")
         return
 
-    print(f"\n📂 Available categories:")
+    print(f"\nAvailable categories:")
     categories = [
         "power",
         "microcontrollers",
@@ -54,10 +54,10 @@ def create_circuit_interactive():
         cat_choice = int(input("Select category (1-6): ").strip()) - 1
         category = categories[cat_choice]
     except (ValueError, IndexError):
-        print("❌ Invalid category selection!")
+        print("Invalid category selection!")
         return
 
-    print(f"\n🔧 Component Requirements:")
+    print(f"\nComponent Requirements:")
     print("Enter component types (one per line, empty line to finish):")
     print("Examples: microcontroller, voltage_regulator, imu, usb_connector, crystal")
 
@@ -69,7 +69,7 @@ def create_circuit_interactive():
         components.append(comp)
 
     if not components:
-        print("❌ At least one component is required!")
+        print("At least one component is required!")
         return
 
     # Create circuit
@@ -80,18 +80,18 @@ def create_circuit_interactive():
         "components": components,
     }
 
-    print(f"\n🔄 Creating circuit...")
+    print(f"\nCreating circuit...")
     result = create_custom_circuit(requirements)
 
     if result["success"]:
-        print(f"✅ Circuit created successfully!")
-        print(f"📊 Found {len(result['components'])} components")
+        print(f"Circuit created successfully!")
+        print(f"Found {len(result['components'])} components")
 
         # Show component suggestions
-        print(f"\n🔍 Component Suggestions:")
+        print(f"\nComponent Suggestions:")
         for comp in result["components"]:
             stock_status = (
-                "✅" if comp["stock"] > 100 else "⚠️" if comp["stock"] > 0 else "❌"
+                "" if comp["stock"] > 100 else "" if comp["stock"] > 0 else ""
             )
             print(
                 f"  {stock_status} {comp['part_number']}: {comp['description']} (Stock: {comp['stock']})"
@@ -99,7 +99,7 @@ def create_circuit_interactive():
 
         # Show generated code preview
         code_lines = result["circuit_code"].split("\n")
-        print(f"\n📝 Generated Code Preview:")
+        print(f"\nGenerated Code Preview:")
         print("```python")
         for line in code_lines[:20]:  # First 20 lines
             print(line)
@@ -109,7 +109,7 @@ def create_circuit_interactive():
 
         # Ask if user wants to register
         register_choice = (
-            input(f"\n💾 Register this circuit for reuse? (y/N): ").strip().lower()
+            input(f"\nRegister this circuit for reuse? (y/N): ").strip().lower()
         )
         if register_choice in ["y", "yes"]:
             registration = circuit_creator.register_circuit(
@@ -117,21 +117,21 @@ def create_circuit_interactive():
             )
 
             if registration["success"]:
-                print(f"✅ Circuit registered successfully!")
-                print(f"📂 Circuit ID: {registration['circuit_id']}")
-                print(f"📄 File: {registration['file_path']}")
-                print(f"📚 Documentation: {registration['documentation_path']}")
+                print(f"Circuit registered successfully!")
+                print(f"Circuit ID: {registration['circuit_id']}")
+                print(f"File: {registration['file_path']}")
+                print(f"Documentation: {registration['documentation_path']}")
             else:
                 print(
-                    f"❌ Registration failed: {registration.get('error', 'Unknown error')}"
+                    f"Registration failed: {registration.get('error', 'Unknown error')}"
                 )
         else:
             print(
-                f"ℹ️  Circuit created but not registered. You can register it later if needed."
+                f"Circuit created but not registered. You can register it later if needed."
             )
 
     else:
-        print(f"❌ Circuit creation failed: {result['error']}")
+        print(f"Circuit creation failed: {result['error']}")
         if "details" in result:
             for detail in result["details"]:
                 print(f"   • {detail}")
@@ -143,11 +143,11 @@ def create_circuit_from_file(file_path: str):
         with open(file_path, "r") as f:
             requirements = json.load(f)
 
-        print(f"🎯 Creating circuit from {file_path}")
+        print(f"Creating circuit from {file_path}")
         result = create_custom_circuit(requirements)
 
         if result["success"]:
-            print(f"✅ Circuit '{requirements['name']}' created successfully!")
+            print(f"Circuit '{requirements['name']}' created successfully!")
 
             # Auto-register if requested
             if requirements.get("auto_register", False):
@@ -160,21 +160,21 @@ def create_circuit_from_file(file_path: str):
 
                 if registration["success"]:
                     print(
-                        f"✅ Circuit registered with ID: {registration['circuit_id']}"
+                        f"Circuit registered with ID: {registration['circuit_id']}"
                     )
                 else:
                     print(
-                        f"❌ Registration failed: {registration.get('error', 'Unknown error')}"
+                        f"Registration failed: {registration.get('error', 'Unknown error')}"
                     )
         else:
-            print(f"❌ Circuit creation failed: {result['error']}")
+            print(f"Circuit creation failed: {result['error']}")
             sys.exit(1)
 
     except FileNotFoundError:
-        print(f"❌ File not found: {file_path}")
+        print(f"File not found: {file_path}")
         sys.exit(1)
     except json.JSONDecodeError as e:
-        print(f"❌ Invalid JSON in {file_path}: {e}")
+        print(f"Invalid JSON in {file_path}: {e}")
         sys.exit(1)
 
 
@@ -184,16 +184,16 @@ def list_circuits_cli(category: str = None):
 
     if not circuits:
         category_msg = f" in category '{category}'" if category else ""
-        print(f"📭 No circuits found{category_msg}")
+        print(f"No circuits found{category_msg}")
         return
 
-    print(f"📚 Registered Circuits")
+    print(f"Registered Circuits")
     if category:
         print(f"   Category: {category}")
     print("=" * 60)
 
     for circuit in circuits:
-        print(f"🔧 {circuit['name']}")
+        print(f"{circuit['name']}")
         print(f"   ID: {circuit['id']}")
         print(f"   Description: {circuit['description']}")
         print(f"   Components: {circuit['component_count']}")
@@ -208,20 +208,20 @@ def use_circuit_cli(circuit_id: str):
 
     if result["success"]:
         circuit_info = result["circuit_info"]
-        print(f"✅ Using circuit: {circuit_info['name']}")
-        print(f"📄 Description: {circuit_info['description']}")
-        print(f"📂 File: {result['file_path']}")
+        print(f"Using circuit: {circuit_info['name']}")
+        print(f"Description: {circuit_info['description']}")
+        print(f"File: {result['file_path']}")
 
-        print(f"\n📋 Usage Instructions:")
+        print(f"\nUsage Instructions:")
         for instruction in result["usage_instructions"]:
             print(f"   • {instruction}")
 
-        print(f"\n🔧 Components ({len(circuit_info.get('components', []))}):")
+        print(f"\nComponents ({len(circuit_info.get('components', []))}):")
         for comp in circuit_info.get("components", []):
             print(f"   • {comp['part_number']}: {comp['description']}")
 
     else:
-        print(f"❌ {result['error']}")
+        print(f"{result['error']}")
         sys.exit(1)
 
 
@@ -246,8 +246,8 @@ def create_example_requirements_file():
     with open(filename, "w") as f:
         json.dump(example, f, indent=2)
 
-    print(f"✅ Created example requirements file: {filename}")
-    print(f"📝 Edit this file and use: circuit-creator --file {filename}")
+    print(f"Created example requirements file: {filename}")
+    print(f"Edit this file and use: circuit-creator --file {filename}")
 
 
 def main():
@@ -319,10 +319,10 @@ Examples:
             create_example_requirements_file()
 
     except KeyboardInterrupt:
-        print(f"\n\n👋 Circuit Creator interrupted by user")
+        print(f"\n\nCircuit Creator interrupted by user")
         sys.exit(0)
     except Exception as e:
-        print(f"❌ Unexpected error: {e}")
+        print(f"Unexpected error: {e}")
         import traceback
 
         traceback.print_exc()

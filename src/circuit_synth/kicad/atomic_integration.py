@@ -333,10 +333,10 @@ def migrate_circuit_to_atomic(
 
     if success:
         logger.info(
-            f"✅ Successfully migrated circuit to KiCad using atomic operations: {output_path}"
+            f"Successfully migrated circuit to KiCad using atomic operations: {output_path}"
         )
     else:
-        logger.error(f"❌ Failed to migrate circuit to KiCad")
+        logger.error(f"Failed to migrate circuit to KiCad")
 
     return success
 
@@ -363,7 +363,7 @@ def add_atomic_methods_to_circuit():
     # Add method to Circuit class
     Circuit.generate_kicad_project_atomic = generate_kicad_project_atomic
 
-    logger.info("✅ Added atomic methods to Circuit class")
+    logger.info("Added atomic methods to Circuit class")
 
 
 # Auto-initialize when imported

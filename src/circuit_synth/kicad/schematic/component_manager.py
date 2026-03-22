@@ -17,8 +17,8 @@ from .instance_utils import add_symbol_instance
 
 # Debug logging for kicad-sch-api version
 logger_init = logging.getLogger(__name__)
-logger_init.info(f"🔍 IMPORT CHECK - kicad-sch-api version: {ksa.__version__}")
-logger_init.info(f"🔍 IMPORT CHECK - ComponentCollection has _add_to_indexes: {hasattr(ComponentCollection, '_add_to_indexes')}")
+logger_init.info(f"IMPORT CHECK - kicad-sch-api version: {ksa.__version__}")
+logger_init.info(f"IMPORT CHECK - ComponentCollection has _add_to_indexes: {hasattr(ComponentCollection, '_add_to_indexes')}")
 from .placement import PlacementEngine, PlacementStrategy
 
 logger = logging.getLogger(__name__)

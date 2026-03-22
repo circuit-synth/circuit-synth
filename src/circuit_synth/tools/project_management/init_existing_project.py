@@ -38,16 +38,16 @@ def find_kicad_project(input_path: Path) -> Optional[Path]:
     if input_path.is_file():
         if input_path.suffix == ".kicad_pro":
             console.print(
-                f"📁 Using KiCad project file: {input_path.name}", style="blue"
+                f"Using KiCad project file: {input_path.name}", style="blue"
             )
             return input_path
         else:
-            console.print("❌ File is not a KiCad project (.kicad_pro)", style="red")
+            console.print("File is not a KiCad project (.kicad_pro)", style="red")
             return None
 
     elif input_path.is_dir():
         console.print(
-            f"📁 Searching for .kicad_pro file in directory: {input_path.name}",
+            f"Searching for .kicad_pro file in directory: {input_path.name}",
             style="blue",
         )
 
@@ -56,10 +56,10 @@ def find_kicad_project(input_path: Path) -> Optional[Path]:
 
         if not kicad_pro_files:
             console.print(
-                f"❌ No .kicad_pro files found in directory: {input_path}", style="red"
+                f"No .kicad_pro files found in directory: {input_path}", style="red"
             )
             console.print(
-                "💡 Directory should contain a KiCad project file (.kicad_pro)",
+                "Directory should contain a KiCad project file (.kicad_pro)",
                 style="dim",
             )
             return None
@@ -67,41 +67,41 @@ def find_kicad_project(input_path: Path) -> Optional[Path]:
         elif len(kicad_pro_files) == 1:
             found_project = kicad_pro_files[0]
             console.print(
-                f"✅ Found KiCad project: {found_project.name}", style="green"
+                f"Found KiCad project: {found_project.name}", style="green"
             )
             return found_project
 
         else:
-            console.print(f"⚠️  Multiple .kicad_pro files found:", style="yellow")
+            console.print(f" Multiple .kicad_pro files found:", style="yellow")
             for i, project in enumerate(kicad_pro_files, 1):
                 console.print(f"   {i}. {project.name}", style="dim")
 
             # Use the first one found
             selected_project = kicad_pro_files[0]
             console.print(
-                f"🎯 Using first project: {selected_project.name}", style="cyan"
+                f"Using first project: {selected_project.name}", style="cyan"
             )
             return selected_project
 
     else:
         console.print(
-            f"❌ Path does not exist or is not accessible: {input_path}", style="red"
+            f"Path does not exist or is not accessible: {input_path}", style="red"
         )
         return None
 
 
 def validate_kicad_project(kicad_project_path: Path) -> bool:
     """Validate that the KiCad project exists and is complete"""
-    console.print("🔍 Validating KiCad project...", style="yellow")
+    console.print("Validating KiCad project...", style="yellow")
 
     if not kicad_project_path.exists():
         console.print(
-            f"❌ KiCad project file not found: {kicad_project_path}", style="red"
+            f"KiCad project file not found: {kicad_project_path}", style="red"
         )
         return False
 
     if kicad_project_path.suffix != ".kicad_pro":
-        console.print("❌ File is not a KiCad project (.kicad_pro)", style="red")
+        console.print("File is not a KiCad project (.kicad_pro)", style="red")
         return False
 
     # Check for required files
@@ -110,17 +110,17 @@ def validate_kicad_project(kicad_project_path: Path) -> bool:
 
     schematic_file = project_dir / f"{project_stem}.kicad_sch"
     if not schematic_file.exists():
-        console.print(f"❌ Missing schematic file: {schematic_file}", style="red")
+        console.print(f"Missing schematic file: {schematic_file}", style="red")
         return False
 
-    console.print("✅ KiCad project validation passed", style="green")
-    console.print(f"   📁 Project: {kicad_project_path.name}")
-    console.print(f"   📋 Schematic: {schematic_file.name}")
+    console.print("KiCad project validation passed", style="green")
+    console.print(f"   Project: {kicad_project_path.name}")
+    console.print(f"   Schematic: {schematic_file.name}")
 
     # Check for PCB file (optional)
     pcb_file = project_dir / f"{project_stem}.kicad_pcb"
     if pcb_file.exists():
-        console.print(f"   🛠️  PCB: {pcb_file.name}")
+        console.print(f"    PCB: {pcb_file.name}")
 
     return True
 
@@ -131,11 +131,11 @@ def check_for_existing_circuit_synth(target_dir: Path) -> bool:
     claude_dir = target_dir / ".claude"
 
     if circuit_synth_dir.exists() or claude_dir.exists():
-        console.print("⚠️  Circuit-synth appears to already be set up:", style="yellow")
+        console.print(" Circuit-synth appears to already be set up:", style="yellow")
         if circuit_synth_dir.exists():
-            console.print(f"   📁 Found: {circuit_synth_dir}")
+            console.print(f"   Found: {circuit_synth_dir}")
         if claude_dir.exists():
-            console.print(f"   🤖 Found: {claude_dir}")
+            console.print(f"   Found: {claude_dir}")
         return True
 
     return False
@@ -143,7 +143,7 @@ def check_for_existing_circuit_synth(target_dir: Path) -> bool:
 
 def create_backup(kicad_project_path: Path) -> Path:
     """Create a backup of the original KiCad project"""
-    console.print("💾 Creating backup of original KiCad project...", style="yellow")
+    console.print("Creating backup of original KiCad project...", style="yellow")
 
     project_dir = kicad_project_path.parent
     project_name = kicad_project_path.stem
@@ -157,34 +157,34 @@ def create_backup(kicad_project_path: Path) -> Path:
     try:
         # Copy entire project directory to backup
         shutil.copytree(project_dir, backup_dir)
-        console.print(f"✅ Backup created: {backup_dir}", style="green")
+        console.print(f"Backup created: {backup_dir}", style="green")
         return backup_dir
     except Exception as e:
-        console.print(f"❌ Failed to create backup: {e}", style="red")
+        console.print(f"Failed to create backup: {e}", style="red")
         raise
 
 
 def setup_circuit_synth_in_place(kicad_project_path: Path) -> Path:
     """Add circuit-synth to existing KiCad project directory and organize KiCad files"""
     console.print(
-        "📁 Setting up circuit-synth in existing project directory...", style="yellow"
+        "Setting up circuit-synth in existing project directory...", style="yellow"
     )
 
     # Work in the same directory as the KiCad project
     source_dir = kicad_project_path.parent
     project_name = kicad_project_path.stem
 
-    console.print(f"📋 Organizing project: {source_dir.name}/", style="blue")
+    console.print(f"Organizing project: {source_dir.name}/", style="blue")
 
     # Check if circuit-synth directory already exists
     circuit_synth_dir = source_dir / "circuit-synth"
     if circuit_synth_dir.exists():
         console.print(
-            "❌ circuit-synth directory already exists - project appears to already be set up",
+            "circuit-synth directory already exists - project appears to already be set up",
             style="red",
         )
         console.print(
-            "💡 Remove the circuit-synth directory if you want to reinitialize",
+            "Remove the circuit-synth directory if you want to reinitialize",
             style="dim",
         )
         sys.exit(1)
@@ -193,7 +193,7 @@ def setup_circuit_synth_in_place(kicad_project_path: Path) -> Path:
     kicad_subdir = source_dir / project_name
     if not kicad_subdir.exists():
         kicad_subdir.mkdir()
-        console.print(f"📁 Created KiCad subdirectory: {project_name}/", style="green")
+        console.print(f"Created KiCad subdirectory: {project_name}/", style="green")
 
         # Move all KiCad files to subdirectory
         kicad_extensions = {
@@ -218,22 +218,22 @@ def setup_circuit_synth_in_place(kicad_project_path: Path) -> Path:
                     target_file = kicad_subdir / file_path.name
                     shutil.move(str(file_path), str(target_file))
                     files_moved.append(file_path.name)
-                    console.print(f"   ✅ {file_path.name}", style="dim")
+                    console.print(f"   {file_path.name}", style="dim")
 
         console.print(
-            f"📁 Moved {len(files_moved)} KiCad files to {project_name}/", style="green"
+            f"Moved {len(files_moved)} KiCad files to {project_name}/", style="green"
         )
     else:
         console.print(
-            f"📁 KiCad subdirectory already exists: {project_name}/", style="blue"
+            f"KiCad subdirectory already exists: {project_name}/", style="blue"
         )
 
     # Create circuit-synth directory
     circuit_synth_dir.mkdir()
-    console.print("✅ Created circuit-synth directory", style="green")
+    console.print("Created circuit-synth directory", style="green")
 
     console.print(
-        f"✅ Project organization complete: {source_dir.name}/", style="green"
+        f"Project organization complete: {source_dir.name}/", style="green"
     )
     return source_dir
 
@@ -242,10 +242,10 @@ def copy_claude_setup(target_dir: Path, developer_mode: bool = False) -> None:
     """Copy .claude directory from circuit-synth to target project, merging if exists"""
     if developer_mode:
         console.print(
-            "🤖 Setting up Claude AI agents (developer mode)...", style="yellow"
+            "Setting up Claude AI agents (developer mode)...", style="yellow"
         )
     else:
-        console.print("🤖 Setting up Claude AI agents...", style="yellow")
+        console.print("Setting up Claude AI agents...", style="yellow")
 
     # Find the circuit-synth root directory
     circuit_synth_root = Path(__file__).parent.parent.parent.parent
@@ -253,7 +253,7 @@ def copy_claude_setup(target_dir: Path, developer_mode: bool = False) -> None:
 
     if not source_claude_dir.exists():
         console.print(
-            "⚠️  Source .claude directory not found - using basic setup", style="yellow"
+            " Source .claude directory not found - using basic setup", style="yellow"
         )
         register_circuit_agents()
         return
@@ -263,7 +263,7 @@ def copy_claude_setup(target_dir: Path, developer_mode: bool = False) -> None:
     try:
         if dest_claude_dir.exists():
             console.print(
-                "📁 Existing .claude directory found - merging agents and commands",
+                "Existing .claude directory found - merging agents and commands",
                 style="blue",
             )
 
@@ -313,7 +313,7 @@ def copy_claude_setup(target_dir: Path, developer_mode: bool = False) -> None:
                     commands_added += 1
 
             console.print(
-                f"✅ Added {agents_added} new agents and {commands_added} new commands",
+                f"Added {agents_added} new agents and {commands_added} new commands",
                 style="green",
             )
 
@@ -358,20 +358,20 @@ def copy_claude_setup(target_dir: Path, developer_mode: bool = False) -> None:
 
             if developer_mode:
                 console.print(
-                    "✅ Developer Claude AI agents setup complete", style="green"
+                    "Developer Claude AI agents setup complete", style="green"
                 )
             else:
-                console.print("✅ Claude AI agents setup complete", style="green")
+                console.print("Claude AI agents setup complete", style="green")
 
     except Exception as e:
-        console.print(f"⚠️  Could not copy .claude directory: {e}", style="yellow")
-        console.print("🔄 Falling back to basic agent registration", style="yellow")
+        console.print(f" Could not copy .claude directory: {e}", style="yellow")
+        console.print("Falling back to basic agent registration", style="yellow")
         register_circuit_agents()
 
 
 def convert_kicad_to_circuit_synth(kicad_project_path: Path, target_dir: Path) -> None:
     """Convert existing KiCad design to circuit-synth Python code"""
-    console.print("🔄 Converting KiCad design to circuit-synth code...", style="yellow")
+    console.print("Converting KiCad design to circuit-synth code...", style="yellow")
 
     try:
         # Use existing KiCad parser
@@ -381,7 +381,7 @@ def convert_kicad_to_circuit_synth(kicad_project_path: Path, target_dir: Path) -
         netlist_path = parser.generate_netlist()
         if not netlist_path:
             console.print(
-                "⚠️  Could not generate netlist from KiCad project", style="yellow"
+                " Could not generate netlist from KiCad project", style="yellow"
             )
             console.print(
                 "   You'll need to create circuit-synth code manually", style="dim"
@@ -391,7 +391,7 @@ def convert_kicad_to_circuit_synth(kicad_project_path: Path, target_dir: Path) -
         # Parse the circuits
         circuits = parser.parse_circuits()
         if not circuits:
-            console.print("⚠️  Could not parse circuits from netlist", style="yellow")
+            console.print(" Could not parse circuits from netlist", style="yellow")
             console.print(
                 "   You'll need to create circuit-synth code manually", style="dim"
             )
@@ -426,7 +426,7 @@ def convert_kicad_to_circuit_synth(kicad_project_path: Path, target_dir: Path) -
                 main_circuit.hierarchical_tree, main_circuit.name
             )
             console.print(
-                f"🔍 Found {len(all_subcircuit_names)} subcircuits for separate files: {sorted(all_subcircuit_names)}"
+                f"Found {len(all_subcircuit_names)} subcircuits for separate files: {sorted(all_subcircuit_names)}"
             )
 
             for subcircuit_name in all_subcircuit_names:
@@ -435,18 +435,18 @@ def convert_kicad_to_circuit_synth(kicad_project_path: Path, target_dir: Path) -
 
         if not main_circuit:
             # Fall back to first circuit if no hierarchical structure found
-            # console.print("🔍 CONVERSION DEBUG: No hierarchical circuit found, using first circuit", style="yellow")
+            # console.print("CONVERSION DEBUG: No hierarchical circuit found, using first circuit", style="yellow")
             main_circuit = list(circuits.values())[0] if circuits else None
 
         if not main_circuit:
-            console.print("⚠️  No circuits found in netlist", style="yellow")
+            console.print(" No circuits found in netlist", style="yellow")
             console.print(
                 "   You'll need to create circuit-synth code manually", style="dim"
             )
             return
 
-        # console.print(f"🔍 CONVERSION DEBUG: Using main circuit: {main_circuit.name}")
-        # console.print(f"🔍 CONVERSION DEBUG: Found {len(subcircuits)} subcircuits: {list(subcircuits.keys())}")
+        # console.print(f"CONVERSION DEBUG: Using main circuit: {main_circuit.name}")
+        # console.print(f"CONVERSION DEBUG: Found {len(subcircuits)} subcircuits: {list(subcircuits.keys())}")
 
         # Generate hierarchical Python code
         if len(subcircuits) > 0:
@@ -463,14 +463,14 @@ def convert_kicad_to_circuit_synth(kicad_project_path: Path, target_dir: Path) -
                 f.write(python_code)
 
         console.print(
-            f"✅ Generated circuit-synth code in circuit-synth/", style="green"
+            f"Generated circuit-synth code in circuit-synth/", style="green"
         )
 
     except Exception as e:
         import traceback
 
         console.print(
-            f"⚠️  Error converting KiCad to circuit-synth: {e}", style="yellow"
+            f" Error converting KiCad to circuit-synth: {e}", style="yellow"
         )
         console.print(f"   Full traceback: {traceback.format_exc()}", style="dim")
         console.print("   A basic template will be created instead", style="dim")
@@ -526,7 +526,7 @@ def generate_hierarchical_circuit_synth_code(
     """Generate hierarchical circuit-synth Python code with proper nesting structure"""
 
     console.print(
-        f"🏗️ Generating hierarchical circuit with {len(subcircuits)} subcircuits",
+        f"Generating hierarchical circuit with {len(subcircuits)} subcircuits",
         style="blue",
     )
 
@@ -594,7 +594,7 @@ def generate_hierarchical_circuit_synth_code(
                     f"    {function_name}_circuit = {function_name}(vcc_3v3, gnd)"
                 )
 
-        console.print(f"   ✅ Generated {subcircuit_filename}")
+        console.print(f"   Generated {subcircuit_filename}")
 
     # Modify the ESP32 subcircuit to include embedded circuits
     if esp32_embedded_imports:
@@ -612,7 +612,7 @@ def generate_hierarchical_circuit_synth_code(
     with open(main_py_path, "w") as f:
         f.write(main_code)
 
-    console.print(f"   ✅ Generated main.py with proper hierarchical structure")
+    console.print(f"   Generated main.py with proper hierarchical structure")
 
 
 def update_esp32_with_embedded_circuits(
@@ -665,7 +665,7 @@ def update_esp32_with_embedded_circuits(
     with open(esp32_path, "w") as f:
         f.write(content)
 
-    console.print(f"   ✅ Updated esp32c6.py with embedded circuits")
+    console.print(f"   Updated esp32c6.py with embedded circuits")
 
 
 def generate_subcircuit_code(
@@ -845,22 +845,22 @@ def main_circuit():
 
 
 if __name__ == "__main__":
-    print("🚀 Starting {project_name} generation...")
+    print("Starting {project_name} generation...")
     
     # Generate the complete hierarchical circuit
-    print("📋 Creating circuit...")
+    print("Creating circuit...")
     circuit = main_circuit()
     
     # Generate KiCad netlist (required for ratsnest display) - save to kicad project folder
-    print("🔌 Generating KiCad netlist...")
+    print("Generating KiCad netlist...")
     circuit.generate_kicad_netlist("{project_name}/{project_name}.net")
     
     # Generate JSON netlist (for debugging and analysis) - save to circuit-synth folder
-    print("📄 Generating JSON netlist...")
+    print("Generating JSON netlist...")
     circuit.generate_json_netlist("circuit-synth/{project_name}.json")
     
     # Create KiCad project with hierarchical sheets
-    print("🏗️  Generating KiCad project...")
+    print(" Generating KiCad project...")
     circuit.generate_kicad_project(
         project_name="{project_name}",
         placement_algorithm="hierarchical",
@@ -868,22 +868,22 @@ if __name__ == "__main__":
     )
     
     print("")
-    print("✅ {project_name} project generated!")
-    print("📁 Check the {project_name}/ directory for KiCad files")
+    print("{project_name} project generated!")
+    print("Check the {project_name}/ directory for KiCad files")
     print("")
-    print("🏗️ Generated circuits:")
+    print("Generated circuits:")
     print("   • Generated hierarchical circuit design")
     print("   • Converted from KiCad project structure")
     print("")
-    print("📋 Generated files:")
+    print("Generated files:")
     print("   • {project_name}.kicad_pro - KiCad project file")
     print("   • {project_name}.kicad_sch - Hierarchical schematic")
     print("   • {project_name}.kicad_pcb - PCB layout")
     print("   • {project_name}.net - Netlist (enables ratsnest)")
     print("   • {project_name}.json - JSON netlist (for analysis)")
     print("")
-    print("🎯 Ready for professional PCB manufacturing!")
-    print("💡 Open {project_name}.kicad_pcb in KiCad to see the ratsnest!")
+    print("Ready for professional PCB manufacturing!")
+    print("Open {project_name}.kicad_pcb in KiCad to see the ratsnest!")
 '''
 
     return code
@@ -893,11 +893,11 @@ def generate_circuit_synth_code(circuit: Any, project_name: str) -> str:
     """Generate circuit-synth Python code from parsed circuit"""
 
     # Check if this is a hierarchical circuit
-    # console.print(f"🔍 CONVERSION DEBUG: Circuit name: {circuit.name}")
-    # console.print(f"🔍 CONVERSION DEBUG: Circuit components count: {len(circuit.components)}")
-    # console.print(f"🔍 CONVERSION DEBUG: Circuit nets count: {len(circuit.nets)}")
-    # console.print(f"🔍 CONVERSION DEBUG: Circuit hierarchical tree: {getattr(circuit, 'hierarchical_tree', None)}")
-    # console.print(f"🔍 CONVERSION DEBUG: Circuit is_hierarchical_sheet: {getattr(circuit, 'is_hierarchical_sheet', None)}")
+    # console.print(f"CONVERSION DEBUG: Circuit name: {circuit.name}")
+    # console.print(f"CONVERSION DEBUG: Circuit components count: {len(circuit.components)}")
+    # console.print(f"CONVERSION DEBUG: Circuit nets count: {len(circuit.nets)}")
+    # console.print(f"CONVERSION DEBUG: Circuit hierarchical tree: {getattr(circuit, 'hierarchical_tree', None)}")
+    # console.print(f"CONVERSION DEBUG: Circuit is_hierarchical_sheet: {getattr(circuit, 'is_hierarchical_sheet', None)}")
 
     code = f'''#!/usr/bin/env python3
 """
@@ -957,7 +957,7 @@ def main_circuit():
     code += (
         '''
 if __name__ == "__main__":
-    print("🚀 Generating KiCad project from circuit-synth...")
+    print("Generating KiCad project from circuit-synth...")
     circuit = main_circuit()
     
     # Generate KiCad project
@@ -969,8 +969,8 @@ if __name__ == "__main__":
         generate_pcb=True
     )
     
-    print("✅ KiCad project generated successfully!")
-    print("📁 Check the generated KiCad files for your circuit")
+    print("KiCad project generated successfully!")
+    print("Check the generated KiCad files for your circuit")
 """
     )
 
@@ -979,7 +979,7 @@ if __name__ == "__main__":
 
 def create_basic_template(target_dir: Path, project_name: str) -> None:
     """Create a basic circuit-synth template when conversion fails"""
-    console.print("📝 Creating basic circuit-synth template...", style="blue")
+    console.print("Creating basic circuit-synth template...", style="blue")
 
     template_code = f'''#!/usr/bin/env python3
 """
@@ -1021,7 +1021,7 @@ def main_circuit():
     led["K"] += gnd
 
 if __name__ == "__main__":
-    print("🚀 Generating KiCad project from circuit-synth...")
+    print("Generating KiCad project from circuit-synth...")
     circuit = main_circuit()
     
     circuit.generate_kicad_project(
@@ -1030,36 +1030,36 @@ if __name__ == "__main__":
         generate_pcb=True
     )
     
-    print("✅ KiCad project generated!")
+    print("KiCad project generated!")
 '''
 
     main_py_path = target_dir / "circuit-synth" / "main.py"
     with open(main_py_path, "w") as f:
         f.write(template_code)
 
-    console.print(f"✅ Basic template created: {main_py_path}", style="green")
+    console.print(f"Basic template created: {main_py_path}", style="green")
 
 
 def create_project_files(target_dir: Path, project_name: str) -> None:
     """Create README.md and CLAUDE.md files"""
-    console.print("📚 Creating project documentation...", style="yellow")
+    console.print("Creating project documentation...", style="yellow")
 
     # Create README.md
     readme_content = f"""# {project_name}
 
 A circuit-synth project converted from an existing KiCad design.
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Run the converted circuit
 uv run python circuit-synth/main.py
 
 # Test circuit-synth is working
-uv run python -c "from circuit_synth import *; print('✅ Circuit-synth ready!')"
+uv run python -c "from circuit_synth import *; print('Circuit-synth ready!')"
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 {project_name}/
@@ -1075,7 +1075,7 @@ uv run python -c "from circuit_synth import *; print('✅ Circuit-synth ready!')
 └── CLAUDE.md           # Project-specific Claude guidance
 ```
 
-## 🔄 Next Steps
+## Next Steps
 
 1. **Review the generated code** in `circuit-synth/main.py`
 2. **Update component symbols and footprints** as needed
@@ -1083,7 +1083,7 @@ uv run python -c "from circuit_synth import *; print('✅ Circuit-synth ready!')
 4. **Test the circuit generation** with `uv run python circuit-synth/main.py`
 5. **Use Claude Code agents** for AI-assisted improvements
 
-## 🤖 AI-Powered Design
+## AI-Powered Design
 
 This project includes specialized AI agents:
 - **circuit-synth**: Circuit code generation and KiCad integration
@@ -1093,17 +1093,17 @@ This project includes specialized AI agents:
 
 Use natural language to improve your design:
 ```
-👤 "Optimize this power supply for better efficiency"
-👤 "Add protection circuits to prevent overcurrent"  
-👤 "Find alternative components available on JLCPCB"
+"Optimize this power supply for better efficiency"
+"Add protection circuits to prevent overcurrent"  
+"Find alternative components available on JLCPCB"
 ```
 
-## 📖 Documentation
+## Documentation
 
 - Circuit-Synth: https://circuit-synth.readthedocs.io
 - KiCad: https://docs.kicad.org
 
-**Happy circuit designing!** 🎛️
+**Happy circuit designing!** 
 """
 
     # Create CLAUDE.md
@@ -1111,7 +1111,7 @@ Use natural language to improve your design:
 
 Project-specific guidance for Claude Code when working with this converted circuit-synth project.
 
-## 🚀 Project Overview
+## Project Overview
 
 This project was **converted from an existing KiCad design** to circuit-synth format.
 
@@ -1120,7 +1120,7 @@ This project was **converted from an existing KiCad design** to circuit-synth fo
 - Net connections should be verified against the original design
 - Component values and references should be checked
 
-## ⚡ Available Tools
+## Available Tools
 
 ### **Slash Commands**
 - `/find-symbol STM32` - Search KiCad symbol libraries
@@ -1133,17 +1133,17 @@ This project was **converted from an existing KiCad design** to circuit-synth fo
 - **jlc-parts-finder** - JLCPCB component availability
 - **orchestrator** - Master coordinator for complex projects
 
-## 🔧 Essential Commands
+## Essential Commands
 
 ```bash
 # Test the converted circuit
 uv run python circuit-synth/main.py
 
 # Validate circuit-synth installation
-uv run python -c "from circuit_synth import *; print('✅ Ready!')"
+uv run python -c "from circuit_synth import *; print('Ready!')"
 ```
 
-## 🎯 Conversion Review Checklist
+## Conversion Review Checklist
 
 When reviewing the converted circuit-synth code:
 
@@ -1162,19 +1162,19 @@ When reviewing the converted circuit-synth code:
    - Replace generic symbols with specific part numbers
    - Ensure manufacturability with JLCPCB-available components
 
-## 🚀 Getting Help
+## Getting Help
 
 Ask for specific improvements:
 ```
-👤 "Review this converted circuit and suggest improvements"
-👤 "Find JLCPCB alternatives for components not in stock"  
-👤 "Add proper decoupling capacitors to this design"
-👤 "Simulate this power supply circuit for stability"
+"Review this converted circuit and suggest improvements"
+"Find JLCPCB alternatives for components not in stock"  
+"Add proper decoupling capacitors to this design"
+"Simulate this power supply circuit for stability"
 ```
 
 ---
 
-**This converted project is ready for AI-powered circuit design with Claude Code!** 🎛️
+**This converted project is ready for AI-powered circuit design with Claude Code!** 
 """
 
     # Write files
@@ -1184,7 +1184,7 @@ Ask for specific improvements:
     with open(target_dir / "CLAUDE.md", "w") as f:
         f.write(claude_md_content)
 
-    console.print("✅ Project documentation created", style="green")
+    console.print("Project documentation created", style="green")
 
 
 @click.command()
@@ -1209,7 +1209,7 @@ def main(kicad_project: Path, skip_conversion: bool):
 
     console.print(
         Panel.fit(
-            Text("🔄 Circuit-Synth Existing Project Integration", style="bold blue"),
+            Text("Circuit-Synth Existing Project Integration", style="bold blue"),
             style="blue",
         )
     )
@@ -1224,7 +1224,7 @@ def main(kicad_project: Path, skip_conversion: bool):
         sys.exit(1)
 
     project_name = actual_kicad_project.stem
-    console.print(f"📁 Project: {project_name}", style="cyan")
+    console.print(f"Project: {project_name}", style="cyan")
 
     # Set up circuit-synth in the same directory as the KiCad project
     target_dir = setup_circuit_synth_in_place(actual_kicad_project)
@@ -1237,7 +1237,7 @@ def main(kicad_project: Path, skip_conversion: bool):
         kicad_project_in_subdir = target_dir / project_name / actual_kicad_project.name
         convert_kicad_to_circuit_synth(kicad_project_in_subdir, target_dir)
     else:
-        console.print("⏭️  Skipped KiCad conversion", style="yellow")
+        console.print("⏭ Skipped KiCad conversion", style="yellow")
         create_basic_template(target_dir, project_name)
 
     # Create project documentation
@@ -1246,13 +1246,13 @@ def main(kicad_project: Path, skip_conversion: bool):
     # Success message
     console.print(
         Panel.fit(
-            Text(f"✅ Circuit-synth integration complete!", style="bold green")
-            + Text(f"\n\n📁 Enhanced project: {target_dir.name}")
-            + Text(f"\n🔄 Circuit-synth code: circuit-synth/main.py")
-            + Text(f"\n🚀 Get started: uv run python circuit-synth/main.py")
-            + Text(f"\n🤖 AI agents: Available in Claude Code")
-            + Text(f"\n📖 Documentation: See README.md"),
-            title="🎉 Success!",
+            Text(f"Circuit-synth integration complete!", style="bold green")
+            + Text(f"\n\nEnhanced project: {target_dir.name}")
+            + Text(f"\nCircuit-synth code: circuit-synth/main.py")
+            + Text(f"\nGet started: uv run python circuit-synth/main.py")
+            + Text(f"\nAI agents: Available in Claude Code")
+            + Text(f"\nDocumentation: See README.md"),
+            title="Success!",
             style="green",
         )
     )

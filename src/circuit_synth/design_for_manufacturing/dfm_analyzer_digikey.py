@@ -207,10 +207,10 @@ class RealDataDFMAnalyzer:
 
             if pricing:
                 priced_components += 1
-                logger.info(f"✓ Found DigiKey pricing for {ref}: {part_number}")
+                logger.info(f"Found DigiKey pricing for {ref}: {part_number}")
             else:
                 missing_components.append(f"{ref}: {part_number}")
-                logger.warning(f"✗ No DigiKey pricing for {ref}: {part_number}")
+                logger.warning(f"No DigiKey pricing for {ref}: {part_number}")
 
             component_analyses.append(analysis)
 

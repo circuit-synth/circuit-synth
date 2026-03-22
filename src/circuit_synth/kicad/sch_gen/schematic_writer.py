@@ -118,30 +118,30 @@ def generate_component_sexp(component_data):
     """Python implementation for component S-expression generation"""
     # CRITICAL DEBUG: Log all component data to identify reference issue
     logger.debug(
-        f"🔍 GENERATE_COMPONENT_SEXP: Input component_data keys: {list(component_data.keys())}"
+        f"GENERATE_COMPONENT_SEXP: Input component_data keys: {list(component_data.keys())}"
     )
-    logger.debug(f"🔍 GENERATE_COMPONENT_SEXP: Full component_data: {component_data}")
+    logger.debug(f"GENERATE_COMPONENT_SEXP: Full component_data: {component_data}")
 
     # CRITICAL FIX: Never use hard-coded fallbacks - always preserve original reference
     ref = component_data.get("ref")
     if not ref:
         logger.error(
-            f"❌ GENERATE_COMPONENT_SEXP: NO REFERENCE found in component_data!"
+            f"GENERATE_COMPONENT_SEXP: NO REFERENCE found in component_data!"
         )
         logger.error(
-            f"❌ GENERATE_COMPONENT_SEXP: This indicates a bug in component processing"
+            f"GENERATE_COMPONENT_SEXP: This indicates a bug in component processing"
         )
         # Don't use hard-coded fallback - this masks the real issue
         ref = "REF_ERROR"  # Make it obvious when this happens
     else:
-        logger.debug(f"✅ GENERATE_COMPONENT_SEXP: Found reference: '{ref}'")
+        logger.debug(f"GENERATE_COMPONENT_SEXP: Found reference: '{ref}'")
 
     lib_id = component_data.get("lib_id", "Device:UNKNOWN")  # More descriptive fallback
     at = component_data.get("at", [0, 0, 0])
     uuid = component_data.get("uuid", "00000000-0000-0000-0000-000000000000")
 
     logger.debug(
-        f"🔍 GENERATE_COMPONENT_SEXP: Using ref='{ref}', lib_id='{lib_id}', at={at}"
+        f"GENERATE_COMPONENT_SEXP: Using ref='{ref}', lib_id='{lib_id}', at={at}"
     )
 
     # Build basic S-expression
@@ -347,19 +347,19 @@ class SchematicWriter:
         import sys
 
         print(
-            f"\n🔍 WRITER_INIT: Circuit='{circuit.name}'", file=sys.stderr, flush=True
+            f"\nWRITER_INIT: Circuit='{circuit.name}'", file=sys.stderr, flush=True
         )
         print(
-            f"🔍 WRITER_INIT:   Hierarchical path={self.hierarchical_path}",
+            f"WRITER_INIT:   Hierarchical path={self.hierarchical_path}",
             file=sys.stderr,
             flush=True,
         )
         print(
-            f"🔍 WRITER_INIT:   Self UUID={self.uuid_top}", file=sys.stderr, flush=True
+            f"WRITER_INIT:   Self UUID={self.uuid_top}", file=sys.stderr, flush=True
         )
         if self.hierarchical_path and len(self.hierarchical_path) > 0:
             print(
-                f"🔍 WRITER_INIT:   Root UUID (path[0])={self.hierarchical_path[0]}",
+                f"WRITER_INIT:   Root UUID (path[0])={self.hierarchical_path[0]}",
                 file=sys.stderr,
                 flush=True,
             )
@@ -414,35 +414,35 @@ class SchematicWriter:
             f.write(f"generate_s_expr called for circuit {self.circuit.name}\n")
         start_time = time.perf_counter()
         logger.info(
-            f"🚀 GENERATE_S_EXPR: Starting schematic generation for circuit '{self.circuit.name}'"
+            f"GENERATE_S_EXPR: Starting schematic generation for circuit '{self.circuit.name}'"
         )
         logger.info(
-            f"📊 GENERATE_S_EXPR: Components: {len(self.circuit.components)}, Nets: {len(self.circuit.nets)}"
+            f"GENERATE_S_EXPR: Components: {len(self.circuit.components)}, Nets: {len(self.circuit.nets)}"
         )
-        logger.info(f"🐍 GENERATE_S_EXPR: Using Python implementation for components")
+        logger.info(f"GENERATE_S_EXPR: Using Python implementation for components")
 
         # Add components using the new API - time this critical operation
         comp_start = time.perf_counter()
-        logger.info(f"⚡ STEP 1/8: Adding {len(self.circuit.components)} components...")
+        logger.info(f"STEP 1/8: Adding {len(self.circuit.components)} components...")
         self._add_components()
         comp_time = time.perf_counter() - comp_start
-        logger.info(f"✅ STEP 1/8: Components added in {comp_time*1000:.2f}ms")
+        logger.info(f"STEP 1/8: Components added in {comp_time*1000:.2f}ms")
 
         # Place components using the placement engine
         place_start = time.perf_counter()
-        logger.info("⚡ STEP 2/8: Placing components...")
+        logger.info("STEP 2/8: Placing components...")
         self._place_components()
         place_time = time.perf_counter() - place_start
-        logger.info(f"✅ STEP 2/8: Components placed in {place_time*1000:.2f}ms")
+        logger.info(f"STEP 2/8: Components placed in {place_time*1000:.2f}ms")
 
         # Add pin-level net labels
         labels_start = time.perf_counter()
         logger.info(
-            f"⚡ STEP 3/8: Adding pin-level net labels for {len(self.circuit.nets)} nets..."
+            f"STEP 3/8: Adding pin-level net labels for {len(self.circuit.nets)} nets..."
         )
         component_labels = self._add_pin_level_net_labels()
         labels_time = time.perf_counter() - labels_start
-        logger.info(f"✅ STEP 3/8: Net labels added in {labels_time*1000:.2f}ms")
+        logger.info(f"STEP 3/8: Net labels added in {labels_time*1000:.2f}ms")
         logger.debug(
             f"  Label tracking: {len(component_labels)} components with labels"
         )
@@ -452,31 +452,31 @@ class SchematicWriter:
         subcircuit_count = (
             len(self.circuit.child_instances) if self.circuit.child_instances else 0
         )
-        logger.info(f"⚡ STEP 4/8: Adding {subcircuit_count} subcircuit sheets...")
+        logger.info(f"STEP 4/8: Adding {subcircuit_count} subcircuit sheets...")
         self._add_subcircuit_sheets()
         sheets_time = time.perf_counter() - sheets_start
-        logger.info(f"✅ STEP 4/8: Subcircuit sheets added in {sheets_time*1000:.2f}ms")
+        logger.info(f"STEP 4/8: Subcircuit sheets added in {sheets_time*1000:.2f}ms")
 
         # Create ComponentUnits (bundles component + labels + bbox)
         units_start = time.perf_counter()
         logger.info(
-            f"⚡ STEP 5/8: Creating ComponentUnits for {len(self.circuit.components)} components..."
+            f"STEP 5/8: Creating ComponentUnits for {len(self.circuit.components)} components..."
         )
         component_units = self._create_component_units(component_labels)
         units_time = time.perf_counter() - units_start
-        logger.info(f"✅ STEP 5/8: ComponentUnits created in {units_time*1000:.2f}ms")
+        logger.info(f"STEP 5/8: ComponentUnits created in {units_time*1000:.2f}ms")
 
         # Draw bounding boxes if enabled
         bbox_start = time.perf_counter()
         if self.draw_bounding_boxes:
             logger.info(
-                f"⚡ STEP 6/8: Drawing bounding boxes for {len(component_units)} ComponentUnits..."
+                f"STEP 6/8: Drawing bounding boxes for {len(component_units)} ComponentUnits..."
             )
             self._draw_component_unit_bboxes(component_units)
             bbox_time = time.perf_counter() - bbox_start
-            logger.info(f"✅ STEP 6/8: Bounding boxes drawn in {bbox_time*1000:.2f}ms")
+            logger.info(f"STEP 6/8: Bounding boxes drawn in {bbox_time*1000:.2f}ms")
         else:
-            logger.info("⏭️  STEP 6/8: Bounding boxes disabled, skipping")
+            logger.info("⏭ STEP 6/8: Bounding boxes disabled, skipping")
             bbox_time = 0
 
         # Add text annotations (TextBox, TextProperty, etc.)
@@ -484,39 +484,39 @@ class SchematicWriter:
 
         # Populate lib_symbols from the symbol cache
         lib_start = time.perf_counter()
-        logger.info("⚡ STEP 7/8: Populating symbol library definitions...")
+        logger.info("STEP 7/8: Populating symbol library definitions...")
         self._populate_lib_symbols()
         lib_time = time.perf_counter() - lib_start
-        logger.info(f"✅ STEP 7/8: Symbol library populated in {lib_time*1000:.2f}ms")
+        logger.info(f"STEP 7/8: Symbol library populated in {lib_time*1000:.2f}ms")
 
         total_time = time.perf_counter() - start_time
 
-        logger.info("🏁 STEP 8/8: Schematic generation complete!")
-        logger.info(f"✅ GENERATE_S_EXPR: ✅ TOTAL TIME: {total_time*1000:.2f}ms")
+        logger.info("STEP 8/8: Schematic generation complete!")
+        logger.info(f"GENERATE_S_EXPR: TOTAL TIME: {total_time*1000:.2f}ms")
 
         # Performance breakdown
-        logger.info("📈 PERFORMANCE_BREAKDOWN:")
+        logger.info("PERFORMANCE_BREAKDOWN:")
         logger.info(
-            f"  🔧 Components: {comp_time*1000:.2f}ms ({comp_time/total_time*100:.1f}%)"
+            f"  Components: {comp_time*1000:.2f}ms ({comp_time/total_time*100:.1f}%)"
         )
         logger.info(
-            f"  📍 Placement: {place_time*1000:.2f}ms ({place_time/total_time*100:.1f}%)"
+            f"  Placement: {place_time*1000:.2f}ms ({place_time/total_time*100:.1f}%)"
         )
         logger.info(
-            f"  🏷️  Labels: {labels_time*1000:.2f}ms ({labels_time/total_time*100:.1f}%)"
+            f"   Labels: {labels_time*1000:.2f}ms ({labels_time/total_time*100:.1f}%)"
         )
         logger.info(
-            f"  📄 Sheets: {sheets_time*1000:.2f}ms ({sheets_time/total_time*100:.1f}%)"
+            f"  Sheets: {sheets_time*1000:.2f}ms ({sheets_time/total_time*100:.1f}%)"
         )
         if bbox_time > 0:
             logger.info(
-                f"  📦 Bounding boxes: {bbox_time*1000:.2f}ms ({bbox_time/total_time*100:.1f}%)"
+                f"  Bounding boxes: {bbox_time*1000:.2f}ms ({bbox_time/total_time*100:.1f}%)"
             )
         logger.info(
-            f"  📚 Lib symbols: {lib_time*1000:.2f}ms ({lib_time/total_time*100:.1f}%)"
+            f"  Lib symbols: {lib_time*1000:.2f}ms ({lib_time/total_time*100:.1f}%)"
         )
 
-        logger.info(f"⚡ PERFORMANCE: Completed in {total_time*1000:.2f}ms")
+        logger.info(f"PERFORMANCE: Completed in {total_time*1000:.2f}ms")
 
         # Return the Schematic object instead of S-expression
         return self.schematic
@@ -746,7 +746,7 @@ class SchematicWriter:
                 # UNIVERSAL SOLUTION: Always use the actual project name for consistency
                 instance_project = self.project_name or "default_project"
                 logger.debug(
-                    f"🔧 UNIVERSAL_PROJECT_NAMING: Using consistent project name: '{instance_project}'"
+                    f"UNIVERSAL_PROJECT_NAMING: Using consistent project name: '{instance_project}'"
                 )
 
                 instance = SymbolInstance(
@@ -798,7 +798,7 @@ class SchematicWriter:
 
         print("=" * 80, file=sys.stderr, flush=True)
         print(
-            "🔤 TEXT-FLOW PLACEMENT _place_components() called!",
+            "TEXT-FLOW PLACEMENT _place_components() called!",
             file=sys.stderr,
             flush=True,
         )
@@ -806,27 +806,27 @@ class SchematicWriter:
 
         if not self.schematic.components:
             logger.debug("No components to place")
-            print("⚠️  No components to place!", file=sys.stderr, flush=True)
+            print(" No components to place!", file=sys.stderr, flush=True)
             return
 
         start_time = time.perf_counter()
         print(
-            f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components",
+            f"PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components",
             file=sys.stderr,
             flush=True,
         )
         print(
-            f"🔤 PLACE_COMPONENTS: Using text-flow placement algorithm",
+            f"PLACE_COMPONENTS: Using text-flow placement algorithm",
             file=sys.stderr,
             flush=True,
         )
         logger.info(
-            f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components"
+            f"PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components"
         )
-        logger.info(f"🔤 PLACE_COMPONENTS: Using text-flow placement algorithm")
+        logger.info(f"PLACE_COMPONENTS: Using text-flow placement algorithm")
 
         # Print current positions
-        print("\n🔍 Component positions before placement:")
+        print("\nComponent positions before placement:")
         for comp in self.schematic.components:
             print(f"  {comp.reference}: ({comp.position.x:.1f}, {comp.position.y:.1f})")
 
@@ -834,11 +834,11 @@ class SchematicWriter:
         components_needing_placement = list(self.schematic.components)
 
         print(
-            f"\n📊 Components to place with text-flow: {len(components_needing_placement)}"
+            f"\nComponents to place with text-flow: {len(components_needing_placement)}"
         )
 
         logger.info(
-            f"🔧 PLACE_COMPONENTS: {len(components_needing_placement)} components need placement"
+            f"PLACE_COMPONENTS: {len(components_needing_placement)} components need placement"
         )
 
         # Use text-flow placement
@@ -875,7 +875,7 @@ class SchematicWriter:
                     import sys
 
                     print(
-                        f"\n🔍 PLACEMENT: About to calculate bbox for {placement_key} ({comp.lib_id})",
+                        f"\nPLACEMENT: About to calculate bbox for {placement_key} ({comp.lib_id})",
                         file=sys.stderr,
                         flush=True,
                     )
@@ -887,7 +887,7 @@ class SchematicWriter:
                     width = max_x - min_x
                     height = max_y - min_y
                     print(
-                        f"🔍 PLACEMENT: Calculated bbox for {placement_key}: {width:.2f} x {height:.2f} mm",
+                        f"PLACEMENT: Calculated bbox for {placement_key}: {width:.2f} x {height:.2f} mm",
                         file=sys.stderr,
                         flush=True,
                     )
@@ -900,7 +900,7 @@ class SchematicWriter:
                 hasattr(self.circuit, "child_instances")
                 and self.circuit.child_instances
             ):
-                print(f"\n📄 Found {len(self.circuit.child_instances)} sheets to place")
+                print(f"\nFound {len(self.circuit.child_instances)} sheets to place")
                 logger.debug(
                     f"Found {len(self.circuit.child_instances)} sheets to place"
                 )
@@ -939,7 +939,7 @@ class SchematicWriter:
                         bbox_width = sheet_width + label_width
 
                         print(
-                            f"🔍 PLACEMENT: Sheet {sub_name}: sheet={sheet_width:.1f}mm, labels={label_width:.1f}mm, bbox={bbox_width:.1f}x{sheet_height:.1f}mm"
+                            f"PLACEMENT: Sheet {sub_name}: sheet={sheet_width:.1f}mm, labels={label_width:.1f}mm, bbox={bbox_width:.1f}x{sheet_height:.1f}mm"
                         )
                         logger.debug(
                             f"  Sheet {sub_name}: bbox {bbox_width:.1f}x{sheet_height:.1f}mm"
@@ -971,7 +971,7 @@ class SchematicWriter:
                 component_bboxes, spacing=15.0
             )
 
-            logger.info(f"📄 PLACE_COMPONENTS: Selected sheet size: {selected_sheet}")
+            logger.info(f"PLACE_COMPONENTS: Selected sheet size: {selected_sheet}")
 
             # Apply placements to components and sheets
             placement_map = {ref: (x, y) for ref, x, y in placements}
@@ -997,7 +997,7 @@ class SchematicWriter:
                         child["x"] = x
                         child["y"] = y
                         print(
-                            f"📄 Placed sheet {child['sub_name']} at ({x:.1f}, {y:.1f})"
+                            f"Placed sheet {child['sub_name']} at ({x:.1f}, {y:.1f})"
                         )
                         logger.debug(
                             f"Placed sheet {child['sub_name']} at ({x:.1f}, {y:.1f})"
@@ -1005,11 +1005,11 @@ class SchematicWriter:
 
             placement_time = time.perf_counter() - placement_start
             logger.info(
-                f"✅ PLACE_COMPONENTS: Component placement completed in {placement_time*1000:.2f}ms"
+                f"PLACE_COMPONENTS: Component placement completed in {placement_time*1000:.2f}ms"
             )
 
             # Log final positions
-            logger.debug("🔧 PLACE_COMPONENTS: Final component positions:")
+            logger.debug("PLACE_COMPONENTS: Final component positions:")
             for comp in components_needing_placement:
                 logger.debug(
                     f"  {comp.reference}: ({comp.position.x:.1f}, {comp.position.y:.1f})"
@@ -1018,23 +1018,23 @@ class SchematicWriter:
         except Exception as e:
             placement_error_time = time.perf_counter() - start_time
             logger.error(
-                f"❌ PLACE_COMPONENTS: TEXT-FLOW PLACEMENT FAILED after {placement_error_time*1000:.2f}ms: {e}"
+                f"PLACE_COMPONENTS: TEXT-FLOW PLACEMENT FAILED after {placement_error_time*1000:.2f}ms: {e}"
             )
-            logger.warning("🔄 PLACE_COMPONENTS: Using fallback grid placement")
+            logger.warning("PLACE_COMPONENTS: Using fallback grid placement")
 
             # Fallback to simple grid placement
             try:
                 self.placement_engine._arrange_grid(components_needing_placement)
-                logger.info("✅ PLACE_COMPONENTS: Fallback grid placement completed")
+                logger.info("PLACE_COMPONENTS: Fallback grid placement completed")
             except Exception as fallback_error:
                 logger.error(
-                    f"❌ PLACE_COMPONENTS: Even fallback placement failed: {fallback_error}"
+                    f"PLACE_COMPONENTS: Even fallback placement failed: {fallback_error}"
                 )
                 # Leave components at their current positions
 
         total_time = time.perf_counter() - start_time
         logger.info(
-            f"🏁 PLACE_COMPONENTS: ✅ PLACEMENT COMPLETE in {total_time*1000:.2f}ms"
+            f"PLACE_COMPONENTS: PLACEMENT COMPLETE in {total_time*1000:.2f}ms"
         )
 
     def _is_net_hierarchical(self, net_obj):
@@ -2023,18 +2023,18 @@ class SchematicWriter:
         import sys
 
         print(
-            f"\n🔍 BBOX: Checking for labels in schematic", file=sys.stderr, flush=True
+            f"\nBBOX: Checking for labels in schematic", file=sys.stderr, flush=True
         )
         if hasattr(self.schematic, "labels"):
             print(
-                f"🔍 BBOX: ✅ Has labels, count: {len(self.schematic.labels)}",
+                f"BBOX: Has labels, count: {len(self.schematic.labels)}",
                 file=sys.stderr,
                 flush=True,
             )
             for i, label in enumerate(self.schematic.labels[:10]):
-                print(f"🔍 BBOX:   Label[{i}]: {label}", file=sys.stderr, flush=True)
+                print(f"BBOX:   Label[{i}]: {label}", file=sys.stderr, flush=True)
         else:
-            print(f"🔍 BBOX: ❌ No labels attribute", file=sys.stderr, flush=True)
+            print(f"BBOX: No labels attribute", file=sys.stderr, flush=True)
 
         # Use schematic components (with updated positions) instead of circuit components
         for comp in self.schematic.components:
@@ -2051,7 +2051,7 @@ class SchematicWriter:
 
                 # Calculate component bbox including pin labels for accurate collision detection
                 print(
-                    f"\n🔍 BBOX: Calculating bbox for {comp.reference} at ({comp.position.x:.3f}, {comp.position.y:.3f})",
+                    f"\nBBOX: Calculating bbox for {comp.reference} at ({comp.position.x:.3f}, {comp.position.y:.3f})",
                     file=sys.stderr,
                     flush=True,
                 )
@@ -2063,7 +2063,7 @@ class SchematicWriter:
                 )
 
                 print(
-                    f"🔍 BBOX: Base component bbox: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})",
+                    f"BBOX: Base component bbox: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})",
                     file=sys.stderr,
                     flush=True,
                 )
@@ -2113,13 +2113,13 @@ class SchematicWriter:
                             max_x = max(max_x, label_rel_x + 2.54)
 
                         print(
-                            f"🔍 BBOX:   Label '{label.text}' ({len(label.text)} chars, {label.rotation}°) at rel ({label_rel_x:.2f}, {label_rel_y:.2f})",
+                            f"BBOX:   Label '{label.text}' ({len(label.text)} chars, {label.rotation}°) at rel ({label_rel_x:.2f}, {label_rel_y:.2f})",
                             file=sys.stderr,
                             flush=True,
                         )
 
                 print(
-                    f"🔍 BBOX: Final bbox with labels: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})",
+                    f"BBOX: Final bbox with labels: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})",
                     file=sys.stderr,
                     flush=True,
                 )
@@ -2412,7 +2412,7 @@ class SchematicWriter:
         Add symbol definitions to the lib_symbols section.
         """
         logger.info(
-            f"🔍 _add_symbol_definitions: Starting with {len(self.schematic.components)} components"
+            f"_add_symbol_definitions: Starting with {len(self.schematic.components)} components"
         )
 
         # Find or create lib_symbols block
@@ -2426,19 +2426,19 @@ class SchematicWriter:
             ):
                 lib_symbols_block = item
                 logger.info(
-                    f"✅ Found existing lib_symbols block at position {schematic_expr.index(item)}"
+                    f"Found existing lib_symbols block at position {schematic_expr.index(item)}"
                 )
                 break
 
         if not lib_symbols_block:
-            logger.warning("⚠️ No lib_symbols block found, creating new one")
+            logger.warning("No lib_symbols block found, creating new one")
             lib_symbols_block = [Symbol("lib_symbols")]
             # Insert after paper
             for i, item in enumerate(schematic_expr):
                 if isinstance(item, list) and item and item[0] == Symbol("paper"):
                     schematic_expr.insert(i + 1, lib_symbols_block)
                     logger.info(
-                        f"✅ Inserted lib_symbols block after paper at position {i+1}"
+                        f"Inserted lib_symbols block after paper at position {i+1}"
                     )
                     break
 
@@ -2446,7 +2446,7 @@ class SchematicWriter:
         # Keep only the first element which is the Symbol("lib_symbols")
         if lib_symbols_block and len(lib_symbols_block) > 1:
             logger.info(
-                f"🧹 Clearing {len(lib_symbols_block)-1} existing items from lib_symbols block"
+                f"Clearing {len(lib_symbols_block)-1} existing items from lib_symbols block"
             )
             lib_symbols_block[:] = [lib_symbols_block[0]]
 
@@ -2457,19 +2457,19 @@ class SchematicWriter:
             logger.debug(f"  Component {comp.reference}: lib_id = {comp.lib_id}")
 
         logger.info(
-            f"📚 Processing {len(symbol_ids)} unique lib_ids: {sorted(symbol_ids)}"
+            f"Processing {len(symbol_ids)} unique lib_ids: {sorted(symbol_ids)}"
         )
 
         for sym_id in sorted(symbol_ids):
-            logger.info(f"📚 SCHEMATIC_WRITER: Fetching symbol data for '{sym_id}'")
+            logger.info(f"SCHEMATIC_WRITER: Fetching symbol data for '{sym_id}'")
             lib_data = SymbolLibCache.get_symbol_data(sym_id)
             if not lib_data:
                 logger.error(
-                    f"❌ No symbol library data found for '{sym_id}'. Skipping definition."
+                    f"No symbol library data found for '{sym_id}'. Skipping definition."
                 )
                 continue
             logger.debug(
-                f"    ✅ SCHEMATIC_WRITER: Got symbol data for '{sym_id}' with properties: {list(lib_data.get('properties', {}).keys()) if isinstance(lib_data, dict) else 'N/A'}"
+                f"    SCHEMATIC_WRITER: Got symbol data for '{sym_id}' with properties: {list(lib_data.get('properties', {}).keys()) if isinstance(lib_data, dict) else 'N/A'}"
             )
 
             # Check if graphics data is missing from cache - if so, use Python fallback
@@ -2498,41 +2498,41 @@ class SchematicWriter:
 
             if isinstance(lib_data, list):
                 # It's already an S-expression block
-                logger.info(f"✅ Adding S-expression symbol definition for {sym_id}")
+                logger.info(f"Adding S-expression symbol definition for {sym_id}")
                 lib_symbols_block.append(lib_data)
             else:
                 # Build from JSON-based library data
-                logger.info(f"🔨 Building symbol definition from JSON for {sym_id}")
+                logger.info(f"Building symbol definition from JSON for {sym_id}")
                 new_sym_def = self._create_symbol_definition(sym_id, lib_data)
                 if new_sym_def:
                     logger.info(
-                        f"✅ Created symbol definition for {sym_id}, adding to lib_symbols"
+                        f"Created symbol definition for {sym_id}, adding to lib_symbols"
                     )
                     if isinstance(new_sym_def[0], Symbol):
                         lib_symbols_block.append(new_sym_def)
                     else:
                         lib_symbols_block.extend(new_sym_def)
                 else:
-                    logger.error(f"❌ Failed to create symbol definition for {sym_id}")
+                    logger.error(f"Failed to create symbol definition for {sym_id}")
 
         logger.info(
-            f"📦 lib_symbols block now has {len(lib_symbols_block)} items (including header)"
+            f"lib_symbols block now has {len(lib_symbols_block)} items (including header)"
         )
         # Only show error if we have components but no symbols
         if len(lib_symbols_block) <= 1 and len(self.schematic.components) > 0:
             logger.error(
-                "❌❌❌ lib_symbols block is EMPTY - no symbol definitions added!"
+                "lib_symbols block is EMPTY - no symbol definitions added!"
             )
         elif len(lib_symbols_block) <= 1 and len(self.schematic.components) == 0:
             logger.info(
-                "📋 No components in this sheet (hierarchical sheet with sub-sheets only)"
+                "No components in this sheet (hierarchical sheet with sub-sheets only)"
             )
 
     def _create_symbol_definition(self, lib_id: str, lib_data: dict):
         """
         Build a full KiCad (symbol ...) block from the library JSON data.
         """
-        logger.debug(f"🔧 SCHEMATIC_WRITER: Creating symbol definition for '{lib_id}'")
+        logger.debug(f"SCHEMATIC_WRITER: Creating symbol definition for '{lib_id}'")
         base_name = lib_id.split(":")[-1]
 
         symbol_block = [
@@ -2548,11 +2548,11 @@ class SchematicWriter:
         # Properties
         props = lib_data.get("properties", {})
         logger.debug(
-            f"    📋 SCHEMATIC_WRITER: Symbol '{lib_id}' has {len(props)} properties"
+            f"    SCHEMATIC_WRITER: Symbol '{lib_id}' has {len(props)} properties"
         )
         for prop_name, prop_value in props.items():
             logger.debug(
-                f"        🏷️  SCHEMATIC_WRITER: Property '{prop_name}' = '{prop_value}' (type: {type(prop_value).__name__})"
+                f"         SCHEMATIC_WRITER: Property '{prop_name}' = '{prop_value}' (type: {type(prop_value).__name__})"
             )
             hide_symbol = Symbol("no")
             if prop_name in (
@@ -2827,7 +2827,7 @@ def write_schematic_file(schematic, out_path: str):
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
 
-        logger.info(f"✅ Successfully wrote schematic to {out_path}")
+        logger.info(f"Successfully wrote schematic to {out_path}")
     except Exception as e:
-        logger.error(f"❌ Failed to write schematic: {e}")
+        logger.error(f"Failed to write schematic: {e}")
         raise

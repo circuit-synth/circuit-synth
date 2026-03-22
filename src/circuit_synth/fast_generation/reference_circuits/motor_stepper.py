@@ -134,7 +134,7 @@ def motor_stepper(VCC_12V, VCC_5V, VCC_3V3, GND, STEP, DIR, ENABLE):
 
 
 if __name__ == "__main__":
-    print("🚀 Generating Stepper Motor Driver Circuit...")
+    print("Generating Stepper Motor Driver Circuit...")
 
     circuit_obj = motor_stepper()
     circuit_obj.generate_kicad_project(
@@ -143,5 +143,5 @@ if __name__ == "__main__":
         generate_pcb=True,
     )
 
-    print("✅ Stepper Motor Driver KiCad project generated!")
-    print("📁 Check Stepper_Motor_Driver/ directory for files")
+    print("Stepper Motor Driver KiCad project generated!")
+    print("Check Stepper_Motor_Driver/ directory for files")

@@ -106,7 +106,7 @@ class DigiKeyConfigManager:
             config_path.chmod(0o600)
 
             logger.info(f"Saved DigiKey config to: {config_path}")
-            print(f"✅ DigiKey configuration saved to: {config_path}")
+            print(f"DigiKey configuration saved to: {config_path}")
             return True
 
         except Exception as e:
@@ -247,12 +247,12 @@ class DigiKeyConfigManager:
         # Get credentials from user
         client_id = input("Enter your DigiKey Client ID: ").strip()
         if not client_id:
-            print("❌ Client ID is required")
+            print("Client ID is required")
             return False
 
         client_secret = input("Enter your DigiKey Client Secret: ").strip()
         if not client_secret:
-            print("❌ Client Secret is required")
+            print("Client Secret is required")
             return False
 
         # Ask about sandbox mode
@@ -275,7 +275,7 @@ class DigiKeyConfigManager:
             success = cls.save_to_file(client_id, client_secret, sandbox, config_path)
 
         elif choice == "3":
-            print("\n✅ Configuration not saved.")
+            print("\nConfiguration not saved.")
             print("\nTo use these credentials, set environment variables:")
             print(f"export DIGIKEY_CLIENT_ID='{client_id}'")
             print(f"export DIGIKEY_CLIENT_SECRET='{client_secret}'")
@@ -284,11 +284,11 @@ class DigiKeyConfigManager:
             success = True
 
         else:
-            print("❌ Invalid choice")
+            print("Invalid choice")
             return False
 
         if success:
-            print("\n✅ DigiKey configuration complete!")
+            print("\nDigiKey configuration complete!")
             print("\nTest your setup with:")
             print("  python -m circuit_synth.manufacturing.digikey.test_connection")
 

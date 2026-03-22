@@ -254,7 +254,7 @@ class UnifiedComponentSearch:
             Formatted comparison table string
         """
         output = []
-        output.append("\n📊 Component Comparison\n")
+        output.append("\nComponent Comparison\n")
         output.append("=" * 80)
 
         # Create comparison table
@@ -288,7 +288,7 @@ class UnifiedComponentSearch:
 
         # Add recommendations
         output.append("\n" + "=" * 80)
-        output.append("\n💡 Recommendations:")
+        output.append("\nRecommendations:")
 
         # Find best for prototyping
         best_proto = None

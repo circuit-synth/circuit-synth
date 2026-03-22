@@ -588,7 +588,7 @@ def debug_circuit(task_description: str) -> str:
     # This would be enhanced with actual parsing logic
 
     result = """
-    🔍 Circuit Debugging Agent Activated
+    Circuit Debugging Agent Activated
     =====================================
     
     This agent will:

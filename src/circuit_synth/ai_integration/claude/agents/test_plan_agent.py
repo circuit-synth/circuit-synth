@@ -1027,7 +1027,7 @@ class TestPlanGenerator:
                 report.append(f"\n**Required Equipment**: {', '.join(proc.equipment)}")
 
                 if proc.safety_warnings:
-                    report.append(f"\n**⚠️ Safety Warnings**:")
+                    report.append(f"\n**Safety Warnings**:")
                     for warning in proc.safety_warnings:
                         report.append(f"- {warning}")
 

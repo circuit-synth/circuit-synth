@@ -306,7 +306,7 @@ class APISynchronizer:
     ):
         """Print a user-friendly synchronization summary."""
         print("\n" + "=" * 70)
-        print("📋 Synchronization Summary")
+        print("Synchronization Summary")
         print("=" * 70)
 
         # Components in schematic (KiCad)
@@ -331,25 +331,25 @@ class APISynchronizer:
                 [kicad_ref for _, kicad_ref in report.matched.items()]
             )
             for ref in matched_refs:
-                print(f"   ✅ Keep: {ref} (matches Python)")
+                print(f"   Keep: {ref} (matches Python)")
 
         # Components that were added
         if report.added:
             added_refs = sorted(report.added)
             for ref in added_refs:
-                print(f"   ➕ Add: {ref} (new in Python)")
+                print(f"   Add: {ref} (new in Python)")
 
         # Components that were renamed
         if report.renamed:
             renamed_pairs = sorted(report.renamed)
             for old_ref, new_ref in renamed_pairs:
-                print(f"   🔄 Rename: {old_ref} → {new_ref}")
+                print(f"   Rename: {old_ref} → {new_ref}")
 
         # Components that were modified
         if report.modified:
             modified_refs = sorted(report.modified)
             for ref in modified_refs:
-                print(f"   🔧 Update: {ref} (changed in Python)")
+                print(f"   Update: {ref} (changed in Python)")
 
         # Components that will be removed (in KiCad but not in Python)
         matched_kicad_refs = set(report.matched.values())
@@ -362,15 +362,15 @@ class APISynchronizer:
         )
         if removed_refs:
             for ref in removed_refs:
-                print(f"   ⚠️  Remove: {ref} (not in Python code)")
+                print(f"    Remove: {ref} (not in Python code)")
 
         # Components that were preserved (exist in KiCad but not Python)
         if report.preserved:
             preserved_refs = sorted(report.preserved)
-            print(f"\n   ⚠️  PRESERVED (preserve_user_components=True):")
+            print(f"\n    PRESERVED (preserve_user_components=True):")
             for ref in preserved_refs:
                 print(f"      {ref} (exists in KiCad but not in Python)")
-            print(f"   💡 Tip: Set preserve_user_components=False to remove these")
+            print(f"   Tip: Set preserve_user_components=False to remove these")
 
         if (
             not report.matched
@@ -386,17 +386,17 @@ class APISynchronizer:
             print("\nNet Labels:")
 
             if report.labels_added:
-                print(f"   ➕ Added {len(report.labels_added)} label(s):")
+                print(f"   Added {len(report.labels_added)} label(s):")
                 for comp_ref, pin, net in sorted(report.labels_added):
                     print(f"      {comp_ref} pin {pin} → {net}")
 
             if report.labels_removed:
-                print(f"   ➖ Removed {len(report.labels_removed)} label(s):")
+                print(f"   Removed {len(report.labels_removed)} label(s):")
                 for comp_ref, pin, net in sorted(report.labels_removed):
                     print(f"      {comp_ref} pin {pin} (was {net})")
 
             if report.labels_updated:
-                print(f"   🔧 Updated {len(report.labels_updated)} label(s):")
+                print(f"   Updated {len(report.labels_updated)} label(s):")
                 for comp_ref, pin, old_net, new_net in sorted(report.labels_updated):
                     print(f"      {comp_ref} pin {pin}: '{old_net}' → '{new_net}'")
 
@@ -990,22 +990,22 @@ class APISynchronizer:
 
             if python_net and not kicad_label:
                 # ADD label - Python has net but KiCad doesn't have label
-                logger.debug(f"    ➕ ADD label: pin {pin_num} -> {python_net}")
+                logger.debug(f"    ADD label: pin {pin_num} -> {python_net}")
                 self._add_pin_label(kicad_comp, pin_num, python_net, report)
 
             elif not python_net and kicad_label:
                 # REMOVE label - KiCad has label but Python doesn't have net
-                logger.debug(f"    ➖ REMOVE label: pin {pin_num} (was {kicad_label.text}, type={label_type})")
+                logger.debug(f"    REMOVE label: pin {pin_num} (was {kicad_label.text}, type={label_type})")
                 self._remove_pin_label(kicad_label, kicad_ref, pin_num, report, label_type)
 
             elif python_net and kicad_label and python_net != kicad_label.text:
                 # UPDATE label - Net name changed
-                logger.debug(f"    🔧 UPDATE label: pin {pin_num} '{kicad_label.text}' -> '{python_net}' (type={label_type})")
+                logger.debug(f"    UPDATE label: pin {pin_num} '{kicad_label.text}' -> '{python_net}' (type={label_type})")
                 self._update_pin_label(kicad_label, python_net, kicad_ref, pin_num, report, label_type)
 
             else:
                 # No change needed
-                logger.debug(f"    ✅ KEEP label: pin {pin_num} -> {python_net}")
+                logger.debug(f"    KEEP label: pin {pin_num} -> {python_net}")
 
     def _reconcile_pin_connections(
         self,
@@ -1023,14 +1023,14 @@ class APISynchronizer:
             matches: Matched circuit_id -> kicad_ref
             report: Sync report to track changes
         """
-        logger.info("🔌 Reconciling pin connections and labels")
+        logger.info("Reconciling pin connections and labels")
 
         for circuit_id, kicad_ref in matches.items():
             self._reconcile_component_pins(
                 circuit_id, kicad_ref, circuit_components, kicad_components, report
             )
 
-        logger.info(f"✅ Pin reconciliation complete: "
+        logger.info(f"Pin reconciliation complete: "
                    f"{len(report.labels_added)} added, "
                    f"{len(report.labels_removed)} removed, "
                    f"{len(report.labels_updated)} updated")
@@ -1181,7 +1181,7 @@ class APISynchronizer:
             # This ensures hierarchical labels and power symbols are added for the new component's pins
             kicad_ref = comp_data["reference"]
             if kicad_ref in self.schematic.components_dict:
-                logger.debug(f"    🔌 Reconciling pins for newly added component {kicad_ref}")
+                logger.debug(f"    Reconciling pins for newly added component {kicad_ref}")
                 # Update kicad_components dict with newly added component
                 kicad_components[kicad_ref] = self.schematic.components_dict[kicad_ref]
                 self._reconcile_component_pins(
@@ -1269,15 +1269,15 @@ class APISynchronizer:
         # If the schematic was loaded with wrong name, we need to correct it before saving
         correct_project_name = self.schematic_path.stem  # e.g., "comprehensive_root.kicad_sch" -> "comprehensive_root"
         if self.schematic.name != correct_project_name:
-            logger.info(f"🔧 Fixing schematic.name: '{self.schematic.name}' -> '{correct_project_name}'")
+            logger.info(f"Fixing schematic.name: '{self.schematic.name}' -> '{correct_project_name}'")
             self.schematic.name = correct_project_name
 
-        logger.info(f"💾 Calling schematic.save(preserve_format=False)")
+        logger.info(f"Calling schematic.save(preserve_format=False)")
         logger.info(f"   - Save path: {self.schematic_path}")
         logger.info(f"   - Using preserve_format=False to force full rewrite from _data")
 
         # Using preserve_format=False forces full rewrite from _data dictionary
         self.schematic.save(str(self.schematic_path), preserve_format=False)
 
-        logger.info(f"✅ Save completed")
+        logger.info(f"Save completed")
         logger.info("=" * 70)

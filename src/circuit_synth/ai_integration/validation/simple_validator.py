@@ -54,7 +54,7 @@ def validate_and_improve_circuit(
         issues = _check_circuit_code(current_code, timeout_seconds)
 
         if not issues:
-            success_msg = f"✅ Circuit code validated successfully"
+            success_msg = f"Circuit code validated successfully"
             if attempt > 0:
                 success_msg += f" (fixed in {attempt} attempts)"
             logger.info(success_msg)
@@ -75,7 +75,7 @@ def validate_and_improve_circuit(
 {original_code}"""
 
     # Max attempts reached
-    final_status = f"⚠️ Still has {len(issues)} issues after {max_attempts} attempts"
+    final_status = f"Still has {len(issues)} issues after {max_attempts} attempts"
     logger.warning(final_status)
     return current_code, False, final_status
 
@@ -96,7 +96,7 @@ def _check_circuit_code(code: str, timeout_seconds: int = 10) -> List[str]:
     # 1. Syntax validation using AST
     try:
         ast.parse(code)
-        logger.debug("✓ Syntax check passed")
+        logger.debug("Syntax check passed")
     except SyntaxError as e:
         syntax_issue = f"Syntax error at line {e.lineno}: {e.msg}"
         issues.append(syntax_issue)

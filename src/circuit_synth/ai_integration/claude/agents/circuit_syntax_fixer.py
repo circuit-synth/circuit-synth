@@ -44,7 +44,7 @@ Apply fixes based on error patterns:
 
 #### Pattern 1: Net Creation Outside Circuit
 ```python
-# ❌ BROKEN: Net created outside @circuit
+# BROKEN: Net created outside @circuit
 VCC_3V3 = Net('VCC_3V3')
 GND = Net('GND')
 
@@ -52,7 +52,7 @@ GND = Net('GND')
 def main_circuit():
     # circuit implementation
 
-# ✅ FIXED: Move Nets inside @circuit
+# FIXED: Move Nets inside @circuit
 @circuit(name="main")
 def main_circuit():
     VCC_3V3 = Net('VCC_3V3')
@@ -62,11 +62,11 @@ def main_circuit():
 
 #### Pattern 2: Missing Imports
 ```python
-# ❌ BROKEN: Missing circuit-synth import
+# BROKEN: Missing circuit-synth import
 def main_circuit():
     mcu = Component(...)
 
-# ✅ FIXED: Add required import
+# FIXED: Add required import
 from circuit_synth import *
 
 def main_circuit():
@@ -75,22 +75,22 @@ def main_circuit():
 
 #### Pattern 3: Invalid Pin Connection Syntax
 ```python
-# ❌ BROKEN: Old skidl syntax
+# BROKEN: Old skidl syntax
 component.pins[1].connect_to(net)
 component.pin["VDD"] = net
 
-# ✅ FIXED: circuit-synth syntax
+# FIXED: circuit-synth syntax
 component[1] += net
 component["VDD"] += net
 ```
 
 #### Pattern 4: Missing @circuit Decorator
 ```python
-# ❌ BROKEN: Function without decorator
+# BROKEN: Function without decorator
 def power_supply():
     regulator = Component(...)
 
-# ✅ FIXED: Add @circuit decorator
+# FIXED: Add @circuit decorator
 @circuit(name="power_supply")
 def power_supply():
     regulator = Component(...)
@@ -245,8 +245,8 @@ while fix_attempts < MAX_ATTEMPTS and errors_exist:
 # BEFORE (broken)
 from circuit_synth import *
 
-VCC_3V3 = Net('VCC_3V3')  # ❌ Outside circuit
-GND = Net('GND')          # ❌ Outside circuit
+VCC_3V3 = Net('VCC_3V3')  # Outside circuit
+GND = Net('GND')          # Outside circuit
 
 @circuit(name="main")
 def main_circuit():
@@ -258,8 +258,8 @@ from circuit_synth import *
 
 @circuit(name="main")
 def main_circuit():
-    VCC_3V3 = Net('VCC_3V3')  # ✅ Inside circuit
-    GND = Net('GND')          # ✅ Inside circuit
+    VCC_3V3 = Net('VCC_3V3')  # Inside circuit
+    GND = Net('GND')          # Inside circuit
     
     mcu = Component(...)
     mcu["VDD"] += VCC_3V3
@@ -268,74 +268,74 @@ def main_circuit():
 ### Example 2: Invalid Syntax Fix
 ```python
 # BEFORE (broken)
-mcu["VDD"].connect_to(vcc_net)      # ❌ Invalid method
-resistor.pins[1] = power_rail       # ❌ Wrong syntax
+mcu["VDD"].connect_to(vcc_net)      # Invalid method
+resistor.pins[1] = power_rail       # Wrong syntax
 
 # AFTER (fixed)  
-mcu["VDD"] += vcc_net               # ✅ Correct syntax
-resistor[1] += power_rail           # ✅ Correct syntax
+mcu["VDD"] += vcc_net               # Correct syntax
+resistor[1] += power_rail           # Correct syntax
 ```
 
 ### Example 3: Missing Import Fix
 ```python
 # BEFORE (broken)
 def power_supply():
-    reg = Component(...)    # ❌ Component not defined
+    reg = Component(...)    # Component not defined
 
 # AFTER (fixed)
-from circuit_synth import *        # ✅ Added import
+from circuit_synth import *        # Added import
 
 def power_supply():
-    reg = Component(...)    # ✅ Now works
+    reg = Component(...)    # Now works
 ```
 
 ## OUTPUT FORMAT
 
 ### Fix Success Report
 ```
-🔧 Circuit Syntax Fixes Applied Successfully
-📁 Project: {project_name}
-🎯 Fixes Applied: {fix_count}
-⏱️  Total Fix Time: {fix_time}s
+Circuit Syntax Fixes Applied Successfully
+Project: {project_name}
+Fixes Applied: {fix_count}
+⏱ Total Fix Time: {fix_time}s
 
-✅ Fixed Issues:
+Fixed Issues:
 1. Moved Net creation inside @circuit decorator (main.py:23-25)
 2. Added missing circuit-synth import (power_supply.py:1)
 3. Fixed pin connection syntax (mcu.py:45, 47, 52)
 
-🧪 Validation Results:
-- Pre-fix: ❌ 3 critical errors, 2 API errors
-- Post-fix: ✅ All errors resolved
-- Execution: ✅ Circuit runs successfully
+Validation Results:
+- Pre-fix: 3 critical errors, 2 API errors
+- Post-fix: All errors resolved
+- Execution: Circuit runs successfully
 
-📊 Design Preservation:
-- Component selections: ✅ Unchanged
-- Pin assignments: ✅ Preserved  
-- Circuit topology: ✅ Maintained
-- Net names: ✅ Preserved
+Design Preservation:
+- Component selections: Unchanged
+- Pin assignments: Preserved  
+- Circuit topology: Maintained
+- Net names: Preserved
 
-🎉 Project ready for KiCad generation!
+Project ready for KiCad generation!
 ```
 
 ### Fix Failure Report
 ```
-⚠️  Circuit Syntax Fix Results - PARTIAL SUCCESS
-📁 Project: {project_name}
-🔄 Attempts Made: {attempt_count}/3
+ Circuit Syntax Fix Results - PARTIAL SUCCESS
+Project: {project_name}
+Attempts Made: {attempt_count}/3
 
-🔧 Fixes Applied:
-✅ Fixed Net creation outside circuit (main.py)
-✅ Added missing imports (power_supply.py)
+Fixes Applied:
+Fixed Net creation outside circuit (main.py)
+Added missing imports (power_supply.py)
 
-❌ Remaining Issues:
+Remaining Issues:
 - Complex import error in hierarchical design
 - Requires manual intervention or redesign
 
-💡 Recommendation:
+Recommendation:
 Project has fundamental structural issues beyond syntax fixes.
 Consider regenerating with circuit-generation-agent.
 
-📝 Learning Note:
+Learning Note:
 Complex hierarchical import issues detected - update fix patterns.
 ```
 

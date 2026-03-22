@@ -201,15 +201,15 @@ class SymbolLibraryCache:
         import time
 
         get_start = time.perf_counter()
-        logger.debug(f"🔍 get_symbol called for: {lib_id}")
+        logger.debug(f"get_symbol called for: {lib_id}")
 
         # First check if already loaded
         if lib_id in self._symbols:
             get_time = (time.perf_counter() - get_start) * 1000
-            logger.debug(f"✅ Cache HIT for {lib_id} in {get_time:.2f}ms")
+            logger.debug(f"Cache HIT for {lib_id} in {get_time:.2f}ms")
             return self._symbols[lib_id]
 
-        logger.debug(f"❌ Cache MISS for {lib_id}, trying lazy search...")
+        logger.debug(f"Cache MISS for {lib_id}, trying lazy search...")
         # Try lazy symbol search first (much faster)
         symbol = self._lazy_symbol_search(lib_id)
         if symbol:

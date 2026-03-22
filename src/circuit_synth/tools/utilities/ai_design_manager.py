@@ -23,9 +23,9 @@ def cmd_status(args):
     print("=" * 50)
     print(f"Platform: {status['platform']}")
     print(f"Plugin path: {status['plugin_path']}")
-    print(f"Plugin exists: {'✓' if status['plugin_exists'] else '✗'}")
+    print(f"Plugin exists: {'' if status['plugin_exists'] else ''}")
     print(f"KiCad plugin directory: {status['kicad_plugin_dir']}")
-    print(f"Plugin installed: {'✓' if status['plugin_installed'] else '✗'}")
+    print(f"Plugin installed: {'' if status['plugin_installed'] else ''}")
 
     if args.json:
         print("\nJSON Output:")
@@ -44,13 +44,13 @@ def cmd_install(args):
 
     print("Installing Circuit-Synth AI design plugin...")
     if bridge.install_plugin():
-        print("✓ Circuit-Synth AI design plugin installed successfully!")
+        print("Circuit-Synth AI design plugin installed successfully!")
         print("\nNext steps:")
         print("1. Restart KiCad")
         print("2. Open schematic or PCB editor")
         print("3. Look for 'Circuit-Synth AI' plugin in the Tools menu")
     else:
-        print("✗ Failed to install AI design plugin")
+        print("Failed to install AI design plugin")
         sys.exit(1)
 
 
@@ -80,24 +80,24 @@ def cmd_generate(args):
         recommendations = result["ai_recommendations"]
 
         if recommendations.get("design_recommendations"):
-            print("\n🎯 Design Recommendations:")
+            print("\nDesign Recommendations:")
             for rec in recommendations["design_recommendations"]:
                 print(f"  • {rec}")
 
         if recommendations.get("suggested_components"):
-            print("\n🔧 Suggested Components:")
+            print("\nSuggested Components:")
             for comp in recommendations["suggested_components"]:
                 print(f"  • {comp['type']}: {comp['suggestion']}")
                 print(f"    Reasoning: {comp['reasoning']}")
 
         if recommendations.get("optimization_tips"):
-            print("\n⚡ Optimization Tips:")
+            print("\nOptimization Tips:")
             for tip in recommendations["optimization_tips"]:
                 print(f"  • {tip}")
 
     if args.output:
         output_path = Path(args.output)
-        output_path.write_text(result["circuit_code"])
+        output_path.write_text(result["circuit_code"], encoding="utf-8")
         print(f"\nCircuit template saved to: {output_path}")
 
 
@@ -110,24 +110,24 @@ def cmd_analyze(args):
     analysis = bridge.analyze_existing_circuit(circuit_file)
 
     if "error" in analysis:
-        print(f"✗ Error: {analysis['error']}")
+        print(f"Error: {analysis['error']}")
         sys.exit(1)
 
     print("\nAI Circuit Analysis Results:")
     print("=" * 50)
 
     if analysis.get("suggestions"):
-        print("\n💡 Suggestions:")
+        print("\nSuggestions:")
         for suggestion in analysis["suggestions"]:
             print(f"  • {suggestion}")
 
     if analysis.get("warnings"):
-        print("\n⚠️  Warnings:")
+        print("\n Warnings:")
         for warning in analysis["warnings"]:
             print(f"  • {warning}")
 
     if analysis.get("optimizations"):
-        print("\n🚀 Optimizations:")
+        print("\nOptimizations:")
         for optimization in analysis["optimizations"]:
             print(f"  • {optimization}")
 

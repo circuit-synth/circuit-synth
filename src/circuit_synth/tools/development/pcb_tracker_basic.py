@@ -29,7 +29,7 @@ def init(project_path):
     storage = SimpleFileStorage(tracking_path)
     storage.save_board_state(state)
 
-    click.echo(f"✓ Initialized PCB tracking in {tracking_path}")
+    click.echo(f"Initialized PCB tracking in {tracking_path}")
 
 
 @cli.command()
@@ -46,13 +46,13 @@ def log(summary, entry_type, details):
     # Find tracking directory
     tracking_path = Path.cwd() / "board_log"
     if not tracking_path.exists():
-        click.echo("❌ No board_log found. Run 'init' first.")
+        click.echo("No board_log found. Run 'init' first.")
         return
 
     storage = SimpleFileStorage(tracking_path)
     entry = TrackingEntry(entry_type=entry_type, summary=summary, details=details)
     storage.add_entry(entry)
-    click.echo(f"✓ Logged {entry_type}: {summary}")
+    click.echo(f"Logged {entry_type}: {summary}")
 
 
 @cli.command()
@@ -62,7 +62,7 @@ def list(entry_type, limit):
     """List tracking entries."""
     tracking_path = Path.cwd() / "board_log"
     if not tracking_path.exists():
-        click.echo("❌ No board_log found.")
+        click.echo("No board_log found.")
         return
 
     storage = SimpleFileStorage(tracking_path)
@@ -94,13 +94,13 @@ def install_hooks(install):
     # Check if we're in a git repository
     git_dir = Path.cwd() / ".git"
     if not git_dir.exists():
-        click.echo("❌ Not in a git repository")
+        click.echo("Not in a git repository")
         return
 
     # Check if board_log exists
     tracking_path = Path.cwd() / "board_log"
     if not tracking_path.exists():
-        click.echo("❌ No board_log found. Run 'init' first.")
+        click.echo("No board_log found. Run 'init' first.")
         return
 
     # Create hooks directory if it doesn't exist
@@ -128,10 +128,10 @@ except Exception as e:
     print(f"PCB Tracking warning: {e}")
 '''
 
-    hook_path.write_text(hook_content)
+    hook_path.write_text(hook_content, encoding="utf-8")
     hook_path.chmod(0o755)
 
-    click.echo(f"✓ Installed git post-commit hook at {hook_path}")
+    click.echo(f"Installed git post-commit hook at {hook_path}")
     click.echo("  Git commits will now be automatically tracked")
 
 

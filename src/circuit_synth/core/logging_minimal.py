@@ -15,7 +15,14 @@ _base_logger.setLevel(logging.INFO)
 
 # Add console handler if not already present
 if not _base_logger.handlers:
-    handler = logging.StreamHandler()
+    import sys
+    import io
+
+    stream = sys.stderr
+    # On Windows, ensure the stream can handle non-ASCII characters
+    if sys.platform == "win32" and isinstance(stream, io.TextIOWrapper):
+        stream.reconfigure(encoding="utf-8", errors="replace")
+    handler = logging.StreamHandler(stream)
     formatter = logging.Formatter("%(asctime)s | %(levelname)8s | %(message)s")
     handler.setFormatter(formatter)
     _base_logger.addHandler(handler)

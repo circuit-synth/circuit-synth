@@ -631,8 +631,8 @@ def analyze_circuit_with_enhanced_kb(circuit_path: str, output_pdf: str = None) 
         if 125 <= fm.severity * fm.occurrence * fm.detection < 300
     )
 
-    print(f"\n✅ Enhanced FMEA Report generated: {pdf_path}")
-    print(f"📊 Analysis Summary:")
+    print(f"\nEnhanced FMEA Report generated: {pdf_path}")
+    print(f"Analysis Summary:")
     print(f"  - Total failure modes: {len(all_failure_modes)}")
     print(f"  - Critical risk (RPN ≥ 300): {critical}")
     print(f"  - High risk (125 ≤ RPN < 300): {high_risk}")

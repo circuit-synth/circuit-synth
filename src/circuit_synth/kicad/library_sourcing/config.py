@@ -154,13 +154,13 @@ class LibrarySourceConfig:
 
         instructions.append("## Current Status")
         instructions.append(
-            f"- Local KiCad: {'✅ Ready' if local_ok else '❌ Not found'}"
+            f"- Local KiCad: {'Ready' if local_ok else 'Not found'}"
         )
         instructions.append(
-            f"- SnapEDA: {'✅ Configured' if snapeda_ok else '⚙️ Setup needed'}"
+            f"- SnapEDA: {'Configured' if snapeda_ok else 'Setup needed'}"
         )
         instructions.append(
-            f"- DigiKey: {'✅ Configured' if digikey_ok else '⚙️ Setup needed'}"
+            f"- DigiKey: {'Configured' if digikey_ok else 'Setup needed'}"
         )
         instructions.append("")
 

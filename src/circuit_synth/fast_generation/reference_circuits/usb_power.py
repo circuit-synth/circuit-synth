@@ -146,7 +146,7 @@ def usb_power():
 
 
 if __name__ == "__main__":
-    print("🚀 Generating USB-C Power Input Circuit...")
+    print("Generating USB-C Power Input Circuit...")
 
     circuit_obj = usb_power()
     circuit_obj.generate_kicad_project(
@@ -155,5 +155,5 @@ if __name__ == "__main__":
         generate_pcb=True,
     )
 
-    print("✅ USB-C Power Input KiCad project generated!")
-    print("📁 Check USB_C_Power_Input/ directory for files")
+    print("USB-C Power Input KiCad project generated!")
+    print("Check USB_C_Power_Input/ directory for files")

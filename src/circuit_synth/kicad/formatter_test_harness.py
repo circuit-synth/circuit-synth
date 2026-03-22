@@ -71,7 +71,7 @@ class FormatterTestHarness:
 
         # Save baseline
         baseline_file = self.baseline_dir / f"{test_name}.kicad_sch"
-        baseline_file.write_text(sexp_output)
+        baseline_file.write_text(sexp_output, encoding="utf-8")
 
         # Store metadata
         metadata = {
@@ -83,7 +83,7 @@ class FormatterTestHarness:
         }
 
         metadata_file = self.baseline_dir / f"{test_name}.json"
-        metadata_file.write_text(json.dumps(metadata, indent=2))
+        metadata_file.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
 
         return str(baseline_file)
 
@@ -102,13 +102,13 @@ class FormatterTestHarness:
         # Generate with old formatter
         old_output = self._generate_schematic_sexp(circuit_data, use_new=False)
         old_file = self.baseline_dir / f"{test_name}_parallel.kicad_sch"
-        old_file.write_text(old_output)
+        old_file.write_text(old_output, encoding="utf-8")
 
         # Generate with new formatter (when available)
         try:
             new_output = self._generate_schematic_sexp(circuit_data, use_new=True)
             new_file = self.new_output_dir / f"{test_name}_parallel.kicad_sch"
-            new_file.write_text(new_output)
+            new_file.write_text(new_output, encoding="utf-8")
         except Exception as e:
             logger.warning(f"New formatter not available yet: {e}")
             new_output = old_output
@@ -387,14 +387,14 @@ class FormatterTestHarness:
         report_file = (
             self.reports_dir / f"migration_report_{datetime.now():%Y%m%d_%H%M%S}.json"
         )
-        report_file.write_text(json.dumps(report, indent=2))
+        report_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
 
         # Generate human-readable summary
         summary_file = (
             self.reports_dir / f"migration_summary_{datetime.now():%Y%m%d_%H%M%S}.md"
         )
         summary_text = self._generate_summary_markdown(report)
-        summary_file.write_text(summary_text)
+        summary_file.write_text(summary_text, encoding="utf-8")
 
         logger.info(f"Reports generated: {report_file}, {summary_file}")
 
@@ -426,7 +426,7 @@ class FormatterTestHarness:
 """
 
         for result in report["test_results"]:
-            equiv = "✅" if result["functional_equivalent"] else "❌"
+            equiv = "" if result["functional_equivalent"] else ""
             diff_count = len(result["differences"]) if result["differences"] else 0
             summary += f"| {result['test_name']} | {equiv} | {diff_count} lines |\n"
 
@@ -479,13 +479,13 @@ class FormatterTestHarness:
         success_rate = report["summary"]["success_rate"]
 
         if success_rate == 100:
-            return "✅ All tests passing! Ready to proceed to next migration phase."
+            return "All tests passing! Ready to proceed to next migration phase."
         elif success_rate >= 95:
-            return "⚠️ Nearly ready. Review failing tests before proceeding."
+            return "Nearly ready. Review failing tests before proceeding."
         elif success_rate >= 80:
-            return "🔧 Significant work needed. Focus on failing test cases."
+            return "Significant work needed. Focus on failing test cases."
         else:
-            return "❌ Major issues detected. Review formatter implementation."
+            return "Major issues detected. Review formatter implementation."
 
 
 def run_baseline_capture():

@@ -159,7 +159,7 @@ class KiCadParser:
     def parse_circuits(self) -> Dict[str, Circuit]:
         """Parse KiCad project using real netlist data"""
         logger.info(
-            f"🔍 HIERARCHICAL DEBUG: Starting parse_circuits for {self.kicad_project}"
+            f"HIERARCHICAL DEBUG: Starting parse_circuits for {self.kicad_project}"
         )
 
         if not self.kicad_project.exists():
@@ -168,7 +168,7 @@ class KiCadParser:
 
         try:
             # Step 1: Generate real KiCad netlist
-            logger.debug("🔍 HIERARCHICAL DEBUG: Step 1 - Generating KiCad netlist")
+            logger.debug("HIERARCHICAL DEBUG: Step 1 - Generating KiCad netlist")
             netlist_path = self.generate_netlist()
             if not netlist_path:
                 logger.warning(
@@ -178,11 +178,11 @@ class KiCadParser:
 
             # Step 2: Parse netlist to get real connections
             logger.info(
-                "🔍 HIERARCHICAL DEBUG: Step 2 - Parsing netlist for components and nets"
+                "HIERARCHICAL DEBUG: Step 2 - Parsing netlist for components and nets"
             )
             components, nets = self.netlist_parser.parse_netlist(netlist_path)
 
-            logger.info(f"🔍 HIERARCHICAL DEBUG: Netlist parsing results:")
+            logger.info(f"HIERARCHICAL DEBUG: Netlist parsing results:")
             logger.info(f"  - Total components from netlist: {len(components)}")
             for comp in components:
                 logger.info(f"    * {comp.reference}: {comp.lib_id} = {comp.value}")
@@ -194,11 +194,11 @@ class KiCadParser:
 
             # Step 3: Find hierarchical structure from schematics
             logger.info(
-                "🔍 HIERARCHICAL DEBUG: Step 3 - Analyzing hierarchical structure"
+                "HIERARCHICAL DEBUG: Step 3 - Analyzing hierarchical structure"
             )
             hierarchical_info = self._analyze_hierarchical_structure()
 
-            logger.info(f"🔍 HIERARCHICAL DEBUG: Hierarchical analysis results:")
+            logger.info(f"HIERARCHICAL DEBUG: Hierarchical analysis results:")
             if hierarchical_info:
                 for sheet_name, sheet_components in hierarchical_info.items():
                     logger.info(
@@ -210,25 +210,25 @@ class KiCadParser:
                 logger.info("  - No hierarchical structure detected")
 
             # Step 3.5: Build hierarchical tree for import relationships
-            logger.debug("🔍 HIERARCHICAL DEBUG: Step 3.5 - Building hierarchical tree")
+            logger.debug("HIERARCHICAL DEBUG: Step 3.5 - Building hierarchical tree")
             hierarchical_tree = self._build_hierarchical_tree(hierarchical_info)
 
-            logger.info(f"🔍 HIERARCHICAL DEBUG: Hierarchical tree results:")
+            logger.info(f"HIERARCHICAL DEBUG: Hierarchical tree results:")
             for parent, children in hierarchical_tree.items():
                 logger.info(f"  - {parent} -> {children}")
 
             # Step 4: Create circuit representation with real connections
             logger.info(
-                "🔍 HIERARCHICAL DEBUG: Step 4 - Creating circuit representations"
+                "HIERARCHICAL DEBUG: Step 4 - Creating circuit representations"
             )
             circuits = {}
 
             if hierarchical_info:
-                logger.debug("🔍 HIERARCHICAL DEBUG: Using hierarchical approach")
+                logger.debug("HIERARCHICAL DEBUG: Using hierarchical approach")
                 # Distribute components across hierarchical sheets based on schematic analysis
                 for sheet_name, sheet_components in hierarchical_info.items():
                     logger.info(
-                        f"🔍 HIERARCHICAL DEBUG: Processing sheet '{sheet_name}'"
+                        f"HIERARCHICAL DEBUG: Processing sheet '{sheet_name}'"
                     )
 
                     # Filter components that belong to this sheet
@@ -270,10 +270,10 @@ class KiCadParser:
                     )
                     circuits[sheet_name] = circuit
                     logger.info(
-                        f"🔍 HIERARCHICAL DEBUG: Created {sheet_name}: {len(sheet_actual_components)} components, {len(sheet_nets)} nets"
+                        f"HIERARCHICAL DEBUG: Created {sheet_name}: {len(sheet_actual_components)} components, {len(sheet_nets)} nets"
                     )
             else:
-                logger.debug("🔍 HIERARCHICAL DEBUG: Using flat circuit approach")
+                logger.debug("HIERARCHICAL DEBUG: Using flat circuit approach")
                 # Single flat circuit - use project name instead of hardcoded "main"
                 circuit = Circuit(
                     name=self.kicad_project.stem,
@@ -285,10 +285,10 @@ class KiCadParser:
                 )
                 circuits[self.kicad_project.stem] = circuit
                 logger.info(
-                    f"🔍 HIERARCHICAL DEBUG: Created flat circuit: {len(components)} components, {len(nets)} nets"
+                    f"HIERARCHICAL DEBUG: Created flat circuit: {len(components)} components, {len(nets)} nets"
                 )
 
-            logger.info(f"🔍 HIERARCHICAL DEBUG: Final circuits created:")
+            logger.info(f"HIERARCHICAL DEBUG: Final circuits created:")
             for name, circuit in circuits.items():
                 logger.info(
                     f"  - {name}: {len(circuit.components)} components, {len(circuit.nets)} nets, hierarchical={circuit.is_hierarchical_sheet}"
@@ -307,13 +307,13 @@ class KiCadParser:
 
     def _analyze_hierarchical_structure(self) -> Dict[str, List[Component]]:
         """Analyze schematic files to understand hierarchical structure"""
-        logger.debug("🔍 HIERARCHICAL DEBUG: Starting _analyze_hierarchical_structure")
+        logger.debug("HIERARCHICAL DEBUG: Starting _analyze_hierarchical_structure")
         hierarchical_info = {}
 
         # Find all schematic files
         schematic_files = list(self.project_dir.glob("*.kicad_sch"))
         logger.info(
-            f"🔍 HIERARCHICAL DEBUG: Found {len(schematic_files)} schematic files:"
+            f"HIERARCHICAL DEBUG: Found {len(schematic_files)} schematic files:"
         )
         for sch_file in schematic_files:
             logger.info(f"  - {sch_file.name}")
@@ -322,23 +322,23 @@ class KiCadParser:
         main_sch_file = self.project_dir / f"{self.kicad_project.stem}.kicad_sch"
         if main_sch_file.exists():
             logger.info(
-                f"🔍 HIERARCHICAL DEBUG: Parsing main schematic for sheet instances: {main_sch_file.name}"
+                f"HIERARCHICAL DEBUG: Parsing main schematic for sheet instances: {main_sch_file.name}"
             )
             sheet_instances = self._parse_sheet_instances(main_sch_file)
             logger.info(
-                f"🔍 HIERARCHICAL DEBUG: Found {len(sheet_instances)} sheet instances:"
+                f"HIERARCHICAL DEBUG: Found {len(sheet_instances)} sheet instances:"
             )
             for sheet_path, sheet_file in sheet_instances.items():
                 logger.info(f"  - {sheet_path} -> {sheet_file}")
         else:
             logger.warning(
-                f"🔍 HIERARCHICAL DEBUG: Main schematic file not found: {main_sch_file}"
+                f"HIERARCHICAL DEBUG: Main schematic file not found: {main_sch_file}"
             )
             sheet_instances = {}
 
         for sch_file in schematic_files:
             logger.info(
-                f"🔍 HIERARCHICAL DEBUG: Parsing schematic file: {sch_file.name}"
+                f"HIERARCHICAL DEBUG: Parsing schematic file: {sch_file.name}"
             )
             components, net_names = self._parse_schematic_file(sch_file)
 
@@ -347,7 +347,7 @@ class KiCadParser:
             circuit_name = sch_file.stem
 
             logger.info(
-                f"🔍 HIERARCHICAL DEBUG: Circuit '{circuit_name}' from {sch_file.name}:"
+                f"HIERARCHICAL DEBUG: Circuit '{circuit_name}' from {sch_file.name}:"
             )
             logger.info(f"  - Components: {len(components)}")
             for comp in components:
@@ -356,7 +356,7 @@ class KiCadParser:
 
             hierarchical_info[circuit_name] = components
 
-        logger.info(f"🔍 HIERARCHICAL DEBUG: Final hierarchical structure:")
+        logger.info(f"HIERARCHICAL DEBUG: Final hierarchical structure:")
         for sheet_name, components in hierarchical_info.items():
             logger.info(f"  - {sheet_name}: {len(components)} components")
 
@@ -366,7 +366,7 @@ class KiCadParser:
         self, hierarchical_info: Dict[str, List[Component]]
     ) -> Dict[str, List[str]]:
         """Build a tree structure showing parent-child relationships between sheets"""
-        logger.debug("🔍 HIERARCHICAL DEBUG: Building hierarchical tree")
+        logger.debug("HIERARCHICAL DEBUG: Building hierarchical tree")
         hierarchical_tree = {}
 
         # Find all schematic files and their sheet instances
@@ -378,7 +378,7 @@ class KiCadParser:
 
             # Parse this schematic file for sheet instances
             logger.info(
-                f"🔍 HIERARCHICAL DEBUG: Analyzing {circuit_name} for child sheets"
+                f"HIERARCHICAL DEBUG: Analyzing {circuit_name} for child sheets"
             )
             sheet_instances = self._parse_sheet_instances(sch_file)
 
@@ -389,12 +389,12 @@ class KiCadParser:
                 child_circuit_name = Path(sheet_file).stem
                 child_sheets.append(child_circuit_name)
                 logger.info(
-                    f"🔍 HIERARCHICAL DEBUG: {circuit_name} has child: {child_circuit_name}"
+                    f"HIERARCHICAL DEBUG: {circuit_name} has child: {child_circuit_name}"
                 )
 
             hierarchical_tree[circuit_name] = child_sheets
 
-        logger.info(f"🔍 HIERARCHICAL DEBUG: Complete hierarchical tree:")
+        logger.info(f"HIERARCHICAL DEBUG: Complete hierarchical tree:")
         for parent, children in hierarchical_tree.items():
             logger.info(f"  - {parent}: {children}")
 
@@ -403,7 +403,7 @@ class KiCadParser:
     def _parse_sheet_instances(self, main_sch_file: Path) -> Dict[str, str]:
         """Parse main schematic to find hierarchical sheet instances and their relationships"""
         logger.info(
-            f"🔍 HIERARCHICAL DEBUG: Parsing sheet instances from {main_sch_file}"
+            f"HIERARCHICAL DEBUG: Parsing sheet instances from {main_sch_file}"
         )
         sheet_instances = {}
 
@@ -416,7 +416,7 @@ class KiCadParser:
             sheet_blocks = self._extract_sheet_blocks(content)
 
             logger.info(
-                f"🔍 HIERARCHICAL DEBUG: Found {len(sheet_blocks)} sheet blocks"
+                f"HIERARCHICAL DEBUG: Found {len(sheet_blocks)} sheet blocks"
             )
 
             for block in sheet_blocks:
@@ -425,24 +425,24 @@ class KiCadParser:
                     sheet_path, sheet_file = sheet_info
                     sheet_instances[sheet_path] = sheet_file
                     logger.info(
-                        f"🔍 HIERARCHICAL DEBUG: Sheet instance: {sheet_path} -> {sheet_file}"
+                        f"HIERARCHICAL DEBUG: Sheet instance: {sheet_path} -> {sheet_file}"
                     )
 
             # Also look for sheet_instances definitions which show the hierarchy
             instance_blocks = self._extract_sheet_instance_blocks(content)
             logger.info(
-                f"🔍 HIERARCHICAL DEBUG: Found {len(instance_blocks)} sheet instance definition blocks"
+                f"HIERARCHICAL DEBUG: Found {len(instance_blocks)} sheet instance definition blocks"
             )
 
             for block in instance_blocks:
                 instance_info = self._parse_sheet_instance_block(block)
                 if instance_info:
                     logger.info(
-                        f"🔍 HIERARCHICAL DEBUG: Sheet instance definition: {instance_info}"
+                        f"HIERARCHICAL DEBUG: Sheet instance definition: {instance_info}"
                     )
 
         except Exception as e:
-            logger.error(f"🔍 HIERARCHICAL DEBUG: Failed to parse sheet instances: {e}")
+            logger.error(f"HIERARCHICAL DEBUG: Failed to parse sheet instances: {e}")
 
         return sheet_instances
 
@@ -513,20 +513,20 @@ class KiCadParser:
 
             if sheet_name and sheet_file:
                 logger.info(
-                    f"🔍 HIERARCHICAL DEBUG: Parsed sheet block: {sheet_name} -> {sheet_file}"
+                    f"HIERARCHICAL DEBUG: Parsed sheet block: {sheet_name} -> {sheet_file}"
                 )
                 return (sheet_name, sheet_file)
             else:
                 logger.warning(
-                    f"🔍 HIERARCHICAL DEBUG: Could not parse sheet block: name={sheet_name}, file={sheet_file}"
+                    f"HIERARCHICAL DEBUG: Could not parse sheet block: name={sheet_name}, file={sheet_file}"
                 )
                 logger.debug(
-                    f"🔍 HIERARCHICAL DEBUG: Sheet block content: {block[:200]}..."
+                    f"HIERARCHICAL DEBUG: Sheet block content: {block[:200]}..."
                 )
                 return None
 
         except Exception as e:
-            logger.error(f"🔍 HIERARCHICAL DEBUG: Failed to parse sheet block: {e}")
+            logger.error(f"HIERARCHICAL DEBUG: Failed to parse sheet block: {e}")
             return None
 
     def _parse_sheet_instance_block(self, block: str) -> Optional[Dict]:
@@ -543,14 +543,14 @@ class KiCadParser:
             for path, reference in instance_matches:
                 instances[path] = reference
                 logger.info(
-                    f"🔍 HIERARCHICAL DEBUG: Sheet instance path: {path} -> {reference}"
+                    f"HIERARCHICAL DEBUG: Sheet instance path: {path} -> {reference}"
                 )
 
             return instances if instances else None
 
         except Exception as e:
             logger.error(
-                f"🔍 HIERARCHICAL DEBUG: Failed to parse sheet instance block: {e}"
+                f"HIERARCHICAL DEBUG: Failed to parse sheet instance block: {e}"
             )
             return None
 

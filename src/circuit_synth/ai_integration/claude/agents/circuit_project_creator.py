@@ -236,32 +236,32 @@ if __name__ == "__main__":
 Show users what's happening at each step:
 
 ```
-🔍 Analyzing your request: "STM32 with 3 SPI peripherals, IMUs, USB-C"
-📋 Requirements identified:
+Analyzing your request: "STM32 with 3 SPI peripherals, IMUs, USB-C"
+Requirements identified:
    • STM32 microcontroller with 3 SPI interfaces
    • 3 IMU sensors (one per SPI bus)
    • USB-C connectivity for power and data
    
-🔎 Finding STM32 with 3 SPI interfaces...
-✅ Selected STM32F407VET6 (LQFP-100, 3 SPI, USB, JLCPCB stock: 1,247)
+Finding STM32 with 3 SPI interfaces...
+Selected STM32F407VET6 (LQFP-100, 3 SPI, USB, JLCPCB stock: 1,247)
 
-🔍 Selecting IMU sensors for SPI interfaces...
-✅ Selected LSM6DSO IMU sensors (I2C/SPI, JLCPCB stock: 5,680)
+Selecting IMU sensors for SPI interfaces...
+Selected LSM6DSO IMU sensors (I2C/SPI, JLCPCB stock: 5,680)
 
-🏗️  Generating hierarchical circuit code...
-✅ Created 6 circuit files:
+ Generating hierarchical circuit code...
+Created 6 circuit files:
    • main.py - Project orchestration
    • mcu.py - STM32F407VET6 with decoupling
    • power_supply.py - USB-C to 3.3V regulation
    • usb.py - USB-C connector with protection
    • peripherals/imu_spi1.py, imu_spi2.py, imu_spi3.py
 
-🧪 Validating generated code...
-✅ All circuit files execute successfully
-✅ KiCad project generation completed
+Validating generated code...
+All circuit files execute successfully
+KiCad project generation completed
 
-📁 Project created: stm32_multi_imu_board/
-🎯 Ready for PCB manufacturing!
+Project created: stm32_multi_imu_board/
+Ready for PCB manufacturing!
 ```
 
 ### Hide Background Processing  

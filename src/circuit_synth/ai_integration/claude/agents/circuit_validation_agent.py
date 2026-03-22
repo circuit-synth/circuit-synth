@@ -58,34 +58,34 @@ Generate comprehensive validation reports with:
 ### Critical Errors (Prevent Execution)
 ```python
 # Net creation outside @circuit decorator
-VCC_3V3 = Net('VCC_3V3')  # ❌ CRITICAL: No active circuit
+VCC_3V3 = Net('VCC_3V3')  # CRITICAL: No active circuit
 
 # Missing @circuit decorator  
-def my_circuit():  # ❌ CRITICAL: Missing decorator
+def my_circuit():  # CRITICAL: Missing decorator
     pass
 
 # Import errors
-from circuit_synth import *  # ❌ CRITICAL: Module not found
+from circuit_synth import *  # CRITICAL: Module not found
 ```
 
 ### API Usage Errors (Runtime Failures)
 ```python
 # Invalid pin connection syntax
-component.pins[1].connect_to(net)  # ❌ API: Invalid syntax
-component["VDD"].connect_to(net)   # ❌ API: No connect_to method
+component.pins[1].connect_to(net)  # API: Invalid syntax
+component["VDD"].connect_to(net)   # API: No connect_to method
 
 # Backwards net assignment
-net += component["VDD"]            # ❌ API: Backwards assignment
+net += component["VDD"]            # API: Backwards assignment
 ```
 
 ### Structural Errors (Design Issues)
 ```python
 # Component reference conflicts
-mcu1 = Component(ref="U")          # ❌ STRUCTURE: Duplicate refs
+mcu1 = Component(ref="U")          # STRUCTURE: Duplicate refs
 mcu2 = Component(ref="U")          
 
 # Missing component connections
-mcu["VDD"]  # exists but never connected  # ❌ STRUCTURE: Floating pins
+mcu["VDD"]  # exists but never connected  # STRUCTURE: Floating pins
 ```
 
 ## VALIDATION WORKFLOW
@@ -132,69 +132,69 @@ def analyze_execution_results(execution_results):
 
 ### Validation Success Report
 ```
-✅ Circuit Validation Results - PASSED
-📁 Project: {project_name}
-⏱️  Execution Time: {execution_time}s
-📋 Files Validated: {file_count}
+Circuit Validation Results - PASSED
+Project: {project_name}
+⏱ Execution Time: {execution_time}s
+Files Validated: {file_count}
 
-🎯 Execution Summary:
+Execution Summary:
 - Main circuit executed successfully
 - All subcircuits loaded properly  
 - KiCad project generation completed
 - No critical errors detected
 
-📊 Validation Metrics:
+Validation Metrics:
 - Component count: {component_count}
 - Net connections: {net_count}
 - Subcircuit depth: {hierarchy_depth}
 - Generated files: {output_files}
 
-✅ Ready for production use
+Ready for production use
 ```
 
 ### Validation Failure Report
 ```
-❌ Circuit Validation Results - FAILED
-📁 Project: {project_name}
-⏱️  Execution Time: {execution_time}s (before failure)
-🚨 Error Classification: {error_type}
+Circuit Validation Results - FAILED
+Project: {project_name}
+⏱ Execution Time: {execution_time}s (before failure)
+Error Classification: {error_type}
 
-💥 Primary Error:
+Primary Error:
 File: main.py, Line: 23
 Error: CircuitSynthError: Cannot create Net('VCC_5V'): No active circuit found.
 
-🔍 Root Cause Analysis:
+Root Cause Analysis:
 The Net('VCC_5V') is being created outside of a @circuit decorated function.
 This violates circuit-synth's requirement that all Net objects must be created
 within an active circuit context.
 
-📋 Error Context:
+Error Context:
 ```python
 22: from circuit_synth import *
-23: VCC_5V = Net('VCC_5V')          # ❌ ERROR HERE  
+23: VCC_5V = Net('VCC_5V')          # ERROR HERE  
 24: GND = Net('GND')
 25: 
 26: @circuit(name="main_circuit")
 27: def main_circuit():
 ```
 
-🎯 Fix Required:
+Fix Required:
 Move Net creation inside the @circuit decorated function.
 This is a SYNTAX issue that requires code restructuring.
 
-🔧 Needs Attention From: circuit-syntax-fixer agent
+Needs Attention From: circuit-syntax-fixer agent
 ```
 
 ### Complex Error Analysis
 ```
-❌ Multiple Validation Issues Detected
+Multiple Validation Issues Detected
 
-🚨 Error Summary:
+Error Summary:
 - 2 CRITICAL errors (prevent execution)
 - 1 API usage error
 - 3 STRUCTURAL warnings
 
-📋 Detailed Analysis:
+Detailed Analysis:
 
 1. [CRITICAL] main.py:23 - Net creation outside circuit
    └─ Move Net('VCC_5V') and Net('GND') inside @circuit function
@@ -208,12 +208,12 @@ This is a SYNTAX issue that requires code restructuring.
 4. [STRUCTURE] main.py - Potential floating pins
    └─ USB_DP net created but never connected to components
 
-🎯 Recommended Fix Order:
+Recommended Fix Order:
 1. Fix CRITICAL errors first (prevents execution)
 2. Address API usage errors  
 3. Review STRUCTURAL issues for completeness
 
-⚠️  Requires 2-3 fix iterations for full resolution
+ Requires 2-3 fix iterations for full resolution
 ```
 
 ## INTEGRATION POINTS

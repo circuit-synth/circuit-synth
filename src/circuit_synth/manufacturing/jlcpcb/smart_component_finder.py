@@ -72,7 +72,7 @@ class SmartComponentFinder:
         Returns:
             List of complete component recommendations
         """
-        logger.info(f"🔍 Finding components for: {search_term}")
+        logger.info(f"Finding components for: {search_term}")
 
         # Search JLCPCB for available components
         search_terms = [search_term]
@@ -99,7 +99,7 @@ class SmartComponentFinder:
         # Sort by manufacturability score
         recommendations.sort(key=lambda x: x.manufacturability_score, reverse=True)
 
-        logger.info(f"✅ Found {len(recommendations)} suitable components")
+        logger.info(f"Found {len(recommendations)} suitable components")
         return recommendations
 
     def get_best_component(
@@ -290,21 +290,21 @@ component = Component(
 
         stock = component.get("stock", 0)
         if stock >= 10000:
-            notes.append("✅ High stock availability")
+            notes.append("High stock availability")
         elif stock >= 1000:
-            notes.append("⚠️ Medium stock - consider ordering soon")
+            notes.append("Medium stock - consider ordering soon")
         else:
-            notes.append("🔶 Low stock - verify availability before production")
+            notes.append("Low stock - verify availability before production")
 
         library_type = component.get("library_type", "").lower()
         if "basic" in library_type:
-            notes.append("🎯 Basic part - optimal for assembly")
+            notes.append("Basic part - optimal for assembly")
         elif "preferred" in library_type:
-            notes.append("👍 Preferred part - good for assembly")
+            notes.append("Preferred part - good for assembly")
 
         price = component.get("price", "")
         if price and "$" in price:
-            notes.append(f"💰 Price: {price}")
+            notes.append(f"Price: {price}")
 
         return " | ".join(notes)
 
@@ -537,23 +537,23 @@ def find_components(
 
 def print_component_recommendation(recommendation: ComponentRecommendation) -> None:
     """Print a nicely formatted component recommendation."""
-    print(f"\n🔧 Component Recommendation: {recommendation.manufacturer_part}")
+    print(f"\nComponent Recommendation: {recommendation.manufacturer_part}")
     print(
-        f"   📊 Stock: {recommendation.stock_quantity:,} units | Score: {recommendation.manufacturability_score:.2f}/1.0"
+        f"   Stock: {recommendation.stock_quantity:,} units | Score: {recommendation.manufacturability_score:.2f}/1.0"
     )
-    print(f"   💰 Price: {recommendation.price} | Type: {recommendation.library_type}")
-    print(f"   📝 {recommendation.description}")
+    print(f"   Price: {recommendation.price} | Type: {recommendation.library_type}")
+    print(f"   {recommendation.description}")
     print(
-        f"   ✅ KiCad: {recommendation.kicad_symbol} → {recommendation.kicad_footprint}"
+        f"   KiCad: {recommendation.kicad_symbol} → {recommendation.kicad_footprint}"
     )
-    print(f"   💡 {recommendation.recommendation_notes}")
-    print(f"\n📋 Circuit-Synth Code:")
+    print(f"   {recommendation.recommendation_notes}")
+    print(f"\nCircuit-Synth Code:")
     print(recommendation.circuit_synth_code)
 
 
 if __name__ == "__main__":
     # Example usage
-    print("🔍 Testing Smart Component Finder...")
+    print("Testing Smart Component Finder...")
 
     # Find an STM32 microcontroller
     stm32_rec = find_component("STM32G4", "LQFP")

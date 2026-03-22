@@ -497,14 +497,14 @@ def analyze_any_circuit(
     report_path = analyzer.generate_report(circuit_data, failure_modes, output_pdf)
 
     if verbose and report_path:
-        print(f"✅ FMEA Report generated: {report_path}")
+        print(f"FMEA Report generated: {report_path}")
 
         # Print summary statistics
         total = len(failure_modes)
         critical = sum(1 for fm in failure_modes if fm["rpn"] >= 300)
         high = sum(1 for fm in failure_modes if 125 <= fm["rpn"] < 300)
 
-        print(f"📊 Analysis Summary:")
+        print(f"Analysis Summary:")
         print(f"  - Total failure modes: {total}")
         print(f"  - Critical risk (RPN ≥ 300): {critical}")
         print(f"  - High risk (125 ≤ RPN < 300): {high}")

@@ -162,13 +162,13 @@ class KiCadSymbolReader:
         pin_data = self.read_symbol_pins(symbol_name)
 
         if not pin_data["success"]:
-            return f"❌ Could not read pins for {symbol_name}: {pin_data['error']}"
+            return f"Could not read pins for {symbol_name}: {pin_data['error']}"
 
         pins = pin_data["pins"]
         if not pins:
-            return f"❌ No pins found for {symbol_name}"
+            return f"No pins found for {symbol_name}"
 
-        output = [f"📍 Real KiCad pins for {symbol_name}:"]
+        output = [f"Real KiCad pins for {symbol_name}:"]
         output.append("=" * 60)
 
         # Sort pins by number/name
@@ -187,7 +187,7 @@ class KiCadSymbolReader:
 
             pin_names.append(pin_name if pin_name else pin_key)
 
-        output.append(f"\n🔧 Circuit-synth usage:")
+        output.append(f"\nCircuit-synth usage:")
         output.append(f'component = Component(symbol="{symbol_name}", ref="U1")')
 
         # Show examples with actual pin names
@@ -195,7 +195,7 @@ class KiCadSymbolReader:
             if pin_name and pin_name not in ["", "NC"]:
                 output.append(f'component["{pin_name}"] += some_net')
 
-        output.append(f"\n✅ Available pins: {', '.join(pin_names[:15])}")
+        output.append(f"\nAvailable pins: {', '.join(pin_names[:15])}")
         if len(pin_names) > 15:
             output.append(f"    ... and {len(pin_names) - 15} more")
 

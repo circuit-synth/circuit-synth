@@ -101,7 +101,7 @@ class ProjectGenerator:
         has_components = hasattr(circuit, "_components") and circuit._components
         has_subcircuits = hasattr(circuit, "_subcircuits") and circuit._subcircuits
 
-        print(f"\n🔍 SCHEMATIC GENERATION PATH:")
+        print(f"\nSCHEMATIC GENERATION PATH:")
         print(f"   has_components: {has_components}")
         print(f"   has_subcircuits: {has_subcircuits}")
 
