@@ -57,21 +57,26 @@ class PowerNetRegistry:
         # Get power library path
         power_lib_path = self._find_power_library()
         if not power_lib_path:
-            logger.debug("Could not find power.kicad_sym, using built-in defaults")
+            logger.debug("Could not find power symbol library, using built-in defaults")
             self._use_builtin_defaults()
             return
 
-        # Parse power.kicad_sym
+        # Parse power library (file or directory)
         try:
-            with open(power_lib_path, 'r') as f:
-                content = f.read()
+            symbol_names = []
 
-            # Extract symbol names using regex
-            # Pattern: (symbol "SYMBOL_NAME"
-            pattern = r'\(symbol\s+"([^"]+)"'
-            matches = re.findall(pattern, content)
+            if power_lib_path.is_dir():
+                # KiCad >= 10: directory-based .kicad_symdir with one file per symbol
+                for sym_file in power_lib_path.glob("*.kicad_sym"):
+                    symbol_names.append(sym_file.stem)
+            else:
+                # KiCad <= 9: single power.kicad_sym file
+                with open(power_lib_path, 'r') as f:
+                    content = f.read()
+                pattern = r'\(symbol\s+"([^"]+)"'
+                symbol_names = re.findall(pattern, content)
 
-            for symbol_name in matches:
+            for symbol_name in symbol_names:
                 # symbol_name is like "+3V3", "GND", "VCC", etc.
                 lib_id = f"power:{symbol_name}"
 
@@ -105,24 +110,42 @@ class PowerNetRegistry:
             self._power_symbols[without_plus_decimal] = lib_id
 
     def _find_power_library(self) -> Optional[Path]:
-        """Find power.kicad_sym in KiCad library paths."""
-        # Check common locations
-        search_paths = [
-            Path("tests/test_data/kicad_symbols/power.kicad_sym"),
-            Path("tests/test_data/kicad9/power.kicad_sym"),
-            Path("/usr/share/kicad/symbols/power.kicad_sym"),
-            Path.home() / ".local/share/kicad/8.0/symbols/power.kicad_sym",
-            Path.home() / ".local/share/kicad/9.0/symbols/power.kicad_sym",
+        """Find power.kicad_sym or power.kicad_symdir in KiCad library paths."""
+        # Base symbol directories to search
+        symbol_dirs = [
+            Path("tests/test_data/kicad_symbols"),
+            Path("tests/test_data/kicad9"),
+            Path("/usr/share/kicad/symbols"),
+            Path.home() / ".local/share/kicad/8.0/symbols",
+            Path.home() / ".local/share/kicad/9.0/symbols",
+            Path.home() / ".local/share/kicad/10.0/symbols",
             # macOS paths
-            Path("/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/power.kicad_sym"),
-            Path.home() / "Library/Application Support/kicad/8.0/symbols/power.kicad_sym",
-            Path.home() / "Library/Application Support/kicad/9.0/symbols/power.kicad_sym",
+            Path("/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols"),
+            Path.home() / "Library/Application Support/kicad/8.0/symbols",
+            Path.home() / "Library/Application Support/kicad/9.0/symbols",
+            Path.home() / "Library/Application Support/kicad/10.0/symbols",
+            # Windows paths
+            Path("C:/Program Files/KiCad/8.0/share/kicad/symbols"),
+            Path("C:/Program Files/KiCad/9.0/share/kicad/symbols"),
+            Path("C:/Program Files/KiCad/10.0/share/kicad/symbols"),
+            # WSL2: Windows KiCad accessible via /mnt/c/
+            Path("/mnt/c/Program Files/KiCad/8.0/share/kicad/symbols"),
+            Path("/mnt/c/Program Files/KiCad/9.0/share/kicad/symbols"),
+            Path("/mnt/c/Program Files/KiCad/10.0/share/kicad/symbols"),
         ]
 
-        for path in search_paths:
-            if path.exists():
-                logger.debug(f"Found power library at: {path}")
-                return path
+        for sym_dir in symbol_dirs:
+            # KiCad <= 9: single file power.kicad_sym
+            single_file = sym_dir / "power.kicad_sym"
+            if single_file.is_file():
+                logger.debug(f"Found power library (file) at: {single_file}")
+                return single_file
+
+            # KiCad >= 10: directory-based power.kicad_symdir/
+            symdir = sym_dir / "power.kicad_symdir"
+            if symdir.is_dir():
+                logger.debug(f"Found power library (symdir) at: {symdir}")
+                return symdir
 
         return None
 
