@@ -167,7 +167,9 @@ def copy_complete_claude_setup(
     """
 
     # Find the circuit-synth root directory (where we have the complete .claude setup)
-    circuit_synth_root = Path(__file__).parent.parent.parent.parent
+    # From src/circuit_synth/tools/project_management/new_project.py -> repo root
+    circuit_synth_pkg = Path(__file__).parent.parent.parent  # -> circuit_synth/
+    circuit_synth_root = circuit_synth_pkg.parent.parent  # -> repo root (past src/)
     source_claude_dir = circuit_synth_root / ".claude"
 
     if not source_claude_dir.exists():
