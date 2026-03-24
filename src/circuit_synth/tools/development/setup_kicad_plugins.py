@@ -12,7 +12,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import click
 from rich.console import Console
@@ -20,107 +20,13 @@ from rich.panel import Panel
 from rich.prompt import Confirm
 from rich.text import Text
 
+from circuit_synth.core.kicad_validator import (
+    _is_wsl,
+    _looks_like_version,
+    validate_kicad_installation,
+)
+
 console = Console()
-
-
-def _is_wsl() -> bool:
-    """Detect if running inside Windows Subsystem for Linux."""
-    try:
-        return "microsoft" in Path("/proc/version").read_text().lower()
-    except (OSError, FileNotFoundError):
-        return False
-
-
-def _find_kicad_install() -> Tuple[Optional[Path], Optional[str]]:
-    """Find the KiCad installation directory and its version string.
-
-    Returns (install_path, version) e.g. (Path("/mnt/c/Program Files/KiCad/10.0"), "10.0").
-    Either or both may be None if not found.
-    """
-    system = platform.system()
-    wsl = _is_wsl()
-
-    candidate_roots: List[Path] = []
-
-    if system == "Darwin":
-        candidate_roots.append(Path("/Applications/KiCad"))
-    elif system == "Windows" or wsl:
-        # Windows-native paths (or /mnt/c equivalents under WSL)
-        if wsl:
-            candidate_roots += [
-                Path("/mnt/c/Program Files/KiCad"),
-                Path("/mnt/c/Program Files (x86)/KiCad"),
-            ]
-        else:
-            candidate_roots += [
-                Path("C:/Program Files/KiCad"),
-                Path("C:/Program Files (x86)/KiCad"),
-            ]
-    if system == "Linux":
-        # Native Linux installs
-        candidate_roots.append(Path("/usr/share/kicad"))
-        candidate_roots.append(Path("/usr/local/share/kicad"))
-        # Also check if the binary is on PATH
-        try:
-            subprocess.run(["which", "kicad"], capture_output=True, check=True)
-            # kicad exists natively; version will be detected below from config dirs
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            pass
-
-    # Try to find a versioned sub-directory (e.g. "10.0", "8.0")
-    for root in candidate_roots:
-        if not root.exists():
-            continue
-        # Some installs put the version as a direct child: /Program Files/KiCad/10.0/
-        versioned = sorted(
-            [d for d in root.iterdir() if d.is_dir() and _looks_like_version(d.name)],
-            key=lambda d: d.name,
-            reverse=True,  # highest version first
-        )
-        if versioned:
-            return versioned[0], versioned[0].name
-        # Flat install (no versioned subdir) — try to read version from the dir itself
-        if (root / "share" / "kicad").exists() or (root / "bin").exists():
-            return root, None
-
-    # Fallback: detect version from user config directories
-    version = _detect_version_from_config(wsl)
-    return None, version
-
-
-def _looks_like_version(name: str) -> bool:
-    """Check if a directory name looks like a version (e.g. '8.0', '10.0')."""
-    parts = name.split(".")
-    return len(parts) >= 1 and all(p.isdigit() for p in parts)
-
-
-def _detect_version_from_config(wsl: bool) -> Optional[str]:
-    """Try to detect the KiCad version from user config directories."""
-    config_roots: List[Path] = []
-    if wsl:
-        # WSL: check the Windows-side AppData
-        win_home = _get_windows_home()
-        if win_home:
-            config_roots.append(win_home / "AppData" / "Roaming" / "kicad")
-    if platform.system() == "Darwin":
-        config_roots.append(Path.home() / "Library" / "Application Support" / "kicad")
-    if platform.system() == "Windows":
-        config_roots.append(Path.home() / "AppData" / "Roaming" / "kicad")
-    # Linux native
-    config_roots.append(Path.home() / ".config" / "kicad")
-    config_roots.append(Path.home() / ".local" / "share" / "kicad")
-
-    for config_root in config_roots:
-        if not config_root.exists():
-            continue
-        versioned = sorted(
-            [d for d in config_root.iterdir() if d.is_dir() and _looks_like_version(d.name)],
-            key=lambda d: d.name,
-            reverse=True,
-        )
-        if versioned:
-            return versioned[0].name
-    return None
 
 
 def _get_windows_home() -> Optional[Path]:
@@ -139,10 +45,23 @@ def _get_windows_home() -> Optional[Path]:
     except Exception:
         pass
     # Fallback: try common pattern
-    for user_dir in Path("/mnt/c/Users").iterdir():
-        if user_dir.is_dir() and user_dir.name not in ("Public", "Default", "Default User", "All Users"):
-            if (user_dir / "AppData" / "Roaming" / "kicad").exists():
-                return user_dir
+    try:
+        for user_dir in Path("/mnt/c/Users").iterdir():
+            if user_dir.is_dir() and user_dir.name not in ("Public", "Default", "Default User", "All Users"):
+                if (user_dir / "AppData" / "Roaming" / "kicad").exists():
+                    return user_dir
+    except OSError:
+        pass
+    return None
+
+
+def _extract_version_from_path(path_str: str) -> Optional[str]:
+    """Extract version string from a KiCad path like '/mnt/c/Program Files/KiCad/10.0/...'."""
+    if not path_str:
+        return None
+    for part in Path(path_str).parts:
+        if _looks_like_version(part):
+            return part
     return None
 
 
@@ -235,20 +154,6 @@ def get_plugin_files() -> List[str]:
     ]
 
 
-def check_kicad_installation() -> Tuple[bool, Optional[str]]:
-    """Check if KiCad is installed and return its version.
-
-    Returns (found, version) e.g. (True, "10.0").
-    """
-    install_path, version = _find_kicad_install()
-    if install_path is not None:
-        return True, version
-    # No install path but we may have found a version from config dirs
-    if version is not None:
-        return True, version
-    return False, None
-
-
 def install_plugins_to_directory(source_dir: Path, target_dir: Path) -> bool:
     """Install plugin files to the specified directory."""
     try:
@@ -330,8 +235,23 @@ def main(manual: bool, system: bool):
     if wsl:
         console.print("🐧 WSL detected — looking for Windows-side KiCad", style="cyan")
 
-    # Check if KiCad is installed
-    found, kicad_version = check_kicad_installation()
+    # Check if KiCad is installed (reuses shared kicad_validator)
+    results = validate_kicad_installation()
+    found = results.get("cli_available", False) or results.get("libraries_available", False)
+    kicad_version = None
+    # Extract version from CLI version string or from discovered paths
+    if results.get("cli_version"):
+        # cli_version is like "10.0.1" — take major.minor
+        parts = results["cli_version"].split(".")
+        if len(parts) >= 2:
+            kicad_version = f"{parts[0]}.{parts[1]}"
+    if not kicad_version:
+        # Try to extract from discovered paths
+        for key in ("cli_path", "symbol_path", "footprint_path"):
+            kicad_version = _extract_version_from_path(results.get(key, ""))
+            if kicad_version:
+                break
+
     if not found:
         console.print("⚠️  KiCad not found on this system", style="yellow")
         if not Confirm.ask("Continue with plugin setup anyway?"):
