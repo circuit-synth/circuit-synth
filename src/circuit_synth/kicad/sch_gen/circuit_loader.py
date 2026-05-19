@@ -283,7 +283,7 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             pin_identifier = None
 
             # First check if name is available (most specific)
-            if "name" in pin_data and pin_data["name"] != "~":
+            if "name" in pin_data and pin_data["name"] and pin_data["name"] != "~":
                 pin_identifier = pin_data["name"]
                 logger.debug(
                     f"Using pin name '{pin_identifier}' for {comp_ref} in net {net_name}"
