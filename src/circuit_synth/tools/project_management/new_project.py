@@ -963,12 +963,12 @@ def main(
 
     readme_content = readme_gen.generate(config, project_path)
     readme_path = project_path / "README.md"
-    readme_path.write_text(readme_content)
+    readme_path.write_text(readme_content, encoding="utf-8")
     console.print("✅ Created README.md", style="green")
 
     claude_md_content = claude_md_gen.generate(config)
     claude_md_path = project_path / "CLAUDE.md"
-    claude_md_path.write_text(claude_md_content)
+    claude_md_path.write_text(claude_md_content, encoding="utf-8")
     console.print("✅ Created CLAUDE.md", style="green")
 
     # Step 8: KiCad plugins note (if KiCad is installed)

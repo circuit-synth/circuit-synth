@@ -410,8 +410,6 @@ class SchematicWriter:
 
         PERFORMANCE MONITORING: Times each major operation.
         """
-        with open("/tmp/circuit_synth_debug.log", "a") as f:
-            f.write(f"generate_s_expr called for circuit {self.circuit.name}\n")
         start_time = time.perf_counter()
         logger.info(
             f"🚀 GENERATE_S_EXPR: Starting schematic generation for circuit '{self.circuit.name}'"

@@ -43,7 +43,7 @@ class TemplateManager:
                 f"Expected location: {template_dir}"
             )
 
-        return template_file.read_text()
+        return template_file.read_text(encoding="utf-8")
 
     def copy_circuit_to_project(
         self, circuit: Circuit, project_path: Path, is_first: bool = False
@@ -69,7 +69,7 @@ class TemplateManager:
 
         # Write the circuit file
         target_file = circuit_dir / target_filename
-        target_file.write_text(circuit_code)
+        target_file.write_text(circuit_code, encoding="utf-8")
 
     def list_available_circuits(self) -> list[Circuit]:
         """Get list of all available circuits
