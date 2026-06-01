@@ -274,25 +274,30 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             }
             net_obj = Net.from_dict(net_dict)
 
-        # Parse connections and add them to the net
+        # Parse connections and add them to the net.
+        # Deduplicate: circuit-synth emits each node twice in the JSON.
+        seen_connections: set = set()
         for conn in connections:
             comp_ref = conn["component"]
             pin_data = conn["pin"]
 
-            # Enhanced pin identification - store the most specific identifier available
+            # Enhanced pin identification - store the most specific identifier available.
+            # Pin number is preferred over name because multiple pins can share the same
+            # name (e.g. GND pads), which would cause all of them to resolve to the same
+            # coordinates. Pin numbers are always unique within a component.
             pin_identifier = None
 
-            # First check if name is available (most specific)
-            if "name" in pin_data and pin_data["name"] != "~":
-                pin_identifier = pin_data["name"]
-                logger.debug(
-                    f"Using pin name '{pin_identifier}' for {comp_ref} in net {net_name}"
-                )
-            # Then check for number
-            elif "number" in pin_data:
+            # First check for number (unique per pin)
+            if "number" in pin_data:
                 pin_identifier = str(pin_data["number"])
                 logger.debug(
                     f"Using pin number '{pin_identifier}' for {comp_ref} in net {net_name}"
+                )
+            # Then fall back to name
+            elif "name" in pin_data and pin_data["name"] and pin_data["name"] != "~":
+                pin_identifier = pin_data["name"]
+                logger.debug(
+                    f"Using pin name '{pin_identifier}' for {comp_ref} in net {net_name}"
                 )
             # Finally fall back to pin_id
             else:
@@ -301,6 +306,11 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
                     f"Using pin ID '{pin_identifier}' for {comp_ref} in net {net_name}"
                 )
 
+            conn_key = (comp_ref, pin_identifier)
+            if conn_key in seen_connections:
+                logger.debug(f"Skipping duplicate connection: {comp_ref}.{pin_identifier} in net {net_name}")
+                continue
+            seen_connections.add(conn_key)
             net_obj.connections.append((comp_ref, pin_identifier))
             logger.debug(
                 f"Added connection: {comp_ref}.{pin_identifier} to net {net_name}"
