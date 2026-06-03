@@ -1085,19 +1085,32 @@ class SchematicWriter:
             nets = circ.nets.values() if isinstance(circ.nets, dict) else circ.nets
             return {n.name for n in nets}
 
-        # 1) Shared with the parent sheet?
+        # Find this sheet's parent circuit (the one whose children include it).
+        parent = None
         for circ in self.all_subcircuits.values():
-            found_parent = False
             for child_info in getattr(circ, "child_instances", []) or []:
                 if child_info.get("sub_name") == self.circuit.name:
-                    found_parent = True
+                    parent = circ
                     break
-            if found_parent:
-                if net_name in _net_names(circ):
-                    return True
-                break  # each sheet has exactly one parent
+            if parent is not None:
+                break
 
-        # 2) Used by a child sheet?
+        if parent is not None:
+            # 1) Shared with the parent sheet?
+            if net_name in _net_names(parent):
+                return True
+            # 2) Shared with a SIBLING sheet (another child of the same parent)?
+            #    A net created in the parent and passed into two children, with no
+            #    parent-sheet component on it, lives only in the children. It still
+            #    must cross between them, so it needs a hierarchical label + sheet
+            #    pin in each child (and matching labels in the parent).
+            for sib in getattr(parent, "child_instances", []) or []:
+                if sib.get("sub_name") == self.circuit.name:
+                    continue
+                if net_name in _net_names(self.all_subcircuits.get(sib.get("sub_name"))):
+                    return True
+
+        # 3) Used by one of this sheet's own children?
         for child_info in getattr(self.circuit, "child_instances", []) or []:
             child_circ = self.all_subcircuits.get(child_info.get("sub_name"))
             if net_name in _net_names(child_circ):
@@ -1576,71 +1589,47 @@ class SchematicWriter:
             internal_net_names = []
 
             # Handle both dict and list forms of .nets
-            child_nets = (
+            child_nets = list(
                 child_circ.nets.values()
                 if isinstance(child_circ.nets, dict)
                 else child_circ.nets
             )
-            parent_nets = (
+            parent_nets = list(
                 self.circuit.nets.values()
                 if isinstance(self.circuit.nets, dict)
                 else self.circuit.nets
             )
 
-            # First try object identity (works when circuits are created directly in Python)
-            for child_net in child_nets:
-                is_shared = False
-                for parent_net in parent_nets:
-                    if parent_net is child_net:  # Same object reference!
-                        is_shared = True
-                        break
+            # A child net is exposed as a sheet pin if it crosses the child's
+            # boundary, i.e. it is shared with the parent OR with a sibling child.
+            # Object identity covers Python-built circuits; name covers JSON-loaded
+            # ones. Sibling sharing matters when a net is created in the parent and
+            # passed into two children with no parent-sheet component on it (it then
+            # lives only in the children but still must connect between them).
+            parent_net_ids = {id(n) for n in parent_nets}
+            parent_net_names = {n.name for n in parent_nets}
 
-                if is_shared:
+            sibling_net_names = set()
+            for sibling_info in self.circuit.child_instances:
+                if sibling_info["sub_name"] == sub_name:
+                    continue
+                sib = self.all_subcircuits.get(sibling_info["sub_name"])
+                if sib is None:
+                    continue
+                sib_nets = sib.nets.values() if isinstance(sib.nets, dict) else sib.nets
+                sibling_net_names.update(n.name for n in sib_nets)
+
+            for child_net in child_nets:
+                if (
+                    id(child_net) in parent_net_ids
+                    or child_net.name in parent_net_names
+                    or child_net.name in sibling_net_names
+                ):
                     shared_net_names.append(child_net.name)
                 else:
                     internal_net_names.append(child_net.name)
 
-            # If object identity found no shared nets but we have nets to check, fall back to name matching
-            # (needed when circuits are loaded from JSON, which creates new Net objects)
-            if not shared_net_names and list(parent_nets) and list(child_nets):
-                shared_net_names = []
-                internal_net_names = []
-
-                parent_net_names_set = {n.name for n in parent_nets}
-                for child_net in child_nets:
-                    if child_net.name in parent_net_names_set:
-                        shared_net_names.append(child_net.name)
-                    else:
-                        internal_net_names.append(child_net.name)
-
-            # Special case: If parent has NO nets, infer shared nets by looking at sibling circuits
-            # Nets that appear in multiple children are likely shared parameters
-            if not list(parent_nets) and list(child_nets):
-                shared_net_names = []
-                internal_net_names = []
-
-                # Collect nets from all sibling circuits
-                sibling_net_names = set()
-                for sibling_info in self.circuit.child_instances:
-                    if (
-                        sibling_info["sub_name"] != sub_name
-                    ):  # Don't include current child
-                        sibling_circ = self.all_subcircuits[sibling_info["sub_name"]]
-                        sibling_nets = (
-                            sibling_circ.nets.values()
-                            if isinstance(sibling_circ.nets, dict)
-                            else sibling_circ.nets
-                        )
-                        sibling_net_names.update(n.name for n in sibling_nets)
-
-                # Nets that appear in both this child AND siblings are likely shared
-                for child_net in child_nets:
-                    if child_net.name in sibling_net_names:
-                        shared_net_names.append(child_net.name)
-                    else:
-                        internal_net_names.append(child_net.name)
-
-            pin_list = sorted(shared_net_names)
+            pin_list = sorted(set(shared_net_names))
 
             # CRITICAL FIX: Also include the parameters from child circuit instances
             # For subcircuits that only contain other subcircuits (no components),
