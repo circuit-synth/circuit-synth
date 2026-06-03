@@ -49,6 +49,9 @@ class SheetDef:
 SHEET_SIZES = [
     SheetDef("A4", 297.0, 210.0, 12.7, 12.7, 284.48, 165.10),
     SheetDef("A3", 420.0, 297.0, 12.7, 12.7, 407.0, 277.0),
+    SheetDef("A2", 594.0, 420.0, 12.7, 12.7, 581.0, 400.0),
+    SheetDef("A1", 841.0, 594.0, 12.7, 12.7, 828.0, 574.0),
+    SheetDef("A0", 1189.0, 841.0, 12.7, 12.7, 1176.0, 821.0),
 ]
 
 
@@ -110,7 +113,7 @@ class TextFlowPlacer:
 
         # If we get here, even A3 overflowed
         raise ValueError(
-            f"Components do not fit on A3 sheet (largest supported size). "
+            f"Components do not fit on A0 sheet (largest supported size). "
             f"Reduce component count or implement larger sheet support."
         )
 
