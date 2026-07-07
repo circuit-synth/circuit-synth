@@ -1,0 +1,7 @@
+* PSpice-flavored test lib (typical vendor idioms): PARAMS:, VALUE={IF(...)}.
+* Rejected by ngspice's default mode; parses under `set ngbehavior=psa`.
+.SUBCKT PSTEST IN OUT PARAMS: GAIN=2
+.PARAM RVAL={1K}
+E1 OUT 0 VALUE = { IF( V(IN) > 0.5, V(IN)*GAIN, 0 ) }
+R1 OUT 0 {RVAL}
+.ENDS

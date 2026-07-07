@@ -367,13 +367,16 @@ class TestFileHandling:
         os.chmod(source_file, 0o444)
 
         try:
-            # On Unix systems, atomic rename can still work even if file is read-only
-            # as long as we own the directory
+            # On Unix the owner can rename over a read-only file (dir is writable),
+            # so update() succeeds. On Windows the read-only bit is enforced on the
+            # atomic rename, so update() raises PermissionError -- which is the
+            # documented behavior for a read-only file. Accept either outcome.
             rewriter = SourceRefRewriter(source_file, {"R": "R1"})
-            success = rewriter.update()
+            try:
+                success = rewriter.update()
+            except PermissionError:
+                success = False
 
-            # Should succeed on Unix (owner can rename files)
-            # Would fail on other systems with actual readonly enforcement
             if success:
                 assert 'ref="R1"' in source_file.read_text()
         finally:

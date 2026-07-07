@@ -8,6 +8,7 @@ Provides both automatic installation and manual setup instructions.
 
 import os
 import platform
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -20,6 +21,25 @@ from rich.prompt import Confirm
 from rich.text import Text
 
 console = Console()
+
+
+def _newest_kicad_version_dir(kicad_root: Path, default: str) -> str:
+    """Return the newest version subdir name under ``kicad_root``.
+
+    KiCad's Linux 3rdparty plugin directory is version-specific
+    (``~/.local/share/kicad/<ver>/3rdparty/plugins``). Detect the highest
+    installed version instead of hardcoding one, falling back to ``default``
+    when nothing is installed yet.
+    """
+    if kicad_root.is_dir():
+        versions = [
+            (tuple(int(p) for p in c.name.split(".")), c.name)
+            for c in kicad_root.iterdir()
+            if c.is_dir() and re.fullmatch(r"\d+(?:\.\d+)*", c.name)
+        ]
+        if versions:
+            return max(versions)[1]
+    return default
 
 
 def get_kicad_plugin_directories() -> Dict[str, Path]:
@@ -49,14 +69,10 @@ def get_kicad_plugin_directories() -> Dict[str, Path]:
             "system": Path("C:/Program Files/KiCad/share/kicad/scripting/plugins"),
         }
     else:  # Linux
+        kicad_root = Path.home() / ".local" / "share" / "kicad"
+        version = _newest_kicad_version_dir(kicad_root, default="9.0")
         return {
-            "user": Path.home()
-            / ".local"
-            / "share"
-            / "kicad"
-            / "8.0"
-            / "3rdparty"
-            / "plugins",
+            "user": kicad_root / version / "3rdparty" / "plugins",
             "system": Path("/usr/share/kicad/scripting/plugins"),
         }
 
@@ -129,48 +145,48 @@ def install_plugins_to_directory(source_dir: Path, target_dir: Path) -> bool:
             if source_file.exists():
                 shutil.copy2(source_file, target_file)
                 installed_files.append(plugin_file)
-                console.print(f"✅ Installed: {plugin_file}", style="green")
+                console.print(f"Installed: {plugin_file}", style="green")
             else:
-                console.print(f"⚠️  Missing source file: {plugin_file}", style="yellow")
+                console.print(f"Missing source file: {plugin_file}", style="yellow")
 
         if installed_files:
-            console.print(f"📁 Installed to: {target_dir}", style="cyan")
+            console.print(f"Installed to: {target_dir}", style="cyan")
             return True
         else:
-            console.print("❌ No plugin files were installed", style="red")
+            console.print("No plugin files were installed", style="red")
             return False
 
     except Exception as e:
-        console.print(f"❌ Installation failed: {e}", style="red")
+        console.print(f"Installation failed: {e}", style="red")
         return False
 
 
 def show_manual_instructions(plugin_dirs: Dict[str, Path], source_dir: Path):
     """Show manual installation instructions."""
-    console.print("\n📋 Manual Installation Instructions", style="bold yellow")
+    console.print("\nManual Installation Instructions", style="bold yellow")
 
     system = platform.system()
     plugin_files = get_plugin_files()
     files_list = " ".join(plugin_files)
 
-    console.print(f"\n📂 Source files located at: {source_dir}", style="cyan")
-    console.print(f"📄 Files to copy: {files_list}", style="dim")
+    console.print(f"\nSource files located at: {source_dir}", style="cyan")
+    console.print(f"Files to copy: {files_list}", style="dim")
 
     if system == "Darwin":  # macOS
-        console.print("\n🍎 macOS Installation:", style="bold")
+        console.print("\nmacOS Installation:", style="bold")
         console.print(f"cp {source_dir}/*.py \"{plugin_dirs['user']}\"", style="dim")
 
     elif system == "Windows":
-        console.print("\n🪟 Windows Installation:", style="bold")
+        console.print("\nWindows Installation:", style="bold")
         console.print(
             f"copy \"{source_dir}\\*.py\" \"{plugin_dirs['user']}\"", style="dim"
         )
 
     else:  # Linux
-        console.print("\n🐧 Linux Installation:", style="bold")
+        console.print("\nLinux Installation:", style="bold")
         console.print(f"cp {source_dir}/*.py \"{plugin_dirs['user']}\"", style="dim")
 
-    console.print(f"\n🎯 Target directory: {plugin_dirs['user']}", style="cyan")
+    console.print(f"\nTarget directory: {plugin_dirs['user']}", style="cyan")
 
 
 @click.command()
@@ -185,27 +201,27 @@ def main(manual: bool, system: bool):
 
     console.print(
         Panel.fit(
-            Text("🔌 Circuit-Synth KiCad Plugin Setup", style="bold blue"), style="blue"
+            Text("Circuit-Synth KiCad Plugin Setup", style="bold blue"), style="blue"
         )
     )
 
     # Check if KiCad is installed
     if not check_kicad_installation():
-        console.print("⚠️  KiCad not found on this system", style="yellow")
+        console.print("KiCad not found on this system", style="yellow")
         if not Confirm.ask("Continue with plugin setup anyway?"):
-            console.print("❌ Aborted", style="red")
+            console.print("Aborted", style="red")
             sys.exit(1)
     else:
-        console.print("✅ KiCad installation detected", style="green")
+        console.print("KiCad installation detected", style="green")
 
     # Find plugin source files
     source_dir = find_plugin_source_files()
     if not source_dir:
-        console.print("❌ Could not locate circuit-synth plugin files", style="red")
+        console.print("Could not locate circuit-synth plugin files", style="red")
         console.print("   Make sure circuit-synth is properly installed", style="dim")
         sys.exit(1)
 
-    console.print(f"📂 Found plugin files at: {source_dir}", style="green")
+    console.print(f"Found plugin files at: {source_dir}", style="green")
 
     # Get target directories
     plugin_dirs = get_kicad_plugin_directories()
@@ -217,14 +233,14 @@ def main(manual: bool, system: bool):
         return
 
     # Automatic installation
-    console.print(f"\n🎯 Installing to: {target_dir}", style="cyan")
+    console.print(f"\nInstalling to: {target_dir}", style="cyan")
 
     if system:
         console.print(
-            "⚠️  System installation requires administrator privileges", style="yellow"
+            "System installation requires administrator privileges", style="yellow"
         )
         if not Confirm.ask("Continue with system installation?"):
-            console.print("❌ Aborted", style="red")
+            console.print("Aborted", style="red")
             sys.exit(1)
 
     # Install plugins
@@ -233,23 +249,23 @@ def main(manual: bool, system: bool):
     if success:
         console.print(
             Panel.fit(
-                Text("✅ KiCad plugins installed successfully!", style="bold green")
-                + Text(f"\n\n📁 Location: {target_dir}")
-                + Text("\n🔄 Restart KiCad to activate the plugins")
-                + Text("\n\n🔧 Usage in KiCad:")
+                Text("KiCad plugins installed successfully!", style="bold green")
+                + Text(f"\n\nLocation: {target_dir}")
+                + Text("\nRestart KiCad to activate the plugins")
+                + Text("\n\nUsage in KiCad:")
                 + Text(
                     "\n   • PCB Editor: Tools → External Plugins → 'Circuit-Synth AI'"
                 )
                 + Text(
                     "\n   • Schematic Editor: Tools → Generate BOM → 'Circuit-Synth AI'"
                 ),
-                title="🎉 Success!",
+                title="Success!",
                 style="green",
             )
         )
     else:
-        console.print("\n❌ Plugin installation failed", style="red")
-        console.print("💡 Try manual installation:", style="yellow")
+        console.print("\nPlugin installation failed", style="red")
+        console.print("Try manual installation:", style="yellow")
         show_manual_instructions(plugin_dirs, source_dir)
         sys.exit(1)
 

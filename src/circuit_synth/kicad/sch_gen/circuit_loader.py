@@ -66,10 +66,34 @@ class Net:
 
     @staticmethod
     def from_dict(data: Dict[str, Any]) -> "Net":
-        """Create Net from dictionary representation."""
+        """Create Net from dictionary representation with auto-detection support."""
+        from circuit_synth.core.power_net_registry import is_power_net, get_power_symbol
+
         net = Net(data.get("name", ""))
-        net.is_power = data.get("is_power", False)
-        net.power_symbol = data.get("power_symbol")
+        net_name = data.get("name", "")
+
+        # Get explicit values from dict
+        explicit_is_power = data.get("is_power")
+        explicit_power_symbol = data.get("power_symbol")
+
+        # Auto-detect power nets if not explicitly specified
+        # This matches the behavior of circuit_synth.core.Net
+        if explicit_is_power is None and net_name:
+            # No explicit is_power value - try auto-detection
+            if is_power_net(net_name):
+                net.is_power = True
+                net.power_symbol = explicit_power_symbol or get_power_symbol(net_name)
+                logger.debug(
+                    f"Auto-detected power net '{net_name}' -> {net.power_symbol}"
+                )
+            else:
+                net.is_power = False
+                net.power_symbol = None
+        else:
+            # Explicit value provided - use it
+            net.is_power = explicit_is_power if explicit_is_power is not None else False
+            net.power_symbol = explicit_power_symbol
+
         net.trace_current = data.get("trace_current")
         net.impedance = data.get("impedance")
         net.properties = data.get("properties", {})
@@ -158,6 +182,20 @@ def load_circuit_hierarchy(json_file: str) -> (Circuit, Dict[str, Circuit]):
     logger.info(
         f"Finished building circuit hierarchy. Found {len(all_subcircuits)} unique subcircuit(s)."
     )
+
+    # Stage 22.9: warn (never fail) for any footprint id that doesn't exist in the
+    # installed KiCad libraries -- otherwise these only surface as ERC
+    # footprint_link_issues after generation. Skips silently with no KiCad install.
+    try:
+        from .footprint_check import check_footprints
+
+        all_components = [
+            comp for circ in all_subcircuits.values() for comp in circ.components
+        ]
+        check_footprints(all_components)
+    except Exception as e:  # defensive: a footprint check must never break generation
+        logger.debug(f"Footprint check skipped: {e}")
+
     return top_circuit, all_subcircuits
 
 
@@ -217,6 +255,21 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
         # Handle DNP special case: KiCad has built-in dnp attribute
         dnp_value = extract_dnp_value(comp_dict)
 
+        # Determine BOM inclusion (stage 17.4, G5). Precedence:
+        #   1. explicit Component(in_bom=False) kwarg (rides as a top-level field),
+        #   2. Simulation_SPICE:* stimulus symbols (e.g. an ISIN current source) are
+        #      simulation-only, not physical BOM parts -> exclude natively,
+        #   3. DNP.
+        # Excluded parts get KiCad's native (in_bom no) so `kicad-cli sch export bom`
+        # drops them without a post-filter.
+        explicit_in_bom = comp_dict.get("in_bom", None)
+        if explicit_in_bom is not None:
+            in_bom_flag = bool(explicit_in_bom) and not dnp_value
+        elif symbol_id.startswith("Simulation_SPICE:"):
+            in_bom_flag = False
+        else:
+            in_bom_flag = not dnp_value
+
         # Create SchematicSymbol with properties
         # NOTE: kicad-sch-api SchematicSymbol doesn't support dnp parameter yet
         # DNP is written as a property for now. in_bom/on_board flags can be set based on DNP.
@@ -230,7 +283,7 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             properties=properties,  # FIXED: Use extracted properties instead of hardcoded
             pins=[],
             uuid=str(uuid_module.uuid4()),
-            in_bom=not dnp_value,  # If DNP, exclude from BOM
+            in_bom=in_bom_flag,
             on_board=not dnp_value,  # If DNP, exclude from board
         )
 
@@ -266,7 +319,7 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             # Create Net with metadata using from_dict
             net_dict = {
                 "name": net_name,
-                "is_power": net_info.get("is_power", False),
+                "is_power": net_info.get("is_power"),  # Don't use False as default - let from_dict() auto-detect
                 "power_symbol": net_info.get("power_symbol"),
                 "trace_current": net_info.get("trace_current"),
                 "impedance": net_info.get("impedance"),
@@ -274,33 +327,35 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             }
             net_obj = Net.from_dict(net_dict)
 
-        # Parse connections and add them to the net
+        # Parse connections and add them to the net.
+        # Deduplicate: circuit-synth emits each node twice in the JSON.
+        seen_connections: set = set()
         for conn in connections:
             comp_ref = conn["component"]
             pin_data = conn["pin"]
 
-            # Enhanced pin identification - store the most specific identifier available
+            # Pin identification for label placement. Use the pin NUMBER first:
+            # it is unique per component, whereas a NAME is shared by every pin
+            # of the same function (VDD/VDDQ, OUT, PGND, ...). Resolving by name
+            # makes find_pin_by_identifier() return the first match, so all those
+            # pins collapse onto one coordinate and only one gets a label/wire —
+            # the rest float. The number keeps each physical pin distinct.
             pin_identifier = None
-
-            # First check if name is available (most specific)
-            if "name" in pin_data and pin_data["name"] != "~":
-                pin_identifier = pin_data["name"]
-                logger.debug(
-                    f"Using pin name '{pin_identifier}' for {comp_ref} in net {net_name}"
-                )
-            # Then check for number
-            elif "number" in pin_data:
+            if "number" in pin_data and str(pin_data["number"]) not in ("", "~"):
                 pin_identifier = str(pin_data["number"])
-                logger.debug(
-                    f"Using pin number '{pin_identifier}' for {comp_ref} in net {net_name}"
-                )
-            # Finally fall back to pin_id
+            elif "name" in pin_data and pin_data["name"] not in ("~", ""):
+                pin_identifier = pin_data["name"]
             else:
                 pin_identifier = str(pin_data.get("pin_id", ""))
-                logger.debug(
-                    f"Using pin ID '{pin_identifier}' for {comp_ref} in net {net_name}"
-                )
+            logger.debug(
+                f"Using pin id '{pin_identifier}' for {comp_ref} in net {net_name}"
+            )
 
+            conn_key = (comp_ref, pin_identifier)
+            if conn_key in seen_connections:
+                logger.debug(f"Skipping duplicate connection: {comp_ref}.{pin_identifier} in net {net_name}")
+                continue
+            seen_connections.add(conn_key)
             net_obj.connections.append((comp_ref, pin_identifier))
             logger.debug(
                 f"Added connection: {comp_ref}.{pin_identifier} to net {net_name}"

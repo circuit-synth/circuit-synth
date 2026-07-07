@@ -9,6 +9,13 @@ import tempfile
 from pathlib import Path
 
 import pytest
+
+# The PCB backend is an optional dependency; skip cleanly when it isn't installed.
+pytest.importorskip(
+    "kicad_pcb_api", reason="optional kicad_pcb_api PCB backend not installed"
+)
+pytestmark = pytest.mark.requires_pcb
+
 from kicad_pcb_api import PCBBoard
 
 from circuit_synth.kicad.pcb_gen.pcb_synchronizer import PCBSynchronizer, PCBSyncReport
@@ -38,9 +45,7 @@ class TestPCBSynchronizerBasics:
 
         # Initialize synchronizer
         sync = PCBSynchronizer(
-            pcb_path=str(pcb_path),
-            project_dir=tmp_path,
-            project_name=project_name
+            pcb_path=str(pcb_path), project_dir=tmp_path, project_name=project_name
         )
 
         assert sync.pcb_path == pcb_path
@@ -54,9 +59,7 @@ class TestPCBSynchronizerBasics:
 
         with pytest.raises(FileNotFoundError):
             PCBSynchronizer(
-                pcb_path=str(pcb_path),
-                project_dir=tmp_path,
-                project_name="test"
+                pcb_path=str(pcb_path), project_dir=tmp_path, project_name="test"
             )
 
 
@@ -167,7 +170,7 @@ class TestComponentMatching:
             x=100.0,
             y=100.0,
             rotation=0.0,
-            value="10k"
+            value="10k",
         )
         pcb.save(str(pcb_path))
 
@@ -309,7 +312,7 @@ class TestRemoveDeletedFootprints:
             x=100.0,
             y=100.0,
             rotation=0.0,
-            value="10k"
+            value="10k",
         )
         pcb.save(str(pcb_path))
 
@@ -366,7 +369,7 @@ class TestPositionPreservation:
             x=original_x,
             y=original_y,
             rotation=0.0,
-            value="10k"
+            value="10k",
         )
         pcb.save(str(pcb_path))
 
@@ -442,7 +445,9 @@ class TestPositionPreservation:
         # Run synchronization
         sync = PCBSynchronizer(str(pcb_path), tmp_path, project_name)
         sch_components = sync._extract_components_from_schematics()
-        matches = sync._match_components(sch_components, sync._get_existing_footprints())
+        matches = sync._match_components(
+            sch_components, sync._get_existing_footprints()
+        )
         report = PCBSyncReport()
         sync._update_existing_footprints(sch_components, matches, report)
 
@@ -474,7 +479,7 @@ class TestValueUpdate:
             x=original_x,
             y=original_y,
             rotation=0.0,
-            value="10k"
+            value="10k",
         )
         pcb.save(str(pcb_path))
 
@@ -550,7 +555,9 @@ class TestValueUpdate:
         # Run synchronization
         sync = PCBSynchronizer(str(pcb_path), tmp_path, project_name)
         sch_components = sync._extract_components_from_schematics()
-        matches = sync._match_components(sch_components, sync._get_existing_footprints())
+        matches = sync._match_components(
+            sch_components, sync._get_existing_footprints()
+        )
         report = PCBSyncReport()
         sync._update_existing_footprints(sch_components, matches, report)
         sync.pcb.save(str(pcb_path))

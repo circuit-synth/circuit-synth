@@ -2,6 +2,7 @@
 Local KiCad installation library source
 """
 
+import logging
 import os
 import re
 import subprocess
@@ -11,6 +12,8 @@ from typing import List, Optional
 
 from ..models import ComponentSearchResult, LibrarySource, SearchQuery
 from .base import BaseLibrarySource
+
+logger = logging.getLogger(__name__)
 
 
 class LocalKiCadSource(BaseLibrarySource):

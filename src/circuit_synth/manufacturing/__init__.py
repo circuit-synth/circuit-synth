@@ -9,6 +9,17 @@ This module provides integrations with various PCB manufacturers and component s
 - oshpark/: OSH Park manufacturing services (future)
 """
 
+from .availability import (
+    AvailabilityReport,
+    PartAvailability,
+    check_availability,
+)
 from .unified_search import UnifiedComponentSearch, find_parts
 
-__all__ = ["UnifiedComponentSearch", "find_parts"]
+__all__ = [
+    "UnifiedComponentSearch",
+    "find_parts",
+    "check_availability",
+    "AvailabilityReport",
+    "PartAvailability",
+]

@@ -16,14 +16,14 @@ class Circuit(Enum):
     RESISTOR_DIVIDER = (
         "resistor_divider",
         "Resistor Divider",
-        "Beginner ⭐",
+        "Beginner",
         "5V → 3.3V logic level shifter",
         "base_circuits",
     )
     LED_BLINKER = (
         "led_blinker",
         "LED Blinker",
-        "Beginner ⭐",
+        "Beginner",
         "LED with current limiting resistor",
         "base_circuits",
     )
@@ -32,21 +32,21 @@ class Circuit(Enum):
     VOLTAGE_REGULATOR = (
         "voltage_regulator",
         "Voltage Regulator",
-        "Intermediate ⭐⭐",
+        "Intermediate",
         "AMS1117-3.3 linear regulator with decoupling",
         "base_circuits",
     )
     USB_C_BASIC = (
         "usb_c_basic",
         "USB-C Basic Circuit",
-        "Intermediate ⭐⭐",
+        "Intermediate",
         "USB-C connector with CC resistors",
         "example_circuits",
     )
     POWER_SUPPLY = (
         "power_supply_module",
         "Power Supply Module",
-        "Intermediate ⭐⭐",
+        "Intermediate",
         "Dual-rail 5V/3.3V power supply",
         "example_circuits",
     )
@@ -55,14 +55,14 @@ class Circuit(Enum):
     ESP32_DEV_BOARD = (
         "esp32_dev_board",
         "ESP32-C6 Dev Board",
-        "Advanced ⭐⭐⭐",
+        "Advanced",
         "Minimal ESP32 integration example",
         "example_circuits",
     )
     STM32_MINIMAL = (
         "stm32_minimal",
         "STM32 Minimal Board",
-        "Advanced ⭐⭐⭐",
+        "Advanced",
         "STM32F411 with USB, crystal, and SWD debug",
         "example_circuits",
     )

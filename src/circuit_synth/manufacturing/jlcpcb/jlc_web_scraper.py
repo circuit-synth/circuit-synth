@@ -44,27 +44,43 @@ class JlcWebScraper:
         )
 
     def search_components(
-        self, search_term: str, max_results: int = 50
+        self,
+        search_term: str,
+        max_results: int = 50,
+        allow_demo_data: bool = False,
     ) -> List[Dict[str, Any]]:
         """
         Search for components on JLCPCB website.
 
+        JLCPCB renders results client-side, so this scraper cannot actually
+        extract live data -- it only has canned *demo* rows. To avoid demo data
+        masquerading as real availability, it returns an empty list by default
+        and logs a warning. Pass ``allow_demo_data=True`` to opt into the demo
+        rows (each tagged ``"demo_data": True``) for offline development/tests.
+        Use ``JlcPartsInterface`` (the credentialed JLC API) for real data.
+
         Args:
             search_term: Search query (e.g., "STM32G0")
             max_results: Maximum number of results to return
+            allow_demo_data: Return canned demo rows instead of an empty list.
 
         Returns:
-            List of component dictionaries with available data
+            List of component dictionaries (empty unless ``allow_demo_data``).
         """
         try:
-            logger.info(f"Searching JLCPCB for: {search_term}")
+            if not allow_demo_data:
+                logger.warning(
+                    "JLCPCB web scraper cannot fetch live data (client-side "
+                    "rendering); returning no results for '%s'. Use the "
+                    "credentialed JLC API (JlcPartsInterface) for real "
+                    "availability, or pass allow_demo_data=True for demo rows.",
+                    search_term,
+                )
+                return []
 
-            # Since JLCPCB uses client-side rendering, we'll return realistic demo data
-            # that matches the expected format. In production, this would use their API
-            # or browser automation tools like Selenium/Playwright.
+            logger.info(f"Searching JLCPCB (DEMO DATA) for: {search_term}")
             components = self._get_demo_components(search_term, max_results)
-
-            logger.info(f"Found {len(components)} components for '{search_term}'")
+            logger.info(f"Found {len(components)} demo components for '{search_term}'")
             return components
 
         except Exception as e:
@@ -349,21 +365,29 @@ class JlcWebScraper:
                 }
             ]
 
+        # Tag every row so downstream consumers can never mistake demo data for
+        # live availability.
+        for row in demo_data:
+            row["demo_data"] = True
+
         return demo_data[:max_results]
 
     def get_most_available_component(
-        self, search_term: str
+        self, search_term: str, allow_demo_data: bool = False
     ) -> Optional[Dict[str, Any]]:
         """
         Find the component with highest stock for given search term.
 
         Args:
             search_term: Search query
+            allow_demo_data: Forwarded to :meth:`search_components`.
 
         Returns:
             Component with highest stock or None
         """
-        components = self.search_components(search_term, max_results=100)
+        components = self.search_components(
+            search_term, max_results=100, allow_demo_data=allow_demo_data
+        )
 
         if not components:
             return None
@@ -377,20 +401,27 @@ class JlcWebScraper:
 
 
 def search_jlc_components_web(
-    search_term: str, max_results: int = 20
+    search_term: str, max_results: int = 20, allow_demo_data: bool = False
 ) -> List[Dict[str, Any]]:
     """
     Convenience function to search JLC components via web scraping.
 
+    Returns an empty list by default (the scraper has no live data source);
+    pass ``allow_demo_data=True`` for offline demo rows. See
+    :meth:`JlcWebScraper.search_components`.
+
     Args:
         search_term: Component to search for
         max_results: Maximum results to return
+        allow_demo_data: Return canned demo rows instead of an empty list.
 
     Returns:
         List of component data dictionaries
     """
     scraper = JlcWebScraper(delay_seconds=1.0)
-    return scraper.search_components(search_term, max_results)
+    return scraper.search_components(
+        search_term, max_results, allow_demo_data=allow_demo_data
+    )
 
 
 def get_component_availability_web(search_term: str) -> Optional[Dict[str, Any]]:
@@ -451,8 +482,8 @@ if __name__ == "__main__":
 
     print("Testing JLC web scraper...")
 
-    # Test search
-    results = search_jlc_components_web("STM32G0", max_results=5)
+    # Test search (demo data explicitly opted in for this standalone demo)
+    results = search_jlc_components_web("STM32G0", max_results=5, allow_demo_data=True)
     print(f"Found {len(results)} components")
 
     for i, component in enumerate(results):

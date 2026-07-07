@@ -3,11 +3,14 @@ Configuration management for library sourcing
 """
 
 import json
+import logging
 import os
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 from .models import LibrarySource, SourceConfig
+
+logger = logging.getLogger(__name__)
 
 
 class LibrarySourceConfig:
@@ -153,14 +156,12 @@ class LibrarySourceConfig:
         digikey_ok = self.is_source_configured(LibrarySource.DIGIKEY_API)
 
         instructions.append("## Current Status")
+        instructions.append(f"- Local KiCad: {'Ready' if local_ok else 'Not found'}")
         instructions.append(
-            f"- Local KiCad: {'✅ Ready' if local_ok else '❌ Not found'}"
+            f"- SnapEDA: {'Configured' if snapeda_ok else 'Setup needed'}"
         )
         instructions.append(
-            f"- SnapEDA: {'✅ Configured' if snapeda_ok else '⚙️ Setup needed'}"
-        )
-        instructions.append(
-            f"- DigiKey: {'✅ Configured' if digikey_ok else '⚙️ Setup needed'}"
+            f"- DigiKey: {'Configured' if digikey_ok else 'Setup needed'}"
         )
         instructions.append("")
 

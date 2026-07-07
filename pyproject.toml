@@ -77,6 +77,14 @@ claude = [
     # Claude Code SDK integration for AI-powered circuit design
     "claude-code-sdk>=0.0.17",
 ]
+skidl = [
+    # Optional SKiDL render backend (Stage 13): pretty wire-routed schematics.
+    # circuit_synth never imports skidl in-process -- the render runs in a
+    # separate interpreter via subprocess -- so this is only needed in the
+    # interpreter that does the rendering. May instead be an editable install
+    # of the local skidl fork; see workingdocs/plans/stage-13-skidl-render-adapter.md.
+    "skidl>=2.2.3",
+]
 fast_generation = [
     # Fast generation with Google ADK (optional)
     "google-adk>=0.1.0",
@@ -109,9 +117,9 @@ validate-kicad = "circuit_synth.core.kicad_validator:main"
 
 # Claude Code Integration
 setup-claude-integration = "circuit_synth.tools.development.setup_claude:main"
-register-agents = "circuit_synth.ai_integration.claude.agent_registry:main"
 validate-circuit = "circuit_synth.ai_integration.validation.real_time_check:main"
 cs-new-project = "circuit_synth.tools.project_management.new_project:main"
+cs-bootstrap = "circuit_synth.tools.project_management.bootstrap:main"
 cs-init-pcb = "circuit_synth.tools.project_management.init_pcb:main"
 cs-init-existing-project = "circuit_synth.tools.project_management.init_existing_project:main"
 cs-setup-kicad-plugins = "circuit_synth.tools.development.setup_kicad_plugins:main"
@@ -169,13 +177,21 @@ circuit_synth = [
     "data/templates/example_project/**/**/**/*",
     # Explicitly include hidden files in .claude directory
     "data/templates/example_project/.claude/**/*",
+    "data/templates/example_project/.claude/skills/*/*.md",
+    # Dot-files and tool helpers are NOT matched by the **/* globs above
+    # (setuptools glob does not match leading-dot names), so list them explicitly.
+    "data/templates/example_project/.mcp.json",
+    "data/templates/example_project/tools/*.py",
     # Explicitly include Python source files in circuit-synth directory
     "data/templates/example_project/circuit-synth/*.py",
     "data/templates/project_template/*",
     "data/templates/project_template/circuit-synth/*",
     "data/templates/project_template/.claude/*",
     "data/templates/project_template/.claude/agents/*/*",
-    "data/templates/project_template/.claude/commands/*/*"
+    "data/templates/project_template/.claude/commands/*/*",
+    # Standalone skills shipped for install into ~/.claude/skills (e.g. the
+    # new-kicad-project bootstrapper, which necessarily lives outside any project).
+    "data/skills/*/*.md"
 ]
 
 # Include all Python module files
@@ -226,6 +242,8 @@ markers = [
     "asyncio: marks tests as async/await tests",
     "functional: marks tests as functional tests",
     "cache: marks tests as cache-related tests",
+    "requires_pcb: needs the optional kicad_pcb_api PCB backend (skipped if absent)",
+    "requires_skidl: needs a skidl-capable interpreter for the SKiDL render backend (Stage 13; skipped if CIRCUIT_SYNTH_SKIDL_PYTHON / .venv-skidl absent)",
 ]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"

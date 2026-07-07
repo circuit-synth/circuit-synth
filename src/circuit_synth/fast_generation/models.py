@@ -116,16 +116,16 @@ class OpenRouterModel:
 
     def _get_pin_information(self, components: List[str]) -> str:
         """Get pin information for components using pin finder"""
-        logger.info(f"🔍 Finding pin information for {len(components)} components")
+        logger.info(f"Finding pin information for {len(components)} components")
 
         pin_info_parts = []
         for symbol in components:
             try:
                 pin_info = pin_finder.get_pin_info_for_ai(symbol)
                 pin_info_parts.append(f"\n{pin_info}")
-                logger.debug(f"✅ Found pins for {symbol}")
+                logger.debug(f"Found pins for {symbol}")
             except Exception as e:
-                error_msg = f"❌ Could not find pins for {symbol}: {e}"
+                error_msg = f"Could not find pins for {symbol}: {e}"
                 pin_info_parts.append(error_msg)
                 logger.warning(error_msg)
 
@@ -143,9 +143,9 @@ CRITICAL REQUIREMENTS:
 5. Include proper @circuit decorator and function structure
 6. Use correct pin connection syntax: component["pin_name"] += net
 
-⚠️  NEVER GUESS PIN NAMES - Use only pins listed in PIN INFORMATION section below!
+NEVER GUESS PIN NAMES - Use only pins listed in PIN INFORMATION section below!
 
-📚 REFERENCE CIRCUITS: Study these working examples for proper syntax:
+REFERENCE CIRCUITS: Study these working examples for proper syntax:
 - ESP32 Basic: /src/circuit_synth/fast_generation/reference_circuits/esp32_basic.py
 - ESP32 Sensor: /src/circuit_synth/fast_generation/reference_circuits/esp32_sensor.py  
 - STM32 Basic: /src/circuit_synth/fast_generation/reference_circuits/stm32_basic.py
@@ -181,7 +181,7 @@ if __name__ == "__main__":
         placement_algorithm="hierarchical", 
         generate_pcb=True
     )
-    print("✅ KiCad project generated!")
+    print("KiCad project generated!")
 ```
 
 VERIFIED WORKING COMPONENTS:
@@ -218,13 +218,13 @@ GENERATE COMPLETE WORKING CODE WITH:
         # Add exact pin information if available - make it very prominent
         if "pin_information" in context and context["pin_information"]:
             base_msg += f"\n\n{'='*80}"
-            base_msg += f"\n🔥 MANDATORY PIN INFORMATION - USE THESE EXACT NAMES ONLY!"
+            base_msg += f"\nMANDATORY PIN INFORMATION - USE THESE EXACT NAMES ONLY!"
             base_msg += f"\n{'='*80}"
             base_msg += f"\n{context['pin_information']}"
             base_msg += f"\n{'='*80}"
-            base_msg += f"\n⚠️  CRITICAL: Use ONLY the pin names listed above!"
+            base_msg += f"\nCRITICAL: Use ONLY the pin names listed above!"
             base_msg += (
-                f"\n⚠️  Example: mpu6050['VDD'] += power_net (NOT mpu6050['VCC'])"
+                f"\nExample: mpu6050['VDD'] += power_net (NOT mpu6050['VCC'])"
             )
             base_msg += f"\n{'='*80}"
 

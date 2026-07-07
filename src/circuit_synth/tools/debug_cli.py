@@ -37,7 +37,7 @@ class DebugCLI:
     ):
         """Start a new debugging session"""
         self.current_session = self.debugger.start_session(board_name, board_version)
-        print(f"✅ Started debugging session for {board_name} v{board_version}")
+        print(f"Started debugging session for {board_name} v{board_version}")
         print(f"   Session ID: {self.current_session.session_id}")
 
         if symptoms:
@@ -50,16 +50,16 @@ class DebugCLI:
     def add_symptom(self, symptom: str):
         """Add a symptom to current session"""
         if not self.current_session:
-            print("❌ No active debugging session. Use 'start' first.")
+            print("No active debugging session. Use 'start' first.")
             return
 
         self.current_session.add_symptom(symptom)
-        print(f"✅ Added symptom: {symptom}")
+        print(f"Added symptom: {symptom}")
 
     def add_measurement(self, name: str, value: str, unit: str = "", notes: str = ""):
         """Add a measurement to current session"""
         if not self.current_session:
-            print("❌ No active debugging session. Use 'start' first.")
+            print("No active debugging session. Use 'start' first.")
             return
 
         # Try to parse value as float
@@ -69,20 +69,20 @@ class DebugCLI:
             parsed_value = value
 
         self.current_session.add_measurement(name, parsed_value, unit, notes)
-        print(f"✅ Added measurement: {name} = {value}{unit}")
+        print(f"Added measurement: {name} = {value}{unit}")
 
     def analyze(self):
         """Analyze current symptoms and measurements"""
         if not self.current_session:
-            print("❌ No active debugging session. Use 'start' first.")
+            print("No active debugging session. Use 'start' first.")
             return
 
-        print("\n🔍 Analyzing symptoms and measurements...\n")
+        print("\nAnalyzing symptoms and measurements...\n")
 
         # Categorize symptoms
         categories = self.analyzer.categorize_symptoms(self.current_session.symptoms)
         if categories:
-            print("📊 Symptom Categories:")
+            print("Symptom Categories:")
             for category, symptoms in categories.items():
                 print(f"   {category.upper()}: {', '.join(symptoms)}")
             print()
@@ -91,12 +91,12 @@ class DebugCLI:
         issues = self.debugger.analyze_symptoms(self.current_session)
 
         if issues:
-            print(f"🔧 Identified {len(issues)} potential issues:\n")
+            print(f"Identified {len(issues)} potential issues:\n")
             for i, issue in enumerate(issues, 1):
                 self._print_issue(i, issue)
         else:
             print(
-                "ℹ️  No specific issues identified yet. Add more symptoms or measurements."
+                "No specific issues identified yet. Add more symptoms or measurements."
             )
 
         # Search knowledge base
@@ -105,18 +105,18 @@ class DebugCLI:
                 self.current_session.symptoms
             )
             if patterns:
-                print("\n📚 Similar Historical Patterns:")
+                print("\nSimilar Historical Patterns:")
                 for pattern, similarity in patterns[:3]:
                     print(
-                        f"\n   🔹 {pattern.root_cause} (similarity: {similarity:.0%})"
+                        f"\n   {pattern.root_cause} (similarity: {similarity:.0%})"
                     )
                     print(f"      Solutions: {', '.join(pattern.solutions[:2])}")
 
     def _print_issue(self, num: int, issue):
         """Print a formatted issue"""
-        severity_icons = {"critical": "🔴", "high": "🟠", "medium": "🟡", "low": "🟢"}
+        severity_icons = {"critical": "", "high": "", "medium": "", "low": ""}
 
-        icon = severity_icons.get(issue.severity.value, "⚪")
+        icon = severity_icons.get(issue.severity.value, "")
         print(f"{num}. {icon} [{issue.severity.value.upper()}] {issue.title}")
         print(f"   Category: {issue.category.value}")
         print(f"   Confidence: {issue.confidence:.0%}")
@@ -135,18 +135,18 @@ class DebugCLI:
         if issue.solutions:
             print(f"   Potential Solutions:")
             for solution in issue.solutions[:2]:
-                print(f"      ✓ {solution}")
+                print(f"      {solution}")
         print()
 
     def suggest_tests(self):
         """Suggest next debugging steps"""
         if not self.current_session:
-            print("❌ No active debugging session. Use 'start' first.")
+            print("No active debugging session. Use 'start' first.")
             return
 
         suggestions = self.debugger.suggest_next_test(self.current_session)
 
-        print("\n🎯 Suggested Next Steps:\n")
+        print("\nSuggested Next Steps:\n")
         for i, suggestion in enumerate(suggestions, 1):
             print(f"{i}. {suggestion}")
 
@@ -159,7 +159,7 @@ class DebugCLI:
         }
 
         if issue_type not in trees:
-            print(f"❌ Unknown issue type. Available: {', '.join(trees.keys())}")
+            print(f"Unknown issue type. Available: {', '.join(trees.keys())}")
             return
 
         tree = trees[issue_type]()
@@ -170,7 +170,7 @@ class DebugCLI:
         patterns = self.knowledge_base.search_patterns(keywords)
 
         if patterns:
-            print(f"\n📚 Found {len(patterns)} historical patterns:\n")
+            print(f"\nFound {len(patterns)} historical patterns:\n")
             for pattern, similarity in patterns:
                 print(f"Pattern: {pattern.root_cause}")
                 print(f"Similarity: {similarity:.0%}")
@@ -186,11 +186,11 @@ class DebugCLI:
     def close_session(self, resolution: str, root_cause: str):
         """Close current debugging session"""
         if not self.current_session:
-            print("❌ No active debugging session.")
+            print("No active debugging session.")
             return
 
         self.debugger.close_session(self.current_session, resolution, root_cause)
-        print(f"✅ Session closed successfully")
+        print(f"Session closed successfully")
         print(f"   Root Cause: {root_cause}")
         print(f"   Resolution: {resolution}")
 
@@ -205,14 +205,14 @@ class DebugCLI:
     def export_session(self, filename: str):
         """Export current session to file"""
         if not self.current_session:
-            print("❌ No active debugging session.")
+            print("No active debugging session.")
             return
 
         output_path = Path(filename)
         with open(output_path, "w") as f:
             json.dump(self.current_session.to_dict(), f, indent=2)
 
-        print(f"✅ Session exported to {output_path}")
+        print(f"Session exported to {output_path}")
 
 
 def main():
@@ -276,7 +276,7 @@ def main():
 
     if args.interactive or not args.command:
         # Interactive mode
-        print("🔧 Circuit Debugging Assistant - Interactive Mode")
+        print("Circuit Debugging Assistant - Interactive Mode")
         print("Type 'help' for available commands or 'quit' to exit\n")
 
         while True:

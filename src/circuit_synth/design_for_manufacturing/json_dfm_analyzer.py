@@ -86,7 +86,7 @@ class DFMAnalysisResult:
             lines.append(f"  BOM Cost @ Qty 1000: ${self.bom_cost_qty_1000:.2f}")
 
         if not self.bom_cost_qty_1:
-            lines.append("  ⚠️  No pricing data available (DigiKey API required)")
+            lines.append("  No pricing data available (DigiKey API required)")
 
         if self.components_without_pricing:
             lines.append(
@@ -103,7 +103,7 @@ class DFMAnalysisResult:
         if self.manufacturing_issues:
             lines.append(f"MANUFACTURING ISSUES: {len(self.manufacturing_issues)}")
             if self.critical_issues > 0:
-                lines.append(f"  ⚠️  Critical Issues: {self.critical_issues}")
+                lines.append(f"  Critical Issues: {self.critical_issues}")
             for issue in self.manufacturing_issues[:3]:
                 lines.append(f"  • {issue.get('description', 'Issue')}")
         lines.append("")

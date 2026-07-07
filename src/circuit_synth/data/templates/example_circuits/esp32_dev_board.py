@@ -102,48 +102,41 @@ if __name__ == "__main__":
     project_result = circuit_obj.generate_kicad_project(
         project_name="esp32_simple",
         placement_algorithm="hierarchical",
-        generate_pcb=True,
+        generate_pcb=False,
     )
 
-    print("✅ ESP32-C6 simple circuit generated!")
-    print("📁 Open in KiCad: esp32_simple/esp32_simple.kicad_pro")
+    print("ESP32-C6 simple circuit generated!")
+    print("Open in KiCad: esp32_simple/esp32_simple.kicad_pro")
     print()
 
-    # Generate manufacturing files (BOM, PDF, Gerbers)
-    print("📦 Generating manufacturing files...")
+    # Generate manufacturing files (BOM and PDF)
+    print("Generating manufacturing files...")
     print()
 
     # Generate BOM for component ordering
     bom_result = circuit_obj.generate_bom(project_name="esp32_simple")
     if bom_result["success"]:
-        print(f"✅ BOM generated: {bom_result['file']}")
+        print(f"BOM generated: {bom_result['file']}")
         print(f"   Components: {bom_result['component_count']}")
     else:
-        print(f"⚠️  BOM generation failed: {bom_result.get('error')}")
+        print(f"BOM generation failed: {bom_result.get('error')}")
     print()
 
     # Generate PDF schematic for documentation
     pdf_result = circuit_obj.generate_pdf_schematic(project_name="esp32_simple")
     if pdf_result["success"]:
-        print(f"✅ PDF schematic generated: {pdf_result['file']}")
+        print(f"PDF schematic generated: {pdf_result['file']}")
     else:
-        print(f"⚠️  PDF generation failed: {pdf_result.get('error')}")
+        print(f"PDF generation failed: {pdf_result.get('error')}")
     print()
 
-    # Generate Gerber files for manufacturing
-    gerber_result = circuit_obj.generate_gerbers(project_name="esp32_simple")
-    if gerber_result["success"]:
-        print(f"✅ Gerber files generated: {gerber_result['output_dir']}")
-        print(f"   Gerber files: {len(gerber_result['gerber_files'])}")
-        if gerber_result["drill_files"]:
-            print(f"   Drill files: {gerber_result['drill_files']}")
-    else:
-        print(f"⚠️  Gerber generation failed: {gerber_result.get('error')}")
+    # NOTE: Gerber/PCB export is not available in this build (licensed feature
+    # of upstream circuit-synth). Tracked as a wishlist item in TODO.md.
     print()
 
-    print("⚠️  WARNING: This is a minimal example!")
+    print("WARNING: This is a minimal example!")
     print()
-    print("📝 Missing components for a complete dev board:")
+    print("Missing components for a complete dev board:")
     print("   • USB-C connector with CC resistors")
     print("   • 3.3V voltage regulator (AMS1117-3.3 or similar)")
     print("   • Programming interface (USB-Serial bridge)")
@@ -151,10 +144,10 @@ if __name__ == "__main__":
     print("   • Status LED")
     print("   • Additional GPIO connections")
     print()
-    print("💡 For a complete hierarchical design, see:")
+    print("For a complete hierarchical design, see:")
     print("   src/circuit_synth/data/templates/example_project/")
     print()
-    print("🔧 To make this work:")
+    print("To make this work:")
     print("   1. Add USB-C interface for power and programming")
     print("   2. Add voltage regulator for 5V→3.3V")
     print("   3. Add USB-to-Serial bridge (CH340, CP2102, etc.)")

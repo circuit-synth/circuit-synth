@@ -394,13 +394,32 @@ def _flatten_symbol(
 
     Also merges in sub_symbols’ pins/graphics.
     """
-    # gather all pins
-    pins = list(sym_data["pins"])
+    # gather all pins, tagging each with its KiCad unit number.
+    # Sub-symbol names follow "SymbolName_<unit>_<style>" (e.g. "74LS74_2_0" => unit 2).
+    # Top-level pins (rare for multi-unit parts) are tagged unit 0 = common-to-all-units.
+    # The unit tag is required downstream so per-unit labels land on the correct unit
+    # body instead of all stacking on unit 1's position (multi-unit short bug).
+    pins = []
+    for _p in sym_data["pins"]:
+        _p = dict(_p)
+        _p.setdefault("unit", 0)
+        pins.append(_p)
     graphics = list(sym_data["graphics"])
 
     # Add sub_symbols pins/graphics
     for sub_s in sym_data.get("sub_symbols", []):
-        pins.extend(sub_s["pins"])
+        sub_name = sub_s.get("sub_name", "")
+        sub_unit = 0
+        parts = sub_name.rsplit("_", 2)
+        if len(parts) == 3:
+            try:
+                sub_unit = int(parts[1])
+            except ValueError:
+                sub_unit = 0
+        for _p in sub_s["pins"]:
+            _p = dict(_p)
+            _p["unit"] = sub_unit
+            pins.append(_p)
         graphics.extend(sub_s["graphics"])
 
     # Calculate unit_count from sub_symbols

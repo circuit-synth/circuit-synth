@@ -11,8 +11,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from ..core import Component, Net, circuit
-from ..manufacturing.jlcpcb import search_jlc_components_web
+from circuit_synth.core import Component, Net, circuit
+from circuit_synth.manufacturing.jlcpcb import search_jlc_components_web
 
 
 class CircuitCreatorAgent:
@@ -87,8 +87,8 @@ class CircuitCreatorAgent:
         Returns:
             Dictionary with circuit creation results
         """
-        print(f"🎯 Creating circuit from requirements...")
-        print(f"📋 Requirements: {requirements}")
+        print(f"Creating circuit from requirements...")
+        print(f"Requirements: {requirements}")
 
         # Validate requirements
         validation_result = self.validate_requirements(requirements)
@@ -215,7 +215,7 @@ class CircuitCreatorAgent:
                         }
                     )
             except Exception as e:
-                print(f"⚠️  Could not search for {term}: {e}")
+                print(f"Could not search for {term}: {e}")
 
         return suggestions
 
@@ -247,7 +247,7 @@ class CircuitCreatorAgent:
                     }
                 )
         except Exception as e:
-            print(f"⚠️  Could not search for {search_term}: {e}")
+            print(f"Could not search for {search_term}: {e}")
 
         return suggestions
 
@@ -371,7 +371,7 @@ class CircuitCreatorAgent:
                 f"    # Basic power connections",
                 f"    # TODO: Add specific net connections based on circuit requirements",
                 f"    ",
-                f'    print("✅ {requirements["name"]} circuit created successfully!")',
+                f'    print("{requirements["name"]} circuit created successfully!")',
                 f"    return locals()  # Return all local variables for inspection",
                 "",
                 "",

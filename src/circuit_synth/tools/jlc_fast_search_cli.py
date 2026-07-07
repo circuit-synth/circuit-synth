@@ -63,7 +63,7 @@ def search(
     start_time = time.time()
 
     if not output_json:
-        console.print(f"\n🔍 Searching JLCPCB for: [bold blue]{query}[/bold blue]\n")
+        console.print(f"\nSearching JLCPCB for: [bold blue]{query}[/bold blue]\n")
 
     # Perform search
     results = fast_jlc_search(
@@ -136,7 +136,7 @@ def cheapest(query: str, min_stock: int):
         jlc-fast cheapest "10uF 0805"
     """
     start_time = time.time()
-    console.print(f"\n💰 Finding cheapest: [bold blue]{query}[/bold blue]\n")
+    console.print(f"\nFinding cheapest: [bold blue]{query}[/bold blue]\n")
 
     result = find_cheapest_jlc(query, min_stock)
     elapsed = time.time() - start_time
@@ -167,7 +167,7 @@ def most_available(query: str):
         jlc-fast most-available STM32F103
     """
     start_time = time.time()
-    console.print(f"\n📦 Finding most available: [bold blue]{query}[/bold blue]\n")
+    console.print(f"\nFinding most available: [bold blue]{query}[/bold blue]\n")
 
     result = find_most_available_jlc(query)
     elapsed = time.time() - start_time
@@ -200,7 +200,7 @@ def alternatives(part_number: str, max_results: int):
     """
     start_time = time.time()
     console.print(
-        f"\n🔄 Finding alternatives for: [bold blue]{part_number}[/bold blue]\n"
+        f"\nFinding alternatives for: [bold blue]{part_number}[/bold blue]\n"
     )
 
     searcher = get_fast_searcher()
@@ -240,7 +240,7 @@ def benchmark():
 
     Shows the performance improvement of direct search.
     """
-    console.print("\n⏱️  [bold]Performance Benchmark[/bold]\n")
+    console.print("\n[bold]Performance Benchmark[/bold]\n")
 
     test_queries = ["STM32G4", "0.1uF 0603", "LM358", "USB-C connector", "10k resistor"]
 
@@ -251,7 +251,7 @@ def benchmark():
         elapsed = time.time() - start
         total_time += elapsed
 
-        status = "✅" if results else "❌"
+        status = "" if results else ""
         console.print(f"{status} '{query}': {elapsed:.3f}s ({len(results)} results)")
 
     avg_time = total_time / len(test_queries)

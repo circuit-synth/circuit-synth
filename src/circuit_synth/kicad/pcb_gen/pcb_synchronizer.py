@@ -82,9 +82,9 @@ class PCBSynchronizer:
         if not self.pcb_path.exists():
             raise FileNotFoundError(f"PCB file not found: {self.pcb_path}")
 
-        logger.info(f"📄 Loading existing PCB: {self.pcb_path}")
+        logger.info(f"Loading existing PCB: {self.pcb_path}")
         self.pcb = PCBBoard(str(self.pcb_path))
-        logger.info(f"✅ PCB loaded with {len(self.pcb.footprints)} existing footprints")
+        logger.info(f"PCB loaded with {len(self.pcb.footprints)} existing footprints")
 
     def sync_with_schematics(self) -> PCBSyncReport:
         """
@@ -103,54 +103,54 @@ class PCBSynchronizer:
             PCBSyncReport with synchronization results
         """
         logger.info("="*70)
-        logger.info("🔄 Starting PCB Synchronization")
+        logger.info("Starting PCB Synchronization")
         logger.info("="*70)
 
         report = PCBSyncReport()
 
         try:
             # Step 1: Extract components from schematics
-            logger.info("📋 Step 1: Extracting components from schematics")
+            logger.info("Step 1: Extracting components from schematics")
             schematic_components = self._extract_components_from_schematics()
             logger.info(f"  Found {len(schematic_components)} components in schematics")
 
             # Step 2: Get existing PCB footprints
-            logger.info("📦 Step 2: Getting existing PCB footprints")
+            logger.info("Step 2: Getting existing PCB footprints")
             pcb_footprints = self._get_existing_footprints()
             logger.info(f"  Found {len(pcb_footprints)} existing footprints in PCB")
 
             # Step 3: Match components
-            logger.info("🔗 Step 3: Matching schematic components with PCB footprints")
+            logger.info("Step 3: Matching schematic components with PCB footprints")
             matches = self._match_components(schematic_components, pcb_footprints)
             logger.info(f"  Matched {len(matches)} components")
 
             # Step 4: Add new footprints
-            logger.info("➕ Step 4: Adding new footprints")
+            logger.info("Step 4: Adding new footprints")
             self._add_new_footprints(schematic_components, matches, report)
             logger.info(f"  Added {len(report.added)} new footprints")
 
             # Step 5: Remove deleted footprints
-            logger.info("➖ Step 5: Removing deleted footprints")
+            logger.info("Step 5: Removing deleted footprints")
             self._remove_deleted_footprints(pcb_footprints, matches, report)
             logger.info(f"  Removed {len(report.removed)} deleted footprints")
 
             # Step 6: Update existing footprints
-            logger.info("🔧 Step 6: Updating existing footprints")
+            logger.info("Step 6: Updating existing footprints")
             self._update_existing_footprints(schematic_components, matches, report)
             logger.info(f"  Updated {len(report.updated)} footprints")
 
             # Step 7: Update netlist connections
-            logger.info("🔌 Step 7: Updating netlist connections")
+            logger.info("Step 7: Updating netlist connections")
             self._update_netlist()
             logger.info(f"  Netlist updated")
 
             # Step 8: Save PCB
-            logger.info("💾 Step 8: Saving PCB")
+            logger.info("Step 8: Saving PCB")
             self.pcb.save(str(self.pcb_path))
-            logger.info(f"✅ PCB saved: {self.pcb_path}")
+            logger.info(f"PCB saved: {self.pcb_path}")
 
             logger.info("="*70)
-            logger.info("📊 Synchronization Summary")
+            logger.info("Synchronization Summary")
             logger.info("="*70)
             logger.info(f"  Matched:   {len(matches)}")
             logger.info(f"  Added:     {len(report.added)}")
@@ -163,7 +163,7 @@ class PCBSynchronizer:
             return report
 
         except Exception as e:
-            logger.error(f"❌ PCB synchronization failed: {e}", exc_info=True)
+            logger.error(f"PCB synchronization failed: {e}", exc_info=True)
             report.errors.append(str(e))
             raise
 
@@ -178,7 +178,7 @@ class PCBSynchronizer:
 
         # Read all schematic files
         sch_files = list(self.project_dir.glob("*.kicad_sch"))
-        logger.debug(f"🔍 Found {len(sch_files)} schematic files")
+        logger.debug(f"Found {len(sch_files)} schematic files")
 
         for sch_file in sch_files:
             try:
@@ -206,7 +206,7 @@ class PCBSynchronizer:
                         logger.debug(f"    • {comp.reference}: {comp.footprint}")
 
             except Exception as e:
-                logger.error(f"❌ Error reading schematic {sch_file}: {e}")
+                logger.error(f"Error reading schematic {sch_file}: {e}")
                 continue
 
         return components
@@ -255,9 +255,9 @@ class PCBSynchronizer:
             ref = comp["reference"]
             if ref in pcb_footprints:
                 matches[ref] = ref
-                logger.debug(f"  ✓ Matched: {ref}")
+                logger.debug(f"  Matched: {ref}")
             else:
-                logger.debug(f"  ✗ Not in PCB: {ref}")
+                logger.debug(f"  Not in PCB: {ref}")
 
         return matches
 
@@ -284,12 +284,12 @@ class PCBSynchronizer:
                 continue
 
             if not footprint:
-                logger.warning(f"⚠️  {ref} has no footprint, skipping")
+                logger.warning(f"{ref} has no footprint, skipping")
                 report.errors.append(f"{ref}: No footprint specified")
                 continue
 
             try:
-                logger.info(f"  ➕ Adding {ref}: {footprint}")
+                logger.info(f"  Adding {ref}: {footprint}")
 
                 # Add footprint at default position (50mm, 50mm)
                 fp = self.pcb.add_footprint_from_library(
@@ -307,13 +307,13 @@ class PCBSynchronizer:
                         fp.path = comp["hierarchical_path"]
 
                     report.added.append(ref)
-                    logger.debug(f"    ✅ Added at (50.0, 50.0)")
+                    logger.debug(f"    Added at (50.0, 50.0)")
                 else:
-                    logger.error(f"    ❌ Failed to add {ref}")
+                    logger.error(f"    Failed to add {ref}")
                     report.errors.append(f"{ref}: Failed to add footprint")
 
             except Exception as e:
-                logger.error(f"    ❌ Error adding {ref}: {e}")
+                logger.error(f"    Error adding {ref}: {e}")
                 report.errors.append(f"{ref}: {str(e)}")
 
     def _remove_deleted_footprints(
@@ -341,15 +341,15 @@ class PCBSynchronizer:
                 continue
 
             try:
-                logger.info(f"  ➖ Removing {ref}: no longer in schematic")
+                logger.info(f"  Removing {ref}: no longer in schematic")
 
                 # Remove footprint from PCB
                 self.pcb.footprints.remove(fp_info["footprint"])
                 report.removed.append(ref)
-                logger.debug(f"    ✅ Removed")
+                logger.debug(f"    Removed")
 
             except Exception as e:
-                logger.error(f"    ❌ Error removing {ref}: {e}")
+                logger.error(f"    Error removing {ref}: {e}")
                 report.errors.append(f"{ref}: {str(e)}")
 
     def _update_existing_footprints(
@@ -382,13 +382,13 @@ class PCBSynchronizer:
                     break
 
             if not pcb_fp:
-                logger.warning(f"⚠️  Matched component {ref} not found in PCB")
+                logger.warning(f"Matched component {ref} not found in PCB")
                 continue
 
             # Check if value changed
             sch_value = sch_comp.get("value", "")
             if pcb_fp.value != sch_value:
-                logger.debug(f"  🔧 Updating {ref} value: {pcb_fp.value} → {sch_value}")
+                logger.debug(f"  Updating {ref} value: {pcb_fp.value} → {sch_value}")
                 pcb_fp.value = sch_value
 
                 # Also update the Value property in properties list
@@ -401,7 +401,7 @@ class PCBSynchronizer:
             else:
                 # Position preserved, no changes needed
                 report.preserved.append(ref)
-                logger.debug(f"  ✓ Preserved: {ref} at ({pcb_fp.position.x:.2f}, {pcb_fp.position.y:.2f})")
+                logger.debug(f"  Preserved: {ref} at ({pcb_fp.position.x:.2f}, {pcb_fp.position.y:.2f})")
 
     def _update_netlist(self):
         """
@@ -425,7 +425,7 @@ class PCBSynchronizer:
             netlist_path = self.project_dir.parent.parent / f"{self.project_name}.net"
 
         if not netlist_path.exists():
-            logger.warning(f"⚠️  No netlist file found for {self.project_name}")
+            logger.warning(f"No netlist file found for {self.project_name}")
             logger.info("  Skipping netlist update")
             return
 
@@ -531,7 +531,7 @@ class PCBSynchronizer:
             if unconnected_count > 0:
                 logger.debug(f"  Created {unconnected_count} nets for unconnected pads")
 
-            logger.info(f"  ✅ Netlist applied: {nets_created} nets created, {len(assigned_pads)} pads assigned")
+            logger.info(f"  Netlist applied: {nets_created} nets created, {len(assigned_pads)} pads assigned")
 
         except Exception as e:
-            logger.error(f"❌ Error updating netlist: {e}", exc_info=True)
+            logger.error(f"Error updating netlist: {e}", exc_info=True)

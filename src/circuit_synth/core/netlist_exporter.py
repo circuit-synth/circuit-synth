@@ -619,7 +619,7 @@ class NetlistExporter:
                 )
 
                 # Run synchronization with new API
-                print("\n🔄 Synchronizing KiCad project with Circuit Synth...")
+                print("\nSynchronizing KiCad project with Circuit Synth...")
                 logger.info("Running synchronization with new KiCad API...")
                 sync_report = synchronizer.sync_with_circuit(self.circuit)
 
@@ -638,7 +638,7 @@ class NetlistExporter:
                     # Total KiCad components = matched + to preserve
                     kicad_comp_count = matched_count + preserve_count
 
-                print(f"📊 Analysis:")
+                print(f"Analysis:")
                 print(f"   - Python circuit: {circuit_comp_count} component(s)")
                 print(f"   - KiCad project: {kicad_comp_count} component(s)")
 
@@ -649,7 +649,7 @@ class NetlistExporter:
 
                 # Report discrepancies
                 if components_to_preserve or components_to_add or components_to_modify:
-                    print("\n⚠️  Discrepancies detected:")
+                    print("\nDiscrepancies detected:")
 
                     # Components in KiCad but not in Python
                     for comp in components_to_preserve:
@@ -693,20 +693,20 @@ class NetlistExporter:
                     or components_to_modify
                     or (components_to_preserve and not preserve_user_components)
                 ):
-                    print("\n📝 Applying changes to schematic...")
+                    print("\nApplying changes to schematic...")
                     logger.info("Changes detected, applying updates to schematic...")
 
                     # Use the traditional synchronize method which handles the complete workflow
                     # including applying updates and saving the schematic
                     full_sync_report = synchronizer.synchronize(self.circuit)
 
-                    print("✅ Schematic updated successfully")
+                    print("Schematic updated successfully")
                     logger.info("Schematic updated successfully")
 
                     # Use the full sync report for logging
                     sync_report = full_sync_report
                 else:
-                    print("\n✅ No changes needed - schematic is already up to date")
+                    print("\nNo changes needed - schematic is already up to date")
                     logger.info("No changes needed - schematic is already up to date")
 
                 # Print final summary

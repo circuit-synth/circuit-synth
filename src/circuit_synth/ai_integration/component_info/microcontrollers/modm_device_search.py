@@ -526,24 +526,24 @@ def search_by_peripherals(
 
 def print_mcu_result(result: MCUSearchResult) -> None:
     """Print a nicely formatted MCU search result."""
-    print(f"\\n🔧 MCU Recommendation: {result.part_number}")
+    print(f"\\nMCU Recommendation: {result.part_number}")
     print(
-        f"   📊 Specs: {result.flash_size}KB Flash, {result.ram_size}KB RAM, {result.pin_count} pins"
+        f"   Specs: {result.flash_size}KB Flash, {result.ram_size}KB RAM, {result.pin_count} pins"
     )
     print(
-        f"   📦 Package: {result.package} | Score: {result.availability_score:.2f}/1.0"
+        f"   Package: {result.package} | Score: {result.availability_score:.2f}/1.0"
     )
-    print(f"   📝 {result.description}")
+    print(f"   {result.description}")
 
     if result.peripherals:
-        print(f"   ⚡ Peripherals: {', '.join(result.peripherals[:10])}")
+        print(f"   Peripherals: {', '.join(result.peripherals[:10])}")
         if len(result.peripherals) > 10:
             print(f"      ... and {len(result.peripherals) - 10} more")
 
     if result.kicad_symbol:
-        print(f"   ✅ KiCad: {result.kicad_symbol} → {result.kicad_footprint}")
+        print(f"   KiCad: {result.kicad_symbol} → {result.kicad_footprint}")
 
-    print(f"\\n📋 Circuit-Synth Code:")
+    print(f"\\nCircuit-Synth Code:")
     ref = "U"
     symbol = (
         result.kicad_symbol
@@ -563,7 +563,7 @@ def print_mcu_result(result: MCUSearchResult) -> None:
 
 if __name__ == "__main__":
     # Example usage
-    print("🔍 Testing MODM Device Search...")
+    print("Testing MODM Device Search...")
 
     # Search for STM32G4 series with minimum 128KB flash
     stm32_results = search_stm32(series="g4", flash_min=128, max_results=3)

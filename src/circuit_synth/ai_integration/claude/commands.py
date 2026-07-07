@@ -52,7 +52,7 @@ def get_circuit_commands() -> Dict[str, CircuitCommand]:
         description="Real-time component availability and DFM validation",
         content="""Quick manufacturing readiness check with real-time component availability.
 
-🏭 **Manufacturing Validation**
+**Manufacturing Validation**
 
 **Automated Checks:**
 1. **Component Availability**: Real-time JLC stock verification for all components
@@ -66,10 +66,10 @@ def get_circuit_commands() -> Dict[str, CircuitCommand]:
 - Validate package types against JLC assembly capabilities
 
 **Quick Report:**
-- ✅/❌ Status for each component with stock levels
-- 🔄 Alternative suggestions for problematic components  
-- 💰 Current pricing at 100/1K/10K quantities
-- ⚠️ Any DFM issues or assembly constraints""",
+-/Status for each component with stock levels
+- Alternative suggestions for problematic components  
+- Current pricing at 100/1K/10K quantities
+- Any DFM issues or assembly constraints""",
     )
 
     return commands
@@ -91,9 +91,9 @@ def register_circuit_commands():
         with open(cmd_file, "w") as f:
             f.write(command.to_markdown())
 
-        print(f"✅ Registered command: /{cmd_name}")
+        print(f"Registered command: /{cmd_name}")
 
-    print(f"⚡ Registered {len(commands)} essential circuit command")
+    print(f"Registered {len(commands)} essential circuit command")
 
     # Also create project-local commands for development
     project_commands_dir = (
@@ -104,7 +104,7 @@ def register_circuit_commands():
             cmd_file = project_commands_dir / f"{cmd_name}.md"
             with open(cmd_file, "w") as f:
                 f.write(command.to_markdown())
-        print(f"📁 Also created project-local commands for development")
+        print(f"Also created project-local commands for development")
 
 
 if __name__ == "__main__":

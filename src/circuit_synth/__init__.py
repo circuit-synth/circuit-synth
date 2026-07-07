@@ -3,7 +3,7 @@ Circuit-Synth: Open Source Circuit Synthesis Framework
 
 A Python framework for programmatic circuit design with KiCad integration.
 
-🤖 **Claude Code Integration Available**
+**Claude Code Integration Available**
 For AI-powered circuit design with specialized agents:
 
     pip install circuit-synth[claude]
@@ -15,6 +15,36 @@ Or in Python:
 """
 
 __version__ = "0.12.1"
+
+
+def _ensure_utf8_streams():
+    """Force stdout/stderr to UTF-8 on import.
+
+    On Windows the console defaults to the cp1252 codec, so printing any
+    non-ASCII character (Greek Omega, arrows, box-drawing, etc.) raises
+    UnicodeEncodeError whenever stdout is captured or redirected. Reconfiguring
+    the streams to UTF-8 makes circuit-synth work without requiring the caller
+    to set ``PYTHONUTF8=1``. No-op where the streams already speak UTF-8 or
+    cannot be reconfigured (e.g. a non-standard stream object).
+    """
+    import sys
+
+    for _stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(_stream, "reconfigure", None)
+        if reconfigure is None:
+            continue
+        try:
+            if (getattr(_stream, "encoding", "") or "").lower() not in (
+                "utf-8",
+                "utf8",
+            ):
+                reconfigure(encoding="utf-8")
+        except (ValueError, OSError):
+            # Detached/closed stream or one that refuses reconfiguration.
+            pass
+
+
+_ensure_utf8_streams()
 
 
 def print_version_info():
@@ -86,9 +116,6 @@ def print_version_info():
     print("=" * 60)
 
 
-# Plugin integration
-from .ai_integration.plugins import AIDesignBridge
-
 # Dependency injection imports
 # Exception imports
 # Core imports
@@ -159,7 +186,7 @@ def setup_claude_integration():
 
         initialize_claude_integration()
     except ImportError as e:
-        print("⚠️  Claude Code integration not available.")
+        print("Claude Code integration not available.")
         print(
             "   For AI-powered circuit design, install with: pip install circuit-synth[claude]"
         )

@@ -34,12 +34,12 @@ class LLMCodeUpdater:
         - Prefix with underscore if starts with a digit
         - Handle common power net naming conventions
         """
-        # 🔧 HIERARCHICAL FIX: Remove hierarchical path prefixes
+        # HIERARCHICAL FIX: Remove hierarchical path prefixes
         # Convert "/resistor_divider/GND" to "GND"
         if "/" in name:
             # Take the last part after the final slash
             name = name.split("/")[-1]
-            logger.debug(f"🔍 NET NAME DEBUG: Cleaned hierarchical name to: {name}")
+            logger.debug(f"NET NAME DEBUG: Cleaned hierarchical name to: {name}")
 
         # Handle common power net special cases first
         if name in ["3V3", "3.3V", "+3V3", "+3.3V"]:
@@ -75,7 +75,7 @@ class LLMCodeUpdater:
 
     def _check_llm_availability(self) -> bool:
         """Check if LLM services are available"""
-        logger.info("🔍 LLM_AVAILABILITY_CHECK: Starting LLM availability check")
+        logger.info("LLM_AVAILABILITY_CHECK: Starting LLM availability check")
 
         try:
             # Try different LLM import methods
@@ -91,7 +91,7 @@ class LLMCodeUpdater:
                     import litellm
 
                     logger.info(
-                        "🔍 LLM_AVAILABILITY_CHECK: Found litellm, testing connection"
+                        "LLM_AVAILABILITY_CHECK: Found litellm, testing connection"
                     )
 
                     # Try a simple test with Claude Sonnet
@@ -103,21 +103,21 @@ class LLMCodeUpdater:
 
                     if test_response and test_response.choices:
                         logger.info(
-                            "🔍 LLM_AVAILABILITY_CHECK: ✅ Direct litellm connection successful"
+                            "LLM_AVAILABILITY_CHECK: Direct litellm connection successful"
                         )
                         return True
                     else:
                         logger.warning(
-                            "🔍 LLM_AVAILABILITY_CHECK: ❌ litellm test failed - no response"
+                            "LLM_AVAILABILITY_CHECK: litellm test failed - no response"
                         )
 
                 except ImportError:
                     logger.info(
-                        "🔍 LLM_AVAILABILITY_CHECK: litellm not available (ImportError)"
+                        "LLM_AVAILABILITY_CHECK: litellm not available (ImportError)"
                     )
                 except Exception as e:
                     logger.warning(
-                        f"🔍 LLM_AVAILABILITY_CHECK: litellm test failed: {str(e)[:100]}..."
+                        f"LLM_AVAILABILITY_CHECK: litellm test failed: {str(e)[:100]}..."
                     )
 
             # Method 3: Check for OpenAI compatibility
@@ -126,7 +126,7 @@ class LLMCodeUpdater:
                     import openai
 
                     logger.info(
-                        "🔍 LLM_AVAILABILITY_CHECK: Found openai, checking for API key"
+                        "LLM_AVAILABILITY_CHECK: Found openai, checking for API key"
                     )
 
                     # Check if API key is available
@@ -134,102 +134,102 @@ class LLMCodeUpdater:
 
                     if api_key:
                         logger.info(
-                            "🔍 LLM_AVAILABILITY_CHECK: ✅ OpenAI API key found"
+                            "LLM_AVAILABILITY_CHECK: OpenAI API key found"
                         )
                         return True
                     else:
                         logger.info(
-                            "🔍 LLM_AVAILABILITY_CHECK: ❌ OpenAI API key not found"
+                            "LLM_AVAILABILITY_CHECK: OpenAI API key not found"
                         )
 
                 except ImportError:
                     logger.info(
-                        "🔍 LLM_AVAILABILITY_CHECK: openai not available (ImportError)"
+                        "LLM_AVAILABILITY_CHECK: openai not available (ImportError)"
                     )
                 except Exception as e:
                     logger.warning(
-                        f"🔍 LLM_AVAILABILITY_CHECK: openai check failed: {str(e)[:100]}..."
+                        f"LLM_AVAILABILITY_CHECK: openai check failed: {str(e)[:100]}..."
                     )
 
             logger.info(
-                "🔍 LLM_AVAILABILITY_CHECK: ❌ No LLM services available - using fallback code generation"
+                "LLM_AVAILABILITY_CHECK: No LLM services available - using fallback code generation"
             )
             return False
 
         except Exception as e:
-            logger.error(f"🔍 LLM_AVAILABILITY_CHECK: Unexpected error: {e}")
+            logger.error(f"LLM_AVAILABILITY_CHECK: Unexpected error: {e}")
             return False
 
     def update_python_file(
         self, python_file: Path, circuits: Dict[str, Circuit], preview_only: bool = True
     ) -> Optional[str]:
         """Update Python file with circuit data"""
-        logger.info(f"🔄 CODE_UPDATE: Starting update of {python_file}")
-        logger.info(f"🔄 CODE_UPDATE: Preview mode: {preview_only}")
-        logger.info(f"🔄 CODE_UPDATE: Circuits to update: {list(circuits.keys())}")
+        logger.info(f"CODE_UPDATE: Starting update of {python_file}")
+        logger.info(f"CODE_UPDATE: Preview mode: {preview_only}")
+        logger.info(f"CODE_UPDATE: Circuits to update: {list(circuits.keys())}")
 
         try:
             # Read existing Python file or create empty one if it doesn't exist
             if python_file.exists():
-                logger.info("🔄 CODE_UPDATE: Reading existing Python file")
+                logger.info("CODE_UPDATE: Reading existing Python file")
                 with open(python_file, "r") as f:
                     original_code = f.read()
                 logger.info(
-                    f"🔄 CODE_UPDATE: Original file size: {len(original_code)} chars"
+                    f"CODE_UPDATE: Original file size: {len(original_code)} chars"
                 )
             else:
                 logger.info(
-                    "🔄 CODE_UPDATE: Python file doesn't exist, creating new one"
+                    "CODE_UPDATE: Python file doesn't exist, creating new one"
                 )
                 original_code = ""
 
             # Determine update strategy based on LLM availability
             if self.llm_available:
-                logger.info("🔄 CODE_UPDATE: Using LLM-assisted update strategy")
+                logger.info("CODE_UPDATE: Using LLM-assisted update strategy")
                 updated_code = self._llm_assisted_update(original_code, circuits)
             else:
-                logger.info("🔄 CODE_UPDATE: Using fallback update strategy")
+                logger.info("CODE_UPDATE: Using fallback update strategy")
                 updated_code = self._fallback_update(original_code, circuits)
 
             if updated_code:
                 logger.info(
-                    f"🔄 CODE_UPDATE: Generated updated code: {len(updated_code)} chars"
+                    f"CODE_UPDATE: Generated updated code: {len(updated_code)} chars"
                 )
 
                 if preview_only:
-                    logger.info("🔄 CODE_UPDATE: Preview mode - not writing to file")
+                    logger.info("CODE_UPDATE: Preview mode - not writing to file")
                     return updated_code
                 else:
-                    logger.info("🔄 CODE_UPDATE: Writing updated code to file")
+                    logger.info("CODE_UPDATE: Writing updated code to file")
                     with open(python_file, "w") as f:
                         f.write(updated_code)
-                    logger.info("🔄 CODE_UPDATE: ✅ File update completed")
+                    logger.info("CODE_UPDATE: File update completed")
                     return updated_code
             else:
-                logger.error("🔄 CODE_UPDATE: ❌ Failed to generate updated code")
+                logger.error("CODE_UPDATE: Failed to generate updated code")
                 return None
 
         except Exception as e:
-            logger.error(f"🔄 CODE_UPDATE: Failed to update Python file: {e}")
+            logger.error(f"CODE_UPDATE: Failed to update Python file: {e}")
             return None
 
     def _llm_assisted_update(
         self, original_code: str, circuits: Dict[str, Circuit]
     ) -> Optional[str]:
         """Use LLM to intelligently update the Python code"""
-        logger.info("🤖 LLM_UPDATE: Starting LLM-assisted code update")
+        logger.info("LLM_UPDATE: Starting LLM-assisted code update")
 
         try:
             # Prepare context for LLM
             context = self._prepare_llm_context(original_code, circuits)
 
             # For now, fall back to the simpler update since LLM integration is complex
-            logger.info("🤖 LLM_UPDATE: Using simplified update for now")
+            logger.info("LLM_UPDATE: Using simplified update for now")
             return self._fallback_update(original_code, circuits)
 
         except Exception as e:
-            logger.error(f"🤖 LLM_UPDATE: LLM update failed: {e}")
-            logger.info("🤖 LLM_UPDATE: Falling back to simple update")
+            logger.error(f"LLM_UPDATE: LLM update failed: {e}")
+            logger.info("LLM_UPDATE: Falling back to simple update")
             return self._fallback_update(original_code, circuits)
 
     def _prepare_llm_context(
@@ -265,7 +265,7 @@ class LLMCodeUpdater:
         self, original_code: str, circuits: Dict[str, Circuit]
     ) -> Optional[str]:
         """Simple fallback update without LLM"""
-        logger.info("📝 FALLBACK_UPDATE: Starting fallback code update")
+        logger.info("FALLBACK_UPDATE: Starting fallback code update")
 
         try:
             # Check if this is a hierarchical design
@@ -273,23 +273,23 @@ class LLMCodeUpdater:
                 circuit.is_hierarchical_sheet for circuit in circuits.values()
             )
 
-            logger.info(f"📝 FALLBACK_UPDATE: Hierarchical design: {is_hierarchical}")
+            logger.info(f"FALLBACK_UPDATE: Hierarchical design: {is_hierarchical}")
 
             if is_hierarchical:
-                logger.info("📝 FALLBACK_UPDATE: Generating hierarchical circuit code")
+                logger.info("FALLBACK_UPDATE: Generating hierarchical circuit code")
                 return self._generate_hierarchical_code(circuits)
             else:
-                logger.info("📝 FALLBACK_UPDATE: Generating flat circuit code")
+                logger.info("FALLBACK_UPDATE: Generating flat circuit code")
                 main_circuit = list(circuits.values())[0]
                 return self._generate_flat_code(main_circuit)
 
         except Exception as e:
-            logger.error(f"📝 FALLBACK_UPDATE: Fallback update failed: {e}")
+            logger.error(f"FALLBACK_UPDATE: Fallback update failed: {e}")
             return None
 
     def _generate_hierarchical_code(self, circuits: Dict[str, Circuit]) -> str:
         """Generate hierarchical Python code"""
-        logger.info("🏗️ HIERARCHICAL_CODE: Generating hierarchical circuit code")
+        logger.info("HIERARCHICAL_CODE: Generating hierarchical circuit code")
 
         code_parts = []
 
@@ -309,7 +309,7 @@ class LLMCodeUpdater:
         for circuit_name, circuit in circuits.items():
             if circuit.is_hierarchical_sheet:
                 logger.info(
-                    f"🏗️ HIERARCHICAL_CODE: Generating subcircuit: {circuit_name}"
+                    f"HIERARCHICAL_CODE: Generating subcircuit: {circuit_name}"
                 )
                 subcircuit_code = self._generate_subcircuit_function(circuit)
                 code_parts.extend(subcircuit_code)
@@ -321,13 +321,13 @@ class LLMCodeUpdater:
 
         # Generate main circuit function
         if main_circuit:
-            logger.info("🏗️ HIERARCHICAL_CODE: Generating main circuit")
+            logger.info("HIERARCHICAL_CODE: Generating main circuit")
             main_code = self._generate_main_circuit_function(
                 main_circuit, hierarchical_tree
             )
             code_parts.extend(main_code)
         else:
-            logger.warning("🏗️ HIERARCHICAL_CODE: No main circuit found")
+            logger.warning("HIERARCHICAL_CODE: No main circuit found")
 
         # Add generation code
         code_parts.extend(
@@ -342,13 +342,13 @@ class LLMCodeUpdater:
 
         result = "\n".join(code_parts)
         logger.info(
-            f"🏗️ HIERARCHICAL_CODE: Generated {len(result)} characters of hierarchical code"
+            f"HIERARCHICAL_CODE: Generated {len(result)} characters of hierarchical code"
         )
         return result
 
     def _generate_subcircuit_function(self, circuit: Circuit) -> List[str]:
         """Generate code for a hierarchical subcircuit"""
-        logger.info(f"🔧 SUBCIRCUIT: Generating subcircuit function for {circuit.name}")
+        logger.info(f"SUBCIRCUIT: Generating subcircuit function for {circuit.name}")
 
         function_name = self._sanitize_variable_name(circuit.name)
         code_lines = []
@@ -392,7 +392,7 @@ class LLMCodeUpdater:
                             code_lines.append(f"    {comp_var}['{pin}'] += {net_var}")
 
         logger.info(
-            f"🔧 SUBCIRCUIT: Generated {len(code_lines)} lines for {circuit.name}"
+            f"SUBCIRCUIT: Generated {len(code_lines)} lines for {circuit.name}"
         )
         return code_lines
 
@@ -400,7 +400,7 @@ class LLMCodeUpdater:
         self, circuit: Circuit, hierarchical_tree: Dict[str, List[str]]
     ) -> List[str]:
         """Generate the main circuit function"""
-        logger.info("🎯 MAIN_CIRCUIT: Generating main circuit function")
+        logger.info("MAIN_CIRCUIT: Generating main circuit function")
 
         code_lines = []
 
@@ -453,13 +453,13 @@ class LLMCodeUpdater:
                             code_lines.append(f"    {comp_var}['{pin}'] += {net_var}")
 
         logger.info(
-            f"🎯 MAIN_CIRCUIT: Generated {len(code_lines)} lines for main circuit"
+            f"MAIN_CIRCUIT: Generated {len(code_lines)} lines for main circuit"
         )
         return code_lines
 
     def _generate_flat_code(self, circuit: Circuit) -> str:
         """Generate flat (non-hierarchical) Python code"""
-        logger.info("📄 FLAT_CODE: Generating flat circuit code")
+        logger.info("FLAT_CODE: Generating flat circuit code")
 
         code_parts = []
 
@@ -520,7 +520,7 @@ class LLMCodeUpdater:
         )
 
         result = "\n".join(code_parts)
-        logger.info(f"📄 FLAT_CODE: Generated {len(result)} characters of flat code")
+        logger.info(f"FLAT_CODE: Generated {len(result)} characters of flat code")
         return result
 
     def _generate_component_code(

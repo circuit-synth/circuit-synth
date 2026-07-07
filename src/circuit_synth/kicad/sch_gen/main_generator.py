@@ -387,7 +387,7 @@ class SchematicGenerator:
         root_sch_file = self.project_dir / "root.kicad_sch"
 
         # Debug logging
-        logger.debug(f"🔍 _check_existing_project:")
+        logger.debug(f"_check_existing_project:")
         logger.debug(f"   project_dir: {self.project_dir}")
         logger.debug(f"   project_name: {self.project_name}")
         logger.debug(
@@ -428,7 +428,7 @@ class SchematicGenerator:
         self, json_file: str, draw_bounding_boxes: bool = False, preserve_user_components: bool = False
     ):
         """Update existing project using synchronizer to preserve manual work"""
-        logger.info("🔄 Updating existing project while preserving your work...")
+        logger.info("Updating existing project while preserving your work...")
 
         # Import here to avoid circular dependencies
         logger.debug("Importing synchronizers...")
@@ -467,7 +467,7 @@ class SchematicGenerator:
         # Use the preserve_user_components parameter
         preserve_components = preserve_user_components
         if preserve_components:
-            logger.info("⚠️  preserve_user_components=True: Components in KiCad but not in Python will be kept")
+            logger.info("preserve_user_components=True: Components in KiCad but not in Python will be kept")
 
         if has_subcircuits:
             # Use hierarchical synchronizer for projects with subcircuits
@@ -493,11 +493,11 @@ class SchematicGenerator:
             sync_report = synchronizer.sync_with_circuit(top_circuit, sub_dict)
         else:
             sync_report = synchronizer.sync_with_circuit(top_circuit)
-        logger.info("✅ Synchronization completed!")
+        logger.info("Synchronization completed!")
 
         # Add bounding boxes if requested
         if draw_bounding_boxes:
-            logger.info("📦 Adding bounding boxes to visualize component placement...")
+            logger.info("Adding bounding boxes to visualize component placement...")
             self._add_bounding_boxes_to_schematic(top_circuit)
 
         # FIX: Post-process all schematic files to fix missing project names
@@ -507,24 +507,24 @@ class SchematicGenerator:
         self._log_sync_results(sync_report)
 
         # Synchronize PCB after schematic sync
-        logger.info("🔄 Synchronizing PCB with updated schematic...")
+        logger.info("Synchronizing PCB with updated schematic...")
         try:
             from circuit_synth.kicad.pcb_gen.pcb_synchronizer import PCBSynchronizer
 
             pcb_path = self.project_dir / f"{self.project_name}.kicad_pcb"
             if pcb_path.exists():
-                logger.info("📋 PCB file exists - using synchronizer to preserve manual placement")
+                logger.info("PCB file exists - using synchronizer to preserve manual placement")
                 pcb_sync = PCBSynchronizer(
                     pcb_path=str(pcb_path),
                     project_dir=self.project_dir,
                     project_name=self.project_name
                 )
                 pcb_sync_report = pcb_sync.sync_with_schematics()
-                logger.info("✅ PCB synchronization complete!")
+                logger.info("PCB synchronization complete!")
             else:
-                logger.info("ℹ️  No PCB file found - skipping PCB sync")
+                logger.info("No PCB file found - skipping PCB sync")
         except Exception as e:
-            logger.error(f"❌ PCB synchronization failed: {e}")
+            logger.error(f"PCB synchronization failed: {e}")
             logger.warning("   PCB may not reflect latest schematic changes")
             import traceback
             traceback.print_exc()
@@ -539,19 +539,19 @@ class SchematicGenerator:
         if "sheets_synchronized" in sync_report:
             # Hierarchical project report
             logger.info(
-                f"✓ Sheets synchronized: {sync_report.get('sheets_synchronized', 0)}"
+                f"Sheets synchronized: {sync_report.get('sheets_synchronized', 0)}"
             )
             logger.info(
-                f"✓ Total components matched: {sync_report.get('total_matched', 0)}"
+                f"Total components matched: {sync_report.get('total_matched', 0)}"
             )
             logger.info(
-                f"✓ Total components added: {sync_report.get('total_added', 0)}"
+                f"Total components added: {sync_report.get('total_added', 0)}"
             )
             logger.info(
-                f"✓ Total components modified: {sync_report.get('total_modified', 0)}"
+                f"Total components modified: {sync_report.get('total_modified', 0)}"
             )
             logger.info(
-                f"✓ Total components preserved: {sync_report.get('total_preserved', 0)}"
+                f"Total components preserved: {sync_report.get('total_preserved', 0)}"
             )
 
             # Show per-sheet details if available
@@ -568,15 +568,15 @@ class SchematicGenerator:
         else:
             # Regular flat project report
             summary = sync_report.get("summary", {})
-            logger.info(f"✓ Components matched: {summary.get('matched', 0)}")
-            logger.info(f"✓ Components added: {summary.get('added', 0)}")
-            logger.info(f"✓ Components modified: {summary.get('modified', 0)}")
-            logger.info(f"✓ Components preserved: {summary.get('preserved', 0)}")
+            logger.info(f"Components matched: {summary.get('matched', 0)}")
+            logger.info(f"Components added: {summary.get('added', 0)}")
+            logger.info(f"Components modified: {summary.get('modified', 0)}")
+            logger.info(f"Components preserved: {summary.get('preserved', 0)}")
 
             if summary.get("removed", 0) > 0:
-                logger.info(f"✓ Components removed: {summary.get('removed', 0)}")
+                logger.info(f"Components removed: {summary.get('removed', 0)}")
 
-        logger.info("✓ All manual work preserved!")
+        logger.info("All manual work preserved!")
         logger.info(f"\nProject updated successfully at: {self.project_dir}")
 
     def _fix_all_schematic_project_names(self):
@@ -589,7 +589,7 @@ class SchematicGenerator:
         import re
         from pathlib import Path
 
-        logger.info("🔧 Fixing missing project names in schematic files...")
+        logger.info("Fixing missing project names in schematic files...")
 
         # Find all .kicad_sch files in the project directory
         schematic_files = list(Path(self.project_dir).glob("*.kicad_sch"))
@@ -620,7 +620,7 @@ class SchematicGenerator:
 
         if total_fixes > 0:
             logger.info(
-                f"✅ Fixed {total_fixes} total empty project names across {len(schematic_files)} files"
+                f"Fixed {total_fixes} total empty project names across {len(schematic_files)} files"
             )
         else:
             logger.debug("No empty project names found")
@@ -653,7 +653,7 @@ class SchematicGenerator:
 
             # Save the updated schematic
             schematic.save(str(sch_path), preserve_format=True)
-            logger.info(f"✅ Bounding boxes added and saved to {sch_path.name}")
+            logger.info(f"Bounding boxes added and saved to {sch_path.name}")
 
         except Exception as e:
             logger.error(f"Failed to add bounding boxes: {e}")
@@ -683,7 +683,7 @@ class SchematicGenerator:
             **pcb_kwargs: Additional keyword arguments passed to PCB generation
         """
         logger.debug(
-            f"🚀 generate_project() called: force_regenerate={force_regenerate}"
+            f"generate_project() called: force_regenerate={force_regenerate}"
         )
 
         # Check if project already exists
@@ -691,9 +691,15 @@ class SchematicGenerator:
 
         if project_exists and not force_regenerate:
             # Auto-switch to update mode
+            logger.info(
+                f"Updating '{self.project_name}' in place (force_regenerate=False): "
+                "existing components keep their placement; structural renames may not "
+                "apply. Delete the output dir or pass force_regenerate=True for a clean "
+                "rebuild."
+            )
             logger.info(f"Existing KiCad project detected at: {self.project_dir}")
             logger.info(
-                "🔄 Automatically switching to update mode to preserve your work"
+                "Automatically switching to update mode to preserve your work"
             )
             logger.info(
                 "   (Use force_regenerate=True to create a new project instead)"
@@ -702,18 +708,18 @@ class SchematicGenerator:
             try:
                 preserve_components = pcb_kwargs.get('preserve_user_components', False)
                 if preserve_components:
-                    logger.info("⚠️  preserve_user_components=True: Components in KiCad but not in Python will be kept")
+                    logger.info("preserve_user_components=True: Components in KiCad but not in Python will be kept")
                 result = self._update_existing_project(json_file, draw_bounding_boxes, preserve_components)
                 return result
             except Exception as e:
-                print(f"🔥 Exception type: {type(e).__name__}")
-                print(f"🔥 Exception message: {e}")
+                print(f"Exception type: {type(e).__name__}")
+                print(f"Exception message: {e}")
                 import traceback
 
-                print(f"🔥 Traceback:")
+                print(f"Traceback:")
                 traceback.print_exc()
                 print("=" * 80 + "\n")
-                logger.error(f"❌ Update failed: {e}")
+                logger.error(f"Update failed: {e}")
                 logger.error("   ABORTING to preserve existing schematic.")
                 logger.error("   Fix the error and try again, or use force_regenerate=True to start fresh.")
                 # Re-raise the exception to abort instead of falling back to regeneration
@@ -730,6 +736,7 @@ class SchematicGenerator:
             # For now, we'll proceed with regeneration
 
         # Original generate_project logic starts here
+        logger.info(f"Generating '{self.project_name}' (fresh build)")
         if generate_pcb:
             logger.info(
                 f"Generating KiCad project '{self.project_name}' with schematics and PCB from '{json_file}'"
@@ -762,7 +769,7 @@ class SchematicGenerator:
 
         # 5) NATURAL HIERARCHY: Top circuit goes on root schematic, subcircuits become child sheets
         logger.info(
-            "🔧 NATURAL HIERARCHY: Top circuit on root, subcircuits as child sheets"
+            "NATURAL HIERARCHY: Top circuit on root, subcircuits as child sheets"
         )
         root_uuid = str(
             uuid.uuid4()
@@ -991,7 +998,7 @@ class SchematicGenerator:
 
             # Generate the netlist using the modular service approach
             logger.info(
-                f"🔧 DEBUG: Using netlist service to generate hierarchical netlist..."
+                f"DEBUG: Using netlist service to generate hierarchical netlist..."
             )
             from ..netlist_service import KiCadNetlistService
 
@@ -1009,18 +1016,18 @@ class SchematicGenerator:
                     )
                 else:
                     logger.error(
-                        f"❌ Netlist generation failed: {result.error_message}"
+                        f"Netlist generation failed: {result.error_message}"
                     )
                     logger.warning("PCB generation will proceed without netlist")
             except Exception as netlist_error:
-                logger.error(f"❌ Netlist generation failed: {netlist_error}")
+                logger.error(f"Netlist generation failed: {netlist_error}")
                 logger.warning("PCB generation will proceed without netlist")
 
         except Exception as e:
             import traceback
 
             logger.error(f"Failed to generate KiCad netlist with modular service: {e}")
-            logger.error(f"❌ Full traceback: {traceback.format_exc()}")
+            logger.error(f"Full traceback: {traceback.format_exc()}")
             logger.warning("PCB generation will proceed without netlist")
 
         # Generate PCB (default behavior)
@@ -1036,7 +1043,7 @@ class SchematicGenerator:
             # Decide whether to sync or regenerate
             if pcb_exists and not force_pcb_regenerate:
                 # Synchronize existing PCB (preserves manual placement)
-                logger.info("📋 PCB exists - using synchronizer to preserve manual placement")
+                logger.info("PCB exists - using synchronizer to preserve manual placement")
                 try:
                     pcb_sync = PCBSynchronizer(
                         pcb_path=str(pcb_path),
@@ -1044,10 +1051,10 @@ class SchematicGenerator:
                         project_name=self.project_name
                     )
                     sync_report = pcb_sync.sync_with_schematics()
-                    logger.info("✅ PCB synchronization complete!")
+                    logger.info("PCB synchronization complete!")
                     success = True
                 except Exception as e:
-                    logger.error(f"❌ PCB synchronization failed: {e}")
+                    logger.error(f"PCB synchronization failed: {e}")
                     logger.info("Falling back to full PCB regeneration...")
                     success = False
                     pcb_exists = False  # Force regeneration below
@@ -1057,7 +1064,7 @@ class SchematicGenerator:
             # Generate PCB if it doesn't exist or sync failed or force_pcb_regenerate
             if not pcb_exists or force_pcb_regenerate or not success:
                 if force_pcb_regenerate:
-                    logger.warning("⚠️  force_pcb_regenerate=True - regenerating PCB from scratch (manual placement will be lost!)")
+                    logger.warning("force_pcb_regenerate=True - regenerating PCB from scratch (manual placement will be lost!)")
                 else:
                     logger.debug("Generating new PCB with hierarchical placement...")
 
@@ -1090,7 +1097,7 @@ class SchematicGenerator:
                 if success:
                     logger.info("PCB generation complete!")
                 else:
-                    logger.error("❌ PCB generation failed!")
+                    logger.error("PCB generation failed!")
 
         # NOTE: Netlist generation now handled earlier in the method using modular service
         logger.debug("Netlist generation completed earlier using modular service")
@@ -1142,8 +1149,8 @@ class SchematicGenerator:
         except Exception as e:
             import traceback
 
-            logger.error(f"❌ Failed to create netlist service: {e}")
-            logger.error(f"❌ Full traceback: {traceback.format_exc()}")
+            logger.error(f"Failed to create netlist service: {e}")
+            logger.error(f"Full traceback: {traceback.format_exc()}")
             return False
 
     def _determine_paper_size(self, components, sheets):
@@ -1398,32 +1405,32 @@ class SchematicGenerator:
                             raise ValueError(f"No symbol data found for {comp.lib_id}")
 
                         # Build pin-to-net mapping for accurate bounding box calculation
-                        logger.debug(f"🔍 Building pin_net_map for {comp.reference}")
-                        logger.debug(f"🔍 Component type: {type(comp)}")
-                        logger.debug(f"🔍 Has _pins: {hasattr(comp, '_pins')}")
-                        logger.debug(f"🔍 Has pins: {hasattr(comp, 'pins')}")
+                        logger.debug(f"Building pin_net_map for {comp.reference}")
+                        logger.debug(f"Component type: {type(comp)}")
+                        logger.debug(f"Has _pins: {hasattr(comp, '_pins')}")
+                        logger.debug(f"Has pins: {hasattr(comp, 'pins')}")
 
                         pin_net_map = {}
                         # Handle both Component (has _pins) and SchematicSymbol (has pins list)
                         if hasattr(comp, "_pins"):
                             logger.debug(
-                                f"🔍 Using _pins dict, count: {len(comp._pins)}"
+                                f"Using _pins dict, count: {len(comp._pins)}"
                             )
                             for pin_num, pin in comp._pins.items():
                                 logger.debug(
-                                    f"🔍   Pin {pin_num}: number={pin.number}, net={pin.net}, net.name={pin.net.name if pin.net else 'None'}"
+                                    f"Pin {pin_num}: number={pin.number}, net={pin.net}, net.name={pin.net.name if pin.net else 'None'}"
                                 )
                                 if pin.net:
                                     pin_net_map[pin.number] = pin.net.name
                                     logger.debug(
-                                        f"🔍     ✅ Mapped {pin.number} -> {pin.net.name}"
+                                        f"Mapped {pin.number} -> {pin.net.name}"
                                     )
                         elif hasattr(comp, "pins"):
                             # SchematicSymbol from kicad-sch-api: pins don't have net information
                             # Net connections are stored separately in the schematic's nets list
                             # For bounding box calculation, we can use an empty pin_net_map
                             logger.debug(
-                                f"🔍 Component has pins list (SchematicSymbol) - skipping net mapping"
+                                f"Component has pins list (SchematicSymbol) - skipping net mapping"
                             )
                             logger.debug(
                                 f"   (Net info not available on SchematicPin objects from kicad-sch-api)"
@@ -1431,10 +1438,10 @@ class SchematicGenerator:
                             # Leave pin_net_map empty - bounding box will be calculated without net labels
 
                         logger.debug(
-                            f"🔍 FINAL pin_net_map for {comp.reference}: {pin_net_map}"
+                            f"FINAL pin_net_map for {comp.reference}: {pin_net_map}"
                         )
                         logger.debug(
-                            f"🔍 Calling get_symbol_dimensions with pin_net_map"
+                            f"Calling get_symbol_dimensions with pin_net_map"
                         )
 
                         comp_width, comp_height = (
@@ -1811,10 +1818,10 @@ class SchematicGenerator:
 
         if success:
             logger.info(
-                f"✅ PCB generated successfully at: {self.project_dir / f'{self.project_name}.kicad_pcb'}"
+                f"PCB generated successfully at: {self.project_dir / f'{self.project_name}.kicad_pcb'}"
             )
         else:
-            logger.error("❌ PCB generation failed")
+            logger.error("PCB generation failed")
 
         return success
 

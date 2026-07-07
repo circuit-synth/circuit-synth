@@ -62,7 +62,7 @@ def extract_components_from_file(file_path: str) -> List[Dict[str, str]]:
         return components
 
     except Exception as e:
-        print(f"⚠️  Error extracting components: {e}")
+        print(f"Error extracting components: {e}")
         return []
 
 
@@ -219,17 +219,17 @@ def validate_circuit_file(file_path: str) -> None:
     """Main validation function called by Claude Code hooks"""
 
     if not file_path or not Path(file_path).exists():
-        print("⚠️  File not found for validation")
+        print("File not found for validation")
         return
 
-    print(f"🔍 Validating circuit design: {Path(file_path).name}")
+    print(f"Validating circuit design: {Path(file_path).name}")
 
     all_issues = []
 
     # Extract and validate components
     components = extract_components_from_file(file_path)
     if components:
-        print(f"📦 Found {len(components)} components")
+        print(f"Found {len(components)} components")
 
         symbol_issues = validate_component_symbols(components)
         all_issues.extend(symbol_issues)
@@ -244,15 +244,15 @@ def validate_circuit_file(file_path: str) -> None:
 
     # Report results
     if not all_issues:
-        print("✅ Circuit validation passed - no issues found")
+        print("Circuit validation passed - no issues found")
     else:
-        print(f"⚠️  Found {len(all_issues)} design issues:")
+        print(f"Found {len(all_issues)} design issues:")
         for i, issue in enumerate(all_issues, 1):
             print(f"   {i}. {issue}")
 
     # Provide helpful suggestions
     if components:
-        print("💡 Suggestions:")
+        print("Suggestions:")
         print("   - Use /check-manufacturing to verify component availability")
         print("   - Use /analyze-power for power supply recommendations")
         print("   - Use /optimize-routing for signal integrity analysis")

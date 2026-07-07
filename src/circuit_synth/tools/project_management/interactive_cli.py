@@ -19,7 +19,7 @@ console = Console()
 
 def display_welcome() -> None:
     """Display welcome banner"""
-    welcome_text = Text("🚀 Circuit-Synth Project Setup", style="bold blue")
+    welcome_text = Text("Circuit-Synth Project Setup", style="bold blue")
     console.print(Panel.fit(welcome_text, style="blue"))
     console.print()
 
@@ -68,21 +68,21 @@ def select_circuits() -> List[Circuit]:
             if 1 <= idx <= len(circuits):
                 selected_circuits.append(circuits[idx - 1])
             else:
-                console.print(f"[yellow]⚠️  Skipping invalid option: {idx}[/yellow]")
+                console.print(f"[yellow]Skipping invalid option: {idx}[/yellow]")
     except ValueError:
         console.print(
-            "[red]❌ Invalid input format. Using default (Resistor Divider)[/red]"
+            "[red]Invalid input format. Using default (Resistor Divider)[/red]"
         )
         selected_circuits = [Circuit.RESISTOR_DIVIDER]
 
     if not selected_circuits:
         console.print(
-            "[yellow]⚠️  No circuits selected. Using default (Resistor Divider)[/yellow]"
+            "[yellow]No circuits selected. Using default (Resistor Divider)[/yellow]"
         )
         selected_circuits = [Circuit.RESISTOR_DIVIDER]
 
     console.print()
-    console.print(f"✅ Selected {len(selected_circuits)} circuit(s):")
+    console.print(f"Selected {len(selected_circuits)} circuit(s):")
     for circuit in selected_circuits:
         console.print(f"   • [green]{circuit.display_name}[/green]")
     console.print()
@@ -130,7 +130,7 @@ def show_confirmation(config: ProjectConfig, project_path) -> bool:
     Returns:
         True if user confirms, False otherwise
     """
-    console.print("[bold cyan]📋 Project Summary[/bold cyan]")
+    console.print("[bold cyan]Project Summary[/bold cyan]")
     console.print()
 
     summary_table = Table(show_header=False, box=None)
@@ -146,19 +146,19 @@ def show_confirmation(config: ProjectConfig, project_path) -> bool:
         summary_table.add_row("Circuits", "[dim]None[/dim]")
 
     summary_table.add_row(
-        "Claude AI Agents", "✅ Yes" if config.include_agents else "❌ No"
+        "Claude AI Agents", "Yes" if config.include_agents else "No"
     )
     summary_table.add_row(
-        "KiCad Plugins", "✅ Yes" if config.include_kicad_plugins else "❌ No"
+        "KiCad Plugins", "Yes" if config.include_kicad_plugins else "No"
     )
 
     if config.developer_mode:
-        summary_table.add_row("Developer Mode", "✅ Enabled")
+        summary_table.add_row("Developer Mode", "Enabled")
 
     console.print(summary_table)
     console.print()
 
-    return Confirm.ask("✅ Create project with these settings?", default=True)
+    return Confirm.ask("Create project with these settings?", default=True)
 
 
 def run_interactive_setup(
@@ -195,7 +195,7 @@ def run_interactive_setup(
 
     # Step 3: Show summary and confirm
     if not show_confirmation(config, project_path):
-        console.print("[yellow]❌ Setup cancelled[/yellow]")
+        console.print("[yellow]Setup cancelled[/yellow]")
         return None
 
     return config
@@ -246,7 +246,7 @@ def parse_cli_flags(
         circuit_names = [c.strip().lower() for c in circuits.split(",")]
         for name in circuit_names:
             if name not in circuit_map:
-                console.print(f"[yellow]⚠️  Unknown circuit: {name} (skipping)[/yellow]")
+                console.print(f"[yellow]Unknown circuit: {name} (skipping)[/yellow]")
                 console.print(
                     f"[dim]Valid options: {', '.join(sorted(set(circuit_map.keys())))}[/dim]"
                 )

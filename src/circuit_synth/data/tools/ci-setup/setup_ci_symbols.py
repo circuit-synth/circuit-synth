@@ -36,7 +36,7 @@ def get_ci_symbols_dir():
 def download_file(url, output_path):
     """Download a file with error handling."""
     try:
-        print(f"⬇️  Downloading {output_path.name}...")
+        print(f"Downloading {output_path.name}...")
 
         # Create request with user agent to avoid 403 errors
         req = urllib.request.Request(
@@ -67,12 +67,12 @@ def download_file(url, output_path):
             raise ValueError("Downloaded file is empty")
 
         print(
-            f"✅ Successfully downloaded {output_path.name} ({output_path.stat().st_size:,} bytes)"
+            f"Successfully downloaded {output_path.name} ({output_path.stat().st_size:,} bytes)"
         )
         return True
 
     except Exception as e:
-        print(f"❌ Failed to download {output_path.name}: {e}")
+        print(f"Failed to download {output_path.name}: {e}")
         return False
 
 
@@ -86,34 +86,34 @@ def verify_symbols(symbols_dir):
         from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
         data = SymbolLibCache.get_symbol_data("Device:R")
-        print(f'✅ Successfully loaded Device:R symbol with {len(data["pins"])} pins')
+        print(f'Successfully loaded Device:R symbol with {len(data["pins"])} pins')
         return True
 
     except ImportError as e:
         print(
-            f"⚠️  circuit_synth not installed - symbols downloaded but validation skipped"
+            f"circuit_synth not installed - symbols downloaded but validation skipped"
         )
         print(f"   This is normal for CI setup phase. Error: {e}")
         return True  # Not an error for CI setup
 
     except Exception as e:
-        print(f"❌ Failed to load symbol: {e}")
+        print(f"Failed to load symbol: {e}")
         return False
 
 
 def main():
     """Main setup function."""
-    print("🔧 Setting up KiCad symbols for CI testing...")
+    print("Setting up KiCad symbols for CI testing...")
 
     # Get symbols directory
     symbols_dir = get_ci_symbols_dir()
-    print(f"📁 Using symbols directory: {symbols_dir}")
+    print(f"Using symbols directory: {symbols_dir}")
 
     # Create directory
     symbols_dir.mkdir(parents=True, exist_ok=True)
 
     # Download all symbol libraries
-    print("📋 Downloading symbol libraries...")
+    print("Downloading symbol libraries...")
     success_count = 0
 
     for filename, url in SYMBOL_URLS.items():
@@ -122,25 +122,25 @@ def main():
             success_count += 1
 
     if success_count == 0:
-        print("❌ Failed to download any symbol libraries!")
+        print("Failed to download any symbol libraries!")
         return 1
 
-    print(f"✅ Downloaded {success_count}/{len(SYMBOL_URLS)} symbol libraries")
+    print(f"Downloaded {success_count}/{len(SYMBOL_URLS)} symbol libraries")
 
     # Set environment variable
-    print(f"🔗 Setting KICAD_SYMBOL_DIR={symbols_dir}")
+    print(f"Setting KICAD_SYMBOL_DIR={symbols_dir}")
     os.environ["KICAD_SYMBOL_DIR"] = str(symbols_dir)
 
     # Test symbol loading if possible
-    print("🧪 Testing symbol access...")
+    print("Testing symbol access...")
     if not verify_symbols(symbols_dir):
         return 1
 
     # Print completion message
     print()
-    print("✅ KiCad symbols setup complete for CI")
-    print(f"📁 Symbols location: {symbols_dir}")
-    print("🔧 Set KICAD_SYMBOL_DIR environment variable to use these symbols")
+    print("KiCad symbols setup complete for CI")
+    print(f"Symbols location: {symbols_dir}")
+    print("Set KICAD_SYMBOL_DIR environment variable to use these symbols")
     print()
 
     # CI-specific instructions
@@ -149,7 +149,7 @@ def main():
         for env in ["CI", "GITHUB_ACTIONS", "GITLAB_CI", "TRAVIS", "CIRCLECI"]
     )
     if ci_detected:
-        print("🤖 CI Environment Detected")
+        print("CI Environment Detected")
         print("Add this to your CI configuration:")
         if os.name == "nt":
             print(f"   set KICAD_SYMBOL_DIR={symbols_dir}")

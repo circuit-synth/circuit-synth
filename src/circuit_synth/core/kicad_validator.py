@@ -211,7 +211,7 @@ class KiCadValidator:
         """Generate platform-specific installation guide."""
         if sys.platform == "darwin":  # macOS
             return """
-🍎 KiCad Installation for macOS:
+KiCad Installation for macOS:
 
 1. **Official Installer (Recommended):**
    Download from: https://www.kicad.org/download/macos/
@@ -228,7 +228,7 @@ After installation, KiCad should be available at:
 """
         elif sys.platform.startswith("linux"):  # Linux
             return """
-🐧 KiCad Installation for Linux:
+KiCad Installation for Linux:
 
 1. **Ubuntu/Debian:**
    sudo apt update
@@ -247,7 +247,7 @@ After installation, verify with: kicad-cli version
 """
         elif sys.platform == "win32":  # Windows
             return """
-🪟 KiCad Installation for Windows:
+KiCad Installation for Windows:
 
 1. **Official Installer (Recommended):**
    Download from: https://www.kicad.org/download/windows/
@@ -316,7 +316,7 @@ def main():
     """CLI entry point for KiCad validation."""
     import sys
 
-    print("🔍 Circuit-Synth KiCad Validation")
+    print("Circuit-Synth KiCad Validation")
     print("=" * 50)
 
     try:
@@ -324,43 +324,43 @@ def main():
 
         # Print results
         if results["cli_available"]:
-            print(f"✅ KiCad CLI: {results['cli_path']}")
+            print(f"KiCad CLI: {results['cli_path']}")
             print(f"   Version: {results['cli_version']}")
         else:
-            print("❌ KiCad CLI: Not found")
+            print("KiCad CLI: Not found")
 
         if results["symbol_path"]:
-            print(f"✅ Symbol Libraries: {results['symbol_path']}")
+            print(f"Symbol Libraries: {results['symbol_path']}")
         else:
-            print("❌ Symbol Libraries: Not found")
+            print("Symbol Libraries: Not found")
 
         if results["footprint_path"]:
-            print(f"✅ Footprint Libraries: {results['footprint_path']}")
+            print(f"Footprint Libraries: {results['footprint_path']}")
         else:
-            print("❌ Footprint Libraries: Not found")
+            print("Footprint Libraries: Not found")
 
         # Print warnings and errors
         if results["warnings"]:
-            print("\n⚠️  Warnings:")
+            print("\nWarnings:")
             for warning in results["warnings"]:
                 print(f"   - {warning}")
 
         if results["errors"]:
-            print("\n❌ Errors:")
+            print("\nErrors:")
             for error in results["errors"]:
                 print(f"   - {error}")
 
             if results["installation_guide"]:
-                print("\n📖 Installation Guide:")
+                print("\nInstallation Guide:")
                 print(results["installation_guide"])
 
             sys.exit(1)
         else:
-            print("\n🎉 KiCad installation is valid and ready to use!")
+            print("\nKiCad installation is valid and ready to use!")
             sys.exit(0)
 
     except Exception as e:
-        print(f"\n💥 Validation failed: {e}")
+        print(f"\nValidation failed: {e}")
         sys.exit(1)
 
 

@@ -126,7 +126,13 @@ class TestLibraryOrchestrator:
     async def test_search_with_cache(self):
         """Test search with caching"""
 
-        query = SearchQuery(query="STM32F4")
+        # Scope to the local source only: search_component now fans out to all
+        # preferred_sources in parallel (default = 5, incl. network sources), so a
+        # bare query would aggregate results from unmocked sources. Restricting to
+        # LOCAL_KICAD isolates the caching behaviour this test targets.
+        query = SearchQuery(
+            query="STM32F4", preferred_sources=[LibrarySource.LOCAL_KICAD]
+        )
 
         # Mock local source to return results
         mock_result = ComponentSearchResult(

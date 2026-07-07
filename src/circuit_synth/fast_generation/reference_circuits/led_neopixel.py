@@ -128,7 +128,7 @@ def led_neopixel():
 
 
 if __name__ == "__main__":
-    print("🚀 Generating NeoPixel LED Driver Circuit...")
+    print("Generating NeoPixel LED Driver Circuit...")
 
     circuit_obj = led_neopixel()
     circuit_obj.generate_kicad_project(
@@ -137,5 +137,5 @@ if __name__ == "__main__":
         generate_pcb=True,
     )
 
-    print("✅ NeoPixel LED Driver KiCad project generated!")
-    print("📁 Check NeoPixel_LED_Driver/ directory for files")
+    print("NeoPixel LED Driver KiCad project generated!")
+    print("Check NeoPixel_LED_Driver/ directory for files")

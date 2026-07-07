@@ -13,12 +13,24 @@ Test strategy:
 5. Verify labels appear for each pin connected to a net
 """
 
+import re
 import tempfile
 from pathlib import Path
 
 import pytest
 
-from circuit_synth import circuit, Component, Net
+from circuit_synth import Component, Net, circuit
+
+
+def _count_local_labels(content: str, name: str) -> int:
+    """Count local labels `(label "NAME"` for a net (excludes hierarchical_label).
+
+    Issue #385 (labels missing entirely from a non-existent net.connections API) is
+    verified by these labels being present per connected pin. PR #608 later changed
+    internal flat-sheet nets from hierarchical labels to *local* labels, so we count
+    local labels here -- the #385 property (one label per pin) is unchanged.
+    """
+    return len(re.findall(rf'(?<!\(hierarchical_)\(label "{re.escape(name)}"', content))
 
 
 class TestIssue385HierarchicalLabels:
@@ -94,28 +106,30 @@ class TestIssue385HierarchicalLabels:
         # Verify hierarchical_label elements exist for each net
         # Each net should have labels on all connected pins
 
+        # Internal flat-sheet nets emit local labels (PR #608); the #385 property
+        # is one label per connected pin.
         # VIN_IN should appear once (R1 pin 1)
-        vin_in_labels = sch_content.count('hierarchical_label "VIN_IN"')
+        vin_in_labels = _count_local_labels(sch_content, "VIN_IN")
         assert vin_in_labels >= 1, (
-            f"Expected at least 1 hierarchical label for VIN_IN, found {vin_in_labels}. "
+            f"Expected at least 1 local label for VIN_IN, found {vin_in_labels}. "
             f"This indicates Issue #385 is not fixed: net loader not reading 'nodes' key from JSON."
         )
 
         # VOUT_DIV should appear twice (R1 pin 2 and R2 pin 1)
-        vout_div_labels = sch_content.count('hierarchical_label "VOUT_DIV"')
+        vout_div_labels = _count_local_labels(sch_content, "VOUT_DIV")
         assert vout_div_labels >= 2, (
-            f"Expected at least 2 hierarchical labels for VOUT_DIV, found {vout_div_labels}. "
+            f"Expected at least 2 local labels for VOUT_DIV, found {vout_div_labels}. "
             f"This indicates Issue #385 is not fixed: net loader not reading 'nodes' key from JSON."
         )
 
         # GND_REF should appear once (R2 pin 2)
-        gnd_ref_labels = sch_content.count('hierarchical_label "GND_REF"')
+        gnd_ref_labels = _count_local_labels(sch_content, "GND_REF")
         assert gnd_ref_labels >= 1, (
-            f"Expected at least 1 hierarchical label for GND_REF, found {gnd_ref_labels}. "
+            f"Expected at least 1 local label for GND_REF, found {gnd_ref_labels}. "
             f"This indicates Issue #385 is not fixed: net loader not reading 'nodes' key from JSON."
         )
 
-        print(f"\n✅ Hierarchical labels verified:")
+        print(f"\n✅ Local labels verified:")
         print(f"   - VIN_IN labels: {vin_in_labels}")
         print(f"   - VOUT_DIV labels: {vout_div_labels}")
         print(f"   - GND_REF labels: {gnd_ref_labels}")
@@ -170,15 +184,15 @@ class TestIssue385HierarchicalLabels:
         # Read schematic content
         sch_content = schematic_file.read_text()
 
-        # Verify hierarchical labels exist for NET1
-        net1_labels = sch_content.count('hierarchical_label "NET1"')
+        # Verify local labels exist for NET1 (one per connected pin; PR #608)
+        net1_labels = _count_local_labels(sch_content, "NET1")
         assert net1_labels >= 2, (
-            f"Expected at least 2 NET1 hierarchical labels (one per connected pin), "
+            f"Expected at least 2 NET1 local labels (one per connected pin), "
             f"found {net1_labels}. "
             f"This indicates Issue #385 is not fixed: net.connections API is wrong."
         )
 
-        print(f"\n✅ NET1 hierarchical labels verified: {net1_labels}")
+        print(f"\n✅ NET1 local labels verified: {net1_labels}")
 
     def test_net_pins_iteration(self):
         """

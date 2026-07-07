@@ -67,7 +67,7 @@ def test_hierarchical_label_orientation_and_justify():
     lines = content.split('\n')
     i = 0
     while i < len(lines):
-        if '(hierarchical_label' in lines[i]:
+        if '(label' in lines[i]:
             # Extract label data
             label_name = lines[i].split('"')[1]
 
@@ -89,8 +89,8 @@ def test_hierarchical_label_orientation_and_justify():
                     break
         i += 1
 
-    # Verify we found exactly 2 labels
-    assert len(labels_data) == 2, f"Expected 2 hierarchical labels, found {len(labels_data)}"
+    # Verify we found exactly 2 labels (local labels on a flat sheet; PR #608)
+    assert len(labels_data) == 2, f"Expected 2 local labels, found {len(labels_data)}"
 
     # Sort labels for consistent testing
     labels_data = sorted(labels_data, key=lambda x: x['rotation'])
@@ -150,7 +150,7 @@ def test_all_four_orientations():
     lines = content.split('\n')
     i = 0
     while i < len(lines):
-        if '(hierarchical_label' in lines[i]:
+        if '(label' in lines[i]:
             rotation = None
             justify = None
 

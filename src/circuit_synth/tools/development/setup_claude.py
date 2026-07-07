@@ -63,8 +63,8 @@ memory:
   load_memory_bank: true
 """
 
-    claude_config.write_text(config_content)
-    print(f"✅ Created Claude configuration: {claude_config}")
+    claude_config.write_text(config_content, encoding="utf-8")
+    print(f"Created Claude configuration: {claude_config}")
 
 
 def copy_examples(source_dir: Path, target_dir: Path) -> None:
@@ -74,19 +74,19 @@ def copy_examples(source_dir: Path, target_dir: Path) -> None:
 
     if source_examples.exists():
         if target_examples.exists():
-            print(f"📁 Updating existing examples directory...")
+            print(f"Updating existing examples directory...")
             shutil.rmtree(target_examples)
         else:
-            print(f"📁 Creating examples directory...")
+            print(f"Creating examples directory...")
 
         shutil.copytree(source_examples, target_examples)
-        print(f"✅ Agent training examples copied to: {target_examples}")
+        print(f"Agent training examples copied to: {target_examples}")
 
         # Count files to show scope
         example_count = sum(1 for f in target_examples.rglob("*.py") if f.is_file())
-        print(f"   📋 {example_count} example circuits available for AI training")
+        print(f"   {example_count} example circuits available for AI training")
     else:
-        print(f"⚠️  Examples directory not found at: {source_examples}")
+        print(f"Examples directory not found at: {source_examples}")
         return False
     return True
 
@@ -98,19 +98,19 @@ def copy_memory_bank(source_dir: Path, target_dir: Path) -> None:
 
     if source_memory.exists():
         if target_memory.exists():
-            print(f"🧠 Updating existing memory-bank...")
+            print(f"Updating existing memory-bank...")
             shutil.rmtree(target_memory)
         else:
-            print(f"🧠 Creating memory-bank directory...")
+            print(f"Creating memory-bank directory...")
 
         shutil.copytree(source_memory, target_memory)
-        print(f"✅ Design knowledge memory-bank copied to: {target_memory}")
+        print(f"Design knowledge memory-bank copied to: {target_memory}")
 
         # Count knowledge files
         knowledge_count = sum(1 for f in target_memory.rglob("*.md") if f.is_file())
-        print(f"   📚 {knowledge_count} knowledge documents available")
+        print(f"   {knowledge_count} knowledge documents available")
     else:
-        print(f"⚠️  Memory-bank directory not found at: {source_memory}")
+        print(f"Memory-bank directory not found at: {source_memory}")
         return False
     return True
 
@@ -122,14 +122,14 @@ def copy_claude_md(source_dir: Path, target_dir: Path) -> None:
 
     if source_claude_md.exists():
         if target_claude_md.exists():
-            print(f"📄 Updating CLAUDE.md instructions...")
+            print(f"Updating CLAUDE.md instructions...")
         else:
-            print(f"📄 Creating CLAUDE.md instructions...")
+            print(f"Creating CLAUDE.md instructions...")
 
         shutil.copy2(source_claude_md, target_claude_md)
-        print(f"✅ Claude instructions copied to: {target_claude_md}")
+        print(f"Claude instructions copied to: {target_claude_md}")
     else:
-        print(f"⚠️  CLAUDE.md not found at: {source_claude_md}")
+        print(f"CLAUDE.md not found at: {source_claude_md}")
         return False
     return True
 
@@ -148,27 +148,27 @@ def main(target_dir: Optional[Path] = None) -> None:
     if target_dir is None:
         target_dir = Path.cwd()
 
-    print("🚀 Setting up Claude Code integration for circuit-synth...")
-    print(f"📁 Target directory: {target_dir}")
+    print("Setting up Claude Code integration for circuit-synth...")
+    print(f"Target directory: {target_dir}")
 
     # Detect environment
     env_mode = detect_environment()
     if env_mode == "ci":
-        print("🤖 CI/CD environment detected")
+        print("CI/CD environment detected")
 
     # Check Claude availability
     claude_available = check_claude_availability()
     if not claude_available:
-        print("⚠️  Claude Code not found in PATH")
+        print("Claude Code not found in PATH")
         print("   Install Claude Code to enable AI-powered circuit design")
         print("   See: https://claude.ai/code")
 
     # Get source directory
     source_dir = get_package_data_dir()
-    print(f"📦 Package data source: {source_dir}")
+    print(f"Package data source: {source_dir}")
 
     if not source_dir.exists():
-        print(f"❌ Package data directory not found: {source_dir}")
+        print(f"Package data directory not found: {source_dir}")
         print("   This may indicate a packaging issue.")
         sys.exit(1)
 
@@ -196,34 +196,34 @@ def main(target_dir: Optional[Path] = None) -> None:
 
             setup_claude_integration()
         except ImportError:
-            print("⚠️  Claude Code SDK not available for full integration")
+            print("Claude Code SDK not available for full integration")
             print("   Install with: pip install circuit-synth[claude]")
 
         print(
-            f"\n🎯 Claude Code integration setup complete! ({success_count}/{total_steps} components)"
+            f"\nClaude Code integration setup complete! ({success_count}/{total_steps} components)"
         )
 
         if claude_available:
-            print("\n🤖 Available agent:")
+            print("\nAvailable agent:")
             print("   - circuit-synth: Circuit-synth code generation specialist")
 
-            print("\n⚡ Available shortcut:")
+            print("\nAvailable shortcut:")
             print("   - /check-manufacturing: Real-time component availability")
 
-            print("\n🔧 Real-time validation enabled:")
+            print("\nReal-time validation enabled:")
             print("   - Component availability checking")
             print("   - Circuit design rule validation")
             print("   - STM32 pin assignment verification")
             print("   - Manufacturing readiness assessment")
 
-            print(f"\n✨ Ready for AI-powered circuit design!")
+            print(f"\nReady for AI-powered circuit design!")
             print("   Try: Ask Claude to design an STM32 development board")
         else:
-            print(f"\n✅ Circuit-synth infrastructure ready!")
+            print(f"\nCircuit-synth infrastructure ready!")
             print("   Install Claude Code for AI-powered design assistance")
 
     except Exception as e:
-        print(f"❌ Setup failed: {e}")
+        print(f"Setup failed: {e}")
         print("\nPlease report this issue at:")
         print("https://github.com/circuit-synth/circuit-synth/issues")
         sys.exit(1)

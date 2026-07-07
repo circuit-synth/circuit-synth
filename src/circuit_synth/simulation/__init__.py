@@ -26,11 +26,12 @@ Example Usage:
 """
 
 from .analysis import ACAnalysis, DCAnalysis, TransientAnalysis
-from .converter import SpiceConverter
+from .converter import ResolvedModel, SimulationValidationError, SpiceConverter
 from .manufacturer_models import ManufacturerModels, get_manufacturer_models
+from .model_store import SpiceModelStore, get_model_store, resolve_mpn
 from .models import ModelLibrary, SpiceModel, get_model_library
+from .plotting import save_bode_plot, save_dc_transfer_plot, save_transient_plot
 from .simulator import CircuitSimulator, SimulationResult
-from .testbench import TestBenchGenerator, generate_testbench_for_circuit
 from .visualization import SimulationVisualizer, enhance_simulation_result
 
 # Enhance SimulationResult with export capabilities
@@ -40,6 +41,8 @@ __all__ = [
     "CircuitSimulator",
     "SimulationResult",
     "SpiceConverter",
+    "SimulationValidationError",
+    "ResolvedModel",
     "DCAnalysis",
     "ACAnalysis",
     "TransientAnalysis",
@@ -48,7 +51,11 @@ __all__ = [
     "get_model_library",
     "ManufacturerModels",
     "get_manufacturer_models",
-    "TestBenchGenerator",
-    "generate_testbench_for_circuit",
+    "SpiceModelStore",
+    "get_model_store",
+    "resolve_mpn",
     "SimulationVisualizer",
+    "save_bode_plot",
+    "save_transient_plot",
+    "save_dc_transfer_plot",
 ]

@@ -1,0 +1,2 @@
+* Custom diode model card (self-authored).
+.model CUSTOMD D (IS=1e-14 RS=0.2 N=1.6 BV=75)

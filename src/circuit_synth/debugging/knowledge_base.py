@@ -69,8 +69,27 @@ class DebugKnowledgeBase:
     def __init__(self, db_path: Optional[Path] = None):
         self.db_path = db_path or Path("memory-bank/debugging/debug_kb.db")
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self.conn = None
         self._init_database()
         self._load_default_patterns()
+
+    def close(self):
+        """Close the SQLite connection.
+
+        Important on Windows: an open connection keeps the .db file locked, so
+        callers using a temporary directory must close before it is removed
+        (otherwise cleanup raises PermissionError [WinError 32]).
+        """
+        if self.conn is not None:
+            self.conn.close()
+            self.conn = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+        return False
 
     def _init_database(self):
         """Initialize SQLite database for pattern storage"""
@@ -78,8 +97,7 @@ class DebugKnowledgeBase:
         self.conn.row_factory = sqlite3.Row
 
         # Create tables
-        self.conn.executescript(
-            """
+        self.conn.executescript("""
             CREATE TABLE IF NOT EXISTS debug_patterns (
                 pattern_id TEXT PRIMARY KEY,
                 category TEXT,
@@ -125,8 +143,7 @@ class DebugKnowledgeBase:
             CREATE INDEX IF NOT EXISTS idx_patterns_category ON debug_patterns(category);
             CREATE INDEX IF NOT EXISTS idx_components_type ON component_failures(component_type);
             CREATE INDEX IF NOT EXISTS idx_sessions_board ON debug_sessions(board_name);
-        """
-        )
+        """)
         self.conn.commit()
 
     def _load_default_patterns(self):

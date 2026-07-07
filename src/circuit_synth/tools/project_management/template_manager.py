@@ -43,7 +43,7 @@ class TemplateManager:
                 f"Expected location: {template_dir}"
             )
 
-        return template_file.read_text()
+        return template_file.read_text(encoding="utf-8")
 
     def copy_circuit_to_project(
         self, circuit: Circuit, project_path: Path, is_first: bool = False
@@ -69,7 +69,7 @@ class TemplateManager:
 
         # Write the circuit file
         target_file = circuit_dir / target_filename
-        target_file.write_text(circuit_code)
+        target_file.write_text(circuit_code, encoding="utf-8")
 
     def list_available_circuits(self) -> list[Circuit]:
         """Get list of all available circuits
@@ -116,7 +116,7 @@ class READMEGenerator:
 
 A circuit-synth project for PCB design with Python.
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Run your circuit
@@ -129,7 +129,7 @@ This will generate KiCad project files that you can open in KiCad.
 
         # Add section about included circuits
         if config.has_circuits():
-            readme += f"""## 📁 Included Circuits ({len(config.circuits)})
+            readme += f"""## Included Circuits ({len(config.circuits)})
 
 This project includes the following circuit templates:
 
@@ -142,7 +142,7 @@ This project includes the following circuit templates:
             readme += "\nYou can run any circuit file independently or use them as reference for your own designs.\n\n"
 
         # Add circuit-synth basics
-        readme += """## 🏗️ Circuit-Synth Basics
+        readme += """## Circuit-Synth Basics
 
 ### Creating Components
 
@@ -182,7 +182,7 @@ if __name__ == '__main__':
     circuit_obj = my_circuit()
     circuit_obj.generate_kicad_project(
         project_name="my_project",
-        generate_pcb=True
+        generate_pcb=False
     )
 ```
 
@@ -198,20 +198,16 @@ bom_result = circuit_obj.generate_bom(project_name="my_project")
 
 # 2. PDF Schematic - Documentation and review
 pdf_result = circuit_obj.generate_pdf_schematic(project_name="my_project")
-
-# 3. Gerber Files - PCB manufacturing (JLCPCB, PCBWay, etc.)
-gerber_result = circuit_obj.generate_gerbers(project_name="my_project")
 ```
 
 **Generated files:**
 - `my_project/my_project_bom.csv` - Component list with references and values
 - `my_project/my_project_schematic.pdf` - Printable schematic documentation
-- `my_project/gerbers/` - Complete Gerber package for PCB fabrication
 
 """
 
         # Add documentation links
-        readme += """## 📖 Documentation
+        readme += """## Documentation
 
 - Circuit-Synth: https://circuit-synth.readthedocs.io
 - KiCad: https://docs.kicad.org
@@ -220,28 +216,40 @@ gerber_result = circuit_obj.generate_gerbers(project_name="my_project")
 
         # Add Claude agents section if included
         if config.include_agents:
-            readme += """## 🤖 AI-Powered Design with Claude Code
+            readme += """## AI-Powered Design with Claude Code
 
-This project includes specialized circuit design agents in `.claude/agents/`:
+This project ships Claude Code helpers for circuit design:
 
-- **circuit-architect**: Master circuit design coordinator
-- **circuit-synth**: Circuit code generation and KiCad integration
-- **simulation-expert**: SPICE simulation and validation
-- **component-guru**: Component sourcing and manufacturing optimization
+- **`design-circuit` skill** — describe a circuit in natural language and let
+  Claude write the circuit-synth Python, generate the KiCad schematic, simulate,
+  and refine it (`.claude/skills/design-circuit/`).
+- **`tools/find_symbol.py`** — look up exact KiCad symbol/footprint ids:
+  `uv run python tools/find_symbol.py <query> [--footprints]`.
+- **`tools/simulate_example.py`** — known-good DC SPICE reference: runs a DC
+  operating-point analysis via ngspice (auto-uses KiCad's bundled `ngspice.dll`
+  on Windows). Copy its pattern to verify your own circuit's node voltages.
+- **`tools/simulate_filter.py`** — known-good AC-sweep reference: an op-amp
+  low-pass filter driven by a `Simulation_SPICE:VSIN` source (AC magnitude 1 V);
+  prints passband gain, -3 dB cutoff, and roll-off via
+  `circuit.simulate().ac_analysis(...)` and the `cutoff_frequency`/`bode` helpers.
+- **kicad-sch-api MCP server** (optional) — enable with
+  `uv add mcp-kicad-sch-api` (config in `.mcp.json`).
 
-Use natural language to design circuits with AI assistance!
+Declare simulation sources with KiCad's real `Simulation_SPICE` symbols —
+`Simulation_SPICE:VDC` for a DC supply, `Simulation_SPICE:VSIN` for an AC/transient
+stimulus (NOT the fictitious `Device:V`). Pin 1 is `+`, pin 2 is `-`.
 
 """
 
         # Add next steps
-        readme += """## 🚀 Next Steps
+        readme += """## Next Steps
 
 1. Open `circuit-synth/main.py` and review the base circuit
 2. Run the circuit to generate KiCad files
 3. Open the generated `.kicad_pro` file in KiCad
 4. Modify the circuit or create your own designs
 
-**Happy circuit designing!** 🎛️
+**Happy circuit designing!**
 """
 
         return readme
@@ -264,7 +272,7 @@ class CLAUDEMDGenerator:
 
 Project-specific guidance for Claude Code when working with this circuit-synth project.
 
-## 🚀 Project Overview
+## Project Overview
 
 This is a **circuit-synth project** for PCB design with Python code.
 
@@ -272,7 +280,7 @@ This is a **circuit-synth project** for PCB design with Python code.
 
         # Add info about included circuits
         if config.has_circuits():
-            claude_md += f"""## 📝 Included Circuits ({len(config.circuits)})
+            claude_md += f"""## Included Circuits ({len(config.circuits)})
 
 This project includes the following circuit templates:
 
@@ -289,31 +297,43 @@ This project includes the following circuit templates:
 
         # Add available tools
         if config.include_agents:
-            claude_md += """## ⚡ Available Tools & Commands
+            claude_md += """## AI Tooling
 
-### Slash Commands
-- `/find-symbol` - Search KiCad symbol libraries
-- `/find-footprint` - Search KiCad footprint libraries
-- `/find_stm32` - STM32-specific component search
+This project ships these Claude Code helpers:
 
-### Specialized Agents
-- **circuit-architect** - Master coordinator for complex projects
-- **circuit-synth** - Circuit code generation and KiCad integration
-- **simulation-expert** - SPICE simulation and validation
-- **component-guru** - Component sourcing and manufacturing
+- **`design-circuit` skill** (`.claude/skills/design-circuit/`) — iterative loop
+  to design a circuit from a prompt: write circuit-synth Python, generate the
+  KiCad schematic, simulate, and refine.
+- **`tools/find_symbol.py`** — resolve exact KiCad `Lib:Symbol` / footprint ids:
+  `uv run python tools/find_symbol.py <query> [--footprints]`.
+- **`tools/simulate_example.py`** — known-good SPICE reference (DC operating
+  point via ngspice; auto-uses KiCad's bundled `ngspice.dll` on Windows). Copy
+  its pattern to verify node voltages: `circuit.simulate().operating_point()`.
+- **`tools/simulate_filter.py`** — known-good AC-sweep reference (op-amp low-pass
+  filter). Copy its pattern for frequency-domain checks:
+  `circuit.simulate().ac_analysis(start_hz, stop_hz, points)` then
+  `.cutoff_frequency("NET")` / `.passband_gain_db("NET")` / `.bode("NET")`.
+- **kicad-sch-api MCP server** (optional) — direct schematic tools; enable with
+  `uv add mcp-kicad-sch-api` (config in `.mcp.json`).
+
+Declare simulation sources with real `Simulation_SPICE` symbols:
+`Simulation_SPICE:VDC` (DC supply) or `Simulation_SPICE:VSIN` (AC/transient
+stimulus, carries AC magnitude 1 V) — NOT the fictitious `Device:V`. Pin 1 = `+`,
+pin 2 = `-`.
 
 """
 
         # Add workflow guidance
-        claude_md += """## 🔧 Development Workflow
+        claude_md += """## Development Workflow
 
-1. **Component Selection**: Use `/find-symbol` and `/find-footprint` to find KiCad components
+1. **Component Selection**: Find KiCad symbols/footprints (browse
+   `<KiCad>/share/kicad/symbols` or use the KiCad symbol editor)
 2. **Circuit Design**: Write Python code using circuit-synth
 3. **Generate KiCad**: Run the Python file to create KiCad project
-4. **Manufacturing Files**: Templates automatically generate BOM, PDF, and Gerbers
+4. **Manufacturing Files**: Templates automatically generate BOM and PDF
 5. **Validate**: Open in KiCad and verify the design
 
-## 📚 Quick Reference
+## Quick Reference
 
 ### Component Creation
 ```python
@@ -336,17 +356,15 @@ component[1] += vcc
 # All templates automatically generate manufacturing files:
 circuit_obj.generate_bom(project_name="my_project")          # BOM CSV
 circuit_obj.generate_pdf_schematic(project_name="my_project")  # PDF schematic
-circuit_obj.generate_gerbers(project_name="my_project")      # Gerber files
 ```
 
 **Output:**
 - BOM: `my_project/my_project_bom.csv`
 - PDF: `my_project/my_project_schematic.pdf`
-- Gerbers: `my_project/gerbers/` (ready for JLCPCB, PCBWay, etc.)
 
 ---
 
-**This project is optimized for AI-powered circuit design with Claude Code!** 🎛️
+**This project is optimized for AI-powered circuit design with Claude Code!**
 """
 
         return claude_md

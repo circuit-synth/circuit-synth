@@ -203,7 +203,7 @@ class PCBGenerator:
 
         if placement_algorithm not in SUPPORTED_ALGORITHMS:
             logger.warning(
-                f"⚠️  Unknown placement algorithm '{placement_algorithm}'.\n"
+                f"Unknown placement algorithm '{placement_algorithm}'.\n"
                 f"   Supported algorithms: {', '.join(sorted(SUPPORTED_ALGORITHMS))}\n"
                 f"   Using default: '{DEFAULT_ALGORITHM}'"
             )
@@ -229,7 +229,7 @@ class PCBGenerator:
 
                 # Save blank PCB file
                 pcb.save(self.pcb_path)
-                logger.info(f"✓ Blank PCB file saved to: {self.pcb_path}")
+                logger.info(f"Blank PCB file saved to: {self.pcb_path}")
 
                 # Update project file to include PCB
                 self._update_project_file()
@@ -343,7 +343,7 @@ class PCBGenerator:
                     # If we get here, placement was successful
                     placement_successful = True
                     logger.debug(
-                        f"✓ Placement successful with board size: {current_width}x{current_height}mm"
+                        f"Placement successful with board size: {current_width}x{current_height}mm"
                     )
 
                     # Calculate actual board size needed based on placement
@@ -370,7 +370,7 @@ class PCBGenerator:
                     if placement_algorithm != "external":
                         pcb.set_board_outline_rect(0, 0, actual_width, actual_height)
                         logger.debug(
-                            f"✓ Adjusted board size to actual needs: {actual_width}x{actual_height}mm"
+                            f"Adjusted board size to actual needs: {actual_width}x{actual_height}mm"
                         )
                     else:
                         logger.debug(
@@ -417,9 +417,9 @@ class PCBGenerator:
             logger.debug("Applying netlist to PCB...")
             netlist_applied = self._apply_netlist_to_pcb(pcb)
             if netlist_applied:
-                logger.info("✓ Netlist successfully applied to PCB")
+                logger.info("Netlist successfully applied to PCB")
             else:
-                logger.warning("⚠ No netlist found or netlist application failed")
+                logger.warning("No netlist found or netlist application failed")
 
             # Auto-route if requested
             if auto_route:
@@ -428,13 +428,13 @@ class PCBGenerator:
                     pcb, passes=routing_passes, effort=routing_effort
                 )
                 if routing_success:
-                    logger.info("✓ Auto-routing completed successfully")
+                    logger.info("Auto-routing completed successfully")
                 else:
-                    logger.warning("⚠ Auto-routing failed, saving unrouted PCB")
+                    logger.warning("Auto-routing failed, saving unrouted PCB")
 
             # Save PCB file
             pcb.save(self.pcb_path)
-            logger.info(f"✓ PCB file saved to: {self.pcb_path}")
+            logger.info(f"PCB file saved to: {self.pcb_path}")
 
             # Generate ratsnest connections if requested (AFTER PCB save)
             if generate_ratsnest:
@@ -444,7 +444,7 @@ class PCBGenerator:
                 # KiCad generates ratsnest connections dynamically based on net connectivity
                 # No need to add explicit ratsnest tokens to the PCB file
                 logger.info(
-                    "✓ PCB nets are properly defined for dynamic ratsnest generation"
+                    "PCB nets are properly defined for dynamic ratsnest generation"
                 )
 
             # Update project file to include PCB
@@ -593,10 +593,10 @@ class PCBGenerator:
                             if ref.startswith("subcircuit_"):
                                 original_ref = ref[len("subcircuit_") :]
                                 print(
-                                    f"🔧 SUBCIRCUIT MAPPING (early): {ref} -> {original_ref}"
+                                    f"SUBCIRCUIT MAPPING (early): {ref} -> {original_ref}"
                                 )
                                 logger.info(
-                                    f"🔧 SUBCIRCUIT MAPPING (early): {ref} -> {original_ref}"
+                                    f"SUBCIRCUIT MAPPING (early): {ref} -> {original_ref}"
                                 )
                                 ref = original_ref
 
@@ -982,7 +982,7 @@ class PCBGenerator:
                     return False
 
                 logger.info(
-                    f"✓ Temp PCB saved, size: {temp_pcb_file.stat().st_size} bytes"
+                    f"Temp PCB saved, size: {temp_pcb_file.stat().st_size} bytes"
                 )
 
                 # Verify PCB content
@@ -1010,7 +1010,7 @@ class PCBGenerator:
                     return False
 
                 logger.info(
-                    f"✓ DSN export complete, size: {dsn_file.stat().st_size} bytes"
+                    f"DSN export complete, size: {dsn_file.stat().st_size} bytes"
                 )
 
                 # Check DSN content
@@ -1072,7 +1072,7 @@ class PCBGenerator:
                     return False
 
                 logger.info(
-                    f"✓ Freerouting completed, SES size: {ses_file.stat().st_size} bytes"
+                    f"Freerouting completed, SES size: {ses_file.stat().st_size} bytes"
                 )
 
                 # Check SES content
@@ -1092,7 +1092,7 @@ class PCBGenerator:
                     logger.error(f"SES import failed: {e}")
                     return False
 
-                logger.info("✓ Routing import complete")
+                logger.info("Routing import complete")
 
                 # Check the routed PCB
                 with open(temp_pcb_file, "r") as f:

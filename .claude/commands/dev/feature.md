@@ -65,7 +65,7 @@ Guides you through the complete feature development workflow:
 6. **PR Creation**
    - Commit with descriptive message
    - Create PR with summary
-   - Run /dev:review-branch for pre-merge validation
+   - Run /code-review for pre-merge validation
    - Address any issues found
 
 ## Iterative Cycle Pattern (CRITICAL)

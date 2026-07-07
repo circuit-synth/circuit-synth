@@ -2,6 +2,7 @@
 DigiKey GitHub library source using converted modern .kicad_sym files
 """
 
+import logging
 import re
 import time
 from pathlib import Path
@@ -10,6 +11,8 @@ from typing import Dict, List, Optional
 from ..converter import DigiKeyLibraryConverter
 from ..models import ComponentSearchResult, LibrarySource, SearchQuery
 from .base import BaseLibrarySource
+
+logger = logging.getLogger(__name__)
 
 
 class DigiKeyGitHubModernSource(BaseLibrarySource):

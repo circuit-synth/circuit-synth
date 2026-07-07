@@ -40,7 +40,7 @@ def main(circuit_path: str, output: str, verbose: bool, top: int, threshold: int
 
     console.print(
         Panel.fit(
-            Text("🔍 FMEA Circuit Analysis Tool", style="bold blue"), style="blue"
+            Text("FMEA Circuit Analysis Tool", style="bold blue"), style="blue"
         )
     )
 
@@ -52,8 +52,8 @@ def main(circuit_path: str, output: str, verbose: bool, top: int, threshold: int
         else:
             output = f"{path.name}_FMEA_Report.pdf"
 
-    console.print(f"📂 Analyzing: {circuit_path}", style="cyan")
-    console.print(f"📄 Output: {output}", style="cyan")
+    console.print(f"Analyzing: {circuit_path}", style="cyan")
+    console.print(f"Output: {output}", style="cyan")
 
     try:
         # Perform analysis
@@ -78,18 +78,18 @@ def main(circuit_path: str, output: str, verbose: bool, top: int, threshold: int
                 else:
                     circuit_file = py_files[0]
             else:
-                console.print("❌ No circuit files found", style="red")
+                console.print("No circuit files found", style="red")
                 return
         else:
             circuit_file = path
 
-        console.print(f"🔧 Parsing: {circuit_file.name}", style="yellow")
+        console.print(f"Parsing: {circuit_file.name}", style="yellow")
 
         # Analyze
         circuit_data, failure_modes = analyzer.analyze_circuit_file(str(circuit_file))
 
         # Display summary
-        console.print("\n📊 Analysis Results:", style="bold green")
+        console.print("\nAnalysis Results:", style="bold green")
 
         # Statistics
         total = len(failure_modes)
@@ -104,24 +104,24 @@ def main(circuit_path: str, output: str, verbose: bool, top: int, threshold: int
         stats_table.add_column("Percentage", justify="right")
 
         stats_table.add_row(
-            "🔴 Critical (≥300)", str(critical), f"{critical/total*100:.1f}%"
+            "Critical (≥300)", str(critical), f"{critical/total*100:.1f}%"
         )
         stats_table.add_row(
-            "🟠 High (≥{})".format(threshold), str(high), f"{high/total*100:.1f}%"
+            "High (≥{})".format(threshold), str(high), f"{high/total*100:.1f}%"
         )
         stats_table.add_row(
-            "🟡 Medium (50-{})".format(threshold - 1),
+            "Medium (50-{})".format(threshold - 1),
             str(medium),
             f"{medium/total*100:.1f}%",
         )
-        stats_table.add_row("🟢 Low (<50)", str(low), f"{low/total*100:.1f}%")
+        stats_table.add_row("Low (<50)", str(low), f"{low/total*100:.1f}%")
         stats_table.add_row("", "", "")
         stats_table.add_row("Total", str(total), "100.0%", style="bold")
 
         console.print(stats_table)
 
         # Top risks
-        console.print(f"\n🚨 Top {top} Risks:", style="bold red")
+        console.print(f"\nTop {top} Risks:", style="bold red")
 
         risk_table = Table(show_header=True)
         risk_table.add_column("#", justify="right", style="dim")
@@ -133,16 +133,16 @@ def main(circuit_path: str, output: str, verbose: bool, top: int, threshold: int
         for i, fm in enumerate(failure_modes[:top], 1):
             rpn = fm["rpn"]
             if rpn >= 300:
-                risk_emoji = "🔴"
+                risk_emoji = ""
                 risk_style = "red"
             elif rpn >= threshold:
-                risk_emoji = "🟠"
+                risk_emoji = ""
                 risk_style = "yellow"
             elif rpn >= 50:
-                risk_emoji = "🟡"
+                risk_emoji = ""
                 risk_style = "dim yellow"
             else:
-                risk_emoji = "🟢"
+                risk_emoji = ""
                 risk_style = "green"
 
             risk_table.add_row(
@@ -157,7 +157,7 @@ def main(circuit_path: str, output: str, verbose: bool, top: int, threshold: int
         console.print(risk_table)
 
         # Component summary
-        console.print(f"\n🔧 Component Analysis:", style="bold blue")
+        console.print(f"\nComponent Analysis:", style="bold blue")
         console.print(
             f"  Total components analyzed: {circuit_data.get('component_count', 'N/A')}"
         )
@@ -168,19 +168,19 @@ def main(circuit_path: str, output: str, verbose: bool, top: int, threshold: int
                 console.print(f"    • {subsystem['name']}", style="dim")
 
         # Generate PDF report
-        console.print(f"\n📝 Generating PDF report...", style="yellow")
+        console.print(f"\nGenerating PDF report...", style="yellow")
 
         report_path = analyzer.generate_report(circuit_data, failure_modes, output)
 
         if report_path:
             file_size = Path(report_path).stat().st_size / 1024
             console.print(
-                f"✅ Report generated: {report_path} ({file_size:.1f} KB)",
+                f"Report generated: {report_path} ({file_size:.1f} KB)",
                 style="green",
             )
 
             # Recommendations summary
-            console.print("\n💡 Key Recommendations:", style="bold magenta")
+            console.print("\nKey Recommendations:", style="bold magenta")
 
             # Get unique recommendations for critical/high risks
             recommendations = set()
@@ -193,17 +193,17 @@ def main(circuit_path: str, output: str, verbose: bool, top: int, threshold: int
             for i, rec in enumerate(list(recommendations)[:5], 1):
                 console.print(f"  {i}. {rec[:80]}...", style="dim")
 
-            console.print("\n🎯 Next Steps:", style="bold")
+            console.print("\nNext Steps:", style="bold")
             console.print("  1. Review the PDF report for detailed analysis")
             console.print("  2. Address critical and high-risk failure modes")
             console.print("  3. Implement recommended design improvements")
             console.print("  4. Re-run analysis after modifications")
 
         else:
-            console.print("❌ Failed to generate report", style="red")
+            console.print("Failed to generate report", style="red")
 
     except Exception as e:
-        console.print(f"❌ Error: {e}", style="red")
+        console.print(f"Error: {e}", style="red")
         if verbose:
             import traceback
 

@@ -615,6 +615,8 @@ class Circuit:
         generate_ratsnest: bool = True,
         update_source_refs: Optional[bool] = None,
         preserve_user_components: bool = False,
+        erc_gate: bool = True,
+        selective_wires: bool = True,
     ) -> Dict[str, Any]:
         """
         Generate a complete KiCad project (schematic + PCB) from this circuit.
@@ -637,6 +639,19 @@ class Circuit:
             preserve_user_components: Keep components in KiCad that don't exist in Python (default: False)
                                      False: Python is source of truth - delete components not in Python
                                      True: Preserve all components in KiCad, even if not in Python
+            erc_gate: Run KiCad headless ERC on the generated root schematic and
+                     auto-fix `power_pin_not_driven` (add PWR_FLAG), iterating up to
+                     3 times (default: True as of Stage 18 — the autofix is net-aware
+                     and reverts any iteration that makes ERC worse). Residual
+                     violations are returned in `result["erc_report"]`. If kicad-cli
+                     is unavailable this is a warning, not a failure. Pass False to
+                     skip the ERC pass entirely.
+            selective_wires: Draw real wires for simple 2-pin, short, same-sheet,
+                     non-power local nets (instead of leaving them as labels only) as
+                     a post-generation readability pass (default: True). Guarded by a
+                     netlist-equivalence check that reverts if a wire would change
+                     connectivity, so it can only ever add cosmetic wires. Summary on
+                     `result["selective_wires"]`. Pass False to skip it.
 
         Returns:
             dict: Result dictionary containing:
@@ -775,12 +790,57 @@ class Circuit:
                     project_name=project_name,
                     output_path=str(output_path),
                 )
-                # Return success result with JSON path
-                return {
+
+                success_result: Dict[str, Any] = {
                     "success": True,
                     "json_path": json_path,
                     "project_path": output_path,
                 }
+
+                root_sch = output_path / f"{project_base_name}.kicad_sch"
+
+                # Post-generation readability pass: draw wires for simple local nets.
+                if selective_wires and root_sch.exists():
+                    try:
+                        from ..kicad.sch_gen.selective_wiring import wire_local_nets
+
+                        wire_result = wire_local_nets(str(root_sch))
+                        success_result["selective_wires"] = wire_result
+                        context_logger.info(
+                            f"Selective wiring drew {wire_result.get('wires_drawn', 0)} wire(s)",
+                            component="CIRCUIT",
+                        )
+                    except Exception as e:  # never fail generation over a cosmetic pass
+                        context_logger.warning(
+                            f"Selective wiring skipped: {e}", component="CIRCUIT"
+                        )
+
+                # Post-generation ERC gate (opt-in).
+                if erc_gate and root_sch.exists():
+                    try:
+                        from ..kicad.sch_gen.erc_gate import ErcUnavailable
+                        from ..kicad.sch_gen.erc_gate import erc_gate as run_erc_gate
+
+                        report = run_erc_gate(str(root_sch))
+                        success_result["erc_report"] = report
+                        context_logger.info(
+                            f"ERC gate: {report.error_count} error(s), "
+                            f"{report.warning_count} warning(s), "
+                            f"{report.autofixes_applied} autofix(es)",
+                            component="CIRCUIT",
+                        )
+                    except ErcUnavailable as e:
+                        context_logger.warning(
+                            f"ERC gate skipped (kicad-cli unavailable): {e}",
+                            component="CIRCUIT",
+                        )
+                    except Exception as e:  # ERC must never break generation
+                        context_logger.warning(
+                            f"ERC gate skipped ({type(e).__name__}): {e}",
+                            component="CIRCUIT",
+                        )
+
+                return success_result
             else:
                 error_msg = result.get(
                     "error", "Unknown error occurred during project generation"
@@ -814,6 +874,32 @@ class Circuit:
                 "success": False,
                 "error": error_msg,
             }
+
+    # Sourcing fields that ride as KiCad component properties (see Stage 10 Part B).
+    # Order is stable so the auto-generated BOM columns are deterministic.
+    _SOURCING_FIELDS = ("MPN", "Manufacturer", "Distributor", "LCSC")
+
+    def _detect_sourcing_fields(self) -> list:
+        """Return the sourcing fields (in stable order) attached to any component.
+
+        Scans this circuit and all subcircuits. A field counts as present if any
+        component carries it in ``_extra_fields`` (how ``Component(MPN=...)`` kwargs
+        are stored) or in its ``properties`` dict.
+        """
+        found = set()
+
+        def scan(circuit):
+            for comp in circuit._components.values():
+                extra = getattr(comp, "_extra_fields", {}) or {}
+                props = getattr(comp, "properties", {}) or {}
+                for f in self._SOURCING_FIELDS:
+                    if f in extra or f in props:
+                        found.add(f)
+            for sub in getattr(circuit, "_subcircuits", []):
+                scan(sub)
+
+        scan(self)
+        return [f for f in self._SOURCING_FIELDS if f in found]
 
     def generate_bom(
         self,
@@ -907,6 +993,22 @@ class Circuit:
                     component="CIRCUIT",
                     project_path=str(project_path),
                 )
+
+            # When no explicit fields are requested, auto-include any attached
+            # sourcing fields (MPN/Manufacturer/Distributor/LCSC) so they aren't
+            # silently dropped from KiCad's default BOM columns (stage 17.4, G5).
+            # Explicit fields= always wins.
+            if fields is None:
+                present = self._detect_sourcing_fields()
+                if present:
+                    fields = "Reference,Value,Footprint,QUANTITY,DNP," + ",".join(
+                        present
+                    )
+                    labels = "Refs,Value,Footprint,Qty,DNP," + ",".join(present)
+                    context_logger.info(
+                        f"BOM: auto-including sourcing columns {present}",
+                        component="CIRCUIT",
+                    )
 
             # Export BOM using kicad-cli
             context_logger.info(
@@ -1229,13 +1331,19 @@ class Circuit:
             )
             return {"success": False, "error": error_msg}
 
-    def simulate(self):
+    def simulate(self, compat=None):
         """
         Create a simulator instance for this circuit.
 
         This method provides access to circuit simulation capabilities using
         PySpice as the backend. The returned simulator object can be used to
         run various analyses such as DC operating point, transient, and AC.
+
+        Args:
+            compat: Optional ngspice dialect (``ngbehavior``) so vendor
+                PSpice/LTspice-flavored ``.lib`` files parse -- e.g.
+                ``compat="psa"`` for a TI-style PSpice model. When omitted, a
+                schematic ``Sim.Compat`` property is used if present.
 
         Returns:
             CircuitSimulator: Simulator object for running analyses
@@ -1265,16 +1373,16 @@ class Circuit:
             component="CIRCUIT",
             circuit_name=self.name,
         )
-        return CircuitSimulator(self)
+        return CircuitSimulator(self, compat=compat)
 
-    def simulator(self):
+    def simulator(self, compat=None):
         """
         Alias for simulate() method for backward compatibility.
 
         Returns:
             CircuitSimulator: Simulator object for running analyses
         """
-        return self.simulate()
+        return self.simulate(compat=compat)
 
 
     @property

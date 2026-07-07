@@ -2,6 +2,7 @@
 DigiKey API source implementation
 """
 
+import logging
 import time
 from typing import List, Optional
 
@@ -9,6 +10,8 @@ import aiohttp
 
 from ..models import ComponentSearchResult, LibrarySource, SearchQuery
 from .base import BaseLibrarySource
+
+logger = logging.getLogger(__name__)
 
 
 class DigiKeySource(BaseLibrarySource):

@@ -308,8 +308,13 @@ class SourceRefRewriter:
         )
 
         try:
-            # Write content
-            with open(temp_fd, "w", encoding=encoding, newline=newline) as f:
+            # Write content. `content` was read with newline="" and processed with
+            # splitlines(keepends=True), so it already carries the file's original
+            # line endings verbatim. Write with newline="" too, so text-mode
+            # translation does NOT re-apply them -- otherwise on Windows every
+            # existing "\r\n" would become "\r\r\n" (a blank line inserted between
+            # every source line, corrupting the user's file).
+            with open(temp_fd, "w", encoding=encoding, newline="") as f:
                 f.write(content)
 
             # Restore original permissions

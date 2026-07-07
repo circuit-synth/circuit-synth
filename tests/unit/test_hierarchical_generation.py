@@ -293,15 +293,18 @@ class TestHierarchicalGeneration:
 
 def count_symbol_instances(content: str) -> int:
     """
-    Count symbol instances in KiCad schematic content.
+    Count real component symbol instances in KiCad schematic content.
 
-    Excludes symbol definitions in lib_symbols section.
-    Only counts actual component instances.
+    Excludes symbol definitions in the lib_symbols section, and excludes
+    auto-generated power symbols (lib_id "power:*" -- the GND/VCC symbols that
+    #582 power-net detection places once per connected pin) so the count reflects
+    the actual components placed in the sheet, not the power connection points.
     """
     lines = content.split('\n')
     in_lib_symbols = False
     instance_count = 0
     depth = 0
+    pending = False  # inside a component instance, waiting to see its lib_id
 
     for line in lines:
         stripped = line.strip()
@@ -311,13 +314,21 @@ def count_symbol_instances(content: str) -> int:
             in_lib_symbols = True
             depth = line.count('\t')
 
-        # Count opening symbol tags outside lib_symbols
-        if '(symbol' in line and not in_lib_symbols:
-            instance_count += 1
+        if in_lib_symbols:
+            # Track when we exit lib_symbols (closing paren at the same depth)
+            if stripped == ')' and line.count('\t') == depth:
+                in_lib_symbols = False
+            continue
 
-        # Track when we exit lib_symbols (when we hit closing paren at same depth)
-        if in_lib_symbols and stripped == ')' and line.count('\t') == depth:
-            in_lib_symbols = False
+        # A component instance opens with '(symbol' outside lib_symbols.
+        if stripped.startswith('(symbol'):
+            instance_count += 1
+            pending = True
+        # The instance's first lib_id decides whether it was a power symbol.
+        elif pending and stripped.startswith('(lib_id '):
+            pending = False
+            if '"power:' in stripped:
+                instance_count -= 1
 
     return instance_count
 

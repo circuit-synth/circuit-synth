@@ -31,8 +31,8 @@ When this command is invoked, you MUST:
 ## Usage Examples
 ```bash
 /dev:review-prompt @CLAUDE.md
-/dev:review-prompt @.claude/commands/dev/review-branch.md
-/dev:review-prompt @.claude/agents/circuit-architect.md
+/dev:review-prompt @.claude/commands/dev/update-and-commit.md
+/dev:review-prompt @.claude/agents/prompt-improver.md
 /dev:review-prompt "inline prompt text here"
 ```
 
@@ -173,7 +173,7 @@ For the most critical sections, the agent may provide rewritten versions:
 
 ### Review a slash command prompt
 ```bash
-/dev:review-prompt @.claude/commands/dev/review-branch.md
+/dev:review-prompt @.claude/commands/dev/update-and-commit.md
 ```
 
 ### Review inline prompt text

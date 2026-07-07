@@ -3,12 +3,15 @@ Caching system for library sourcing results
 """
 
 import json
+import logging
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from .models import ComponentSearchResult, LibrarySource, SearchQuery
+
+logger = logging.getLogger(__name__)
 
 
 class LibraryCache:

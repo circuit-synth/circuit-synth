@@ -151,56 +151,49 @@ if __name__ == "__main__":
     circuit_obj.generate_kicad_project(
         project_name="power_supply_module",
         placement_algorithm="hierarchical",
-        generate_pcb=True,
+        generate_pcb=False,
     )
 
-    print("✅ Dual-rail power supply circuit generated!")
-    print("📁 Open in KiCad: power_supply_module/power_supply_module.kicad_pro")
+    print("Dual-rail power supply circuit generated!")
+    print("Open in KiCad: power_supply_module/power_supply_module.kicad_pro")
     print()
 
-    # Generate manufacturing files (BOM, PDF, Gerbers)
-    print("📦 Generating manufacturing files...")
+    # Generate manufacturing files (BOM and PDF)
+    print("Generating manufacturing files...")
     print()
 
     # Generate BOM for component ordering
     bom_result = circuit_obj.generate_bom(project_name="power_supply_module")
     if bom_result["success"]:
-        print(f"✅ BOM generated: {bom_result['file']}")
+        print(f"BOM generated: {bom_result['file']}")
         print(f"   Components: {bom_result['component_count']}")
     else:
-        print(f"⚠️  BOM generation failed: {bom_result.get('error')}")
+        print(f"BOM generation failed: {bom_result.get('error')}")
     print()
 
     # Generate PDF schematic for documentation
     pdf_result = circuit_obj.generate_pdf_schematic(project_name="power_supply_module")
     if pdf_result["success"]:
-        print(f"✅ PDF schematic generated: {pdf_result['file']}")
+        print(f"PDF schematic generated: {pdf_result['file']}")
     else:
-        print(f"⚠️  PDF generation failed: {pdf_result.get('error')}")
+        print(f"PDF generation failed: {pdf_result.get('error')}")
     print()
 
-    # Generate Gerber files for manufacturing
-    gerber_result = circuit_obj.generate_gerbers(project_name="power_supply_module")
-    if gerber_result["success"]:
-        print(f"✅ Gerber files generated: {gerber_result['output_dir']}")
-        print(f"   Gerber files: {len(gerber_result['gerber_files'])}")
-        if gerber_result["drill_files"]:
-            print(f"   Drill files: {gerber_result['drill_files']}")
-    else:
-        print(f"⚠️  Gerber generation failed: {gerber_result.get('error')}")
+    # NOTE: Gerber/PCB export is not available in this build (licensed feature
+    # of upstream circuit-synth). Tracked as a wishlist item in TODO.md.
     print()
 
-    print("📊 Circuit Specifications:")
+    print("Circuit Specifications:")
     print("   Input:  6.5V - 12V")
     print("   Output 1: 5.0V @ 1A max")
     print("   Output 2: 3.3V @ 1A max")
     print()
-    print("💡 Features:")
+    print("Features:")
     print("   • Independent voltage regulation")
     print("   • Power indicator LEDs (green)")
     print("   • Proper decoupling capacitors")
     print()
-    print("🔧 Next Steps:")
+    print("Next Steps:")
     print("   • Add input protection (reverse polarity, overvoltage)")
     print("   • Add output filtering if needed for sensitive circuits")
     print("   • Consider heatsinking for continuous 1A loads")

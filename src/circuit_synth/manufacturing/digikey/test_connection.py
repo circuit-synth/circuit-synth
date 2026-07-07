@@ -35,31 +35,31 @@ def test_digikey_connection():
     config_file_found = False
     for path in config_paths:
         if path.exists():
-            print(f"✅ Config file found: {path}")
+            print(f"Config file found: {path}")
             config_file_found = True
             break
 
     if not config_file_found:
-        print("ℹ️  No config file found")
+        print("No config file found")
 
     # Check environment variables
     import os
 
     if os.environ.get("DIGIKEY_CLIENT_ID"):
-        print("✅ Environment variable DIGIKEY_CLIENT_ID is set")
+        print("Environment variable DIGIKEY_CLIENT_ID is set")
     else:
-        print("ℹ️  Environment variable DIGIKEY_CLIENT_ID not set")
+        print("Environment variable DIGIKEY_CLIENT_ID not set")
 
     if os.environ.get("DIGIKEY_CLIENT_SECRET"):
-        print("✅ Environment variable DIGIKEY_CLIENT_SECRET is set")
+        print("Environment variable DIGIKEY_CLIENT_SECRET is set")
     else:
-        print("ℹ️  Environment variable DIGIKEY_CLIENT_SECRET not set")
+        print("Environment variable DIGIKEY_CLIENT_SECRET not set")
 
     # Try to get configuration
     print("\nAttempting to load configuration...")
     try:
         config_dict = DigiKeyConfigManager.get_config()
-        print("✅ Configuration loaded successfully")
+        print("Configuration loaded successfully")
 
         # Show config (without secret)
         print(f"\nConfiguration:")
@@ -71,7 +71,7 @@ def test_digikey_connection():
         print(f"  Sandbox Mode: {config_dict.get('sandbox_mode', False)}")
 
     except ValueError as e:
-        print(f"❌ Configuration error: {e}")
+        print(f"Configuration error: {e}")
         print(
             "\nRun 'python -m circuit_synth.manufacturing.digikey.config_manager' to set up credentials"
         )
@@ -82,9 +82,9 @@ def test_digikey_connection():
     try:
         config = DigiKeyConfig.from_environment()
         client = DigiKeyAPIClient(config)
-        print("✅ API client created successfully")
+        print("API client created successfully")
     except Exception as e:
-        print(f"❌ Failed to create API client: {e}")
+        print(f"Failed to create API client: {e}")
         return False
 
     # Try to get access token
@@ -92,13 +92,13 @@ def test_digikey_connection():
     try:
         token = client._get_access_token()
         if token:
-            print("✅ Successfully obtained access token")
+            print("Successfully obtained access token")
             print(f"  Token (first 10 chars): {token[:10]}...")
         else:
-            print("❌ Failed to obtain access token")
+            print("Failed to obtain access token")
             return False
     except Exception as e:
-        print(f"❌ Authentication failed: {e}")
+        print(f"Authentication failed: {e}")
         print("\nPossible issues:")
         print("1. Invalid Client ID or Client Secret")
         print("2. Network connection problems")
@@ -111,7 +111,7 @@ def test_digikey_connection():
         results = client.search_products("1N4148", record_count=1)
         if results and "Products" in results:
             product_count = len(results["Products"])
-            print(f"✅ Search successful! Found {product_count} product(s)")
+            print(f"Search successful! Found {product_count} product(s)")
 
             if product_count > 0:
                 product = results["Products"][0]
@@ -122,17 +122,17 @@ def test_digikey_connection():
                 )
                 print(f"  Stock: {product.get('QuantityOnHand', 0)}")
         else:
-            print("⚠️  Search returned no results (might be sandbox mode)")
+            print("Search returned no results (might be sandbox mode)")
 
     except Exception as e:
-        print(f"❌ Search failed: {e}")
+        print(f"Search failed: {e}")
         return False
 
     # Check cache
     print("\nChecking cache system...")
     cache_dir = config.cache_dir
     if cache_dir and cache_dir.exists():
-        print(f"✅ Cache directory exists: {cache_dir}")
+        print(f"Cache directory exists: {cache_dir}")
 
         # Count cache files
         search_cache = cache_dir / "searches"
@@ -146,10 +146,10 @@ def test_digikey_connection():
             product_count = len(list(product_cache.glob("*.json")))
             print(f"  Product cache: {product_count} files")
     else:
-        print(f"ℹ️  Cache directory not yet created: {cache_dir}")
+        print(f"Cache directory not yet created: {cache_dir}")
 
     print("\n" + "=" * 60)
-    print("✅ DigiKey API connection test PASSED!")
+    print("DigiKey API connection test PASSED!")
     print("=" * 60)
     print("\nYour DigiKey integration is ready to use.")
     print("\nTry running: python examples/digikey_example.py")

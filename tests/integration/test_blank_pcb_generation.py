@@ -10,6 +10,12 @@ from pathlib import Path
 
 import pytest
 
+# generate_pcb=True needs the optional PCB backend; skip cleanly when it's absent.
+pytest.importorskip(
+    "kicad_pcb_api", reason="optional kicad_pcb_api PCB backend not installed"
+)
+pytestmark = pytest.mark.requires_pcb
+
 from circuit_synth import circuit
 
 

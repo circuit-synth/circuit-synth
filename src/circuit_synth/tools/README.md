@@ -28,7 +28,6 @@ This directory contains user-facing command-line tools and utilities that are in
 - `kicad_netlist_parser.py` - Parse KiCad netlist files
 - `kicad_parser.py` - General KiCad file parser
 - `python_code_generator.py` - Generate Python from circuit data
-- `ai_design_manager.py` - AI-powered design management
 - `circuit_creator_cli.py` - Command-line circuit creation
 - `llm_code_updater.py` - LLM-assisted code updates
 

@@ -177,11 +177,11 @@ class ProjectTemplateGenerator:
         # Generate subcircuit files
         for subcircuit in template["subcircuits"]:
             subcircuit_file = project_dir / subcircuit.filename
-            subcircuit_file.write_text(subcircuit.code_template)
+            subcircuit_file.write_text(subcircuit.code_template, encoding="utf-8")
 
         # Generate main.py
         main_file = project_dir / "main.py"
-        main_file.write_text(template["main_template"])
+        main_file.write_text(template["main_template"], encoding="utf-8")
 
         return True
 
@@ -496,25 +496,25 @@ def main_circuit():
 
 
 if __name__ == "__main__":
-    print("🚀 Starting ESP32 Complete Board generation...")
+    print("Starting ESP32 Complete Board generation...")
     
     circuit = main_circuit()
     
-    print("🔌 Generating KiCad netlist...")
+    print("Generating KiCad netlist...")
     circuit.generate_kicad_netlist("ESP32_Complete_Board.net")
     
-    print("📄 Generating JSON netlist...")  
+    print("Generating JSON netlist...")  
     circuit.generate_json_netlist("ESP32_Complete_Board.json")
     
-    print("🏗️  Generating KiCad project...")
+    print("Generating KiCad project...")
     circuit.generate_kicad_project(
         project_name="ESP32_Complete_Board",
         placement_algorithm="hierarchical",
         generate_pcb=True
     )
     
-    print("✅ ESP32 Complete Board project generated!")
-    print("📁 Check the ESP32_Complete_Board/ directory for KiCad files")
+    print("ESP32 Complete Board project generated!")
+    print("Check the ESP32_Complete_Board/ directory for KiCad files")
 '''
 
     def _get_stm32_power_template(self) -> str:
@@ -742,25 +742,25 @@ def main_circuit():
 
 
 if __name__ == "__main__":
-    print("🚀 Starting STM32 Complete Board generation...")
+    print("Starting STM32 Complete Board generation...")
     
     circuit = main_circuit()
     
-    print("🔌 Generating KiCad netlist...")
+    print("Generating KiCad netlist...")
     circuit.generate_kicad_netlist("STM32_Complete_Board.net")
     
-    print("📄 Generating JSON netlist...")
+    print("Generating JSON netlist...")
     circuit.generate_json_netlist("STM32_Complete_Board.json")
     
-    print("🏗️  Generating KiCad project...")
+    print("Generating KiCad project...")
     circuit.generate_kicad_project(
         project_name="STM32_Complete_Board",
         placement_algorithm="hierarchical",
         generate_pcb=True
     )
     
-    print("✅ STM32 Complete Board project generated!")
-    print("📁 Check the STM32_Complete_Board/ directory for KiCad files")
+    print("STM32 Complete Board project generated!")
+    print("Check the STM32_Complete_Board/ directory for KiCad files")
 '''
 
 
@@ -769,4 +769,4 @@ if __name__ == "__main__":
     generator = ProjectTemplateGenerator()
     output_dir = Path("generated_projects")
     success = generator.generate_project("esp32_complete_board", output_dir)
-    print(f"Project generation: {'✅ Success' if success else '❌ Failed'}")
+    print(f"Project generation: {'Success' if success else 'Failed'}")

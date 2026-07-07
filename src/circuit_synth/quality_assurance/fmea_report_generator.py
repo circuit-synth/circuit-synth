@@ -170,7 +170,7 @@ class FMEAReportGenerator:
         # Build the PDF
         doc.build(story)
 
-        print(f"✅ FMEA Report generated: {output_path}")
+        print(f"FMEA Report generated: {output_path}")
         return output_path
 
     def _create_title_page(self) -> List:
@@ -576,7 +576,7 @@ class FMEAReportGenerator:
 
     def _get_status_indicator(self, is_good: bool) -> str:
         """Get status indicator for findings"""
-        return "✓ Good" if is_good else "⚠ Attention"
+        return "Good" if is_good else "Attention"
 
 
 def analyze_circuit_for_fmea(circuit_path: str) -> Tuple[Dict, List[Dict]]:
@@ -668,10 +668,10 @@ def main():
     )
 
     if output_file:
-        print(f"✅ FMEA PDF Report generated successfully: {output_file}")
-        print(f"📄 Open the report to review the analysis")
+        print(f"FMEA PDF Report generated successfully: {output_file}")
+        print(f"Open the report to review the analysis")
     else:
-        print("❌ Failed to generate FMEA report")
+        print("Failed to generate FMEA report")
 
 
 if __name__ == "__main__":

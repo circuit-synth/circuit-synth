@@ -18,6 +18,12 @@ from pathlib import Path
 
 import pytest
 
+# These tests exercise the optional PCB backend; skip cleanly when it isn't installed.
+pytest.importorskip(
+    "kicad_pcb_api", reason="optional kicad_pcb_api PCB backend not installed"
+)
+pytestmark = pytest.mark.requires_pcb
+
 from circuit_synth import Circuit, Component, Net, circuit
 
 
@@ -42,15 +48,27 @@ class TestPCBSynchronization:
         for fp in pcb.pcb_data.get("footprints", []):
             # Handle both dict-like and Footprint objects
             # For Footprint objects from kicad_pcb_api, directly access reference attribute
-            if hasattr(fp, 'reference'):
+            if hasattr(fp, "reference"):
                 if fp.reference == reference:
                     return fp
             # Fallback: search properties list
-            properties = fp.get("properties", []) if hasattr(fp, 'get') else (fp.properties if hasattr(fp, 'properties') else [])
+            properties = (
+                fp.get("properties", [])
+                if hasattr(fp, "get")
+                else (fp.properties if hasattr(fp, "properties") else [])
+            )
             for prop in properties:
                 # Property objects have 'name' and 'value' attributes
-                prop_key = prop.get("key") if hasattr(prop, 'get') else (prop.name if hasattr(prop, 'name') else None)
-                prop_val = prop.get("value") if hasattr(prop, 'get') else (prop.value if hasattr(prop, 'value') else None)
+                prop_key = (
+                    prop.get("key")
+                    if hasattr(prop, "get")
+                    else (prop.name if hasattr(prop, "name") else None)
+                )
+                prop_val = (
+                    prop.get("value")
+                    if hasattr(prop, "get")
+                    else (prop.value if hasattr(prop, "value") else None)
+                )
                 if prop_key == "Reference" and prop_val == reference:
                     return fp
         return None
@@ -59,15 +77,21 @@ class TestPCBSynchronization:
     def _get_footprint_position(footprint):
         """Extract position (x, y, rotation) from a footprint object."""
         # Handle Footprint objects from kicad_pcb_api
-        if hasattr(footprint, 'position'):
+        if hasattr(footprint, "position"):
             # Footprint object with position attribute (Point object)
-            x = float(footprint.position.x) if hasattr(footprint.position, 'x') else 5.0
-            y = float(footprint.position.y) if hasattr(footprint.position, 'y') else 5.0
-            rotation = float(footprint.rotation) if hasattr(footprint, 'rotation') else 0.0
+            x = float(footprint.position.x) if hasattr(footprint.position, "x") else 5.0
+            y = float(footprint.position.y) if hasattr(footprint.position, "y") else 5.0
+            rotation = (
+                float(footprint.rotation) if hasattr(footprint, "rotation") else 0.0
+            )
             return x, y, rotation
 
         # Fallback for dict-like objects
-        at_data = footprint.get("at", [5.0, 5.0, 0.0]) if hasattr(footprint, 'get') else [5.0, 5.0, 0.0]
+        at_data = (
+            footprint.get("at", [5.0, 5.0, 0.0])
+            if hasattr(footprint, "get")
+            else [5.0, 5.0, 0.0]
+        )
         x = float(at_data[0]) if len(at_data) > 0 else 5.0
         y = float(at_data[1]) if len(at_data) > 1 else 5.0
         rotation = float(at_data[2]) if len(at_data) > 2 else 0.0
@@ -76,13 +100,13 @@ class TestPCBSynchronization:
     @staticmethod
     def _set_footprint_position(footprint, x, y, rotation=0.0):
         """Set position on a footprint object."""
-        if hasattr(footprint, 'position') and hasattr(footprint.position, 'x'):
+        if hasattr(footprint, "position") and hasattr(footprint.position, "x"):
             # Footprint object from kicad_pcb_api with Point position
             footprint.position.x = x
             footprint.position.y = y
-            if hasattr(footprint, 'rotation'):
+            if hasattr(footprint, "rotation"):
                 footprint.rotation = rotation
-        elif hasattr(footprint, '__setitem__'):
+        elif hasattr(footprint, "__setitem__"):
             # Dict-like object
             footprint["at"] = [x, y, rotation]
         else:
@@ -91,10 +115,10 @@ class TestPCBSynchronization:
                 footprint["at"] = [x, y, rotation]
             except (TypeError, KeyError):
                 # If that fails, just try to set the attributes
-                if hasattr(footprint, 'position'):
+                if hasattr(footprint, "position"):
                     footprint.position.x = x
                     footprint.position.y = y
-                if hasattr(footprint, 'rotation'):
+                if hasattr(footprint, "rotation"):
                     footprint.rotation = rotation
 
     def test_initial_pcb_generation_creates_single_component(self, temp_workspace):
@@ -103,6 +127,7 @@ class TestPCBSynchronization:
 
         This is the baseline: starting with R1 only.
         """
+
         # Define circuit with single resistor
         @circuit(name="single_resistor")
         def single_component_circuit():
@@ -140,7 +165,9 @@ class TestPCBSynchronization:
         # Extract footprint references
         footprint_refs = self._get_footprint_refs(pcb)
 
-        assert "R1" in footprint_refs, f"R1 should be in PCB footprints. Found: {footprint_refs}"
+        assert (
+            "R1" in footprint_refs
+        ), f"R1 should be in PCB footprints. Found: {footprint_refs}"
         assert (
             len(footprint_refs) == 1
         ), f"Should have exactly 1 footprint (R1), found: {footprint_refs}"
@@ -151,6 +178,7 @@ class TestPCBSynchronization:
 
         Core issue #410 test case: R1 exists, add R2, both should appear in PCB.
         """
+
         # Step 1: Generate initial circuit with R1 only
         @circuit(name="dual_resistor")
         def initial_circuit():
@@ -234,6 +262,7 @@ class TestPCBSynchronization:
         This verifies the critical feature: R1's position stays the same even after
         adding R2.
         """
+
         # Step 1: Generate initial circuit with R1
         @circuit(name="position_test")
         def initial_pos_circuit():
@@ -324,6 +353,7 @@ class TestPCBSynchronization:
 
         When R2 is added, it should be at a predictable default position (50mm, 50mm).
         """
+
         # Step 1: Generate initial circuit with R1
         @circuit(name="default_pos")
         def initial_default_circuit():
@@ -397,6 +427,7 @@ class TestPCBSynchronization:
         Add: R2, R3, R4
         Verify: All preserve positions, new ones at default
         """
+
         # Step 1: Create and place initial circuit
         @circuit(name="multi_add")
         def initial_multi():
@@ -515,6 +546,7 @@ class TestPCBSynchronization:
         Remove: R2
         Verify: R1 and R3 remain, R2 is gone, positions preserved
         """
+
         # Step 1: Create circuit with 3 resistors
         @circuit(name="removal_test")
         def initial_removal():
@@ -596,15 +628,9 @@ class TestPCBSynchronization:
         r2_fp = self._find_footprint_by_ref(pcb_final, "R2")
         r3_fp = self._find_footprint_by_ref(pcb_final, "R3")
 
-        assert (
-            r1_fp is not None
-        ), "R1 should remain in PCB after removing R2"
-        assert (
-            r3_fp is not None
-        ), "R3 should remain in PCB after removing R2"
-        assert (
-            r2_fp is None
-        ), "R2 should be removed from PCB when removed from circuit"
+        assert r1_fp is not None, "R1 should remain in PCB after removing R2"
+        assert r3_fp is not None, "R3 should remain in PCB after removing R2"
+        assert r2_fp is None, "R2 should be removed from PCB when removed from circuit"
 
         # Verify R1 and R3 positions are preserved
         r1_x, _, _ = self._get_footprint_position(r1_fp)
@@ -629,6 +655,7 @@ class TestPCBSynchronization:
 
         This verifies the safety mechanism: when explicitly requested, full regeneration happens.
         """
+
         # Step 1: Create and position initial circuit
         @circuit(name="force_regen")
         def initial_force():

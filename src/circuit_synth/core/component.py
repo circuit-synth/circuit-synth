@@ -243,6 +243,21 @@ class Component(SimplifiedPinAccess):
 
         # Use the reference provided in constructor
         user_ref = self.ref.strip()
+
+        # Warn (do NOT fail) on a lowercase-prefix ref such as "Rf1". KiCad accepts
+        # these and so does the kicad-sch-api fork, but PyPI kicad-sch-api <=0.5.5 --
+        # what bootstrapped user projects install -- rejects them at save time, which
+        # silently breaks schematic round-trip / update-mode regeneration (E2E run-2
+        # finding G1). Prefer an uppercase prefix until the fork's fix is released.
+        _prefix = re.match(r"#?([A-Za-z]+)", user_ref)
+        if _prefix and any(c.islower() for c in _prefix.group(1)):
+            context_logger.warning(
+                f"Reference '{user_ref}' has a lowercase prefix; KiCad accepts it "
+                "but kicad-sch-api <=0.5.5 rejects it on save (breaks schematic "
+                f"round-trip). Prefer an uppercase prefix (e.g. '{user_ref.upper()}').",
+                component="COMPONENT",
+            )
+
         # Only set _user_reference and _is_prefix if not already set by __setattr__
         if not hasattr(self, "_user_reference"):
             self._user_reference = user_ref
@@ -350,7 +365,12 @@ class Component(SimplifiedPinAccess):
             raise ValidationError("start with a digit")
         if keyword.iskeyword(name):
             raise ValidationError("reserved keyword")
-        if not re.match(r"^[A-Za-z][A-Za-z0-9_]*$", name):
+        # Dots are permitted after the first character so KiCad's native,
+        # dotted property names (e.g. "Sim.Enable", "Sim.Device") round-trip
+        # verbatim. Such names are only reachable via getattr()/_extra_fields,
+        # never plain attribute access, which is exactly how the SPICE converter
+        # reads them.
+        if not re.match(r"^[A-Za-z][A-Za-z0-9_.]*$", name):
             raise ValidationError("invalid characters")
         if isinstance(value, str) and not value.strip():
             raise ValidationError("cannot be empty")

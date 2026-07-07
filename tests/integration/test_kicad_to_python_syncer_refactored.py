@@ -214,13 +214,13 @@ class TestKiCadToPythonSyncerRefactored:
         assert len(circuit.components) == 2
         assert len(circuit.nets) == 2
 
-        # Verify component data
-        refs = [c.reference for c in circuit.components.values()]
+        # Verify component data (utilities.models.Circuit.components is a List)
+        refs = [c.reference for c in circuit.components]
         assert "R1" in refs
         assert "C1" in refs
 
         # Verify component details
-        r1 = next(c for c in circuit.components.values() if c.reference == "R1")
+        r1 = next(c for c in circuit.components if c.reference == "R1")
         assert r1.lib_id == "Device:R"
         assert r1.value == "10k"
         assert r1.footprint == "R_0603"

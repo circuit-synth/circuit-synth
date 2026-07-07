@@ -93,7 +93,7 @@ def test_circuit_file_contains_circuit_code(circuit, temp_project_dir):
 
     # Read generated file
     main_file = temp_project_dir / "circuit-synth" / "main.py"
-    content = main_file.read_text()
+    content = main_file.read_text(encoding="utf-8")
 
     # Verify file is not empty
     assert len(content) > 100, f"Circuit {circuit.display_name} file is too small"
@@ -124,7 +124,7 @@ def test_circuit_file_is_valid_python(circuit, temp_project_dir):
 
     # Read and parse
     main_file = temp_project_dir / "circuit-synth" / "main.py"
-    content = main_file.read_text()
+    content = main_file.read_text(encoding="utf-8")
 
     # This will raise SyntaxError if invalid
     try:
@@ -153,7 +153,7 @@ def test_circuit_file_has_required_structure(circuit, temp_project_dir):
 
     # Read and parse
     main_file = temp_project_dir / "circuit-synth" / "main.py"
-    content = main_file.read_text()
+    content = main_file.read_text(encoding="utf-8")
 
     # Parse AST
     tree = ast.parse(content)
@@ -568,7 +568,7 @@ def test_circuit_file_not_empty(temp_project_dir):
     )
 
     main_file = temp_project_dir / "circuit-synth" / "main.py"
-    content = main_file.read_text()
+    content = main_file.read_text(encoding="utf-8")
 
     assert len(content) > 100, "Circuit file should have meaningful content"
 
@@ -588,7 +588,7 @@ def test_all_circuit_files_valid_python(temp_project_dir):
 
         # Validate syntax
         main_file = test_dir / "circuit-synth" / "main.py"
-        content = main_file.read_text()
+        content = main_file.read_text(encoding="utf-8")
 
         try:
             ast.parse(content)
@@ -626,7 +626,7 @@ def test_circuit_files_have_imports(temp_project_dir):
         template_manager.copy_circuit_to_project(circuit, test_dir, is_first=True)
 
         main_file = test_dir / "circuit-synth" / "main.py"
-        content = main_file.read_text()
+        content = main_file.read_text(encoding="utf-8")
 
         # Should have imports
         assert (
@@ -646,7 +646,7 @@ def test_circuit_files_have_functions(temp_project_dir):
         template_manager.copy_circuit_to_project(circuit, test_dir, is_first=True)
 
         main_file = test_dir / "circuit-synth" / "main.py"
-        content = main_file.read_text()
+        content = main_file.read_text(encoding="utf-8")
 
         # Should have function definition
         assert "def " in content, f"Circuit {circuit.value} missing function definition"

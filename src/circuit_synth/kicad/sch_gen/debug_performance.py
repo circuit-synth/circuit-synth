@@ -33,7 +33,7 @@ def timed_operation(
         details: Additional details to log
     """
     start_time = time.perf_counter()
-    logger.debug(f"⏱️  START: {name}")
+    logger.debug(f"START: {name}")
     if details:
         logger.debug(f"   Details: {details}")
 
@@ -44,7 +44,7 @@ def timed_operation(
 
         if elapsed_ms > threshold_ms:
             logger.debug(
-                f"🐌 SLOW OPERATION: {name} took {elapsed_ms:.2f}ms (threshold: {threshold_ms}ms)"
+                f"SLOW OPERATION: {name} took {elapsed_ms:.2f}ms (threshold: {threshold_ms}ms)"
             )
             if details:
                 logger.debug(f"   Context: {details}")
@@ -54,7 +54,7 @@ def timed_operation(
                 {"name": name, "time_ms": elapsed_ms, "details": details or {}}
             )
         else:
-            logger.debug(f"⏱️  END: {name} completed in {elapsed_ms:.2f}ms")
+            logger.debug(f"END: {name} completed in {elapsed_ms:.2f}ms")
 
 
 def profile_function(threshold_ms: float = 10.0):
@@ -88,7 +88,7 @@ def log_symbol_lookup(
     lib_id: str, found: bool, time_ms: float, source: str = "unknown"
 ):
     """Log detailed symbol lookup information."""
-    logger.debug(f"📚 Symbol Lookup: {lib_id}")
+    logger.debug(f"Symbol Lookup: {lib_id}")
     logger.debug(f"   Found: {found}, Time: {time_ms:.2f}ms, Source: {source}")
 
     # Track in performance data
@@ -102,7 +102,7 @@ def log_symbol_lookup(
     # Warn if slow
     if time_ms > 50:
         logger.debug(
-            f"🐌 SLOW SYMBOL LOOKUP: {lib_id} took {time_ms:.2f}ms from {source}"
+            f"SLOW SYMBOL LOOKUP: {lib_id} took {time_ms:.2f}ms from {source}"
         )
 
 
@@ -110,7 +110,7 @@ def log_net_label_creation(net_name: str, component_ref: str, pin: str, time_ms:
     """Log detailed net label creation information."""
     label_key = f"{net_name}:{component_ref}:{pin}"
 
-    logger.debug(f"🏷️  Net Label: {label_key}")
+    logger.debug(f"Net Label: {label_key}")
     logger.debug(f"   Time: {time_ms:.2f}ms")
 
     # Track in performance data
@@ -123,7 +123,7 @@ def log_net_label_creation(net_name: str, component_ref: str, pin: str, time_ms:
 
     # Warn if slow
     if time_ms > 5:
-        logger.debug(f"🐌 SLOW NET LABEL: {label_key} took {time_ms:.2f}ms")
+        logger.debug(f"SLOW NET LABEL: {label_key} took {time_ms:.2f}ms")
 
 
 def log_component_processing(
@@ -134,7 +134,7 @@ def log_component_processing(
     details: Optional[Dict] = None,
 ):
     """Log detailed component processing information."""
-    logger.debug(f"🔧 Component Processing: {component_ref} ({lib_id})")
+    logger.debug(f"Component Processing: {component_ref} ({lib_id})")
     logger.debug(f"   Operation: {operation}, Time: {time_ms:.2f}ms")
     if details:
         logger.debug(f"   Details: {details}")
@@ -153,19 +153,19 @@ def log_component_processing(
     # Warn if slow
     if time_ms > 20:
         logger.debug(
-            f"🐌 SLOW COMPONENT OPERATION: {component_ref} - {operation} took {time_ms:.2f}ms"
+            f"SLOW COMPONENT OPERATION: {component_ref} - {operation} took {time_ms:.2f}ms"
         )
 
 
 def print_performance_summary():
     """Print a summary of performance data collected."""
     print("\n" + "=" * 80)
-    print("📊 PERFORMANCE DEBUGGING SUMMARY")
+    print("PERFORMANCE DEBUGGING SUMMARY")
     print("=" * 80)
 
     # Slow operations
     if PERF_DATA["slow_operations"]:
-        print("\n🐌 SLOW OPERATIONS (>10ms):")
+        print("\nSLOW OPERATIONS (>10ms):")
         print("-" * 60)
         sorted_ops = sorted(
             PERF_DATA["slow_operations"], key=lambda x: x["time_ms"], reverse=True
@@ -178,7 +178,7 @@ def print_performance_summary():
 
     # Symbol lookup analysis
     if PERF_DATA["symbol_lookups"]:
-        print("\n📚 SYMBOL LOOKUP ANALYSIS:")
+        print("\nSYMBOL LOOKUP ANALYSIS:")
         print("-" * 60)
         total_time = 0
         slow_symbols = []
@@ -204,7 +204,7 @@ def print_performance_summary():
 
     # Net label analysis
     if PERF_DATA["net_labels"]:
-        print("\n🏷️  NET LABEL ANALYSIS:")
+        print("\nNET LABEL ANALYSIS:")
         print("-" * 60)
         total_time = 0
         label_count = 0
@@ -224,7 +224,7 @@ def print_performance_summary():
 
     # Component processing analysis
     if PERF_DATA["component_details"]:
-        print("\n🔧 COMPONENT PROCESSING ANALYSIS:")
+        print("\nCOMPONENT PROCESSING ANALYSIS:")
         print("-" * 60)
 
         component_totals = {}

@@ -129,7 +129,7 @@ class PythonCodeGenerator:
         hierarchical_tree: Optional[Dict] = None,
     ) -> str:
         """Generate hierarchical Python code with main circuit and subcircuits"""
-        logger.info("🏗️ HIERARCHICAL_CODE: Starting hierarchical code generation")
+        logger.info("HIERARCHICAL_CODE: Starting hierarchical code generation")
 
         code_lines = []
 
@@ -168,12 +168,12 @@ class PythonCodeGenerator:
         )
 
         result = "\n".join(code_lines)
-        logger.info(f"🏗️ HIERARCHICAL_CODE: Generated {len(code_lines)} lines of code")
+        logger.info(f"HIERARCHICAL_CODE: Generated {len(code_lines)} lines of code")
         return result
 
     def _generate_subcircuit_code(self, circuit: Circuit) -> List[str]:
         """Generate code for a subcircuit function"""
-        logger.info(f"🔧 SUBCIRCUIT: Generating code for {circuit.name}")
+        logger.info(f"SUBCIRCUIT: Generating code for {circuit.name}")
 
         code_lines = []
 
@@ -226,7 +226,7 @@ class PythonCodeGenerator:
                                 )
 
         logger.info(
-            f"🔧 SUBCIRCUIT: Generated {len(code_lines)} lines for {circuit.name}"
+            f"SUBCIRCUIT: Generated {len(code_lines)} lines for {circuit.name}"
         )
         return code_lines
 
@@ -234,7 +234,7 @@ class PythonCodeGenerator:
         self, circuit: Circuit, hierarchical_tree: Optional[Dict] = None
     ) -> List[str]:
         """Generate code for the main circuit function"""
-        logger.info("🎯 MAIN_CIRCUIT: Generating main circuit code")
+        logger.info("MAIN_CIRCUIT: Generating main circuit code")
 
         code_lines = []
 
@@ -297,13 +297,13 @@ class PythonCodeGenerator:
                                 )
 
         logger.info(
-            f"🎯 MAIN_CIRCUIT: Generated {len(code_lines)} lines for main circuit"
+            f"MAIN_CIRCUIT: Generated {len(code_lines)} lines for main circuit"
         )
         return code_lines
 
     def _generate_flat_code(self, circuit: Circuit) -> str:
         """Generate flat (non-hierarchical) Python code"""
-        logger.info("📄 FLAT_CODE: Generating flat circuit code")
+        logger.info("FLAT_CODE: Generating flat circuit code")
 
         code_parts = []
 
@@ -380,7 +380,7 @@ class PythonCodeGenerator:
         )
 
         result = "\n".join(code_parts)
-        logger.info(f"📄 FLAT_CODE: Generated {len(code_parts)} lines of flat code")
+        logger.info(f"FLAT_CODE: Generated {len(code_parts)} lines of flat code")
         return result
 
     def update_or_create_file(
@@ -405,35 +405,35 @@ class PythonCodeGenerator:
             bool: True if successful, False otherwise
         """
         try:
-            logger.info(f"📝 CODE_UPDATE: Updating file {target_path}")
+            logger.info(f"CODE_UPDATE: Updating file {target_path}")
 
             # Create backup if requested and file exists
             if backup and target_path.exists():
                 backup_path = target_path.with_suffix(target_path.suffix + ".backup")
-                backup_path.write_text(target_path.read_text())
-                logger.info(f"📋 BACKUP: Created backup at {backup_path}")
+                backup_path.write_text(target_path.read_text(), encoding="utf-8")
+                logger.info(f"BACKUP: Created backup at {backup_path}")
 
             # Determine if this is hierarchical or flat
             if subcircuits and len(subcircuits) > 0:
-                logger.info("🏗️ CODE_UPDATE: Generating hierarchical code")
+                logger.info("CODE_UPDATE: Generating hierarchical code")
                 content = self.generate_hierarchical_code(
                     main_circuit, subcircuits, hierarchical_tree
                 )
             else:
-                logger.info("📄 CODE_UPDATE: Generating flat code")
+                logger.info("CODE_UPDATE: Generating flat code")
                 content = self._generate_flat_code(main_circuit)
 
             # Write the file
             target_path.parent.mkdir(parents=True, exist_ok=True)
-            target_path.write_text(content)
+            target_path.write_text(content, encoding="utf-8")
 
             logger.info(
-                f"✅ CODE_UPDATE: Successfully wrote {len(content)} characters to {target_path}"
+                f"CODE_UPDATE: Successfully wrote {len(content)} characters to {target_path}"
             )
             return True
 
         except Exception as e:
-            logger.error(f"❌ CODE_UPDATE: Failed to update {target_path}: {e}")
+            logger.error(f"CODE_UPDATE: Failed to update {target_path}: {e}")
             return False
 
     def _get_ancestors(
@@ -585,14 +585,14 @@ class PythonCodeGenerator:
             shared_nets_per_subcircuit: Dict mapping subcircuit names to nets they should receive as parameters
         """
         logger.info(
-            "🔍 NET_ANALYSIS: Starting hierarchical net analysis with LCA algorithm"
+            "NET_ANALYSIS: Starting hierarchical net analysis with LCA algorithm"
         )
 
         # Use provided hierarchical tree or build a fallback structure
         if hierarchical_tree:
             hierarchy_tree = hierarchical_tree
             logger.info(
-                f"🔍 NET_ANALYSIS: Using provided hierarchy tree: {hierarchy_tree}"
+                f"NET_ANALYSIS: Using provided hierarchy tree: {hierarchy_tree}"
             )
         else:
             # Fallback: Build simple 2-level hierarchy structure
@@ -609,7 +609,7 @@ class PythonCodeGenerator:
                 hierarchy_tree = {name: [] for name in circuits.keys()}
 
             logger.info(
-                f"🔍 NET_ANALYSIS: Built fallback hierarchy tree: {hierarchy_tree}"
+                f"NET_ANALYSIS: Built fallback hierarchy tree: {hierarchy_tree}"
             )
 
         # Collect all nets and their usage across circuits
@@ -621,7 +621,7 @@ class PythonCodeGenerator:
                     net_usage[net.name] = set()
                 net_usage[net.name].add(circuit_name)
 
-        logger.info(f"🔍 NET_ANALYSIS: Net usage analysis:")
+        logger.info(f"NET_ANALYSIS: Net usage analysis:")
         for net_name, using_circuits in net_usage.items():
             logger.info(f"  - {net_name}: used by {list(using_circuits)}")
 
@@ -654,11 +654,11 @@ class PythonCodeGenerator:
                     shared_nets_per_subcircuit[circuit_name].append(net_name)
 
             logger.info(
-                f"🔍 NET_ANALYSIS: {net_name} -> created at {net_scope}, shared with {[c for c in using_circuits if c != net_scope]}"
+                f"NET_ANALYSIS: {net_name} -> created at {net_scope}, shared with {[c for c in using_circuits if c != net_scope]}"
             )
 
         logger.info(
-            "🔍 NET_ANALYSIS: Hierarchical net analysis complete using LCA algorithm"
+            "NET_ANALYSIS: Hierarchical net analysis complete using LCA algorithm"
         )
         return hierarchical_nets, shared_nets_per_subcircuit
 
@@ -670,12 +670,12 @@ class PythonCodeGenerator:
         hierarchical_tree: Optional[Dict] = None,
     ) -> Optional[str]:
         """Generate separate Python files for each circuit"""
-        logger.info(f"🗂️ MULTI_FILE: Generating {len(circuits)} separate circuit files")
+        logger.info(f"MULTI_FILE: Generating {len(circuits)} separate circuit files")
 
         try:
             # Determine output directory (where main.py will go)
             output_dir = main_python_file.parent
-            logger.info(f"🗂️ MULTI_FILE: Output directory: {output_dir}")
+            logger.info(f"MULTI_FILE: Output directory: {output_dir}")
 
             # Find main circuit and subcircuits
             main_circuit = circuits.get("main")
@@ -697,34 +697,34 @@ class PythonCodeGenerator:
                 if circuit != main_circuit
             }
 
-            logger.info(f"🗂️ MULTI_FILE: Main circuit: {main_circuit.name}")
-            logger.info(f"🗂️ MULTI_FILE: Subcircuits: {list(subcircuits.keys())}")
+            logger.info(f"MULTI_FILE: Main circuit: {main_circuit.name}")
+            logger.info(f"MULTI_FILE: Subcircuits: {list(subcircuits.keys())}")
 
             # Perform hierarchical net analysis to determine proper net creation levels
             hierarchical_nets, shared_nets_per_subcircuit = (
                 self._analyze_hierarchical_nets(circuits, hierarchical_tree)
             )
 
-            logger.info(f"🗂️ MULTI_FILE: Hierarchical net analysis results:")
+            logger.info(f"MULTI_FILE: Hierarchical net analysis results:")
             for level, nets in hierarchical_nets.items():
                 logger.info(f"  - {level}: {list(nets.keys())}")
 
             for name, shared_nets in shared_nets_per_subcircuit.items():
-                logger.info(f"🗂️ MULTI_FILE: Shared nets with {name}: {shared_nets}")
+                logger.info(f"MULTI_FILE: Shared nets with {name}: {shared_nets}")
 
             # Identify only top-level circuits (direct children of main)
             top_level_circuits = self._identify_top_level_circuits(
                 hierarchical_tree or {}
             )
             logger.info(
-                f"🗂️ MULTI_FILE: Top-level circuits (direct children of main): {top_level_circuits}"
+                f"MULTI_FILE: Top-level circuits (direct children of main): {top_level_circuits}"
             )
 
             # Generate subcircuit files for ALL circuits (not just top-level)
             subcircuit_files_created = []
             for name, circuit in subcircuits.items():
                 subcircuit_file = output_dir / f"{name}.py"
-                logger.info(f"🗂️ MULTI_FILE: Generating {subcircuit_file}")
+                logger.info(f"MULTI_FILE: Generating {subcircuit_file}")
 
                 # Generate subcircuit code with shared nets as parameters
                 shared_nets = shared_nets_per_subcircuit.get(name, [])
@@ -740,16 +740,16 @@ class PythonCodeGenerator:
 
                 if preview_only:
                     logger.info(
-                        f"🗂️ MULTI_FILE: [PREVIEW] Would create {subcircuit_file}"
+                        f"MULTI_FILE: [PREVIEW] Would create {subcircuit_file}"
                     )
                     logger.info(
-                        f"🗂️ MULTI_FILE: [PREVIEW] Content preview:\n{subcircuit_code[:200]}..."
+                        f"MULTI_FILE: [PREVIEW] Content preview:\n{subcircuit_code[:200]}..."
                     )
                 else:
                     # Write subcircuit file
                     with open(subcircuit_file, "w") as f:
                         f.write(subcircuit_code)
-                    logger.info(f"🗂️ MULTI_FILE: ✅ Created {subcircuit_file}")
+                    logger.info(f"MULTI_FILE: Created {subcircuit_file}")
 
                 subcircuit_files_created.append(name)
 
@@ -760,18 +760,18 @@ class PythonCodeGenerator:
             )
 
             if preview_only:
-                logger.info(f"🗂️ MULTI_FILE: [PREVIEW] Would create {main_python_file}")
-                logger.info("🗂️ MULTI_FILE: [PREVIEW] Main file content:")
+                logger.info(f"MULTI_FILE: [PREVIEW] Would create {main_python_file}")
+                logger.info("MULTI_FILE: [PREVIEW] Main file content:")
                 return main_code
             else:
                 # Write main file
                 with open(main_python_file, "w") as f:
                     f.write(main_code)
-                logger.info(f"🗂️ MULTI_FILE: ✅ Created {main_python_file}")
+                logger.info(f"MULTI_FILE: Created {main_python_file}")
                 return main_code
 
         except Exception as e:
-            logger.error(f"🗂️ MULTI_FILE: Failed to generate multiple files: {e}")
+            logger.error(f"MULTI_FILE: Failed to generate multiple files: {e}")
             return None
 
     def _generate_standalone_subcircuit_file(
@@ -785,7 +785,7 @@ class PythonCodeGenerator:
     ) -> str:
         """Generate a complete Python file for a single subcircuit"""
         logger.info(
-            f"📄 SUBCIRCUIT_FILE: Generating standalone file for {circuit.name}"
+            f"SUBCIRCUIT_FILE: Generating standalone file for {circuit.name}"
         )
 
         code_lines = []
@@ -827,7 +827,7 @@ class PythonCodeGenerator:
 
         result = "\n".join(code_lines)
         logger.info(
-            f"📄 SUBCIRCUIT_FILE: Generated {len(code_lines)} lines for {circuit.name}"
+            f"SUBCIRCUIT_FILE: Generated {len(code_lines)} lines for {circuit.name}"
         )
         return result
 
@@ -842,7 +842,7 @@ class PythonCodeGenerator:
     ) -> List[str]:
         """Generate code for a subcircuit function with net parameters and internal hierarchy"""
         logger.info(
-            f"🔧 SUBCIRCUIT_PARAMS: Generating parameterized code for {circuit.name}"
+            f"SUBCIRCUIT_PARAMS: Generating parameterized code for {circuit.name}"
         )
 
         code_lines = []
@@ -940,7 +940,7 @@ class PythonCodeGenerator:
                                 )
 
         logger.info(
-            f"🔧 SUBCIRCUIT_PARAMS: Generated {len(code_lines)} lines for {circuit.name}"
+            f"SUBCIRCUIT_PARAMS: Generated {len(code_lines)} lines for {circuit.name}"
         )
         return code_lines
 
@@ -953,7 +953,7 @@ class PythonCodeGenerator:
     ) -> str:
         """Generate the main.py file that imports subcircuits from separate files"""
         logger.info(
-            f"📄 MAIN_FILE: Generating main file with imports for {len(subcircuit_names)} subcircuits"
+            f"MAIN_FILE: Generating main file with imports for {len(subcircuit_names)} subcircuits"
         )
 
         code_lines = []
@@ -1003,7 +1003,7 @@ class PythonCodeGenerator:
         )
 
         result = "\n".join(code_lines)
-        logger.info(f"📄 MAIN_FILE: Generated {len(code_lines)} lines for main circuit")
+        logger.info(f"MAIN_FILE: Generated {len(code_lines)} lines for main circuit")
         return result
 
     def _identify_top_level_circuits(
@@ -1082,7 +1082,7 @@ class PythonCodeGenerator:
         # Skip if circuit doesn't exist
         if circuit_name not in circuits:
             logger.warning(
-                f"🔧 RECURSIVE_GEN: Circuit {circuit_name} not found in circuits"
+                f"RECURSIVE_GEN: Circuit {circuit_name} not found in circuits"
             )
             return code_lines
 
@@ -1178,7 +1178,7 @@ class PythonCodeGenerator:
     ) -> List[str]:
         """Generate code for the main circuit function with proper hierarchical structure"""
         logger.info(
-            "🎯 MAIN_CIRCUIT_PARAMS: Generating main circuit code with hierarchical structure"
+            "MAIN_CIRCUIT_PARAMS: Generating main circuit code with hierarchical structure"
         )
 
         code_lines = []
@@ -1262,7 +1262,7 @@ class PythonCodeGenerator:
                                 )
 
         logger.info(
-            f"🎯 MAIN_CIRCUIT_PARAMS: Generated {len(code_lines)} lines for main circuit"
+            f"MAIN_CIRCUIT_PARAMS: Generated {len(code_lines)} lines for main circuit"
         )
         return code_lines
 
@@ -1274,20 +1274,20 @@ class PythonCodeGenerator:
         hierarchical_tree: Optional[Dict] = None,
     ) -> Optional[str]:
         """Update Python file with circuit data - creates separate files for each circuit"""
-        logger.info(f"🔄 CODE_UPDATE: Starting update of {python_file}")
-        logger.info(f"🔄 CODE_UPDATE: Preview mode: {preview_only}")
+        logger.info(f"CODE_UPDATE: Starting update of {python_file}")
+        logger.info(f"CODE_UPDATE: Preview mode: {preview_only}")
         # Handle both dict and list types for circuits parameter
         circuit_keys = list(circuits.keys()) if isinstance(circuits, dict) else [f"circuit_{i}" for i in range(len(circuits))]
-        logger.info(f"🔄 CODE_UPDATE: Circuits to update: {circuit_keys}")
+        logger.info(f"CODE_UPDATE: Circuits to update: {circuit_keys}")
 
         # Debug hierarchical tree
         if hierarchical_tree:
             logger.info(
-                f"🔧 CODE_UPDATE_DEBUG: Using hierarchical tree: {hierarchical_tree}"
+                f"CODE_UPDATE_DEBUG: Using hierarchical tree: {hierarchical_tree}"
             )
         else:
             logger.warning(
-                "🔧 CODE_UPDATE_DEBUG: No hierarchical tree provided, will use fallback"
+                "CODE_UPDATE_DEBUG: No hierarchical tree provided, will use fallback"
             )
 
         try:
@@ -1304,18 +1304,18 @@ class PythonCodeGenerator:
                 and circuit.is_hierarchical_sheet
                 for circuit in circuits_dict.values()
             )
-            logger.info(f"📝 CODE_UPDATE: Hierarchical design: {is_hierarchical}")
+            logger.info(f"CODE_UPDATE: Hierarchical design: {is_hierarchical}")
 
             if is_hierarchical:
                 logger.info(
-                    "📝 CODE_UPDATE: Generating separate files for hierarchical circuits"
+                    "CODE_UPDATE: Generating separate files for hierarchical circuits"
                 )
                 return self._generate_multiple_files(
                     python_file, circuits_dict, preview_only, hierarchical_tree
                 )
             else:
                 # For non-hierarchical (flat) circuits, still use the old single-file approach
-                logger.info("📝 CODE_UPDATE: Generating single file for flat circuit")
+                logger.info("CODE_UPDATE: Generating single file for flat circuit")
                 main_circuit = list(circuits_dict.values())[0]
                 updated_code = self._generate_flat_code(main_circuit)
 
@@ -1337,7 +1337,7 @@ class PythonCodeGenerator:
                     return updated_code
                 else:
                     python_file.parent.mkdir(parents=True, exist_ok=True)
-                    python_file.write_text(updated_code)
+                    python_file.write_text(updated_code, encoding="utf-8")
                     logger.info("File update completed")
                     return updated_code
             else:
@@ -1345,7 +1345,7 @@ class PythonCodeGenerator:
                 return None
 
         except Exception as e:
-            logger.error(f"🔄 CODE_UPDATE: Failed to update Python file: {e}")
+            logger.error(f"CODE_UPDATE: Failed to update Python file: {e}")
             import traceback
             logger.error(f"Stack trace:\n{traceback.format_exc()}")
             return None

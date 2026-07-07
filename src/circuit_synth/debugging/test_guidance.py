@@ -46,7 +46,7 @@ class TestStep:
         md = f"## Step {self.step_id}: {self.description}\n\n"
 
         if self.safety_warnings:
-            md += "⚠️ **Safety Warnings:**\n"
+            md += "**Safety Warnings:**\n"
             for warning in self.safety_warnings:
                 md += f"- {warning}\n"
             md += "\n"
@@ -72,15 +72,15 @@ class TestStep:
         md += "\n"
 
         if self.tips:
-            md += "💡 **Tips:**\n"
+            md += "**Tips:**\n"
             for tip in self.tips:
                 md += f"- {tip}\n"
             md += "\n"
 
         if self.pass_action:
-            md += f"✅ **If Pass:** {self.pass_action}\n"
+            md += f"**If Pass:** {self.pass_action}\n"
         if self.fail_action:
-            md += f"❌ **If Fail:** {self.fail_action}\n"
+            md += f"**If Fail:** {self.fail_action}\n"
 
         return md
 
@@ -106,7 +106,7 @@ class TroubleshootingTree:
         md += f"{self.description}\n\n"
 
         if self.safety_notes:
-            md += "## ⚠️ General Safety Notes\n"
+            md += "## General Safety Notes\n"
             for note in self.safety_notes:
                 md += f"- {note}\n"
             md += "\n"

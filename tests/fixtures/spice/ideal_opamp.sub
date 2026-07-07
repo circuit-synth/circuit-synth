@@ -1,0 +1,5 @@
+* Ideal op-amp macromodel (self-authored; no vendor licensing).
+* Terminals: out in+ in-  (output referenced to global ground 0).
+.subckt IDEALOA out inp inn
+Eoa out 0 inp inn 1e6
+.ends IDEALOA

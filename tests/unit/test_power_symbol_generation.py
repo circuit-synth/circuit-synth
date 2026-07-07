@@ -59,6 +59,65 @@ class TestPowerSymbolGeneration:
             # Should NOT have hierarchical_label for GND
             assert 'hierarchical_label "GND"' not in content
 
+    def test_power_symbol_instance_path_includes_root_uuid(self):
+        """A power symbol's instance (path ...) must be /<root_schematic_uuid>, the
+        same as regular components -- NOT a bare "/".
+
+        Regression: power symbols are added on a separate code path that skipped the
+        instance-path fix-up, so they kept kicad-sch-api's default (path "/"). A bare
+        "/" is a dangling hierarchy reference: KiCad loads it (and kicad-cli
+        netlist/erc tolerate it) but its writer/connectivity null-dereferences it on
+        SAVE -> segfault and a corrupted file. `kicad-cli sch upgrade` reproduces the
+        crash headlessly. This asserts the generated path is well-formed so the file
+        is GUI-saveable.
+        """
+
+        @circuit(name="pwr_path")
+        def _c():
+            r1 = Component(
+                symbol="Device:R", ref="R1", value="1k",
+                footprint="Resistor_SMD:R_0603_1608Metric",
+            )
+            r2 = Component(
+                symbol="Device:R", ref="R2", value="2k",
+                footprint="Resistor_SMD:R_0603_1608Metric",
+            )
+            vin, vout, gnd = Net("VIN"), Net("VOUT"), Net("GND")
+            r1[1] += vin
+            r1[2] += vout
+            r2[1] += vout
+            r2[2] += gnd
+
+        with TemporaryDirectory() as tmpdir:
+            _c().generate_kicad_project(
+                project_name=f"{tmpdir}/pwr_path",
+                generate_pcb=False,
+                erc_gate=False,
+                selective_wires=False,
+            )
+            sch = next(Path(tmpdir).rglob("pwr_path.kicad_sch"))
+            content = sch.read_text()
+
+            root_uuid = re.search(
+                r'\(uuid "([0-9a-f-]+)"\)', content[: content.index("(lib_symbols")]
+            ).group(1)
+
+            # Every symbol instance -- regular AND power (#PWR) -- must use the root
+            # UUID path. Collect (ref, path) pairs from the instances blocks.
+            pairs = re.findall(
+                r'\(instances\s*\(project "[^"]*"\s*\(path "([^"]+)"\s*'
+                r'\(reference "([^"]+)"',
+                content,
+            )
+            assert pairs, "no symbol instances found"
+            pwr = [(ref, path) for (path, ref) in pairs if ref.startswith("#PWR")]
+            assert pwr, "expected a #PWR power symbol instance"
+            for ref, path in pwr:
+                assert path == f"/{root_uuid}", (
+                    f"{ref} has dangling instance path {path!r}; expected "
+                    f"/{root_uuid} (a bare '/' crashes KiCad on save)"
+                )
+
     def test_vcc_generates_power_symbol(self):
         """VCC net should generate power:VCC symbols."""
 
@@ -151,8 +210,13 @@ class TestPowerSymbolGeneration:
             assert 'hierarchical_label "VCC"' not in content
             assert 'hierarchical_label "+3V3"' not in content
 
-    def test_regular_nets_still_use_hierarchical_labels(self):
-        """Non-power nets should still use hierarchical labels."""
+    def test_regular_nets_use_local_labels(self):
+        """Non-power nets on a flat/root sheet use local labels.
+
+        PR #608 changed internal flat-sheet regular nets from hierarchical labels
+        to local labels (a hierarchical label without a matching sheet pin does not
+        render a connection in KiCad). Power nets still become power symbols.
+        """
 
         @circuit(name="test_mixed")
         def test_mixed():
@@ -195,8 +259,9 @@ class TestPowerSymbolGeneration:
             assert 'lib_id "power:GND"' in content
             assert 'hierarchical_label "GND"' not in content
 
-            # DATA should use hierarchical label
-            assert 'hierarchical_label "DATA"' in content
+            # DATA is an internal flat-sheet net: local label, not hierarchical.
+            assert '(label "DATA"' in content
+            assert 'hierarchical_label "DATA"' not in content
 
 
 class TestNetJSONSerialization:

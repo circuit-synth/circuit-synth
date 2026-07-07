@@ -12,6 +12,7 @@ import json
 import logging
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -20,6 +21,36 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 logger = logging.getLogger(__name__)
+
+
+def _sorted_kicad_version_dirs(kicad_root: str) -> List[str]:
+    """Return versioned KiCad install dirs under ``kicad_root``, newest first.
+
+    Looks for children named like ``8.0``, ``9.0``, ``10.0`` and sorts them by
+    numeric version descending so that the most recent KiCad install is
+    preferred. Unknown/unparseable names are ignored. This avoids hardcoding a
+    finite list of version numbers, which previously locked discovery to old
+    releases (KiCad is now on 10.0).
+    """
+    root = Path(kicad_root)
+    if not root.is_dir():
+        return []
+
+    def _version_key(name: str) -> Optional[Tuple[int, ...]]:
+        m = re.fullmatch(r"(\d+)(?:\.(\d+))*", name)
+        if not m:
+            return None
+        return tuple(int(p) for p in name.split("."))
+
+    versioned = []
+    for child in root.iterdir():
+        if child.is_dir():
+            key = _version_key(child.name)
+            if key is not None:
+                versioned.append((key, str(child)))
+
+    versioned.sort(key=lambda t: t[0], reverse=True)
+    return [path for _, path in versioned]
 
 
 class KiCadCLIError(Exception):
@@ -109,19 +140,23 @@ class KiCadCLI:
                 os.path.expanduser("~/Applications/KiCad.app/Contents/MacOS/kicad-cli"),
             ]
         elif system == "Windows":
-            # Common Windows installation paths
+            # Common Windows installation paths. Rather than hardcoding known
+            # version numbers (which locks us out of future KiCad releases),
+            # glob every installed version and prefer the newest.
             program_files = [
                 os.environ.get("PROGRAMFILES", "C:\\Program Files"),
                 os.environ.get("PROGRAMFILES(X86)", "C:\\Program Files (x86)"),
             ]
             for pf in program_files:
-                search_paths.extend(
-                    [
-                        os.path.join(pf, "KiCad", "9.0", "bin", "kicad-cli.exe"),
-                        os.path.join(pf, "KiCad", "8.0", "bin", "kicad-cli.exe"),
-                        os.path.join(pf, "KiCad", "7.0", "bin", "kicad-cli.exe"),
-                        os.path.join(pf, "KiCad", "bin", "kicad-cli.exe"),
-                    ]
+                for versioned in _sorted_kicad_version_dirs(
+                    os.path.join(pf, "KiCad")
+                ):
+                    search_paths.append(
+                        os.path.join(versioned, "bin", "kicad-cli.exe")
+                    )
+                # Unversioned fallback (e.g. a nightly or custom install)
+                search_paths.append(
+                    os.path.join(pf, "KiCad", "bin", "kicad-cli.exe")
                 )
         elif system == "Linux":
             search_paths = [

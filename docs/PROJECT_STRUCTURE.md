@@ -99,7 +99,7 @@ circuit-synth/
   - `agents/development/` - Development workflow agents (contributor, first_setup_agent, circuit_generation_agent)
   - `agents/manufacturing/` - Manufacturing specialists (component-guru, jlc-parts-finder, stm32-mcu-finder)
   - `commands/circuit-design/` - Circuit design commands (find-symbol, find-footprint, validate-existing-circuit)
-  - `commands/development/` - Development commands (dev-run-tests, dev-update-and-commit, dev-review-branch)
+  - `commands/development/` - Development commands (dev-update-and-commit)
   - `commands/manufacturing/` - Manufacturing commands (find-mcu, find_stm32)
   - `commands/setup/` - Setup and configuration commands (setup-kicad-plugins, setup_circuit_synth)
   - `settings.json` - Claude Code hooks and configuration
@@ -130,14 +130,7 @@ python examples/example_kicad_project.py
 git clone <repo>
 cd circuit-synth
 uv sync
-./tools/ci-setup/setup-ci-symbols.sh
-```
-
-### For CI/CD
-```bash
-# CI environment setup
-./tools/ci-setup/setup-ci-symbols.sh
-pytest tests/ -v
+uv run pytest
 ```
 
 ## 📊 Organization Benefits

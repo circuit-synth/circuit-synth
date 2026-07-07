@@ -69,9 +69,12 @@ class TestPhase0JSONCanonical:
         json_path = Path(result["json_path"])
         assert json_path.exists(), f"JSON file should exist at {json_path}"
         assert json_path.parent == project_path, "JSON should be in project directory"
+        # All generated outputs (.json/.kicad_sch/.kicad_pro/.net) are named after
+        # the circuit, not the project directory. create_simple_circuit() is
+        # @circuit(name="voltage_divider"), so the JSON is voltage_divider.json.
         assert (
-            json_path.name == "test_board.json"
-        ), "JSON should follow naming convention"
+            json_path.name == "voltage_divider.json"
+        ), "JSON should be named after the circuit, like the sibling KiCad files"
 
         # Verify JSON is valid circuit-synth schema
         assert validate_json_schema(
@@ -279,11 +282,15 @@ class TestPhase0JSONCanonical:
             assert "ref" in comp, "Component should have ref field"
             assert comp["ref"] == ref, "Component ref field should match dict key"
 
-        # Verify net structure
-        for net_name, connections in json_data["nets"].items():
+        # Verify net structure. Current schema (#582): each net is a dict with its
+        # connections under "nodes" plus metadata (is_power/power_symbol/...).
+        for net_name, net_data in json_data["nets"].items():
             assert isinstance(
-                connections, list
-            ), f"Net {net_name} connections should be list"
+                net_data, dict
+            ), f"Net {net_name} should be a dict"
+            assert isinstance(
+                net_data.get("nodes"), list
+            ), f"Net {net_name} 'nodes' should be a list"
 
     def test_07_json_validates_against_schema(self, tmp_path):
         """
@@ -453,8 +460,9 @@ class TestPhase0JSONCanonical:
                 original_refs.add(comp_ref)
 
         json_refs = set()
-        for connections in json_nets.values():
-            for conn in connections:
+        for net_data in json_nets.values():
+            # Current schema (#582): connections live under "nodes".
+            for conn in net_data.get("nodes", []):
                 json_refs.add(conn["component"])
 
         assert original_refs == json_refs, "Components in nets should match"

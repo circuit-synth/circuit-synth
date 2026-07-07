@@ -290,6 +290,16 @@ class APISynchronizer:
                 f"{len(report.added)} added, {len(report.modified)} modified"
             )
 
+            # Update-mode visibility summary (Stage 22.6, bug #10): make the
+            # match/add/remove/preserve outcome visible at INFO so a silently
+            # stale update (e.g. a structural rename that did not apply) is not
+            # invisible until the file is diffed.
+            logger.info(
+                f"Update mode: matched {len(report.matched)}, "
+                f"added {len(report.added)}, removed {len(report.removed)}, "
+                f"kicad-only preserved {len(report.preserved)} component(s)."
+            )
+
         except Exception as e:
             logger.error(f"Synchronization failed: {e}")
             print(f"[ERROR] Synchronization failed: {e}")
@@ -306,7 +316,7 @@ class APISynchronizer:
     ):
         """Print a user-friendly synchronization summary."""
         print("\n" + "=" * 70)
-        print("📋 Synchronization Summary")
+        print("Synchronization Summary")
         print("=" * 70)
 
         # Components in schematic (KiCad)
@@ -331,25 +341,25 @@ class APISynchronizer:
                 [kicad_ref for _, kicad_ref in report.matched.items()]
             )
             for ref in matched_refs:
-                print(f"   ✅ Keep: {ref} (matches Python)")
+                print(f"   Keep: {ref} (matches Python)")
 
         # Components that were added
         if report.added:
             added_refs = sorted(report.added)
             for ref in added_refs:
-                print(f"   ➕ Add: {ref} (new in Python)")
+                print(f"   Add: {ref} (new in Python)")
 
         # Components that were renamed
         if report.renamed:
             renamed_pairs = sorted(report.renamed)
             for old_ref, new_ref in renamed_pairs:
-                print(f"   🔄 Rename: {old_ref} → {new_ref}")
+                print(f"   Rename: {old_ref} → {new_ref}")
 
         # Components that were modified
         if report.modified:
             modified_refs = sorted(report.modified)
             for ref in modified_refs:
-                print(f"   🔧 Update: {ref} (changed in Python)")
+                print(f"   Update: {ref} (changed in Python)")
 
         # Components that will be removed (in KiCad but not in Python)
         matched_kicad_refs = set(report.matched.values())
@@ -362,15 +372,15 @@ class APISynchronizer:
         )
         if removed_refs:
             for ref in removed_refs:
-                print(f"   ⚠️  Remove: {ref} (not in Python code)")
+                print(f"   Remove: {ref} (not in Python code)")
 
         # Components that were preserved (exist in KiCad but not Python)
         if report.preserved:
             preserved_refs = sorted(report.preserved)
-            print(f"\n   ⚠️  PRESERVED (preserve_user_components=True):")
+            print(f"\n   PRESERVED (preserve_user_components=True):")
             for ref in preserved_refs:
                 print(f"      {ref} (exists in KiCad but not in Python)")
-            print(f"   💡 Tip: Set preserve_user_components=False to remove these")
+            print(f"   Tip: Set preserve_user_components=False to remove these")
 
         if (
             not report.matched
@@ -386,17 +396,17 @@ class APISynchronizer:
             print("\nNet Labels:")
 
             if report.labels_added:
-                print(f"   ➕ Added {len(report.labels_added)} label(s):")
+                print(f"   Added {len(report.labels_added)} label(s):")
                 for comp_ref, pin, net in sorted(report.labels_added):
                     print(f"      {comp_ref} pin {pin} → {net}")
 
             if report.labels_removed:
-                print(f"   ➖ Removed {len(report.labels_removed)} label(s):")
+                print(f"   Removed {len(report.labels_removed)} label(s):")
                 for comp_ref, pin, net in sorted(report.labels_removed):
                     print(f"      {comp_ref} pin {pin} (was {net})")
 
             if report.labels_updated:
-                print(f"   🔧 Updated {len(report.labels_updated)} label(s):")
+                print(f"   Updated {len(report.labels_updated)} label(s):")
                 for comp_ref, pin, old_net, new_net in sorted(report.labels_updated):
                     print(f"      {comp_ref} pin {pin}: '{old_net}' → '{new_net}'")
 
@@ -764,6 +774,25 @@ class APISynchronizer:
         logger.debug(f"  → label position: ({label_pos.x}, {label_pos.y})")
         logger.debug(f"  → label angle: {label_angle}°")
 
+        # CHECK FOR DUPLICATE LABELS: Issue #559
+        # Before adding a new label, check if one already exists at this position
+        for existing_label in self.schematic.hierarchical_labels:
+            distance = math.sqrt(
+                (existing_label.position.x - label_pos.x) ** 2 +
+                (existing_label.position.y - label_pos.y) ** 2
+            )
+            if distance < PIN_LABEL_DISTANCE_TOLERANCE:  # 0.5mm tolerance
+                # Found existing label at this position
+                if existing_label.text == net_name:
+                    logger.debug(f"Label '{net_name}' already exists at pin {pin_number}, skipping duplicate")
+                    return True  # Not an error - label already exists with correct name
+                else:
+                    logger.warning(
+                        f"Conflicting label at {kicad_component.reference} pin {pin_number}: "
+                        f"existing='{existing_label.text}', new='{net_name}'"
+                    )
+                    # Continue to add the new label - this is a real conflict that needs attention
+
         # CHECK FOR POWER NETS: Place power symbol instead of hierarchical label
         # This matches the behavior in schematic_writer.py for consistency
         net_obj = self._get_net_object(net_name)
@@ -840,18 +869,29 @@ class APISynchronizer:
             True if label removed successfully
         """
         try:
+            # Power-symbol labels (PowerSymbolLabel) have no uuid; there is
+            # nothing to remove by uuid, so skip quietly instead of raising
+            # AttributeError (which was logged as an ERROR on every regen).
+            label_uuid = getattr(label, "uuid", None)
+            if label_uuid is None:
+                logger.debug(
+                    f"Label '{getattr(label, 'text', '?')}' has no uuid "
+                    f"(type={type(label).__name__}); skipping removal"
+                )
+                return False
+
             # Use the appropriate removal method based on label type
             if label_type == "hierarchical":
-                removed = self.schematic.remove_hierarchical_label(label.uuid)
+                removed = self.schematic.remove_hierarchical_label(label_uuid)
             else:
-                removed = self.schematic.remove_label(label.uuid)
+                removed = self.schematic.remove_label(label_uuid)
 
             if removed:
                 logger.info(f"Removed {label_type} label '{label.text}' from {component_ref} pin {pin_number}")
                 report.labels_removed.append((component_ref, pin_number, label.text))
                 return True
             else:
-                logger.warning(f"Label {label.uuid} not found for removal")
+                logger.warning(f"Label {label_uuid} not found for removal")
                 return False
 
         except Exception as e:
@@ -990,22 +1030,22 @@ class APISynchronizer:
 
             if python_net and not kicad_label:
                 # ADD label - Python has net but KiCad doesn't have label
-                logger.debug(f"    ➕ ADD label: pin {pin_num} -> {python_net}")
+                logger.debug(f"    ADD label: pin {pin_num} -> {python_net}")
                 self._add_pin_label(kicad_comp, pin_num, python_net, report)
 
             elif not python_net and kicad_label:
                 # REMOVE label - KiCad has label but Python doesn't have net
-                logger.debug(f"    ➖ REMOVE label: pin {pin_num} (was {kicad_label.text}, type={label_type})")
+                logger.debug(f"    REMOVE label: pin {pin_num} (was {kicad_label.text}, type={label_type})")
                 self._remove_pin_label(kicad_label, kicad_ref, pin_num, report, label_type)
 
             elif python_net and kicad_label and python_net != kicad_label.text:
                 # UPDATE label - Net name changed
-                logger.debug(f"    🔧 UPDATE label: pin {pin_num} '{kicad_label.text}' -> '{python_net}' (type={label_type})")
+                logger.debug(f"    UPDATE label: pin {pin_num} '{kicad_label.text}' -> '{python_net}' (type={label_type})")
                 self._update_pin_label(kicad_label, python_net, kicad_ref, pin_num, report, label_type)
 
             else:
                 # No change needed
-                logger.debug(f"    ✅ KEEP label: pin {pin_num} -> {python_net}")
+                logger.debug(f"    KEEP label: pin {pin_num} -> {python_net}")
 
     def _reconcile_pin_connections(
         self,
@@ -1023,14 +1063,14 @@ class APISynchronizer:
             matches: Matched circuit_id -> kicad_ref
             report: Sync report to track changes
         """
-        logger.info("🔌 Reconciling pin connections and labels")
+        logger.info("Reconciling pin connections and labels")
 
         for circuit_id, kicad_ref in matches.items():
             self._reconcile_component_pins(
                 circuit_id, kicad_ref, circuit_components, kicad_components, report
             )
 
-        logger.info(f"✅ Pin reconciliation complete: "
+        logger.info(f"Pin reconciliation complete: "
                    f"{len(report.labels_added)} added, "
                    f"{len(report.labels_removed)} removed, "
                    f"{len(report.labels_updated)} updated")
@@ -1180,10 +1220,11 @@ class APISynchronizer:
             # Issue #489: Also reconcile pin connections for newly added components
             # This ensures hierarchical labels and power symbols are added for the new component's pins
             kicad_ref = comp_data["reference"]
-            if kicad_ref in self.schematic.components_dict:
-                logger.debug(f"    🔌 Reconciling pins for newly added component {kicad_ref}")
+            added_component = self.schematic.components.get(kicad_ref)
+            if added_component is not None:
+                logger.debug(f"    Reconciling pins for newly added component {kicad_ref}")
                 # Update kicad_components dict with newly added component
-                kicad_components[kicad_ref] = self.schematic.components_dict[kicad_ref]
+                kicad_components[kicad_ref] = added_component
                 self._reconcile_component_pins(
                     circuit_id, kicad_ref, circuit_components, kicad_components, report
                 )
@@ -1221,16 +1262,52 @@ class APISynchronizer:
         # Determine library ID from component type
         lib_id = self._determine_library_id(comp_data)
 
-        component = self.component_manager.add_component(
-            library_id=lib_id,
-            reference=comp_data["reference"],
-            value=comp_data["value"],
-            footprint=comp_data.get("footprint"),
-            placement_strategy="edge_right",  # Place new components on right edge
-        )
+        components_api = getattr(self.schematic, "components", None)
+        native_add = getattr(components_api, "add", None)
+        if callable(native_add) and hasattr(self.schematic, "_data"):
+            # KiCad-10 kicad-sch-api: add through the native collection so the
+            # new component lands in ComponentCollection._items and is written
+            # out by save() (which rebuilds _data from the collections). Going
+            # through ComponentManager here only touches _data['symbol'], which
+            # that rebuild discards, so the added component would silently vanish.
+            component = native_add(
+                lib_id=lib_id,
+                reference=comp_data["reference"],
+                value=comp_data.get("value") or "",
+                position=self._next_edge_right_position(),
+                footprint=comp_data.get("footprint"),
+            )
+        else:
+            component = self.component_manager.add_component(
+                library_id=lib_id,
+                reference=comp_data["reference"],
+                value=comp_data["value"],
+                footprint=comp_data.get("footprint"),
+                placement_strategy="edge_right",  # Place new components on right edge
+            )
 
         if component:
             report.added.append(comp_data["id"])
+
+    def _next_edge_right_position(self, spacing: float = 25.4):
+        """Pick a spot to the right of existing components for a new part.
+
+        A deliberately simple placement: new components land in a free column to
+        the right of everything already placed, so they never overlap existing
+        (possibly hand-placed) parts. The user repositions as desired in KiCad.
+        """
+        xs, ys = [], []
+        try:
+            for comp in self.schematic.components:
+                pos = getattr(comp, "position", None)
+                if pos is not None:
+                    xs.append(pos.x)
+                    ys.append(pos.y)
+        except Exception:
+            pass
+        if xs:
+            return (max(xs) + spacing, min(ys))
+        return (50.8, 50.8)
 
     def _determine_library_id(self, comp_data: Dict) -> str:
         """Determine KiCad library ID from component data."""
@@ -1269,15 +1346,15 @@ class APISynchronizer:
         # If the schematic was loaded with wrong name, we need to correct it before saving
         correct_project_name = self.schematic_path.stem  # e.g., "comprehensive_root.kicad_sch" -> "comprehensive_root"
         if self.schematic.name != correct_project_name:
-            logger.info(f"🔧 Fixing schematic.name: '{self.schematic.name}' -> '{correct_project_name}'")
+            logger.info(f"Fixing schematic.name: '{self.schematic.name}' -> '{correct_project_name}'")
             self.schematic.name = correct_project_name
 
-        logger.info(f"💾 Calling schematic.save(preserve_format=False)")
+        logger.info(f"Calling schematic.save(preserve_format=False)")
         logger.info(f"   - Save path: {self.schematic_path}")
         logger.info(f"   - Using preserve_format=False to force full rewrite from _data")
 
         # Using preserve_format=False forces full rewrite from _data dictionary
         self.schematic.save(str(self.schematic_path), preserve_format=False)
 
-        logger.info(f"✅ Save completed")
+        logger.info(f"Save completed")
         logger.info("=" * 70)

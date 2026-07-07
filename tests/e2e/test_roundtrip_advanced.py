@@ -360,8 +360,14 @@ class TestManualComponentPreservation:
                 return r1
 
             c2 = circuit_v2()
+            # Keeping a KiCad-only component across regeneration is opt-in:
+            # the default (preserve_user_components=False) treats the Python
+            # source as authoritative and removes components not present in it.
             c2.generate_kicad_project(
-                str(output_path), force_regenerate=False, generate_pcb=False
+                str(output_path),
+                force_regenerate=False,
+                generate_pcb=False,
+                preserve_user_components=True,
             )
 
             # Step 4: Verify manual component preserved

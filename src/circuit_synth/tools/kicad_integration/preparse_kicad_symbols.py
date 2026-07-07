@@ -121,7 +121,7 @@ def build_symbol_index(verbose: bool = False, progress: bool = True) -> Dict[str
     start_time = time.time()
 
     if progress:
-        print(f"🔍 Building symbol index from KICAD_SYMBOL_DIR")
+        print(f"Building symbol index from KICAD_SYMBOL_DIR")
 
     # Use the enhanced SymbolLibCache to build the index
     from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
@@ -147,7 +147,7 @@ def build_symbol_index(verbose: bool = False, progress: bool = True) -> Dict[str
         }
 
         if verbose and lib_symbols:
-            print(f"  📚 {lib_name}: {len(lib_symbols)} symbols")
+            print(f"  {lib_name}: {len(lib_symbols)} symbols")
             if verbose and len(lib_symbols) <= 20:  # Show all if small library
                 for sym in lib_symbols:
                     print(f"    - {sym}")
@@ -158,11 +158,11 @@ def build_symbol_index(verbose: bool = False, progress: bool = True) -> Dict[str
 
     # Summary
     if progress:
-        print(f"\n✅ Symbol index built successfully!")
-        print(f"  📁 Libraries indexed: {len(all_libraries)}")
-        print(f"  🔍 Symbols indexed: {len(all_symbols)}")
-        print(f"  ⏱️  Processing time: {processing_time:.2f} seconds")
-        print(f"  💾 Cache directory: {SymbolLibCache.CACHE_DIR}")
+        print(f"\nSymbol index built successfully!")
+        print(f"  Libraries indexed: {len(all_libraries)}")
+        print(f"  Symbols indexed: {len(all_symbols)}")
+        print(f"  Processing time: {processing_time:.2f} seconds")
+        print(f"  Cache directory: {SymbolLibCache.CACHE_DIR}")
 
         # Show some example symbols
         if all_symbols:
@@ -172,7 +172,7 @@ def build_symbol_index(verbose: bool = False, progress: bool = True) -> Dict[str
                 if sym in all_symbols:
                     found_examples.append(f"{sym} ({all_symbols[sym]})")
             if found_examples:
-                print(f"  📋 Example symbols: {', '.join(found_examples[:5])}")
+                print(f"  Example symbols: {', '.join(found_examples[:5])}")
 
     return {
         "total_files": len(all_libraries),
@@ -194,7 +194,7 @@ def preparse_symbols(
     The library_root parameter is ignored - uses KICAD_SYMBOL_DIR instead.
     """
     if progress:
-        print("⚡ Using fast symbol index building (lazy loading approach)")
+        print("Using fast symbol index building (lazy loading approach)")
 
     return build_symbol_index(verbose, progress)
 
@@ -209,7 +209,7 @@ def preparse_specific_libraries(
     start_time = time.time()
 
     if progress:
-        print(f"🔧 Pre-parsing {len(library_names)} specific libraries...")
+        print(f"Pre-parsing {len(library_names)} specific libraries...")
 
     from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
 
@@ -222,7 +222,7 @@ def preparse_specific_libraries(
 
     for lib_name in library_names:
         if progress:
-            print(f"  📚 Processing library: {lib_name}")
+            print(f"  Processing library: {lib_name}")
 
         try:
             # Get all symbols in this library
@@ -231,7 +231,7 @@ def preparse_specific_libraries(
 
             if not lib_symbols:
                 if progress:
-                    print(f"    ⚠️  No symbols found in library: {lib_name}")
+                    print(f"    No symbols found in library: {lib_name}")
                 continue
 
             lib_stats = {
@@ -245,7 +245,7 @@ def preparse_specific_libraries(
             total_symbols += len(lib_symbols)
 
             if progress:
-                print(f"    🔍 Found {len(lib_symbols)} symbols, parsing...")
+                print(f"    Found {len(lib_symbols)} symbols, parsing...")
 
             for sym_name in lib_symbols:
                 symbol_id = f"{lib_name}:{sym_name}"
@@ -257,7 +257,7 @@ def preparse_specific_libraries(
                     lib_stats["symbols"].append({"name": sym_name, "status": "cached"})
 
                     if verbose:
-                        print(f"      ✓ {sym_name}")
+                        print(f"      {sym_name}")
 
                 except Exception as e:
                     failed_symbols += 1
@@ -267,7 +267,7 @@ def preparse_specific_libraries(
                     )
 
                     if verbose:
-                        print(f"      ✗ {sym_name}: {e}")
+                        print(f"      {sym_name}: {e}")
 
             libraries[lib_name] = lib_stats
 
@@ -276,26 +276,26 @@ def preparse_specific_libraries(
                     lib_stats["cached_symbols"] / lib_stats["total_symbols"]
                 ) * 100
                 print(
-                    f"    ✅ {lib_stats['cached_symbols']}/{lib_stats['total_symbols']} symbols cached ({success_rate:.1f}%)"
+                    f"    {lib_stats['cached_symbols']}/{lib_stats['total_symbols']} symbols cached ({success_rate:.1f}%)"
                 )
 
         except Exception as e:
             if progress:
-                print(f"    ❌ Failed to process library {lib_name}: {e}")
+                print(f"    Failed to process library {lib_name}: {e}")
             failed_symbols += 1
 
     processing_time = time.time() - start_time
 
     if progress:
-        print(f"\n🎉 Library pre-parsing complete!")
-        print(f"  📚 Libraries processed: {len(library_names)}")
-        print(f"  🔍 Total symbols: {total_symbols}")
-        print(f"  ✅ Successfully cached: {cached_symbols}")
-        print(f"  ❌ Failed: {failed_symbols}")
-        print(f"  ⏱️  Processing time: {processing_time:.2f} seconds")
+        print(f"\nLibrary pre-parsing complete!")
+        print(f"  Libraries processed: {len(library_names)}")
+        print(f"  Total symbols: {total_symbols}")
+        print(f"  Successfully cached: {cached_symbols}")
+        print(f"  Failed: {failed_symbols}")
+        print(f"  Processing time: {processing_time:.2f} seconds")
         if total_symbols > 0:
             success_rate = (cached_symbols / total_symbols) * 100
-            print(f"  📊 Success rate: {success_rate:.1f}%")
+            print(f"  Success rate: {success_rate:.1f}%")
 
     return {
         "total_files": len(library_names),
@@ -447,19 +447,19 @@ Examples:
             if path_obj.exists() and path_obj.is_dir():
                 valid_paths.append(path_obj)
             else:
-                print(f"⚠️  Warning: Symbol library path does not exist: {path_obj}")
+                print(f"Warning: Symbol library path does not exist: {path_obj}")
 
         return valid_paths
 
     valid_paths = validate_symbol_paths(str(args.lib_path))
     if not valid_paths:
-        print(f"❌ Error: No valid symbol library paths found in: {args.lib_path}")
+        print(f"Error: No valid symbol library paths found in: {args.lib_path}")
         return 1
 
     try:
         progress = not args.quiet
         if progress:
-            print(f"📁 Using symbol library paths:")
+            print(f"Using symbol library paths:")
             for path in valid_paths:
                 print(f"   - {path}")
 
@@ -468,7 +468,7 @@ Examples:
             # Pre-parse specific libraries
             library_names = [lib.strip() for lib in args.preparse_libraries.split(",")]
             if progress:
-                print(f"🎯 Pre-parsing specific libraries: {', '.join(library_names)}")
+                print(f"Pre-parsing specific libraries: {', '.join(library_names)}")
             stats = preparse_specific_libraries(
                 library_names, verbose=args.verbose, progress=progress
             )
@@ -476,9 +476,9 @@ Examples:
         elif args.legacy_preparse:
             # Legacy full pre-parsing (not recommended)
             if progress:
-                print("⚠️  Using legacy full pre-parsing (this will be very slow)")
+                print("Using legacy full pre-parsing (this will be very slow)")
                 print(
-                    "💡 Consider using --preparse-libraries for specific libraries instead"
+                    "Consider using --preparse-libraries for specific libraries instead"
                 )
             # Use the old implementation for backward compatibility
             stats = preparse_symbols_legacy(
@@ -488,7 +488,7 @@ Examples:
         else:
             # Default: Fast index building
             if progress:
-                print("⚡ Building fast symbol index (lazy loading approach)")
+                print("Building fast symbol index (lazy loading approach)")
             stats = build_symbol_index(verbose=args.verbose, progress=progress)
 
         # Return appropriate exit code
@@ -507,10 +507,10 @@ Examples:
             return 0  # Success
 
     except KeyboardInterrupt:
-        print("\n⏹️  Operation cancelled by user")
+        print("\nOperation cancelled by user")
         return 130
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
         if args.verbose:
             import traceback
 
@@ -528,11 +528,11 @@ def preparse_symbols_legacy(
     start_time = time.time()
 
     if progress:
-        print(f"⚠️  WARNING: Legacy mode will parse {44000}+ symbols individually")
+        print(f"WARNING: Legacy mode will parse {44000}+ symbols individually")
         print(
             f"   This may take several hours. Consider using fast index building instead."
         )
-        print(f"🔍 Scanning for .kicad_sym files in: {library_root}")
+        print(f"Scanning for .kicad_sym files in: {library_root}")
 
     # Find all symbol files
     symbol_files = find_kicad_symbol_files(library_root)
@@ -592,7 +592,7 @@ def preparse_symbols_legacy(
                 lib_stats["symbols"].append({"name": sym_name, "status": "cached"})
 
                 if verbose:
-                    print(f"    ✓ Cached: {full_symbol_id}")
+                    print(f"    Cached: {full_symbol_id}")
             except Exception as e:
                 failed_symbols += 1
                 lib_stats["failed_symbols"] += 1
@@ -601,7 +601,7 @@ def preparse_symbols_legacy(
                 )
 
                 if verbose:
-                    print(f"    ✗ Failed: {full_symbol_id} - {e}")
+                    print(f"    Failed: {full_symbol_id} - {e}")
 
         libraries[lib_name] = lib_stats
 

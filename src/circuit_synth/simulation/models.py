@@ -78,6 +78,43 @@ class ModelLibrary:
             manufacturer="Various",
         )
 
+        # Schottky rectifiers (low Vf, fast recovery) -- the standard PSU rectifier.
+        self.models["SS14"] = SpiceModel(
+            name="SS14",
+            model_type="D",
+            parameters={
+                "IS": 1e-6,  # Saturation current (Schottky: high vs silicon)
+                "RS": 0.05,  # Series resistance
+                "N": 1.05,  # Emission coefficient
+                "CJO": 120e-12,  # Zero-bias junction capacitance
+                "M": 0.5,  # Grading coefficient
+                "BV": 40,  # Reverse breakdown voltage (SS14 = 40 V)
+                "IBV": 1e-4,  # Current at breakdown
+                "EG": 0.69,  # Bandgap (Schottky metal-semiconductor barrier)
+                "XTI": 2,  # Saturation-current temp exponent
+            },
+            description="1 A 40 V SMA Schottky rectifier",
+            manufacturer="Various",
+        )
+
+        self.models["1N5819"] = SpiceModel(
+            name="1N5819",
+            model_type="D",
+            parameters={
+                "IS": 31.7e-6,
+                "RS": 0.051,
+                "N": 1.373,
+                "CJO": 110e-12,
+                "M": 0.35,
+                "BV": 40,
+                "IBV": 1e-4,
+                "EG": 0.69,
+                "XTI": 2,
+            },
+            description="1 A 40 V through-hole Schottky rectifier",
+            manufacturer="Various",
+        )
+
         self.models["LED_Red"] = SpiceModel(
             name="LED_Red",
             model_type="D",
@@ -266,6 +303,20 @@ class ModelLibrary:
             description="Generic silicon diode",
         )
 
+        self.models["DefaultSchottky"] = SpiceModel(
+            name="DefaultSchottky",
+            model_type="D",
+            parameters={
+                "IS": 1e-6,
+                "RS": 0.05,
+                "N": 1.05,
+                "CJO": 100e-12,
+                "BV": 40,
+                "IBV": 1e-3,
+            },
+            description="Generic Schottky diode (low Vf)",
+        )
+
         self.models["DefaultNPN"] = SpiceModel(
             name="DefaultNPN",
             model_type="NPN",
@@ -342,12 +393,6 @@ class ModelLibrary:
         # Format parameters for SPICE
         params = " ".join([f"{k}={v}" for k, v in model.parameters.items()])
         return f".MODEL {model.name} {model.model_type} ({params})"
-
-    def apply_to_circuit(self, spice_circuit):
-        """Apply all required models to a PySpice circuit."""
-        # This would be called by the converter to add model definitions
-        # to the SPICE netlist
-        pass
 
 
 # Global model library instance

@@ -34,9 +34,11 @@ class TestJlcWebScraper:
         assert scraper.delay_seconds == 2.5
 
     def test_search_components_success(self):
-        """Test successful component search with demo data."""
+        """Demo data is returned only when explicitly opted in, and is tagged."""
         scraper = JlcWebScraper(delay_seconds=0.1)
-        results = scraper.search_components("STM32G0", max_results=10)
+        results = scraper.search_components(
+            "STM32G0", max_results=10, allow_demo_data=True
+        )
 
         # Verify demo data is returned for STM32G0
         assert len(results) == 1
@@ -44,11 +46,17 @@ class TestJlcWebScraper:
         assert results[0]["manufacturer"] == "STMicroelectronics"
         assert results[0]["stock"] == 54891
         assert results[0]["price"] == "$1.20@100pcs"
+        assert results[0]["demo_data"] is True
+
+    def test_search_components_no_demo_by_default(self):
+        """Without opt-in the scraper returns nothing (never demo as live data)."""
+        scraper = JlcWebScraper(delay_seconds=0.1)
+        assert scraper.search_components("STM32G0") == []
 
     def test_search_components_request_error(self):
         """Test component search with demo data (no network errors in demo mode)."""
         scraper = JlcWebScraper()
-        results = scraper.search_components("STM32G0")
+        results = scraper.search_components("STM32G0", allow_demo_data=True)
 
         # Demo data should always be returned successfully
         assert len(results) == 1
@@ -57,7 +65,7 @@ class TestJlcWebScraper:
     def test_search_components_http_error(self):
         """Test component search with demo data (no HTTP errors in demo mode)."""
         scraper = JlcWebScraper()
-        results = scraper.search_components("STM32G0")
+        results = scraper.search_components("STM32G0", allow_demo_data=True)
 
         # Demo data should always be returned successfully
         assert len(results) == 1
@@ -233,7 +241,7 @@ class TestErrorHandling:
     def test_search_components_timeout(self):
         """Test component search with demo data (no timeouts in demo mode)."""
         scraper = JlcWebScraper()
-        results = scraper.search_components("STM32G0")
+        results = scraper.search_components("STM32G0", allow_demo_data=True)
 
         # Demo data should always be returned successfully
         assert len(results) == 1

@@ -296,15 +296,22 @@ def validate_json_schema(json_path: Path) -> bool:
                     print(f"Component {ref} missing required field: {field}")
                     return False
 
-        # Validate net structure
-        for net_name, connections in data["nets"].items():
-            if not isinstance(connections, list):
-                print(f"Net {net_name} connections should be a list")
+        # Validate net structure. Current schema (#582): each net maps to a dict
+        # carrying its connection list under "nodes" plus metadata
+        # (is_power/power_symbol/...). Each node has a "component" field.
+        for net_name, net_data in data["nets"].items():
+            if not isinstance(net_data, dict):
+                print(f"Net {net_name} should be a dict")
                 return False
 
-            for conn in connections:
+            nodes = net_data.get("nodes")
+            if not isinstance(nodes, list):
+                print(f"Net {net_name} 'nodes' should be a list")
+                return False
+
+            for conn in nodes:
                 if "component" not in conn:
-                    print(f"Net {net_name} connection missing 'component' field")
+                    print(f"Net {net_name} node missing 'component' field")
                     return False
 
         return True

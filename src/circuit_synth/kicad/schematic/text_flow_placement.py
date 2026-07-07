@@ -49,6 +49,9 @@ class SheetDef:
 SHEET_SIZES = [
     SheetDef("A4", 297.0, 210.0, 12.7, 12.7, 284.48, 165.10),
     SheetDef("A3", 420.0, 297.0, 12.7, 12.7, 407.0, 277.0),
+    SheetDef("A2", 594.0, 420.0, 12.7, 12.7, 581.0, 400.0),
+    SheetDef("A1", 841.0, 594.0, 12.7, 12.7, 828.0, 574.0),
+    SheetDef("A0", 1189.0, 841.0, 12.7, 12.7, 1176.0, 821.0),
 ]
 
 
@@ -86,31 +89,31 @@ class TextFlowPlacer:
         Raises:
             ValueError: If components don't fit on A3 sheet
         """
-        print(f"\n{'='*80}")
-        print(f"🔤 TEXT-FLOW PLACEMENT ALGORITHM")
-        print(f"{'='*80}")
-        print(f"Components to place: {len(component_bboxes)}")
-        print(f"Spacing: {self.spacing}mm\n")
+        logger.debug(f"\n{'='*80}")
+        logger.debug(f"TEXT-FLOW PLACEMENT ALGORITHM")
+        logger.debug(f"{'='*80}")
+        logger.debug(f"Components to place: {len(component_bboxes)}")
+        logger.debug(f"Spacing: {self.spacing}mm\n")
 
         # Try each sheet size
         for sheet in SHEET_SIZES:
-            print(f"Trying {sheet.name} ({sheet.width}×{sheet.height}mm)")
-            print(
+            logger.debug(f"Trying {sheet.name} ({sheet.width}×{sheet.height}mm)")
+            logger.debug(
                 f"  Usable area: ({sheet.min_x}, {sheet.min_y}) to ({sheet.max_x}, {sheet.max_y})"
             )
 
             placements, success = self._try_place_on_sheet(component_bboxes, sheet)
 
             if success:
-                print(f"✅ All components fit on {sheet.name}!")
-                print(f"{'='*80}\n")
+                logger.debug(f"All components fit on {sheet.name}!")
+                logger.debug(f"{'='*80}\n")
                 return placements, sheet.name
             else:
-                print(f"❌ Overflow on {sheet.name}, trying next size...\n")
+                logger.debug(f"Overflow on {sheet.name}, trying next size...\n")
 
         # If we get here, even A3 overflowed
         raise ValueError(
-            f"Components do not fit on A3 sheet (largest supported size). "
+            f"Components do not fit on A0 sheet (largest supported size). "
             f"Reduce component count or implement larger sheet support."
         )
 
@@ -139,14 +142,13 @@ class TextFlowPlacer:
             reverse=True,
         )
 
-        print(f"  Sorted components (largest first):")
+        logger.debug(f"  Sorted components (largest first):")
         for i, (ref, width, height) in enumerate(sorted_bboxes[:5]):
-            print(
+            logger.debug(
                 f"    [{i+1}] {ref}: {width:.1f}×{height:.1f}mm (area={width*height:.1f}mm²)"
             )
         if len(sorted_bboxes) > 5:
-            print(f"    ... and {len(sorted_bboxes)-5} more")
-        print()
+            logger.debug(f"    ... and {len(sorted_bboxes)-5} more")
 
         # Initialize bounding box position (top-left corner)
         # Add extra left margin for first component to account for leftward hierarchical labels
@@ -164,12 +166,12 @@ class TextFlowPlacer:
                 bbox_x = sheet.min_x + LEFT_MARGIN_PADDING
                 bbox_y += current_row_height + self.spacing
                 current_row_height = 0.0
-                print(f"  ↓ Row wrap at y={bbox_y:.1f}mm")
+                logger.debug(f"  ↓ Row wrap at y={bbox_y:.1f}mm")
 
             # Check if component fits on sheet vertically
             if bbox_y + height > sheet.max_y:
-                print(
-                    f"  ⚠️  Component {ref} overflows at y={bbox_y:.1f}mm (max={sheet.max_y:.1f}mm)"
+                logger.debug(
+                    f"  Component {ref} overflows at y={bbox_y:.1f}mm (max={sheet.max_y:.1f}mm)"
                 )
                 return placements, False
 
@@ -183,7 +185,7 @@ class TextFlowPlacer:
 
             placements.append((ref, center_x, center_y))
 
-            print(
+            logger.debug(
                 f"  [{i+1:2d}] {ref:6s} ({width:5.1f}×{height:5.1f}mm) "
                 f"bbox=({bbox_x:6.1f},{bbox_y:6.1f}) center=({center_x:6.1f},{center_y:6.1f})"
             )

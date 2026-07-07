@@ -43,6 +43,15 @@ import uuid as uuid_module
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+# Version stamped into generated .kicad_sch files. Derived from installed
+# package metadata so it never goes stale; falls back if metadata is missing.
+try:
+    from importlib.metadata import version as _pkg_version
+
+    _GENERATOR_VERSION = _pkg_version("circuit-synth")
+except Exception:
+    _GENERATOR_VERSION = "0.12.1"
+
 log_level = os.environ.get("CIRCUIT_SYNTH_LOG_LEVEL", "WARNING")
 try:
     level = getattr(logging, log_level.upper())
@@ -87,14 +96,10 @@ from kicad_sch_api.core.types import (
 )
 from sexpdata import Symbol
 
-# Import symbol cache for multi-unit component support
-from ..core.symbol_cache import get_symbol_cache
-
+# Import Python symbol cache specifically for graphics data
 # Use optimized symbol cache from kicad_symbol_cache for better performance,
 # but keep Python fallback for graphics data
 from circuit_synth.kicad.kicad_symbol_cache import SymbolLibCache
-
-# Import Python symbol cache specifically for graphics data
 from circuit_synth.kicad.kicad_symbol_cache import (
     SymbolLibCache as PythonSymbolLibCache,
 )
@@ -104,6 +109,9 @@ from circuit_synth.kicad.schematic.placement import PlacementEngine, PlacementSt
 
 # Import existing dependencies
 from ...core.circuit import Circuit
+
+# Import symbol cache for multi-unit component support
+from ..core.symbol_cache import get_symbol_cache
 from .collision_manager import SHEET_MARGIN
 from .integrated_reference_manager import IntegratedReferenceManager
 
@@ -118,30 +126,28 @@ def generate_component_sexp(component_data):
     """Python implementation for component S-expression generation"""
     # CRITICAL DEBUG: Log all component data to identify reference issue
     logger.debug(
-        f"🔍 GENERATE_COMPONENT_SEXP: Input component_data keys: {list(component_data.keys())}"
+        f"GENERATE_COMPONENT_SEXP: Input component_data keys: {list(component_data.keys())}"
     )
-    logger.debug(f"🔍 GENERATE_COMPONENT_SEXP: Full component_data: {component_data}")
+    logger.debug(f"GENERATE_COMPONENT_SEXP: Full component_data: {component_data}")
 
     # CRITICAL FIX: Never use hard-coded fallbacks - always preserve original reference
     ref = component_data.get("ref")
     if not ref:
+        logger.error(f"GENERATE_COMPONENT_SEXP: NO REFERENCE found in component_data!")
         logger.error(
-            f"❌ GENERATE_COMPONENT_SEXP: NO REFERENCE found in component_data!"
-        )
-        logger.error(
-            f"❌ GENERATE_COMPONENT_SEXP: This indicates a bug in component processing"
+            f"GENERATE_COMPONENT_SEXP: This indicates a bug in component processing"
         )
         # Don't use hard-coded fallback - this masks the real issue
         ref = "REF_ERROR"  # Make it obvious when this happens
     else:
-        logger.debug(f"✅ GENERATE_COMPONENT_SEXP: Found reference: '{ref}'")
+        logger.debug(f"GENERATE_COMPONENT_SEXP: Found reference: '{ref}'")
 
     lib_id = component_data.get("lib_id", "Device:UNKNOWN")  # More descriptive fallback
     at = component_data.get("at", [0, 0, 0])
     uuid = component_data.get("uuid", "00000000-0000-0000-0000-000000000000")
 
     logger.debug(
-        f"🔍 GENERATE_COMPONENT_SEXP: Using ref='{ref}', lib_id='{lib_id}', at={at}"
+        f"GENERATE_COMPONENT_SEXP: Using ref='{ref}', lib_id='{lib_id}', at={at}"
     )
 
     # Build basic S-expression
@@ -309,13 +315,15 @@ class SchematicWriter:
             name=self.project_name,
             version="20250114",
             generator="circuit_synth",
-            generator_version="0.8.36",
+            generator_version=_GENERATOR_VERSION,
             paper=self.paper_size,
             uuid=self.uuid_top,
         )
 
         # Initialize KiCad API managers
-        self.component_manager = ComponentManager(self.schematic, project_name=self.project_name)
+        self.component_manager = ComponentManager(
+            self.schematic, project_name=self.project_name
+        )
         self.placement_engine = PlacementEngine(self.schematic)
 
         # Initialize S-expression parser
@@ -346,22 +354,14 @@ class SchematicWriter:
         # CRITICAL DEBUG: Log hierarchical path for UUID fix verification
         import sys
 
-        print(
-            f"\n🔍 WRITER_INIT: Circuit='{circuit.name}'", file=sys.stderr, flush=True
+        logger.debug(f"\nWRITER_INIT: Circuit='{circuit.name}'")
+        logger.debug(
+            f"WRITER_INIT:   Hierarchical path={self.hierarchical_path}",
         )
-        print(
-            f"🔍 WRITER_INIT:   Hierarchical path={self.hierarchical_path}",
-            file=sys.stderr,
-            flush=True,
-        )
-        print(
-            f"🔍 WRITER_INIT:   Self UUID={self.uuid_top}", file=sys.stderr, flush=True
-        )
+        logger.debug(f"WRITER_INIT:   Self UUID={self.uuid_top}")
         if self.hierarchical_path and len(self.hierarchical_path) > 0:
-            print(
-                f"🔍 WRITER_INIT:   Root UUID (path[0])={self.hierarchical_path[0]}",
-                file=sys.stderr,
-                flush=True,
+            logger.debug(
+                f"WRITER_INIT:   Root UUID (path[0])={self.hierarchical_path[0]}",
             )
 
     @staticmethod
@@ -410,39 +410,44 @@ class SchematicWriter:
 
         PERFORMANCE MONITORING: Times each major operation.
         """
-        with open("/tmp/circuit_synth_debug.log", "a") as f:
-            f.write(f"generate_s_expr called for circuit {self.circuit.name}\n")
         start_time = time.perf_counter()
         logger.info(
-            f"🚀 GENERATE_S_EXPR: Starting schematic generation for circuit '{self.circuit.name}'"
+            f"GENERATE_S_EXPR: Starting schematic generation for circuit '{self.circuit.name}'"
         )
         logger.info(
-            f"📊 GENERATE_S_EXPR: Components: {len(self.circuit.components)}, Nets: {len(self.circuit.nets)}"
+            f"GENERATE_S_EXPR: Components: {len(self.circuit.components)}, Nets: {len(self.circuit.nets)}"
         )
-        logger.info(f"🐍 GENERATE_S_EXPR: Using Python implementation for components")
+        logger.info(f"GENERATE_S_EXPR: Using Python implementation for components")
 
         # Add components using the new API - time this critical operation
         comp_start = time.perf_counter()
-        logger.info(f"⚡ STEP 1/8: Adding {len(self.circuit.components)} components...")
+        logger.info(f"STEP 1/8: Adding {len(self.circuit.components)} components...")
         self._add_components()
         comp_time = time.perf_counter() - comp_start
-        logger.info(f"✅ STEP 1/8: Components added in {comp_time*1000:.2f}ms")
+        logger.info(f"STEP 1/8: Components added in {comp_time*1000:.2f}ms")
 
         # Place components using the placement engine
         place_start = time.perf_counter()
-        logger.info("⚡ STEP 2/8: Placing components...")
+        logger.info("STEP 2/8: Placing components...")
         self._place_components()
         place_time = time.perf_counter() - place_start
-        logger.info(f"✅ STEP 2/8: Components placed in {place_time*1000:.2f}ms")
+        logger.info(f"STEP 2/8: Components placed in {place_time*1000:.2f}ms")
+
+        # Restore the unit number on each multi-unit body. The component_manager
+        # index keys them as "{ref}_unit{n}" (correct), but the body objects'
+        # .unit attribute can read back as 1 for every unit (lost in the
+        # collection round-trip). Without this, all units serialize as (unit 1)
+        # -> KiCad duplicates unit-1 pins and cannot resolve unit-3 pins.
+        self._restore_multi_unit_numbers()
 
         # Add pin-level net labels
         labels_start = time.perf_counter()
         logger.info(
-            f"⚡ STEP 3/8: Adding pin-level net labels for {len(self.circuit.nets)} nets..."
+            f"STEP 3/8: Adding pin-level net labels for {len(self.circuit.nets)} nets..."
         )
         component_labels = self._add_pin_level_net_labels()
         labels_time = time.perf_counter() - labels_start
-        logger.info(f"✅ STEP 3/8: Net labels added in {labels_time*1000:.2f}ms")
+        logger.info(f"STEP 3/8: Net labels added in {labels_time*1000:.2f}ms")
         logger.debug(
             f"  Label tracking: {len(component_labels)} components with labels"
         )
@@ -452,31 +457,31 @@ class SchematicWriter:
         subcircuit_count = (
             len(self.circuit.child_instances) if self.circuit.child_instances else 0
         )
-        logger.info(f"⚡ STEP 4/8: Adding {subcircuit_count} subcircuit sheets...")
+        logger.info(f"STEP 4/8: Adding {subcircuit_count} subcircuit sheets...")
         self._add_subcircuit_sheets()
         sheets_time = time.perf_counter() - sheets_start
-        logger.info(f"✅ STEP 4/8: Subcircuit sheets added in {sheets_time*1000:.2f}ms")
+        logger.info(f"STEP 4/8: Subcircuit sheets added in {sheets_time*1000:.2f}ms")
 
         # Create ComponentUnits (bundles component + labels + bbox)
         units_start = time.perf_counter()
         logger.info(
-            f"⚡ STEP 5/8: Creating ComponentUnits for {len(self.circuit.components)} components..."
+            f"STEP 5/8: Creating ComponentUnits for {len(self.circuit.components)} components..."
         )
         component_units = self._create_component_units(component_labels)
         units_time = time.perf_counter() - units_start
-        logger.info(f"✅ STEP 5/8: ComponentUnits created in {units_time*1000:.2f}ms")
+        logger.info(f"STEP 5/8: ComponentUnits created in {units_time*1000:.2f}ms")
 
         # Draw bounding boxes if enabled
         bbox_start = time.perf_counter()
         if self.draw_bounding_boxes:
             logger.info(
-                f"⚡ STEP 6/8: Drawing bounding boxes for {len(component_units)} ComponentUnits..."
+                f"STEP 6/8: Drawing bounding boxes for {len(component_units)} ComponentUnits..."
             )
             self._draw_component_unit_bboxes(component_units)
             bbox_time = time.perf_counter() - bbox_start
-            logger.info(f"✅ STEP 6/8: Bounding boxes drawn in {bbox_time*1000:.2f}ms")
+            logger.info(f"STEP 6/8: Bounding boxes drawn in {bbox_time*1000:.2f}ms")
         else:
-            logger.info("⏭️  STEP 6/8: Bounding boxes disabled, skipping")
+            logger.info("STEP 6/8: Bounding boxes disabled, skipping")
             bbox_time = 0
 
         # Add text annotations (TextBox, TextProperty, etc.)
@@ -484,39 +489,39 @@ class SchematicWriter:
 
         # Populate lib_symbols from the symbol cache
         lib_start = time.perf_counter()
-        logger.info("⚡ STEP 7/8: Populating symbol library definitions...")
+        logger.info("STEP 7/8: Populating symbol library definitions...")
         self._populate_lib_symbols()
         lib_time = time.perf_counter() - lib_start
-        logger.info(f"✅ STEP 7/8: Symbol library populated in {lib_time*1000:.2f}ms")
+        logger.info(f"STEP 7/8: Symbol library populated in {lib_time*1000:.2f}ms")
 
         total_time = time.perf_counter() - start_time
 
-        logger.info("🏁 STEP 8/8: Schematic generation complete!")
-        logger.info(f"✅ GENERATE_S_EXPR: ✅ TOTAL TIME: {total_time*1000:.2f}ms")
+        logger.info("STEP 8/8: Schematic generation complete!")
+        logger.info(f"GENERATE_S_EXPR: TOTAL TIME: {total_time*1000:.2f}ms")
 
         # Performance breakdown
-        logger.info("📈 PERFORMANCE_BREAKDOWN:")
+        logger.info("PERFORMANCE_BREAKDOWN:")
         logger.info(
-            f"  🔧 Components: {comp_time*1000:.2f}ms ({comp_time/total_time*100:.1f}%)"
+            f"  Components: {comp_time*1000:.2f}ms ({comp_time/total_time*100:.1f}%)"
         )
         logger.info(
-            f"  📍 Placement: {place_time*1000:.2f}ms ({place_time/total_time*100:.1f}%)"
+            f"  Placement: {place_time*1000:.2f}ms ({place_time/total_time*100:.1f}%)"
         )
         logger.info(
-            f"  🏷️  Labels: {labels_time*1000:.2f}ms ({labels_time/total_time*100:.1f}%)"
+            f"  Labels: {labels_time*1000:.2f}ms ({labels_time/total_time*100:.1f}%)"
         )
         logger.info(
-            f"  📄 Sheets: {sheets_time*1000:.2f}ms ({sheets_time/total_time*100:.1f}%)"
+            f"  Sheets: {sheets_time*1000:.2f}ms ({sheets_time/total_time*100:.1f}%)"
         )
         if bbox_time > 0:
             logger.info(
-                f"  📦 Bounding boxes: {bbox_time*1000:.2f}ms ({bbox_time/total_time*100:.1f}%)"
+                f"  Bounding boxes: {bbox_time*1000:.2f}ms ({bbox_time/total_time*100:.1f}%)"
             )
         logger.info(
-            f"  📚 Lib symbols: {lib_time*1000:.2f}ms ({lib_time/total_time*100:.1f}%)"
+            f"  Lib symbols: {lib_time*1000:.2f}ms ({lib_time/total_time*100:.1f}%)"
         )
 
-        logger.info(f"⚡ PERFORMANCE: Completed in {total_time*1000:.2f}ms")
+        logger.info(f"PERFORMANCE: Completed in {total_time*1000:.2f}ms")
 
         # Return the Schematic object instead of S-expression
         return self.schematic
@@ -612,6 +617,10 @@ class SchematicWriter:
 
             # Add component using the API - for multi-unit, add each unit separately
             # Time the component manager operation
+            first_api_component = None
+            # Every placed unit body, as (unit_num, api_component). Multi-unit
+            # symbols place several bodies; each needs a rooted instance path.
+            placed_units: list = []
             with timed_operation(
                 f"add_component[{comp.lib_id}]", threshold_ms=20, details=comp_details
             ):
@@ -620,10 +629,18 @@ class SchematicWriter:
                     logger.debug(
                         f"      Adding multi-unit component with {unit_count} units"
                     )
-                    # Add each unit with a vertical offset
-                    unit_spacing = (
-                        12.7  # 0.5 inch (12.7mm) vertical spacing between units
-                    )
+                    # Add each unit with a vertical offset equal to the symbol's
+                    # own height (+margin) so large multi-unit parts (e.g. MCUs)
+                    # don't stack on top of each other.
+                    unit_spacing = 12.7  # fallback: 0.5 inch
+                    try:
+                        _ld = SymbolLibCache.get_symbol_data(comp.lib_id)
+                        _bb = SymbolBoundingBoxCalculator.calculate_bounding_box(
+                            _ld, include_properties=True
+                        )
+                        unit_spacing = max(12.7, (_bb[3] - _bb[1]) + 5.08)
+                    except Exception:
+                        pass
                     for unit_num in range(1, unit_count + 1):
                         unit_position = (
                             comp.position.x,
@@ -644,9 +661,11 @@ class SchematicWriter:
                             **user_properties,  # Pass user properties
                         )
 
-                        if api_component and unit_num == 1:
-                            # Store the first unit as the main component for mapping
-                            first_api_component = api_component
+                        if api_component:
+                            placed_units.append((unit_num, api_component))
+                            if unit_num == 1:
+                                # First unit is the main component for mapping
+                                first_api_component = api_component
                 else:
                     # Single-unit component - add as before
                     api_component = self.component_manager.add_component(
@@ -660,6 +679,8 @@ class SchematicWriter:
                         **user_properties,  # Pass user properties
                     )
                     first_api_component = api_component
+                    if api_component:
+                        placed_units.append((1, api_component))
 
             if first_api_component:
                 # Update our mapping (use the first unit for UUID mapping)
@@ -668,106 +689,73 @@ class SchematicWriter:
                 # Update the original component reference
                 comp.reference = new_ref
 
-                # Copy additional properties to first unit
-                first_api_component.rotation = comp.rotation
-                # Note: unit is already set during add_component call
-                first_api_component.in_bom = getattr(comp, "in_bom", True)
-                first_api_component.on_board = getattr(comp, "on_board", True)
-                # dnp and mirror may not exist in kicad-sch-api SchematicSymbol
-                if hasattr(first_api_component, "dnp") and hasattr(comp, "dnp"):
-                    first_api_component.dnp = comp.dnp
-                if hasattr(first_api_component, "mirror") and hasattr(comp, "mirror"):
-                    first_api_component.mirror = comp.mirror
-
-                # Store hierarchy path and project name for instances generation
-                if self.hierarchical_path:
-                    first_api_component.properties["hierarchy_path"] = "/" + "/".join(
-                        self.hierarchical_path
-                    )
-
-                # Store project name for the instances section in new KiCad format
-                first_api_component.properties["project_name"] = self.project_name
-
-                # CRITICAL: Store root UUID for instances path generation
-                # The parser needs this to create correct instance paths
+                # Compute the instance path once -- shared by every unit body.
+                # Component instances MUST use the FULL hierarchical path (root
+                # UUID + all sheet symbol UUIDs) so KiCad annotates references
+                # correctly (avoids "?" display).
                 if self.hierarchical_path and len(self.hierarchical_path) > 0:
-                    root_uuid = self.hierarchical_path[0]
-                    first_api_component.properties["root_uuid"] = root_uuid
-                    logger.debug(f"  Storing root_uuid property: {root_uuid}")
-
-                # Create instances for the new KiCad format (20250114+)
-                # The path should contain only sheet UUIDs, not component UUID
-                logger.debug(f"=== CREATING INSTANCE FOR COMPONENT {new_ref} ===")
-                logger.debug(f"  Component lib_id: {comp.lib_id}")
-                logger.debug(f"  Component UUID: {first_api_component.uuid}")
-                logger.debug(f"  Current circuit: {self.circuit.name}")
-                logger.debug(f"  Hierarchical path: {self.hierarchical_path}")
-                logger.debug(
-                    f"  Hierarchical path length: {len(self.hierarchical_path) if self.hierarchical_path else 0}"
-                )
-
-                # Add path validation
-                if self.hierarchical_path:
-                    logger.debug(f"  Path UUIDs:")
-                    for i, uuid in enumerate(self.hierarchical_path):
-                        logger.debug(f"    [{i}]: {uuid}")
-
-                # CRITICAL FIX FOR KICAD ANNOTATION:
-                # Component instances MUST use the FULL hierarchical path
-                # This includes the root UUID + all sheet symbol UUIDs in the path
-                # For KiCad to properly annotate references (avoid "?" display)
-                if self.hierarchical_path and len(self.hierarchical_path) > 0:
-                    # Use the FULL hierarchical path (root + all sheet symbols)
-                    # The hierarchical_path contains [root_uuid, sheet_symbol_uuid, sub_sheet_symbol_uuid, ...]
-                    # For USB_Port: [root_uuid, usb_port_sheet_symbol_uuid]
-                    # For nested sheets like LED_Blinker: [root_uuid, esp32_mcu_sheet_symbol_uuid, led_blinker_sheet_symbol_uuid]
+                    # [root_uuid, sheet_symbol_uuid, sub_sheet_symbol_uuid, ...]
                     instance_path = "/" + "/".join(self.hierarchical_path)
-                    logger.debug(
-                        f"  Creating SUB-SHEET component instance with FULL hierarchical path: {instance_path}"
-                    )
-                    logger.debug(
-                        f"    Full hierarchical path: {self.hierarchical_path}"
-                    )
-                    logger.debug(f"    Number of levels: {len(self.hierarchical_path)}")
                 else:
                     # Root sheet - use schematic UUID in path
                     instance_path = f"/{self.schematic.uuid}"
-                    logger.debug(
-                        f"  Creating ROOT SHEET instance with path: {instance_path}"
+                logger.debug(
+                    f"=== CREATING INSTANCE(S) FOR {new_ref} ({comp.lib_id}), "
+                    f"{len(placed_units)} unit(s), path {instance_path} ==="
+                )
+
+                # Apply per-unit properties + a rooted instance to EVERY placed
+                # unit. A multi-unit symbol (dual/quad op-amp, etc.) is placed as
+                # several unit bodies, and each carries its OWN (instances ...)
+                # block. Previously only the first unit got the hidden
+                # hierarchy/project/root properties and only the last unit got
+                # the rooted instance, so the remaining units kept
+                # kicad-sch-api's default (path "/") -- a dangling hierarchy ref
+                # that null-derefs KiCad's writer on SAVE (segfault + 0-byte
+                # file). Stamp all of them uniformly. (component_uuid_map still
+                # points at unit 1, above; BOM/netlist mapping is per-reference.)
+                for unit_num, unit_component in placed_units:
+                    # in_bom/on_board/dnp/mirror mirror to every unit (KiCad
+                    # treats the placed units of one part symmetrically);
+                    # rotation applies to each placed unit as-is.
+                    unit_component.rotation = comp.rotation
+                    unit_component.in_bom = getattr(comp, "in_bom", True)
+                    unit_component.on_board = getattr(comp, "on_board", True)
+                    # dnp and mirror may not exist in kicad-sch-api SchematicSymbol
+                    if hasattr(unit_component, "dnp") and hasattr(comp, "dnp"):
+                        unit_component.dnp = comp.dnp
+                    if hasattr(unit_component, "mirror") and hasattr(comp, "mirror"):
+                        unit_component.mirror = comp.mirror
+
+                    # Hidden internal properties consumed by instances generation
+                    # (hidden from user view but retained for parsing).
+                    if self.hierarchical_path:
+                        hierarchy_path_value = "/" + "/".join(self.hierarchical_path)
+                        unit_component.properties["hierarchy_path"] = (
+                            hierarchy_path_value
+                        )
+                        unit_component.hidden_properties.add("hierarchy_path")
+                    unit_component.properties["project_name"] = self.project_name
+                    unit_component.hidden_properties.add("project_name")
+                    if self.hierarchical_path and len(self.hierarchical_path) > 0:
+                        root_uuid = self.hierarchical_path[0]
+                        unit_component.properties["root_uuid"] = root_uuid
+                        unit_component.hidden_properties.add("root_uuid")
+
+                    # Replace component_manager's default instance (which carries
+                    # the dangling "/" path) with a rooted one for this unit.
+                    unit_component.instances.clear()
+                    unit_component.instances.append(
+                        SymbolInstance(
+                            path=instance_path,
+                            reference=new_ref,
+                            unit=unit_num,
+                        )
                     )
-
-                # Clear any existing instances that might have been added by component_manager
-                # We need to control the project name ourselves
-                api_component.instances.clear()
-
-                # Create the instance
-                # CRITICAL FIX: Use consistent project naming for ALL components
-                # The inconsistency between component and sheet instances causes KiCad GUI annotation issues
-                # UNIVERSAL SOLUTION: Always use the actual project name for consistency
-                instance_project = self.project_name or "default_project"
-                logger.debug(
-                    f"🔧 UNIVERSAL_PROJECT_NAMING: Using consistent project name: '{instance_project}'"
-                )
-
-                instance = SymbolInstance(
-                    path=instance_path,
-                    reference=new_ref,
-                    unit=comp.unit,
-                )
-                api_component.instances.append(instance)
-
-                logger.debug(f"  Instance created:")
-                logger.debug(f"    - Path: {instance.path}")
-                logger.debug(f"    - Reference: {instance.reference}")
-                logger.debug(f"    - Unit: {instance.unit}")
-                logger.debug(
-                    f"  Total instances on component: {len(api_component.instances)}"
-                )
+                    logger.debug(
+                        f"  unit {unit_num}: path={instance_path} ref={new_ref}"
+                    )
                 logger.debug(f"=== END INSTANCE CREATION FOR {new_ref} ===")
-
-                logger.debug(
-                    f"Added component {new_ref} ({comp.lib_id}) at ({comp.position.x}, {comp.position.y})"
-                )
             else:
                 logger.error(f"Failed to add component {comp.reference}")
 
@@ -787,6 +775,51 @@ class SchematicWriter:
 
                 net.connections = updated_connections
 
+    def _restore_multi_unit_numbers(self):
+        """
+        Force each multi-unit body's .unit attribute to match its index key.
+
+        The component_manager indexes instances as "{reference}_unit{n}", which
+        is authoritative, but the body objects themselves can report .unit == 1
+        for every unit (the value is lost when the component round-trips through
+        the kicad-sch-api collection). Since serialization writes component.unit,
+        every body would otherwise be emitted as (unit 1), making KiCad treat the
+        three 74HC74 bodies as three copies of unit 1: it then duplicates unit-1
+        pins and never resolves the unit-3 (VCC/GND) pins. Re-stamp .unit here.
+        """
+        index = getattr(self.component_manager, "_component_index", None)
+        if not index:
+            return
+        fixed = 0
+        for key, comp in index.items():
+            # key format: "{reference}_unit{n}"
+            marker = "_unit"
+            pos = key.rfind(marker)
+            if pos < 0:
+                continue
+            suffix = key[pos + len(marker) :]
+            if not suffix.isdigit():
+                continue
+            unit_num = int(suffix)
+            try:
+                changed = False
+                if getattr(comp, "unit", None) != unit_num:
+                    comp.unit = unit_num
+                    changed = True
+                # KiCad resolves the netlist from the per-instance unit (in the
+                # symbol's (instances ...) block), not the symbol-level unit, so
+                # re-stamp those too -- otherwise unit 3 still reads as unit 1.
+                for inst in getattr(comp, "instances", None) or []:
+                    if getattr(inst, "unit", None) != unit_num:
+                        inst.unit = unit_num
+                        changed = True
+                if changed:
+                    fixed += 1
+            except Exception:
+                pass
+        if fixed:
+            logger.info(f"🔧 Restored unit numbers on {fixed} multi-unit body(ies)")
+
     def _place_components(self):
         """
         Use text-flow placement algorithm for component arrangement.
@@ -796,49 +829,45 @@ class SchematicWriter:
         """
         import sys
 
-        print("=" * 80, file=sys.stderr, flush=True)
-        print(
-            "🔤 TEXT-FLOW PLACEMENT _place_components() called!",
-            file=sys.stderr,
-            flush=True,
+        logger.debug("=" * 80)
+        logger.debug(
+            "TEXT-FLOW PLACEMENT _place_components() called!",
         )
-        print("=" * 80, file=sys.stderr, flush=True)
+        logger.debug("=" * 80)
 
         if not self.schematic.components:
             logger.debug("No components to place")
-            print("⚠️  No components to place!", file=sys.stderr, flush=True)
+            logger.debug("No components to place!")
             return
 
         start_time = time.perf_counter()
-        print(
-            f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components",
-            file=sys.stderr,
-            flush=True,
+        logger.debug(
+            f"PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components",
         )
-        print(
-            f"🔤 PLACE_COMPONENTS: Using text-flow placement algorithm",
-            file=sys.stderr,
-            flush=True,
+        logger.debug(
+            f"PLACE_COMPONENTS: Using text-flow placement algorithm",
         )
         logger.info(
-            f"🚀 PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components"
+            f"PLACE_COMPONENTS: Starting placement of {len(self.schematic.components)} components"
         )
-        logger.info(f"🔤 PLACE_COMPONENTS: Using text-flow placement algorithm")
+        logger.info(f"PLACE_COMPONENTS: Using text-flow placement algorithm")
 
         # Print current positions
-        print("\n🔍 Component positions before placement:")
+        logger.debug("\nComponent positions before placement:")
         for comp in self.schematic.components:
-            print(f"  {comp.reference}: ({comp.position.x:.1f}, {comp.position.y:.1f})")
+            logger.debug(
+                f"  {comp.reference}: ({comp.position.x:.1f}, {comp.position.y:.1f})"
+            )
 
         # Use text-flow placement for ALL components (ignore existing positions)
         components_needing_placement = list(self.schematic.components)
 
-        print(
-            f"\n📊 Components to place with text-flow: {len(components_needing_placement)}"
+        logger.debug(
+            f"\nComponents to place with text-flow: {len(components_needing_placement)}"
         )
 
         logger.info(
-            f"🔧 PLACE_COMPONENTS: {len(components_needing_placement)} components need placement"
+            f"PLACE_COMPONENTS: {len(components_needing_placement)} components need placement"
         )
 
         # Use text-flow placement
@@ -857,9 +886,21 @@ class SchematicWriter:
             # Create unique placement keys for multi-unit components
             placement_key_map = {}  # Maps unique placement key -> component
             for comp in components_needing_placement:
-                # Create unique key for placement (reference + unit number)
+                # Create a DISTINCT placement key per component instance so the
+                # text-flow placer positions every multi-unit body separately.
+                # comp.unit is unreliable here (the kicad-sch-api round-trip can
+                # reset it to 1 for every unit of a part), which previously made
+                # all units share one key -> only unit 1 placed, units 2..n left
+                # stacked too tightly -> different-net pin labels coincided
+                # (e.g. 74HC74 ~R1 over ~S2 => +5V/RSTN short). Disambiguate
+                # colliding keys with a counter so each body gets its own slot.
                 unit_num = getattr(comp, "unit", 1)
                 placement_key = f"{comp.reference}_U{unit_num}"
+                if placement_key in placement_key_map:
+                    _dup = 2
+                    while f"{placement_key}#{_dup}" in placement_key_map:
+                        _dup += 1
+                    placement_key = f"{placement_key}#{_dup}"
                 placement_key_map[placement_key] = comp
 
                 # Get symbol library data
@@ -872,12 +913,8 @@ class SchematicWriter:
                     width, height = 10.0, 10.0
                 else:
                     # Calculate accurate bounding box including pin labels for proper collision detection
-                    import sys
-
-                    print(
-                        f"\n🔍 PLACEMENT: About to calculate bbox for {placement_key} ({comp.lib_id})",
-                        file=sys.stderr,
-                        flush=True,
+                    logger.debug(
+                        f"PLACEMENT: About to calculate bbox for {placement_key} ({comp.lib_id})"
                     )
                     min_x, min_y, max_x, max_y = (
                         SymbolBoundingBoxCalculator.calculate_bounding_box(
@@ -886,10 +923,13 @@ class SchematicWriter:
                     )
                     width = max_x - min_x
                     height = max_y - min_y
-                    print(
-                        f"🔍 PLACEMENT: Calculated bbox for {placement_key}: {width:.2f} x {height:.2f} mm",
-                        file=sys.stderr,
-                        flush=True,
+                    # Each unit now has its own placement key (placed separately),
+                    # so reserve only this body's bbox -- no need to inflate by the
+                    # unit count. The full-symbol bbox already exceeds the pin span,
+                    # keeping adjacent unit bodies clear of each other.
+                    logger.debug(
+                        f"PLACEMENT: Calculated bbox for {placement_key}: "
+                        f"{width:.2f} x {height:.2f} mm"
                     )
 
                 component_bboxes.append((placement_key, width, height))
@@ -900,7 +940,9 @@ class SchematicWriter:
                 hasattr(self.circuit, "child_instances")
                 and self.circuit.child_instances
             ):
-                print(f"\n📄 Found {len(self.circuit.child_instances)} sheets to place")
+                logger.debug(
+                    f"\nFound {len(self.circuit.child_instances)} sheets to place"
+                )
                 logger.debug(
                     f"Found {len(self.circuit.child_instances)} sheets to place"
                 )
@@ -938,8 +980,8 @@ class SchematicWriter:
                         sheet_width = max(min_width, name_width)
                         bbox_width = sheet_width + label_width
 
-                        print(
-                            f"🔍 PLACEMENT: Sheet {sub_name}: sheet={sheet_width:.1f}mm, labels={label_width:.1f}mm, bbox={bbox_width:.1f}x{sheet_height:.1f}mm"
+                        logger.debug(
+                            f"PLACEMENT: Sheet {sub_name}: sheet={sheet_width:.1f}mm, labels={label_width:.1f}mm, bbox={bbox_width:.1f}x{sheet_height:.1f}mm"
                         )
                         logger.debug(
                             f"  Sheet {sub_name}: bbox {bbox_width:.1f}x{sheet_height:.1f}mm"
@@ -971,7 +1013,7 @@ class SchematicWriter:
                 component_bboxes, spacing=15.0
             )
 
-            logger.info(f"📄 PLACE_COMPONENTS: Selected sheet size: {selected_sheet}")
+            logger.info(f"PLACE_COMPONENTS: Selected sheet size: {selected_sheet}")
 
             # Apply placements to components and sheets
             placement_map = {ref: (x, y) for ref, x, y in placements}
@@ -996,8 +1038,8 @@ class SchematicWriter:
                         x, y = placement_map[sheet_ref]
                         child["x"] = x
                         child["y"] = y
-                        print(
-                            f"📄 Placed sheet {child['sub_name']} at ({x:.1f}, {y:.1f})"
+                        logger.debug(
+                            f"Placed sheet {child['sub_name']} at ({x:.1f}, {y:.1f})"
                         )
                         logger.debug(
                             f"Placed sheet {child['sub_name']} at ({x:.1f}, {y:.1f})"
@@ -1005,11 +1047,11 @@ class SchematicWriter:
 
             placement_time = time.perf_counter() - placement_start
             logger.info(
-                f"✅ PLACE_COMPONENTS: Component placement completed in {placement_time*1000:.2f}ms"
+                f"PLACE_COMPONENTS: Component placement completed in {placement_time*1000:.2f}ms"
             )
 
             # Log final positions
-            logger.debug("🔧 PLACE_COMPONENTS: Final component positions:")
+            logger.debug("PLACE_COMPONENTS: Final component positions:")
             for comp in components_needing_placement:
                 logger.debug(
                     f"  {comp.reference}: ({comp.position.x:.1f}, {comp.position.y:.1f})"
@@ -1018,24 +1060,22 @@ class SchematicWriter:
         except Exception as e:
             placement_error_time = time.perf_counter() - start_time
             logger.error(
-                f"❌ PLACE_COMPONENTS: TEXT-FLOW PLACEMENT FAILED after {placement_error_time*1000:.2f}ms: {e}"
+                f"PLACE_COMPONENTS: TEXT-FLOW PLACEMENT FAILED after {placement_error_time*1000:.2f}ms: {e}"
             )
-            logger.warning("🔄 PLACE_COMPONENTS: Using fallback grid placement")
+            logger.warning("PLACE_COMPONENTS: Using fallback grid placement")
 
             # Fallback to simple grid placement
             try:
                 self.placement_engine._arrange_grid(components_needing_placement)
-                logger.info("✅ PLACE_COMPONENTS: Fallback grid placement completed")
+                logger.info("PLACE_COMPONENTS: Fallback grid placement completed")
             except Exception as fallback_error:
                 logger.error(
-                    f"❌ PLACE_COMPONENTS: Even fallback placement failed: {fallback_error}"
+                    f"PLACE_COMPONENTS: Even fallback placement failed: {fallback_error}"
                 )
                 # Leave components at their current positions
 
         total_time = time.perf_counter() - start_time
-        logger.info(
-            f"🏁 PLACE_COMPONENTS: ✅ PLACEMENT COMPLETE in {total_time*1000:.2f}ms"
-        )
+        logger.info(f"PLACE_COMPONENTS: PLACEMENT COMPLETE in {total_time*1000:.2f}ms")
 
     def _is_net_hierarchical(self, net_obj):
         """
@@ -1045,6 +1085,9 @@ class SchematicWriter:
         1. Is shared with the parent circuit (passed as parameter), OR
         2. Is used by any child circuit (needs to connect down to children)
 
+        Power nets NEVER need hierarchical labels because power symbols
+        create global connections across all sheets.
+
         Local labels are ONLY for nets that are purely internal to this sheet.
 
         Args:
@@ -1053,50 +1096,80 @@ class SchematicWriter:
         Returns:
             bool: True if net should have hierarchical label, False for local label
         """
-        # TEMPORARY: Always use hierarchical labels for now
-        # We want all labels to be hierarchical until we're ready to differentiate
-        # between local (internal) and hierarchical (cross-circuit) nets.
-        # The logic below is correct but bypassed for now.
-        return True
+        # Power nets don't need hierarchical labels - power symbols create global
+        # connections across all sheets (#554).
+        if hasattr(net_obj, "is_power") and net_obj.is_power:
+            logger.debug(
+                f"Net '{net_obj.name}' is power net - skipping hierarchical label "
+                f"(power symbol creates global connection)"
+            )
+            return False
 
-        # TODO: Enable this logic when ready to support local labels
-        # ============================================================
-        # # Check if shared with parent
-        # parent_circuit = None
-        # for circ_name, circ in self.all_subcircuits.items():
-        #     for child_info in circ.child_instances:
-        #         if child_info["sub_name"] == self.circuit.name:
-        #             parent_circuit = circ
-        #             break
-        #     if parent_circuit:
-        #         break
+        # A net needs a HIERARCHICAL label (and a matching sheet pin) only if it
+        # crosses this sheet's boundary: shared with the parent circuit, or used
+        # by a child circuit. Nets that are purely internal to this sheet get a
+        # plain LOCAL label. This mirrors the sheet-pin logic in
+        # _add_subcircuit_sheets (which only exposes shared nets as pins).
         #
-        # if parent_circuit:
-        #     # Check if this Net OBJECT (not name) is used in the parent
-        #     parent_nets = parent_circuit.nets.values() if isinstance(parent_circuit.nets, dict) else parent_circuit.nets
-        #     for parent_net in parent_nets:
-        #         if parent_net is net_obj:  # Same object reference!
-        #             return True
-        #
-        #     # Fallback to name matching (for JSON-loaded circuits)
-        #     parent_net_names = {n.name for n in parent_nets}
-        #     if net_obj.name in parent_net_names:
-        #         return True
-        #
-        # # Check if used by any child circuit
-        # for child_info in self.circuit.child_instances:
-        #     child_circ = self.all_subcircuits[child_info["sub_name"]]
-        #     child_nets = child_circ.nets.values() if isinstance(child_circ.nets, dict) else child_circ.nets
-        #
-        #     for child_net in child_nets:
-        #         # Check object identity
-        #         if child_net is net_obj:
-        #             return True
-        #         # Fallback to name matching
-        #         if child_net.name == net_obj.name:
-        #             return True
-        #
-        # return False
+        # Matching is by Net-object identity with a name-based fallback, because
+        # circuits are reconstructed from JSON and object identity does not
+        # survive that round-trip.
+        net_name = getattr(net_obj, "name", None)
+
+        def _net_names(circ):
+            if circ is None:
+                return set()
+            nets = circ.nets.values() if isinstance(circ.nets, dict) else circ.nets
+            return {n.name for n in nets}
+
+        # Find this sheet's parent circuit (the one whose children include it).
+        parent = self._find_parent_circuit()
+
+        if parent is not None:
+            # 1) Shared with the parent sheet?
+            if net_name in _net_names(parent):
+                return True
+            # 2) Shared with a SIBLING sheet (another child of the same parent)?
+            #    A net created in the parent and passed into two children, with no
+            #    parent-sheet component on it, lives only in the children. It still
+            #    must cross between them, so it needs a hierarchical label + sheet
+            #    pin in each child (and matching labels in the parent).
+            for sib in getattr(parent, "child_instances", []) or []:
+                if sib.get("sub_name") == self.circuit.name:
+                    continue
+                if net_name in _net_names(
+                    self.all_subcircuits.get(sib.get("sub_name"))
+                ):
+                    return True
+
+            # 3) Used by one of this sheet's own children? (non-root only)
+            #    A hierarchical label declares a port of the sheet it sits in, which
+            #    binds to a sheet pin in the PARENT. The ROOT has no parent, so a
+            #    hierarchical label in the root is an ERC error (bug #9). The root
+            #    joins its child sheet pins with LOCAL labels instead (see the
+            #    sheet-pin label writer in _add_subcircuit_sheets), so this case is
+            #    only meaningful when there is a parent above us.
+            for child_info in getattr(self.circuit, "child_instances", []) or []:
+                child_circ = self.all_subcircuits.get(child_info.get("sub_name"))
+                if net_name in _net_names(child_circ):
+                    return True
+
+        # Otherwise it is internal to this sheet (or the root joining children) ->
+        # local label.
+        return False
+
+    def _find_parent_circuit(self):
+        """This sheet's parent circuit, or None if it is the root.
+
+        The parent is whichever subcircuit lists this sheet as a child instance.
+        A None result means this writer is rendering the root sheet -- which has
+        no parent sheet pin for a hierarchical label to bind to.
+        """
+        for circ in self.all_subcircuits.values():
+            for child_info in getattr(circ, "child_instances", []) or []:
+                if child_info.get("sub_name") == self.circuit.name:
+                    return circ
+        return None
 
     def _add_power_symbol(
         self,
@@ -1147,6 +1220,28 @@ class SchematicWriter:
                 power_comp.in_bom = True
                 power_comp.on_board = True
                 power_comp.dnp = False
+
+                # Instance path must include the root schematic UUID (or the full
+                # hierarchical path), exactly like regular components get in
+                # _add_components. Power symbols are created on this separate code
+                # path, which skips that fix-up, so without this they keep
+                # kicad-sch-api's default instance of (path "/"). A bare "/" is a
+                # dangling hierarchy reference: KiCad LOADS it fine (and kicad-cli
+                # netlist/erc tolerate it) but its schematic writer / connectivity
+                # null-dereferences it on SAVE -> segfault and a truncated, corrupted
+                # file. Reproduces headlessly with `kicad-cli sch upgrade`.
+                if self.hierarchical_path and len(self.hierarchical_path) > 0:
+                    power_instance_path = "/" + "/".join(self.hierarchical_path)
+                else:
+                    power_instance_path = f"/{self.schematic.uuid}"
+                power_comp.instances.clear()
+                power_comp.instances.append(
+                    SymbolInstance(
+                        path=power_instance_path,
+                        reference=reference,
+                        unit=1,
+                    )
+                )
 
                 # Fix Value property position - kicad-sch-api places it incorrectly
                 # The Value should be positioned based on symbol rotation:
@@ -1370,6 +1465,17 @@ class SchematicWriter:
                     )
                     continue
 
+                # Multi-unit: anchor the label to the body of the pin's OWN unit.
+                # Every unit shares one reference but sits at a different position;
+                # using the base component for all pins stacks unit-2/3 labels onto
+                # unit-1's body, so labels of different nets coincide and KiCad fuses
+                # them (e.g. +5V/GND short on a 74HC74). Resolve the per-unit instance.
+                pin_unit = int(pin_dict.get("unit", 0) or 0)
+                comp_for_pin = (
+                    self.component_manager.find_component_unit(actual_ref, pin_unit)
+                    or comp
+                )
+
                 # Calculate pin position
                 anchor_x = float(pin_dict.get("x", 0.0))
                 anchor_y = float(pin_dict.get("y", 0.0))
@@ -1382,15 +1488,15 @@ class SchematicWriter:
                 )
                 logger.debug(f"  component rotation: {comp.rotation}°")
 
-                # Rotate coords by component rotation
-                r = math.radians(comp.rotation)
+                # Rotate coords by component rotation (of the pin's own unit body)
+                r = math.radians(comp_for_pin.rotation)
                 local_x = anchor_x
                 local_y = -anchor_y
                 rx = (local_x * math.cos(r)) - (local_y * math.sin(r))
                 ry = (local_x * math.sin(r)) + (local_y * math.cos(r))
 
-                global_x = comp.position.x + rx
-                global_y = comp.position.y + ry
+                global_x = comp_for_pin.position.x + rx
+                global_y = comp_for_pin.position.y + ry
 
                 # Calculate label angle (opposite to pin orientation for correct text direction)
                 # Pin orientation indicates direction pin points FROM component
@@ -1463,6 +1569,48 @@ class SchematicWriter:
                     LabelType.HIERARCHICAL if is_hierarchical else LabelType.LOCAL
                 )
 
+                # Rotation follows global_angle (KiCad convention, already correct
+                # for hierarchical labels). The justify MUST match it: the
+                # local-label serializer otherwise defaults to "left", which makes
+                # 180deg (left-side) labels read back into the component body. Apply
+                # the canonical justify to BOTH label kinds.
+                from ..schematic.label_utils import calculate_hierarchical_label_justify
+
+                net_label_justify = calculate_hierarchical_label_justify(global_angle)
+
+                # CHECK FOR DUPLICATE LABELS: Issue #559
+                # Before creating a new label, check if one already exists at this position
+                duplicate_found = False
+                if hasattr(self.schematic, "_data"):
+                    label_list_key = (
+                        "hierarchical_labels"
+                        if label_type == LabelType.HIERARCHICAL
+                        else "labels"
+                    )
+                    if label_list_key in self.schematic._data:
+                        for existing_label in self.schematic._data[label_list_key]:
+                            # Calculate distance to existing label
+                            ex_pos = existing_label.get("position", {})
+                            ex_x = ex_pos.get("x", float("inf"))
+                            ex_y = ex_pos.get("y", float("inf"))
+                            distance = (
+                                (ex_x - global_x) ** 2 + (ex_y - global_y) ** 2
+                            ) ** 0.5
+
+                            if (
+                                distance < 0.5
+                            ):  # 0.5mm tolerance (same as PIN_LABEL_DISTANCE_TOLERANCE)
+                                if existing_label.get("text") == net_name:
+                                    logger.debug(
+                                        f"Label '{net_name}' already exists at ({global_x}, {global_y}), skipping duplicate"
+                                    )
+                                    duplicate_found = True
+                                    break
+
+                # Skip creating duplicate label
+                if duplicate_found:
+                    continue
+
                 # Create label using the API
                 label = Label(
                     uuid=str(uuid_module.uuid4()),
@@ -1482,7 +1630,10 @@ class SchematicWriter:
                             self.schematic._data["hierarchical_labels"] = []
 
                         # Use canonical justification calculation from label_utils
-                        from ..schematic.label_utils import calculate_hierarchical_label_justify
+                        from ..schematic.label_utils import (
+                            calculate_hierarchical_label_justify,
+                        )
+
                         justify = calculate_hierarchical_label_justify(label.rotation)
 
                         label_dict = {
@@ -1511,6 +1662,7 @@ class SchematicWriter:
                             ),
                             "rotation": label.rotation,
                             "size": label.size,
+                            "justify_h": net_label_justify,
                         }
                         self.schematic._data["labels"].append(label_dict)
 
@@ -1547,6 +1699,13 @@ class SchematicWriter:
             len(self.circuit.child_instances),
         )
 
+        # A sheet pin is joined to the rest of THIS sheet by a same-named label at
+        # the pin. In a NON-root sheet that label re-exports the net upward, so it
+        # is hierarchical; in the ROOT there is no parent to export to, and a
+        # hierarchical label in the root is an ERC error (bug #9). The root joins
+        # its child sheet pins with LOCAL labels (same name -> connected by name).
+        is_root_sheet = self._find_parent_circuit() is None
+
         for child_info in self.circuit.child_instances:
             sub_name = child_info["sub_name"]
             usage_label = child_info["instance_label"]
@@ -1561,71 +1720,77 @@ class SchematicWriter:
             internal_net_names = []
 
             # Handle both dict and list forms of .nets
-            child_nets = (
+            child_nets = list(
                 child_circ.nets.values()
                 if isinstance(child_circ.nets, dict)
                 else child_circ.nets
             )
-            parent_nets = (
+            parent_nets = list(
                 self.circuit.nets.values()
                 if isinstance(self.circuit.nets, dict)
                 else self.circuit.nets
             )
 
-            # First try object identity (works when circuits are created directly in Python)
-            for child_net in child_nets:
-                is_shared = False
-                for parent_net in parent_nets:
-                    if parent_net is child_net:  # Same object reference!
-                        is_shared = True
-                        break
+            # A child net is exposed as a sheet pin if it crosses the child's
+            # boundary, i.e. it is shared with the parent OR with a sibling child.
+            # Object identity covers Python-built circuits; name covers JSON-loaded
+            # ones. Sibling sharing matters when a net is created in the parent and
+            # passed into two children with no parent-sheet component on it (it then
+            # lives only in the children but still must connect between them).
+            parent_net_ids = {id(n) for n in parent_nets}
+            parent_net_names = {n.name for n in parent_nets}
 
-                if is_shared:
+            sibling_net_names = set()
+            for sibling_info in self.circuit.child_instances:
+                if sibling_info["sub_name"] == sub_name:
+                    continue
+                sib = self.all_subcircuits.get(sibling_info["sub_name"])
+                if sib is None:
+                    continue
+                sib_nets = sib.nets.values() if isinstance(sib.nets, dict) else sib.nets
+                sibling_net_names.update(n.name for n in sib_nets)
+
+            for child_net in child_nets:
+                if (
+                    id(child_net) in parent_net_ids
+                    or child_net.name in parent_net_names
+                    or child_net.name in sibling_net_names
+                ):
                     shared_net_names.append(child_net.name)
                 else:
                     internal_net_names.append(child_net.name)
 
-            # If object identity found no shared nets but we have nets to check, fall back to name matching
-            # (needed when circuits are loaded from JSON, which creates new Net objects)
-            if not shared_net_names and list(parent_nets) and list(child_nets):
-                shared_net_names = []
-                internal_net_names = []
+            pin_list = sorted(set(shared_net_names))
 
-                parent_net_names_set = {n.name for n in parent_nets}
+            # ISSUE #554: Filter out power nets from sheet pins
+            # Power nets use power symbols which create global connections,
+            # so they don't need sheet pins or hierarchical labels
+            power_nets_filtered = []
+            non_power_pin_list = []
+            for net_name in pin_list:
+                # Find the net object to check if it's a power net
+                net_obj = None
                 for child_net in child_nets:
-                    if child_net.name in parent_net_names_set:
-                        shared_net_names.append(child_net.name)
-                    else:
-                        internal_net_names.append(child_net.name)
+                    if child_net.name == net_name:
+                        net_obj = child_net
+                        break
 
-            # Special case: If parent has NO nets, infer shared nets by looking at sibling circuits
-            # Nets that appear in multiple children are likely shared parameters
-            if not list(parent_nets) and list(child_nets):
-                shared_net_names = []
-                internal_net_names = []
+                # Skip power nets - they use global power symbols
+                if net_obj and hasattr(net_obj, "is_power") and net_obj.is_power:
+                    power_nets_filtered.append(net_name)
+                    logger.debug(
+                        f"Skipping sheet pin for power net '{net_name}' "
+                        f"(power symbol creates global connection)"
+                    )
+                else:
+                    non_power_pin_list.append(net_name)
 
-                # Collect nets from all sibling circuits
-                sibling_net_names = set()
-                for sibling_info in self.circuit.child_instances:
-                    if (
-                        sibling_info["sub_name"] != sub_name
-                    ):  # Don't include current child
-                        sibling_circ = self.all_subcircuits[sibling_info["sub_name"]]
-                        sibling_nets = (
-                            sibling_circ.nets.values()
-                            if isinstance(sibling_circ.nets, dict)
-                            else sibling_circ.nets
-                        )
-                        sibling_net_names.update(n.name for n in sibling_nets)
+            if power_nets_filtered:
+                logger.info(
+                    f"Filtered {len(power_nets_filtered)} power nets from sheet '{usage_label}' pins: {power_nets_filtered}"
+                )
 
-                # Nets that appear in both this child AND siblings are likely shared
-                for child_net in child_nets:
-                    if child_net.name in sibling_net_names:
-                        shared_net_names.append(child_net.name)
-                    else:
-                        internal_net_names.append(child_net.name)
-
-            pin_list = sorted(shared_net_names)
+            pin_list = non_power_pin_list
 
             # CRITICAL FIX: Also include the parameters from child circuit instances
             # For subcircuits that only contain other subcircuits (no components),
@@ -1740,7 +1905,9 @@ class SchematicWriter:
                     uuid=str(uuid_module.uuid4()),
                     position=Point(label_x, pin_y),
                     text=net_name,
-                    label_type=LabelType.HIERARCHICAL,
+                    label_type=(
+                        LabelType.LOCAL if is_root_sheet else LabelType.HIERARCHICAL
+                    ),
                     rotation=0.0,
                 )
 
@@ -1754,7 +1921,10 @@ class SchematicWriter:
                             self.schematic._data["hierarchical_labels"] = []
 
                         # Use canonical justification calculation from label_utils
-                        from ..schematic.label_utils import calculate_hierarchical_label_justify
+                        from ..schematic.label_utils import (
+                            calculate_hierarchical_label_justify,
+                        )
+
                         justify = calculate_hierarchical_label_justify(label.rotation)
 
                         label_dict = {
@@ -2022,19 +2192,15 @@ class SchematicWriter:
         # Check if labels are available
         import sys
 
-        print(
-            f"\n🔍 BBOX: Checking for labels in schematic", file=sys.stderr, flush=True
-        )
+        logger.debug(f"\nBBOX: Checking for labels in schematic")
         if hasattr(self.schematic, "labels"):
-            print(
-                f"🔍 BBOX: ✅ Has labels, count: {len(self.schematic.labels)}",
-                file=sys.stderr,
-                flush=True,
+            logger.debug(
+                f"BBOX: Has labels, count: {len(self.schematic.labels)}",
             )
             for i, label in enumerate(self.schematic.labels[:10]):
-                print(f"🔍 BBOX:   Label[{i}]: {label}", file=sys.stderr, flush=True)
+                logger.debug(f"BBOX:   Label[{i}]: {label}")
         else:
-            print(f"🔍 BBOX: ❌ No labels attribute", file=sys.stderr, flush=True)
+            logger.debug(f"BBOX: No labels attribute")
 
         # Use schematic components (with updated positions) instead of circuit components
         for comp in self.schematic.components:
@@ -2050,10 +2216,8 @@ class SchematicWriter:
                 from .symbol_geometry import SymbolBoundingBoxCalculator
 
                 # Calculate component bbox including pin labels for accurate collision detection
-                print(
-                    f"\n🔍 BBOX: Calculating bbox for {comp.reference} at ({comp.position.x:.3f}, {comp.position.y:.3f})",
-                    file=sys.stderr,
-                    flush=True,
+                logger.debug(
+                    f"\nBBOX: Calculating bbox for {comp.reference} at ({comp.position.x:.3f}, {comp.position.y:.3f})",
                 )
 
                 min_x, min_y, max_x, max_y = (
@@ -2062,10 +2226,8 @@ class SchematicWriter:
                     )
                 )
 
-                print(
-                    f"🔍 BBOX: Base component bbox: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})",
-                    file=sys.stderr,
-                    flush=True,
+                logger.debug(
+                    f"BBOX: Base component bbox: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})",
                 )
 
                 # Extend bbox to include all nearby hierarchical labels
@@ -2112,16 +2274,12 @@ class SchematicWriter:
                             min_x = min(min_x, label_rel_x - 2.54)
                             max_x = max(max_x, label_rel_x + 2.54)
 
-                        print(
-                            f"🔍 BBOX:   Label '{label.text}' ({len(label.text)} chars, {label.rotation}°) at rel ({label_rel_x:.2f}, {label_rel_y:.2f})",
-                            file=sys.stderr,
-                            flush=True,
+                        logger.debug(
+                            f"BBOX:   Label '{label.text}' ({len(label.text)} chars, {label.rotation}°) at rel ({label_rel_x:.2f}, {label_rel_y:.2f})",
                         )
 
-                print(
-                    f"🔍 BBOX: Final bbox with labels: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})",
-                    file=sys.stderr,
-                    flush=True,
+                logger.debug(
+                    f"BBOX: Final bbox with labels: ({min_x:.2f}, {min_y:.2f}) to ({max_x:.2f}, {max_y:.2f})",
                 )
 
                 # TODO: Create Rectangle using API types
@@ -2412,7 +2570,7 @@ class SchematicWriter:
         Add symbol definitions to the lib_symbols section.
         """
         logger.info(
-            f"🔍 _add_symbol_definitions: Starting with {len(self.schematic.components)} components"
+            f"_add_symbol_definitions: Starting with {len(self.schematic.components)} components"
         )
 
         # Find or create lib_symbols block
@@ -2426,19 +2584,19 @@ class SchematicWriter:
             ):
                 lib_symbols_block = item
                 logger.info(
-                    f"✅ Found existing lib_symbols block at position {schematic_expr.index(item)}"
+                    f"Found existing lib_symbols block at position {schematic_expr.index(item)}"
                 )
                 break
 
         if not lib_symbols_block:
-            logger.warning("⚠️ No lib_symbols block found, creating new one")
+            logger.warning("No lib_symbols block found, creating new one")
             lib_symbols_block = [Symbol("lib_symbols")]
             # Insert after paper
             for i, item in enumerate(schematic_expr):
                 if isinstance(item, list) and item and item[0] == Symbol("paper"):
                     schematic_expr.insert(i + 1, lib_symbols_block)
                     logger.info(
-                        f"✅ Inserted lib_symbols block after paper at position {i+1}"
+                        f"Inserted lib_symbols block after paper at position {i+1}"
                     )
                     break
 
@@ -2446,7 +2604,7 @@ class SchematicWriter:
         # Keep only the first element which is the Symbol("lib_symbols")
         if lib_symbols_block and len(lib_symbols_block) > 1:
             logger.info(
-                f"🧹 Clearing {len(lib_symbols_block)-1} existing items from lib_symbols block"
+                f"Clearing {len(lib_symbols_block)-1} existing items from lib_symbols block"
             )
             lib_symbols_block[:] = [lib_symbols_block[0]]
 
@@ -2457,19 +2615,19 @@ class SchematicWriter:
             logger.debug(f"  Component {comp.reference}: lib_id = {comp.lib_id}")
 
         logger.info(
-            f"📚 Processing {len(symbol_ids)} unique lib_ids: {sorted(symbol_ids)}"
+            f"Processing {len(symbol_ids)} unique lib_ids: {sorted(symbol_ids)}"
         )
 
         for sym_id in sorted(symbol_ids):
-            logger.info(f"📚 SCHEMATIC_WRITER: Fetching symbol data for '{sym_id}'")
+            logger.info(f"SCHEMATIC_WRITER: Fetching symbol data for '{sym_id}'")
             lib_data = SymbolLibCache.get_symbol_data(sym_id)
             if not lib_data:
                 logger.error(
-                    f"❌ No symbol library data found for '{sym_id}'. Skipping definition."
+                    f"No symbol library data found for '{sym_id}'. Skipping definition."
                 )
                 continue
             logger.debug(
-                f"    ✅ SCHEMATIC_WRITER: Got symbol data for '{sym_id}' with properties: {list(lib_data.get('properties', {}).keys()) if isinstance(lib_data, dict) else 'N/A'}"
+                f"    SCHEMATIC_WRITER: Got symbol data for '{sym_id}' with properties: {list(lib_data.get('properties', {}).keys()) if isinstance(lib_data, dict) else 'N/A'}"
             )
 
             # Check if graphics data is missing from cache - if so, use Python fallback
@@ -2498,41 +2656,39 @@ class SchematicWriter:
 
             if isinstance(lib_data, list):
                 # It's already an S-expression block
-                logger.info(f"✅ Adding S-expression symbol definition for {sym_id}")
+                logger.info(f"Adding S-expression symbol definition for {sym_id}")
                 lib_symbols_block.append(lib_data)
             else:
                 # Build from JSON-based library data
-                logger.info(f"🔨 Building symbol definition from JSON for {sym_id}")
+                logger.info(f"Building symbol definition from JSON for {sym_id}")
                 new_sym_def = self._create_symbol_definition(sym_id, lib_data)
                 if new_sym_def:
                     logger.info(
-                        f"✅ Created symbol definition for {sym_id}, adding to lib_symbols"
+                        f"Created symbol definition for {sym_id}, adding to lib_symbols"
                     )
                     if isinstance(new_sym_def[0], Symbol):
                         lib_symbols_block.append(new_sym_def)
                     else:
                         lib_symbols_block.extend(new_sym_def)
                 else:
-                    logger.error(f"❌ Failed to create symbol definition for {sym_id}")
+                    logger.error(f"Failed to create symbol definition for {sym_id}")
 
         logger.info(
-            f"📦 lib_symbols block now has {len(lib_symbols_block)} items (including header)"
+            f"lib_symbols block now has {len(lib_symbols_block)} items (including header)"
         )
         # Only show error if we have components but no symbols
         if len(lib_symbols_block) <= 1 and len(self.schematic.components) > 0:
-            logger.error(
-                "❌❌❌ lib_symbols block is EMPTY - no symbol definitions added!"
-            )
+            logger.error("lib_symbols block is EMPTY - no symbol definitions added!")
         elif len(lib_symbols_block) <= 1 and len(self.schematic.components) == 0:
             logger.info(
-                "📋 No components in this sheet (hierarchical sheet with sub-sheets only)"
+                "No components in this sheet (hierarchical sheet with sub-sheets only)"
             )
 
     def _create_symbol_definition(self, lib_id: str, lib_data: dict):
         """
         Build a full KiCad (symbol ...) block from the library JSON data.
         """
-        logger.debug(f"🔧 SCHEMATIC_WRITER: Creating symbol definition for '{lib_id}'")
+        logger.debug(f"SCHEMATIC_WRITER: Creating symbol definition for '{lib_id}'")
         base_name = lib_id.split(":")[-1]
 
         symbol_block = [
@@ -2548,11 +2704,11 @@ class SchematicWriter:
         # Properties
         props = lib_data.get("properties", {})
         logger.debug(
-            f"    📋 SCHEMATIC_WRITER: Symbol '{lib_id}' has {len(props)} properties"
+            f"    SCHEMATIC_WRITER: Symbol '{lib_id}' has {len(props)} properties"
         )
         for prop_name, prop_value in props.items():
             logger.debug(
-                f"        🏷️  SCHEMATIC_WRITER: Property '{prop_name}' = '{prop_value}' (type: {type(prop_value).__name__})"
+                f"        SCHEMATIC_WRITER: Property '{prop_name}' = '{prop_value}' (type: {type(prop_value).__name__})"
             )
             hide_symbol = Symbol("no")
             if prop_name in (
@@ -2794,13 +2950,13 @@ def write_schematic_file(schematic, out_path: str):
         logger.debug("Hiding non-essential properties (all except Reference and Value)")
         for component in schematic.components:
             # Access the raw component data
-            if hasattr(component, '_data'):
+            if hasattr(component, "_data"):
                 comp_data = component._data
             else:
                 comp_data = component
 
             # Mark all properties except Reference and Value as hidden
-            if hasattr(comp_data, 'hidden_properties'):
+            if hasattr(comp_data, "hidden_properties"):
                 for prop_name in list(component.properties.keys()):
                     if prop_name not in ("Reference", "Value"):
                         comp_data.hidden_properties.add(prop_name)
@@ -2827,7 +2983,7 @@ def write_schematic_file(schematic, out_path: str):
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
 
-        logger.info(f"✅ Successfully wrote schematic to {out_path}")
+        logger.info(f"Successfully wrote schematic to {out_path}")
     except Exception as e:
-        logger.error(f"❌ Failed to write schematic: {e}")
+        logger.error(f"Failed to write schematic: {e}")
         raise

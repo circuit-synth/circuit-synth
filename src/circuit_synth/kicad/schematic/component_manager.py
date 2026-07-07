@@ -17,8 +17,8 @@ from .instance_utils import add_symbol_instance
 
 # Debug logging for kicad-sch-api version
 logger_init = logging.getLogger(__name__)
-logger_init.info(f"🔍 IMPORT CHECK - kicad-sch-api version: {ksa.__version__}")
-logger_init.info(f"🔍 IMPORT CHECK - ComponentCollection has _add_to_indexes: {hasattr(ComponentCollection, '_add_to_indexes')}")
+logger_init.info(f"IMPORT CHECK - kicad-sch-api version: {ksa.__version__}")
+logger_init.info(f"IMPORT CHECK - ComponentCollection has _add_to_indexes: {hasattr(ComponentCollection, '_add_to_indexes')}")
 from .placement import PlacementEngine, PlacementStrategy
 
 logger = logging.getLogger(__name__)
@@ -428,6 +428,23 @@ class ComponentManager:
 
         # Not found
         return None
+
+    def find_component_unit(
+        self, reference: str, unit: int
+    ) -> Optional[SchematicSymbol]:
+        """
+        Find the specific unit instance of a (possibly multi-unit) component.
+
+        Multi-unit parts are stored as separate symbol instances sharing one
+        reference but with distinct positions, indexed as "{reference}_unit{n}".
+        Returns the matching unit if present, else falls back to find_component
+        (single-unit parts, or unit 0 / common pins).
+        """
+        if unit:
+            comp = self._component_index.get(f"{reference}_unit{unit}")
+            if comp:
+                return comp
+        return self.find_component(reference)
 
     def list_components(self) -> List[SchematicSymbol]:
         """

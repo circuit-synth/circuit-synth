@@ -451,7 +451,7 @@ def main():
     # Print summary
     for component_type, data in updates.items():
         print(
-            f"✅ {component_type.upper()}: {data['part_number']} "
+            f"{component_type.upper()}: {data['part_number']} "
             f"({data['stock']:,} units in stock)"
         )
 

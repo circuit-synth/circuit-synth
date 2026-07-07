@@ -70,3 +70,8 @@ HIERARCHICAL_CIRCUITS_GUIDE.md
 SETUP.md
 test_openrouter.py
 DEPLOYMENT.md
+
+# The broad 'agents/' rule above must not drop the packaged project template's
+# agents dir (needed for cs-new-project; stage 5 adds real agent files here).
+!src/circuit_synth/data/templates/example_project/.claude/agents/
+!src/circuit_synth/data/templates/example_project/.claude/agents/**

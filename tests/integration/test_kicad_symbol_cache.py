@@ -231,8 +231,9 @@ class TestSymbolLibCache:
         (dir1 / "Custom1.kicad_sym").write_text("(kicad_symbol_lib)")
         (dir2 / "Custom2.kicad_sym").write_text("(kicad_symbol_lib)")
 
-        # Set multiple paths (colon-separated on Unix)
-        monkeypatch.setenv("KICAD_SYMBOL_DIR", f"{dir1}:{dir2}")
+        # Set multiple paths using the platform separator (':' on Unix, ';' on
+        # Windows) so this matches _parse_kicad_symbol_dirs' os.name-based split.
+        monkeypatch.setenv("KICAD_SYMBOL_DIR", os.pathsep.join([str(dir1), str(dir2)]))
         monkeypatch.setenv("CIRCUIT_SYNTH_CACHE_DIR", str(temp_cache_dir / "cache"))
 
         # Clear singleton

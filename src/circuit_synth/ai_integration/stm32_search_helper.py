@@ -267,18 +267,18 @@ def handle_stm32_peripheral_query(query: str) -> Optional[str]:
     # Find matching STM32
     recommendation = find_stm32_with_peripherals(parsed_query["peripherals"])
     if not recommendation:
-        return "❌ No STM32 MCUs found matching your peripheral requirements with sufficient JLCPCB stock."
+        return "No STM32 MCUs found matching your peripheral requirements with sufficient JLCPCB stock."
 
     # Format response
-    response = f"🎯 **{recommendation['part_number']}** - Perfect match found!\n\n"
+    response = f"**{recommendation['part_number']}** - Perfect match found!\n\n"
 
     # Add availability info
     if recommendation["availability"]:
         avail = recommendation["availability"]
-        response += f"📊 Stock: {avail['stock']:,} units | Price: {avail['price']} | LCSC: {avail['part_number']}\n"
+        response += f"Stock: {avail['stock']:,} units | Price: {avail['price']} | LCSC: {avail['part_number']}\n"
 
     # Add peripheral info
-    response += "✅ Peripherals: "
+    response += "Peripherals: "
     peripheral_strs = []
     for peripheral, instances in recommendation["matched_peripherals"].items():
         peripheral_strs.append(
@@ -287,10 +287,10 @@ def handle_stm32_peripheral_query(query: str) -> Optional[str]:
     response += " | ".join(peripheral_strs) + "\n"
 
     # Add specs
-    response += f"📦 {recommendation['package']} package | {recommendation['flash_size']}KB Flash, {recommendation['ram_size']}KB RAM\n\n"
+    response += f"{recommendation['package']} package | {recommendation['flash_size']}KB Flash, {recommendation['ram_size']}KB RAM\n\n"
 
     # Add circuit-synth code
-    response += "📋 Ready Circuit-Synth Code:\n```python\n"
+    response += "Ready Circuit-Synth Code:\n```python\n"
     var_name = recommendation["part_number"].lower().replace("-", "_")
     response += f"""{var_name} = Component(
     symbol="{recommendation['kicad_symbol']}",

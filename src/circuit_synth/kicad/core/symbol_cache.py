@@ -201,15 +201,15 @@ class SymbolLibraryCache:
         import time
 
         get_start = time.perf_counter()
-        logger.debug(f"🔍 get_symbol called for: {lib_id}")
+        logger.debug(f"get_symbol called for: {lib_id}")
 
         # First check if already loaded
         if lib_id in self._symbols:
             get_time = (time.perf_counter() - get_start) * 1000
-            logger.debug(f"✅ Cache HIT for {lib_id} in {get_time:.2f}ms")
+            logger.debug(f"Cache HIT for {lib_id} in {get_time:.2f}ms")
             return self._symbols[lib_id]
 
-        logger.debug(f"❌ Cache MISS for {lib_id}, trying lazy search...")
+        logger.debug(f"Cache MISS for {lib_id}, trying lazy search...")
         # Try lazy symbol search first (much faster)
         symbol = self._lazy_symbol_search(lib_id)
         if symbol:
@@ -592,15 +592,17 @@ class SymbolLibraryCache:
                 else:
                     logger.warning(f"Skipping invalid symbol directory: {path_obj}")
 
-        # If no valid directories from environment, try defaults
+        # If no valid directories from environment, try defaults. Versioned
+        # KiCad install roots (KiCad 10 lives under e.g.
+        # C:\Program Files\KiCad\10.0\share\kicad\symbols) are discovered
+        # dynamically and preferred (newest first) so new KiCad releases work
+        # without hardcoding version numbers.
         if not valid_dirs:
             logger.warning("KICAD_SYMBOL_DIR not set or invalid, trying default paths")
-            default_dirs = [
+            default_dirs = [str(p) for p in self._versioned_symbol_dirs()] + [
                 "/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/",  # macOS
                 "/usr/share/kicad/symbols/",  # Linux
-                "C:\\Program Files\\KiCad\\share\\kicad\\symbols\\",  # Windows
-                # Also check the path from the log output
-                "/Users/shanemattner/Desktop/skip/electronics/PCB/pcb_libraries/kicad",
+                "C:\\Program Files\\KiCad\\share\\kicad\\symbols\\",  # Windows (unversioned)
             ]
 
             for dir_path in default_dirs:
@@ -610,6 +612,29 @@ class SymbolLibraryCache:
                     logger.info(f"Using default symbol directory: {path_obj}")
 
         return valid_dirs
+
+    @staticmethod
+    def _versioned_symbol_dirs() -> List[Path]:
+        """Discover versioned KiCad symbol dirs, newest version first.
+
+        KiCad 10+ installs under a version-numbered directory. Version numbers
+        are globbed rather than hardcoded so future releases are found
+        automatically (matches power_net_registry's discovery).
+        """
+        from ...core.power_net_registry import _sorted_kicad_version_dirs
+
+        roots = [
+            Path.home() / ".local" / "share" / "kicad",
+            Path.home() / "Library" / "Application Support" / "kicad",
+            Path(os.environ.get("PROGRAMFILES", r"C:\Program Files")) / "KiCad",
+            Path(os.environ.get("PROGRAMFILES(X86)", r"C:\Program Files (x86)")) / "KiCad",
+        ]
+        dirs: List[Path] = []
+        for root in roots:
+            for versioned in _sorted_kicad_version_dirs(root):
+                dirs.append(versioned / "symbols")  # Linux/macOS layout
+                dirs.append(versioned / "share" / "kicad" / "symbols")  # Windows layout
+        return dirs
 
     def _lazy_symbol_search(self, lib_id: str) -> Optional[SymbolDefinition]:
         """

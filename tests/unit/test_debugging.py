@@ -227,72 +227,71 @@ class TestDebugKnowledgeBase:
 
     def test_add_and_search_pattern(self):
         """Test adding and searching patterns"""
+        # Use the context manager so the SQLite connection is closed before the
+        # TemporaryDirectory is removed (Windows locks an open .db file).
         with tempfile.TemporaryDirectory() as tmpdir:
-            kb = DebugKnowledgeBase(db_path=Path(tmpdir) / "test.db")
+            with DebugKnowledgeBase(db_path=Path(tmpdir) / "test.db") as kb:
+                pattern = DebugPattern(
+                    pattern_id="test_pattern",
+                    category="power",
+                    symptoms=["No power", "Board dead"],
+                    root_cause="Blown fuse",
+                    solutions=["Replace fuse", "Check input voltage"],
+                    component_types=["Fuse"],
+                    occurrence_count=1,
+                    success_rate=0.9,
+                )
 
-            pattern = DebugPattern(
-                pattern_id="test_pattern",
-                category="power",
-                symptoms=["No power", "Board dead"],
-                root_cause="Blown fuse",
-                solutions=["Replace fuse", "Check input voltage"],
-                component_types=["Fuse"],
-                occurrence_count=1,
-                success_rate=0.9,
-            )
+                assert kb.add_pattern(pattern)
 
-            assert kb.add_pattern(pattern)
-
-            # Search for pattern
-            results = kb.search_patterns(["Board dead"])
-            assert len(results) > 0
-            assert results[0][0].pattern_id == "test_pattern"
+                # Search for pattern
+                results = kb.search_patterns(["Board dead"])
+                assert len(results) > 0
+                assert results[0][0].pattern_id == "test_pattern"
 
     def test_component_failures(self):
         """Test component failure tracking"""
         with tempfile.TemporaryDirectory() as tmpdir:
-            kb = DebugKnowledgeBase(db_path=Path(tmpdir) / "test.db")
+            with DebugKnowledgeBase(db_path=Path(tmpdir) / "test.db") as kb:
+                failure = ComponentFailure(
+                    component_type="AMS1117-3.3",
+                    manufacturer="AMS",
+                    failure_mode="Thermal shutdown",
+                    failure_rate=50.0,
+                    symptoms=["Output drops to 0V", "Regulator very hot"],
+                    root_causes=["Overcurrent", "Inadequate cooling"],
+                    environmental_factors=["High ambient temperature"],
+                    mitigation=["Add heatsink", "Reduce load current"],
+                )
 
-            failure = ComponentFailure(
-                component_type="AMS1117-3.3",
-                manufacturer="AMS",
-                failure_mode="Thermal shutdown",
-                failure_rate=50.0,
-                symptoms=["Output drops to 0V", "Regulator very hot"],
-                root_causes=["Overcurrent", "Inadequate cooling"],
-                environmental_factors=["High ambient temperature"],
-                mitigation=["Add heatsink", "Reduce load current"],
-            )
+                assert kb.add_component_failure(failure)
 
-            assert kb.add_component_failure(failure)
-
-            # Search for failures
-            failures = kb.get_component_failures("AMS1117")
-            assert len(failures) > 0
-            assert failures[0].failure_mode == "Thermal shutdown"
+                # Search for failures
+                failures = kb.get_component_failures("AMS1117")
+                assert len(failures) > 0
+                assert failures[0].failure_mode == "Thermal shutdown"
 
     def test_record_debug_session(self):
         """Test recording debug session"""
         with tempfile.TemporaryDirectory() as tmpdir:
-            kb = DebugKnowledgeBase(db_path=Path(tmpdir) / "test.db")
+            with DebugKnowledgeBase(db_path=Path(tmpdir) / "test.db") as kb:
+                session_data = {
+                    "session_id": "test_session",
+                    "board_name": "test_board",
+                    "board_version": "1.0",
+                    "symptoms": ["No power"],
+                    "measurements": {"VCC": 0},
+                    "root_cause": "Blown fuse",
+                    "resolution": "Replaced fuse",
+                    "duration_minutes": 30,
+                    "success": True,
+                }
 
-            session_data = {
-                "session_id": "test_session",
-                "board_name": "test_board",
-                "board_version": "1.0",
-                "symptoms": ["No power"],
-                "measurements": {"VCC": 0},
-                "root_cause": "Blown fuse",
-                "resolution": "Replaced fuse",
-                "duration_minutes": 30,
-                "success": True,
-            }
+                assert kb.record_debug_session(session_data)
 
-            assert kb.record_debug_session(session_data)
-
-            # Search for similar sessions
-            similar = kb.get_similar_sessions("test_board", ["No power"])
-            assert len(similar) > 0
+                # Search for similar sessions
+                similar = kb.get_similar_sessions("test_board", ["No power"])
+                assert len(similar) > 0
 
 
 class TestTestGuidance:

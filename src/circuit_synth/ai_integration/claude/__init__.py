@@ -19,7 +19,7 @@ def register_circuit_agents():
 
         return _register()
     except ImportError:
-        print("⚠️  Claude Code SDK not available. Skipping agent registration.")
+        print("Claude Code SDK not available. Skipping agent registration.")
         print("   Install with: pip install circuit-synth[claude]")
 
 
@@ -30,7 +30,7 @@ def setup_circuit_hooks():
 
         return _setup()
     except ImportError:
-        print("⚠️  Claude Code SDK not available. Skipping hook setup.")
+        print("Claude Code SDK not available. Skipping hook setup.")
 
 
 def register_circuit_commands():
@@ -40,7 +40,7 @@ def register_circuit_commands():
 
         return _register()
     except ImportError:
-        print("⚠️  Claude Code SDK not available. Skipping command registration.")
+        print("Claude Code SDK not available. Skipping command registration.")
 
 
 __all__ = [
@@ -53,7 +53,7 @@ __all__ = [
 
 def initialize_claude_integration():
     """Initialize complete Claude Code integration for circuit-synth"""
-    print("🚀 Initializing Claude Code integration for circuit-synth...")
+    print("Initializing Claude Code integration for circuit-synth...")
 
     try:
         # Try to import the full implementations
@@ -64,10 +64,10 @@ def initialize_claude_integration():
         _register_agents()
         _setup_hooks()
         _register_commands()
-        print("✅ Claude Code integration initialized for circuit-synth")
+        print("Claude Code integration initialized for circuit-synth")
 
     except ImportError as e:
-        print("⚠️  Claude Code SDK not available for full integration.")
+        print("Claude Code SDK not available for full integration.")
         print(
             "   For AI-powered circuit design, install with: pip install circuit-synth[claude]"
         )
@@ -78,4 +78,4 @@ def initialize_claude_integration():
         register_circuit_agents()
         setup_circuit_hooks()
         register_circuit_commands()
-        print("ℹ️  Basic Claude integration setup complete (without SDK)")
+        print("Basic Claude integration setup complete (without SDK)")

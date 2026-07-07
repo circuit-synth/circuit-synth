@@ -74,7 +74,7 @@ class CircuitWorkflowLogger:
         # Create master workflow log file
         self.master_log_file = self.log_dir / f"workflow_{self.session_id}.json"
 
-        print(f"📝 Logging initialized: {self.log_dir}")
+        print(f"Logging initialized: {self.log_dir}")
 
     def set_user_prompt(self, prompt: str):
         """Set the original user prompt for the workflow"""
@@ -103,7 +103,7 @@ class CircuitWorkflowLogger:
         # Create individual agent log file
         self._create_agent_log_file(agent_log)
 
-        print(f"▶️  Started {agent_name} (session: {agent_session_id})")
+        print(f"▶Started {agent_name} (session: {agent_session_id})")
         return agent_session_id
 
     def log_agent_decision(self, agent_session_id: str, decision: str, rationale: str):
@@ -167,8 +167,8 @@ class CircuitWorkflowLogger:
         self.workflow_log["validation_attempts"].append(validation_log)
         self._save_workflow_log()
 
-        status = "✅ PASSED" if success else "❌ FAILED"
-        print(f"🧪 Validation attempt {attempt_number}: {status}")
+        status = "PASSED" if success else "FAILED"
+        print(f"Validation attempt {attempt_number}: {status}")
         if not success:
             print(f"   Errors: {len(errors)}")
 
@@ -199,7 +199,7 @@ class CircuitWorkflowLogger:
             self.workflow_log["agents_executed"].append(agent_log.to_dict())
             self._save_workflow_log()
 
-            status = "✅" if success else "❌"
+            status = "" if success else ""
             print(
                 f"{status} Completed {agent_log.agent_name} ({agent_log.duration_seconds:.1f}s)"
             )
@@ -219,10 +219,10 @@ class CircuitWorkflowLogger:
         self._save_workflow_log()
         self._create_workflow_summary()
 
-        status = "🎉 SUCCESS" if success else "⚠️ FAILED"
+        status = "SUCCESS" if success else "FAILED"
         duration = self.workflow_log["total_duration_seconds"]
         print(f"{status} Workflow completed in {duration:.1f}s")
-        print(f"📁 Complete logs: {self.log_dir}")
+        print(f"Complete logs: {self.log_dir}")
 
     def _create_agent_log_file(self, agent_log: AgentExecutionLog):
         """Create individual markdown log file for an agent"""
@@ -275,7 +275,7 @@ class CircuitWorkflowLogger:
             if agent_log.error_messages:
                 updated_content += "\n## Errors Encountered\n"
                 for error in agent_log.error_messages:
-                    updated_content += f"\n❌ {error}\n"
+                    updated_content += f"\n{error}\n"
 
             with open(log_file, "w") as f:
                 f.write(updated_content)
@@ -358,7 +358,7 @@ class CircuitWorkflowLogger:
 - **Successful Agents:** {successful_agents}/{total_agents}
 - **Design Decisions:** {total_decisions}
 - **Validation Attempts:** {validation_attempts}
-- **Final Validation:** {"✅ PASSED" if final_validation_success else "❌ FAILED"}
+- **Final Validation:** {"PASSED" if final_validation_success else "FAILED"}
 
 ## Component Selections
 """
@@ -376,7 +376,7 @@ class CircuitWorkflowLogger:
         # Add agent execution timeline
         content += "\n## Agent Execution Timeline\n"
         for agent in self.workflow_log["agents_executed"]:
-            status_icon = "✅" if agent["status"] == "completed" else "❌"
+            status_icon = "" if agent["status"] == "completed" else ""
             content += f"- {status_icon} **{agent['agent_name']}** ({agent.get('duration_seconds', 0):.1f}s)\n"
 
         # Add validation history
@@ -384,9 +384,9 @@ class CircuitWorkflowLogger:
             content += "\n## Validation History\n"
             for i, attempt in enumerate(self.workflow_log["validation_attempts"], 1):
                 status = (
-                    "✅ PASSED"
+                    "PASSED"
                     if attempt["success"]
-                    else f"❌ FAILED ({attempt['error_count']} errors)"
+                    else f"FAILED ({attempt['error_count']} errors)"
                 )
                 content += f"- **Attempt {i}:** {status}\n"
 
