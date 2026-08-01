@@ -14,6 +14,7 @@ small fixture library, so this module locates a real KiCad symbol directory
 and skips if there is not one.
 """
 
+import json
 import os
 import re
 import shutil
@@ -58,6 +59,9 @@ KICAD_CLI = shutil.which("kicad-cli") or next(
 requires_kicad_cli = pytest.mark.skipif(
     KICAD_CLI is None, reason="kicad-cli is not installed"
 )
+
+# A node entry in a KiCad-exported netlist.
+KICAD_NODE = re.compile(r'\(ref\s+"([^"]+)"\)\s*\(pin\s+"([^"]+)"\)')
 
 
 def find_symbol_directory() -> Path:
@@ -180,6 +184,127 @@ def kicad_nets(project_root: Path, output_dir: Path) -> Dict[str, List[str]]:
     return nets
 
 
+class _Union:
+    """Minimal union-find used to build the intended pin partition."""
+
+    def __init__(self) -> None:
+        self._parent: Dict[object, object] = {}
+
+    def find(self, key: object) -> object:
+        """Return the representative of the set holding ``key``."""
+        self._parent.setdefault(key, key)
+        while self._parent[key] != key:
+            self._parent[key] = self._parent[self._parent[key]]
+            key = self._parent[key]
+        return key
+
+    def join(self, first: object, second: object) -> None:
+        """Merge the sets holding two keys."""
+        left, right = self.find(first), self.find(second)
+        if left != right:
+            self._parent[left] = right
+
+
+def intended_partition(circuit_json: Path) -> Dict[str, frozenset]:
+    """Build the connectivity the Python circuit described.
+
+    The JSON is walked as a hierarchy, so two instances of one block keep their
+    internal nets apart. A net crosses a sheet boundary exactly where a
+    hierarchical port says it does, which is the only place the two sides are
+    joined.
+
+    Args:
+        circuit_json: The generated circuit JSON.
+
+    Returns:
+        A mapping of ``"REF.PIN"`` to the frozen set of pins sharing its net.
+    """
+    union = _Union()
+    tokens = set()
+
+    def walk(node: dict, path: str) -> None:
+        for net_name, info in (node.get("nets") or {}).items():
+            entries = info.get("nodes", info) if isinstance(info, dict) else info
+            # A rail drawn with power symbols connects by name across the whole
+            # design, so it belongs to one set no matter which sheet it is on.
+            is_power = isinstance(info, dict) and info.get("power_symbol")
+            key = ("power", net_name) if is_power else (path, net_name)
+            for entry in entries:
+                token = f"{entry['component']}.{entry['pin']['number']}"
+                tokens.add(token)
+                union.join(token, key)
+
+        for index, child in enumerate(node.get("subcircuits") or []):
+            child_path = f"{path}/{child.get('name', '?')}#{index}"
+            for port in child.get("ports") or []:
+                union.join((child_path, port["net"]), (path, port["net"]))
+            walk(child, child_path)
+
+    walk(json.loads(circuit_json.read_text(encoding="utf-8")), "")
+
+    groups: Dict[object, set] = {}
+    for token in tokens:
+        groups.setdefault(union.find(token), set()).add(token)
+    # Power symbols and PWR_FLAGs exist only on the KiCad side.
+    cleaned = [
+        {token for token in group if not token.startswith("#")}
+        for group in groups.values()
+    ]
+    return {
+        token: frozenset(group) for group in cleaned for token in group if group
+    }
+
+
+def kicad_partition(project_root: Path, output_dir: Path) -> Dict[str, frozenset]:
+    """Build the connectivity KiCad reads back from the generated project.
+
+    Args:
+        project_root: The root .kicad_sch of the project.
+        output_dir: Directory the netlist is written to.
+
+    Returns:
+        A mapping of ``"REF.PIN"`` to the frozen set of pins sharing its net.
+    """
+    partition: Dict[str, frozenset] = {}
+    for nodes in _exported_nets(project_root, output_dir):
+        pins = frozenset(node for node in nodes if not node.startswith("#"))
+        for token in pins:
+            partition[token] = pins
+    return partition
+
+
+def _exported_nets(project_root: Path, output_dir: Path) -> List[set]:
+    """Export a netlist with KiCad and return each net's pin tokens."""
+    netlist = output_dir / "partition.net"
+    subprocess.run(
+        [KICAD_CLI, "sch", "export", "netlist", "--format", "kicadsexpr",
+         "-o", str(netlist), str(project_root)],
+        check=True, capture_output=True, timeout=900,
+    )
+    text = netlist.read_text(encoding="utf-8")
+    section = text[text.index("(nets"):]
+
+    nets = []
+    for start in (m.start() for m in re.finditer(r"\(net\s", section)):
+        depth = 0
+        block = ""
+        for index in range(start, len(section)):
+            if section[index] == "(":
+                depth += 1
+            elif section[index] == ")":
+                depth -= 1
+                if depth == 0:
+                    block = section[start:index + 1]
+                    break
+        name = re.search(r'\(name\s+"([^"]*)"\)', block)
+        if name and name.group(1).startswith("unconnected"):
+            continue
+        nodes = {f"{r}.{p}" for r, p in KICAD_NODE.findall(block)}
+        if nodes:
+            nets.append(nodes)
+    return nets
+
+
 def kicad_erc_violations(project_root: Path, output_dir: Path) -> List[str]:
     """Run KiCad ERC and return the violation type of each reported error.
 
@@ -293,7 +418,6 @@ class TestGeneratedStructure:
         labels = set(hierarchical_labels(project / "Power.kicad_sch"))
         assert ("V30", "output") in labels
         assert ("V3V3", "output") in labels
-        assert ("GND", "bidirectional") in labels
 
     def test_mcu_block_outputs_six_gate_signals(self, project):
         """The MCU block takes 3.3V in and drives three high/low signal pairs."""
@@ -311,7 +435,6 @@ class TestGeneratedStructure:
             ("PHASE", "output"),
             ("VM", "input"),
             ("VDRV", "input"),
-            ("GND", "bidirectional"),
         }
 
     def test_root_sheet_pins_match_the_block_interfaces(self, project):
@@ -323,16 +446,13 @@ class TestGeneratedStructure:
             ("VM", "input"),
             ("VDRV", "input"),
             ("PHASE", "output"),
-            ("GND", "bidirectional"),
         ]
         assert (
             pins
             == [
                 ("V30", "output"),
                 ("V3V3", "output"),
-                ("GND", "bidirectional"),
                 ("V3V3", "input"),
-                ("GND", "bidirectional"),
                 ("AH", "output"),
                 ("AL", "output"),
                 ("BH", "output"),
@@ -384,7 +504,7 @@ class TestKicadConnectivity:
         nets = kicad_nets(project / ROOT_SCHEMATIC, tmp_path)
         assert len(nets["/V30"]) >= 4, nets["/V30"]
         assert len(nets["/V3V3"]) >= 10, nets["/V3V3"]
-        assert len(nets["/GND"]) >= 20, nets["/GND"]
+        assert len(nets["GND"]) >= 20, nets["GND"]
 
     def test_instance_internals_stay_separate(self, project, tmp_path):
         """Nets internal to a driver belong to that instance alone."""
@@ -396,6 +516,51 @@ class TestKicadConnectivity:
         ]
         assert all(len(nodes) == 3 for nodes in boots), boots
         assert boots[0] != boots[1] != boots[2]
+
+    def test_wiring_does_not_change_the_netlist(self, project, tmp_path):
+        """What KiCad reads back matches the circuit described in Python.
+
+        This is the guarantee behind drawing wires rather than labelling every
+        pin: the router may place a wire wherever it likes, but the resulting
+        connectivity has to be identical, pin for pin, to what the Python
+        circuit declared. A wire that strayed onto a neighbouring pin would
+        show up here as a short.
+        """
+        expected = intended_partition(project / "BLDC_Motor_Driver.json")
+        actual = kicad_partition(project / ROOT_SCHEMATIC, tmp_path)
+
+        problems = []
+        for token, group in sorted(expected.items()):
+            found = actual.get(token)
+            if found is None:
+                problems.append(f"{token} is missing from the netlist")
+            elif found != group:
+                problems.append(
+                    f"{token}: shorted to {sorted(found - group)}"
+                    if found - group
+                    else f"{token}: no longer joined to {sorted(group - found)}"
+                )
+
+        assert not problems, "\n".join(problems[:10])
+
+    def test_signal_nets_are_drawn_as_wires(self, project):
+        """The sheets carry real wires, not only labels at every pin."""
+        total = 0
+        for sheet in (*DRIVER_SHEETS, "Power.kicad_sch", "MCU.kicad_sch"):
+            total += len(
+                re.findall(r"\(wire\s*\(pts", (project / sheet).read_text(encoding="utf-8"))
+            )
+        assert total > 20, f"expected the blocks to be wired, found {total} segments"
+
+    def test_ground_is_always_a_power_symbol(self, project):
+        """Ground renders as a power symbol and never as a label."""
+        for sheet in (*DRIVER_SHEETS, "Power.kicad_sch", "MCU.kicad_sch"):
+            text = (project / sheet).read_text(encoding="utf-8")
+            assert '(lib_id "power:GND")' in text, f"{sheet} has no ground symbol"
+            assert '(label "GND"' not in text, f"{sheet} labels ground instead"
+            assert '(hierarchical_label "GND"' not in text, (
+                f"{sheet} exports ground as a port instead of drawing a symbol"
+            )
 
     def test_erc_reports_no_hierarchy_errors(self, project, tmp_path):
         """ERC finds no mismatched, dangling or undriven hierarchical items.

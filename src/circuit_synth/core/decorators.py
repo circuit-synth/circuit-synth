@@ -72,6 +72,13 @@ def _collect_ports(
         if not isinstance(value, Net):
             continue
 
+        if getattr(value, "is_power", False) and getattr(value, "power_symbol", None):
+            # Ground and the supply rails are drawn as power symbols, which
+            # connect by name across the whole design. Turning them into sheet
+            # pins as well would clutter every block with rails that need no
+            # routing, so they are left out of the interface.
+            continue
+
         annotation = (
             None if param.annotation is inspect.Parameter.empty else param.annotation
         )
