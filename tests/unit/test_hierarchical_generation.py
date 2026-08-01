@@ -8,6 +8,7 @@ Tests that hierarchical circuits properly generate:
 - Proper hierarchical structure and UUIDs
 """
 
+import re
 import shutil
 import tempfile
 from pathlib import Path
@@ -295,9 +296,13 @@ def count_symbol_instances(content: str) -> int:
     """
     Count symbol instances in KiCad schematic content.
 
-    Excludes symbol definitions in lib_symbols section.
-    Only counts actual component instances.
+    Excludes symbol definitions in lib_symbols section, and the power symbols
+    the generator adds for ground and the supply rails, which are drawn rather
+    than placed by the circuit. Only counts actual component instances.
     """
+    content = re.sub(
+        r'\n\t\(symbol\n\t\t\(lib_id "power:[^"]*"\)(?:.*?)\n\t\)', "", content, flags=re.S
+    )
     lines = content.split('\n')
     in_lib_symbols = False
     instance_count = 0

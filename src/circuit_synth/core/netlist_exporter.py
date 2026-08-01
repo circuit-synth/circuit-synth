@@ -226,6 +226,9 @@ class NetlistExporter:
             "nets": {},
             "subcircuits": [],
             "annotations": [],  # Add annotations to JSON data
+            # Declared hierarchical interface, used to emit KiCad sheet pins
+            # and hierarchical labels. Empty for circuits without ports.
+            "ports": [port.to_dict() for port in getattr(self.circuit, "ports", [])],
         }
 
         # 1) Collect all components
@@ -236,6 +239,11 @@ class NetlistExporter:
         # 2) Gather net usage only from our local components
         #    (including any net that actually comes from a parent)
         net_to_pins = {}
+        # Remember the Net object behind each name. A net created in a parent
+        # circuit and passed into this one is not in self.circuit._nets, so
+        # without this its power flags would be dropped and the generator would
+        # draw a ground rail as labels instead of power symbols.
+        net_objects = {}
         for comp in self.circuit._components.values():
             for pin_id, pin_obj in comp._pins.items():
                 net_obj = pin_obj.net
@@ -243,6 +251,7 @@ class NetlistExporter:
                     continue
 
                 net_name = net_obj.name
+                net_objects.setdefault(net_name, net_obj)
 
                 if net_name not in net_to_pins:
                     net_to_pins[net_name] = []
@@ -261,7 +270,7 @@ class NetlistExporter:
         # Store them in data["nets"] - include both nodes and Net properties
         for net_name, pin_list in net_to_pins.items():
             # Find the Net object to include its metadata
-            net_obj = self.circuit._nets.get(net_name)
+            net_obj = self.circuit._nets.get(net_name) or net_objects.get(net_name)
             if net_obj:
                 # Include Net properties along with nodes
                 data["nets"][net_name] = {
