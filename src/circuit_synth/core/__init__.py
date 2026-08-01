@@ -17,6 +17,17 @@ from .dependency_injection import (
     ServiceLocator,
 )
 from .exception import CircuitSynthError, ComponentError, ValidationError
+from .hierarchy import (
+    Bidirectional,
+    Input,
+    Output,
+    PassivePort,
+    Port,
+    PortDirection,
+    PowerIn,
+    PowerOut,
+    TriState,
+)
 from .net import Net
 from .pin import Pin
 
@@ -26,6 +37,16 @@ __all__ = [
     "Net",
     "Pin",
     "circuit",
+    # Hierarchical block ports
+    "Port",
+    "PortDirection",
+    "Input",
+    "Output",
+    "Bidirectional",
+    "TriState",
+    "PassivePort",
+    "PowerIn",
+    "PowerOut",
     "ComponentError",
     "ValidationError",
     "CircuitSynthError",

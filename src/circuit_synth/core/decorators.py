@@ -1,6 +1,10 @@
 # FILE: src/circuit_synth/core/decorators.py
 
+import inspect
 from functools import wraps
+from typing import Any, Dict, List, Optional
+
+from .hierarchy import Port, resolve_port_direction
 
 _CURRENT_CIRCUIT = None
 # Track how many times each function has been called to auto-increment instance names
@@ -22,7 +26,80 @@ def reset_circuit_call_counters():
     _CIRCUIT_CALL_COUNTERS = {}
 
 
-def circuit(_func=None, *, name=None, comments=True):
+def _collect_ports(
+    func, args, kwargs, ports_override: Optional[Dict[str, Any]]
+) -> List[Port]:
+    """Build the hierarchical port list for one call of a circuit function.
+
+    A parameter becomes a port when it is annotated with a port marker (such as
+    ``Input`` or ``Output``) or named in the decorator's ``ports`` argument, and
+    the value bound to it is a Net. If the circuit declares at least one port
+    this way, every remaining Net parameter is also exported, as a passive port,
+    so that a partially annotated signature still describes a complete block
+    interface.
+
+    Args:
+        func: The undecorated circuit function.
+        args: Positional arguments the circuit was called with.
+        kwargs: Keyword arguments the circuit was called with.
+        ports_override: Explicit ``{parameter_name: direction}`` mapping from
+            the decorator, or None.
+
+    Returns:
+        The declared ports, in signature order. Empty if the circuit declares
+        no hierarchical interface.
+    """
+    from .net import Net  # local import to avoid a circular import
+
+    try:
+        signature = inspect.signature(func)
+        bound = signature.bind_partial(*args, **kwargs)
+    except (TypeError, ValueError):
+        # Not introspectable, or called in a way we cannot map to parameters.
+        return []
+
+    bound.apply_defaults()
+    overrides = ports_override or {}
+
+    declared: List[Port] = []
+    undeclared: List[Port] = []
+
+    for param_name, param in signature.parameters.items():
+        if param.kind in (param.VAR_POSITIONAL, param.VAR_KEYWORD):
+            continue
+
+        value = bound.arguments.get(param_name)
+        if not isinstance(value, Net):
+            continue
+
+        annotation = (
+            None if param.annotation is inspect.Parameter.empty else param.annotation
+        )
+        direction = resolve_port_direction(annotation, overrides.get(param_name))
+
+        if direction is None:
+            undeclared.append(Port(param_name, None, value.name))
+        else:
+            declared.append(Port(param_name, direction, value.name))
+
+    if not declared:
+        return []
+
+    # At least one port was declared, so treat the whole Net interface as ports.
+    from .hierarchy import PortDirection
+
+    for port in undeclared:
+        port.direction = PortDirection.PASSIVE
+
+    by_name = {port.name: port for port in declared + undeclared}
+    return [
+        by_name[param_name]
+        for param_name in signature.parameters
+        if param_name in by_name
+    ]
+
+
+def circuit(_func=None, *, name=None, comments=True, ports=None):
     """
     Decorator that can be used in three ways:
       1) @circuit
@@ -41,6 +118,17 @@ def circuit(_func=None, *, name=None, comments=True):
     If there's an existing current circuit (the "parent"), the new circuit is
     attached to the parent as a subcircuit. Then references are finalized
     before returning the child circuit.
+
+    Args:
+        _func: The decorated function when used as a bare ``@circuit``.
+        name: Explicit circuit name. Defaults to the function name.
+        comments: Whether the docstring becomes a schematic annotation.
+        ports: Optional ``{parameter_name: direction}`` mapping declaring the
+            hierarchical interface of this block, for signatures that are not
+            annotated with the ``Input``/``Output``/... markers. Directions are
+            strings such as ``"input"``, ``"output"``, ``"bidirectional"``,
+            ``"tri_state"`` or ``"passive"``. Declaring ports makes the block
+            generate KiCad sheet pins and matching hierarchical labels.
     """
 
     def _decorator(func):
@@ -85,6 +173,11 @@ def circuit(_func=None, *, name=None, comments=True):
 
             # Store reference to the circuit function for source rewriting
             c._circuit_func = func
+
+            # Record the hierarchical interface declared by this call, so the
+            # KiCad generator can emit sheet pins and hierarchical labels.
+            for port in _collect_ports(func, args, kwargs, ports):
+                c.add_port(port)
 
             # Link it as a subcircuit if there's a parent
             if parent_circuit is not None:
