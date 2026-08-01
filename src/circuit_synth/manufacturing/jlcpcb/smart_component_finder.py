@@ -140,6 +140,72 @@ class SmartComponentFinder:
 
         return self.find_components(family, max_results=max_alternatives)
 
+    def find_kicad_symbol(self, component: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        Resolve the KiCad symbol for a JLCPCB catalog entry.
+
+        Args:
+            component: Catalog entry with at least "part_number" and
+                "description" keys.
+
+        Returns:
+            Dictionary with "symbol" and "verified" keys, or None when no
+            mapping could be determined.
+        """
+        return self._find_kicad_symbol(component)
+
+    def find_kicad_footprint(
+        self, component: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Resolve the KiCad footprint for a JLCPCB catalog entry.
+
+        Args:
+            component: Catalog entry with at least a "package" key.
+
+        Returns:
+            Dictionary with "footprint" and "verified" keys, or None when no
+            mapping could be determined.
+        """
+        return self._find_kicad_footprint(component)
+
+    def reference_designator_for(self, symbol: str) -> str:
+        """
+        Get the reference designator prefix for a KiCad symbol.
+
+        Args:
+            symbol: KiCad symbol identifier, for example "Device:R".
+
+        Returns:
+            Reference designator prefix, for example "R". Defaults to "U".
+        """
+        return self._get_reference_designator(symbol)
+
+    def is_passive_component(self, symbol: str) -> bool:
+        """
+        Check whether a KiCad symbol represents a passive component.
+
+        Args:
+            symbol: KiCad symbol identifier, for example "Device:R".
+
+        Returns:
+            True when the symbol is a resistor, capacitor or inductor.
+        """
+        return self._is_passive_component(symbol)
+
+    def extract_component_value(self, component: Dict[str, Any]) -> Optional[str]:
+        """
+        Extract the component value from a JLCPCB catalog entry.
+
+        Args:
+            component: Catalog entry with a "description" key.
+
+        Returns:
+            The parsed value, for example "10K", or None when no value could
+            be extracted.
+        """
+        return self._extract_component_value(component)
+
     def _create_recommendation(
         self, jlc_component: Dict[str, Any]
     ) -> Optional[ComponentRecommendation]:
