@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional
 
 from ._logger import context_logger
 from .exception import ValidationError
+from .hierarchy import Port
 from .net import Net
 from .netlist_exporter import NetlistExporter
 from .reference_manager import ReferenceManager
@@ -31,6 +32,25 @@ class Circuit:
             {}
         )  # Track prefix -> final ref mappings for source rewriting
         self._circuit_func = None  # Store reference to the @circuit decorated function
+        self._ports = []  # Declared hierarchical ports (see core.hierarchy)
+
+    @property
+    def ports(self) -> List["Port"]:
+        """Hierarchical ports declared by this circuit's interface."""
+        return self._ports
+
+    def add_port(self, port: "Port") -> None:
+        """Declare a hierarchical port on this circuit.
+
+        Args:
+            port: The port to add. A port whose name is already declared
+                replaces the earlier declaration.
+        """
+        for index, existing in enumerate(self._ports):
+            if existing.name == port.name:
+                self._ports[index] = port
+                return
+        self._ports.append(port)
 
     def validate_reference(self, ref: str) -> bool:
         """Check if reference is available in this circuit's scope"""

@@ -7,6 +7,19 @@ web scraping approaches for maximum flexibility.
 """
 
 from .cache import JLCPCBCache, cached_jlcpcb_search, get_jlcpcb_cache
+from .component_import import (
+    JlcComponentImporter,
+    JlcImportError,
+    JlcLookupError,
+    JlcPartNotFoundError,
+    JlcPartSpec,
+    SymbolResolutionError,
+    component_from_search_result,
+    get_component_importer,
+    import_jlc_component,
+    lookup_lcsc_part,
+    normalize_lcsc_part,
+)
 from .fast_search import (
     FastJLCSearch,
     FastSearchResult,
@@ -65,4 +78,16 @@ __all__ = [
     "find_cheapest_jlc",
     "find_most_available_jlc",
     "get_fast_searcher",
+    # Component import
+    "JlcComponentImporter",
+    "JlcPartSpec",
+    "JlcImportError",
+    "JlcLookupError",
+    "JlcPartNotFoundError",
+    "SymbolResolutionError",
+    "import_jlc_component",
+    "component_from_search_result",
+    "lookup_lcsc_part",
+    "normalize_lcsc_part",
+    "get_component_importer",
 ]
