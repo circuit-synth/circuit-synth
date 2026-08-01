@@ -40,8 +40,9 @@ import math
 import os
 import time
 import uuid as uuid_module
+from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 log_level = os.environ.get("CIRCUIT_SYNTH_LOG_LEVEL", "WARNING")
 try:
@@ -110,6 +111,27 @@ from .integrated_reference_manager import IntegratedReferenceManager
 
 # from .kicad_formatter import format_kicad_schematic  # Removed - using integrated formatter
 from .shape_drawer import arc_s_expr, circle_s_expr, polyline_s_expr, rectangle_s_expr
+from .symbol_geometry import SymbolBoundingBoxCalculator
+from .wired_layout import (
+    ComponentInfo,
+    LayoutPlan,
+    NetRole,
+    PinInfo,
+    WiredLayoutEngine,
+    outward_step,
+    rotate_offset,
+)
+from .wired_layout import GRID, LABEL_STUB, POWER_STUB
+from .wired_layout import SHEET_MARGIN_Y as LAYOUT_MARGIN_Y
+
+# Gap between the bottom of the child sheet symbols and the first row of parts.
+LAYOUT_SHEET_GAP = 20.32
+
+# How far the reference and value text sit above and below a rotated part.
+FIELD_OFFSET = 5.08
+
+# Clear space kept between two power symbols so their rail names do not collide.
+POWER_TEXT_CLEARANCE = 7.62
 
 # Geometry of hierarchical sheet pins, in mm. KiCad snaps schematic geometry to
 # a 50mil grid, and 100mil pin spacing matches the symbol libraries.
@@ -349,10 +371,13 @@ class SchematicWriter:
         # Initialize sheet symbol tracking for hierarchical references
         self.sheet_symbol_map = {}  # Maps subcircuit name to sheet symbol UUID
 
-        # Cached answer for _uses_declared_ports(), and the set of ports that
-        # have picked up a label while this sheet is being written.
+        # Cached answer for _uses_declared_ports(), the set of ports that have
+        # picked up a label while this sheet is being written, and the parts
+        # whose reference and value text the layout repositions.
         self._declared_ports_in_use = None
         self._ports_labelled = set()
+        self._laid_out_fields: Dict[str, Tuple[float, float]] = {}
+        self._power_positions: List[Tuple[float, float]] = []
 
         # Log initialization details
         logger.debug(f"SchematicWriter initialized for circuit '{circuit.name}'")
@@ -453,12 +478,17 @@ class SchematicWriter:
         place_time = time.perf_counter() - place_start
         logger.info(f"✅ STEP 2/8: Components placed in {place_time*1000:.2f}ms")
 
+        # Lay the components out and wire them together. Anything the layout
+        # engine cannot route tidily falls back to a label at every pin, which
+        # is what the generator did for all nets before.
+        layout_plan = self._apply_wired_layout()
+
         # Add pin-level net labels
         labels_start = time.perf_counter()
         logger.info(
             f"⚡ STEP 3/8: Adding pin-level net labels for {len(self.circuit.nets)} nets..."
         )
-        component_labels = self._add_pin_level_net_labels()
+        component_labels = self._add_pin_level_net_labels(layout_plan)
         labels_time = time.perf_counter() - labels_start
         logger.info(f"✅ STEP 3/8: Net labels added in {labels_time*1000:.2f}ms")
         logger.debug(
@@ -1159,6 +1189,380 @@ class SchematicWriter:
         #
         # return False
 
+    def _net_role(self, net) -> NetRole:
+        """Classify how a net should be drawn on this sheet.
+
+        Args:
+            net: The circuit's Net object.
+
+        Returns:
+            POWER for rails that render as power symbols, PORT for nets leaving
+            the sheet through a declared port, SIGNAL for everything else.
+        """
+        if net.name in self._ports_by_net():
+            return NetRole.PORT
+        if getattr(net, "is_power", False) and getattr(net, "power_symbol", None):
+            return NetRole.POWER
+        return NetRole.SIGNAL
+
+    def _collect_layout_components(self) -> List[ComponentInfo]:
+        """Describe this sheet's components for the layout engine.
+
+        Returns:
+            One ComponentInfo per component whose symbol has usable pin data.
+            Components with no pin data are skipped so they keep their existing
+            placement rather than being dropped.
+        """
+        pins_by_component: Dict[str, Dict[str, str]] = defaultdict(dict)
+        circuit_nets = (
+            self.circuit.nets.values()
+            if isinstance(self.circuit.nets, dict)
+            else self.circuit.nets
+        )
+        for net in circuit_nets:
+            for comp_ref, pin_identifier in net.connections:
+                pins_by_component[comp_ref][str(pin_identifier)] = net.name
+
+        collected: List[ComponentInfo] = []
+        for comp in self.circuit.components:
+            reference = comp.reference
+            lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
+            if not lib_data or not lib_data.get("pins"):
+                logger.debug(
+                    "No pin data for %s (%s), leaving it to the default placement",
+                    reference,
+                    comp.lib_id,
+                )
+                continue
+
+            pins = []
+            for pin_data in lib_data["pins"]:
+                identifier = str(pin_data.get("number", ""))
+                pins.append(
+                    PinInfo(
+                        component=reference,
+                        identifier=identifier,
+                        offset_x=float(pin_data.get("x", 0.0)),
+                        offset_y=float(pin_data.get("y", 0.0)),
+                        orientation=float(pin_data.get("orientation", 0.0)),
+                        net=pins_by_component[reference].get(identifier),
+                    )
+                )
+
+            try:
+                # Measure the symbol body only. Including the reference and
+                # value text would report a resistor as tens of millimetres
+                # tall and blow the spacing out of proportion; the layout adds
+                # its own margin for text instead.
+                width, height = SymbolBoundingBoxCalculator.get_symbol_dimensions(
+                    lib_data, include_properties=False
+                )
+            except Exception as error:  # pragma: no cover - defensive
+                logger.debug("Bounding box for %s failed: %s", reference, error)
+                width, height = 10.0, 10.0
+
+            collected.append(
+                ComponentInfo(
+                    reference=reference,
+                    lib_id=comp.lib_id,
+                    pins=pins,
+                    width=width,
+                    height=height,
+                )
+            )
+        return collected
+
+    def _sheet_bottom(self) -> float:
+        """Find the lowest edge of the sheet symbols already placed.
+
+        Returns:
+            The y coordinate below every child sheet symbol, or the top margin
+            when the circuit has no child sheets.
+        """
+        bottom = LAYOUT_MARGIN_Y
+        for child in self.circuit.child_instances or []:
+            centre_y = child.get("y")
+            height = child.get("sheet_height", child.get("height", 25.4))
+            if centre_y is None:
+                continue
+            bottom = max(bottom, centre_y + height / 2)
+        return bottom
+
+    def _apply_wired_layout(self) -> Optional[LayoutPlan]:
+        """Place this sheet's components and draw the wires between them.
+
+        Overrides the positions chosen by the generic placement pass with a
+        layout built from the circuit's connectivity, then emits the wires,
+        junctions and power symbols that go with it.
+
+        Returns:
+            The layout plan, or None when the sheet has nothing to lay out.
+        """
+        components = self._collect_layout_components()
+        if not components:
+            return None
+
+        circuit_nets = (
+            self.circuit.nets.values()
+            if isinstance(self.circuit.nets, dict)
+            else self.circuit.nets
+        )
+        net_roles = {}
+        power_symbols = {}
+        for net in circuit_nets:
+            net_roles[net.name] = self._net_role(net)
+            if net_roles[net.name] is NetRole.POWER:
+                power_symbols[net.name] = net.power_symbol
+
+        origin_y = self._sheet_bottom()
+        if self.circuit.child_instances:
+            origin_y += LAYOUT_SHEET_GAP
+
+        engine = WiredLayoutEngine(
+            components=components,
+            net_roles=net_roles,
+            power_symbols=power_symbols,
+            origin_y=origin_y,
+        )
+        plan = engine.build()
+
+        for reference, placement in plan.placements.items():
+            comp = self.component_manager.find_component(reference)
+            if comp is None:
+                continue
+            comp.position = Point(placement.x, placement.y)
+            comp.rotation = placement.rotation
+            if placement.rotation in (90.0, 270.0):
+                # A quarter-turned passive gets its reference and value stacked
+                # to one side by the default rules, where they run into each
+                # other. Put them above and below the body instead.
+                self._laid_out_fields[reference] = (placement.x, placement.y)
+
+        for start, end in plan.wires:
+            self._add_wire(start, end)
+        for junction in plan.junctions:
+            self._add_junction(junction)
+
+        power_counter = 1
+        for lib_id, net_name, x, y, rotation in plan.power_symbols:
+            # The engine reports the pin point; stand the symbol off it and
+            # stagger it clear of any rail name already placed nearby.
+            outward = (rotation + 90.0) % 360.0
+            if "GND" in lib_id or "VSS" in lib_id:
+                outward = (outward + 180.0) % 360.0
+            position = self._staggered_power_position(
+                (x, y), outward, self._power_positions
+            )
+            if position != (x, y):
+                self._add_wire((x, y), position)
+            self._add_power_symbol(
+                lib_id=lib_id,
+                reference=f"#PWR0{power_counter:02d}",
+                value=net_name,
+                position=position,
+                rotation=rotation,
+            )
+            power_counter += 1
+
+        for net_name, x, y, rotation in plan.node_labels:
+            port = self._ports_by_net().get(net_name)
+            if port is not None:
+                self._add_label(
+                    text=port.name,
+                    position=(x, y),
+                    rotation=rotation,
+                    label_type=LabelType.HIERARCHICAL,
+                    shape=port.direction.value,
+                )
+                self._ports_labelled.add(port.name)
+            else:
+                self._add_label(
+                    text=net_name,
+                    position=(x, y),
+                    rotation=rotation,
+                    label_type=LabelType.LOCAL,
+                )
+
+        logger.info(
+            "Wired layout: %d part(s), %d wire segment(s), %d junction(s), "
+            "%d power symbol(s), %d net(s) fully wired",
+            len(plan.placements),
+            len(plan.wires),
+            len(plan.junctions),
+            len(plan.power_symbols),
+            len(plan.fully_wired_nets),
+        )
+        return plan
+
+    def _pin_point_index(self) -> Dict[Tuple[float, float], Set[str]]:
+        """Index every component pin point on this sheet by the nets on it.
+
+        Returns:
+            A mapping of rounded ``(x, y)`` point to the set of net names whose
+            pins sit there.
+        """
+        index: Dict[Tuple[float, float], Set[str]] = defaultdict(set)
+        circuit_nets = (
+            self.circuit.nets.values()
+            if isinstance(self.circuit.nets, dict)
+            else self.circuit.nets
+        )
+        for net in circuit_nets:
+            for comp_ref, pin_identifier in net.connections:
+                comp = self.component_manager.find_component(comp_ref)
+                if comp is None:
+                    continue
+                lib_data = SymbolLibCache.get_symbol_data(comp.lib_id)
+                if not lib_data or "pins" not in lib_data:
+                    continue
+                pin_dict = find_pin_by_identifier(lib_data["pins"], pin_identifier)
+                if not pin_dict:
+                    continue
+                dx, dy = rotate_offset(
+                    float(pin_dict.get("x", 0.0)),
+                    float(pin_dict.get("y", 0.0)),
+                    comp.rotation,
+                )
+                point = (
+                    round(comp.position.x + dx, 2),
+                    round(comp.position.y + dy, 2),
+                )
+                index[point].add(net.name)
+        return index
+
+    @staticmethod
+    def _staggered_power_position(
+        pin: Tuple[float, float],
+        angle: float,
+        placed: List[Tuple[float, float]],
+    ) -> Tuple[float, float]:
+        """Choose where a power symbol sits so its rail name stays readable.
+
+        Power pins are often grouped a tenth of an inch apart, which puts the
+        rail names of neighbouring symbols on top of one another. Extending the
+        stub for each successive symbol staggers them instead.
+
+        Args:
+            pin: The pin's connection point.
+            angle: The outward direction for the symbol, in degrees.
+            placed: Positions already used on this sheet. Appended to in place.
+
+        Returns:
+            The position for the power symbol.
+        """
+        for multiplier in range(1, 5):
+            step_x, step_y = outward_step(angle, POWER_STUB * multiplier)
+            candidate = (round(pin[0] + step_x, 2), round(pin[1] + step_y, 2))
+            crowded = any(
+                abs(candidate[0] - other[0]) < POWER_TEXT_CLEARANCE
+                and abs(candidate[1] - other[1]) < POWER_TEXT_CLEARANCE
+                for other in placed
+            )
+            if not crowded:
+                placed.append(candidate)
+                return candidate
+
+        placed.append(pin)
+        return pin
+
+    @staticmethod
+    def _segment_points(
+        start: Tuple[float, float], end: Tuple[float, float]
+    ) -> List[Tuple[float, float]]:
+        """List the grid points an orthogonal wire segment passes through.
+
+        Args:
+            start: One end of the segment.
+            end: The other end.
+
+        Returns:
+            The rounded points along the segment, both ends included.
+        """
+        points = []
+        length = max(abs(end[0] - start[0]), abs(end[1] - start[1]))
+        steps = max(1, int(round(length / GRID)))
+        for index in range(steps + 1):
+            ratio = index / steps
+            points.append(
+                (
+                    round(start[0] + (end[0] - start[0]) * ratio, 2),
+                    round(start[1] + (end[1] - start[1]) * ratio, 2),
+                )
+            )
+        return points
+
+    @staticmethod
+    def _safe_stub(
+        pin: Tuple[float, float],
+        angle: float,
+        net_name: str,
+        pin_points: Dict[Tuple[float, float], Set[str]],
+        claimed: Dict[Tuple[float, float], str],
+    ) -> Tuple[float, float]:
+        """Find how far a label can stand off its pin without touching anything.
+
+        Args:
+            pin: The pin's connection point.
+            angle: The outward direction for the label, in degrees.
+            net_name: The net the label names.
+            pin_points: Every pin point on the sheet, by net.
+            claimed: Stub endpoints already taken, by net. Updated in place.
+
+        Returns:
+            The point to put the label on. Equal to ``pin`` when no stub is
+            safe, in which case the label sits on the pin as before.
+        """
+        for length in (LABEL_STUB, LABEL_STUB / 2):
+            step_x, step_y = outward_step(angle, length)
+            candidate = (round(pin[0] + step_x, 2), round(pin[1] + step_y, 2))
+
+            # Walk the stub in grid steps. A pin belonging to another net
+            # anywhere along it, not just at the far end, would be connected by
+            # the wire passing over it.
+            steps = max(1, int(round(length / GRID)))
+            blocked = False
+            for index in range(1, steps + 1):
+                part_x, part_y = outward_step(angle, GRID * index)
+                point = (round(pin[0] + part_x, 2), round(pin[1] + part_y, 2))
+                owners = pin_points.get(point, set())
+                if owners and owners != {net_name}:
+                    blocked = True
+                    break
+                taken = claimed.get(point)
+                if taken is not None and taken != net_name:
+                    blocked = True
+                    break
+            if blocked:
+                continue
+
+            for index in range(1, steps + 1):
+                part_x, part_y = outward_step(angle, GRID * index)
+                claimed[(round(pin[0] + part_x, 2), round(pin[1] + part_y, 2))] = net_name
+            return candidate
+
+        logger.debug(
+            "No clear stub for net '%s' at %s, labelling the pin directly",
+            net_name,
+            pin,
+        )
+        return pin
+
+    def _add_junction(self, position: Tuple[float, float]) -> None:
+        """Add a junction dot where three or more connections meet.
+
+        Args:
+            position: The (x, y) point in mm.
+        """
+        if not hasattr(self.schematic, "_data"):
+            return
+        self.schematic._data.setdefault("junctions", []).append(
+            {
+                "uuid": str(uuid_module.uuid4()),
+                "position": {"x": position[0], "y": position[1]},
+                "diameter": 0,
+            }
+        )
+
     def _uses_declared_ports(self) -> bool:
         """Report whether this sheet takes part in a declared-port hierarchy.
 
@@ -1403,6 +1807,9 @@ class SchematicWriter:
         kicad-sch-api doesn't expose property positioning API, so we fix it in the file.
         """
         if not hasattr(self, "_power_symbols_to_fix") or not self._power_symbols_to_fix:
+            # A sheet can still have rotated parts whose fields need moving,
+            # even when it has no power symbols at all.
+            self._fix_rotated_field_positions(sch_file_path)
             return
 
         logger.debug(
@@ -1476,9 +1883,62 @@ class SchematicWriter:
         logger.debug(f"Fixed Value positions in {sch_file_path}")
         self._power_symbols_to_fix = []  # Clear for next use
 
-    def _add_pin_level_net_labels(self):
+        self._fix_rotated_field_positions(sch_file_path)
+
+    def _fix_rotated_field_positions(self, sch_file_path: str) -> None:
+        """Stack the reference and value of quarter-turned parts vertically.
+
+        The default rules place both fields to one side of a rotated symbol,
+        where a reference such as "C11" and a value such as "1uF/25V" overlap.
+        A horizontal part reads best with its reference above the body and its
+        value below, which is what this rewrites them to.
+
+        Args:
+            sch_file_path: The schematic file to post-process.
+        """
+        if not self._laid_out_fields:
+            return
+
+        import re
+
+        content = Path(sch_file_path).read_text(encoding="utf-8")
+        for reference, (x, y) in self._laid_out_fields.items():
+            escaped = re.escape(reference)
+            content, changed = re.subn(
+                rf'(\(property "Reference" "{escaped}"\s*\n\s*\(at )[\d.-]+ [\d.-]+ [\d.-]+(\))',
+                rf"\g<1>{round(x, 4)} {round(y - FIELD_OFFSET, 4)} 0\g<2>",
+                content,
+                count=1,
+            )
+            if not changed:
+                continue
+
+            # The value sits in the same symbol block, right after the
+            # reference, so anchor the search there.
+            anchor = content.find(f'(property "Reference" "{reference}"')
+            block = content[anchor : anchor + 2000]
+            fixed = re.sub(
+                r'(\(property "Value" "[^"]*"\s*\n\s*\(at )[\d.-]+ [\d.-]+ [\d.-]+(\))',
+                rf"\g<1>{round(x, 4)} {round(y + FIELD_OFFSET, 4)} 0\g<2>",
+                block,
+                count=1,
+            )
+            content = content[:anchor] + fixed + content[anchor + 2000 :]
+
+        Path(sch_file_path).write_text(content, encoding="utf-8")
+        logger.debug(
+            "Repositioned reference and value text for %d rotated part(s)",
+            len(self._laid_out_fields),
+        )
+
+    def _add_pin_level_net_labels(self, layout_plan=None):
         """
         Add local net labels or power symbols at component pins for all nets.
+
+        Args:
+            layout_plan: The wired layout plan, when one was produced. Pins it
+                already connected with a wire or a power symbol are skipped, so
+                a wired net is not labelled a second time.
 
         For power nets (is_power=True):
             - Generate KiCad power symbol components
@@ -1502,7 +1962,22 @@ class SchematicWriter:
         # the port name rather than the net name, so the same block can be
         # instantiated more than once with different nets attached to it.
         ports_by_net = self._ports_by_net()
-        self._ports_labelled = set()
+        wired_pins = layout_plan.wired_pins if layout_plan else set()
+        fully_wired = layout_plan.fully_wired_nets if layout_plan else set()
+
+        # Every pin point on this sheet, so a label stub can be checked against
+        # them before it is drawn. A stub that lands on another net's pin would
+        # short the two together.
+        pin_points = self._pin_point_index()
+        claimed_stubs: Dict[Tuple[float, float], str] = {}
+
+        # The router's wires occupy points too, so a stub must not run into one.
+        # They are claimed under a name no net can have, which keeps any stub
+        # off them.
+        if layout_plan:
+            for start, end in layout_plan.wires:
+                for point in self._segment_points(start, end):
+                    claimed_stubs.setdefault(point, "\x00routed")
 
         # Counter for power symbol references (#PWR01, #PWR02, etc.)
         power_symbol_counter = 1
@@ -1521,7 +1996,15 @@ class SchematicWriter:
                 f"Processing net '{net_name}' with {len(net.connections)} connections"
             )
 
+            if net_name in fully_wired:
+                logger.debug(f"Net '{net_name}' is fully wired, no labels needed")
+                continue
+
             for comp_ref, pin_identifier in net.connections:
+                if (comp_ref, str(pin_identifier)) in wired_pins:
+                    # A wire or a power symbol already reaches this pin.
+                    continue
+
                 label_start = time.perf_counter()
                 label_details = {
                     "net": net_name,
@@ -1576,12 +2059,10 @@ class SchematicWriter:
                 )
                 logger.debug(f"  component rotation: {comp.rotation}°")
 
-                # Rotate coords by component rotation
-                r = math.radians(comp.rotation)
-                local_x = anchor_x
-                local_y = -anchor_y
-                rx = (local_x * math.cos(r)) - (local_y * math.sin(r))
-                ry = (local_x * math.sin(r)) + (local_y * math.cos(r))
+                # Rotate the pin offset into schematic space. This uses the
+                # same helper as the layout engine, so a label and the wire
+                # drawn for the same pin always land on the same point.
+                rx, ry = rotate_offset(anchor_x, anchor_y, comp.rotation)
 
                 global_x = comp.position.x + rx
                 global_y = comp.position.y + ry
@@ -1594,6 +2075,19 @@ class SchematicWriter:
 
                 logger.debug(f"  → label position: ({global_x}, {global_y})")
                 logger.debug(f"  → label angle: {global_angle}°")
+
+                # Hold the label off the pin with a short stub. Sitting it on
+                # the connection point draws the text across the symbol body.
+                # The stub is only drawn where it provably reaches nothing that
+                # belongs to another net.
+                stub_x, stub_y = self._safe_stub(
+                    (global_x, global_y),
+                    global_angle,
+                    net_name,
+                    pin_points,
+                    claimed_stubs,
+                )
+                draw_stub = (stub_x, stub_y) != (global_x, global_y)
 
                 # Check if this is a power net. An explicitly declared port
                 # wins over power symbol generation: the user asked for this
@@ -1614,10 +2108,15 @@ class SchematicWriter:
                         f"at component {actual_ref}.{pin_identifier}"
                     )
 
-                    # Place power symbol directly at pin location
-                    # The power symbol's connection point should be exactly at the pin
-                    power_x = global_x
-                    power_y = global_y
+                    # Stand the power symbol off the pin on a short stub so its
+                    # graphic does not sit on top of the symbol body. Where a
+                    # part has several power pins close together, the stubs are
+                    # staggered so the rail names beside them stay readable.
+                    power_x, power_y = self._staggered_power_position(
+                        (global_x, global_y), global_angle, self._power_positions
+                    )
+                    if (power_x, power_y) != (global_x, global_y):
+                        self._add_wire((global_x, global_y), (power_x, power_y))
 
                     # DEBUG: Log power symbol placement (uncomment for debugging)
                     # logger.debug(f"POWER SYMBOL: {power_ref} for {net_name} - "
@@ -1654,13 +2153,16 @@ class SchematicWriter:
                     # Power symbols don't create labels - skip the rest
                     continue
 
+                if draw_stub:
+                    self._add_wire((global_x, global_y), (stub_x, stub_y))
+
                 if port is not None:
                     # This net leaves the sheet through a declared port. Label
                     # it with the port name and the port's direction, which is
                     # what the parent's sheet pin will be called.
                     label = self._add_label(
                         text=port.name,
-                        position=(global_x, global_y),
+                        position=(stub_x, stub_y),
                         rotation=float(global_angle),
                         label_type=LabelType.HIERARCHICAL,
                         shape=port.direction.value,
@@ -1672,7 +2174,7 @@ class SchematicWriter:
                     is_hierarchical = self._is_net_hierarchical(net)
                     label = self._add_label(
                         text=net_name,
-                        position=(global_x, global_y),
+                        position=(stub_x, stub_y),
                         rotation=float(global_angle),
                         label_type=(
                             LabelType.HIERARCHICAL

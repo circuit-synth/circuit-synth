@@ -195,8 +195,14 @@ class TestPowerSymbolGeneration:
             assert 'lib_id "power:GND"' in content
             assert 'hierarchical_label "GND"' not in content
 
-            # DATA should use hierarchical label
-            assert 'hierarchical_label "DATA"' in content
+            # DATA joins two pins on the same sheet, so the layout draws it as
+            # a wire and names it once, rather than labelling both pins.
+            assert "(wire" in content, "the signal net should be drawn as a wire"
+            assert '(label "DATA"' in content
+            assert 'hierarchical_label "DATA"' not in content, (
+                "a sheet with no parent must not export a net through a "
+                "hierarchical label"
+            )
 
 
 class TestNetJSONSerialization:

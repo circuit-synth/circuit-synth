@@ -168,21 +168,21 @@ class TestPortDeclaration:
         """Annotated parameters become ports named after the parameter."""
 
         @circuit(name="Block")
-        def block(HI: Input, LO: Input, OUT: Output, GND: Bidirectional):
+        def block(HI: Input, LO: Input, OUT: Output, REF: Bidirectional):
             resistor = Component(symbol="Device:R", ref="R", value="1k")
             resistor[1] += HI
             resistor[2] += OUT
 
         @circuit(name="Top")
         def top():
-            block(Net("A"), Net("B"), Net("C"), Net("GND"))
+            block(Net("A"), Net("B"), Net("C"), Net("REF_NET"))
 
         child = top().subcircuits[0]
         assert [(p.name, p.direction) for p in child.ports] == [
             ("HI", PortDirection.INPUT),
             ("LO", PortDirection.INPUT),
             ("OUT", PortDirection.OUTPUT),
-            ("GND", PortDirection.BIDIRECTIONAL),
+            ("REF", PortDirection.BIDIRECTIONAL),
         ]
 
     def test_ports_record_the_connected_net(self):
@@ -266,6 +266,27 @@ class TestPortDeclaration:
             ("third", PortDirection.PASSIVE),
         ]
 
+    def test_power_rails_are_not_ports(self):
+        """Ground and the supply rails stay off the block interface.
+
+        They are drawn as KiCad power symbols, which connect by name across the
+        whole design, so turning them into sheet pins as well would clutter
+        every block with rails that need no routing.
+        """
+
+        @circuit(name="Block")
+        def block(SIG: Input, OUT: Output, GND: Bidirectional, VCC: PowerIn):
+            resistor = Component(symbol="Device:R", ref="R", value="1k")
+            resistor[1] += SIG
+            resistor[2] += OUT
+
+        @circuit(name="Top")
+        def top():
+            block(Net("A"), Net("B"), Net("GND"), Net("VCC"))
+
+        names = [port.name for port in top().subcircuits[0].ports]
+        assert names == ["SIG", "OUT"], f"power rails leaked into the ports: {names}"
+
     def test_undeclared_circuit_has_no_ports(self):
         """Circuits that declare nothing keep the previous behaviour."""
 
@@ -307,7 +328,7 @@ class TestGeneratedSheetPins:
     @staticmethod
     def _two_level_project(temp_dir: Path) -> Path:
         @circuit(name="Divider")
-        def divider(VIN: Input, VOUT: Output, GND: Bidirectional):
+        def divider(VIN: Input, VOUT: Output, RTN: Bidirectional):
             top_resistor = Component(
                 symbol="Device:R",
                 ref="R",
@@ -323,11 +344,11 @@ class TestGeneratedSheetPins:
             top_resistor[1] += VIN
             top_resistor[2] += VOUT
             bottom_resistor[1] += VOUT
-            bottom_resistor[2] += GND
+            bottom_resistor[2] += RTN
 
         @circuit(name="Board")
         def board():
-            divider(Net("VBUS"), Net("VSENSE"), Net("GND"))
+            divider(Net("SRC"), Net("VSENSE"), Net("RETURN"))
 
         project = temp_dir / "divider_project"
         board().generate_kicad_project(
@@ -341,7 +362,7 @@ class TestGeneratedSheetPins:
         assert sheet_pins(project / "Board.kicad_sch") == [
             ("VIN", "input"),
             ("VOUT", "output"),
-            ("GND", "bidirectional"),
+            ("RTN", "bidirectional"),
         ]
 
     def test_child_labels_match_the_pins(self, temp_dir):
@@ -351,7 +372,7 @@ class TestGeneratedSheetPins:
         assert labels == {
             ("VIN", "input"),
             ("VOUT", "output"),
-            ("GND", "bidirectional"),
+            ("RTN", "bidirectional"),
         }
 
     def test_pins_are_named_for_ports_not_nets(self, temp_dir):
@@ -367,16 +388,16 @@ class TestGeneratedSheetPins:
         """The parent labels each sheet pin with the net it connects."""
         project = self._two_level_project(temp_dir)
         assert set(local_labels(project / "Board.kicad_sch")) == {
-            "VBUS",
+            "SRC",
             "VSENSE",
-            "GND",
+            "RETURN",
         }
 
     def test_internal_nets_stay_local(self, temp_dir):
         """A net that is not a port does not become a hierarchical label."""
 
         @circuit(name="Filter")
-        def rc_filter(IN: Input, OUT: Output, GND: Bidirectional):
+        def rc_filter(IN: Input, OUT: Output, RTN: Bidirectional):
             resistor = Component(
                 symbol="Device:R",
                 ref="R",
@@ -399,13 +420,13 @@ class TestGeneratedSheetPins:
             resistor[1] += IN
             resistor[2] += middle
             first_cap[1] += middle
-            first_cap[2] += GND
+            first_cap[2] += RTN
             second_cap[1] += middle
             second_cap[2] += OUT
 
         @circuit(name="Board")
         def board():
-            rc_filter(Net("A"), Net("B"), Net("GND"))
+            rc_filter(Net("A"), Net("B"), Net("RETURN"))
 
         project = temp_dir / "filter_project"
         board().generate_kicad_project(
@@ -423,7 +444,7 @@ class TestRepeatedInstances:
     @staticmethod
     def _three_instance_project(temp_dir: Path) -> Path:
         @circuit(name="Buffer")
-        def buffer_block(IN: Input, OUT: Output, GND: Bidirectional):
+        def buffer_block(IN: Input, OUT: Output, RTN: Bidirectional):
             resistor = Component(
                 symbol="Device:R",
                 ref="R",
@@ -439,11 +460,11 @@ class TestRepeatedInstances:
             resistor[1] += IN
             resistor[2] += OUT
             cap[1] += OUT
-            cap[2] += GND
+            cap[2] += RTN
 
         @circuit(name="Board")
         def board():
-            gnd = Net("GND")
+            gnd = Net("RETURN")
             buffer_block(Net("IN_A"), Net("OUT_A"), gnd)
             buffer_block(Net("IN_B"), Net("OUT_B"), gnd)
             buffer_block(Net("IN_C"), Net("OUT_C"), gnd)
@@ -482,7 +503,7 @@ class TestRepeatedInstances:
         """Every instance's sheet symbol has the same declared pins."""
         project = self._three_instance_project(temp_dir)
         pins = sheet_pins(project / "Board.kicad_sch")
-        expected = [("IN", "input"), ("OUT", "output"), ("GND", "bidirectional")]
+        expected = [("IN", "input"), ("OUT", "output"), ("RTN", "bidirectional")]
         assert pins == expected * 3
 
 
@@ -493,7 +514,7 @@ class TestNesting:
         """A block inside a block inside the root keeps its ports at each level."""
 
         @circuit(name="Leaf")
-        def leaf(IN: Input, OUT: Output, GND: Bidirectional):
+        def leaf(IN: Input, OUT: Output, RTN: Bidirectional):
             resistor = Component(
                 symbol="Device:R",
                 ref="R",
@@ -509,18 +530,18 @@ class TestNesting:
             resistor[1] += IN
             resistor[2] += OUT
             cap[1] += OUT
-            cap[2] += GND
+            cap[2] += RTN
 
         @circuit(name="Middle")
-        def middle(IN: Input, OUT: Output, GND: Bidirectional):
+        def middle(IN: Input, OUT: Output, RTN: Bidirectional):
             stage = Net("STAGE")
-            leaf(IN, stage, GND)
-            leaf(stage, OUT, GND)
+            leaf(IN, stage, RTN)
+            leaf(stage, OUT, RTN)
 
         @circuit(name="Board")
         def board():
-            leaf_gnd = Net("GND")
-            middle(Net("SRC"), Net("SINK"), leaf_gnd)
+            leaf_return = Net("RETURN")
+            middle(Net("SRC"), Net("SINK"), leaf_return)
 
         project = temp_dir / "nested_project"
         board().generate_kicad_project(
@@ -531,7 +552,7 @@ class TestNesting:
         assert sheet_pins(project / "Board.kicad_sch") == [
             ("IN", "input"),
             ("OUT", "output"),
-            ("GND", "bidirectional"),
+            ("RTN", "bidirectional"),
         ]
         # Middle -> two Leaf instances, and Middle exports its own ports
         assert (
@@ -539,14 +560,14 @@ class TestNesting:
             == [
                 ("IN", "input"),
                 ("OUT", "output"),
-                ("GND", "bidirectional"),
+                ("RTN", "bidirectional"),
             ]
             * 2
         )
         assert set(hierarchical_labels(project / "Middle.kicad_sch")) == {
             ("IN", "input"),
             ("OUT", "output"),
-            ("GND", "bidirectional"),
+            ("RTN", "bidirectional"),
         }
         # The net between the two leaves stays inside Middle
         assert "STAGE" in local_labels(project / "Middle.kicad_sch")
