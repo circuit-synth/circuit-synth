@@ -17,9 +17,11 @@ from rich.table import Table
 from rich.text import Text
 
 from circuit_synth.manufacturing.jlcpcb import (
+    JlcImportError,
     fast_jlc_search,
     find_cheapest_jlc,
     find_most_available_jlc,
+    get_component_importer,
     get_fast_searcher,
 )
 
@@ -231,6 +233,83 @@ def alternatives(part_number: str, max_results: int):
         table.add_row(result.part_number, desc, stock_str, price_str, result.package)
 
     console.print(table)
+
+
+@cli.command("import")
+@click.argument("lcsc_part")
+@click.option("--ref", "-r", default=None, help="Reference designator or prefix")
+@click.option("--symbol", default=None, help="Override the resolved KiCad symbol")
+@click.option("--footprint", default=None, help="Override the resolved KiCad footprint")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def import_part(
+    lcsc_part: str,
+    ref: str,
+    symbol: str,
+    footprint: str,
+    output_json: bool,
+) -> None:
+    """
+    Import an LCSC part as a circuit-synth component definition.
+
+    Example:
+        jlc-fast import C25804
+    """
+    importer = get_component_importer()
+
+    try:
+        spec = importer.resolve_part(lcsc_part)
+    except JlcImportError as error:
+        console.print(f"[red]{error}[/red]")
+        raise SystemExit(1)
+
+    if symbol:
+        spec.symbol = symbol
+    if footprint:
+        spec.footprint = footprint
+
+    if not spec.symbol:
+        console.print(
+            f"[red]No KiCad symbol mapping for {spec.lcsc_part}; "
+            f"rerun with --symbol[/red]"
+        )
+        raise SystemExit(1)
+
+    code = spec.to_circuit_synth_code(ref=ref)
+
+    if output_json:
+        output = {
+            "lcsc_part": spec.lcsc_part,
+            "manufacturer_part": spec.manufacturer_part,
+            "manufacturer": spec.manufacturer,
+            "description": spec.description,
+            "package": spec.package,
+            "stock": spec.stock,
+            "basic_part": spec.basic_part,
+            "symbol": spec.symbol,
+            "footprint": spec.footprint,
+            "value": spec.value,
+            "properties": spec.to_properties(),
+            "circuit_synth_code": code,
+        }
+        print(json.dumps(output, indent=2))
+        return
+
+    table = Table(title=f"JLCPCB part {spec.lcsc_part}")
+    table.add_column("Field", style="cyan")
+    table.add_column("Value", style="white")
+    table.add_row("Manufacturer part", spec.manufacturer_part or "-")
+    table.add_row("Manufacturer", spec.manufacturer or "-")
+    table.add_row("Description", spec.description or "-")
+    table.add_row("Package", spec.package or "-")
+    table.add_row("Stock", f"{spec.stock:,}")
+    table.add_row("Part type", "Basic" if spec.basic_part else "Extended")
+    table.add_row("Symbol", spec.symbol)
+    table.add_row("Footprint", spec.footprint or "unresolved")
+    table.add_row("Value", spec.value or "-")
+    console.print(table)
+
+    console.print("\nCircuit-synth component:\n")
+    console.print(code)
 
 
 @cli.command()
