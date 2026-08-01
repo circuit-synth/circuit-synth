@@ -15,6 +15,8 @@ from typing import Any, Dict
 
 from kicad_sch_api.core.types import Point, SchematicPin, SchematicSymbol
 
+from ...core.hierarchy import Port as HierarchyPort
+
 logger = logging.getLogger(__name__)
 
 
@@ -100,6 +102,31 @@ class Circuit:
         self.child_instances = []
         # Annotations for text elements
         self._annotations = []
+        # Declared hierarchical ports (core.hierarchy.Port). Empty when the
+        # circuit does not declare an interface.
+        self.ports: List[HierarchyPort] = []
+
+    @property
+    def port_net_names(self) -> Dict[str, str]:
+        """Map each declared port name to the net bound to it.
+
+        Returns:
+            ``{port_name: net_name}`` for every declared port.
+        """
+        return {port.name: port.net_name for port in self.ports}
+
+    @property
+    def net_port_names(self) -> Dict[str, str]:
+        """Map each net that is exported to the port name exporting it.
+
+        Returns:
+            ``{net_name: port_name}``. If several ports bind the same net, the
+            first declaration wins, since that is the name KiCad will show.
+        """
+        mapping: Dict[str, str] = {}
+        for port in self.ports:
+            mapping.setdefault(port.net_name, port.name)
+        return mapping
 
     def add_component(self, comp: SchematicSymbol):
         logger.debug(
@@ -180,16 +207,13 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
 
     logger.debug(f"Parsing circuit named '{c_name}'...")
 
-    # If we have a collision in name, compare content
+    # Every entry in the JSON is a distinct instance, even when two instances
+    # come from the same @circuit function and therefore share a name. Each one
+    # has its own component references and its own nets connected to its ports,
+    # so each needs its own Circuit and its own .kicad_sch file.
     if c_name in sub_dict:
-        existing_circuit = sub_dict[c_name]
-        if not _circuits_match(existing_circuit, circ_data):
-            raise ValueError(
-                f"Error: Subcircuit name '{c_name}' is used more than once with different definitions.\n"
-                f"Please rename one of them or unify the definitions."
-            )
-        # If it matches, reuse the existing circuit
-        return existing_circuit
+        c_name = _unique_circuit_name(c_name, sub_dict)
+        logger.debug(f"Renamed duplicate subcircuit instance to '{c_name}'")
 
     # Otherwise, create a new Circuit
     circuit = Circuit(name=c_name)
@@ -279,22 +303,23 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             comp_ref = conn["component"]
             pin_data = conn["pin"]
 
-            # Enhanced pin identification - store the most specific identifier available
+            # Pin identification. The pin number is preferred because it is the
+            # only identifier guaranteed to be unique within a symbol: passive
+            # parts such as Device:R leave every pin name empty, and larger
+            # parts repeat names (an STM32 has three pins called VDD), both of
+            # which collapse every connection onto one pin when matched by name.
             pin_identifier = None
 
-            # First check if name is available (most specific)
-            if "name" in pin_data and pin_data["name"] != "~":
-                pin_identifier = pin_data["name"]
-                logger.debug(
-                    f"Using pin name '{pin_identifier}' for {comp_ref} in net {net_name}"
-                )
-            # Then check for number
-            elif "number" in pin_data:
+            if pin_data.get("number") not in (None, ""):
                 pin_identifier = str(pin_data["number"])
                 logger.debug(
                     f"Using pin number '{pin_identifier}' for {comp_ref} in net {net_name}"
                 )
-            # Finally fall back to pin_id
+            elif pin_data.get("name") and pin_data["name"] != "~":
+                pin_identifier = pin_data["name"]
+                logger.debug(
+                    f"Using pin name '{pin_identifier}' for {comp_ref} in net {net_name}"
+                )
             else:
                 pin_identifier = str(pin_data.get("pin_id", ""))
                 logger.debug(
@@ -307,6 +332,15 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
             )
 
         circuit.add_net(net_obj)
+
+    # Parse declared hierarchical ports
+    for port_data in circ_data.get("ports", []) or []:
+        circuit.ports.append(HierarchyPort.from_dict(port_data))
+    if circuit.ports:
+        logger.debug(
+            f"Circuit '{c_name}' declares {len(circuit.ports)} hierarchical port(s): "
+            f"{[p.name for p in circuit.ports]}"
+        )
 
     # Parse subcircuits
     sub_list = circ_data.get("subcircuits", [])
@@ -326,47 +360,24 @@ def _parse_circuit(circ_data: dict, sub_dict: Dict[str, Circuit]) -> Circuit:
     return circuit
 
 
-def _circuits_match(existing_circuit: Circuit, new_data: dict) -> bool:
+def _unique_circuit_name(base_name: str, sub_dict: Dict[str, Circuit]) -> str:
+    """Derive an unused circuit name for a repeated subcircuit instance.
+
+    The first instance keeps the plain name, so a design that instantiates a
+    block once is unaffected. Later instances get a numeric suffix, which also
+    becomes their .kicad_sch filename and their sheet name.
+
+    Args:
+        base_name: The name the instance would like to use.
+        sub_dict: All circuits parsed so far, keyed by name.
+
+    Returns:
+        A name that is not yet present in ``sub_dict``.
     """
-    Check if existing_circuit matches the new subcircuit data enough to reuse the same name.
-
-    Compares circuit STRUCTURE (component types/values, net count) rather than
-    specific references/names, since multiple instances will have different references.
-    """
-    # Compare component structure (types and values, not specific references)
-    existing_comp_types = sorted([
-        (c.lib_id, c.value) for c in existing_circuit.components
-    ])
-
-    new_comps_data = new_data.get("components", {})
-    # Handle components as a dictionary
-    if isinstance(new_comps_data, dict):
-        new_comp_types = sorted([
-            (comp['symbol'], comp.get('value', ''))
-            for ref, comp in new_comps_data.items()
-        ])
-    else:
-        # Fallback for list format
-        new_comp_types = sorted([
-            (comp['symbol'], comp.get('value', ''))
-            for comp in new_comps_data
-        ])
-
-    if existing_comp_types != new_comp_types:
-        logger.debug(f"Component types mismatch: {existing_comp_types} vs {new_comp_types}")
-        return False
-
-    # Compare net count only (names will differ between instances)
-    existing_net_count = len(existing_circuit.nets)
-    new_nets_data = new_data.get("nets", {})
-    new_net_count = len(new_nets_data)
-
-    if existing_net_count != new_net_count:
-        logger.debug(f"Net count mismatch: {existing_net_count} vs {new_net_count}")
-        return False
-
-    logger.debug(f"Circuits match! Reusing existing circuit definition.")
-    return True
+    index = 2
+    while f"{base_name}{index}" in sub_dict:
+        index += 1
+    return f"{base_name}{index}"
 
 
 def assign_subcircuit_instance_labels(

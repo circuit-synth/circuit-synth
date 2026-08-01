@@ -226,6 +226,9 @@ class NetlistExporter:
             "nets": {},
             "subcircuits": [],
             "annotations": [],  # Add annotations to JSON data
+            # Declared hierarchical interface, used to emit KiCad sheet pins
+            # and hierarchical labels. Empty for circuits without ports.
+            "ports": [port.to_dict() for port in getattr(self.circuit, "ports", [])],
         }
 
         # 1) Collect all components

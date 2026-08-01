@@ -41,7 +41,7 @@ import os
 import time
 import uuid as uuid_module
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 log_level = os.environ.get("CIRCUIT_SYNTH_LOG_LEVEL", "WARNING")
 try:
@@ -104,11 +104,24 @@ from circuit_synth.kicad.schematic.placement import PlacementEngine, PlacementSt
 
 # Import existing dependencies
 from ...core.circuit import Circuit
+from ...core.hierarchy import PortDirection
 from .collision_manager import SHEET_MARGIN
 from .integrated_reference_manager import IntegratedReferenceManager
 
 # from .kicad_formatter import format_kicad_schematic  # Removed - using integrated formatter
 from .shape_drawer import arc_s_expr, circle_s_expr, polyline_s_expr, rectangle_s_expr
+
+# Geometry of hierarchical sheet pins, in mm. KiCad snaps schematic geometry to
+# a 50mil grid, and 100mil pin spacing matches the symbol libraries.
+GRID_SIZE = 1.27
+SHEET_PORT_SPACING = 2.54
+SHEET_PORT_MARGIN = 5.08
+SHEET_PORT_STUB = 5.08
+PIN_NAME_CHAR_WIDTH = 1.4
+
+# Where free-standing labels for unconnected ports are parked.
+ORPHAN_PORT_X = 12.7
+ORPHAN_PORT_Y = 190.5
 
 # Python-only implementation
 
@@ -336,6 +349,11 @@ class SchematicWriter:
         # Initialize sheet symbol tracking for hierarchical references
         self.sheet_symbol_map = {}  # Maps subcircuit name to sheet symbol UUID
 
+        # Cached answer for _uses_declared_ports(), and the set of ports that
+        # have picked up a label while this sheet is being written.
+        self._declared_ports_in_use = None
+        self._ports_labelled = set()
+
         # Log initialization details
         logger.debug(f"SchematicWriter initialized for circuit '{circuit.name}'")
         logger.debug(f"  - Using KiCad API Phase 2 integration")
@@ -456,6 +474,10 @@ class SchematicWriter:
         self._add_subcircuit_sheets()
         sheets_time = time.perf_counter() - sheets_start
         logger.info(f"✅ STEP 4/8: Subcircuit sheets added in {sheets_time*1000:.2f}ms")
+
+        # Any declared port that neither a component pin nor a child sheet pin
+        # picked up still has to appear, or the block's interface is incomplete.
+        self._add_unconnected_port_labels()
 
         # Create ComponentUnits (bundles component + labels + bbox)
         units_start = time.perf_counter()
@@ -910,6 +932,37 @@ class SchematicWriter:
 
                     # Calculate sheet dimensions (same logic as main_generator.py)
                     sub_circ = self.all_subcircuits.get(sub_name)
+                    sub_ports = list(getattr(sub_circ, "ports", []) or []) if sub_circ else []
+                    if sub_ports:
+                        # A declared interface gives an exact pin count, so the
+                        # sheet can be sized to fit its pins and pin names.
+                        left_ports, right_ports = self._split_ports_by_side(sub_ports)
+                        name_width = len(sub_name) * 1.5 + 10
+                        sheet_width, sheet_height = self._size_sheet_for_ports(
+                            max(25.4, name_width), 20.32, left_ports, right_ports
+                        )
+                        # Reserve room either side for the stub labels.
+                        longest_net = max(
+                            (len(p.net_name) for p in sub_ports), default=0
+                        )
+                        bbox_width = sheet_width + 2 * (
+                            SHEET_PORT_STUB + longest_net * PIN_NAME_CHAR_WIDTH
+                        )
+
+                        child["sheet_width"] = sheet_width
+                        child["sheet_height"] = sheet_height
+                        child["bbox_width"] = bbox_width
+                        child["bbox_height"] = sheet_height
+                        component_bboxes.append(
+                            (f"SHEET_{sub_name}", bbox_width, sheet_height)
+                        )
+                        child["placement_ref"] = f"SHEET_{sub_name}"
+                        logger.debug(
+                            f"  Sheet {sub_name}: {len(sub_ports)} declared port(s), "
+                            f"bbox {bbox_width:.1f}x{sheet_height:.1f}mm"
+                        )
+                        continue
+
                     if sub_circ:
                         pin_count = len(sub_circ.nets)
 
@@ -1053,6 +1106,14 @@ class SchematicWriter:
         Returns:
             bool: True if net should have hierarchical label, False for local label
         """
+        # Once any block in this part of the hierarchy declares its ports, the
+        # interface is known exactly: a net leaves the sheet only through a
+        # declared port, and those are labelled by the caller. Everything else
+        # is internal and must be a local label - a hierarchical label with no
+        # matching sheet pin is an ERC error in KiCad.
+        if self._uses_declared_ports():
+            return False
+
         # TEMPORARY: Always use hierarchical labels for now
         # We want all labels to be hierarchical until we're ready to differentiate
         # between local (internal) and hierarchical (cross-circuit) nets.
@@ -1097,6 +1158,133 @@ class SchematicWriter:
         #             return True
         #
         # return False
+
+    def _uses_declared_ports(self) -> bool:
+        """Report whether this sheet takes part in a declared-port hierarchy.
+
+        True when this circuit declares ports, or when any of its children do.
+        In that case every crossing of a sheet boundary is described by a port,
+        so labels can be typed correctly instead of falling back to making
+        everything hierarchical. Circuits that declare nothing keep the older
+        net-name matching behaviour.
+
+        Returns:
+            True if declared ports govern this sheet's labels.
+        """
+        if self._declared_ports_in_use is None:
+            in_use = bool(getattr(self.circuit, "ports", None))
+            if not in_use:
+                for child_info in self.circuit.child_instances or []:
+                    child = self.all_subcircuits.get(child_info["sub_name"])
+                    if getattr(child, "ports", None):
+                        in_use = True
+                        break
+            self._declared_ports_in_use = in_use
+        return self._declared_ports_in_use
+
+    def _ports_by_net(self) -> Dict[str, Any]:
+        """Index this circuit's declared hierarchical ports by the net they export.
+
+        Returns:
+            ``{net_name: Port}``. Empty when the circuit declares no interface.
+            If two ports export the same net, the first declaration wins, since
+            that is the name KiCad will use for the merged net.
+        """
+        by_net: Dict[str, Any] = {}
+        for port in getattr(self.circuit, "ports", []) or []:
+            by_net.setdefault(port.net_name, port)
+        return by_net
+
+    def _add_label(
+        self,
+        text: str,
+        position: Tuple[float, float],
+        rotation: float,
+        label_type: LabelType,
+        shape: Optional[str] = None,
+    ) -> Label:
+        """Add a local or hierarchical label to the schematic.
+
+        Args:
+            text: The label text, which is what determines connectivity.
+            position: (x, y) anchor point in mm. For the label to connect, this
+                must sit on a wire end, a pin or a sheet pin.
+            rotation: Label rotation in degrees. 0 points right, 180 points left.
+            label_type: ``LabelType.HIERARCHICAL`` or ``LabelType.LOCAL``.
+            shape: Hierarchical label shape ("input", "output", "bidirectional",
+                "tri_state" or "passive"). Ignored for local labels; defaults to
+                "input" when omitted.
+
+        Returns:
+            The label that was added.
+        """
+        label = Label(
+            uuid=str(uuid_module.uuid4()),
+            position=Point(position[0], position[1]),
+            text=text,
+            label_type=label_type,
+            rotation=float(rotation),
+        )
+        if shape is not None:
+            label.shape = shape
+
+        if not hasattr(self.schematic, "_data"):
+            self.schematic.labels.append(label)
+            return label
+
+        if label.label_type == LabelType.HIERARCHICAL:
+            from ..schematic.label_utils import calculate_hierarchical_label_justify
+
+            self.schematic._data.setdefault("hierarchical_labels", []).append(
+                {
+                    "uuid": label.uuid,
+                    "position": {"x": label.position.x, "y": label.position.y},
+                    "text": label.text,
+                    "rotation": label.rotation,
+                    "size": label.size,
+                    "shape": label.shape if label.shape else "input",
+                    "justify": calculate_hierarchical_label_justify(label.rotation),
+                }
+            )
+        else:
+            self.schematic._data.setdefault("labels", []).append(
+                {
+                    "uuid": label.uuid,
+                    "position": {"x": label.position.x, "y": label.position.y},
+                    "text": label.text,
+                    "label_type": (
+                        label.label_type.value
+                        if hasattr(label.label_type, "value")
+                        else label.label_type
+                    ),
+                    "rotation": label.rotation,
+                    "size": label.size,
+                }
+            )
+        return label
+
+    def _add_wire(
+        self, start: Tuple[float, float], end: Tuple[float, float]
+    ) -> None:
+        """Add a two-point wire segment to the schematic.
+
+        Args:
+            start: (x, y) of the first end point in mm.
+            end: (x, y) of the second end point in mm.
+        """
+        if not hasattr(self.schematic, "_data"):
+            logger.debug("Schematic has no _data store, skipping wire")
+            return
+
+        self.schematic._data.setdefault("wires", []).append(
+            {
+                "uuid": str(uuid_module.uuid4()),
+                "points": [
+                    {"x": start[0], "y": start[1]},
+                    {"x": end[0], "y": end[1]},
+                ],
+            }
+        )
 
     def _add_power_symbol(
         self,
@@ -1310,6 +1498,12 @@ class SchematicWriter:
         # Track which labels belong to which component
         component_labels = {}  # Dict[str, List[Label]]
 
+        # Nets exported through a declared hierarchical port are labelled with
+        # the port name rather than the net name, so the same block can be
+        # instantiated more than once with different nets attached to it.
+        ports_by_net = self._ports_by_net()
+        self._ports_labelled = set()
+
         # Counter for power symbol references (#PWR01, #PWR02, etc.)
         power_symbol_counter = 1
 
@@ -1401,9 +1595,13 @@ class SchematicWriter:
                 logger.debug(f"  → label position: ({global_x}, {global_y})")
                 logger.debug(f"  → label angle: {global_angle}°")
 
-                # Check if this is a power net
+                # Check if this is a power net. An explicitly declared port
+                # wins over power symbol generation: the user asked for this
+                # net to leave the sheet through the hierarchy.
+                port = ports_by_net.get(net_name)
                 if (
-                    hasattr(net, "is_power")
+                    port is None
+                    and hasattr(net, "is_power")
                     and net.is_power
                     and hasattr(net, "power_symbol")
                 ):
@@ -1456,63 +1654,32 @@ class SchematicWriter:
                     # Power symbols don't create labels - skip the rest
                     continue
 
-                # Determine label type: hierarchical if shared with parent OR used by children
-                # Local labels are ONLY for nets that are purely internal to this sheet
-                is_hierarchical = self._is_net_hierarchical(net)
-                label_type = (
-                    LabelType.HIERARCHICAL if is_hierarchical else LabelType.LOCAL
-                )
-
-                # Create label using the API
-                label = Label(
-                    uuid=str(uuid_module.uuid4()),
-                    position=Point(global_x, global_y),
-                    text=net_name,
-                    label_type=label_type,
-                    rotation=float(global_angle),
-                )
-
-                # Add to schematic _data directly to bypass kicad-sch-api methods
-                if not hasattr(self.schematic, "_data"):
-                    self.schematic.labels.append(label)
+                if port is not None:
+                    # This net leaves the sheet through a declared port. Label
+                    # it with the port name and the port's direction, which is
+                    # what the parent's sheet pin will be called.
+                    label = self._add_label(
+                        text=port.name,
+                        position=(global_x, global_y),
+                        rotation=float(global_angle),
+                        label_type=LabelType.HIERARCHICAL,
+                        shape=port.direction.value,
+                    )
+                    self._ports_labelled.add(port.name)
                 else:
-                    # Hierarchical labels go in separate list
-                    if label.label_type == LabelType.HIERARCHICAL:
-                        if "hierarchical_labels" not in self.schematic._data:
-                            self.schematic._data["hierarchical_labels"] = []
-
-                        # Use canonical justification calculation from label_utils
-                        from ..schematic.label_utils import calculate_hierarchical_label_justify
-                        justify = calculate_hierarchical_label_justify(label.rotation)
-
-                        label_dict = {
-                            "uuid": label.uuid,
-                            "position": {"x": label.position.x, "y": label.position.y},
-                            "text": label.text,
-                            "rotation": label.rotation,
-                            "size": label.size,
-                            "shape": (
-                                label.shape if label.shape else "input"
-                            ),  # Default to "input" if None
-                            "justify": justify,
-                        }
-                        self.schematic._data["hierarchical_labels"].append(label_dict)
-                    else:
-                        if "labels" not in self.schematic._data:
-                            self.schematic._data["labels"] = []
-                        label_dict = {
-                            "uuid": label.uuid,
-                            "position": {"x": label.position.x, "y": label.position.y},
-                            "text": label.text,
-                            "label_type": (
-                                label.label_type.value
-                                if hasattr(label.label_type, "value")
-                                else label.label_type
-                            ),
-                            "rotation": label.rotation,
-                            "size": label.size,
-                        }
-                        self.schematic._data["labels"].append(label_dict)
+                    # Determine label type: hierarchical if shared with parent OR used by children
+                    # Local labels are ONLY for nets that are purely internal to this sheet
+                    is_hierarchical = self._is_net_hierarchical(net)
+                    label = self._add_label(
+                        text=net_name,
+                        position=(global_x, global_y),
+                        rotation=float(global_angle),
+                        label_type=(
+                            LabelType.HIERARCHICAL
+                            if is_hierarchical
+                            else LabelType.LOCAL
+                        ),
+                    )
 
                 # Track that this label belongs to this component
                 if actual_ref not in component_labels:
@@ -1529,6 +1696,254 @@ class SchematicWriter:
                 )
 
         return component_labels
+
+    @staticmethod
+    def _split_ports_by_side(ports: List[Any]) -> Tuple[List[Any], List[Any]]:
+        """Assign hierarchical ports to the left or right edge of a sheet symbol.
+
+        Inputs go on the left and everything else on the right, which is the
+        usual reading order for a block diagram.
+
+        Args:
+            ports: The child circuit's declared ports, in declaration order.
+
+        Returns:
+            A ``(left_ports, right_ports)`` tuple.
+        """
+        left = [p for p in ports if p.direction == PortDirection.INPUT]
+        right = [p for p in ports if p.direction != PortDirection.INPUT]
+        return left, right
+
+    @staticmethod
+    def _size_sheet_for_ports(
+        width: float, height: float, left_ports: List[Any], right_ports: List[Any]
+    ) -> Tuple[float, float]:
+        """Grow a sheet symbol so its port pins and pin names fit inside it.
+
+        Args:
+            width: Proposed sheet width in mm.
+            height: Proposed sheet height in mm.
+            left_ports: Ports placed on the left edge.
+            right_ports: Ports placed on the right edge.
+
+        Returns:
+            The ``(width, height)`` to use, snapped up to the 1.27mm grid.
+        """
+        rows = max(len(left_ports), len(right_ports))
+        needed_height = (2 * SHEET_PORT_MARGIN) + max(0, rows - 1) * SHEET_PORT_SPACING
+
+        def text_width(ports: List[Any]) -> float:
+            return max((len(p.name) for p in ports), default=0) * PIN_NAME_CHAR_WIDTH
+
+        needed_width = (
+            text_width(left_ports) + text_width(right_ports) + 3 * SHEET_PORT_MARGIN
+        )
+
+        width = math.ceil(max(width, needed_width) / GRID_SIZE) * GRID_SIZE
+        height = math.ceil(max(height, needed_height) / GRID_SIZE) * GRID_SIZE
+        return width, height
+
+    def _add_sheet_port_pins(
+        self,
+        sheet,
+        sheet_x: float,
+        sheet_y: float,
+        width: float,
+        height: float,
+        left_ports: List[Any],
+        right_ports: List[Any],
+    ) -> None:
+        """Add typed sheet pins for a child block and connect them in this sheet.
+
+        Each declared port of the child becomes a sheet pin on the child's sheet
+        symbol, named after the port and carrying the port's direction. A short
+        wire stub runs outward from every pin to a label naming the net this
+        sheet connects to it. That label is hierarchical when the current
+        circuit re-exports the net through one of its own ports, which is what
+        makes blocks nest to any depth, and local otherwise.
+
+        Args:
+            sheet: The Sheet the pins are added to.
+            sheet_x: Left edge of the sheet symbol in mm.
+            sheet_y: Top edge of the sheet symbol in mm.
+            width: Sheet symbol width in mm.
+            height: Sheet symbol height in mm.
+            left_ports: Ports to place on the left edge.
+            right_ports: Ports to place on the right edge.
+        """
+        own_ports_by_net = self._ports_by_net()
+
+        for ports, on_left in ((left_ports, True), (right_ports, False)):
+            edge_x = sheet_x if on_left else sheet_x + width
+            stub_x = edge_x - SHEET_PORT_STUB if on_left else edge_x + SHEET_PORT_STUB
+            # KiCad derives which edge a sheet pin sits on from its angle when
+            # the file is read back: 0 is the right edge and 180 the left one.
+            # Getting this backwards makes KiCad move the pin to the opposite
+            # edge, silently disconnecting it from the wire drawn for it.
+            rotation = 180.0 if on_left else 0.0
+
+            for index, port in enumerate(ports):
+                pin_y = sheet_y + SHEET_PORT_MARGIN + (index * SHEET_PORT_SPACING)
+                pin_y = round(pin_y / GRID_SIZE) * GRID_SIZE
+
+                pin = SheetPin(
+                    uuid=str(uuid_module.uuid4()),
+                    name=port.name,
+                    position=Point(edge_x, pin_y),
+                    pin_type=port.direction.value,
+                )
+                # Left edge pins read into the sheet, right edge pins read out
+                # of it, so their text runs in opposite directions.
+                pin.rotation = rotation
+                pin.justify = "left" if on_left else "right"
+                sheet.pins.append(pin)
+
+                # Stub wire so the label has somewhere to attach outside the
+                # sheet outline, where it stays readable.
+                self._add_wire((edge_x, pin_y), (stub_x, pin_y))
+
+                own_port = own_ports_by_net.get(port.net_name)
+                if own_port is not None:
+                    self._add_label(
+                        text=own_port.name,
+                        position=(stub_x, pin_y),
+                        rotation=180.0 if on_left else 0.0,
+                        label_type=LabelType.HIERARCHICAL,
+                        shape=own_port.direction.value,
+                    )
+                    self._ports_labelled.add(own_port.name)
+                else:
+                    self._add_label(
+                        text=port.net_name,
+                        position=(stub_x, pin_y),
+                        rotation=180.0 if on_left else 0.0,
+                        label_type=LabelType.LOCAL,
+                    )
+
+                logger.debug(
+                    f"Sheet pin '{port.name}' ({port.direction.value}) at "
+                    f"({edge_x}, {pin_y}) connects net '{port.net_name}'"
+                )
+
+    def _register_sheet(self, sheet) -> None:
+        """Store a sheet symbol on the schematic being built.
+
+        Args:
+            sheet: The Sheet to add, with its pins already populated.
+        """
+        if not hasattr(self.schematic, "_data"):
+            self.schematic.sheets.append(sheet)
+            return
+
+        self.schematic._data.setdefault("sheets", []).append(
+            {
+                "uuid": sheet.uuid,
+                "position": {"x": sheet.position.x, "y": sheet.position.y},
+                # The parser expects width/height rather than a Point.
+                "size": {"width": sheet.size.x, "height": sheet.size.y},
+                "name": sheet.name,
+                "filename": sheet.filename,
+                "pins": [
+                    {
+                        "uuid": pin.uuid,
+                        "name": pin.name,
+                        "position": {"x": pin.position.x, "y": pin.position.y},
+                        "pin_type": (
+                            pin.pin_type.value
+                            if hasattr(pin.pin_type, "value")
+                            else pin.pin_type
+                        ),
+                        "size": pin.size,
+                        "rotation": getattr(pin, "rotation", 0),
+                        "justify": getattr(pin, "justify", "right"),
+                    }
+                    for pin in sheet.pins
+                ],
+                "project_name": self.project_name or "",
+                "page_number": "2",  # Default page number for sub-sheets
+            }
+        )
+
+    def _add_port_based_sheet(
+        self,
+        child_info: Dict[str, Any],
+        sub_name: str,
+        usage_label: str,
+        child_ports: List[Any],
+    ) -> None:
+        """Add a sheet symbol for a child block that declares hierarchical ports.
+
+        Unlike the net-name heuristics used for undeclared blocks, the pin set
+        here comes straight from the child's declared interface, so it is exact
+        and stable across instances of the same block.
+
+        Args:
+            child_info: Placement record for this child instance.
+            sub_name: Name of the child circuit, which is also its file name.
+            usage_label: Sheet name shown in the parent schematic.
+            child_ports: The child's declared ports, in declaration order.
+        """
+        left_ports, right_ports = self._split_ports_by_side(child_ports)
+
+        cx = child_info.get("x", 50.0)
+        cy = child_info.get("y", 50.0)
+        width = child_info.get("sheet_width", child_info.get("width", 30.0))
+        height = child_info.get("sheet_height", child_info.get("height", 30.0))
+        width, height = self._size_sheet_for_ports(
+            width, height, left_ports, right_ports
+        )
+
+        sheet_x = round((cx - (width / 2)) / GRID_SIZE) * GRID_SIZE
+        sheet_y = round((cy - (height / 2)) / GRID_SIZE) * GRID_SIZE
+
+        sheet = Sheet(
+            uuid=str(uuid_module.uuid4()),
+            position=Point(sheet_x, sheet_y),
+            size=Point(width, height),
+            name=usage_label,
+            filename=f"{sub_name}.kicad_sch",
+        )
+        sheet._project_name = self.project_name
+
+        self._add_sheet_port_pins(
+            sheet, sheet_x, sheet_y, width, height, left_ports, right_ports
+        )
+        self._register_sheet(sheet)
+        self.sheet_symbol_map[sub_name] = sheet.uuid
+
+        logger.debug(
+            f"Added hierarchical block sheet '{usage_label}' -> {sheet.filename} "
+            f"with {len(sheet.pins)} declared port pin(s)"
+        )
+
+    def _add_unconnected_port_labels(self) -> None:
+        """Emit hierarchical labels for declared ports that got no label.
+
+        A port normally picks up its label from a component pin or from a child
+        sheet pin. A port that connects to neither would silently disappear from
+        the sheet, so a free-standing label is placed for it instead, keeping
+        the block's interface complete.
+        """
+        labelled = getattr(self, "_ports_labelled", set())
+        missing = [p for p in getattr(self.circuit, "ports", []) or [] if p.name not in labelled]
+        if not missing:
+            return
+
+        logger.debug(
+            f"Circuit '{self.circuit.name}': {len(missing)} declared port(s) have "
+            f"no connection in this sheet, placing standalone labels"
+        )
+        for index, port in enumerate(missing):
+            self._add_label(
+                text=port.name,
+                position=(
+                    ORPHAN_PORT_X,
+                    ORPHAN_PORT_Y + index * SHEET_PORT_SPACING,
+                ),
+                rotation=0.0,
+                label_type=LabelType.HIERARCHICAL,
+                shape=port.direction.value,
+            )
 
     def _add_subcircuit_sheets(self):
         """
@@ -1552,6 +1967,11 @@ class SchematicWriter:
             usage_label = child_info["instance_label"]
 
             child_circ = self.all_subcircuits[sub_name]
+            child_ports = list(getattr(child_circ, "ports", []) or [])
+
+            if child_ports:
+                self._add_port_based_sheet(child_info, sub_name, usage_label, child_ports)
+                continue
 
             # Get only SHARED nets for this subcircuit to create sheet pins
             # Check which child nets have the SAME OBJECT REFERENCE as parent nets
@@ -1735,56 +2155,32 @@ class SchematicWriter:
                     f"Created sheet pin '{net_name}' at position ({pin_x}, {pin_y})"
                 )
 
-                label_x = pin_x
-                label = Label(
-                    uuid=str(uuid_module.uuid4()),
-                    position=Point(label_x, pin_y),
-                    text=net_name,
-                    label_type=LabelType.HIERARCHICAL,
-                    rotation=0.0,
-                )
-
-                # Add to schematic _data directly to bypass kicad-sch-api methods
-                if not hasattr(self.schematic, "_data"):
-                    self.schematic.labels.append(label)
+                own_port = self._ports_by_net().get(net_name)
+                if own_port is not None:
+                    self._add_label(
+                        text=own_port.name,
+                        position=(pin_x, pin_y),
+                        rotation=0.0,
+                        label_type=LabelType.HIERARCHICAL,
+                        shape=own_port.direction.value,
+                    )
+                    self._ports_labelled.add(own_port.name)
+                elif self._uses_declared_ports():
+                    # This sheet is part of a declared-port hierarchy and does
+                    # not export this net, so it stays local to the sheet.
+                    self._add_label(
+                        text=net_name,
+                        position=(pin_x, pin_y),
+                        rotation=0.0,
+                        label_type=LabelType.LOCAL,
+                    )
                 else:
-                    # Hierarchical labels go in separate list
-                    if label.label_type == LabelType.HIERARCHICAL:
-                        if "hierarchical_labels" not in self.schematic._data:
-                            self.schematic._data["hierarchical_labels"] = []
-
-                        # Use canonical justification calculation from label_utils
-                        from ..schematic.label_utils import calculate_hierarchical_label_justify
-                        justify = calculate_hierarchical_label_justify(label.rotation)
-
-                        label_dict = {
-                            "uuid": label.uuid,
-                            "position": {"x": label.position.x, "y": label.position.y},
-                            "text": label.text,
-                            "rotation": label.rotation,
-                            "size": label.size,
-                            "shape": (
-                                label.shape if label.shape else "input"
-                            ),  # Default to "input" if None
-                            "justify": justify,
-                        }
-                        self.schematic._data["hierarchical_labels"].append(label_dict)
-                    else:
-                        if "labels" not in self.schematic._data:
-                            self.schematic._data["labels"] = []
-                        label_dict = {
-                            "uuid": label.uuid,
-                            "position": {"x": label.position.x, "y": label.position.y},
-                            "text": label.text,
-                            "label_type": (
-                                label.label_type.value
-                                if hasattr(label.label_type, "value")
-                                else label.label_type
-                            ),
-                            "rotation": label.rotation,
-                            "size": label.size,
-                        }
-                        self.schematic._data["labels"].append(label_dict)
+                    self._add_label(
+                        text=net_name,
+                        position=(pin_x, pin_y),
+                        rotation=0.0,
+                        label_type=LabelType.HIERARCHICAL,
+                    )
 
             # Add sheet to schematic _data directly to bypass kicad-sch-api methods
             if not hasattr(self.schematic, "_data"):
