@@ -94,6 +94,70 @@ class PlacementSpec:
     labels: List[LabelPlacement] = field(default_factory=list)
     power: List[PowerPlacement] = field(default_factory=list)
     no_connects: List[Point] = field(default_factory=list)
+    paper: Optional[str] = None
+
+    def translated(self, dx: float, dy: float) -> "PlacementSpec":
+        """Return the same placement moved bodily across the sheet.
+
+        Useful for centring a finished layout on its page without redoing every
+        coordinate by hand.
+
+        Args:
+            dx: Distance to move in x, in mm.
+            dy: Distance to move in y, in mm.
+
+        Returns:
+            A new spec with every coordinate shifted.
+        """
+        move = lambda point: (round(point[0] + dx, 4), round(point[1] + dy, 4))
+        return PlacementSpec(
+            components=[
+                ComponentPlacement(item.reference, move(item.at), item.rotation)
+                for item in self.components
+            ],
+            wires=[(move(start), move(end)) for start, end in self.wires],
+            junctions=[move(point) for point in self.junctions],
+            labels=[
+                LabelPlacement(
+                    item.text, move(item.at), item.rotation, item.kind, item.shape
+                )
+                for item in self.labels
+            ],
+            power=[
+                PowerPlacement(item.lib_id, move(item.at), item.rotation, item.reference)
+                for item in self.power
+            ],
+            no_connects=[move(point) for point in self.no_connects],
+            paper=self.paper,
+        )
+
+    def renamed(self, mapping: Dict[str, str]) -> "PlacementSpec":
+        """Return the same placement applied to a different set of references.
+
+        Two instances of one block have the same shape and different reference
+        designators, so a layout written for one can be reused for the others.
+
+        Args:
+            mapping: Old reference to new reference.
+
+        Returns:
+            A new spec addressing the renamed components.
+        """
+        renamed = PlacementSpec(
+            components=[
+                ComponentPlacement(
+                    mapping.get(item.reference, item.reference), item.at, item.rotation
+                )
+                for item in self.components
+            ],
+            wires=list(self.wires),
+            junctions=list(self.junctions),
+            labels=list(self.labels),
+            power=list(self.power),
+            no_connects=list(self.no_connects),
+            paper=self.paper,
+        )
+        return renamed
 
     @staticmethod
     def from_dict(data: dict) -> "PlacementSpec":
@@ -139,6 +203,7 @@ class PlacementSpec:
                 for entry in data.get("power", [])
             ],
             no_connects=[tuple(point) for point in data.get("no_connects", [])],
+            paper=data.get("paper"),
         )
 
     @staticmethod
@@ -336,17 +401,20 @@ def apply_placement(
     if match:
         project = match.group(1)
 
+    if spec.paper:
+        text = re.sub(r'\(paper "[^"]*"\)', f'(paper "{spec.paper}")', text, count=1)
+
     # Move the real parts. Power symbols are redrawn from the spec instead, so
     # they are removed here and written back below.
     wanted = {placement.reference: placement for placement in spec.components}
     moved = 0
-    power_extents: List[Tuple[int, int]] = []
 
-    for extent in list(sexp.iter_blocks(text, "symbol")):
+    # Rewriting a block changes the length of the text after it, so the blocks
+    # are edited back to front and the offsets in front of the edit stay valid.
+    for extent in sorted(sexp.iter_blocks(text, "symbol"), reverse=True):
         block = sexp.block_text(text, extent)
         lib_id = sexp.read_string(block, "lib_id") or ""
         if lib_id.startswith("power:"):
-            power_extents.append(extent)
             continue
 
         reference = sexp.read_property(block, "Reference")
