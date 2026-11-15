@@ -1171,6 +1171,7 @@ class APISynchronizer:
                 unmatched_circuit_components.append((circuit_id, comp_data))
 
         logger.info(f"  Circuit components to ADD: {len(unmatched_circuit_components)}")
+        added_refs = set()
         for circuit_id, comp_data in unmatched_circuit_components:
             logger.info(
                 f"    ADDING: {circuit_id} (ref={comp_data.get('reference')}, value={comp_data.get('value')})"
@@ -1180,16 +1181,17 @@ class APISynchronizer:
             # Issue #489: Also reconcile pin connections for newly added components
             # This ensures hierarchical labels and power symbols are added for the new component's pins
             kicad_ref = comp_data["reference"]
-            if kicad_ref in self.schematic.components_dict:
+            added_refs.add(kicad_ref)
+            added_comp = self.schematic.components.get(kicad_ref)
+            if added_comp is not None:
                 logger.debug(f"    🔌 Reconciling pins for newly added component {kicad_ref}")
-                # Update kicad_components dict with newly added component
-                kicad_components[kicad_ref] = self.schematic.components_dict[kicad_ref]
+                kicad_components[kicad_ref] = added_comp
                 self._reconcile_component_pins(
                     circuit_id, kicad_ref, circuit_components, kicad_components, report
                 )
 
         # Find KiCad components to preserve/remove
-        matched_kicad_refs = set(matches.values())
+        matched_kicad_refs = set(matches.values()) | added_refs
         unmatched_kicad_components = []
         for kicad_ref in kicad_components:
             if kicad_ref not in matched_kicad_refs:
