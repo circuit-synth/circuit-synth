@@ -15,6 +15,7 @@ from circuit_synth.core.exception import (
     ParseError,
     SymbolNotFoundError,
 )
+from ..core.kicad_env import kicad_symbol_dir_env
 
 logger = logging.getLogger(__name__)
 
@@ -634,7 +635,7 @@ class KicadSymbolParser:
         Look for 'lib_name.kicad_sym' in environment or known paths.
         If not found, return None.
         """
-        kicad_dir = os.environ.get("KICAD_SYMBOL_DIR", "")
+        kicad_dir = kicad_symbol_dir_env()
         candidates = []
         if kicad_dir:
             candidates.append(os.path.join(kicad_dir, f"{lib_name}.kicad_sym"))
@@ -659,7 +660,7 @@ class KicadSymbolParser:
             return str(lib_path)
 
         # Fallback to environment variable search
-        kicad_dir = os.environ.get("KICAD_SYMBOL_DIR", "")
+        kicad_dir = kicad_symbol_dir_env()
         candidates = []
         if kicad_dir:
             candidates.append(os.path.join(kicad_dir, f"{lib_name}.kicad_sym"))

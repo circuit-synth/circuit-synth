@@ -728,18 +728,18 @@ class PlacementEngine:
             )
 
         # Add sheet bounds if sheets exist
-        if hasattr(self.schematic, "sheets"):
-            for sheet in self.schematic.sheets:
-                # Sheets store their position as top-left corner
-                bounds.append(
-                    ElementBounds(
-                        sheet.position.x,
-                        sheet.position.y,
-                        sheet.size[0],
-                        sheet.size[1],
-                        "sheet",
-                    )
+        # kicad-sch-api keeps sheets as dicts in _data (schematic.sheets is a manager)
+        for sheet in getattr(self.schematic, "_data", {}).get("sheets", []):
+            # Sheets store their position as top-left corner
+            bounds.append(
+                ElementBounds(
+                    sheet["position"]["x"],
+                    sheet["position"]["y"],
+                    sheet["size"]["width"],
+                    sheet["size"]["height"],
+                    "sheet",
                 )
+            )
 
         return bounds
 

@@ -12,6 +12,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import kicad_sch_api as ksa
 
+from .label_utils import calculate_hierarchical_label_justify
+from .sheet_interface import shared_net_names
 from .synchronizer import APISynchronizer
 
 logger = logging.getLogger(__name__)
@@ -112,31 +114,10 @@ class HierarchicalSynchronizer:
                 logger.debug(f"Processing hierarchical sheets")
                 for sheet_elem in sheets_list:
                     logger.debug(f"Processing sheet element: {sheet_elem}")
-                    logger.debug(f"Sheet attributes: {dir(sheet_elem)}")
 
-                    # Try different ways to get sheet info
-                    sheet_file = None
-                    sheet_name = None
-
-                    # Direct attributes
-                    if hasattr(sheet_elem, "filename"):
-                        sheet_file = sheet_elem.filename
-                    elif hasattr(sheet_elem, "file"):
-                        sheet_file = sheet_elem.file
-                    if hasattr(sheet_elem, "name"):
-                        sheet_name = sheet_elem.name
-
-                    # From at property (position)
-                    if hasattr(sheet_elem, "at"):
-                        logger.debug(f"Sheet at: {sheet_elem.at}")
-
-                    # From properties
-                    if hasattr(sheet_elem, "properties"):
-                        for prop in sheet_elem.properties:
-                            if prop.name == "Sheetfile":
-                                sheet_file = prop.value
-                            elif prop.name == "Sheetname":
-                                sheet_name = prop.value
+                    # kicad-sch-api stores parsed sheets as plain dicts
+                    sheet_file = sheet_elem.get("filename")
+                    sheet_name = sheet_elem.get("name")
 
                     logger.debug(f"Sheet file: {sheet_file}, name: {sheet_name}")
 
@@ -161,41 +142,9 @@ class HierarchicalSynchronizer:
                     "Schematic has no sheets attribute or sheets list is empty"
                 )
 
-            # Alternative: Look in components for sheet instances
-            if len(sheet.children) == 0:
-                for comp in schematic.components:
-                    # Check if this is a sheet (has Sheetfile property)
-                    sheet_file = None
-                    sheet_name = None
-
-                    if hasattr(comp, "properties"):
-                        for prop in comp.properties:
-                            if prop.name == "Sheetfile":
-                                sheet_file = prop.value
-                            elif prop.name == "Sheetname":
-                                sheet_name = prop.value
-
-                    if sheet_file:
-                        logger.debug(
-                            f"Found sheet component: {sheet_name} -> {sheet_file}"
-                        )
-                        # Resolve the file path
-                        child_path = self.project_dir / sheet_file
-
-                        if child_path.exists():
-                            # Create child sheet and load recursively
-                            child = HierarchicalSheet(
-                                sheet_name or sheet_file, child_path, sheet
-                            )
-                            sheet.add_child(child)
-                            self._load_sheet_hierarchy(child)
-                        else:
-                            logger.warning(
-                                f"Hierarchical sheet file not found: {child_path}"
-                            )
-
         except Exception as e:
             logger.error(f"Failed to load sheet {sheet.file_path}: {e}")
+            raise
 
     def sync_with_circuit(
         self, circuit, subcircuit_dict: Optional[Dict[str, Any]] = None
@@ -283,12 +232,99 @@ class HierarchicalSynchronizer:
                 f"Sheet {sheet.name}: {sheet_report.get('matched', 0)} matched, "
                 f"{sheet_report.get('added', 0)} added, {sheet_report.get('modified', 0)} modified"
             )
+
+            if self._reconcile_sheet_pins(sheet, sheet_circuit, subcircuit_dict):
+                sheet.synchronizer._save_schematic()
         else:
             logger.warning(f"No circuit found for sheet: {sheet.name}")
 
         # Synchronize child sheets
         for child in sheet.children:
             self._sync_sheet_recursive(child, circuit, subcircuit_dict, report)
+
+    def _reconcile_sheet_pins(
+        self,
+        sheet: HierarchicalSheet,
+        sheet_circuit: Any,
+        subcircuit_dict: Dict[str, Any],
+    ) -> bool:
+        """
+        Make each sheet symbol's pins (and the parent-side labels attached to
+        them) match the nets the child circuit shares with this circuit.
+
+        Returns:
+            True if the parent schematic was modified.
+        """
+        schematic = sheet.synchronizer.schematic
+        child_instances = getattr(sheet_circuit, "child_instances", None) or []
+        changed = False
+
+        for sheet_elem in list(schematic._data.get("sheets", [])):
+            sub_name = Path(sheet_elem.get("filename", "")).stem
+            child_circ = subcircuit_dict.get(sub_name)
+            if child_circ is None:
+                continue
+
+            siblings = [
+                subcircuit_dict[info["sub_name"]]
+                for info in child_instances
+                if info["sub_name"] != sub_name and info["sub_name"] in subcircuit_dict
+            ]
+            desired = set(shared_net_names(child_circ, sheet_circuit, siblings))
+            pins = sheet_elem.setdefault("pins", [])
+            present = {p["name"] for p in pins}
+
+            for pin in [p for p in pins if p["name"] not in desired]:
+                self._remove_pin_labels(schematic, pin)
+                schematic.sheets.remove_sheet_pin(sheet_elem["uuid"], pin["uuid"])
+                logger.info(f"Removed sheet pin '{pin['name']}' from {sub_name}")
+                changed = True
+
+            for name in sorted(desired - present):
+                self._add_sheet_pin_with_label(schematic, sheet_elem, name)
+                logger.info(f"Added sheet pin '{name}' to {sub_name}")
+                changed = True
+
+        return changed
+
+    @staticmethod
+    def _remove_pin_labels(schematic: Any, pin: Dict[str, Any]) -> None:
+        """Remove parent-side hierarchical labels attached to a sheet pin."""
+        px, py = pin["position"]["x"], pin["position"]["y"]
+        for label in list(schematic.hierarchical_labels):
+            # Generated pins sit 1.27mm inside the edge, labels on the edge
+            if (
+                label.text == pin["name"]
+                and abs(label.position.y - py) < 0.01
+                and abs(label.position.x - px) <= 1.28
+            ):
+                schematic.remove_hierarchical_label(label.uuid)
+
+    @staticmethod
+    def _add_sheet_pin_with_label(
+        schematic: Any, sheet_elem: Dict[str, Any], name: str
+    ) -> None:
+        """Append a right-edge sheet pin plus a parent-side hierarchical label."""
+        pitch = 2.54
+        top = sheet_elem["position"]["y"]
+        right = sheet_elem["position"]["x"] + sheet_elem["size"]["width"]
+        offsets = [p["position"]["y"] - top for p in sheet_elem["pins"]]
+        offset = (max(offsets) + pitch) if offsets else pitch
+
+        if offset > sheet_elem["size"]["height"] - pitch:
+            sheet_elem["size"]["height"] = offset + pitch
+
+        schematic.sheets.add_sheet_pin(
+            sheet_elem["uuid"], name, "bidirectional", "right", offset
+        )
+
+        label_uuid = schematic.add_hierarchical_label(
+            text=name, position=(right, top + offset), shape="input", rotation=0.0
+        )
+        justify = calculate_hierarchical_label_justify(0.0)
+        for label_dict in schematic._data.get("hierarchical_labels", []):
+            if label_dict.get("uuid") == label_uuid:
+                label_dict["justify"] = justify
 
     def _find_circuit_for_sheet(
         self, sheet: HierarchicalSheet, main_circuit, subcircuit_dict: Dict[str, Any]

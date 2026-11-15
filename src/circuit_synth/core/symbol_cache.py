@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from ..kicad.core import Point, SchematicPin
 from ..kicad.kicad_symbol_parser import parse_kicad_sym_file
+from .kicad_env import kicad_symbol_dir_env
 
 logger = logging.getLogger(__name__)
 
@@ -296,9 +297,9 @@ class SymbolLibraryCache:
                 {
                     "number": pin.number,
                     "name": pin.name,
-                    "type": pin.type,
+                    "type": pin.pin_type.value,
                     "position": {"x": pin.position.x, "y": pin.position.y},
-                    "orientation": pin.orientation,
+                    "orientation": pin.rotation,
                 }
                 for pin in symbol.pins
             ],
@@ -316,11 +317,11 @@ class SymbolLibraryCache:
                 SchematicPin(
                     number=pin_data["number"],
                     name=pin_data["name"],
-                    type=pin_data["type"],
+                    pin_type=pin_data["type"],
                     position=Point(
                         pin_data["position"]["x"], pin_data["position"]["y"]
                     ),
-                    orientation=pin_data.get("orientation", 0),
+                    rotation=pin_data.get("orientation", 0),
                 )
             )
 
@@ -414,7 +415,7 @@ class SymbolLibraryCache:
         Parse KICAD_SYMBOL_DIR environment variable which can contain multiple paths
         separated by colons (like PATH variable). Returns list of valid directory paths.
         """
-        kicad_dir_env = os.environ.get("KICAD_SYMBOL_DIR", "")
+        kicad_dir_env = kicad_symbol_dir_env()
         valid_dirs = []
 
         if kicad_dir_env:
@@ -610,11 +611,11 @@ class SymbolLibraryCache:
                 pin = SchematicPin(
                     number=str(pin_data.get("number", "")),
                     name=str(pin_data.get("name", "~")),
-                    type=pin_data.get(
+                    pin_type=pin_data.get(
                         "electrical_type", pin_data.get("type", "passive")
                     ),
                     position=Point(x, y),
-                    orientation=orientation,
+                    rotation=orientation,
                     length=length,
                 )
                 pins.append(pin)

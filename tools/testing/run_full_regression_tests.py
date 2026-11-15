@@ -207,6 +207,27 @@ class ComprehensiveRegressionSuite:
 
         self.log(f"Environment info saved to {env_file}", "SUCCESS")
 
+    def _git_tracked_paths(self) -> Optional[List[str]]:
+        """Absolute paths of git-tracked files, or None if git is unavailable."""
+        try:
+            out = subprocess.run(
+                ["git", "ls-files", "-z"],
+                cwd=self.project_root,
+                capture_output=True,
+                check=True,
+            ).stdout.decode()
+        except (OSError, subprocess.CalledProcessError):
+            return None
+        return [str(self.project_root / p) for p in out.split("\0") if p]
+
+    @staticmethod
+    def _is_tracked(path: Path, tracked: Optional[List[str]]) -> bool:
+        """True if path is, or (for a directory) contains, a git-tracked file."""
+        if tracked is None:
+            return True  # cannot tell, so never delete
+        p = str(path)
+        return any(t == p or t.startswith(p + os.sep) for t in tracked)
+
     def clear_all_caches(self) -> bool:
         self.log("=" * 60, "HEADER")
         self.log("CLEARING ALL CACHES", "HEADER")
@@ -288,11 +309,16 @@ class ComprehensiveRegressionSuite:
         ]
 
         self.log("Clearing test artifacts...", "INFO")
+        tracked = self._git_tracked_paths()
         for artifact_pattern in test_artifacts:
             if "*" in str(artifact_pattern):
                 parent = artifact_pattern.parent
                 pattern = artifact_pattern.name
                 for artifact in parent.glob(pattern):
+                    # Patterns like test_*.py also match committed source files
+                    if self._is_tracked(artifact, tracked):
+                        self.log(f"Skipped tracked file: {artifact}", "INFO", 1)
+                        continue
                     if artifact.exists():
                         try:
                             if artifact.is_dir():

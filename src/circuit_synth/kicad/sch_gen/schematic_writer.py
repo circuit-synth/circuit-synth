@@ -89,6 +89,7 @@ from sexpdata import Symbol
 
 # Import symbol cache for multi-unit component support
 from ..core.symbol_cache import get_symbol_cache
+from ..schematic.sheet_interface import shared_net_names
 
 # Use optimized symbol cache from kicad_symbol_cache for better performance,
 # but keep Python fallback for graphics data
@@ -1553,79 +1554,12 @@ class SchematicWriter:
 
             child_circ = self.all_subcircuits[sub_name]
 
-            # Get only SHARED nets for this subcircuit to create sheet pins
-            # Check which child nets have the SAME OBJECT REFERENCE as parent nets
-            # (not just matching names - must be the same Net object passed from parent to child)
-
-            shared_net_names = []
-            internal_net_names = []
-
-            # Handle both dict and list forms of .nets
-            child_nets = (
-                child_circ.nets.values()
-                if isinstance(child_circ.nets, dict)
-                else child_circ.nets
-            )
-            parent_nets = (
-                self.circuit.nets.values()
-                if isinstance(self.circuit.nets, dict)
-                else self.circuit.nets
-            )
-
-            # First try object identity (works when circuits are created directly in Python)
-            for child_net in child_nets:
-                is_shared = False
-                for parent_net in parent_nets:
-                    if parent_net is child_net:  # Same object reference!
-                        is_shared = True
-                        break
-
-                if is_shared:
-                    shared_net_names.append(child_net.name)
-                else:
-                    internal_net_names.append(child_net.name)
-
-            # If object identity found no shared nets but we have nets to check, fall back to name matching
-            # (needed when circuits are loaded from JSON, which creates new Net objects)
-            if not shared_net_names and list(parent_nets) and list(child_nets):
-                shared_net_names = []
-                internal_net_names = []
-
-                parent_net_names_set = {n.name for n in parent_nets}
-                for child_net in child_nets:
-                    if child_net.name in parent_net_names_set:
-                        shared_net_names.append(child_net.name)
-                    else:
-                        internal_net_names.append(child_net.name)
-
-            # Special case: If parent has NO nets, infer shared nets by looking at sibling circuits
-            # Nets that appear in multiple children are likely shared parameters
-            if not list(parent_nets) and list(child_nets):
-                shared_net_names = []
-                internal_net_names = []
-
-                # Collect nets from all sibling circuits
-                sibling_net_names = set()
-                for sibling_info in self.circuit.child_instances:
-                    if (
-                        sibling_info["sub_name"] != sub_name
-                    ):  # Don't include current child
-                        sibling_circ = self.all_subcircuits[sibling_info["sub_name"]]
-                        sibling_nets = (
-                            sibling_circ.nets.values()
-                            if isinstance(sibling_circ.nets, dict)
-                            else sibling_circ.nets
-                        )
-                        sibling_net_names.update(n.name for n in sibling_nets)
-
-                # Nets that appear in both this child AND siblings are likely shared
-                for child_net in child_nets:
-                    if child_net.name in sibling_net_names:
-                        shared_net_names.append(child_net.name)
-                    else:
-                        internal_net_names.append(child_net.name)
-
-            pin_list = sorted(shared_net_names)
+            siblings = [
+                self.all_subcircuits[info["sub_name"]]
+                for info in self.circuit.child_instances
+                if info["sub_name"] != sub_name
+            ]
+            pin_list = shared_net_names(child_circ, self.circuit, siblings)
 
             # CRITICAL FIX: Also include the parameters from child circuit instances
             # For subcircuits that only contain other subcircuits (no components),
