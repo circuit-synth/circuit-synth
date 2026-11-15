@@ -50,6 +50,7 @@ def _get_default_kicad_symbol_path():
 
 
 from circuit_synth.kicad.symbol_lib_parser_manager import SharedParserManager
+from circuit_synth.core.kicad_env import kicad_symbol_dir_env
 
 
 def extract_symbol_names(sym_file_path: Path):
@@ -140,7 +141,7 @@ def main():
     parser.add_argument(
         "--lib-path",
         type=Path,
-        default=os.environ.get("KICAD_SYMBOL_DIR", _get_default_kicad_symbol_path()),
+        default=kicad_symbol_dir_env() or _get_default_kicad_symbol_path(),
         help="Path to KiCad symbol libraries (default: KICAD_SYMBOL_DIR environment variable or KiCad default location)",
     )
     parser.add_argument(

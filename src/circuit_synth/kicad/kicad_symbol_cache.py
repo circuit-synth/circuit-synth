@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Optional
 
 # Import the parser
 from .kicad_symbol_parser import parse_kicad_sym_file
+from ..core.kicad_env import kicad_symbol_dir_env
 
 # Python implementation for symbol cache
 
@@ -255,7 +256,7 @@ class SymbolLibCache:
         separated by colons (like PATH variable). Returns list of valid directory paths.
         If no environment variable is set, try common KiCad installation paths.
         """
-        kicad_dir_env = os.environ.get("KICAD_SYMBOL_DIR", "")
+        kicad_dir_env = kicad_symbol_dir_env()
         valid_dirs = []
 
         if kicad_dir_env:

@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from ..kicad.core import Point, SchematicPin
 from ..kicad.kicad_symbol_parser import parse_kicad_sym_file
+from .kicad_env import kicad_symbol_dir_env
 
 logger = logging.getLogger(__name__)
 
@@ -414,7 +415,7 @@ class SymbolLibraryCache:
         Parse KICAD_SYMBOL_DIR environment variable which can contain multiple paths
         separated by colons (like PATH variable). Returns list of valid directory paths.
         """
-        kicad_dir_env = os.environ.get("KICAD_SYMBOL_DIR", "")
+        kicad_dir_env = kicad_symbol_dir_env()
         valid_dirs = []
 
         if kicad_dir_env:
