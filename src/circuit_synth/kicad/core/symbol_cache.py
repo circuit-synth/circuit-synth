@@ -393,9 +393,9 @@ class SymbolLibraryCache:
                 {
                     "number": pin.number,
                     "name": pin.name,
-                    "type": pin.type,
+                    "type": pin.pin_type.value,
                     "position": {"x": pin.position.x, "y": pin.position.y},
-                    "orientation": pin.orientation,
+                    "orientation": pin.rotation,
                 }
                 for pin in symbol.pins
             ],
